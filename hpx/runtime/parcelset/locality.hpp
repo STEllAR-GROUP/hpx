@@ -16,7 +16,7 @@
 
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/tti/has_type.hpp>
+#include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
 
@@ -26,7 +26,7 @@
 namespace hpx { namespace parcelset
 {
     namespace detail {
-        BOOST_TTI_HAS_TYPE(iterator_category);
+        BOOST_MPL_HAS_XXX_TRAIT_DEF(iterator_category);
     };
 
     class locality
@@ -42,7 +42,7 @@ namespace hpx { namespace parcelset
             virtual bool equal(impl_base const & rhs) const = 0;
             virtual bool less_than(impl_base const & rhs) const = 0;
             virtual bool valid() const = 0;
-            virtual connection_type get_type() const = 0;
+            virtual const char *type() const = 0;
             virtual std::ostream & print(std::ostream & os) const = 0;
             virtual void save(serialization::output_archive & ar) const = 0;
             virtual void load(serialization::input_archive & ar) = 0;
@@ -52,14 +52,14 @@ namespace hpx { namespace parcelset
             template <typename Impl>
             Impl & get()
             {
-                HPX_ASSERT(Impl::get_type() == get_type());
+                HPX_ASSERT(Impl::type() == type());
                 return static_cast<impl<Impl>*>(this)->impl_;
             }
 
             template <typename Impl>
             Impl const & get() const
             {
-                HPX_ASSERT(Impl::get_type() == get_type());
+                HPX_ASSERT(Impl::type() == type());
                 return static_cast<const impl<Impl>*>(this)->impl_;
             }
         };
@@ -73,11 +73,11 @@ namespace hpx { namespace parcelset
           , typename boost::disable_if<
                 boost::mpl::or_<
                     boost::is_same<locality, typename util::decay<Impl>::type>
-                  , detail::has_type_iterator_category<typename util::decay<Impl>::type>
+                  , detail::has_iterator_category<typename util::decay<Impl>::type>
                 >
             >::type* = 0
         )
-          : impl_(new typename util::decay<impl<Impl> >::type(std::forward<Impl>(i)))
+          : impl_(new impl<typename util::decay<Impl>::type>(std::forward<Impl>(i)))
         {}
 
         locality(locality const & other)
@@ -128,9 +128,9 @@ namespace hpx { namespace parcelset
             return util::safe_bool<locality>()(impl_ ? impl_->valid(): false);
         }
 
-        connection_type get_type() const
+        const char *type() const
         {
-            return impl_ ? impl_->get_type() : parcelset::connection_unknown;
+            return impl_ ? impl_->type() : "";
         }
 
         template <typename Impl>
@@ -202,14 +202,14 @@ namespace hpx { namespace parcelset
 
             bool equal(impl_base const & rhs) const
             {
-                if(get_type() != rhs.get_type()) return false;
+                if(type() != rhs.type()) return false;
                 return impl_ == rhs.get<Impl>();
             }
 
             bool less_than(impl_base const & rhs) const
             {
-                return get_type() < rhs.get_type() ||
-                    (get_type() == rhs.get_type() && impl_ < rhs.get<Impl>());
+                return type() < rhs.type() ||
+                    (type() == rhs.type() && impl_ < rhs.get<Impl>());
             }
 
             bool valid() const
@@ -217,9 +217,9 @@ namespace hpx { namespace parcelset
                 return !!impl_;
             }
 
-            connection_type get_type() const
+            const char *type() const
             {
-                return Impl::get_type();
+                return Impl::type();
             }
 
             std::ostream & print(std::ostream & os) const
@@ -251,6 +251,8 @@ namespace hpx { namespace parcelset
             Impl impl_;
         };
     };
+
+    typedef std::map<std::string, locality> endpoints_type;
 
     std::ostream& operator<< (std::ostream& os, endpoints_type const& endpoints);
 }}

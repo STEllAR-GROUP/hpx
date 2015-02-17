@@ -76,7 +76,7 @@ void measure_action_futures(boost::uint64_t count, bool csv)
     for (boost::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
 
-    wait_each(futures, scratcher());
+    wait_each(scratcher(), futures);
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -104,8 +104,8 @@ void measure_function_futures(boost::uint64_t count, bool csv)
 
     for (boost::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(&null_function));
-    
-    wait_each(futures, scratcher());
+
+    wait_each(scratcher(), futures);
 
     // stop the clock
     const double duration = walltime.elapsed();

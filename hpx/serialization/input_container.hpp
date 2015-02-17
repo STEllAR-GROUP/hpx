@@ -135,6 +135,8 @@ namespace hpx { namespace serialization {
 
         void load_binary_chunk(void* address, std::size_t count) // override
         {
+            HPX_ASSERT((boost::int64_t)count >= 0);
+
             if (filter_.get() || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
                 // fall back to serialization_chunk-less archive
                 this->input_container::load_binary(address, count);

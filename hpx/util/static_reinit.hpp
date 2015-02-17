@@ -17,8 +17,8 @@ namespace hpx { namespace util
     // been terminated. This is used to initialize/reinitialize all
     // singleton instances.
     HPX_API_EXPORT void reinit_register(
-        HPX_STD_FUNCTION<void()> const& construct,
-        HPX_STD_FUNCTION<void()> const& destruct);
+        util::function_nonser<void()> const& construct,
+        util::function_nonser<void()> const& destruct);
 
     // Invoke all globally registered construction functions
     HPX_API_EXPORT void reinit_construct();

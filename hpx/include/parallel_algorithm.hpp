@@ -6,7 +6,6 @@
 #if !defined(HPX_ALGORITHM_MAY_27_2014_0905PM)
 #define HPX_ALGORITHM_MAY_27_2014_0905PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/algorithm.hpp>
 
 #endif

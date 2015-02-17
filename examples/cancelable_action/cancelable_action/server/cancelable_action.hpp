@@ -15,7 +15,7 @@
 namespace examples { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    void delay(int c)
+    inline void delay(int c)
     {
         double volatile d = 0.;
         for (int i = 0; i < c; ++i)

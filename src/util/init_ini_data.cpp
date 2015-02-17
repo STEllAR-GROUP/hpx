@@ -244,7 +244,7 @@ namespace hpx { namespace util
                 // create the component registry object
                 boost::shared_ptr<components::component_registry_base>
                     registry (pf.create(s, ec));
-                if (ec) return;
+                if (ec) continue;
 
                 registry->get_component_info(ini_data, "", true);
             }
@@ -302,16 +302,21 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void load_plugin_factory(hpx::util::plugin::dll& d, util::section& ini,
+    std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+    load_plugin_factory(hpx::util::plugin::dll& d, util::section& ini,
         std::string const& curr, std::string const& name, error_code& ec)
     {
+        typedef std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+            plugin_list_type;
+
+        plugin_list_type plugin_registries;
         hpx::util::plugin::plugin_factory<plugins::plugin_registry_base>
             pf(d, "plugin");
 
         // retrieve the names of all known registries
         std::vector<std::string> names;
         pf.get_names(names, ec);      // throws on error
-        if (ec) return;
+        if (ec) return plugin_registries;
 
         std::vector<std::string> ini_data;
         if (!names.empty()) {
@@ -321,15 +326,17 @@ namespace hpx { namespace util
                 // create the plugin registry object
                 boost::shared_ptr<plugins::plugin_registry_base>
                     registry(pf.create(s, ec));
-                if (ec) return;
+                if (ec) continue;
 
                 registry->get_plugin_info(ini_data);
+                plugin_registries.push_back(registry);
             }
         }
 
         // incorporate all information from this module's
         // registry into our internal ini object
         ini.parse("<plugin registry>", ini_data, false, false);
+        return plugin_registries;
     }
 
     namespace detail
@@ -350,7 +357,8 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void init_ini_data_default(std::string const& libs, util::section& ini,
+    std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+    init_ini_data_default(std::string const& libs, util::section& ini,
         std::map<std::string, boost::filesystem::path>& basenames,
         std::map<std::string, hpx::util::plugin::dll>& modules)
     {
@@ -359,6 +367,11 @@ namespace hpx { namespace util
         typedef std::vector<std::pair<fs::path, std::string> >::iterator
             iterator_type;
 
+        typedef std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+            plugin_list_type;
+
+        plugin_list_type plugin_registries;
+
         // list of modules to load
         std::vector<std::pair<fs::path, std::string> > libdata;
         try {
@@ -366,7 +379,7 @@ namespace hpx { namespace util
             fs::path libs_path (hpx::util::create_path(libs));
 
             if (!fs::exists(libs_path))
-                return;     // given directory doesn't exist
+                return plugin_registries;     // given directory doesn't exist
 
             // retrieve/create section [hpx.components]
             if (!ini.has_section("hpx.components")) {
@@ -421,7 +434,7 @@ namespace hpx { namespace util
 
         // return if no new modules have been found
         if (libdata.empty())
-            return;
+            return plugin_registries;
 
         // make sure each node loads libraries in a different order
         std::srand(static_cast<unsigned>(std::time(0)));
@@ -436,7 +449,8 @@ namespace hpx { namespace util
             hpx::util::plugin::dll d(p.first.string(), p.second);
             d.load_library(ec);
             if (ec) {
-                LRT_(info) << "skipping (load_library failed): " << p.first.string()
+                LRT_(info)
+                    << "skipping (load_library failed): " << p.first.string()
                     << ": " << get_error_what(ec);
                 continue;
             }
@@ -445,20 +459,29 @@ namespace hpx { namespace util
             std::string curr_fullname(p.first.parent_path().string());
             load_component_factory(d, ini, curr_fullname, p.second, ec);
             if (ec) {
-                LRT_(info) << "skipping (load_component_factory failed): " << p.first.string()
+                LRT_(info)
+                    << "skipping (load_component_factory failed): "
+                    << p.first.string()
                     << ": " << get_error_what(ec);
                 ec = error_code(lightweight);   // reinit ec
             }
 
             // get the plugin factory
-            load_plugin_factory(d, ini, curr_fullname, p.second, ec);
+            plugin_list_type tmp_regs =
+                load_plugin_factory(d, ini, curr_fullname, p.second, ec);
+
+            std::copy(tmp_regs.begin(), tmp_regs.end(),
+                std::back_inserter(plugin_registries));
             if (ec) {
-                LRT_(info) << "skipping (load_plugin_factory failed): " << p.first.string()
+                LRT_(info)
+                    << "skipping (load_plugin_factory failed): "
+                    << p.first.string()
                     << ": " << get_error_what(ec);
             }
 
             // store loaded library for future use
             modules.insert(std::make_pair(p.second, std::move(d)));
         }
+        return plugin_registries;
     }
 }}

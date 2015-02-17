@@ -6,20 +6,15 @@
 #if !defined(HPX_TRAITS_SERIALIZE_AS_FUTURE_AUG_08_2014_0853PM)
 #define HPX_TRAITS_SERIALIZE_AS_FUTURE_AUG_08_2014_0853PM
 
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-
-#include <hpx/lcos/wait_all.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/fusion/include/for_each.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/arithmetic/inc.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
-#include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 namespace hpx { namespace traits
 {
@@ -82,39 +77,15 @@ namespace hpx { namespace traits
         };
     }
 
-    template <>
-    struct serialize_as_future<util::tuple<> >
-      : boost::mpl::false_
+    template <typename ...Ts>
+    struct serialize_as_future<util::tuple<Ts...> >
+      : util::detail::any_of<serialize_as_future<Ts>...>
     {
-        static void call(util::tuple<>& t) {}
+        static void call(util::tuple<Ts...>& t)
+        {
+            boost::fusion::for_each(t, detail::serialize_as_future_helper());
+        }
     };
-
-#define HPX_TRAITS_SERIALIZE_AS_FUTURE_TUPLE_ELEM(Z, N, D)                    \
-     || serialize_as_future<BOOST_PP_CAT(T, N)>::value                        \
-    /**/
-
-#define HPX_TRAITS_SERIALIZE_AS_FUTURE_TUPLE(Z, N, D)                         \
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>                            \
-    struct serialize_as_future<util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> >      \
-      : boost::mpl::bool_<false                                               \
-            BOOST_PP_REPEAT(N, HPX_TRAITS_SERIALIZE_AS_FUTURE_TUPLE_ELEM, _)  \
-        >                                                                     \
-    {                                                                         \
-        static void call(util::tuple<BOOST_PP_ENUM_PARAMS(N, T)>& t)          \
-        {                                                                     \
-            boost::fusion::for_each(t, detail::serialize_as_future_helper()); \
-        }                                                                     \
-    };                                                                        \
-    /**/
-
-    BOOST_PP_REPEAT_FROM_TO(
-        1, BOOST_PP_INC(HPX_TUPLE_LIMIT),
-        HPX_TRAITS_SERIALIZE_AS_FUTURE_TUPLE, _
-    )
-
-#undef HPX_TRAITS_SERIALIZE_AS_FUTURE_TUPLE
-#undef HPX_TRAITS_SERIALIZE_AS_FUTURE_TUPLE_ELEM
 }}
 
 #endif
-

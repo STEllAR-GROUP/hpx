@@ -158,6 +158,11 @@ if(NOT HPX_STATIC_LINKING)
   endif()
 endif()
 
+# Add static parcelport sources ...
+add_static_parcelports()
+set(hpx_HEADERS ${hpx_HEADERS} ${HPX_STATIC_PARCELPORT_PLUGINS_HEADERS})
+set(hpx_SOURCES ${hpx_SOURCES} ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES})
+
 ################################################################################
 # libhpx
 if(HPX_STATIC_LINKING)

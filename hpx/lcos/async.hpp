@@ -51,7 +51,7 @@ namespace hpx
                 HPX_ASSERT(traits::component_type_is_compatible<
                     typename Action::component_type>::call(addr));
                 return Action::execute_function(addr.address_,
-                    util::forward_as_tuple(std::forward<Ts>(vs)...));
+                    std::forward<Ts>(vs)...);
             }
         };
 
@@ -137,30 +137,30 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename ...Ts>
+    template <
+        typename Component, typename Signature, typename Derived,
+        typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
     async(BOOST_SCOPED_ENUM(launch) policy,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > const & /*act*/, naming::id_type const& gid, Ts&&... vs)
+        hpx::actions::basic_action<Component, Signature, Derived> const& /*act*/,
+        naming::id_type const& gid, Ts&&... vs)
     {
         return async<Derived>(policy, gid, std::forward<Ts>(vs)...);
     }
 
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived, typename ...Ts>
+    template <
+        typename Component, typename Signature, typename Derived,
+        typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
     async(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/ const &, naming::id_type const& gid, Ts&&... vs)
+        hpx::actions::basic_action<Component, Signature, Derived> const& /*act*/,
+        naming::id_type const& gid, Ts&&... vs)
     {
         return async<Derived>(launch::all, gid, std::forward<Ts>(vs)...);
     }

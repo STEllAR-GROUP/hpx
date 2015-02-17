@@ -1,14 +1,10 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-
-#include <iostream>
-#include <vector>
-
 #include <boost/config.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -19,7 +15,6 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/set_thread_name.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/apex.hpp>
@@ -31,12 +26,13 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
-#endif
-
-#if defined(HPX_PARCELPORT_MPI)
-#include <hpx/util/mpi_environment.hpp>
 #endif
 
 namespace hpx {
@@ -44,11 +40,11 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // There is no need to protect these global from thread concurrent access
     // as they are access during early startup only.
-    std::list<HPX_STD_FUNCTION<void()> > global_pre_startup_functions;
-    std::list<HPX_STD_FUNCTION<void()> > global_startup_functions;
+    std::list<util::function_nonser<void()> > global_pre_startup_functions;
+    std::list<util::function_nonser<void()> > global_startup_functions;
 
-    std::list<HPX_STD_FUNCTION<void()> > global_pre_shutdown_functions;
-    std::list<HPX_STD_FUNCTION<void()> > global_shutdown_functions;
+    std::list<util::function_nonser<void()> > global_pre_shutdown_functions;
+    std::list<util::function_nonser<void()> > global_shutdown_functions;
 
     ///////////////////////////////////////////////////////////////////////////
     void register_pre_startup_function(startup_function_type const& f)
@@ -122,7 +118,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            util::runtime_configuration const& rtcfg,
+            util::runtime_configuration & rtcfg,
             runtime_mode locality_mode, std::size_t num_threads,
             init_scheduler_type const& init,
             threads::policies::init_affinity_data const& init_affinity)
@@ -145,7 +141,7 @@ namespace hpx {
         thread_manager_(new hpx::threads::threadmanager_impl<
             SchedulingPolicy, NotificationPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
-        parcel_handler_(agas_client_, thread_manager_.get(),
+        parcel_handler_(rtcfg, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue,
             boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This())),
@@ -168,7 +164,7 @@ namespace hpx {
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(
             parcel_handler_, boost::uint64_t(runtime_support_.get()), boost::uint64_t(memory_.get()));
-        parcel_handler_.initialize();
+        parcel_handler_.initialize(agas_client_);
 
         applier_.initialize(boost::uint64_t(runtime_support_.get()), boost::uint64_t(memory_.get()));
 
@@ -178,25 +174,25 @@ namespace hpx {
 #endif
 
         // copy over all startup functions registered so far
-        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_pre_startup_functions)
+        BOOST_FOREACH(util::function_nonser<void()> const& f, global_pre_startup_functions)
         {
             add_pre_startup_function(f);
         }
         global_pre_startup_functions.clear();
 
-        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_startup_functions)
+        BOOST_FOREACH(util::function_nonser<void()> const& f, global_startup_functions)
         {
             add_startup_function(f);
         }
         global_startup_functions.clear();
 
-        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_pre_shutdown_functions)
+        BOOST_FOREACH(util::function_nonser<void()> const& f, global_pre_shutdown_functions)
         {
             add_pre_shutdown_function(f);
         }
         global_pre_shutdown_functions.clear();
 
-        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_shutdown_functions)
+        BOOST_FOREACH(util::function_nonser<void()> const& f, global_shutdown_functions)
         {
             add_shutdown_function(f);
         }
@@ -218,11 +214,7 @@ namespace hpx {
         io_pool_.stop();
 
         // unload libraries
-        //runtime_support_->tidy();
-
-#if defined(HPX_PARCELPORT_MPI)
-        util::mpi_environment::finalize();
-#endif
+        runtime_support_->tidy();
 
         LRT_(debug) << "~runtime_impl(finished)";
     }
@@ -232,7 +224,7 @@ namespace hpx {
     template <typename SchedulingPolicy, typename NotificationPolicy>
     threads::thread_state
     runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
-        HPX_STD_FUNCTION<runtime::hpx_main_function_type> func, int& result)
+        util::function_nonser<runtime::hpx_main_function_type> func, int& result)
     {
         LBT_(info) << "(2nd stage) runtime_impl::run_helper: launching pre_main";
 
@@ -265,7 +257,7 @@ namespace hpx {
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
-        HPX_STD_FUNCTION<hpx_main_function_type> const& func, bool blocking)
+        util::function_nonser<hpx_main_function_type> const& func, bool blocking)
     {
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
         // needs to be called to avoid problems at system startup
@@ -331,7 +323,7 @@ namespace hpx {
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(bool blocking)
     {
-        HPX_STD_FUNCTION<hpx_main_function_type> empty_main;
+        util::function_nonser<hpx_main_function_type> empty_main;
         return start(empty_main, blocking);
     }
 
@@ -401,7 +393,7 @@ namespace hpx {
         LRT_(warning) << "runtime_impl: about to stop services";
 
         // flush all parcel buffers, stop buffering parcels at this point
-        parcel_handler_.do_background_work(true);
+        //parcel_handler_.do_background_work(true);
 
         // execute all on_exit functions whenever the first thread calls this
         this->runtime::stopping();
@@ -473,7 +465,7 @@ namespace hpx {
         naming::gid_type console_id;
         if (agas_client_.get_console_locality(console_id))
         {
-            if (parcel_handler_.get_locality() != console_id) {
+            if (agas_client_.get_local_locality() != console_id) {
                 components::console_error_sink(
                     naming::id_type(console_id, naming::id_type::unmanaged), e);
             }
@@ -494,7 +486,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
-        HPX_STD_FUNCTION<hpx_main_function_type> const& func)
+        util::function_nonser<hpx_main_function_type> const& func)
     {
         // start the main thread function
         start(func);
@@ -613,28 +605,28 @@ namespace hpx {
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
-        add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f)
+        add_pre_startup_function(util::function_nonser<void()> const& f)
     {
         runtime_support_->add_pre_startup_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
-        add_startup_function(HPX_STD_FUNCTION<void()> const& f)
+        add_startup_function(util::function_nonser<void()> const& f)
     {
         runtime_support_->add_startup_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
-        add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
+        add_pre_shutdown_function(util::function_nonser<void()> const& f)
     {
         runtime_support_->add_pre_shutdown_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
-        add_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
+        add_shutdown_function(util::function_nonser<void()> const& f)
     {
         runtime_support_->add_shutdown_function(f);
     }

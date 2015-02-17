@@ -12,11 +12,12 @@
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/decay.hpp>
+
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
-#include <hpx/util/decay.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util
@@ -366,10 +367,9 @@ namespace hpx { namespace parallel { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Iter, typename R = void,
-        typename Result = R,
+    template <typename ExPolicy, typename R = void, typename Result = R,
         typename PartTag = typename parallel::traits::extract_partitioner<
-            typename hpx::util::decay<ExPolicy>::type, Iter
+            typename hpx::util::decay<ExPolicy>::type
         >::type>
     struct partitioner_with_cleanup
       : detail::partitioner_with_cleanup<

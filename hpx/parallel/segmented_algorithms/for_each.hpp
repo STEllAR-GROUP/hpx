@@ -18,16 +18,18 @@
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/remote/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
 #include <iterator>
 
+#include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_same.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // for_each_n_segmented
+    // segmented_for_each
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -42,8 +44,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef typename local_iterator_type::base_iterator_type
-                local_base_iterator_type;
             typedef detail::algorithm_result<ExPolicy> result;
 
             using boost::mpl::true_;
@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    util::remote::dispatch(sit->get_id(),
+                    util::remote::dispatch(traits::get_id(sit),
                         std::forward<Algo>(algo), policy, true_(),
                         beg, end, std::forward<F>(f));
                 }
@@ -69,7 +69,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    util::remote::dispatch(sit->get_id(),
+                    util::remote::dispatch(traits::get_id(sit),
                         std::forward<Algo>(algo), policy, true_(),
                         beg, end, std::forward<F>(f));
                 }
@@ -81,7 +81,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        util::remote::dispatch(sit->get_id(),
+                        util::remote::dispatch(traits::get_id(sit),
                             std::forward<Algo>(algo), policy, true_(),
                             beg, end, std::forward<F>(f));
                     }
@@ -92,7 +92,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    util::remote::dispatch(sit->get_id(),
+                    util::remote::dispatch(traits::get_id(sit),
                         std::forward<Algo>(algo), policy, true_(),
                         beg, end, std::forward<F>(f));
                 }
@@ -110,8 +110,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef typename local_iterator_type::base_iterator_type
-                local_base_iterator_type;
             typedef detail::algorithm_result<ExPolicy> result;
 
             typedef typename std::iterator_traits<SegIter>::iterator_category
@@ -134,7 +132,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(
-                        util::remote::dispatch_async(sit->get_id(),
+                        util::remote::dispatch_async(traits::get_id(sit),
                             std::forward<Algo>(algo), policy, forced_seq(),
                             beg, end, std::forward<F>(f))
                     );
@@ -147,7 +145,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(
-                        util::remote::dispatch_async(sit->get_id(),
+                        util::remote::dispatch_async(traits::get_id(sit),
                             std::forward<Algo>(algo), policy, forced_seq(),
                             beg, end, std::forward<F>(f))
                     );
@@ -161,7 +159,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         segments.push_back(
-                            util::remote::dispatch_async(sit->get_id(),
+                            util::remote::dispatch_async(traits::get_id(sit),
                                 std::forward<Algo>(algo), policy, forced_seq(),
                                 beg, end, std::forward<F>(f))
                         );
@@ -174,14 +172,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(
-                        util::remote::dispatch_async(sit->get_id(),
+                        util::remote::dispatch_async(traits::get_id(sit),
                             std::forward<Algo>(algo), policy, forced_seq(),
                             beg, end, std::forward<F>(f))
                     );
                 }
             }
 
-            return result::get(future<void>(when_all(segments)));
+            return result::get(
+                lcos::local::dataflow(
+                    [](std::vector<hpx::future<void> > && r)
+                    {
+                        // handle any remote exceptions, will throw on error
+                        std::list<boost::exception_ptr> errors;
+                        parallel::util::detail::handle_remote_exceptions<
+                            ExPolicy
+                        >::call(r, errors);
+                    },
+                    std::move(segments)));
         }
 
         ///////////////////////////////////////////////////////////////////////

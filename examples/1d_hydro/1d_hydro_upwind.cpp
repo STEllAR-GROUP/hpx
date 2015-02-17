@@ -267,7 +267,7 @@ double timestep_size(boost::uint64_t timestep)
 
   double dt_cfl = 1000.0;
 
-   wait_each(grid.time_array.at(timestep).fluid_future,
+   wait_each(
       hpx::util::unwrapped([&](cell const& this_cell)
       {
       // look at all of the cells at a timestep, then pick the smallest
@@ -283,7 +283,8 @@ double timestep_size(boost::uint64_t timestep)
         }
       if (dt_cfl_here < dt_cfl)
         dt_cfl = dt_cfl_here;
-     }));
+     }),
+     grid.time_array.at(timestep).fluid_future);
 
   // initialize dt_cfl to some arbitrary high value
 

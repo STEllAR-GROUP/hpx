@@ -65,7 +65,7 @@ namespace startup_shutdown
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func, bool& pre_startup)
+    bool get_startup(hpx::util::function_nonser<void()>& startup_func, bool& pre_startup)
     {
         startup_func = startup;     // return our startup-function
         pre_startup = true;         // run 'startup' as pre-startup function

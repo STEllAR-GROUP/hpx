@@ -206,11 +206,11 @@ struct object_semaphore
         }
     } // }}}
 
-    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, signal, signal_action);
-    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, get, get_action);
-    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, abort_pending,
+    HPX_DEFINE_COMPONENT_ACTION(object_semaphore, signal, signal_action);
+    HPX_DEFINE_COMPONENT_ACTION(object_semaphore, get, get_action);
+    HPX_DEFINE_COMPONENT_ACTION(object_semaphore, abort_pending,
         abort_pending_action);
-    HPX_DEFINE_COMPONENT_ACTION_TPL(object_semaphore, wait, wait_action);
+    HPX_DEFINE_COMPONENT_ACTION(object_semaphore, wait, wait_action);
 
   private:
     value_queue_type value_queue_;

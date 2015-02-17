@@ -209,7 +209,7 @@ namespace hpx { namespace threads
         ///                 thread is not known to the thread-manager the return
         ///                 value will be false.
         bool add_thread_exit_callback(thread_id_type const& id,
-            HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws);
+            util::function_nonser<void()> const& f, error_code& ec = throws);
 
         ///
         void free_thread_exit_callbacks(thread_id_type const& id,
@@ -493,6 +493,10 @@ namespace hpx { namespace threads
         boost::int64_t get_thread_phase_duration(
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_thread_duration(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        boost::int64_t get_thread_phase_overhead(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        boost::int64_t get_thread_overhead(
             std::size_t num = std::size_t(-1), bool reset = false);
 #endif
 #endif

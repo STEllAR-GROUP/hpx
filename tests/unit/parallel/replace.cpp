@@ -24,7 +24,7 @@ void test_replace(ExPolicy const& policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
     std::copy(boost::begin(c), boost::end(c), boost::begin(d));
 
-    std::size_t idx = std::rand() % c.size();
+    std::size_t idx = std::rand() % c.size(); //-V104
 
     hpx::parallel::replace(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
@@ -53,7 +53,7 @@ void test_replace_async(ExPolicy const& p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
     std::copy(boost::begin(c), boost::end(c), boost::begin(d));
 
-    std::size_t idx = std::rand() % c.size();
+    std::size_t idx = std::rand() % c.size(); //-V104
 
     hpx::future<void> f =
         hpx::parallel::replace(p,

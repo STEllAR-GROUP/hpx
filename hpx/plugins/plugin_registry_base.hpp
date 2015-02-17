@@ -16,13 +16,13 @@
 namespace hpx { namespace plugins
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a plugin_registry_base has to be used as a base class for all 
+    /// The \a plugin_registry_base has to be used as a base class for all
     /// plugin registries.
     struct HPX_EXPORT plugin_registry_base
     {
         virtual ~plugin_registry_base() {}
 
-        /// Return the configuration information for any plugin implemented by 
+        /// Return the configuration information for any plugin implemented by
         /// this module
         ///
         /// \param fillini  [in, out] The module is expected to fill this vector
@@ -34,6 +34,10 @@ namespace hpx { namespace plugins
         ///         successfully initialized with the registry data of all
         ///         implemented in this module.
         virtual bool get_plugin_info(std::vector<std::string>& fillini) = 0;
+
+        virtual void init(int *argc, char ***argv, util::command_line_handling&)
+        {
+        }
     };
 }}
 

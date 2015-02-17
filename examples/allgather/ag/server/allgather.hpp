@@ -38,7 +38,7 @@ namespace ag { namespace server
 
         HPX_DEFINE_COMPONENT_ACTION(allgather, init, init_action);
         HPX_DEFINE_COMPONENT_ACTION(allgather, compute, compute_action);
-        HPX_DEFINE_COMPONENT_CONST_ACTION(allgather, get_item, get_item_action);
+        HPX_DEFINE_COMPONENT_ACTION(allgather, get_item, get_item_action);
         HPX_DEFINE_COMPONENT_ACTION(allgather, print, print_action);
 
     private:

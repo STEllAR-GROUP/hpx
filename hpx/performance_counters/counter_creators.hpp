@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/util/function.hpp>
 
 #include <boost/cstdint.hpp>
 
@@ -22,8 +23,7 @@ namespace hpx { namespace performance_counters
     /// with the counter types. It will pass the \a counter_info and the
     /// \a error_code to the supplied function.
     HPX_API_EXPORT bool default_counter_discoverer(counter_info const&,
-        HPX_STD_FUNCTION<discover_counter_func> const&, discover_counters_mode,
-        error_code&);
+        discover_counter_func const&, discover_counters_mode, error_code&);
 
     /// Default discoverer function for performance counters; to be registered
     /// with the counter types. It is suitable to be used for all counters
@@ -32,8 +32,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>(locality#<locality_id>/total)/<instancename>
     ///
     HPX_API_EXPORT bool locality_counter_discoverer(counter_info const&,
-        HPX_STD_FUNCTION<discover_counter_func> const&, discover_counters_mode,
-        error_code&);
+        discover_counter_func const&, discover_counters_mode, error_code&);
 
     /// Default discoverer function for AGAS performance counters; to be
     /// registered with the counter types. It is suitable to be used for all
@@ -42,8 +41,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>{locality#0/total}/<instancename>
     ///
     HPX_API_EXPORT bool locality0_counter_discoverer(counter_info const&,
-        HPX_STD_FUNCTION<discover_counter_func> const&, discover_counters_mode,
-        error_code&);
+        discover_counter_func const&, discover_counters_mode, error_code&);
 
     /// Default discoverer function for performance counters; to be registered
     /// with the counter types. It is suitable to be used for all counters
@@ -52,8 +50,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>(locality#<locality_id>/thread#<threadnum>)/<instancename>
     ///
     HPX_API_EXPORT bool locality_thread_counter_discoverer(counter_info const&,
-        HPX_STD_FUNCTION<discover_counter_func> const&,
-        discover_counters_mode, error_code&);
+        discover_counter_func const&, discover_counters_mode, error_code&);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Creation function for raw counters. The passed function is encapsulating
@@ -63,7 +60,7 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>(locality#<locality_id>/total)/<instancename>
     ///
     HPX_API_EXPORT naming::gid_type locality_raw_counter_creator(
-        counter_info const&, HPX_STD_FUNCTION<boost::int64_t(bool)> const&,
+        counter_info const&, hpx::util::function_nonser<boost::int64_t(bool)> const&,
         error_code&);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -83,8 +80,7 @@ namespace hpx { namespace performance_counters
     ///   /agas(<objectinstance>/total)/<instancename>
     ///
     HPX_API_EXPORT bool agas_counter_discoverer(counter_info const&,
-        HPX_STD_FUNCTION<discover_counter_func> const&, discover_counters_mode,
-        error_code&);
+        discover_counter_func const&, discover_counters_mode, error_code&);
 }}
 
 #endif

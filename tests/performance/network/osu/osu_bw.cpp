@@ -10,9 +10,11 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/serialize_buffer.hpp>
+#include <hpx/parallel/algorithm.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/range/irange.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 char* align_buffer (char* ptr, unsigned long align_size)
@@ -56,6 +58,8 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
         loop = LOOP_LARGE;
         skip = SKIP_LARGE;
     }
+    
+    typedef hpx::util::serialize_buffer<char> buffer_type;
 
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
@@ -67,25 +71,26 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
 
     hpx::util::high_resolution_timer t;
 
-    std::vector<hpx::future<void> > lazy_results;
-    lazy_results.reserve(window_size);
     isend_action send;
     for (std::size_t i = 0; i != loop + skip; ++i) {
         // do not measure warm up phase
         if (i == skip)
             t.restart();
 
-        for (std::size_t j = 0; j < window_size; ++j)
-        {
-            typedef hpx::util::serialize_buffer<char> buffer_type;
+        using hpx::parallel::for_each;
+        using hpx::parallel::par;
 
-            // Note: The original benchmark uses MPI_Isend which does not
-            //       create a copy of the passed buffer.
-            lazy_results.push_back(hpx::async(send, dest,
-                buffer_type(send_buffer, size, buffer_type::reference)));
-        }
-        hpx::wait_all(lazy_results);
-        lazy_results.clear();
+        std::size_t const start = 0;
+
+        // Fill the original matrix, set transpose to known garbage value.
+        auto range = boost::irange(start, window_size);
+        for_each(par, boost::begin(range), boost::end(range),
+            [&](boost::uint64_t j)
+            {
+                send(dest,
+                    buffer_type(send_buffer, size, buffer_type::reference));
+            }
+        );
     }
 
     double elapsed = t.elapsed();

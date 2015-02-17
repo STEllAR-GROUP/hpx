@@ -17,7 +17,6 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/util/locking_helpers.hpp>
 
 //Boost includes
 #include <boost/program_options.hpp>

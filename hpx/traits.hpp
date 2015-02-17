@@ -109,17 +109,20 @@ namespace hpx { namespace traits
     template <typename Future, typename Enable = void>
     struct future_traits;
 
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Range, typename Enable = void>
     struct is_future_range;
 
-    ///////////////////////////////////////////////////////////////////////////
+    template <typename Range, typename Enable = void>
+    struct future_range_traits;
+
     template <typename Tuple, typename Enable = void>
     struct is_future_tuple;
 
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename Enable = void>
     struct serialize_as_future;
+
+    template <typename Future, typename Enable = void>
+    struct acquire_future;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Plugin, typename Enable = void>
@@ -137,6 +140,9 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Enable = void>
     struct segmented_iterator_traits;
+
+    template <typename Iterator, typename Enable = void>
+    struct segmented_local_iterator_traits;
 }}
 
 #endif

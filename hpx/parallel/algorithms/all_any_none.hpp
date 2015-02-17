@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return detail::algorithm_result<ExPolicy, bool>::get(true);
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, FwdIter, bool>::call(
+                return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
                     [op, tok](FwdIter part_begin, std::size_t part_count) mutable -> bool
                     {
@@ -161,8 +161,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::none_of().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return detail::algorithm_result<ExPolicy, bool>::get(false);
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, FwdIter, bool>::call(
+                return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
                     [op, tok](FwdIter part_begin, std::size_t part_count) mutable -> bool
                     {
@@ -297,8 +297,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::any_of().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -328,7 +328,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return detail::algorithm_result<ExPolicy, bool>::get(true);
 
                 util::cancellation_token<> tok;
-                return util::partitioner<ExPolicy, FwdIter, bool>::call(
+                return util::partitioner<ExPolicy, bool>::call(
                     policy, first, std::distance(first, last),
                     [op, tok](FwdIter part_begin, std::size_t part_count) mutable -> bool
                     {
@@ -433,8 +433,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::all_of().call(
-            std::forward<ExPolicy>(policy),
-            first, last, std::forward<F>(f), is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, std::forward<F>(f));
     }
 }}}
 

@@ -18,6 +18,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/current_function.hpp>
@@ -422,7 +423,7 @@ namespace hpx
         ///
         /// \param e    The parameter \p e holds the hpx::error code the new
         ///             exception should encapsulate.
-        explicit exception(error e)
+        explicit exception(error e = success)
           : boost::system::system_error(make_error_code(e, plain))
         {
             HPX_ASSERT(e >= success && e < last_error);
@@ -1575,6 +1576,13 @@ namespace hpx
     {
         hpx::detail::assertion_failed_msg(msg, expr, function, file, line);
     }
+
+    // For testing purposes we sometime expect to see exceptions, allow those
+    // to go through without attaching a debugger.
+    //
+    // This should be used carefully as it disables the possible attaching of
+    // a debugger for all exceptions, not only the expected ones.
+    HPX_EXPORT bool expect_exception(bool flag = true);
     // \endcond
 }
 

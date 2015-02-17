@@ -17,6 +17,7 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 
 #include <boost/variant.hpp>
@@ -106,6 +107,12 @@ struct HPX_EXPORT response
       , error status_ = success
         );
 
+    response(
+        namespace_action_code type_
+      , parcelset::endpoints_type const& endpoints_
+      , error status_ = success
+        );
+
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     response(
@@ -126,6 +133,10 @@ struct HPX_EXPORT response
         ) const;
 
     std::map<naming::gid_type, parcelset::endpoints_type> get_resolved_localities(
+        error_code& ec = throws
+        ) const;
+
+    parcelset::endpoints_type get_endpoints(
         error_code& ec = throws
         ) const;
 
@@ -203,7 +214,7 @@ struct HPX_EXPORT response
 
     HPX_SERIALIZATION_SPLIT_MEMBER()
 
-    namespace_action_code mc;
+    namespace_action_code mc; //-V707
     error status;
 
     // FIXME: std::unique_ptr doesn't seem to work with incomplete types
@@ -344,6 +355,17 @@ struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>, 
         )
     {
         return rep.get_resolved_localities();
+    }
+};
+
+template <>
+struct get_remote_result<parcelset::endpoints_type, agas::response>
+{
+    static parcelset::endpoints_type call(
+        agas::response const& rep
+        )
+    {
+        return rep.get_endpoints();
     }
 };
 

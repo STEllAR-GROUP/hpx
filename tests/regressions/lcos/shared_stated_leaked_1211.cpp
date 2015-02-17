@@ -31,7 +31,7 @@ struct test_server : hpx::components::simple_component_base<test_server>
         return 42;
     }
 
-    HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(test_server, test, test_action);
+    HPX_DEFINE_COMPONENT_DIRECT_ACTION(test_server, test, test_action);
 };
 
 bool test_server::destructor_called = false;

@@ -58,12 +58,12 @@ namespace hpx { namespace lcos { namespace local
             {
                 HPX_ITT_SYNC_CANCEL(this);
                 HPX_THROWS_IF(ec, deadlock,
-                    "mutex::unlock",
+                    description,
                     "The calling thread already owns the mutex");
                 return;
             }
 
-            if (owner_id_ != threads::invalid_thread_id_repr)
+            while (owner_id_ != threads::invalid_thread_id_repr)
             {
                 cond_.wait(l, ec);
                 if (ec) { HPX_ITT_SYNC_CANCEL(this); return; }
@@ -86,13 +86,13 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_PREPARE(this);
             mutex_type::scoped_lock l(mtx_);
 
-            threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if (owner_id_ != threads::invalid_thread_id_repr)
             {
                 HPX_ITT_SYNC_CANCEL(this);
                 return false;
             }
 
+            threads::thread_id_repr_type self_id = threads::get_self_id().get();
             util::register_lock(this);
             HPX_ITT_SYNC_ACQUIRED(this);
             owner_id_ = self_id;
@@ -120,6 +120,12 @@ namespace hpx { namespace lcos { namespace local
                 if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
 
                 if (reason == threads::wait_signaled) //-V110
+                {
+                    HPX_ITT_SYNC_CANCEL(this);
+                    return false;
+                }
+
+                if (owner_id_ != threads::invalid_thread_id_repr) //-V110
                 {
                     HPX_ITT_SYNC_CANCEL(this);
                     return false;
@@ -160,6 +166,7 @@ namespace hpx { namespace lcos { namespace local
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if (HPX_UNLIKELY(owner_id_ != self_id))
             {
+                util::unregister_lock(this);
                 HPX_THROWS_IF(ec, lock_error,
                     "mutex::unlock",
                     "The calling thread does not own the mutex");

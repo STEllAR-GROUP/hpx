@@ -7,10 +7,12 @@
 #if !defined(HPX_UTIL_DATE_TIME_CHRONO_APR_10_2012_0449PM)
 #define HPX_UTIL_DATE_TIME_CHRONO_APR_10_2012_0449PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <boost/chrono/chrono.hpp>
+#include <boost/date_time/posix_time/conversion.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/thread/thread_time.hpp>
 
 #if defined(HPX_WITH_CXX11_CHRONO)
 #include <chrono>
@@ -155,7 +157,7 @@ namespace hpx { namespace util
             boost::chrono::nanoseconds rel_time(
                 std::chrono::duration_cast<std::chrono::nanoseconds>(
                     std_rel_time).count());
-            
+
             _rel_time = boost::chrono::duration_cast<value_type>(rel_time);
             if (_rel_time < rel_time)
                 ++_rel_time;

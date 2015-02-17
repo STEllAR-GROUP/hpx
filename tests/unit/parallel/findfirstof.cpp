@@ -25,7 +25,7 @@ void test_find_first_of(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand() + 19);
     std::size_t h[] = {1, 7, 18, 3};
-    c[find_first_of_pos] = h[random_sub_seq_pos];
+    c[find_first_of_pos] = h[random_sub_seq_pos]; //-V108
 
     iterator index = hpx::parallel::find_first_of(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)),
@@ -48,7 +48,7 @@ void test_find_first_of_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand() + 19);
     std::size_t h[] = {1, 7, 18, 3};
-    c[find_first_of_pos] = h[random_sub_seq_pos];
+    c[find_first_of_pos] = h[random_sub_seq_pos]; //-V108
 
     hpx::future<iterator> f =
         hpx::parallel::find_first_of(p,

@@ -78,19 +78,15 @@ namespace hpx { namespace parcelset {
         typedef BufferType buffer_type;
         typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
 
-        virtual boost::shared_ptr<parcel_buffer_type> get_buffer(
+        virtual parcel_buffer_type & get_buffer(
             parcel const & p = parcel(), std::size_t arg_size = 0)
         {
-            if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
-            {
-                buffer_ = boost::make_shared<parcel_buffer_type>();
-                buffer_->data_.reserve(arg_size);
-            }
+            buffer_.data_.reserve(arg_size);
             return buffer_;
         }
 
         /// buffer for data
-        boost::shared_ptr<parcel_buffer_type> buffer_;
+        parcel_buffer_type buffer_;
     };
 }}
 

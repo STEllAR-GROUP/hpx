@@ -181,7 +181,7 @@ namespace hpx { namespace components { namespace detail
             alloc_count_ += count;
 #endif
 
-            value_type* p = static_cast<value_type*>(first_free_->address());
+            value_type* p = static_cast<value_type*>(first_free_->address()); //-V707
             HPX_ASSERT(p != NULL);
 
             first_free_ += count;
@@ -312,7 +312,7 @@ namespace hpx { namespace components { namespace detail
         }
 
     protected:
-        bool test_release(scoped_lock& /*lk*/)
+        bool test_release(scoped_lock& lk)
         {
             if (pool_ == NULL || free_size_ < size_ || first_free_ < pool_+size_)
                 return false;
@@ -323,6 +323,7 @@ namespace hpx { namespace components { namespace detail
                 naming::gid_type base_gid = base_gid_;
                 base_gid_ = naming::invalid_gid;
 
+                util::scoped_unlock<scoped_lock> ull(lk);
                 applier::unbind_range_local(base_gid, step_);
             }
 
@@ -344,7 +345,7 @@ namespace hpx { namespace components { namespace detail
             HPX_ASSERT(size_ == 0);
             HPX_ASSERT(first_free_ == NULL);
 
-            std::size_t s = step_ * heap_size; //-V104
+            std::size_t s = step_ * heap_size; //-V104 //-V707
             pool_ = static_cast<storage_type*>(Allocator::alloc(s));
             if (NULL == pool_)
                 return false;

@@ -65,16 +65,15 @@ namespace hpx { namespace agas
           , subtype_gid_gva_prefix          = 0x2
           , subtype_gid                     = 0x3
           , subtype_locality_count          = 0x4
-          , subtype_locality                = 0x5
-          , subtype_ctype                   = 0x6
-          , subtype_name_prefix             = 0x7
-          , subtype_name_gid                = 0x8
-          , subtype_name                    = 0x9
-          , subtype_iterate_names_function  = 0xa
-          , subtype_iterate_types_function  = 0xb
-          , subtype_void                    = 0xc
-          , subtype_parcel                  = 0xd
-          , subtype_name_evt_id             = 0xe
+          , subtype_ctype                   = 0x5
+          , subtype_name_prefix             = 0x6
+          , subtype_name_gid                = 0x7
+          , subtype_name                    = 0x8
+          , subtype_iterate_names_function  = 0x9
+          , subtype_iterate_types_function  = 0xa
+          , subtype_void                    = 0xb
+          , subtype_parcel                  = 0xc
+          , subtype_name_evt_id             = 0xd
           // update HPX_AGAS_REQUEST_SUBTYPES above if you add more entries
         };
 
@@ -106,6 +105,8 @@ namespace hpx { namespace agas
             // 0x3
             // primary_ns_resolve_gid
             // primary_ns_change_credit_one
+            // primary_ns_free
+            // primary_ns_resolve_locality
           , util::tuple<
                 naming::gid_type // gid
             >
@@ -118,30 +119,24 @@ namespace hpx { namespace agas
               , naming::gid_type          // suggested prefix
             >
             // 0x5
-            // primary_ns_free
-            // primary_ns_resolve_locality
-          , util::tuple<
-                parcelset::endpoints_type // locality
-            >
-            // 0x6
             // component_ns_resolve_id
             // component_ns_get_component_type
           , util::tuple<
                 components::component_type // ctype
             >
-            // 0x7
+            // 0x6
             // component_ns_bind_prefix
           , util::tuple<
                 std::string     // name
               , boost::uint32_t // prefix
             >
-            // 0x8
+            // 0x7
             // symbol_ns_bind
           , util::tuple<
                 std::string      // name
               , naming::gid_type // gid
             >
-            // 0x9
+            // 0x8
             // component_ns_bind_name
             // component_ns_unbind_name
             // symbol_ns_resolve
@@ -152,27 +147,27 @@ namespace hpx { namespace agas
           , util::tuple<
                 std::string // name
             >
-            // 0xa
+            // 0x9
             // symbol_ns_iterate_names
           , util::tuple<
                 iterate_names_function_type // f
             >
-            // 0xb
+            // 0xa
             // component_ns_iterate_types
           , util::tuple<
                 iterate_types_function_type // f
             >
-            // 0xc
+            // 0xb
             // primary_ns_localities
             // primary_ns_resolved_localities
           , util::tuple<
             >
-            // 0xd
+            // 0xc
             // primary_ns_route
           , util::tuple<
                 parcelset::parcel
             >
-            // 0xe
+            // 0xd
             // symbol_ns_on_event
           , util::tuple<
                 std::string
@@ -302,16 +297,6 @@ namespace hpx { namespace agas
         )
       : mc(type_)
       , data(new request_data(util::make_tuple(endpoints_, count_, num_threads_, prefix_)))
-    {
-        // TODO: verification of namespace_action_code
-    }
-
-    request::request(
-        namespace_action_code type_
-      , parcelset::endpoints_type const & endpoints_
-        )
-      : mc(type_)
-      , data(new request_data(util::make_tuple(endpoints_)))
     {
         // TODO: verification of namespace_action_code
     }
@@ -560,9 +545,6 @@ namespace hpx { namespace agas
         {
             case request_data::subtype_locality_count:
                 return data->get_data<request_data::subtype_locality_count, 0>(ec);
-
-            case request_data::subtype_locality:
-                return data->get_data<request_data::subtype_locality, 0>(ec);
 
             default: {
                 HPX_THROWS_IF(ec, bad_parameter,

@@ -76,7 +76,8 @@ namespace hpx { namespace plugins { namespace parcel
         stopped_(false)
     {}
 
-    void coalescing_message_handler::put_parcel(parcelset::locality const & dest, parcelset::parcel& p,
+    void coalescing_message_handler::put_parcel(
+        parcelset::locality const & dest, parcelset::parcel& p,
         write_handler_type const& f)
     {
         mutex_type::scoped_lock l(mtx_);
@@ -93,10 +94,12 @@ namespace hpx { namespace plugins { namespace parcel
 
         switch(s) {
         case detail::message_buffer::first_message:
+            l.unlock();
             timer_.start(false);        // start deadline timer to flush buffer
             break;
 
         case detail::message_buffer::normal:
+            l.unlock();
             timer_.restart(false);      // restart timer
             break;
 
@@ -123,22 +126,23 @@ namespace hpx { namespace plugins { namespace parcel
         return false;
     }
 
-    void coalescing_message_handler::flush(bool stop_buffering)
+    bool coalescing_message_handler::flush(bool stop_buffering)
     {
         mutex_type::scoped_lock l(mtx_);
-        flush(l, stop_buffering);
+        return flush(l, stop_buffering);
     }
 
-    void coalescing_message_handler::flush(mutex_type::scoped_lock& l,
+    bool coalescing_message_handler::flush(mutex_type::scoped_lock& l,
         bool stop_buffering)
     {
         if (!stopped_ && stop_buffering) {
             stopped_ = true;
+            l.unlock();
             timer_.stop();              // interrupt timer
         }
 
         if (buffer_.empty())
-            return;
+            return false;
 
         detail::message_buffer buff (buffer_.capacity());
         std::swap(buff, buffer_);
@@ -147,6 +151,8 @@ namespace hpx { namespace plugins { namespace parcel
 
         HPX_ASSERT(NULL != pp_);
         buff(pp_);                   // 'invoke' the buffer
+
+        return true;
     }
 }}}
 

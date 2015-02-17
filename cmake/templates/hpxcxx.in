@@ -1,0 +1,142 @@
+#! /usr/bin/env python
+#
+# Copyright (c) 2014 Steven R. Brandt
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+import sys
+import os
+import re
+
+app = None
+application = False
+component = False
+minusc = False
+output = None
+args = ["@CMAKE_CXX_COMPILER@"]
+libs = []
+
+def remove_suffix(nm):
+    if nm.startswith("lib"):
+        nm = nm[3:-1]
+    n = nm.rfind('.')
+    if n > 0:
+        return nm[0:n]
+    else:
+        return nm
+
+# Deduce the path to HPX's pkgconfig.
+pkgconfpath = []
+if "HPX_LOCATION" in os.environ:
+    pkgconfpath += [
+        os.path.join(os.environ["HPX_LOCATION"],"lib","pkgconfig")]
+pkgconfpath += [
+    os.path.join("@HPX_CONF_PREFIX@","lib","pkgconfig"),     # install directory
+    os.path.join(os.path.dirname(sys.argv[0]),"..","lib","pkgconfig"),
+    os.path.join("opt","hpx","lib","pkgconfig"),
+    os.path.join("usr","bin","hpx","lib","pkgconfig"),
+    os.path.join("usr","local","bin","hpx","lib","pkgconfig"),
+    os.path.join(os.environ["HOME"],"install","hpx","lib","pkgconfig"),
+    os.path.join(os.environ["HOME"],"hpx","lib","pkgconfig")
+    ]
+
+pkgconf = None
+for path in pkgconfpath:
+    if os.path.exists(path):
+        pkgconf = path
+        break
+
+def usage():
+    print >> sys.stderr,"""
+Usage: hpxcxx --comp=ComponentName flags files
+Usage: hpxcxx --exe=ApplicationName flags files
+Usage: hpxcxx -c flags files
+
+The hpxcxx command requires that you build either
+a component, an application, or that you specify
+the -c flag. If you are building against a debug
+build, you need to specify -g. All other flags
+are passed through to the underlying C++ compiler.
+"""
+    sys.exit(2)
+
+if pkgconf == None:
+    print >> sys.stderr,'Cannot locate HPX'
+    usage()
+
+pkg = 'PKG_CONFIG_PATH'
+if pkg in os.environ:
+    os.environ[pkg] += ":" + pkgconf
+else:
+    os.environ[pkg] = pkgconf
+
+pkgconf_suffix = ''
+i = 1
+while i < len(sys.argv):
+
+    # Need to parse libraries to go after the
+    # pkg-config argument
+    if sys.argv[i] == '-l':
+        libs += [sys.argv[i],sys.argv[i+1]]
+        i += 1
+    elif sys.argv[i].startswith('-l'):
+        libs += [sys.argv[i]]
+
+    elif sys.argv[i].startswith('--exe='):
+        output=sys.argv[i][6:]
+        app = output
+        #args += ['-o',app+'.exe']
+        application = True
+    elif sys.argv[i].startswith('--comp='):
+        output='lib'+sys.argv[i][7:]+'.so'
+        app = output
+        #args += ['-o','lib'+app+'.so']
+        component = True
+
+    # Need to determine if this is an application,
+    # and if so what it's name is
+    elif sys.argv[i] == '-o':
+        i += 1
+        output = sys.argv[i]
+    elif sys.argv[i].startswith('-o'):
+        output = sys.argv[i][2:]
+    elif sys.argv[i] == '-c':
+        minusc = True
+        pass
+    elif sys.argv[i].startswith('-g'):
+        pkgconf_suffix = '_debug'
+        args += [sys.argv[i]]
+    else:
+        args += [sys.argv[i]]
+
+    i += 1
+
+if application:
+    args += ["$(pkg-config --cflags --libs hpx_application" + pkgconf_suffix + ")"]
+elif component:
+    args += ["`pkg-config --cflags --libs hpx_component" + pkgconf_suffix + "`"]
+else:
+    args += ["`pkg-config --cflags hpx_application" + pkgconf_suffix + "`"]
+
+if not component and not application and not minusc:
+    usage()
+
+if output != None:
+    args = args[0:1]+['-o',output]+args[1:]
+
+args += libs
+
+if application:
+    if app != None:
+        args += ['-DHPX_APPLICATION_NAME='+app]
+    else:
+        args += ['-DHPX_APPLICATION_NAME=hpx_aout']
+elif component:
+    args += ['-DHPX_COMPONENT_NAME='+app]
+else:
+    args += ['-c']
+
+cmd = ' '.join(args)
+print pkg+'='+pkgconf
+print cmd
+os.system(cmd)

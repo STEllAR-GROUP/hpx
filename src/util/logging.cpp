@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#if !defined(HPX_NO_LOGGING)
+#if defined(HPX_WITH_LOGGING)
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -1085,9 +1085,15 @@ namespace hpx { namespace util { namespace detail
     }
 }}}
 
-#else  // HPX_NO_LOGGING
+#else  // HPX_WITH_LOGGING
 
+#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/init_logging.hpp>
+
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -1111,12 +1117,12 @@ namespace hpx { namespace util { namespace detail
             ini.get_entry("hpx.logging.application.level", "0") != "0")
         {
             std::cerr << "hpx::init_logging: warning: logging is requested even "
-                         "if it has has been disabled at compile time. If you "
+                         "while it was disabled at compile time. If you "
                          "need logging to be functional, please reconfigure and "
-                         "rebuild HPX with HPX_NO_LOGGING set to OFF."
-                      << endl;
+                         "rebuild HPX with HPX_WITH_LOGGING set to ON."
+                      << std::endl;
         }
     }
 }}}
 
-#endif // HPX_NO_LOGGING
+#endif // HPX_WITH_LOGGING

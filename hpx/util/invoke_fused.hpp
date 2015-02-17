@@ -63,7 +63,7 @@ namespace hpx { namespace util
         template <typename R, std::size_t ...Is, typename F, typename Tuple>
         BOOST_FORCEINLINE
         R
-        invoke_fused_impl(detail::pack_c<std::size_t, Is...>,
+        invoke_fused_impl(detail::pack_c<std::size_t, Is...>, //-V659
             F && f, Tuple&& args)
         {
             return invoke_r<R>(
@@ -84,7 +84,7 @@ namespace hpx { namespace util
     template <typename R, typename F, typename ...Ts>
     BOOST_FORCEINLINE
     R
-    invoke_fused_r(F && f, util::tuple<Ts...>&& args)
+    invoke_fused_r(F && f, util::tuple<Ts...>&& args) //-V659
     {
         return detail::invoke_fused_impl<R>(
             typename detail::make_index_pack<sizeof...(Ts)>::type(),
@@ -109,7 +109,7 @@ namespace hpx { namespace util
     template <typename F, typename ...Ts>
     BOOST_FORCEINLINE
     typename invoke_result_of<F(Ts...)>::type
-    invoke_fused(F && f, util::tuple<Ts...>&& args)
+    invoke_fused(F && f, util::tuple<Ts...>&& args) //-V659
     {
         typedef typename invoke_result_of<F(Ts...)>::type result_type;
 

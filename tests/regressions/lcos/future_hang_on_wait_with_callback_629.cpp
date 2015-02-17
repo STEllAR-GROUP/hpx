@@ -115,8 +115,9 @@ double null_tree(
 
     null_function(seed, delay_iterations);
 
-    hpx::lcos::wait_each(futures, hpx::util::unwrapped(
-        [&] (double r) { d += r; }));
+    hpx::lcos::wait_each(
+        hpx::util::unwrapped([&] (double r) { d += r; }),
+        futures);
 
     return d;
 }

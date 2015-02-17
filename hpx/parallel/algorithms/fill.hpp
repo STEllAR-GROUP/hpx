@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, InIter first, InIter last, 
+            sequential(ExPolicy const&, InIter first, InIter last,
                 T const& val)
             {
                 std::fill(first, last, val);
@@ -59,14 +59,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 if(first == last)
                     return detail::algorithm_result<ExPolicy>::get();
-                
+
                 return hpx::util::void_guard<result_type>(),
                     for_each_n<FwdIter>().call(
-                        policy, first, std::distance(first, last),
-                        [val](type& v){
+                        policy, boost::mpl::false_(),
+                        first, std::distance(first, last),
+                        [val](type& v) {
                             v = val;
-                        },
-                        boost::mpl::false_());
+                        });
             }
         };
         /// \endcond
@@ -128,8 +128,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
         return detail::fill().call(
-            std::forward<ExPolicy>(policy),
-            first, last, value, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, value);
     }
     ///////////////////////////////////////////////////////////////////////////
     // fill_n
@@ -145,7 +145,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename T>
             static OutIter
-            sequential(ExPolicy const&, OutIter first, std::size_t count, 
+            sequential(ExPolicy const&, OutIter first, std::size_t count,
                 T const& val)
             {
                 return std::fill_n(first, count, val);
@@ -157,14 +157,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 T const& val)
             {
                 typedef typename std::iterator_traits<OutIter>::value_type type;
-                
+
                 return
                     for_each_n<OutIter>().call(
-                        policy, first, count,
+                        policy, boost::mpl::false_(), first, count,
                         [val](type& v) {
                             v = val;
-                        },
-                        boost::mpl::false_());
+                        });
             }
         };
         /// \endcond
@@ -244,8 +243,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::fill_n<OutIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, std::size_t(count), value, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, std::size_t(count), value);
     }
 }}}
 

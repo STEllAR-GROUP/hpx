@@ -8,7 +8,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/find_prefix.hpp>
 
@@ -17,8 +16,13 @@
 #include <boost/format.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+#include <sstream>
+
 #if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
+#endif
+#if defined(HPX_PARCELPORT_MPI)
+#include <mpi.h>
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,6 +58,28 @@ namespace hpx
         return HPX_VERSION_TAG;
     }
 
+#if defined(HPX_PARCELPORT_MPI)
+    std::string mpi_version()
+    {
+        std::ostringstream strm;
+
+        // add type and library version
+#if defined(OPEN_MPI)
+        strm << "OpenMPI V" << OMPI_MAJOR_VERSION << "."
+             << OMPI_MINOR_VERSION << "." << OMPI_RELEASE_VERSION;
+#elif defined(MPICH)
+        strm << "MPICH V" << MPICH_VERSION;
+#elif defined(MVAPICH2_VERSION)
+        strm << "MVAPICH2 V" << MVAPICH2_VERSION;
+#else
+        strm << "Unknown MPI";
+#endif
+        // add general MPI version
+        strm << ", MPI V" << MPI_VERSION << "." << MPI_SUBVERSION;
+        return strm.str();
+    }
+#endif
+
     std::string copyright()
     {
         char const* const copyright =
@@ -70,7 +96,7 @@ namespace hpx
     // Returns the HPX full build information string.
     std::string full_build_string()
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "{config}:\n" << configuration_string()
              << "{version}: " << build_string() << "\n"
              << "{boost}: " << boost_version() << "\n"
@@ -80,7 +106,7 @@ namespace hpx
              << "{compiler}: " << boost_compiler() << "\n"
              << "{stdlib}: " << boost_stdlib() << "\n";
 
-        return util::osstream_get_string(strm);
+        return strm.str();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -99,12 +125,10 @@ namespace hpx
     //  HPX_HAVE_CXX11_AUTO
     //  HPX_HAVE_CXX11_DECLTYPE
     //  HPX_HAVE_CXX11_STD_UNIQUE_PTR
-    //  HPX_ACTION_ARGUMENT_LIMIT=4
-    //  HPX_FUNCTION_ARGUMENT_LIMIT=7
 
     std::string configuration_string()
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
 
 #if defined(HPX_HAVE_NATIVE_TLS)
         strm << "  HPX_HAVE_NATIVE_TLS=ON\n";
@@ -135,6 +159,16 @@ namespace hpx
         strm << "  HPX_HAVE_PARCEL_COALESCING=ON\n";
 #else
         strm << "  HPX_HAVE_PARCEL_COALESCING=OFF\n";
+#endif
+#if defined(HPX_PARCELPORT_TCP)
+        strm << "  HPX_PARCELPORT_TCP=ON\n";
+#else
+        strm << "  HPX_PARCELPORT_TCP=OFF\n";
+#endif
+#if defined(HPX_PARCELPORT_MPI)
+        strm << "  HPX_PARCELPORT_MPI=ON (" << mpi_version() << ")\n";
+#else
+        strm << "  HPX_PARCELPORT_MPI=OFF\n";
 #endif
 #if defined(HPX_PARCELPORT_IPC)
         strm << "  HPX_PARCELPORT_IPC=ON\n";
@@ -182,28 +216,6 @@ namespace hpx
 #if defined(HPX_LIMIT)
         strm << "  HPX_LIMIT=" << HPX_LIMIT << "\n";
 #endif
-#if defined(HPX_ACTION_ARGUMENT_LIMIT)
-        strm << "  HPX_ACTION_ARGUMENT_LIMIT="
-             << HPX_ACTION_ARGUMENT_LIMIT << "\n";
-#endif
-#if defined(HPX_COMPONENT_CREATE_ARGUMENT_LIMIT)
-        strm << "  HPX_COMPONENT_CREATE_ARGUMENT_LIMIT="
-             << HPX_COMPONENT_CREATE_ARGUMENT_LIMIT << "\n";
-#endif
-#if defined(HPX_FUNCTION_ARGUMENT_LIMIT)
-        strm << "  HPX_FUNCTION_ARGUMENT_LIMIT="
-             << HPX_FUNCTION_ARGUMENT_LIMIT << "\n";
-#endif
-#if defined(HPX_LOCK_LIMIT)
-        strm << "  HPX_LOCK_LIMIT=" << HPX_LOCK_LIMIT << "\n";
-#endif
-#if defined(HPX_TUPLE_LIMIT)
-        strm << "  HPX_TUPLE_LIMIT=" << HPX_TUPLE_LIMIT << "\n";
-#endif
-#if defined(HPX_WAIT_ARGUMENT_LIMIT)
-        strm << "  HPX_WAIT_ARGUMENT_LIMIT="
-             << HPX_WAIT_ARGUMENT_LIMIT << "\n";
-#endif
 #if defined(HPX_PARCEL_MAX_CONNECTIONS)
         strm << "  HPX_PARCEL_MAX_CONNECTIONS="
              << HPX_PARCEL_MAX_CONNECTIONS << "\n";
@@ -230,7 +242,7 @@ namespace hpx
         strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
 #endif
 
-        return util::osstream_get_string(strm);
+        return strm.str();
     }
 
     std::string build_string()
@@ -285,6 +297,9 @@ namespace hpx
 #if defined(HPX_HAVE_HWLOC)
             "  Hwloc: %s\n"
 #endif
+#if defined(HPX_PARCELPORT_MPI)
+            "  MPI: %s\n"
+#endif
             "\n"
             "Build:\n"
             "  Type: %s\n"
@@ -298,6 +313,9 @@ namespace hpx
             boost_version() %
 #if defined(HPX_HAVE_HWLOC)
             hwloc_version() %
+#endif
+#if defined(HPX_PARCELPORT_MPI)
+            mpi_version() %
 #endif
             build_type() %
             build_date_time() %
@@ -320,7 +338,7 @@ namespace hpx
     std::string runtime_configuration_string(
         util::command_line_handling const& cfg)
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
 
         // runtime mode
         strm << "  {mode}: " << get_runtime_mode_name(cfg.mode_) << "\n";
@@ -335,7 +353,7 @@ namespace hpx
         strm << "  {os-threads}: " << cfg.num_threads_ << "\n";
         strm << "  {cores}: " << cfg.num_cores_ << "\n";
 
-        return util::osstream_get_string(strm);
+        return strm.str();
     }
 
     ///////////////////////////////////////////////////////////////////////////

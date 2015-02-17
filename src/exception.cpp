@@ -12,8 +12,8 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/backtrace.hpp>
+#include <hpx/util/command_line_handling.hpp>
 
 #if defined(BOOST_WINDOWS)
 #  include <process.h>
@@ -23,9 +23,14 @@
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
+#include <boost/atomic.hpp>
 
 #include <stdexcept>
 #include <algorithm>
+#if defined(_POSIX_VERSION)
+#include <iostream>
+#endif
+#include <sstream>
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -37,6 +42,16 @@ extern char **environ;
 namespace hpx
 {
     char const* get_runtime_state_name(runtime::state state);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // For testing purposes we sometime expect to see exceptions, allow those
+    // to go through without attaching a debugger.
+    boost::atomic<bool> expect_exception_flag(false);
+
+    bool expect_exception(bool flag)
+    {
+        return expect_exception_flag.exchange(flag);
+    }
 }
 
 namespace hpx { namespace detail
@@ -220,9 +235,9 @@ namespace hpx { namespace detail
             if (rts_state >= runtime::state_initialized &&
                 rts_state < runtime::state_stopped)
             {
-                util::osstream strm;
+                std::ostringstream strm;
                 strm << get_runtime().here();
-                hostname = util::osstream_get_string(strm);
+                hostname = strm.str();
             }
         }
 
@@ -257,6 +272,11 @@ namespace hpx { namespace detail
     HPX_EXPORT void throw_exception(Exception const& e, std::string const& func,
         std::string const& file, long line)
     {
+        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+            get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
+            util::attach_debugger();
+        }
         boost::rethrow_exception(get_exception(e, func, file, line));
     }
 
@@ -328,6 +348,12 @@ namespace hpx { namespace detail
     void assertion_failed_msg(char const* msg, char const* expr,
         char const* function, char const* file, long line)
     {
+        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+            get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
+            util::attach_debugger();
+        }
+
         bool threw = false;
 
         std::string str("assertion '" + std::string(msg) + "' failed");
@@ -369,12 +395,24 @@ namespace hpx { namespace detail
     // report an early or late exception and abort
     void report_exception_and_terminate(boost::exception_ptr const& e)
     {
+        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+            get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
+            util::attach_debugger();
+        }
+
         std::cerr << hpx::diagnostic_information(e) << std::endl;
         std::abort();
     }
 
     void report_exception_and_terminate(hpx::exception const& e)
     {
+        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+            get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
+            util::attach_debugger();
+        }
+
         std::cerr << hpx::diagnostic_information(e) << std::endl;
         std::abort();
     }
@@ -403,7 +441,7 @@ namespace hpx
     // return a string holding a formatted message.
     std::string diagnostic_information(boost::exception const& e)
     {
-        util::osstream strm;
+        std::ostringstream strm;
         strm << "\n";
 
         std::string const* back_trace =
@@ -507,7 +545,7 @@ namespace hpx
         if (se)
             strm << "{what}: " << se->what() << "\n";
 
-        return util::osstream_get_string(strm);
+        return strm.str();
     }
 
     std::string diagnostic_information(boost::exception_ptr const& e)

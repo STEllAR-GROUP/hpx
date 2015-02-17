@@ -11,6 +11,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/serialize_empty_type.hpp>
@@ -28,12 +29,12 @@ namespace hpx
 {
     //////////////////////////////////////////////////////////////////////////
     // forward declare the required overload of apply.
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg>
+    template <typename Component, typename Signature, typename Derived,
+        typename ...Ts>
     inline bool
-    apply(hpx::actions::action<Component, Result, Arguments, Derived>,
-        naming::id_type const&, Arg &&);
-    
+    apply(hpx::actions::basic_action<Component, Signature, Derived>,
+        naming::id_type const&, Ts&&... vs);
+
     // MSVC complains about ambiguities if it sees this forward declaration
 #ifndef BOOST_MSVC
     template <typename F, typename ...Ts>
@@ -46,23 +47,20 @@ namespace hpx
     >::type
     apply(F&& f, Ts&&... vs);
 
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0, typename F>
-    inline typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 1,
-        bool
-    >::type
-    apply_continue(hpx::actions::action<Component, Result, Arguments, Derived>,
-        naming::id_type const& gid, Arg0 && arg0,
-        F && f);
+    template <
+        typename Component, typename Signature, typename Derived,
+        typename Cont, typename ...Ts>
+    bool apply_continue(
+        hpx::actions::basic_action<Component, Signature, Derived>,
+        Cont&& cont, naming::id_type const& gid, Ts&&... vs);
 #endif
 
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0>
+    template <typename Component, typename Signature, typename Derived,
+        typename ...Ts>
     inline bool
-    apply_c(hpx::actions::action<Component, Result, Arguments, Derived>,
+    apply_c(hpx::actions::basic_action<Component, Signature, Derived>,
         naming::id_type const& contgid, naming::id_type const& gid,
-        Arg0 && arg0);
+        Ts&&... vs);
 
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
@@ -220,6 +218,38 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename ...Ts>
+    typename boost::disable_if_c<
+        boost::is_void<typename util::result_of<F(Ts...)>::type>::value
+    >::type trigger(continuation& cont, F&& f, Ts&&... vs)
+    {
+        typedef typename util::result_of<F(Ts...)>::type result_type;
+        try {
+            cont.trigger(util::invoke_r<result_type>(std::forward<F>(f),
+                std::forward<Ts>(vs)...));
+        }
+        catch (...) {
+            // make sure hpx::exceptions are propagated back to the client
+            cont.trigger_error(boost::current_exception());
+        }
+    }
+
+    template <typename F, typename ...Ts>
+    typename boost::enable_if_c<
+        boost::is_void<typename util::result_of<F(Ts...)>::type>::value
+    >::type trigger(continuation& cont, F&& f, Ts&&... vs)
+    {
+        try {
+            util::invoke_r<void>(std::forward<F>(f), std::forward<Ts>(vs)...);
+            cont.trigger();
+        }
+        catch (...) {
+            // make sure hpx::exceptions are propagated back to the client
+            cont.trigger_error(boost::current_exception());
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     struct set_lco_value_continuation
     {
         template <typename T>
@@ -314,8 +344,8 @@ namespace hpx { namespace actions
         T operator()(hpx::id_type const& lco, T && t) const
         {
             using hpx::util::placeholders::_2;
-            hpx::apply_continue(cont_, target_, std::forward<T>(t),
-                hpx::util::bind(f_, lco, _2));
+            hpx::apply_continue(cont_, hpx::util::bind(f_, lco, _2),
+                target_, std::forward<T>(t));
 
             // Yep, 't' is a zombie, however we don't use the returned value
             // anyways. We need it for result type calculation, though.

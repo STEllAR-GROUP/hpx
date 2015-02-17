@@ -9,7 +9,6 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -21,6 +20,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 namespace hpx { namespace util
 {
@@ -74,7 +74,7 @@ namespace hpx { namespace util
             using util::placeholders::_1;
             using util::placeholders::_2;
 
-            HPX_STD_FUNCTION<performance_counters::discover_counter_func> func(
+            performance_counters::discover_counter_func func(
                 util::bind(&query_counters::find_counter, this, _1, _2));
 
             ids_.reserve(names.size());
@@ -338,7 +338,7 @@ namespace hpx { namespace util
         for (std::size_t i = 0; i != ids.size(); ++i)
             values.push_back(performance_counter::get_value_async(ids[i], reset));
 
-        util::osstream output;
+        std::ostringstream output;
         if (description)
             output << description << std::endl;
 
@@ -350,11 +350,11 @@ namespace hpx { namespace util
             print_value(output, names_[i], values[i].get(), uoms_[i]);
 
         if (destination_is_cout) {
-            std::cout << util::osstream_get_string(output) << std::flush;
+            std::cout << output.str() << std::flush;
         }
         else {
             std::ofstream out(destination_.c_str(), std::ofstream::app);
-            out << util::osstream_get_string(output);
+            out << output.str();
         }
 
         return true;

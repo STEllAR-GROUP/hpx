@@ -26,6 +26,8 @@
 #include <map>
 
 #include <boost/format.hpp>
+#include <boost/fusion/include/at_c.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 namespace hpx { namespace agas
 {

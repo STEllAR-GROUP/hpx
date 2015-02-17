@@ -23,15 +23,7 @@
 
 namespace placeholders = hpx::util::placeholders;
 
-#if defined(BOOST_MSVC) && (BOOST_MSVC < 1300)
-#pragma warning(push, 3)
-#endif
-
 #include <iostream>
-
-#if defined(BOOST_MSVC) && (BOOST_MSVC < 1300)
-#pragma warning(pop)
-#endif
 
 #include <hpx/util/lightweight_test.hpp>
 

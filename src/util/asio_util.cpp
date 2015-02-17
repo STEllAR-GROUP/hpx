@@ -6,16 +6,16 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/asio_util.hpp>
-
-#include <ctime>
 
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include <ctime>
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -84,11 +84,11 @@ namespace hpx { namespace util
         }
 
         // report errors
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << errors.get_message() << " (while trying to resolve: "
              << hostname << ":" << port << ")";
         HPX_THROW_EXCEPTION(network_error, "util::resolve_hostname",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
         return tcp::endpoint();
     }
 
@@ -165,12 +165,12 @@ namespace hpx { namespace util
         }
 
         // report errors
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << errors.get_message() << " (while trying to connect to: "
              << address << ":" << port << ")";
 
         HPX_THROW_EXCEPTION(network_error, "connect_begin",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
 
         return endpoint_iterator_type();
     }
@@ -225,12 +225,12 @@ namespace hpx { namespace util
         }
 
         // report errors
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << errors.get_message() << " (while trying to resolve: "
              << address << ":" << port << ")";
 
         HPX_THROW_EXCEPTION(network_error, "accept_begin",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
         return endpoint_iterator_type();
     }
 }}

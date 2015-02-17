@@ -96,6 +96,7 @@ function(hpx_setup_target target)
     if(MSVC)
       string(REPLACE ";" ":" _prefix "${_prefix}")
     endif()
+
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_APPLICATION_NAME=${name}"
@@ -103,6 +104,7 @@ function(hpx_setup_target target)
                  "HPX_PREFIX=\"${_prefix}\""
                  "HPX_APPLICATION_EXPORTS")
   endif()
+
   if("${_type}" STREQUAL "LIBRARY")
     set(nohpxinit FALSE)
     if(DEFINED HPX_LIBRARY_VERSION AND DEFINED HPX_SOVERSION)
@@ -121,12 +123,12 @@ function(hpx_setup_target target)
     if(target_PLUGIN)
       set(plugin_name "HPX_PLUGIN_NAME=${name}")
     endif()
+    set(nohpxinit TRUE)
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
-                   "HPX_LIBRARY_EXPORTS"
-                   ${plugin_name})
-
+                 "HPX_LIBRARY_EXPORTS"
+                 ${plugin_name})
   endif()
 
   if("${_type}" STREQUAL "COMPONENT")
@@ -144,6 +146,7 @@ function(hpx_setup_target target)
       # allow creating static and shared libs without conflicts
       CLEAN_DIRECT_OUTPUT 1
       OUTPUT_NAME ${name})
+    set(nohpxinit TRUE)
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
@@ -154,9 +157,26 @@ function(hpx_setup_target target)
 
   # We force the -DDEBUG and -D_DEBUG defines in debug mode to avoid
   # ABI differences
+  # if hpx is an imported target, get the config debug/release
+  set(HPX_IMPORT_CONFIG "NOTFOUND")
+  if (TARGET "hpx")
+    get_target_property(HPX_IMPORT_CONFIG "hpx" IMPORTED_CONFIGURATIONS)
+  endif()
+  if(HPX_IMPORT_CONFIG MATCHES NOTFOUND)
+    # we are building HPX not importing, so we should use the $<CONFIG:variable
+    set(_USE_CONFIG 1)
+  else()
+    # hpx is an imported target, so set HPX_DEBUG based on build config of hpx library
+    set(_USE_CONFIG 0)
+  endif()
   if(CMAKE_MAJOR_VERSION GREATER 2)
-    set_property(TARGET ${target} APPEND PROPERTY
-	    COMPILE_DEFINITIONS $<$<CONFIG:Debug>:HPX_DEBUG>)
+    if(_USE_CONFIG)
+      set_property(TARGET ${target} APPEND PROPERTY
+        COMPILE_DEFINITIONS $<$<CONFIG:Debug>:HPX_DEBUG>)
+    else()
+      set_property(TARGET ${target} APPEND PROPERTY
+        COMPILE_DEFINITIONS $<$<STREQUAL:${HPX_IMPORT_CONFIG},DEBUG>:HPX_DEBUG>)
+    endif()
   else()
     set_property(TARGET ${target} APPEND PROPERTY
       COMPILE_DEFINITIONS_DEBUG HPX_DEBUG)

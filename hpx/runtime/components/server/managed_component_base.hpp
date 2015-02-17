@@ -20,7 +20,6 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/type_traits/is_same.hpp>
-#include <boost/preprocessor/repeat.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <utility>
 
@@ -65,28 +64,12 @@ namespace hpx { namespace components
             {
             }
 
-            template <typename Component, typename Managed>
-            static void call_new(Component*& component, Managed* this_)
+            template <typename Component, typename Managed, typename ...Ts>
+            static void call_new(Component*& component, Managed* this_, Ts&&... vs)
             {
                 typedef typename Managed::wrapped_type wrapped_type;
-                component = new wrapped_type(this_);
+                component = new wrapped_type(this_, std::forward<Ts>(vs)...);
             }
-
-#define MANAGED_COMPONENT_CONSTRUCT_INIT1(Z, N, _)                            \
-            template <typename Component, typename Managed,                   \
-                BOOST_PP_ENUM_PARAMS(N, typename T)>                          \
-            static void call(Component*& component, Managed* this_,           \
-                HPX_ENUM_FWD_ARGS(N, T, t))                                   \
-            {                                                                 \
-                typedef typename Managed::wrapped_type wrapped_type;          \
-                component = new wrapped_type(this_,                           \
-                    HPX_ENUM_FORWARD_ARGS(N , T, t));                         \
-            }                                                                 \
-    /**/
-            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
-                MANAGED_COMPONENT_CONSTRUCT_INIT1, _)
-
-#undef MANAGED_COMPONENT_CONSTRUCT_INIT1
         };
 
         template <>
@@ -98,30 +81,13 @@ namespace hpx { namespace components
                 component->set_back_ptr(this_);
             }
 
-            template <typename Component, typename Managed>
-            static void call_new(Component*& component, Managed* this_)
+            template <typename Component, typename Managed, typename ...Ts>
+            static void call_new(Component*& component, Managed* this_, Ts&&... vs)
             {
                 typedef typename Managed::wrapped_type wrapped_type;
-                component = new wrapped_type();
+                component = new wrapped_type(std::forward<Ts>(vs)...);
                 component->set_back_ptr(this_);
             }
-
-#define MANAGED_COMPONENT_CONSTRUCT_INIT2(Z, N, _)                            \
-            template <typename Component, typename Managed,                   \
-                BOOST_PP_ENUM_PARAMS(N, typename T)>                          \
-            static void call(Component*& component, Managed* this_,           \
-                HPX_ENUM_FWD_ARGS(N, T, t))                                   \
-            {                                                                 \
-                typedef typename Managed::wrapped_type wrapped_type;          \
-                component = new wrapped_type(                                 \
-                    HPX_ENUM_FORWARD_ARGS(N , T, t));                         \
-                component->set_back_ptr(this_);                               \
-            }                                                                 \
-    /**/
-            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
-                MANAGED_COMPONENT_CONSTRUCT_INIT2, _)
-
-#undef MANAGED_COMPONENT_CONSTRUCT_INIT2
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -433,31 +399,15 @@ namespace hpx { namespace components
     public:
         /// \brief Construct a managed_component instance holding a new wrapped
         ///        instance
-        managed_component()
+        template <typename ...Ts>
+        managed_component(Ts&&... vs)
           : component_(0)
         {
             detail_adl_barrier::init<
                 typename traits::managed_component_ctor_policy<Component>::type
-            >::call_new(component_, this);
+            >::call_new(component_, this, std::forward<Ts>(vs)...);
             intrusive_ptr_add_ref(this);
         }
-
-#define MANAGED_COMPONENT_CONSTRUCT(Z, N, _)                                  \
-        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
-        managed_component(HPX_ENUM_FWD_ARGS(N, T, t))                         \
-          : component_(0)                                                     \
-        {                                                                     \
-            detail_adl_barrier::init<                                         \
-                typename traits::managed_component_ctor_policy<Component>::type \
-            >::call(component_, this, HPX_ENUM_FORWARD_ARGS(N, T, t));        \
-            intrusive_ptr_add_ref(this);                                      \
-        }                                                                     \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
-            MANAGED_COMPONENT_CONSTRUCT, _)
-
-#undef MANAGED_COMPONENT_CONSTRUCT
 
     public:
         /// \brief The destructor releases any wrapped instances
@@ -496,14 +446,14 @@ namespace hpx { namespace components
         Component* get_checked()
         {
             if (!component_) {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "component is NULL ("
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
                      << ") gid(" << get_base_gid() << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "managed_component<Component, Derived>::get_checked",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             return get();
         }
@@ -511,14 +461,14 @@ namespace hpx { namespace components
         Component const* get_checked() const
         {
             if (!component_) {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "component is NULL ("
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
                      << ") gid(" << get_base_gid() << ")";
                 HPX_THROW_EXCEPTION(invalid_status,
                     "managed_component<Component, Derived>::get_checked",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
             return get();
         }

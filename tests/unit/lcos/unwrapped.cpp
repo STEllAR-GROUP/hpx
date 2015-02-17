@@ -25,8 +25,7 @@ using hpx::finalize;
 
 using hpx::util::report_errors;
 
-using hpx::actions::plain_action0;
-using hpx::actions::plain_result_action0;
+using hpx::actions::action;
 
 using hpx::util::unwrapped;
 using hpx::util::unwrapped2;
@@ -46,7 +45,7 @@ void null_thread()
     ++void_counter;
 }
 
-typedef plain_action0<null_thread> null_action;
+typedef action<void (*)(), null_thread> null_action;
 
 HPX_REGISTER_PLAIN_ACTION(null_action);
 
@@ -59,7 +58,7 @@ bool null_result_thread()
     return true;
 }
 
-typedef plain_result_action0<bool, null_result_thread> null_result_action;
+typedef action<bool (*)(), null_result_thread> null_result_action;
 
 HPX_REGISTER_PLAIN_ACTION(null_result_action);
 
@@ -124,14 +123,14 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Sync wait, multiple futures, non-void return.
         {
-            HPX_STD_TUPLE<bool, bool, bool> r
+            hpx::util::tuple<bool, bool, bool> r
                 = unwrapped(async<null_result_action>(here_)
                      , async<null_result_action>(here_)
                      , async<null_result_action>(here_));
 
-            HPX_TEST_EQ(true, HPX_STD_GET(0, r));
-            HPX_TEST_EQ(true, HPX_STD_GET(1, r));
-            HPX_TEST_EQ(true, HPX_STD_GET(2, r));
+            HPX_TEST_EQ(true, hpx::util::get<0>(r));
+            HPX_TEST_EQ(true, hpx::util::get<1>(r));
+            HPX_TEST_EQ(true, hpx::util::get<2>(r));
             HPX_TEST_EQ(3U, result_counter.load());
 
             result_counter.store(0);

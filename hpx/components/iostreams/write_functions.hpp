@@ -8,19 +8,20 @@
 #if !defined(HPX_B72D9BF0_B236_46F6_83AA_E45A70BD1FAA)
 #define HPX_B72D9BF0_B236_46F6_83AA_E45A70BD1FAA
 
+#include <hpx/util/bind.hpp>
+#include <hpx/util/function.hpp>
+
+#include <boost/ref.hpp>
+
 #include <ostream>
 #include <iterator>
 #include <algorithm>
 #include <deque>
 
-#include <boost/ref.hpp>
-#include <boost/bind.hpp>
-#include <boost/bind/placeholders.hpp>
-
 namespace hpx { namespace iostreams
 {
 
-typedef HPX_STD_FUNCTION<void(std::vector<char> const&)> write_function_type;
+typedef util::function_nonser<void(std::vector<char> const&)> write_function_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Write function that works on STL OutputIterators
@@ -34,7 +35,8 @@ inline void iterator_write_function(std::vector<char> const& in, Iterator it)
 template <typename Iterator>
 inline write_function_type make_iterator_write_function(Iterator it)
 {
-    return boost::bind(iterator_write_function<Iterator>, _1, it);
+    return util::bind(iterator_write_function<Iterator>,
+        util::placeholders::_1, it);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,7 +49,8 @@ std_ostream_write_function(std::vector<char> const& in, std::ostream& os)
 // Factory function
 inline write_function_type make_std_ostream_write_function(std::ostream& os)
 {
-    return boost::bind(std_ostream_write_function, _1, boost::ref(os));
+    return util::bind(std_ostream_write_function,
+        util::placeholders::_1, boost::ref(os));
 }
 
 }}

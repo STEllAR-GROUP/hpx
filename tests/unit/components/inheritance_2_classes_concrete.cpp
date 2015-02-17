@@ -25,7 +25,7 @@ struct A : hpx::components::managed_component_base<A>
 
     virtual std::string test0() const { return "A"; }
     std::string test0_nonvirt() const { return test0(); }
-    HPX_DEFINE_COMPONENT_CONST_ACTION(A, test0_nonvirt, test0_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
 };
 
 typedef hpx::components::managed_component<A> serverA_type;
@@ -58,7 +58,7 @@ struct B : A, hpx::components::managed_component_base<B>
     std::string test0() const { return "B"; }
 
     std::string test1() const { return "B"; }
-    HPX_DEFINE_COMPONENT_CONST_ACTION(B, test1, test1_action);
+    HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action);
 };
 
 typedef hpx::components::managed_component<B> serverB_type;

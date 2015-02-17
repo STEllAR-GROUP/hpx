@@ -3,13 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_GET_LOCALITY_NAME_SEP_26_2013_0533PM)
-#define HPX_RUNTIME_GET_LOCALITY_NAME_SEP_26_2013_0533PM
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/lcos/async.hpp>
 
@@ -22,8 +20,8 @@ namespace hpx { namespace detail
         runtime* rt = get_runtime_ptr();
         if (rt == 0)
         {
-            HPX_THROW_EXCEPTION(invalid_status, 
-                "hpx::detail::get_locality_name", 
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::detail::get_locality_name",
                 "the runtime system is not operational at this point");
             return "";
         }
@@ -52,5 +50,3 @@ namespace hpx
         return async<hpx_get_locality_name_action>(id);
     }
 }
-
-#endif

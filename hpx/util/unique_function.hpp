@@ -8,7 +8,7 @@
 #ifndef HPX_UTIL_UNIQUE_FUNCTION_HPP
 #define HPX_UTIL_UNIQUE_FUNCTION_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/error.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/unique_function_template.hpp>

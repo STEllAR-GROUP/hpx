@@ -7,9 +7,9 @@
 #define HPX_UTIL_AGAS_LOGGING_APR_10_2008_1032AM
 
 #include <string>
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
-#if !defined(HPX_NO_LOGGING)
+#if defined(HPX_WITH_LOGGING)
 
 #include <hpx/util/logging/format/named_write.hpp>
 #include <hpx/util/logging/format_fwd.hpp>

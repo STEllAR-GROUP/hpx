@@ -11,9 +11,6 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/util/move.hpp>
 
-#include <boost/preprocessor/enum_params.hpp>
-#include <boost/preprocessor/dec.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
@@ -32,136 +29,61 @@ namespace hpx { namespace components
 
         ///////////////////////////////////////////////////////////////////////
         /// Asynchronously create a new instance of a component
+        template <typename ...Ts>
         static lcos::future<naming::id_type>
-        create_async(naming::id_type const& gid)
+        create_async(naming::id_type const& gid, Ts&&... vs)
         {
             using stubs::runtime_support;
-            return runtime_support::create_component_async<
-                ServerComponent>(gid);
+            return runtime_support::create_component_async<ServerComponent>(
+                gid, std::forward<Ts>(vs)...);
         }
 
+        template <typename ...Ts>
         static lcos::future<std::vector<naming::id_type> >
-        bulk_create_async(naming::id_type const& gid, std::size_t count)
+        bulk_create_async(naming::id_type const& gid, std::size_t count,
+            Ts&&... vs)
         {
             using stubs::runtime_support;
             return runtime_support::bulk_create_component_async<
                     ServerComponent
-                >(gid, count);
+                >(gid, count, std::forward<Ts>(vs)...);
         }
 
-        static naming::id_type create(naming::id_type const& gid)
+        template <typename ...Ts>
+        static naming::id_type create(
+            naming::id_type const& gid, Ts&&... vs)
         {
             using stubs::runtime_support;
-            return runtime_support::create_component<ServerComponent>(gid);
+            return runtime_support::create_component<ServerComponent>(
+                gid, std::forward<Ts>(vs)...);
         }
 
+        template <typename ...Ts>
         static std::vector<naming::id_type> bulk_create(
-            naming::id_type const& gid, std::size_t count)
+            naming::id_type const& gid, std::size_t count, Ts&&... vs)
         {
             using stubs::runtime_support;
-            return runtime_support::bulk_create_component<
-                    ServerComponent
-                >(gid, count);
+            return runtime_support::bulk_create_component<ServerComponent>(
+                gid, count, std::forward<Ts>(vs)...);
         }
 
+        template <typename ...Ts>
         static lcos::future<naming::id_type>
-        create_colocated_async(naming::id_type const& gid)
+        create_colocated_async(naming::id_type const& gid, Ts&&... vs)
         {
             using stubs::runtime_support;
             return runtime_support::create_component_colocated_async<
-                ServerComponent>(gid);
+                ServerComponent>(gid, std::forward<Ts>(vs)...);
         }
 
-        static naming::id_type create_colocated(naming::id_type const& gid)
+        template <typename ...Ts>
+        static naming::id_type create_colocated(
+            naming::id_type const& gid, Ts&&... vs)
         {
             using stubs::runtime_support;
             return runtime_support::create_component_colocated<
-                ServerComponent>(gid);
+                ServerComponent>(gid, std::forward<Ts>(vs)...);
         }
-
-        ///////////////////////////////////////////////////////////////////////
-#define HPX_STUB_BASE_CREATE(Z, N, D)                                         \
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static lcos::future<naming::id_type>                                  \
-        create_async(naming::id_type const& gid,                              \
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
-        {                                                                     \
-            using stubs::runtime_support;                                     \
-            return runtime_support::create_component_async<ServerComponent>(  \
-                gid, HPX_ENUM_FORWARD_ARGS(N , Arg, arg));                    \
-        }                                                                     \
-                                                                              \
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static naming::id_type create(                                        \
-            naming::id_type const& gid,                                       \
-                HPX_ENUM_FWD_ARGS(N, Arg, arg))                               \
-        {                                                                     \
-            using stubs::runtime_support;                                     \
-            return runtime_support::create_component<ServerComponent>(        \
-                gid, HPX_ENUM_FORWARD_ARGS(N , Arg, arg));                    \
-        }                                                                     \
-                                                                              \
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static lcos::future<naming::id_type>                                  \
-        create_colocated_async(naming::id_type const& gid,                    \
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
-        {                                                                     \
-            using stubs::runtime_support;                                     \
-            return runtime_support::create_component_colocated_async<         \
-                ServerComponent>(gid, HPX_ENUM_FORWARD_ARGS(N , Arg, arg));   \
-        }                                                                     \
-                                                                              \
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static naming::id_type create_colocated(                              \
-            naming::id_type const& gid,                                       \
-                HPX_ENUM_FWD_ARGS(N, Arg, arg))                               \
-        {                                                                     \
-            using stubs::runtime_support;                                     \
-            return runtime_support::create_component_colocated<               \
-                ServerComponent>(gid, HPX_ENUM_FORWARD_ARGS(N , Arg, arg));   \
-        }                                                                     \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(
-            1
-          , HPX_ACTION_ARGUMENT_LIMIT
-          , HPX_STUB_BASE_CREATE
-          , _
-        )
-
-#undef HPX_STUB_BASE_CREATE
-
-#define HPX_STUB_BASE_BULK_CREATE(Z, N, D)                                    \
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static lcos::future<std::vector<naming::id_type> >                    \
-        bulk_create_async(naming::id_type const& gid, std::size_t count,      \
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
-        {                                                                     \
-            using stubs::runtime_support;                                     \
-            return runtime_support::bulk_create_component_async<              \
-                    ServerComponent                                           \
-                >(gid, count, HPX_ENUM_FORWARD_ARGS(N , Arg, arg));           \
-        }                                                                     \
-                                                                              \
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static std::vector<naming::id_type> bulk_create(                      \
-            naming::id_type const& gid, std::size_t count,                    \
-                HPX_ENUM_FWD_ARGS(N, Arg, arg))                               \
-        {                                                                     \
-            using stubs::runtime_support;                                     \
-            return runtime_support::bulk_create_component<ServerComponent>(   \
-                gid, count, HPX_ENUM_FORWARD_ARGS(N , Arg, arg));             \
-        }                                                                     \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(
-            1
-          , BOOST_PP_DEC(HPX_ACTION_ARGUMENT_LIMIT)
-          , HPX_STUB_BASE_BULK_CREATE
-          , _
-        )
-
-#undef HPX_STUB_BASE_BULK_CREATE
 
         /// Delete an existing component
         static void

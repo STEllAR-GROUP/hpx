@@ -483,8 +483,11 @@ namespace hpx { namespace util
                   "AGAS logs to the target destination")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
-#if defined(_POSIX_VERSION) || defined(BOOST_MSVC)
-                ("hpx:attach-debugger", "wait for a debugger to be attached")
+#if defined(_POSIX_VERSION) || defined(BOOST_WINDOWS)
+                ("hpx:attach-debugger",
+                  value<std::string>()->implicit_value("startup"),
+                  "wait for a debugger to be attached, possible values: "
+                  "startup or exception (default: startup)")
 #endif
                 ("hpx:list-parcel-ports", "list all available parcel-ports")
             ;

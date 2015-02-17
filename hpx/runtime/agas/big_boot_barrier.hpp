@@ -29,7 +29,8 @@ namespace hpx { namespace agas
 struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 {
   private:
-    parcelset::parcelport& pp;
+    parcelset::parcelport* pp;
+    parcelset::endpoints_type const& endpoints;
 
     service_mode const service_type;
     parcelset::locality const bootstrap_agas;
@@ -38,7 +39,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     boost::mutex mtx;
     std::size_t connected;
 
-    boost::lockfree::queue<HPX_STD_FUNCTION<void()>* > thunks;
+    boost::lockfree::queue<util::function_nonser<void()>* > thunks;
 
     void spin();
 
@@ -66,18 +67,20 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     };
 
     big_boot_barrier(
-        parcelset::parcelport& pp_
+        parcelset::parcelport* pp_
+      , parcelset::endpoints_type const& endpoints_
       , util::runtime_configuration const& ini_
         );
 
     ~big_boot_barrier()
     {
-        HPX_STD_FUNCTION<void()>* f;
+        util::function_nonser<void()>* f;
         while (thunks.pop(f))
             delete f;
     }
 
     parcelset::locality here() { return bootstrap_agas; }
+    parcelset::endpoints_type const &get_endpoints() { return endpoints; }
 
     void apply(
         boost::uint32_t source_prefix
@@ -100,14 +103,15 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     // no-op on non-bootstrap localities
     void trigger();
 
-    void add_thunk(HPX_STD_FUNCTION<void()>* f)
+    void add_thunk(util::function_nonser<void()>* f)
     {
         thunks.push(f);
     }
 };
 
 HPX_EXPORT void create_big_boot_barrier(
-    parcelset::parcelport& pp_
+    parcelset::parcelport* pp_
+  , parcelset::endpoints_type const& endpoints_
   , util::runtime_configuration const& ini_
     );
 

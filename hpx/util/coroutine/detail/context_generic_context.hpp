@@ -174,21 +174,27 @@ namespace hpx { namespace util { namespace coroutines
 #if BOOST_VERSION > 105500
               , ctx_(0)
 #endif
+              , alloc_()
+              , stack_size_(0)
+              , stack_pointer_(0)
             {}
 
             // Create a context that on restore invokes Functor on
             // a new stack. The stack size can be optionally specified.
             template <typename Functor>
-            explicit fcontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
+            fcontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
               : cb_(reinterpret_cast<intptr_t>(&cb))
+              , funp_(&trampoline<Functor>)
+#if BOOST_VERSION > 105500
+              , ctx_(0)
+#endif
+              , alloc_()
               , stack_size_(
                     (stack_size == -1) ?
                     alloc_.minimum_stacksize() : std::size_t(stack_size)
                 )
               , stack_pointer_(alloc_.allocate(stack_size_))
             {
-                funp_ = &trampoline<Functor>;
-
 #if BOOST_VERSION < 105600
                 boost::context::fcontext_t* ctx =
                     boost::context::make_fcontext(stack_pointer_, stack_size_, funp_);

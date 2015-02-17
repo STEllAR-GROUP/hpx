@@ -6,7 +6,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
-#include <hpx/parallel/algorithm.hpp>
+#include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/include/parallel_numeric.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -182,8 +183,7 @@ double test_results(boost::uint64_t order, std::vector<double> const & trans)
     auto range = boost::irange(start, order);
     // parallel reduce
     double errsq =
-        transform_reduce(par, boost::begin(range), boost::end(range), 0.0,
-            [](double lhs, double rhs) { return lhs + rhs; },
+        transform_reduce(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t i) -> double
             {
                 double errsq = 0.0;
@@ -193,7 +193,9 @@ double test_results(boost::uint64_t order, std::vector<double> const & trans)
                     errsq += diff * diff;
                 }
                 return errsq;
-            }
+            },
+            0.0,
+            [](double lhs, double rhs) { return lhs + rhs; }
         );
 
     if(verbose)

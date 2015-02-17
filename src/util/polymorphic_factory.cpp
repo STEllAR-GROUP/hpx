@@ -76,6 +76,14 @@ namespace hpx { namespace util
     void polymorphic_factory<Base>::add_factory_function(
         std::string const & name, ctor_type ctor)
     {
+        if (name.empty())
+        {
+            HPX_THROW_EXCEPTION(bad_action_code
+                , "polymorphic_factory::add_factory_function"
+                , "trying to insert empty name into type registry");
+            return;
+        }
+
         boost::uint32_t hash = util::jenkins_hash()(name);
         typename ctor_map::const_iterator it = locate(hash, name);
         if (it != ctor_map_.end())

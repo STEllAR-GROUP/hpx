@@ -8,7 +8,6 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
-#include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <algorithm>
@@ -63,10 +62,11 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         pu_nums_.clear();
 
 #if defined(HPX_HAVE_HWLOC)
-	const std::size_t used_cores = data.used_cores_;
+        const std::size_t used_cores = data.used_cores_;
         std::size_t max_cores =
             hpx::util::safe_lexical_cast<std::size_t>(
-                get_runtime().get_config().get_entry("hpx.cores", used_cores), used_cores);
+                get_runtime().get_config().get_entry("hpx.cores", used_cores),
+                used_cores);
 
         if (!data.affinity_desc_.empty())
         {
@@ -110,7 +110,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         }
 
         std::sort(cores.begin(), cores.end());
-        std::vector<std::size_t>::iterator it = std::unique(cores.begin(), cores.end());
+        std::vector<std::size_t>::iterator it =
+            std::unique(cores.begin(), cores.end());
 
         return std::distance(cores.begin(), it);
     }

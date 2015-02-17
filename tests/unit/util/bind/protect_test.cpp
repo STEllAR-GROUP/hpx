@@ -10,8 +10,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/protect.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/protect.hpp>
 
 namespace placeholders = hpx::util::placeholders;
 

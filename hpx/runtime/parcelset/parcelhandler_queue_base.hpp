@@ -23,7 +23,7 @@ namespace hpx { namespace parcelset
     {
         typedef boost::signals2::scoped_connection connection_type;
 
-        typedef HPX_STD_FUNCTION<void(
+        typedef util::function_nonser<void(
             parcelhandler&, naming::gid_type const&
         )> callback_type;
 

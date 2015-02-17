@@ -14,6 +14,8 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
+#include <boost/make_shared.hpp>
+
 namespace hpx { namespace agas
 {
 
@@ -157,7 +159,7 @@ void symbol_namespace::register_counter_types(
         "returns the number of invocations of the AGAS service '%s'");
     boost::format help_time(
         "returns the overall execution time of the AGAS service '%s'");
-    HPX_STD_FUNCTION<performance_counters::create_counter_func> creator(
+    performance_counters::create_counter_func creator(
         boost::bind(&performance_counters::agas_raw_counter_creator, _1, _2
       , agas::server::symbol_namespace_service_name));
 
@@ -266,13 +268,13 @@ response symbol_namespace::bind(
 
     mutex_type::scoped_lock l(mutex_);
 
-    gid_table_type::iterator it = gids_.find(key)
-                           , end = gids_.end();
+    gid_table_type::iterator it = gids_.find(key);
+    gid_table_type::iterator end = gids_.end();
 
     if (it != end)
     {
         boost::int64_t const credits = naming::detail::get_credit_from_gid(gid);
-        naming::gid_type raw_gid = it->second;
+        naming::gid_type raw_gid = *(it->second);
 
         naming::detail::strip_internal_bits_from_gid(raw_gid);
         naming::detail::strip_internal_bits_from_gid(gid);
@@ -284,11 +286,11 @@ response symbol_namespace::bind(
                 "symbol_namespace::bind, key(%1%), gid(%2%), old_credit(%3%), "
                 "new_credit(%4%)")
                 % key % gid
-                % naming::detail::get_credit_from_gid(it->second)
-                % (naming::detail::get_credit_from_gid(it->second) + credits));
+                % naming::detail::get_credit_from_gid(*(it->second))
+                % (naming::detail::get_credit_from_gid(*(it->second)) + credits));
 
             // REVIEW: do we need to add the credit of the argument to the table?
-            naming::detail::add_credit_to_gid(it->second, credits);
+            naming::detail::add_credit_to_gid(*(it->second), credits);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -311,7 +313,7 @@ response symbol_namespace::bind(
     }
 
     if (HPX_UNLIKELY(!util::insert_checked(gids_.insert(
-            std::make_pair(key, gid)))))
+            std::make_pair(key, boost::make_shared<naming::gid_type>(gid))))))
     {
         l.unlock();
 
@@ -327,10 +329,9 @@ response symbol_namespace::bind(
     std::pair<std::string, namespace_action_code> evtkey(key, symbol_ns_bind);
     std::pair<iterator, iterator> p = on_event_data_.equal_range(evtkey);
 
+    std::vector<hpx::id_type> lcos;
     if (p.first != p.second)
     {
-        std::vector<hpx::id_type> lcos;
-
         iterator it = p.first;
         while (it != p.second)
         {
@@ -346,8 +347,8 @@ response symbol_namespace::bind(
             // re-locate the entry in the GID table for each LCO anew, as we
             // need to unlock the mutex protecting the table for each iteration
             // below
-            gid_table_type::iterator it = gids_.find(key);
-            if (it == gids_.end())
+            gid_table_type::iterator gid_it = gids_.find(key);
+            if (gid_it == gids_.end())
             {
                 l.unlock();
 
@@ -357,16 +358,24 @@ response symbol_namespace::bind(
                 return response();
             }
 
-            // split the credit as the receiving end will expect to keep the
-            // object alive
-            naming::gid_type new_gid = naming::detail::split_gid_if_needed(
-                it->second);
+            // hold on to the gid while the map is unlocked
+            boost::shared_ptr<naming::gid_type> current_gid = gid_it->second;
 
-            // trigger the lco
-            util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-            set_lco_value(id, new_gid);
+            {
+                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+
+                // split the credit as the receiving end will expect to keep the
+                // object alive
+                naming::gid_type new_gid =
+                    naming::detail::split_gid_if_needed(*current_gid);
+
+                // trigger the lco
+                set_lco_value(id, new_gid);
+            }
         }
     }
+
+    l.unlock();
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::bind, key(%1%), gid(%2%)")
@@ -388,8 +397,8 @@ response symbol_namespace::resolve(
 
     mutex_type::scoped_lock l(mutex_);
 
-    gid_table_type::iterator it = gids_.find(key)
-                           , end = gids_.end();
+    gid_table_type::iterator it = gids_.find(key);
+    gid_table_type::iterator end = gids_.end();
 
     if (it == end)
     {
@@ -408,7 +417,11 @@ response symbol_namespace::resolve(
     if (&ec != &throws)
         ec = make_success_code();
 
-    naming::gid_type gid = naming::detail::split_gid_if_needed(it->second);
+    // hold on to gid before unlocking the map
+    boost::shared_ptr<naming::gid_type> current_gid(it->second);
+
+    l.unlock();
+    naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid);
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::resolve, key(%1%), gid(%2%)")
@@ -427,8 +440,8 @@ response symbol_namespace::unbind(
 
     mutex_type::scoped_lock l(mutex_);
 
-    gid_table_type::iterator it = gids_.find(key)
-                           , end = gids_.end();
+    gid_table_type::iterator it = gids_.find(key);
+    gid_table_type::iterator end = gids_.end();
 
     if (it == end)
     {
@@ -442,7 +455,7 @@ response symbol_namespace::unbind(
         return response(symbol_ns_unbind, naming::invalid_gid, no_success);
     }
 
-    const naming::gid_type gid = it->second;
+    naming::gid_type const gid = *(it->second);
 
     gids_.erase(it);
 
@@ -466,11 +479,18 @@ response symbol_namespace::iterate(
 
     mutex_type::scoped_lock l(mutex_);
 
-    for (gid_table_type::iterator it = gids_.begin()
-                                , end = gids_.end();
-         it != end; ++it)
+    for (gid_table_type::iterator it = gids_.begin(); it != gids_.end(); ++it)
     {
-        f(it->first, it->second);
+        std::string key(it->first);
+        naming::gid_type gid = *(it->second);
+
+        {
+            util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+            f(key, gid);
+        }
+
+        // re-locate current entry
+        it = gids_.find(key);
     }
 
     LAGAS_(info) << "symbol_namespace::iterate";
@@ -507,17 +527,22 @@ response symbol_namespace::on_event(
         gid_table_type::iterator it = gids_.find(name);
         if (it != gids_.end())
         {
+            // hold on to entry while map is unlocked
+            boost::shared_ptr<naming::gid_type> current_gid(it->second);
+
             // split the credit as the receiving end will expect to keep the
             // object alive
-            naming::gid_type new_gid = naming::detail::split_gid_if_needed(
-                it->second);
+            {
+                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                naming::gid_type new_gid = naming::detail::split_gid_if_needed(
+                    *current_gid);
 
-            // trigger the lco
-            l.unlock();
-            handled = true;
+                // trigger the lco
+                handled = true;
 
-            // trigger LCO as name is already bound to an id
-            set_lco_value(lco, new_gid);
+                // trigger LCO as name is already bound to an id
+                set_lco_value(lco, new_gid);
+            }
         }
     }
 
@@ -540,6 +565,10 @@ response symbol_namespace::on_event(
 
             return response(symbol_ns_on_event, no_success);
         }
+    }
+    else
+    {
+        l.unlock();
     }
 
     LAGAS_(info) << "symbol_namespace::on_event";
@@ -595,7 +624,7 @@ response symbol_namespace::statistics_counter(
 
     typedef symbol_namespace::counter_data cd;
 
-    HPX_STD_FUNCTION<boost::int64_t(bool)> get_data_func;
+    util::function_nonser<boost::int64_t(bool)> get_data_func;
     if (target == detail::counter_target_count)
     {
         switch (code) {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -66,7 +66,12 @@ namespace hpx { namespace util
             }
 
             template <typename Archive>
-            static void serialize(Archive& ar, unused_type& e, boost::mpl::false_)
+            static void serialize(Archive&, unused_type&, boost::mpl::false_)
+            {
+            }
+
+            template <typename Archive>
+            static void serialize(Archive&, unused_type const&, boost::mpl::false_)
             {
             }
 
@@ -77,7 +82,7 @@ namespace hpx { namespace util
             }
 
             template <typename Archive, typename Element>
-            static void serialize(Archive& ar, Element&& e)
+            static void serialize(Archive& ar, Element& e)
             {
                 typedef
                     typename boost::fusion::traits::is_sequence<Element>::type
@@ -145,11 +150,28 @@ namespace hpx { namespace util
 
         if(ar.disable_array_optimization())
         {
-            detail::serialize_sequence(ar, seq, boost::mpl::false_());
-        }
-        else
-        {
-            detail::serialize_sequence(ar, seq, predicate());
+#if defined(HPX_DEBUG_SERIALIZATION)
+            char type = 'S';
+            std::size_t size = boost::fusion::size(seq);
+            ar & type & size;
+            HPX_ASSERT(type == 'S');
+            HPX_ASSERT(size == boost::fusion::size(seq));
+#endif
+
+            if(ar.flags() & disable_array_optimization)
+            {
+                detail::serialize_sequence(ar, seq, boost::mpl::false_());
+            }
+            else
+            {
+                detail::serialize_sequence(ar, seq, predicate());
+            }
+
+#if defined(HPX_DEBUG_SERIALIZATION)
+            type = 'E';
+            ar & type;
+            HPX_ASSERT(type == 'E');
+#endif
         }
     }
 }}

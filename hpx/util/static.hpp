@@ -18,9 +18,8 @@
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 
-#if HPX_GCC_VERSION < 40300 && \
+#if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) && \
     !(BOOST_INTEL_CXX_VERSION > 1200 && !defined(BOOST_WINDOWS)) && \
-    (HPX_CLANG_VERSION < 20900) && \
     (_MSC_FULL_VER < 180021114)         // NovCTP_2013
 #include <boost/thread/once.hpp>
 #include <boost/bind.hpp>
@@ -37,9 +36,8 @@
 
 namespace hpx { namespace util
 {
-#if HPX_GCC_VERSION >= 40300 || \
+#if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION) || \
     (BOOST_INTEL_CXX_VERSION > 1200 && !defined(BOOST_WINDOWS)) || \
-    (HPX_CLANG_VERSION >= 20900) || \
     (_MSC_FULL_VER >= 180021114)         // NovCTP_2013
 
     //

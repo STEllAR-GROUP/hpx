@@ -43,7 +43,7 @@ struct increment_server
         hpx::apply(receive_result_action(), there, accumulator.load());
     }
 
-    HPX_DEFINE_COMPONENT_CONST_ACTION(increment_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(increment_server, call);
 };
 
 typedef hpx::components::managed_component<increment_server> server_type;
@@ -86,11 +86,11 @@ int hpx_main()
         hpx::apply_colocated<increment_action>(where, here, 1);
     }
 
-    // finalize will synchronize will all pending operations
+    // finalize will synchronize with all pending operations
     int result = hpx::finalize();
 
     hpx::util::spinlock::scoped_lock l(result_mutex);
-    result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
+    result_cv.wait_for(l, boost::chrono::seconds(1),
         hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(final_result), 3));
 
     HPX_TEST_EQ(final_result, 3);

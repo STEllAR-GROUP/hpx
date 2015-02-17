@@ -5,6 +5,7 @@
 
 set(tests
     minimal_findend
+    search_zerolength
    )
 
 foreach(test ${tests})

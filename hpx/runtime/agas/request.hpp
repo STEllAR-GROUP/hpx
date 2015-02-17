@@ -19,10 +19,11 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/traits/serialize_as_future.hpp>
 
 // The number of types that the request's variant can represent.
-#define HPX_AGAS_REQUEST_SUBTYPES 15
+#define HPX_AGAS_REQUEST_SUBTYPES 14
 
 namespace hpx { namespace agas
 {
@@ -77,11 +78,6 @@ struct HPX_EXPORT request
       , boost::uint64_t count_
       , boost::uint32_t num_threads_
       , naming::gid_type prefix_ = naming::gid_type()
-        );
-
-    request(
-        namespace_action_code type_
-      , parcelset::endpoints_type const & endpoints_
         );
 
     request(
@@ -250,7 +246,7 @@ struct HPX_EXPORT request
 
     HPX_SERIALIZATION_SPLIT_MEMBER()
 
-    namespace_action_code mc;
+    namespace_action_code mc; //-V707
     boost::shared_ptr<request_data> data;
 };
 

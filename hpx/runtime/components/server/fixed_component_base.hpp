@@ -14,7 +14,8 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
-#include <hpx/util/stringstream.hpp>
+
+#include <sstream>
 
 namespace hpx { namespace components
 {
@@ -95,12 +96,12 @@ public:
             // Try to bind the preset GID first
             if (!applier::bind_gid_local(gid_, addr))
             {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << "could not bind_gid(local): " << gid_;
                 gid_ = naming::gid_type();   // invalidate GID
                 HPX_THROW_EXCEPTION(duplicate_component_address,
                     "fixed_component_base<Component>::get_base_gid",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
         }
         return gid_;

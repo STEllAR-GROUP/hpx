@@ -11,8 +11,9 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
+
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -40,13 +41,13 @@ namespace hpx { namespace components { namespace server
         if (!types_are_compatible(type, addr.type_))
         {
             // FIXME: should the component be re-bound ?
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "global id " << gid << " is not bound to a component "
                     "instance of type: " << get_component_type_name(type)
                  << " (it is bound to a " << get_component_type_name(addr.type_)
                  << ")";
             HPX_THROWS_IF(ec, hpx::unknown_component_address,
-                "destroy<Component>", hpx::util::osstream_get_string(strm));
+                "destroy<Component>", strm.str());
             return;
         }
 
@@ -65,11 +66,11 @@ namespace hpx { namespace components { namespace server
         naming::address addr;
         if (!appl.get_agas_client().resolve_local(gid, addr))
         {
-            hpx::util::osstream strm;
+            std::ostringstream strm;
             strm << "global id " << gid << " is not bound to any "
                     "component instance";
             HPX_THROWS_IF(ec, hpx::unknown_component_address,
-                "destroy<Component>", hpx::util::osstream_get_string(strm));
+                "destroy<Component>", strm.str());
             return;
         }
 

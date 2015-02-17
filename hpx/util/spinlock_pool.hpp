@@ -20,11 +20,7 @@
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>
-#if BOOST_VERSION >= 103900
 #include <boost/smart_ptr/detail/spinlock.hpp>
-#else
-#include <boost/detail/spinlock.hpp>
-#endif
 #include <cstddef>
 
 #include <hpx/util/itt_notify.hpp>

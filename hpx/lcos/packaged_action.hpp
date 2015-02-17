@@ -100,44 +100,54 @@ namespace hpx { namespace lcos
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid)
+        template <typename ...Ts>
+        void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+            Ts&&... vs)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
             hpx::apply_c_cb<action_type>(this->get_gid(), gid,
                 util::bind(&packaged_action::parcel_write_handler,
-                    this->impl_, util::placeholders::_1, util::placeholders::_2));
+                    this->impl_, util::placeholders::_1, util::placeholders::_2),
+                std::forward<Ts>(vs)...);
         }
 
+        template <typename ...Ts>
         void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
-            naming::id_type const& gid)
+            naming::id_type const& gid, Ts&&... vs)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
             hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
                 util::bind(&packaged_action::parcel_write_handler,
-                    this->impl_, util::placeholders::_1, util::placeholders::_2));
+                    this->impl_, util::placeholders::_1, util::placeholders::_2),
+                std::forward<Ts>(vs)...);
         }
 
+        template <typename ...Ts>
         void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-            threads::thread_priority priority)
+            threads::thread_priority priority, Ts&&... vs)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
             hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
                 util::bind(&packaged_action::parcel_write_handler,
-                    this->impl_, util::placeholders::_1, util::placeholders::_2));
+                    this->impl_, util::placeholders::_1, util::placeholders::_2),
+                std::forward<Ts>(vs)...);
         }
 
+        template <typename ...Ts>
         void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
-            naming::id_type const& gid, threads::thread_priority priority)
+            naming::id_type const& gid, threads::thread_priority priority,
+            Ts&&... vs)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
             hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
                 gid, priority,
                 util::bind(&packaged_action::parcel_write_handler,
-                    this->impl_, util::placeholders::_1, util::placeholders::_2));
+                    this->impl_, util::placeholders::_1, util::placeholders::_2),
+                std::forward<Ts>(vs)...);
         }
 
         /// Construct a new \a packaged_action instance. The \a thread
@@ -155,31 +165,31 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this
         ///               packaged_action instance (as it has to be sent along
         ///               with the action as the continuation parameter).
-        explicit packaged_action(naming::id_type const& gid)
+        template <typename ...Ts>
+        packaged_action(naming::id_type const& gid, Ts&&... vs)
           : apply_logger_("packaged_action::apply")
         {
             LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
-                        << ") args(0)";
-            apply(launch::all, gid);
+                        << ") args(" << sizeof...(Ts) << ")";
+            apply(launch::all, gid, std::forward<Ts>(vs)...);
         }
 
-        packaged_action(naming::id_type const& gid,
-                threads::thread_priority priority)
+        template <typename ...Ts>
+        packaged_action(naming::gid_type const& gid,
+                threads::thread_priority priority, Ts&&... vs)
           : apply_logger_("packaged_action::apply")
         {
             LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
-                        << ") args(0)";
-            apply_p(launch::all, gid, priority);
+                        << ") args(" << sizeof...(Ts) << ")";
+            apply_p(launch::all, naming::id_type(gid, naming::id_type::unmanaged),
+                priority, std::forward<Ts>(vs)...);
         }
-
-        // pull in remaining constructors
-        #include <hpx/lcos/packaged_action_constructors.hpp>
 
         util::block_profiler<profiler_tag> apply_logger_;
     };
@@ -227,53 +237,52 @@ namespace hpx { namespace lcos
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        void apply(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::id_type const& gid)
+        template <typename ...Ts>
+        void apply(BOOST_SCOPED_ENUM(launch) /*policy*/,
+            naming::id_type const& gid, Ts&&... vs)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            // Determine whether the gid is local or remote
             naming::address addr;
             if (agas::is_local_address_cached(gid, addr)) {
                 // local, direct execution
                 HPX_ASSERT(traits::component_type_is_compatible<
                     typename Action::component_type>::call(addr));
 
-                (*this->impl_)->set_data(
-                    std::move(action_type::execute_function(addr.address_,
-                        util::forward_as_tuple())));
+                (*this->impl_)->set_data(action_type::execute_function(
+                    addr.address_, std::forward<Ts>(vs)...));
             }
             else {
                 // remote execution
                 hpx::applier::detail::apply_c_cb<action_type>(
                     std::move(addr), this->get_gid(), gid,
                     util::bind(&packaged_action::parcel_write_handler,
-                        this->impl_, util::placeholders::_1,
-                        util::placeholders::_2));
+                        this->impl_, util::placeholders::_1, util::placeholders::_2),
+                    std::forward<Ts>(vs)...);
             }
         }
 
+        template <typename ...Ts>
         void apply(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::address&& addr,
-            naming::id_type const& gid)
+            naming::id_type const& gid, Ts&&... vs)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            // Determine whether the gid is local or remote
             if (addr.locality_ == hpx::get_locality()) {
                 // local, direct execution
                 HPX_ASSERT(traits::component_type_is_compatible<
                     typename Action::component_type>::call(addr));
 
-                (*this->impl_)->set_data(
-                    std::move(action_type::execute_function(addr.address_,
-                        util::forward_as_tuple())));
+                (*this->impl_)->set_data(action_type::execute_function(
+                    addr.address_, std::forward<Ts>(vs)...));
             }
             else {
                 // remote execution
                 hpx::applier::detail::apply_c_cb<action_type>(
                     std::move(addr), this->get_gid(), gid,
                     util::bind(&packaged_action::parcel_write_handler,
-                        this->impl_, util::placeholders::_1,
-                        util::placeholders::_2));
+                        this->impl_, util::placeholders::_1, util::placeholders::_2),
+                    std::forward<Ts>(vs)...);
             }
         }
 
@@ -292,19 +301,17 @@ namespace hpx { namespace lcos
         ///               target for either of these actions has to be this
         ///               packaged_action instance (as it has to be sent along
         ///               with the action as the continuation parameter).
-        packaged_action(naming::id_type const& gid)
+        template <typename ...Ts>
+        packaged_action(naming::id_type const& gid, Ts&&... vs)
           : apply_logger_("packaged_action_direct::apply")
         {
             LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
-                        << ") args(0)";
-            apply(launch::all, gid);
+                        << ") args(" << sizeof...(Ts) << ")";
+            apply(launch::all, gid, std::forward<Ts>(vs)...);
         }
-
-        // pull in remaining constructors
-        #include <hpx/lcos/packaged_action_constructors_direct.hpp>
 
         util::block_profiler<profiler_tag> apply_logger_;
     };

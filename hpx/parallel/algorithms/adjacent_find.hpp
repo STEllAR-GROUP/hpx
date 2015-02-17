@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 difference_type count = std::distance(first, last);
                 util::cancellation_token<difference_type> tok(count);
 
-                return util::partitioner<ExPolicy, FwdIter, FwdIter, void>::
+                return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, hpx::util::make_zip_iterator(first, next), count-1,
                         [op, tok](std::size_t base_idx, zip_iterator it,
@@ -158,9 +158,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::adjacent_find<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, detail::equal_to(),
-            is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, detail::equal_to());
     }
 
     /// Searches the range [first, last) for two consecutive identical elements.
@@ -244,8 +243,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
         return detail::adjacent_find<FwdIter>().call(
-            std::forward<ExPolicy>(policy),
-            first, last, op, is_seq());
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last, op);
     }
 }}}
 

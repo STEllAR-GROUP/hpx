@@ -9,7 +9,6 @@
 #include <boost/optional.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <boost/format.hpp>
 
 #include <boost/noncopyable.hpp>
@@ -17,6 +16,8 @@
 #include "certificate.hpp"
 #include "public_key.hpp"
 #include "signed_type.hpp"
+
+#include <sstream>
 
 namespace hpx { namespace components { namespace security
 {
@@ -73,7 +74,7 @@ namespace hpx { namespace components { namespace security
                 store_.find(certificate.get_issuer());
             if (issuer == store_.end())
             {
-                hpx::util::osstream oss;
+                std::ostringstream oss;
                 oss << boost::str(boost::format(
                     "The certificate issuer is unknown: %1%\n") % subject);
                 oss << "Known certificate subjects:\n";
@@ -87,7 +88,7 @@ namespace hpx { namespace components { namespace security
                 HPX_THROW_EXCEPTION(
                     hpx::security_error
                   , "certificate_store::insert"
-                  , hpx::util::osstream_get_string(oss)
+                  , oss.str()
                 )
             }
 
@@ -128,7 +129,7 @@ namespace hpx { namespace components { namespace security
 
             if (iterator == store_.end())
             {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << boost::str(boost::format(
                     "requesting a certificate for an unknown subject: %1%\n") %
                     subject);
@@ -143,7 +144,7 @@ namespace hpx { namespace components { namespace security
                 HPX_THROWS_IF(
                     ec, hpx::security_error
                   , "certificate_store::certificate_store"
-                  , hpx::util::osstream_get_string(strm)
+                  , strm.str()
                 );
 
                 return signed_type<certificate>::invalid_signed_type;

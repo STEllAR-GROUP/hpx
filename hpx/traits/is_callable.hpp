@@ -9,24 +9,14 @@
 
 #include <hpx/config.hpp>
 
-#if defined(BOOST_NO_SFINAE_EXPR)                                              \
- || defined(BOOST_NO_CXX11_DECLTYPE_N3276)                                     \
- || defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) // C++03
+#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276) // C++03
 
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
 
-#include <boost/function_types/components.hpp>
-#include <boost/function_types/function_pointer.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/facilities/intercept.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/ref.hpp>
 #include <boost/type_traits/has_dereference.hpp>
 #include <boost/type_traits/is_class.hpp>
@@ -53,31 +43,35 @@ namespace hpx { namespace traits
             fallback_call const& operator,(int) const volatile;
         };
 
+        template <std::size_t Arity, typename Is =
+            typename util::detail::make_index_pack<Arity>::type>
+        struct make_fallback_signature;
+
+        template <std::size_t /*I*/>
+        struct make_fallback_argument
+        {
+            typedef fallback_argument type;
+        };
+
+        template <std::size_t Arity, std::size_t ...Is>
+        struct make_fallback_signature<Arity, util::detail::pack_c<std::size_t, Is...> >
+        {
+            typedef fallback_call const& type(
+                typename make_fallback_argument<Is>::type...);
+        };
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T, std::size_t Arity>
-        struct callable_wrapper_fallback;
+        struct callable_wrapper_fallback
+        {
+            typedef typename make_fallback_signature<Arity>::type* function_ptr;
+
+            operator function_ptr() const volatile;
+        };
 
         template <typename R>
         struct callable_wrapper_fallback<R(*)(), 0>
         {};
-
-#       define HPX_TRAITS_DECL_FALLBACK(Z, N, D)                              \
-        template <typename T>                                                 \
-        struct callable_wrapper_fallback<T, N>                                \
-        {                                                                     \
-            typedef fallback_call const& (*pointer_to_function)(              \
-                    BOOST_PP_ENUM_PARAMS(N, fallback_argument BOOST_PP_INTERCEPT)\
-                );                                                            \
-            operator pointer_to_function() const volatile;                    \
-        };                                                                    \
-        /**/
-
-        BOOST_PP_REPEAT(
-            HPX_FUNCTION_ARGUMENT_LIMIT
-          , HPX_TRAITS_DECL_FALLBACK, _
-        );
-
-#       undef HPX_TRAITS_DECL_FALLBACK
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T, std::size_t Arity, typename Enable = void>
@@ -100,63 +94,41 @@ namespace hpx { namespace traits
           : callable_wrapper<typename util::decay<T>::type, Arity>
         {};
 
-#       define HPX_TRAITS_DECL_CALLABLE_WRAPPER_FUNCTION(Z, N, D)             \
-        template <typename R                                                  \
-            BOOST_PP_ENUM_TRAILING_PARAMS(N, typename P)                      \
-          , std::size_t Arity>                                                \
-        struct callable_wrapper<R(*)(BOOST_PP_ENUM_PARAMS(N, P)), Arity>      \
-          : callable_wrapper_fallback<R(*)(BOOST_PP_ENUM_PARAMS(N, P)), Arity>\
-        {                                                                     \
-            R operator()(BOOST_PP_ENUM_PARAMS(N, P)) const volatile;          \
-        };                                                                    \
-                                                                              \
-        template <typename R, typename C                                      \
-            BOOST_PP_ENUM_TRAILING_PARAMS(N, typename P)                      \
-          , std::size_t Arity>                                                \
-        struct callable_wrapper<R(C::*)(BOOST_PP_ENUM_PARAMS(N, P)), Arity>   \
-          : callable_wrapper_fallback<R(C::*)(BOOST_PP_ENUM_PARAMS(N, P)), Arity>\
-        {                                                                     \
-            R operator()(C*                                                   \
-                BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
-            R operator()(C&                                                   \
-                BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
-            R operator()(C&&                                                  \
-                BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
-            template <typename T>                                             \
-            typename boost::enable_if_c<                                      \
-                boost::has_dereference<T, C&>::value                          \
-              , R                                                             \
-            >::type operator()(T                                              \
-                BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
-        };                                                                    \
-                                                                              \
-        template <typename R, typename C                                      \
-            BOOST_PP_ENUM_TRAILING_PARAMS(N, typename P)                      \
-          , std::size_t Arity>                                                \
-        struct callable_wrapper<R(C::*)(BOOST_PP_ENUM_PARAMS(N, P)) const, Arity>\
-          : callable_wrapper_fallback<R(C::*)(BOOST_PP_ENUM_PARAMS(N, P)) const, Arity>\
-        {                                                                     \
-            R operator()(C const*                                             \
-                BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
-            R operator()(C const&                                             \
-                BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
-            R operator()(C const&&                                            \
-                BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
-            template <typename T>                                             \
-            typename boost::enable_if_c<                                      \
-                boost::has_dereference<T, C const&>::value                    \
-              , R                                                             \
-            >::type operator()(T                                              \
-                BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
-        };                                                                    \
-        /**/
+        template <typename R, typename ...Ps, std::size_t Arity>
+        struct callable_wrapper<R(*)(Ps...), Arity>
+          : callable_wrapper_fallback<R(*)(Ps...), Arity>
+        {
+            R operator()(Ps...) const volatile;
+        };
 
-        BOOST_PP_REPEAT(
-            HPX_FUNCTION_ARGUMENT_LIMIT
-          , HPX_TRAITS_DECL_CALLABLE_WRAPPER_FUNCTION, _
-        );
+        template <typename R, typename C, typename ...Ps, std::size_t Arity>
+        struct callable_wrapper<R(C::*)(Ps...), Arity>
+          : callable_wrapper_fallback<R(C::*)(Ps...), Arity>
+        {
+            R operator()(C*, Ps...) const volatile;
+            R operator()(C&, Ps...) const volatile;
+            R operator()(C&&, Ps...) const volatile;
 
-#       undef HPX_TRAITS_DECL_CALLABLE_WRAPPER_FUNCTION
+            template <typename T>
+            typename boost::enable_if_c<
+                boost::has_dereference<T, C&>::value
+              , R
+            >::type operator()(T, Ps...) const volatile;
+        };
+
+        template <typename R, typename C, typename ...Ps, std::size_t Arity>
+        struct callable_wrapper<R(C::*)(Ps...) const, Arity>
+          : callable_wrapper_fallback<R(C::*)(Ps...) const, Arity>
+        {
+            R operator()(C const*, Ps...) const volatile;
+            R operator()(C const&, Ps...) const volatile;
+            R operator()(C const&&, Ps...) const volatile;
+            template <typename T>
+            typename boost::enable_if_c<
+                boost::has_dereference<T, C const&>::value
+              , R
+            >::type operator()(T, Ps...) const volatile;
+        };
 
         template <typename M, typename C, std::size_t Arity>
         struct callable_wrapper<M C::*, Arity>
@@ -172,60 +144,37 @@ namespace hpx { namespace traits
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T
-          , BOOST_PP_ENUM_BINARY_PARAMS(HPX_FUNCTION_ARGUMENT_LIMIT
-              , typename A, = void BOOST_PP_INTERCEPT)
-          , typename Dummy = void>
-        struct is_callable_impl;
+        template <typename F, typename ...Ts>
+        struct is_callable_impl
+        {
+            typedef typename util::detail::qualify_as<
+                    detail::callable_wrapper<
+                        typename util::decay<F>::type, sizeof...(Ts)
+                    >, F
+                >::type callable_wrapper;
+            typedef char (&no_type)[1];
+            typedef char (&yes_type)[2];
 
-#       define HPX_TRAITS_DECL_IS_CALLABLE_IMPL(Z, N, D)                      \
-        template <typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename T)>    \
-        struct is_callable_impl<F BOOST_PP_ENUM_TRAILING_PARAMS(N, T)>        \
-        {                                                                     \
-            typedef typename util::detail::qualify_as<                        \
-                    detail::callable_wrapper<typename util::decay<F>::type, N>, F\
-                >::type callable_wrapper;                                     \
-            typedef char (&no_type)[1];                                       \
-            typedef char (&yes_type)[2];                                      \
-                                                                              \
-            template<typename T>                                              \
-            static yes_type can_be_called(T const &);                         \
-            static no_type can_be_called(detail::fallback_call const &);      \
-                                                                              \
-            static bool const value =                                         \
-                sizeof(can_be_called((boost::declval<callable_wrapper>()(     \
-                    BOOST_PP_ENUM_BINARY_PARAMS(N,                            \
-                        boost::declval<T, >() BOOST_PP_INTERCEPT)), 0))       \
-                ) == sizeof(yes_type);                                        \
-            typedef boost::mpl::bool_<value> type;                            \
-        };                                                                    \
-        /**/
+            template<typename T>
+            static yes_type can_be_called(T const &);
+            static no_type can_be_called(detail::fallback_call const &);
 
-        BOOST_PP_REPEAT(
-            HPX_FUNCTION_ARGUMENT_LIMIT
-          , HPX_TRAITS_DECL_IS_CALLABLE_IMPL, _
-        );
-
-#       undef HPX_TRAITS_DECL_IS_CALLABLE_IMPL
+            static bool const value =
+                sizeof(can_be_called((boost::declval<callable_wrapper>()(
+                    boost::declval<Ts>()...), 0))
+                ) == sizeof(yes_type);
+            typedef boost::mpl::bool_<value> type;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct is_callable;
 
-#   define HPX_TRAITS_DECL_IS_CALLABLE(Z, N, D)                               \
-    template <typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)>        \
-    struct is_callable<F(BOOST_PP_ENUM_PARAMS(N, A))>                         \
-      : detail::is_callable_impl<F BOOST_PP_ENUM_TRAILING_PARAMS(N, A)>       \
-    {};                                                                       \
-    /**/
-
-    BOOST_PP_REPEAT(
-        HPX_FUNCTION_ARGUMENT_LIMIT
-      , HPX_TRAITS_DECL_IS_CALLABLE, _
-    );
-
-#   undef HPX_TRAITS_DECL_IS_CALLABLE
+    template <typename F, typename ...Ts>
+    struct is_callable<F(Ts...)>
+      : detail::is_callable_impl<F, Ts...>
+    {};
 }}
 
 #else // C++11
@@ -262,6 +211,7 @@ namespace hpx { namespace traits
             )>::type
         > : boost::mpl::true_
         {};
+
         template <typename F, typename C>
         struct is_callable_impl<F(C)
           , typename util::always_void<decltype(
@@ -269,6 +219,7 @@ namespace hpx { namespace traits
             )>::type
         > : boost::mpl::true_
         {};
+
         template <typename F, typename C>
         struct is_callable_impl<F(C)
           , typename boost::enable_if_c<
@@ -290,6 +241,7 @@ namespace hpx { namespace traits
             )>::type
         > : boost::mpl::true_
         {};
+
         template <typename F, typename C, typename... A>
         struct is_callable_impl<F(C, A...)
           , typename util::always_void<decltype(
@@ -298,6 +250,7 @@ namespace hpx { namespace traits
             )>::type
         > : boost::mpl::true_
         {};
+
         template <typename F, typename C, typename... A>
         struct is_callable_impl<F(C, A...)
           , typename boost::enable_if_c<
@@ -343,10 +296,6 @@ namespace hpx { namespace traits
 
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/not.hpp>
-#include <boost/preprocessor/facilities/intercept.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
 
 namespace hpx { namespace traits { namespace detail
 {
@@ -354,22 +303,13 @@ namespace hpx { namespace traits { namespace detail
     template <typename T>
     struct is_callable_not_action;
 
-#   define HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION(Z, N, D)                    \
-    template <typename T BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)>        \
-    struct is_callable_not_action<T(BOOST_PP_ENUM_PARAMS(N, A))>              \
-      : boost::mpl::and_<                                                     \
-            is_callable<T(BOOST_PP_ENUM_PARAMS(N, A))>                        \
-          , boost::mpl::not_<traits::is_action<typename util::decay<T>::type> >\
-        >                                                                     \
-    {};                                                                       \
-    /**/
-
-    BOOST_PP_REPEAT(
-        HPX_FUNCTION_ARGUMENT_LIMIT
-      , HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION, _
-    );
-
-#   undef HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION
+    template <typename T, typename ...Ts>
+    struct is_callable_not_action<T(Ts...)>
+      : boost::mpl::and_<
+            is_callable<T(Ts...)>
+          , boost::mpl::not_<traits::is_action<typename util::decay<T>::type> >
+        >
+    {};
 }}}
 
 #endif

@@ -22,7 +22,6 @@
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/query_counters.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/apex.hpp>
 
@@ -35,6 +34,7 @@
 #endif
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <new>
 
@@ -69,12 +69,7 @@ HPX_PLAIN_ACTION(hpx::detail::list_component_type,
 
 typedef
     hpx::util::detail::bound_action<
-        hpx::actions::plain_action2<
-            std::string const&
-          , const hpx::naming::gid_type&
-          , hpx::detail::list_symbolic_name
-          , hpx::actions::detail::this_type
-        >
+        list_symbolic_name_action
       , hpx::util::tuple<
             hpx::naming::id_type
           , hpx::util::detail::placeholder<1>
@@ -95,12 +90,7 @@ HPX_UTIL_REGISTER_FUNCTION(
 
 typedef
     hpx::util::detail::bound_action<
-        hpx::actions::plain_action2<
-            std::string const&
-          , int
-          , hpx::detail::list_component_type
-          , hpx::actions::detail::this_type
-        >
+        list_component_type_action
       , hpx::util::tuple<
             hpx::naming::id_type
           , hpx::util::detail::placeholder<1>
@@ -181,7 +171,7 @@ namespace hpx { namespace detail
         error_code& ec)
     {
         // compose the information to be printed for each of the counters
-        util::osstream strm;
+        std::ostringstream strm;
 
         strm << std::string(78, '-') << '\n';
         strm << "fullname: " << info.fullname_ << '\n';
@@ -233,7 +223,7 @@ namespace hpx { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     void list_symbolic_name(std::string const& name, naming::gid_type const& gid)
     {
-        util::osstream strm;
+        std::ostringstream strm;
 
         strm << name << ", " << gid << ", "
              << (naming::detail::has_credits(gid) ? "managed" : "unmanaged");
@@ -522,7 +512,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         int run(hpx::runtime& rt,
-            HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown)
@@ -538,7 +528,7 @@ namespace hpx
         }
 
         int start(hpx::runtime& rt,
-            HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown)
@@ -1020,7 +1010,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT int run_or_start(
-            HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
             boost::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> const& ini_config,
             startup_function_type const& startup,

@@ -68,18 +68,29 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
     typedef typename hpx::vector<T>::iterator iterator;
     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
     typedef typename traits::segment_iterator segment_iterator;
+    typedef typename traits::local_segment_iterator local_segment_iterator;
     typedef typename traits::local_iterator local_iterator;
+    typedef typename traits::local_raw_iterator local_raw_iterator;
 
     typedef typename hpx::vector<T>::const_iterator const_iterator;
     typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
     typedef typename const_traits::segment_iterator const_segment_iterator;
+    typedef typename const_traits::local_segment_iterator const_local_segment_iterator;
     typedef typename const_traits::local_iterator const_local_iterator;
+    typedef typename const_traits::local_raw_iterator const_local_raw_iterator;
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
             segment_iterator
         >::is_segmented_iterator::value);
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
             const_segment_iterator
+        >::is_segmented_iterator::value);
+
+    HPX_TEST(!hpx::traits::segmented_iterator_traits<
+            local_segment_iterator
+        >::is_segmented_iterator::value);
+    HPX_TEST(!hpx::traits::segmented_iterator_traits<
+            const_local_segment_iterator
         >::is_segmented_iterator::value);
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
@@ -165,12 +176,12 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
     BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
     {
         boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
-        segment_iterator seg_end = v.segment_end(locality_id);
-        for (segment_iterator seg_it = v.segment_begin(locality_id);
+        local_segment_iterator seg_end = v.segment_end(locality_id);
+        for (local_segment_iterator seg_it = v.segment_begin(locality_id);
              seg_it != seg_end; ++seg_it, ++seg_count)
         {
-            local_iterator loc_end = traits::end(seg_it);
-            for (local_iterator lit = traits::begin(seg_it);
+            local_raw_iterator loc_end = traits::end(seg_it);
+            for (local_raw_iterator lit = traits::begin(seg_it);
                  lit != loc_end; ++lit, ++count)
             {
             }
@@ -184,12 +195,12 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
     BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
     {
         boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
-        const_segment_iterator seg_cend = v.segment_cend(locality_id);
-        for (const_segment_iterator seg_cit = v.segment_cbegin(locality_id);
+        const_local_segment_iterator seg_cend = v.segment_cend(locality_id);
+        for (const_local_segment_iterator seg_cit = v.segment_cbegin(locality_id);
              seg_cit != seg_cend; ++seg_cit, ++seg_count)
         {
-            const_local_iterator loc_cend = const_traits::end(seg_cit);
-            for (const_local_iterator lcit = const_traits::begin(seg_cit);
+            const_local_raw_iterator loc_cend = const_traits::end(seg_cit);
+            for (const_local_raw_iterator lcit = const_traits::begin(seg_cit);
                  lcit != loc_cend; ++lcit, ++count)
             {
             }
@@ -334,29 +345,11 @@ void trivial_tests()
 
     trivial_test_without_policy<T>(length, "test1");
 
-    trivial_test_with_policy<T>(length, 1, hpx::block, "test1");
-    trivial_test_with_policy<T>(length, 3, hpx::block(3), "test2");
-    trivial_test_with_policy<T>(length, 3, hpx::block(3, localities), "test3");
+    trivial_test_with_policy<T>(length, 1, hpx::layout, "test1");
+    trivial_test_with_policy<T>(length, 3, hpx::layout(3), "test2");
+    trivial_test_with_policy<T>(length, 3, hpx::layout(3, localities), "test3");
     trivial_test_with_policy<T>(length, localities.size(),
-        hpx::block(localities), "test4");
-
-    trivial_test_with_policy<T>(length, 1, hpx::cyclic, "test5");
-    trivial_test_with_policy<T>(length, 3, hpx::cyclic(3), "test6");
-    trivial_test_with_policy<T>(length, 3, hpx::cyclic(3, localities), "test7");
-    trivial_test_with_policy<T>(length, localities.size(),
-        hpx::cyclic(localities), "test8");
-
-    trivial_test_with_policy<T>(length, 1, hpx::block_cyclic, "test9");
-    trivial_test_with_policy<T>(length, 3, hpx::block_cyclic(3), "test10");
-    trivial_test_with_policy<T>(length, 3,
-        hpx::block_cyclic(3, localities), "test11");
-    trivial_test_with_policy<T>(length, localities.size(),
-        hpx::block_cyclic(localities), "test12");
-    trivial_test_with_policy<T>(length, 4, hpx::block_cyclic(4, 3), "test13");
-    trivial_test_with_policy<T>(length, 4,
-        hpx::block_cyclic(4, localities, 3), "test14");
-    trivial_test_with_policy<T>(length, localities.size(),
-        hpx::block_cyclic(localities, 3), "test15");
+        hpx::layout(localities), "test4");
 }
 
 int main()

@@ -24,8 +24,8 @@ namespace hpx { namespace util
     // file
     struct HPX_EXPORT map_hostnames
     {
-        typedef HPX_STD_FUNCTION<std::string(std::string const&)>
-            transform_function_type;
+        typedef util::function_nonser<
+            std::string(std::string const&)> transform_function_type;
 
         map_hostnames(bool debug = false)
           : debug_(debug)

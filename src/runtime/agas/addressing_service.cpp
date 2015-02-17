@@ -7,8 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/hpx.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -30,11 +31,6 @@
 #include <boost/format.hpp>
 #include <boost/icl/closed_interval.hpp>
 #include <boost/lexical_cast.hpp>
-
-namespace hpx { namespace detail
-{
-    std::string get_locality_base_name();
-}}
 
 namespace hpx { namespace agas
 {
@@ -217,8 +213,8 @@ addressing_service::addressing_service(
   , state_(starting)
   , locality_()
 { // {{{
-    parcelset::parcelport & pp = *ph.get_bootstrap_parcelport();
-    create_big_boot_barrier(pp, ini_);
+    boost::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
+    create_big_boot_barrier(pp ? pp.get() : 0, ph.endpoints(), ini_);
 
     if (caching_)
         gva_cache_->reserve(ini_.get_agas_local_cache_size());
@@ -227,27 +223,28 @@ addressing_service::addressing_service(
     {
         launch_bootstrap(pp, ph.endpoints(), ini_);
     }
-}
+} // }}}
 
-void addressing_service::initialize(
-    parcelset::parcelhandler& ph, boost::uint64_t rts_lva, boost::uint64_t mem_lva)
-{
+void addressing_service::initialize(parcelset::parcelhandler& ph,
+    boost::uint64_t rts_lva, boost::uint64_t mem_lva)
+{ // {{{
     rts_lva_ = rts_lva;
     mem_lva_ = mem_lva;
-    parcelset::parcelport & pp = *ph.get_bootstrap_parcelport();
+
     // now, boot the parcel port
-    pp.run(false);
+    boost::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
+    if(pp)
+        pp->run(false);
 
     if (service_type == service_mode_bootstrap)
     {
         get_big_boot_barrier().wait_bootstrap();
-
-        ph.set_resolved_localities(get_resolved_localities());
     }
     else
     {
         launch_hosted();
-        get_big_boot_barrier().wait_hosted(pp.get_locality_name(),
+        get_big_boot_barrier().wait_hosted(
+            pp->get_locality_name(),
             &hosted->primary_ns_server_, &hosted->symbol_ns_server_);
     }
 
@@ -296,7 +293,7 @@ namespace detail
 }
 
 void addressing_service::launch_bootstrap(
-    parcelset::parcelport& pp
+    boost::shared_ptr<parcelset::parcelport> pp
   , parcelset::endpoints_type const & endpoints
   , util::runtime_configuration const& ini_
     )
@@ -305,18 +302,18 @@ void addressing_service::launch_bootstrap(
 
     runtime& rt = get_runtime();
 
+    naming::gid_type const here =
+        naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
+
     // store number of cores used by other processes
     boost::uint32_t cores_needed = rt.assign_cores();
     boost::uint32_t first_used_core = rt.assign_cores(
-        pp.get_locality_name(), cores_needed);
+        pp ? pp->get_locality_name() : "", cores_needed);
 
     util::runtime_configuration& cfg = rt.get_config();
     cfg.set_first_used_core(first_used_core);
-    HPX_ASSERT(pp.here() == pp.agas_locality(cfg));
+    HPX_ASSERT(pp ? pp->here() == pp->agas_locality(cfg) : true);
     rt.assign_cores();
-
-    naming::gid_type const here =
-        naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
     naming::gid_type const locality_gid = bootstrap_locality_namespace_gid();
     gva locality_gva(here,
@@ -391,18 +388,12 @@ void addressing_service::launch_bootstrap(
     naming::gid_type lower, upper;
     get_id_range(HPX_INITIAL_GID_RANGE, lower, upper);
     rt.get_id_pool().set_range(lower, upper);
-
-//    get_big_boot_barrier().wait();
-//    set_status(running);
 } // }}}
 
 void addressing_service::launch_hosted()
-{ // {{{
+{
     hosted = boost::make_shared<hosted_data_type>();
-
-//    get_big_boot_barrier().wait(&hosted->primary_ns_server_);
-//    set_status(running);
-} // }}}
+}
 
 void addressing_service::adjust_local_cache_size()
 { // {{{
@@ -509,6 +500,16 @@ bool addressing_service::register_locality(
 
         prefix = naming::get_gid_from_locality_id(rep.get_locality_id());
 
+        {
+            mutex_type::scoped_lock l(resolved_localities_mtx_);
+            std::pair<resolved_localities_type::iterator, bool> res
+                = resolved_localities_.insert(std::make_pair(
+                    prefix
+                  , endpoints
+                ));
+            HPX_ASSERT(res.second);
+        }
+
         return true;
     }
     catch (hpx::exception const& e) {
@@ -517,40 +518,96 @@ bool addressing_service::register_locality(
     }
 } // }}}
 
-naming::gid_type addressing_service::resolve_locality(
-    parcelset::endpoints_type const& endpoints
+void addressing_service::register_console(parcelset::endpoints_type const & eps)
+{
+    mutex_type::scoped_lock l(resolved_localities_mtx_);
+    std::pair<resolved_localities_type::iterator, bool> res
+        = resolved_localities_.insert(std::make_pair(
+            naming::get_gid_from_locality_id(0)
+          , eps
+        ));
+    HPX_ASSERT(res.second);
+}
+
+parcelset::endpoints_type const & addressing_service::resolve_locality(
+    naming::gid_type const & gid
   , error_code& ec
     )
 { // {{{
-    try {
-        request req(locality_ns_resolve_locality, endpoints);
-        response rep;
+    mutex_type::scoped_lock l(resolved_localities_mtx_);
+    resolved_localities_type::iterator it = resolved_localities_.find(gid);
+    if(it == resolved_localities_.end())
+    {
+        // The locality hasn't been requested to be resolved yet. Do it now.
+        parcelset::endpoints_type endpoints;
+        request req(locality_ns_resolve_locality, gid);
 
-        if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
+        if(is_bootstrap())
+        {
+            endpoints
+                = bootstrap->locality_ns_server_.service(req, ec).get_endpoints();
+            if(ec)
+            {
+                HPX_THROWS_IF(ec, internal_server_error
+                  , "addressing_service::resolve_locality"
+                  , "could not resolve locality to endpoints");
+                return resolved_localities_[naming::invalid_gid];
+            }
+        }
         else
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
+        {
+            {
+                hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                future<parcelset::endpoints_type> endpoints_future =
+                    hosted->locality_ns_.service_async<parcelset::endpoints_type>(
+                        req
+                      , action_priority_
+                    );
 
-        if (ec || (success != rep.get_status()))
-            return naming::invalid_gid;
+                if (0 == threads::get_self_ptr())
+                {
+                    // this should happen only during bootstrap
+                    // FIXME: Disabled this assert cause it fires. It should not, but doesn't do any harm
+                    //HPX_ASSERT(hpx::is_starting());
 
-        return naming::get_gid_from_locality_id(rep.get_locality_id());
+                    while(!endpoints_future.is_ready())
+                        /**/;
+                }
+                endpoints = endpoints_future.get(ec);
+            }
+            // Search again ... might have been added by a different thread already
+            it = resolved_localities_.find(gid);
+        }
+
+        if(it == resolved_localities_.end())
+        {
+            if(HPX_UNLIKELY(!util::insert_checked(resolved_localities_.insert(
+                    std::make_pair(
+                        gid
+                      , endpoints
+                    )
+                ), it)))
+            {
+                HPX_THROWS_IF(ec, internal_server_error
+                  , "addressing_service::resolve_locality"
+                  , "resolved locality insertion failed "
+                    "due to a locking error or memory corruption");
+                return resolved_localities_[naming::invalid_gid];
+            }
+        }
     }
-    catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_locality");
-        return naming::invalid_gid;
-    }
+    return it->second;
 } // }}}
 
 // TODO: We need to ensure that the locality isn't unbound while it still holds
 // referenced objects.
 bool addressing_service::unregister_locality(
-    parcelset::endpoints_type const& endpoints
+    naming::gid_type const & gid
   , error_code& ec
     )
 { // {{{
     try {
-        request req(locality_ns_free, endpoints);
+        request req(locality_ns_free, gid);
         response rep;
 
         if (is_bootstrap())
@@ -568,6 +625,13 @@ bool addressing_service::unregister_locality(
 
         if (ec || (success != rep.get_status()))
             return false;
+
+        {
+            mutex_type::scoped_lock l(resolved_localities_mtx_);
+            resolved_localities_type::iterator it = resolved_localities_.find(gid);
+            if(it != resolved_localities_.end())
+                resolved_localities_.erase(it);
+        }
 
         return true;
     }
@@ -1679,7 +1743,7 @@ bool addressing_service::resolve_cached(
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::route(
     parcelset::parcel const& p
-  , HPX_STD_FUNCTION<void(boost::system::error_code const&,
+  , util::function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> const& f
     )
 {
@@ -1717,7 +1781,7 @@ void addressing_service::route(
 
             parcelset::parcel route_p(route_target, primary_ns_addr_
               , new hpx::actions::transfer_action<action_type>(action_priority_,
-                    util::forward_as_tuple(req)));
+                    req));
 
             // send to the main AGAS instance for routing
             hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);
@@ -1876,7 +1940,10 @@ void addressing_service::decref(
 
         threads::register_thread_nullary(
             util::bind(decref_ptr, this, gid, credit, boost::ref(throws)),
-            "addressing_service::decref");
+            "addressing_service::decref", threads::pending, true,
+            threads::thread_priority_normal, std::size_t(-1),
+            threads::thread_stacksize_default, ec);
+
         return;
     }
 
@@ -2561,31 +2628,31 @@ std::size_t addressing_service::get_cache_erase_entry_time(bool reset)
 void addressing_service::register_counter_types()
 { // {{{
     // install
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_hits(
+    util::function_nonser<boost::int64_t(bool)> cache_hits(
         boost::bind(&addressing_service::get_cache_hits, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_misses(
+    util::function_nonser<boost::int64_t(bool)> cache_misses(
         boost::bind(&addressing_service::get_cache_misses, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_evictions(
+    util::function_nonser<boost::int64_t(bool)> cache_evictions(
         boost::bind(&addressing_service::get_cache_evictions, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_insertions(
+    util::function_nonser<boost::int64_t(bool)> cache_insertions(
         boost::bind(&addressing_service::get_cache_insertions, this, ::_1));
 
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_get_entry_count(
+    util::function_nonser<boost::int64_t(bool)> cache_get_entry_count(
         boost::bind(&addressing_service::get_cache_get_entry_count, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_insert_entry_count(
+    util::function_nonser<boost::int64_t(bool)> cache_insert_entry_count(
         boost::bind(&addressing_service::get_cache_insert_entry_count, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_update_entry_count(
+    util::function_nonser<boost::int64_t(bool)> cache_update_entry_count(
         boost::bind(&addressing_service::get_cache_update_entry_count, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_erase_entry_count(
+    util::function_nonser<boost::int64_t(bool)> cache_erase_entry_count(
         boost::bind(&addressing_service::get_cache_erase_entry_count, this, ::_1));
 
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_get_entry_time(
+    util::function_nonser<boost::int64_t(bool)> cache_get_entry_time(
         boost::bind(&addressing_service::get_cache_get_entry_time, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_insert_entry_time(
+    util::function_nonser<boost::int64_t(bool)> cache_insert_entry_time(
         boost::bind(&addressing_service::get_cache_insert_entry_time, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_update_entry_time(
+    util::function_nonser<boost::int64_t(bool)> cache_update_entry_time(
         boost::bind(&addressing_service::get_cache_update_entry_time, this, ::_1));
-    HPX_STD_FUNCTION<boost::int64_t(bool)> cache_erase_entry_time(
+    util::function_nonser<boost::int64_t(bool)> cache_erase_entry_time(
         boost::bind(&addressing_service::get_cache_erase_entry_time, this, ::_1));
 
     performance_counters::generic_counter_type_data const counter_types[] =

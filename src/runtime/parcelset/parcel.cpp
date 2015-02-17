@@ -7,8 +7,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/serialization/intrusive_ptr.hpp>
+
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -328,9 +329,9 @@ namespace hpx { namespace parcelset
 
     std::string dump_parcel(parcel const& p)
     {
-        util::osstream os;
+        std::ostringstream os;
         os << p;
-        return util::osstream_get_string(os);
+        return os.str();
     }
 }}
 

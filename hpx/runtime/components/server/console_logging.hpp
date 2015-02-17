@@ -40,12 +40,13 @@ namespace hpx { namespace components { namespace server
     // serialization support instances
     template <typename Dummy = void>
     class console_logging_action
-      : public actions::plain_direct_action1<messages_type const&,
+      : public actions::direct_action<void (*)(messages_type const&),
         console_logging, console_logging_action<Dummy> >
     {
     private:
-        typedef actions::plain_direct_action1<
-            messages_type const&, console_logging, console_logging_action>
+        typedef actions::direct_action<
+            void (*)(messages_type const&),
+            console_logging, console_logging_action>
         base_type;
 
     public:
@@ -62,15 +63,13 @@ namespace hpx { namespace components { namespace server
         {}
 
     public:
-        template <typename Arguments>
+        template <typename T>
         static util::unused_type
-        execute_function(naming::address::address_type lva,
-            Arguments && args)
+        execute_function(naming::address::address_type lva, T&& v)
         {
             try {
                 // call the function, ignoring the return value
-                console_logging(
-                    std::move(boost::fusion::at_c<0>(args)));
+                console_logging(std::forward<T>(v));
             }
             catch (hpx::exception const& /*e*/) {
                 /**/;      // no logging!

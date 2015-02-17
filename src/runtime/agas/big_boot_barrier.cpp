@@ -7,16 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/version.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/hpx.hpp>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/mpi_environment.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
@@ -41,6 +39,8 @@
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include <sstream>
 
 namespace hpx { namespace detail
 {
@@ -152,7 +152,7 @@ struct notification_header
       , naming::address const& symbol_ns_address_
       , boost::uint32_t num_localities_
       , boost::uint32_t used_cores_
-      , std::map<naming::gid_type, parcelset::endpoints_type> const & resolved_localities_
+      , parcelset::endpoints_type const & agas_endpoints_
     ) :
         prefix(prefix_)
       , agas_locality(agas_locality_)
@@ -162,7 +162,7 @@ struct notification_header
       , symbol_ns_address(symbol_ns_address_)
       , num_localities(num_localities_)
       , used_cores(used_cores_)
-      , resolved_localities(resolved_localities_)
+      , agas_endpoints(agas_endpoints_)
     {}
 
     naming::gid_type prefix;
@@ -173,7 +173,7 @@ struct notification_header
     naming::address symbol_ns_address;
     boost::uint32_t num_localities;
     boost::uint32_t used_cores;
-    std::map<naming::gid_type, parcelset::endpoints_type> resolved_localities;
+    parcelset::endpoints_type agas_endpoints;
 
 #if defined(HPX_HAVE_SECURITY)
     components::security::signed_certificate root_certificate;
@@ -190,7 +190,7 @@ struct notification_header
         ar & symbol_ns_address;
         ar & num_localities;
         ar & used_cores;
-        ar & resolved_localities;
+        ar & agas_endpoints;
 #if defined(HPX_HAVE_SECURITY)
         ar & root_certificate;
 #endif
@@ -203,13 +203,13 @@ void notify_worker(notification_header const& header);
 // }}}
 
 // {{{ early action types
-typedef actions::plain_action1<
-    registration_header const&
+typedef actions::action<
+    void (*)(registration_header const&)
   , register_worker
 > register_worker_action;
 
-typedef actions::plain_action1<
-    notification_header const&
+typedef actions::action<
+    void (*)(notification_header const&)
   , notify_worker
 > notify_worker_action;
 // }}}
@@ -274,13 +274,13 @@ struct notification_header_security
 void register_worker_security(registration_header_security const& header);
 void notify_worker_security(notification_header_security const& header);
 
-typedef actions::plain_action1<
-    registration_header_security const&
+typedef actions::action<
+    void (*)(registration_header_security const&)
   , register_worker_security
 > register_worker_security_action;
 
-typedef actions::plain_action1<
-    notification_header_security const&
+typedef actions::action<
+    void (*)(notification_header_security const&)
   , notify_worker_security
 > notify_worker_security_action;
 #endif
@@ -396,7 +396,7 @@ void register_worker(registration_header const& header)
 
     notification_header hdr (prefix, bbb.here(), locality_addr, primary_addr
       , component_addr, symbol_addr, rt.get_config().get_num_localities()
-      , first_core, agas_client.get_resolved_localities());
+      , first_core, bbb.get_endpoints());
 
 #if defined(HPX_HAVE_SECURITY)
     // wait for the root certificate to be available
@@ -425,18 +425,17 @@ void register_worker(registration_header const& header)
 
     parcelset::locality dest;
     parcelset::locality here = bbb.here();
-    BOOST_FOREACH(parcelset::locality const & loc, header.endpoints)
+    BOOST_FOREACH(parcelset::endpoints_type::value_type const & loc, header.endpoints)
     {
-        if(loc.get_type() == here.get_type())
+        if(loc.second.type() == here.type())
         {
-            dest = loc;
+            dest = loc.second;
             break;
         }
     }
 
     actions::base_action* p =
-        new actions::transfer_action<notify_worker_action>(
-            util::forward_as_tuple(hdr));
+        new actions::transfer_action<notify_worker_action>(hdr);
 
 
     // TODO: Handle cases where localities try to connect to AGAS while it's
@@ -463,7 +462,7 @@ void register_worker(registration_header const& header)
           , dest, p);
 #else
         // delay the final response until the runtime system is up and running
-        HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>(
+        util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
             boost::bind(
                 &big_boot_barrier::apply
               , boost::ref(get_big_boot_barrier())
@@ -488,17 +487,18 @@ void notify_worker(notification_header const& header)
 
     if (HPX_UNLIKELY(agas_client.get_status() != starting))
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "locality " << rt.here() << " has launched early";
         HPX_THROW_EXCEPTION(internal_server_error,
             "agas::notify_worker",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
     }
 
     util::runtime_configuration& cfg = rt.get_config();
 
     // set our prefix
     agas_client.set_local_locality(header.prefix);
+    agas_client.register_console(header.agas_endpoints);
     cfg.parse("assigned locality",
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(header.prefix)));
@@ -581,8 +581,6 @@ void notify_worker(notification_header const& header)
     cfg.set_first_used_core(header.used_cores);
     rt.assign_cores();
 
-    rt.get_parcel_handler().set_resolved_localities(header.resolved_localities);
-
 #if defined(HPX_HAVE_SECURITY)
     // initialize certificate store
     rt.store_root_certificate(header.root_certificate);
@@ -597,8 +595,7 @@ void notify_worker(notification_header const& header)
         naming::get_locality_id_from_gid(header.prefix)
       , 0
       , header.agas_locality
-      , new actions::transfer_action<register_worker_security_action>(
-            util::forward_as_tuple(hdr)));
+      , new actions::transfer_action<register_worker_security_action>(hdr));
 #endif
 }
 // }}}
@@ -635,8 +632,7 @@ void register_worker_security(registration_header_security const& header)
       , rt.sign_certificate_signing_request(header.csr));
 
     actions::base_action* p =
-        new actions::transfer_action<notify_worker_security_action>(
-            util::forward_as_tuple(hdr));
+        new actions::transfer_action<notify_worker_security_action>(hdr);
 
 
     parcelset::locality dest;
@@ -666,7 +662,7 @@ void register_worker_security(registration_header_security const& header)
     {
         // AGAS is starting up; this locality is participating in startup
         // synchronization.
-        HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>(
+        util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
             boost::bind(
                 &big_boot_barrier::apply
               , boost::ref(get_big_boot_barrier())
@@ -690,11 +686,11 @@ void notify_worker_security(notification_header_security const& header)
 
     if (HPX_UNLIKELY(agas_client.get_status() != starting))
     {
-        hpx::util::osstream strm;
+        std::ostringstream strm;
         strm << "locality " << rt.here() << " has launched early";
         HPX_THROW_EXCEPTION(internal_server_error,
             "agas::notify_worker",
-            hpx::util::osstream_get_string(strm));
+            strm.str());
     }
 
     // finish initializing the certificate store
@@ -734,18 +730,21 @@ inline std::size_t get_number_of_bootstrap_connections(
 }
 
 big_boot_barrier::big_boot_barrier(
-    parcelset::parcelport& pp_
+    parcelset::parcelport *pp_
+  , parcelset::endpoints_type const& endpoints_
   , util::runtime_configuration const& ini_
 ):
     pp(pp_)
+  , endpoints(endpoints_)
   , service_type(ini_.get_agas_service_mode())
-  , bootstrap_agas(pp_.agas_locality(ini_))
+  , bootstrap_agas(pp_ ? pp_->agas_locality(ini_) : parcelset::locality())
   , cond()
   , mtx()
   , connected(get_number_of_bootstrap_connections(ini_))
   , thunks(32)
 {
-    pp_.register_event_handler(&early_parcel_sink);
+    if(pp_)
+        pp_->register_event_handler(&early_parcel_sink);
 }
 
 void big_boot_barrier::apply(
@@ -754,11 +753,12 @@ void big_boot_barrier::apply(
   , parcelset::locality const & dest
   , actions::base_action* act
 ) { // {{{
+    HPX_ASSERT(pp);
     naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
     parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
-    pp.send_early_parcel(dest, p);
+    pp->send_early_parcel(dest, p);
 } // }}}
 
 void big_boot_barrier::apply_late(
@@ -803,7 +803,8 @@ namespace detail
     }
 }
 
-void big_boot_barrier::wait_hosted(std::string const& locality_name,
+void big_boot_barrier::wait_hosted(
+    std::string const& locality_name,
     void* primary_ns_server, void* symbol_ns_server)
 { // {{{
     HPX_ASSERT(service_mode_bootstrap != service_type);
@@ -822,14 +823,12 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
 
     naming::gid_type suggested_prefix;
 
-#if defined(HPX_PARCELPORT_MPI)
-    // if MPI parcelport is enabled we use the MPI rank as the suggested locality_id
-    if (util::mpi_environment::rank() != -1)
+    std::string locality_str = rt.get_config().get_entry("hpx.locality", "-1");
+    if(locality_str != "-1")
     {
         suggested_prefix = naming::get_gid_from_locality_id(
-            util::mpi_environment::rank());
+            util::safe_lexical_cast<boost::uint32_t>(locality_str, -1));
     }
-#endif
 
     // contact the bootstrap AGAS node
     registration_header hdr(
@@ -845,8 +844,7 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
         naming::invalid_locality_id
         , 0
         , bootstrap_agas
-        , new actions::transfer_action<register_worker_action>(
-            util::forward_as_tuple(hdr)));
+        , new actions::transfer_action<register_worker_action>(hdr));
 
     // wait for registration to be complete
     spin();
@@ -866,7 +864,7 @@ void big_boot_barrier::trigger()
 {
     if (service_mode_bootstrap == service_type)
     {
-        HPX_STD_FUNCTION<void()>* p;
+        util::function_nonser<void()>* p;
 
         while (thunks.pop(p))
             (*p)();
@@ -877,7 +875,8 @@ void big_boot_barrier::trigger()
 struct bbb_tag;
 
 void create_big_boot_barrier(
-    parcelset::parcelport& pp_
+    parcelset::parcelport *pp_
+  , parcelset::endpoints_type const& endpoints_
   , util::runtime_configuration const& ini_
 ) {
     util::reinitializable_static<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
@@ -887,7 +886,7 @@ void create_big_boot_barrier(
             "create_big_boot_barrier",
             "create_big_boot_barrier was called more than once");
     }
-    bbb.get().reset(new big_boot_barrier(pp_, ini_));
+    bbb.get().reset(new big_boot_barrier(pp_, endpoints_, ini_));
 }
 
 void destroy_big_boot_barrier()

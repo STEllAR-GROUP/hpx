@@ -38,22 +38,22 @@ namespace hpx { namespace applier { namespace detail
     template <typename Action>
     struct apply_helper<Action, boost::mpl::false_>
     {
-        template <typename Arguments>
+        template <typename ...Ts>
         static void
         call (naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_priority priority, Arguments && args)
+            threads::thread_priority priority, Ts&&... vs)
         {
             actions::continuation_type cont;
             threads::thread_init_data data;
             if (traits::action_decorate_continuation<Action>::call(cont))
             {
                 data.func = Action::construct_thread_function(cont, lva,
-                    std::forward<Arguments>(args));
+                    std::forward<Ts>(vs)...);
             }
             else
             {
                 data.func = Action::construct_thread_function(lva,
-                    std::forward<Arguments>(args));
+                    std::forward<Ts>(vs)...);
             }
 
 #if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
@@ -72,11 +72,11 @@ namespace hpx { namespace applier { namespace detail
                 lva, data, threads::pending);
         }
 
-        template <typename Arguments>
+        template <typename ...Ts>
         static void
         call (actions::continuation_type& c, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_priority priority,
-            Arguments && args)
+            Ts&&... vs)
         {
             // first decorate the continuation
             traits::action_decorate_continuation<Action>::call(c);
@@ -84,7 +84,7 @@ namespace hpx { namespace applier { namespace detail
             // now, schedule the thread
             threads::thread_init_data data;
             data.func = Action::construct_thread_function(c, lva,
-                std::forward<Arguments>(args));
+                std::forward<Ts>(vs)...);
 #if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
             data.lva = lva;
 #endif
@@ -106,23 +106,23 @@ namespace hpx { namespace applier { namespace detail
     struct apply_helper<Action, boost::mpl::true_>
     {
         // If local and to be directly executed, just call the function
-        template <typename Arguments>
+        template <typename ...Ts>
         static void
         call (naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_priority, Arguments && args)
+            threads::thread_priority, Ts&&... vs)
         {
-            Action::execute_function(lva, std::forward<Arguments>(args));
+            Action::execute_function(lva, std::forward<Ts>(vs)...);
         }
 
-        template <typename Arguments>
+        template <typename ...Ts>
         static void
         call (actions::continuation_type& c, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_priority,
-            Arguments && args)
+            Ts&&... vs)
         {
             try {
-                c->trigger(std::move(Action::execute_function(
-                    lva, std::forward<Arguments>(args))));
+                c->trigger(Action::execute_function(lva,
+                    std::forward<Ts>(vs)...));
             }
             catch (hpx::exception const& /*e*/) {
                 // make sure hpx::exceptions are propagated back to the client

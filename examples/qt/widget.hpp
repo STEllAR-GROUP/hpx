@@ -6,6 +6,7 @@
 #include <QtGui/QDialog>
 
 #ifndef Q_MOC_RUN
+#include <hpx/include/threads.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <boost/function.hpp>
 #endif

@@ -18,11 +18,11 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/acquire_future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
 #include <utility>
 #include <boost/utility/enable_if.hpp>
-#include <boost/preprocessor/enum_params.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -77,6 +77,21 @@ namespace hpx { namespace traits
         get_shared_state(Derived const& client)
         {
             return client.share().shared_state_;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Derived>
+    struct acquire_future_impl<Derived,
+        typename boost::enable_if<is_client<Derived> >::type>
+    {
+        typedef Derived type;
+
+        template <typename T_>
+        BOOST_FORCEINLINE
+        Derived operator()(T_ && value) const
+        {
+            return std::forward<T_>(value);
         }
     };
 }}
@@ -225,42 +240,19 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of an object on the locality as
         /// given by the parameter \a targetgid
-        static Derived create(naming::id_type const& targetgid)
+        template <typename ...Ts>
+        static Derived create(naming::id_type const& targetgid, Ts&&... vs)
         {
-            return Derived(stub_type::create_async(targetgid));
+            return Derived(stub_type::create_async(targetgid,
+                std::forward<Ts>(vs)...));
         }
 
-        static Derived create_colocated(naming::id_type const& id)
+        template <typename ...Ts>
+        static Derived create_colocated(naming::id_type const& id, Ts&&... vs)
         {
-            return Derived(stub_type::create_colocated_async(id));
+            return Derived(stub_type::create_colocated_async(id,
+                std::forward<Ts>(vs)...));
         }
-
-#define HPX_CLIENT_BASE_CREATE(Z, N, D)                                       \
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static Derived create(naming::id_type const& targetgid,               \
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
-        {                                                                     \
-            return Derived(stub_type::create_async(targetgid,                 \
-                HPX_ENUM_FORWARD_ARGS(N , Arg, arg)));                        \
-        }                                                                     \
-                                                                              \
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>                      \
-        static Derived create_colocated(naming::id_type const& id,            \
-            HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
-        {                                                                     \
-            return Derived(stub_type::create_colocated_async(id,              \
-                HPX_ENUM_FORWARD_ARGS(N , Arg, arg)));                        \
-        }                                                                     \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(
-            1
-          , HPX_ACTION_ARGUMENT_LIMIT
-          , HPX_CLIENT_BASE_CREATE
-          , _
-        )
-
-#undef HPX_CLIENT_BASE_CREATE
 
         void free()
         {

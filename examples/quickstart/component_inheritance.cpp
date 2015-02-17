@@ -22,7 +22,7 @@ struct A : hpx::components::abstract_managed_component_base<A>
     // It is not possible to bind a virtual function to an action, thus we
     // bind a simple forwarding function, which is not virtual.
     void print_nonvirt() const { print(); }
-    HPX_DEFINE_COMPONENT_CONST_ACTION(A, print_nonvirt, print_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, print_nonvirt, print_action);
 };
 
 HPX_DEFINE_GET_COMPONENT_TYPE(A);

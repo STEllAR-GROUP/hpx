@@ -16,10 +16,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived>
-    struct action;
-
     // This template meta function can be used to extract the action type, no
     // matter whether it got specified directly or by passing the
     // corresponding make_action<> specialization.
@@ -34,11 +30,8 @@ namespace hpx { namespace actions
     template <typename Action>
     struct extract_action<Action
       , typename util::always_void<typename Action::type>::type>
-    {
-        typedef typename Action::type type;
-        typedef typename type::result_type result_type;
-        typedef typename type::remote_result_type remote_result_type;
-    };
+      : extract_action<typename Action::type>
+    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,27 +53,27 @@ namespace hpx
         >::type>
     async(naming::id_type const& gid, Ts&&... vs);
 
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename ...Ts>
+    template <
+        typename Component, typename Signature, typename Derived,
+        typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
     async(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > const & /*act*/, naming::id_type const& gid, Ts&&... vs);
+        hpx::actions::basic_action<Component, Signature, Derived> const& /*act*/,
+        naming::id_type const& gid, Ts&&... vs);
 
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename ...Ts>
+    template <
+        typename Component, typename Signature, typename Derived,
+        typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
     async(BOOST_SCOPED_ENUM(launch) policy,
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > const & /*act*/, naming::id_type const& gid, Ts&&... vs);
+        hpx::actions::basic_action<Component, Signature, Derived> const& /*act*/,
+        naming::id_type const& gid, Ts&&... vs);
 }
 
 #endif

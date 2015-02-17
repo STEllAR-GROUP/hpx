@@ -313,9 +313,10 @@ namespace hpx { namespace applier
 
     void applier::initialize(boost::uint64_t rts, boost::uint64_t mem)
     {
-        runtime_support_id_ = naming::id_type(parcel_handler_.get_locality().get_msb(),
+        naming::resolver_client & agas_client = get_agas_client();
+        runtime_support_id_ = naming::id_type(agas_client.get_local_locality().get_msb(),
                 rts, naming::id_type::unmanaged);
-        memory_id_ = naming::id_type(parcel_handler_.get_locality().get_msb(),
+        memory_id_ = naming::id_type(agas_client.get_local_locality().get_msb(),
             mem, naming::id_type::unmanaged);
     }
 
@@ -490,13 +491,13 @@ namespace hpx { namespace applier
             if (HPX_UNLIKELY(!components::types_are_compatible(
                 addr.type_, comptype)))
             {
-                hpx::util::osstream strm;
+                std::ostringstream strm;
                 strm << " types are not compatible: destination_type("
                       << addr.type_ << ") action_type(" << comptype
                       << ") parcel ("  << p << ")";
                 HPX_THROW_EXCEPTION(bad_component_type,
                     "action_manager::fetch_parcel",
-                    hpx::util::osstream_get_string(strm));
+                    strm.str());
             }
 
             // dispatch action, register work item either with or without
