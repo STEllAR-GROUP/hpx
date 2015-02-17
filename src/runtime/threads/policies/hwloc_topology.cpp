@@ -855,10 +855,12 @@ namespace hpx { namespace threads
 
         hwloc_obj_t core_obj;
 
+        std::size_t num_core = (core + core_offset) % get_number_of_cores();
+
         {
             scoped_lock lk(topo_mtx);
             core_obj = hwloc_get_obj_by_type(topo,
-                HWLOC_OBJ_CORE, static_cast<unsigned>(core));
+                HWLOC_OBJ_CORE, static_cast<unsigned>(num_core));
         }
 
         if (core_obj)
