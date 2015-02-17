@@ -221,8 +221,19 @@ namespace hpx { namespace server
             result.reserve(keys.size());
 
             for (std::size_t i = 0; i != keys.size(); ++i)
-                result.push_back(partition_unordered_map_[keys[i]]);
-
+            {
+                typename data_type::iterator it =
+                    partition_unordered_map_.find(keys[i]);
+                if (it == partition_unordered_map_.end())
+                {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "partition_unordered_map::get_values",
+                        "unable to find requested key in this partition of the "
+                        "unordered_map");
+                    break;
+                }
+                result.push_back(it->second);
+            }
             return result;
         }
 

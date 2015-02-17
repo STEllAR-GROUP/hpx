@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file hpx/components/vector/vector.hpp
+/// \file hpx/components/unordered/unordered_map.hpp
 
 #if !defined(HPX_UNORDERED_MAP_NOV_11_2014_0852PM)
 #define HPX_UNORDERED_MAP_NOV_11_2014_0852PM
@@ -271,7 +271,7 @@ namespace hpx
             boost::shared_ptr<partition_unordered_map_server> local_data_;
         };
 
-        // The list of partitions belonging to this vector.
+        // The list of partitions belonging to this unordered_map.
         //
         // Each partition is described by it's corresponding client object, its
         // size, and locality id.
@@ -285,8 +285,8 @@ namespace hpx
         std::string registered_name_;
 
         ///////////////////////////////////////////////////////////////////////
-        // Connect this vector to the existing vector using the given symbolic
-        // name.
+        // Connect this unordered_map to the existing unordered_mapusing the
+        // given symbolic name.
         void get_data_helper(id_type id,
             future<server::unordered_map_config_data> && f)
         {
@@ -431,7 +431,7 @@ namespace hpx
             init(localities, ids, num_parts_per_loc);
         }
 
-        // This function is called when we are creating the vector. It
+        // This function is called when we are creating the unordered_map. It
         // initializes the partitions based on the give parameters.
         template <typename DistPolicy>
         void create(std::size_t bucket_count, DistPolicy const& policy,
@@ -501,7 +501,7 @@ namespace hpx
                 util::bind(&unordered_map::connect_to_helper, this, _1));
         }
 
-        // Register this vector with AGAS using the given symbolic name
+        // Register this unordered_map with AGAS using the given symbolic name
         future<void> register_as(std::string const& symbolic_name)
         {
             server::unordered_map_config_data data(partitions_);
@@ -687,8 +687,7 @@ namespace hpx
 
         /// \brief Array subscript operator. This does not throw any exception.
         ///
-        /// \param pos Position of the element in the vector [Note the first
-        ///            position in the partition is 0]
+        /// \param pos Position of the element in the unordered_map
         ///
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
@@ -708,9 +707,9 @@ namespace hpx
             return get_value_sync(pos);
         }
 
-        /// Returns the element at position \a pos in the vector container.
+        /// Returns the element at position \a pos in the unordered_map container.
         ///
-        /// \param pos Position of the element in the vector
+        /// \param pos Position of the element in the unordered_map
         ///
         /// \return Returns the value of the element at position represented by
         ///         \a pos.
@@ -720,7 +719,7 @@ namespace hpx
             return get_value_sync(get_partition(pos), pos, erase);
         }
 
-        /// Returns the element at position \a pos in the vector container.
+        /// Returns the element at position \a pos in the unordered_map container.
         ///
         /// \param part  Sequence number of the partition
         /// \param pos   Position of the element in the partition
@@ -740,10 +739,10 @@ namespace hpx
                 .get_value_sync(pos, erase);
         }
 
-        /// Returns the element at position \a pos in the vector container
+        /// Returns the element at position \a pos in the unordered_map container
         /// asynchronously.
         ///
-        /// \param pos Position of the element in the vector
+        /// \param pos Position of the element in the unordered_map
         ///
         /// \return Returns the hpx::future to value of the element at position
         ///         represented by \a pos.
@@ -754,7 +753,7 @@ namespace hpx
         }
 
         /// Returns the element at position \a pos in the given partition in
-        /// the vector container asynchronously.
+        /// the unordered_map container asynchronously.
         ///
         /// \param part  Sequence number of the partition
         /// \param pos   Position of the element in the partition
@@ -778,9 +777,9 @@ namespace hpx
         }
 
         /// Copy the value of \a val in the element at position \a pos in
-        /// the vector container.
+        /// the unordered_map container.
         ///
-        /// \param pos   Position of the element in the vector
+        /// \param pos   Position of the element in the unordered_map
         /// \param val   The value to be copied
         ///
         template <typename T_>
@@ -791,7 +790,7 @@ namespace hpx
         }
 
         /// Copy the value of \a val in the element at position \a pos in
-        /// the vector container.
+        /// the unordered_map container.
         ///
         /// \param part  Sequence number of the partition
         /// \param pos   Position of the element in the partition
@@ -817,7 +816,7 @@ namespace hpx
         /// Asynchronous set the element at position \a pos of the partition
         /// \a part to the given value \a val.
         ///
-        /// \param pos   Position of the element in the vector
+        /// \param pos   Position of the element in the unordered_map
         /// \param val   The value to be copied
         ///
         /// \return This returns the hpx::future of type void which gets ready
@@ -857,7 +856,7 @@ namespace hpx
 
         /// Asynchronously compute the size of the unordered_map.
         ///
-        /// \return Return the number of elements in the vector
+        /// \return Return the number of elements in the unordered_map
         ///
         hpx::future<std::size_t> size_async() const
         {
@@ -872,7 +871,7 @@ namespace hpx
 
         /// Compute the size compute the size of the unordered_map.
         ///
-        /// \return Return the number of elements in the vector
+        /// \return Return the number of elements in the unordered_map
         ///
         std::size_t size() const
         {
