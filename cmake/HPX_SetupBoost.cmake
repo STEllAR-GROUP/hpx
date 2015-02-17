@@ -17,7 +17,6 @@ find_package(Boost
   filesystem
   program_options
   regex
-  serialization
   system
   thread
   )
