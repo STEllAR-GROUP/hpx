@@ -148,7 +148,7 @@ namespace hpx { namespace util
             hpx::traits::is_bitwise_serializable<sequence_type>::type
         predicate;
 
-        if(ar.disable_array_optimization())
+        if(boost::fusion::size(seq) != 0)
         {
 #if defined(HPX_DEBUG_SERIALIZATION)
             char type = 'S';
@@ -158,7 +158,7 @@ namespace hpx { namespace util
             HPX_ASSERT(size == boost::fusion::size(seq));
 #endif
 
-            if(ar.flags() & disable_array_optimization)
+            if(ar.disable_array_optimization())
             {
                 detail::serialize_sequence(ar, seq, boost::mpl::false_());
             }

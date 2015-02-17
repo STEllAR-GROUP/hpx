@@ -16,16 +16,14 @@
 #include <vector>
 
 // TODO:bikineev: delete chunks stuff
-
-#if defined(HPX_HAVE_SECURITY)
 namespace hpx { namespace parcelset
 {
     template <typename Buffer>
-    std::vector<util::serialization_chunk> decode_chunks(Buffer & buffer)
+    std::vector<serialization::serialization_chunk> decode_chunks(Buffer & buffer)
     {
         typedef typename Buffer::transmission_chunk_type transmission_chunk_type;
 
-        std::vector<util::serialization_chunk> chunks;
+        std::vector<serialization::serialization_chunk> chunks;
 
         std::size_t num_zero_copy_chunks =
             static_cast<std::size_t>(
@@ -48,7 +46,7 @@ namespace hpx { namespace parcelset
 
                 HPX_ASSERT(buffer.chunks_[i].size() == second);
 
-                chunks[first] = util::create_pointer_chunk(
+                chunks[first] = serialization::create_pointer_chunk(
                         buffer.chunks_[i].data(), second);
             }
 
@@ -65,7 +63,7 @@ namespace hpx { namespace parcelset
                     ++index;
 
                 // place the index based chunk at the right spot
-                chunks[index] = util::create_index_chunk(first, second);
+                chunks[index] = serialization::create_index_chunk(first, second);
                 ++index;
             }
 #if defined(HPX_DEBUG)

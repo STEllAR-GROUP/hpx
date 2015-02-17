@@ -388,14 +388,14 @@ namespace hpx { namespace actions
         }
 
         // serialization support
-        void load(hpx::util::portable_binary_iarchive & ar)
+        void load(hpx::serialization::input_archive & ar)
         {
             util::serialize_sequence(ar, arguments_);
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
 
-            if (ar.flags() & util::disable_array_optimization) {
+            if (ar.disable_array_optimization()) {
 #if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
                 boost::uint32_t parent_locality_ = naming::invalid_locality_id;
                 boost::uint64_t parent_id_ = boost::uint64_t(-1);
@@ -427,7 +427,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void save(hpx::util::portable_binary_oarchive & ar) const
+        void save(hpx::serialization::output_archive & ar) const
         {
             util::serialize_sequence(ar, arguments_);
 
@@ -439,7 +439,7 @@ namespace hpx { namespace actions
             boost::uint64_t parent_id_ = boost::uint64_t(-1);
             boost::uint64_t parent_phase_ = 0;
 #endif
-            if (ar.flags() & util::disable_array_optimization) {
+            if (ar.disable_array_optimization()) {
                 ar << parent_locality_;
                 ar << parent_id_;
                 ar << parent_phase_;

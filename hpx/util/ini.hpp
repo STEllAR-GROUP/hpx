@@ -11,6 +11,8 @@
 #include <map>
 #include <iosfwd>
 
+#include <hpx/serialization/serialize.hpp>
+
 #include <boost/lexical_cast.hpp>
 
 // suppress warnings about dependent classes not being exported from the dll
