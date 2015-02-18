@@ -102,6 +102,13 @@ parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_
 # hpx/parallel/algorithms/inclusive_scan.hpp
 parallel::inclusive_scan              "inclusive_scan" "hpx\.parallel\.v1\.inclusive_scan.*"
 
+# hpx/parallel/algorithms/is_partitioned.hpp
+parallel::is_partitioned              "is_partitioned" "hpx\.parallel\.v1\.is_partitioned.*"
+
+# hpx/parallel/algorithms/is_sorted.hpp
+parallel::is_sorted                   "is_sorted"  "hpx\.parallel\.v1\.is_sorted$"
+parallel::is_sorted_until             "is_sorted_until"  "hpx\.parallel\.v1\.is_sorted_until.*"
+
 # hpx/parallel/algorithms/lexicographical_compare.hpp
 parallel::lexicographical_compare     "lexicographical_compare" "hpx\.parallel\.v1\.lexicographical_compare.*"
 
@@ -352,4 +359,3 @@ HPX_DEFINE_COMPONENT_CONST_ACTION         "" "HPX_DEFINE_COMPONENT_CONST_ACTION"
 HPX_REGISTER_PLAIN_ACTION                 "" "HPX_REGISTER_PLAIN_ACTION"
 HPX_DEFINE_PLAIN_ACTION                   "" "HPX_DEFINE_PLAIN_ACTION"
 HPX_PLAIN_ACTION                          "" "HPX_PLAIN_ACTION"
-

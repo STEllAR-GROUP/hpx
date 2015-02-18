@@ -32,5 +32,7 @@
 #include <hpx/parallel/algorithms/search.hpp>
 #include <hpx/parallel/algorithms/swap_ranges.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
-
+#include <hpx/parallel/algorithms/transform_reduce.hpp>
+#include <hpx/parallel/algorithms/is_partitioned.hpp>
+#include <hpx/parallel/algorithms/is_sorted.hpp>
 #endif
