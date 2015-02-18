@@ -194,7 +194,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             "Requires at least input iterator.");
 
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
-            // Should I require it to be a forward iterator too?
 
         return detail::is_partitioned<InpIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,
