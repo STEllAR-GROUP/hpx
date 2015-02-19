@@ -1403,6 +1403,13 @@ public:
         error_code& ec = throws
         );
 
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void remove_cache_entry(
+        naming::gid_type const& gid
+      , error_code& ec = throws
+        );
+
     // Disable refcnt caching during shutdown
     void start_shutdown(
         error_code& ec = throws
@@ -1414,6 +1421,12 @@ public:
       , naming::gid_type& counter
       , error_code& ec = throws
         );
+
+    // start/stop migration of an object
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+    hpx::future<bool> start_migration_async(naming::id_type const& id);
+    hpx::future<bool> end_migration_async(naming::id_type const& id);
+#endif
 };
 
 }}

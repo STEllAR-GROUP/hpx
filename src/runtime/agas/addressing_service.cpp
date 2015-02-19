@@ -1025,7 +1025,10 @@ bool addressing_service::get_id_range(
 { // {{{ get_id_range implementation
     try {
         // parcelset::endpoints_type() is an obsolete, dummy argument
-        request req(primary_ns_allocate, parcelset::endpoints_type(), count, boost::uint32_t(-1));
+        request req(primary_ns_allocate
+          , parcelset::endpoints_type()
+          , count
+          , boost::uint32_t(-1));
         response rep;
 
         if (is_bootstrap())
@@ -1378,15 +1381,22 @@ bool addressing_service::resolve_full_local(
         addr.type_ = g.type;
         addr.address_ = g.lva();
 
-        if(range_caching_)
+        if (addr.address_)
         {
-            // Put the range into the cache.
-            update_cache_entry(base_gid, base_gva, ec);
+            if(range_caching_)
+            {
+                // Put the range into the cache.
+                update_cache_entry(base_gid, base_gva, ec);
+            }
+            else
+            {
+                // Put the fully resolved gva into the cache.
+                update_cache_entry(id, g, ec);
+            }
         }
         else
         {
-            // Put the fully resolved gva into the cache.
-            update_cache_entry(id, g, ec);
+            remove_cache_entry(id, ec);
         }
 
         if (ec)
@@ -2385,6 +2395,34 @@ void addressing_service::clear_cache(
     }
 } // }}}
 
+void addressing_service::remove_cache_entry(
+    naming::gid_type const& gid
+  , error_code& ec
+    )
+{
+    // If caching is disabled, we silently pretend success.
+    if (!caching_)
+        return;
+
+    try {
+        LAGAS_(warning) << "addressing_service::remove_cache_entry";
+
+        cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
+
+        gva_cache_->erase(
+            [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
+            {
+                return gid == p.first.get_gid();
+            });
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+    catch (hpx::exception const& e) {
+        HPX_RETHROWS_IF(ec, e, "addressing_service::clear_cache");
+    }
+}
+
 // Disable refcnt caching during shutdown
 void addressing_service::start_shutdown(error_code& ec)
 {
@@ -3013,6 +3051,50 @@ void addressing_service::send_refcnt_requests_sync(
     if (&ec != &throws)
         ec = make_success_code();
 }
+
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+hpx::future<bool> addressing_service::start_migration_async(
+    naming::id_type const& id
+    )
+{
+    if (!id)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::start_migration_async",
+            "invalid reference id");
+        return make_ready_future(false);
+    }
+
+    agas::request req(agas::primary_ns_start_migration, id.get_gid());
+    naming::id_type service_target(
+        agas::stubs::primary_namespace::get_service_instance(id.get_gid())
+      , naming::id_type::unmanaged);
+
+    return stubs::primary_namespace::service_async<bool>(
+        service_target, req);
+}
+
+hpx::future<bool> addressing_service::end_migration_async(
+    naming::id_type const& id
+    )
+{
+    if (!id)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::start_migration_async",
+            "invalid reference id");
+        return make_ready_future(false);
+    }
+
+    agas::request req(agas::primary_ns_end_migration, id.get_gid());
+    naming::id_type service_target(
+        agas::stubs::primary_namespace::get_service_instance(id.get_gid())
+      , naming::id_type::unmanaged);
+
+    return stubs::primary_namespace::service_async<bool>(
+        service_target, req);
+}
+#endif
 
 }}
 

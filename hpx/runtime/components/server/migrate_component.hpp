@@ -70,6 +70,8 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // This will be executed on the locality where the object lives which is
+    // to be migrated
     template <typename Component>
     future<naming::id_type> migrate_component(
         naming::id_type const& to_migrate,
@@ -102,11 +104,60 @@ namespace hpx { namespace components { namespace server
           , &migrate_component<Component>
           , migrate_component_action<Component> >
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // This is executed on the locality responsible for managing the address
+    // resolution for the given object.
+    template <typename Component>
+    future<naming::id_type> trigger_migrate_component(
+        naming::id_type const& to_migrate,
+        naming::id_type const& target_locality)
+    {
+        if (naming::get_locality_id_from_id(to_migrate) != get_locality_id())
+        {
+            HPX_THROW_EXCEPTION(unexpected,
+                "hpx::components::server::trigger_migrate_component",
+                "this function has to be executed on the locality responsible "
+                "for managing the address of the given object");
+            return make_ready_future(naming::invalid_id);
+        }
+
+        return agas::start_migration_async(to_migrate)
+            .then(
+                [to_migrate, target_locality](future<void> && f)
+                    -> future<naming::id_type>
+                {
+                    f.get();        // rethrow errors
+
+                    typedef server::migrate_component_action<Component> action_type;
+                    return async_colocated<action_type>(to_migrate, to_migrate,
+                        target_locality);
+                })
+            .then(
+                [](future<id_type> && id) -> future<id_type>
+                {
+                    naming::id_type id = f.get();
+                    agas::end_migration_async(id).get();
+                    return id;
+                });
+    }
+
+    template <typename Component>
+    struct trigger_migrate_component_action
+      : ::hpx::actions::action<
+            future<naming::id_type> (*)(naming::id_type const&, naming::id_type const&)
+          , &migrate_component<Component>
+          , trigger_migrate_component_action<Component> >
+    {};
 }}}
 
 HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
     (template <typename Component>),
     (hpx::components::server::migrate_component_action<Component>)
+)
+HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
+    (template <typename Component>),
+    (hpx::components::server::trigger_migrate_component_action<Component>)
 )
 
 #endif

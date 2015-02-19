@@ -264,18 +264,6 @@ struct get_remote_result<naming::id_type, agas::response>
     }
 };
 
-// TODO: verification of namespace_action_code
-template <>
-struct get_remote_result<bool, agas::response>
-{
-    static bool call(
-        agas::response const& rep
-        )
-    {
-        return success == rep.get_status();
-    }
-};
-
 template <>
 struct get_remote_result<boost::uint32_t, agas::response>
 {
@@ -320,6 +308,31 @@ struct get_remote_result<boost::int64_t, agas::response>
             "get_remote_result<boost::int64_t, agas::response>::call",
             "unexpected action code in result conversion");
         return 0;
+    }
+};
+
+template <>
+struct get_remote_result<bool, agas::response>
+{
+    static bool call(
+        agas::response const& rep
+        )
+    {
+        switch(rep.get_action_code()) {
+        case agas::symbol_ns_bind:
+        case agas::symbol_ns_on_event:
+        case agas::primary_ns_start_migration:
+        case agas::primary_ns_end_migration:
+            return rep.get_status() == success;
+
+        default:
+            break;
+        }
+
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "get_remote_result<void, agas::response>::call",
+            "unexpected action code in result conversion");
+        return false;
     }
 };
 
