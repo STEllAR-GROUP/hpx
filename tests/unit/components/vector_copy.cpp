@@ -4,11 +4,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/components/vector/vector.hpp>
-#include <hpx/util/lightweight_test.hpp>
-
+#include <hpx/include/vector.hpp>
 #include <hpx/include/parallel_copy.hpp>
-#include <hpx/parallel/segmented_algorithms/copy.hpp>
+
+#include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.

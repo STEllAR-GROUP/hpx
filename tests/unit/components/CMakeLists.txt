@@ -14,9 +14,11 @@ set(tests
     inheritance_3_classes_2_abstract
     inheritance_3_classes_concrete
     migrate_component
+    migrate_component_to_storage
     remote_object
-    vector_for_each
+    unordered_map
     vector_copy
+    vector_for_each
     vector_handle_values
     vector_move
     vector_transform_reduce
@@ -63,7 +65,14 @@ set(inheritance_3_classes_2_abstract_FLAGS
 set(inheritance_3_classes_concrete_FLAGS
     DEPENDENCIES iostreams_component)
 
-set(unordered_map_FLAGS DEPENDENCIES unordered_component)
+set(unordered_map_FLAGS
+    DEPENDENCIES unordered_component)
+set(unordered_map_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 2)
+
+set(migrate_component_to_storage_FLAGS
+    DEPENDENCIES unordered_component component_storage_component)
 
 set(vector_FLAGS DEPENDENCIES vector_component)
 set(vector_algorithms_FLAGS DEPENDENCIES vector_component)

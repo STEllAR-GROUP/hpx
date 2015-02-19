@@ -7,6 +7,8 @@
 
 set(subdirs
     binpacking_factory
+    component_storage
+    containers
     dataflow
     distributing_factory
     iostreams
@@ -14,7 +16,6 @@ set(subdirs
     papi_counters
     remote_object
     security
-    vector
    )
 
 add_hpx_pseudo_target(components)

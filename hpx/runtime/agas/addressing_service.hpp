@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -597,7 +597,17 @@ public:
       , boost::uint32_t locality_id
         )
     {
-        return bind_range_async(id, 1, addr, 0, locality_id);
+        return bind_range_async(id, 1, addr, 0,
+            naming::get_gid_from_locality_id(locality_id));
+    }
+
+    hpx::future<bool> bind_async(
+        naming::gid_type const& id
+      , naming::address const& addr
+      , naming::gid_type const& locality
+        )
+    {
+        return bind_range_async(id, 1, addr, 0, locality);
     }
 
     /// \brief Bind unique range of global ids to given base address
@@ -646,8 +656,20 @@ public:
       , boost::uint64_t count
       , naming::address const& baseaddr
       , boost::uint64_t offset
-      , boost::uint32_t locality_id
+      , naming::gid_type const& locality
         );
+
+    hpx::future<bool> bind_range_async(
+        naming::gid_type const& lower_id
+      , boost::uint64_t count
+      , naming::address const& baseaddr
+      , boost::uint64_t offset
+      , boost::uint32_t locality_id
+        )
+    {
+        return bind_range_async(lower_id, count, baseaddr, offset,
+            naming::get_gid_from_locality_id(locality_id));
+    }
 
     /// \brief Unbind a global address
     ///

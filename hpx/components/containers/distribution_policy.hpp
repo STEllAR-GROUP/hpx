@@ -4,17 +4,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_VECTOR_DISTRIBUTION_POLICY_HPP
-#define HPX_VECTOR_DISTRIBUTION_POLICY_HPP
+#ifndef HPX_DISTRIBUTION_POLICY_HPP
+#define HPX_DISTRIBUTION_POLICY_HPP
 
-#include <hpx/hpx_fwd.hpp>
-#include <boost/detail/scoped_enum_emulation.hpp>
-
-#include <vector>
-#include <iostream>
+#include <hpx/config.hpp>
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
+
+#include <algorithm>
 
 namespace hpx
 {
@@ -25,7 +23,7 @@ namespace hpx
     {
     public:
         distribution_policy()
-          : num_partitions_(1)
+          : num_partitions_(std::size_t(-1))
         {}
 
         distribution_policy operator()(std::size_t num_partitions) const
@@ -36,7 +34,9 @@ namespace hpx
         distribution_policy operator()(
             std::vector<id_type> const& localities) const
         {
-            return distribution_policy(num_partitions_, localities);
+            if (num_partitions_ != std::size_t(-1))
+                return distribution_policy(num_partitions_, localities);
+            return distribution_policy(localities.size(), localities);
         }
 
         distribution_policy operator()(std::size_t num_partitions,
@@ -53,7 +53,9 @@ namespace hpx
 
         std::size_t get_num_partitions() const
         {
-            return num_partitions_;
+            std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
+                localities_.size() : num_partitions_;
+            return (std::max)(num_parts, std::size_t(1));
         }
 
     private:
@@ -66,7 +68,7 @@ namespace hpx
         }
 
         distribution_policy(std::size_t num_partitions,
-             std::vector<id_type> const& localities)
+                std::vector<id_type> const& localities)
           : localities_(localities),
             num_partitions_(num_partitions)
         {}
@@ -77,28 +79,6 @@ namespace hpx
     };
 
     static distribution_policy const layout;
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <typename T>
-        struct is_vector_distribution_policy
-          : boost::mpl::false_
-        {};
-
-        template <>
-        struct is_vector_distribution_policy<distribution_policy>
-          : boost::mpl::true_
-        {};
-        // \endcond
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct is_vector_distribution_policy
-      : detail::is_vector_distribution_policy<typename hpx::util::decay<T>::type>
-    {};
 }
 
 #endif

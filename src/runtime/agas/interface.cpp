@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -311,6 +311,18 @@ bool bind_sync(
     naming::resolver_client& agas_ = naming::get_agas_client();
     naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
     return agas_.bind_async(gid_, addr, locality_id).get(ec);
+}
+
+bool bind_sync(
+    naming::gid_type const& gid
+  , naming::address const& addr
+  , naming::gid_type const& locality_
+  , error_code& ec
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return agas_.bind_async(gid_, addr, locality_).get(ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

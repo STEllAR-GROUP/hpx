@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http:// ww.boost.org/LICENSE_1_0.txt)
@@ -13,16 +13,16 @@
  // The idea for these iterators is taken from
  // http://afstern.org/matt/segmented.pdf.
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/include/traits.hpp>
 
-#include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/components/vector/partition_vector_component.hpp>
+#include <hpx/components/containers/vector/partition_vector_component.hpp>
 
 #include <cstdint>
 #include <iterator>
 #include <limits>
+#include <type_traits>
 
 #include <boost/integer.hpp>
 #include <boost/iterator/iterator_facade.hpp>
@@ -757,7 +757,7 @@ namespace hpx { namespace traits
     template <typename T>
     struct segmented_iterator_traits<vector_iterator<T> >
     {
-        typedef boost::mpl::true_ is_segmented_iterator;
+        typedef std::true_type is_segmented_iterator;
 
         typedef vector_iterator<T> iterator;
         typedef typename iterator::segment_iterator segment_iterator;
@@ -844,7 +844,7 @@ namespace hpx { namespace traits
     template <typename T>
     struct segmented_iterator_traits<const_vector_iterator<T> >
     {
-        typedef boost::mpl::true_ is_segmented_iterator;
+        typedef std::true_type is_segmented_iterator;
 
         typedef const_vector_iterator<T> iterator;
         typedef typename iterator::segment_iterator segment_iterator;
@@ -936,7 +936,7 @@ namespace hpx { namespace traits
     template <typename T>
     struct segmented_local_iterator_traits<local_vector_iterator<T> >
     {
-        typedef boost::mpl::true_ is_segmented_local_iterator;
+        typedef std::true_type is_segmented_local_iterator;
 
         typedef vector_iterator<T> iterator;
         typedef local_vector_iterator<T> local_iterator;
@@ -958,7 +958,7 @@ namespace hpx { namespace traits
     template <typename T>
     struct segmented_local_iterator_traits<const_local_vector_iterator<T> >
     {
-        typedef boost::mpl::true_ is_segmented_local_iterator;
+        typedef std::true_type is_segmented_local_iterator;
 
         typedef const_vector_iterator<T> iterator;
         typedef const_local_vector_iterator<T> local_iterator;

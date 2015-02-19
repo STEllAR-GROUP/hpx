@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -370,13 +370,13 @@ void addressing_service::launch_bootstrap(
     request reqs[] =
     {
         request(primary_ns_bind_gid, locality_gid, locality_gva
-          , naming::get_locality_id_from_gid(locality_gid))
+          , naming::get_locality_from_gid(locality_gid))
       , request(primary_ns_bind_gid, primary_gid, primary_gva
-          , naming::get_locality_id_from_gid(primary_gid))
+          , naming::get_locality_from_gid(primary_gid))
       , request(primary_ns_bind_gid, component_gid, component_gva
-          , naming::get_locality_id_from_gid(component_gid))
+          , naming::get_locality_from_gid(component_gid))
       , request(primary_ns_bind_gid, symbol_gid, symbol_gva
-          , naming::get_locality_id_from_gid(symbol_gid))
+          , naming::get_locality_from_gid(symbol_gid))
     };
 
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
@@ -1065,7 +1065,7 @@ bool addressing_service::bind_range_local(
         gva const g(prefix, baseaddr.type_, count, baseaddr.address_, offset);
 
         request req(primary_ns_bind_gid, lower_id, g,
-            naming::get_locality_id_from_gid(lower_id));
+            naming::get_locality_from_gid(lower_id));
         response rep;
 
         if (is_bootstrap())
@@ -1130,7 +1130,7 @@ hpx::future<bool> addressing_service::bind_range_async(
   , boost::uint64_t count
   , naming::address const& baseaddr
   , boost::uint64_t offset
-  , boost::uint32_t locality_id
+  , naming::gid_type const& locality
     )
 {
     // ask server
@@ -1144,12 +1144,13 @@ hpx::future<bool> addressing_service::bind_range_async(
         stubs::primary_namespace::get_service_instance(lower_id)
       , naming::id_type::unmanaged);
 
-    request req(primary_ns_bind_gid, lower_id, g, locality_id);
+    request req(primary_ns_bind_gid, lower_id, g, locality);
     response rep;
 
     using util::placeholders::_1;
     future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
+
     return f.then(
         util::bind(&addressing_service::bind_postproc, this, _1, lower_id, g)
     );

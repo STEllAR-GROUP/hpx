@@ -8,10 +8,8 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/iostreams.hpp>
-
-#include <hpx/components/vector/vector.hpp>
+#include <hpx/include/vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
-#include <hpx/parallel/segmented_algorithms/for_each.hpp>
 
 #include "worker_timed.hpp"
 

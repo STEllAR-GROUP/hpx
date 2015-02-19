@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <type_traits>
 
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -86,7 +87,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_(ExPolicy && policy, InIter first, InIter last, T const& value,
-            boost::mpl::false_)
+            std::false_type)
         {
             typedef typename std::iterator_traits<InIter>::iterator_category
                 category;
@@ -109,7 +110,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
-            boost::mpl::true_);
+            std::true_type);
 
         /// \endcond
     }
@@ -238,7 +239,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
-            boost::mpl::false_)
+            std::false_type)
         {
             typedef typename std::iterator_traits<InIter>::iterator_category
                 category;
@@ -262,7 +263,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
-            boost::mpl::true_);
+            std::true_type);
 
         /// \endcond
     }

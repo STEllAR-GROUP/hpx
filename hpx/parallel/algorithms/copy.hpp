@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <type_traits>
 
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -74,7 +75,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename InIter, typename OutIter>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-            boost::mpl::false_)
+            std::false_type)
         {
             typedef typename std::iterator_traits<InIter>::iterator_category
                 input_iterator_category;
@@ -96,7 +97,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename InIter, typename OutIter>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
-            boost::mpl::true_);
+            std::true_type);
 
         /// \endcond
     }

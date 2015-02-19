@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Vinay C Amatya
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,9 +20,6 @@ namespace hpx { namespace agas { namespace server
 {
     response primary_namespace::route(request const& req, error_code& ec)
     { // {{{ route implementation
-        typedef boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
-            resolved_type;
-
         parcelset::parcel p = req.get_parcel();
 
         std::size_t size = p.size();
@@ -56,8 +53,7 @@ namespace hpx { namespace agas { namespace server
                                     "can't route parcel to unknown gid: %s"
                                 ) % id));
 
-                        return response(primary_ns_route, naming::invalid_gid,
-                            gva(), no_success);
+                        return response(primary_ns_route, no_success);
                     }
 
                     gva const g = boost::fusion::at_c<1>(r).resolve(

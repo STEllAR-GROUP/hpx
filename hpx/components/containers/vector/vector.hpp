@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,18 +20,17 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>
 
-#include <hpx/components/vector/vector_segmented_iterator.hpp>
-#include <hpx/components/vector/partition_vector_component.hpp>
-#include <hpx/components/vector/distribution_policy.hpp>
+#include <hpx/components/containers/vector/vector_distribution_policy.hpp>
+#include <hpx/components/containers/vector/vector_segmented_iterator.hpp>
+#include <hpx/components/containers/vector/partition_vector_component.hpp>
 
 #include <cstdint>
 #include <memory>
 #include <iterator>
 #include <algorithm>
+#include <type_traits>
 
-#include <boost/format.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/utility/enable_if.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace server
@@ -259,7 +258,7 @@ namespace hpx
                     ptrs.push_back(get_ptr<partition_vector_server>(
                         it->partition_.get()).then(
                             util::bind(&vector::get_ptr_helper, this, l,
-                                boost::ref(partitions_), _1)));
+                                std::ref(partitions_), _1)));
                 }
             }
             wait_all(ptrs);
@@ -502,7 +501,7 @@ namespace hpx
                         ptrs.push_back(get_ptr<partition_vector_server>(
                             partitions_.back().partition_.get()).then(
                                 util::bind(&vector::get_ptr_helper, this, l,
-                                    boost::ref(partitions_), _1)));
+                                    std::ref(partitions_), _1)));
                     }
 
                     allocated_size += size;
@@ -553,7 +552,7 @@ namespace hpx
             using util::placeholders::_3;
 
             create(localities, policy, util::bind(
-                &vector::create_helper2, this, _1, _2, _3, boost::ref(val)));
+                &vector::create_helper2, this, _1, _2, _3, std::ref(val)));
         }
 
         // This function is called when we are creating the vector. It
@@ -612,7 +611,7 @@ namespace hpx
                     ptrs.push_back(get_ptr<partition_vector_server>(
                         partitions[i].partition_.get()).then(
                             util::bind(&vector::get_ptr_helper, this, i,
-                                boost::ref(partitions), _1)));
+                                std::ref(partitions), _1)));
                 }
             }
 
@@ -689,8 +688,8 @@ namespace hpx
         ///
         template <typename DistPolicy>
         vector(size_type size, DistPolicy const& policy,
-                typename boost::enable_if<
-                        is_vector_distribution_policy<DistPolicy>
+                typename std::enable_if<
+                        is_vector_distribution_policy<DistPolicy>::value
                     >::type* = 0)
           : size_(size),
             partition_size_(std::size_t(-1))
@@ -701,8 +700,8 @@ namespace hpx
         template <typename DistPolicy>
         vector(size_type size, DistPolicy const& policy,
                 std::string const& symbolic_name,
-                typename boost::enable_if<
-                        is_vector_distribution_policy<DistPolicy>
+                typename std::enable_if<
+                        is_vector_distribution_policy<DistPolicy>::value
                     >::type* = 0)
           : size_(size),
             partition_size_(std::size_t(-1))
@@ -725,8 +724,8 @@ namespace hpx
         ///
         template <typename DistPolicy>
         vector(size_type size, T const& val, DistPolicy const& policy,
-                typename boost::enable_if<
-                        is_vector_distribution_policy<DistPolicy>
+                typename std::enable_if<
+                        is_vector_distribution_policy<DistPolicy>::value
                     >::type* = 0)
           : size_(size),
             partition_size_(std::size_t(-1))
@@ -737,8 +736,8 @@ namespace hpx
         template <typename DistPolicy>
         vector(size_type size, T const& val, DistPolicy const& policy,
                 std::string const& symbolic_name,
-                typename boost::enable_if<
-                        is_vector_distribution_policy<DistPolicy>
+                typename std::enable_if<
+                        is_vector_distribution_policy<DistPolicy>::value
                     >::type* = 0)
           : size_(size),
             partition_size_(std::size_t(-1))
