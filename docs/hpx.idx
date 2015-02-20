@@ -46,6 +46,12 @@ find_ids_from_basename                "" "hpx\.find_ids_from_basename.*"
 register_id_with_basename             "" "hpx\.register_id_with_basename.*"
 unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
 
+# hpx/components/component_storage/migrate_from_storage.hpp
+migrate_from_storage                  "" "hpx\.components\.migrate_from_s.*"
+
+# hpx/components/component_storage/migrate_to_storage.hpp
+migrate_to_storage                    "" "hpx\.components\.migrate_to_s.*"
+
 # hpx/parallel/execution_policy.hpp
 parallel::execution_policy                 "execution_policy"               "hpx\.parallel\.v1\.execution_policy.*"
 parallel::parallel_execution_policy        "parallel_execution_policy"      "hpx\.parallel\.v1\.parallel_exec.*"
@@ -175,7 +181,7 @@ new_colocated                         "" "hpx\.components\.new_colocated.*"
 copy                                  "" "hpx\.components\.copy.*"
 
 # hpx/runtime/components/migrate_component.hpp
-migrate                               "" "hpx\.components\.migrate.*"
+migrate                               "" "hpx\.components\.migrate_id.*"
 
 # hpx/exception.hpp
 HPX_THROW_EXCEPTION                   "" "HPX_THROW_EXCEPTION"

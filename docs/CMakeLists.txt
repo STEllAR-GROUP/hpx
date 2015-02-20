@@ -50,6 +50,8 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/error.hpp"
     "${hpx_SOURCE_DIR}/hpx/exception.hpp"
     "${hpx_SOURCE_DIR}/hpx/exception_list.hpp"
+    "${hpx_SOURCE_DIR}/hpx/components/component_storage/migrate_from_storage.hpp"
+    "${hpx_SOURCE_DIR}/hpx/components/component_storage/migrate_to_storage.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithm.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/task_region.hpp"
