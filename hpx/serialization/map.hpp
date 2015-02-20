@@ -100,7 +100,7 @@ namespace hpx { namespace traits {
       {
         value_type v;
         ar >> v;
-        t.insert(v);
+        t.insert(t.end(), v);
       }
     }
 

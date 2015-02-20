@@ -18,7 +18,6 @@ namespace hpx { namespace serialization {
     template <typename Char, typename CharTraits, typename Allocator>
     void serialize(input_archive & ar, std::basic_string<Char, CharTraits, Allocator> & s, unsigned)
     {
-        
         typedef std::basic_string<Char, CharTraits, Allocator> string_type;
         typedef typename string_type::size_type size_type;
         size_type size = 0;
