@@ -999,7 +999,8 @@ namespace hpx { namespace threads
             for (unsigned int i = 0; i != num_of_pus_; ++i) //-V104
             {
                 hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(topo, pu_depth, i);
-                if(hwloc_bitmap_isset(cpuset, detail::get_index(pu_obj)) != 0)
+                unsigned idx = static_cast<unsigned>(detail::get_index(pu_obj));
+                if (hwloc_bitmap_isset(cpuset, idx) != 0)
                     set(mask, detail::get_index(pu_obj));
             }
         }
@@ -1021,7 +1022,8 @@ namespace hpx { namespace threads
 
         {
             scoped_lock lk(topo_mtx);
-            if (hwloc_get_thread_cpubind(topo, handle.native_handle(), cpuset, HWLOC_CPUBIND_THREAD))
+            if (hwloc_get_thread_cpubind(topo, handle.native_handle(), cpuset,
+                    HWLOC_CPUBIND_THREAD))
             {
                 hwloc_bitmap_free(cpuset);
                 HPX_THROWS_IF(ec, kernel_error
@@ -1034,7 +1036,8 @@ namespace hpx { namespace threads
             for (unsigned int i = 0; i != num_of_pus_; ++i) //-V104
             {
                 hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(topo, pu_depth, i);
-                if(hwloc_bitmap_isset(cpuset, detail::get_index(pu_obj)) != 0)
+                unsigned idx = static_cast<unsigned>(detail::get_index(pu_obj));
+                if (hwloc_bitmap_isset(cpuset, idx) != 0)
                     set(mask, detail::get_index(pu_obj));
             }
         }

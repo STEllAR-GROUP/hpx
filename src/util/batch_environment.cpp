@@ -62,7 +62,8 @@ namespace hpx { namespace util { namespace detail
             >
             param_type;
 
-        result_type operator()(std::vector<std::string> & nodes, param_type const & p) const
+        result_type operator()(std::vector<std::string> & nodes,
+            param_type const & p) const
         {
             typedef param_type::value_type value_type;
 
@@ -95,8 +96,9 @@ namespace hpx { namespace util { namespace detail
                         }
                         else
                         {
-                            std::size_t begin = hpx::util::safe_lexical_cast<std::size_t>(range[0]);
-                            std::size_t end = hpx::util::safe_lexical_cast<std::size_t>(range[1]);
+                            using hpx::util::safe_lexical_cast;
+                            std::size_t begin = safe_lexical_cast<std::size_t>(range[0]);
+                            std::size_t end = safe_lexical_cast<std::size_t>(range[1]);
                             if(begin > end) std::swap(begin, end);
 
                             std::vector<std::string> vs;
@@ -152,7 +154,6 @@ namespace hpx { namespace util { namespace detail
             nodes.insert(nodes.end(), tmp_nodes.begin(), tmp_nodes.end());
         }
     };
-
 }}}
 
 namespace hpx { namespace util
@@ -350,7 +351,8 @@ namespace hpx { namespace util
             std::vector<std::string> node_tokens;
             boost::split(node_tokens, tasks_per_node, boost::is_any_of(","));
 
-            if(node_tokens.size() == 1 && node_tokens[0].find_first_of('x') == std::string::npos)
+            if (node_tokens.size() == 1 &&
+                node_tokens[0].find_first_of('x') == std::string::npos)
             {
                 num_tasks_ = safe_lexical_cast<std::size_t>(node_tokens[0]);
             }
@@ -391,21 +393,20 @@ namespace hpx { namespace util
                         {
                             if (debug_) {
                                 std::cerr
-                                    << "SLURM node number outside of available list of tasks"
+                                    << "SLURM node number outside of available "
+                                       "list of tasks"
                                     << std::endl;
                             }
                             break;
                         }
                     }
                 }
-                else
-                {
-                    if (debug_)
-                        std::cerr << "Can't extract SLURM node number" << std::endl;
+                else if (debug_) {
+                    std::cerr << "Can't extract SLURM node number" << std::endl;
                 }
             }
         }
-        if(task_count != num_localities_ && num_nodes)
+        if (task_count != num_localities_ && num_nodes)
         {
             num_tasks_
                 = num_localities_
@@ -486,12 +487,13 @@ namespace hpx { namespace util
         char *slurm_cpus_on_node = std::getenv("SLURM_CPUS_ON_NODE");
         if(slurm_cpus_on_node)
         {
-            std::size_t slurm_num_cpus = safe_lexical_cast<std::size_t>(slurm_cpus_on_node);
+            std::size_t slurm_num_cpus =
+                safe_lexical_cast<std::size_t>(slurm_cpus_on_node);
             threads::topology const & top = threads::create_topology();
             std::size_t num_pus = top.get_number_of_pus();
 
-            // Figure out if we got the number of logical cores (including hyperthreading)
-            // or just the number of physical cores.
+            // Figure out if we got the number of logical cores (including
+            // hyper-threading) or just the number of physical cores.
             char *slurm_cpus_per_task = std::getenv("SLURM_CPUS_PER_TASK");
             if(slurm_num_cpus == num_pus)
             {

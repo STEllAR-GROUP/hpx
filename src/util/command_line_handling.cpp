@@ -193,37 +193,30 @@ namespace hpx { namespace util
             std::string threads_str = cfgmap.get_value<std::string>(
                 "hpx.os_threads", "");
 
-            if(batch_threads == std::size_t(-1))
+            if ("all" == threads_str)
             {
-                if ("all" == threads_str)
-                {
-                    cfgmap.config_["hpx.os_threads"] =
-                        boost::lexical_cast<std::string>(
-                            thread::hardware_concurrency());
+                if (batch_threads == std::size_t(-1))
                     batch_threads = thread::hardware_concurrency();
-                }
+                else
+                    default_threads = batch_threads;
+
+                cfgmap.config_["hpx.os_threads"] =
+                    boost::lexical_cast<std::string>(batch_threads);
             }
-            else
+            else if (batch_threads != std::size_t(-1))
             {
-                if ("all" == threads_str)
-                {
-                    cfgmap.config_["hpx.os_threads"] =
-                        boost::lexical_cast<std::string>(
-                            batch_threads);
-                }
                 default_threads = batch_threads;
             }
-
 
             std::size_t threads = cfgmap.get_value<std::size_t>(
                 "hpx.os_threads", default_threads);
 
-
-            if (vm.count("hpx:threads")) {
+            if (vm.count("hpx:threads"))
+            {
                 threads_str = vm["hpx:threads"].as<std::string>();
                 if ("all" == threads_str)
                 {
-                    if(batch_threads == std::size_t(-1))
+                    if (batch_threads == std::size_t(-1))
                     {
                         batch_threads = thread::hardware_concurrency();
                     }
@@ -789,7 +782,8 @@ namespace hpx { namespace util
                 // returned by the system (see #973: Would like option to
                 // report HWLOC bindings).
                 error_code ec(lightweight);
-                threads::mask_type boundcpu = top.get_cpubind_mask(rt.get_thread_manager().get_os_thread_handle(i), ec);
+                threads::mask_type boundcpu = top.get_cpubind_mask(
+                    rt.get_thread_manager().get_os_thread_handle(i), ec);
 
                 // The masks reported by HPX must be the same as the ones
                 // reported from HWLOC.
@@ -800,7 +794,8 @@ namespace hpx { namespace util
                         "handle_print_bind",
                         boost::str(
                             boost::format("unexpected mismatch between "
-                                "locality %1%: binding reported from HWLOC(%2%) and HPX(%3%) on thread %4%"
+                                "locality %1%: binding reported from HWLOC(%2%) "
+                                " and HPX(%3%) on thread %4%"
                             ) % hpx::get_locality_id() % boundcpu % pu_mask % i));
                 }
             }
