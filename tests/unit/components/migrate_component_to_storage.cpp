@@ -10,8 +10,6 @@
 #include <hpx/include/component_storage.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/atomic/atomic.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::migration_support<
