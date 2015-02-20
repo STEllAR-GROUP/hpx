@@ -147,8 +147,8 @@ namespace hpx { namespace serialization {
 
         void load(bool & b)
         {
-            HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
             load_binary(&b, sizeof(bool));
+            HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
         }
 
         void load_integral_impl(boost::int64_t & l)
