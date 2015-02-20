@@ -120,7 +120,7 @@ response locality_namespace::service(
         case primary_ns_increment_credit:
         case primary_ns_decrement_credit:
         case primary_ns_allocate:
-        case primary_ns_start_migration:
+        case primary_ns_begin_migration:
         case primary_ns_end_migration:
         {
             LAGAS_(warning) <<

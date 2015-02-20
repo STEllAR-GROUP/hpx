@@ -25,7 +25,7 @@ system and application performance.
             `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
             `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
             `route`, `unbind`, `unbind_gid`, `unbind_name`
-            `start_migration`, `end_migration`.
+            `begin_migration`, `end_migration`.
         ]
         [`<agas_instance>/total`
 
@@ -69,7 +69,7 @@ system and application performance.
             `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
             `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
             `route`, `unbind`, `unbind_gid`, `unbind_name`,
-            `start_migration`, `end_migration`.
+            `begin_migration`, `end_migration`.
         ]
         [`<agas_instance>/total`
 

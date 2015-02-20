@@ -3053,25 +3053,29 @@ void addressing_service::send_refcnt_requests_sync(
 }
 
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-hpx::future<bool> addressing_service::start_migration_async(
+hpx::future<std::pair<naming::id_type, naming::address> >
+addressing_service::begin_migration_async(
     naming::id_type const& id
     )
 {
+    typedef std::pair<naming::id_type, naming::address> result_type;
+
     if (!id)
     {
         HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::start_migration_async",
+            "addressing_service::begin_migration_async",
             "invalid reference id");
-        return make_ready_future(false);
+        return make_ready_future(result_type(naming::invalid_id, naming::address()));
     }
 
-    agas::request req(agas::primary_ns_start_migration, id.get_gid());
+    agas::request req(agas::primary_ns_begin_migration, id.get_gid());
     naming::id_type service_target(
         agas::stubs::primary_namespace::get_service_instance(id.get_gid())
       , naming::id_type::unmanaged);
 
-    return stubs::primary_namespace::service_async<bool>(
-        service_target, req);
+    return stubs::primary_namespace::service_async<
+            std::pair<naming::id_type, naming::address>
+        >(service_target, req);
 }
 
 hpx::future<bool> addressing_service::end_migration_async(
@@ -3081,7 +3085,7 @@ hpx::future<bool> addressing_service::end_migration_async(
     if (!id)
     {
         HPX_THROW_EXCEPTION(bad_parameter,
-            "addressing_service::start_migration_async",
+            "addressing_service::end_migration_async",
             "invalid reference id");
         return make_ready_future(false);
     }

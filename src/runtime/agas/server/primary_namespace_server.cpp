@@ -113,14 +113,14 @@ response primary_namespace::service(
                 counter_data_.increment_allocate_count();
                 return allocate(req, ec);
             }
-        case primary_ns_start_migration:
+        case primary_ns_begin_migration:
             {
                 update_time_on_exit update(
                     counter_data_
-                  , counter_data_.start_migration_.time_
+                  , counter_data_.begin_migration_.time_
                 );
                 counter_data_.increment_allocate_count();
-                return start_migration(req, ec);
+                return begin_migration(req, ec);
             }
         case primary_ns_end_migration:
             {
@@ -345,25 +345,42 @@ std::vector<response> primary_namespace::bulk_service(
 
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
 // start migration of the given object
-response primary_namespace::start_migration(
+response primary_namespace::begin_migration(
     request const& req
   , error_code& ec)
 {
+    using boost::fusion::at_c;
+
     naming::gid_type id = req.get_gid();
+
+    mutex_type::scoped_lock l(mutex_);
+
+    resolved_type r = resolve_gid_locked(id, ec);
+    if (at_c<0>(r) == naming::invalid_gid)
+    {
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::begin_migration, gid(%1%), response(no_success)")
+            % id);
+
+        return response(primary_ns_begin_migration, naming::invalid_gid, gva(),
+            naming::invalid_gid, no_success);
+    }
 
     migration_table_type::iterator it = migrating_objects_.find(id);
     if (it != migrating_objects_.end())
     {
+        l.unlock();
+
         HPX_THROWS_IF(ec, bad_parameter
-          , "primary_namespace::start_migration"
-          , "cannot start migration of object more than once");
+            , "primary_namespace::begin_migration"
+            , "cannot start migration of object more than once");
         return response();
     }
 
     migrating_objects_.emplace(std::piecewise_construct,
         std::forward_as_tuple(id), std::forward_as_tuple());
 
-    return response(primary_ns_start_migration, success);
+    return response(primary_ns_begin_migration, at_c<0>(r), at_c<1>(r), at_c<2>(r));
 }
 
 // migration of the given object is complete
@@ -372,6 +389,8 @@ response primary_namespace::end_migration(
   , error_code& ec)
 {
     naming::gid_type id = req.get_gid();
+
+    mutex_type::scoped_lock l(mutex_);
 
     migration_table_type::iterator it = migrating_objects_.find(id);
     if (it == migrating_objects_.end())
@@ -384,7 +403,7 @@ response primary_namespace::end_migration(
 }
 
 // wait if given object is currently being migrated
-void primary_namespace::wait_for_migration(
+void primary_namespace::wait_for_migration_locked(
     mutex_type::scoped_lock& l
   , naming::gid_type id
   , error_code& ec)
@@ -585,7 +604,7 @@ response primary_namespace::resolve_gid(
 
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
         // wait for any migration to be completed
-        wait_for_migration(l, id, ec);
+        wait_for_migration_locked(l, id, ec);
 #endif
 
         // now, resolve the id
@@ -943,7 +962,7 @@ void primary_namespace::resolve_free_list(
 
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
         // wait for any migration to be completed
-        wait_for_migration(l, gid, ec);
+        wait_for_migration_locked(l, gid, ec);
 #endif
 
         // Resolve the query GID.
@@ -1331,8 +1350,8 @@ response primary_namespace::statistics_counter(
         case primary_ns_allocate:
             get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_, ::_1);
             break;
-        case primary_ns_start_migration:
-            get_data_func = boost::bind(&cd::get_start_migration_count, &counter_data_, ::_1);
+        case primary_ns_begin_migration:
+            get_data_func = boost::bind(&cd::get_begin_migration_count, &counter_data_, ::_1);
             break;
         case primary_ns_end_migration:
             get_data_func = boost::bind(&cd::get_end_migration_count, &counter_data_, ::_1);
@@ -1371,8 +1390,8 @@ response primary_namespace::statistics_counter(
         case primary_ns_allocate:
             get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
             break;
-        case primary_ns_start_migration:
-            get_data_func = boost::bind(&cd::get_start_migration_time, &counter_data_, ::_1);
+        case primary_ns_begin_migration:
+            get_data_func = boost::bind(&cd::get_begin_migration_time, &counter_data_, ::_1);
             break;
         case primary_ns_end_migration:
             get_data_func = boost::bind(&cd::get_end_migration_time, &counter_data_, ::_1);
@@ -1448,10 +1467,10 @@ boost::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
     return util::get_and_reset_value(allocate_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_start_migration_count(bool reset)
+boost::int64_t primary_namespace::counter_data::get_begin_migration_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(start_migration_.count_, reset);
+    return util::get_and_reset_value(begin_migration_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_end_migration_count(bool reset)
@@ -1470,7 +1489,7 @@ boost::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
         util::get_and_reset_value(increment_credit_.count_, reset) +
         util::get_and_reset_value(decrement_credit_.count_, reset) +
         util::get_and_reset_value(allocate_.count_, reset) +
-        util::get_and_reset_value(start_migration_.count_, reset) +
+        util::get_and_reset_value(begin_migration_.count_, reset) +
         util::get_and_reset_value(end_migration_.count_, reset);
 }
 
@@ -1517,10 +1536,10 @@ boost::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
     return util::get_and_reset_value(allocate_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_start_migration_time(bool reset)
+boost::int64_t primary_namespace::counter_data::get_begin_migration_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(start_migration_.time_, reset);
+    return util::get_and_reset_value(begin_migration_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_end_migration_time(bool reset)
@@ -1539,7 +1558,7 @@ boost::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
         util::get_and_reset_value(increment_credit_.time_, reset) +
         util::get_and_reset_value(decrement_credit_.time_, reset) +
         util::get_and_reset_value(allocate_.time_, reset) +
-        util::get_and_reset_value(start_migration_.time_, reset) +
+        util::get_and_reset_value(begin_migration_.time_, reset) +
         util::get_and_reset_value(end_migration_.time_, reset);
 }
 
@@ -1586,10 +1605,10 @@ void primary_namespace::counter_data::increment_allocate_count()
     ++allocate_.count_;
 }
 
-void primary_namespace::counter_data::increment_start_migration_count()
+void primary_namespace::counter_data::increment_begin_migration_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++start_migration_.count_;
+    ++begin_migration_.count_;
 }
 
 void primary_namespace::counter_data::increment_end_migration_count()

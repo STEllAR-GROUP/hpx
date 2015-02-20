@@ -88,6 +88,7 @@ namespace hpx { namespace agas
             >
             // 0x1
             // primary_ns_resolve_gid
+            // locality_ns_begin_migration
           , util::tuple<
                 naming::gid_type // idbase
               , gva              // gva
@@ -238,14 +239,16 @@ namespace hpx { namespace agas
         namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
-      , naming::gid_type locality_
+      , naming::gid_type const& locality_
       , error status_
         )
       : mc(type_)
       , status(status_)
       , data(new response_data(util::make_tuple(gidbase_, gva_, locality_)))
     {
-        HPX_ASSERT(type_ == primary_ns_resolve_gid);
+        HPX_ASSERT(
+            type_ == primary_ns_resolve_gid ||
+            type_ == primary_ns_begin_migration);
     }
 
     response::response(
@@ -494,6 +497,24 @@ namespace hpx { namespace agas
                     "response::get_locality_id",
                     "invalid operation for request type");
                 return naming::invalid_locality_id;
+            }
+        }
+    }
+
+    naming::gid_type response::get_locality(
+        error_code& ec
+        ) const
+    {
+        switch (data->which())
+        {
+            case response_data::subtype_gid_gva_prefix:
+                return data->get_data<response_data::subtype_gid_gva_prefix, 2>(ec);
+
+            default: {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "response::get_locality",
+                    "invalid operation for request type");
+                return naming::invalid_gid;
             }
         }
     }

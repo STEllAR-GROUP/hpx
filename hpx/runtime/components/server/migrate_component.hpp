@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 
 #include <boost/serialization/shared_ptr.hpp>
 
@@ -34,13 +35,12 @@ namespace hpx { namespace components { namespace server
         // trigger the actual migration
         template <typename Component>
         future<naming::id_type> migrate_component_postproc(
-            future<boost::shared_ptr<Component> > f,
+            boost::shared_ptr<Component> ptr,
             naming::id_type const& to_migrate,
             naming::id_type const& target_locality)
         {
             using components::stubs::runtime_support;
 
-            boost::shared_ptr<Component> ptr = f.get();
             boost::uint32_t pin_count = ptr->pin_count();
 
             if (pin_count == ~0x0u)
@@ -75,6 +75,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component>
     future<naming::id_type> migrate_component(
         naming::id_type const& to_migrate,
+        naming::address const& addr,
         naming::id_type const& target_locality)
     {
         // 'migration' to same locality as before is a no-op
@@ -92,15 +93,20 @@ namespace hpx { namespace components { namespace server
             return make_ready_future(naming::invalid_id);
         }
 
-        return hpx::detail::get_ptr_for_migration<Component>(to_migrate)
-            .then(util::bind(&detail::migrate_component_postproc<Component>,
-                util::placeholders::_1, to_migrate, target_locality));
+        // retrieve pointer to object (must be local)
+        boost::shared_ptr<Component> ptr =
+            hpx::detail::get_ptr_for_migration<Component>(addr, to_migrate);
+
+        // perform actual migration by sending data over to target locality
+        return detail::migrate_component_postproc<Component>(ptr,
+            to_migrate, target_locality);
     }
 
     template <typename Component>
     struct migrate_component_action
       : ::hpx::actions::action<
-            future<naming::id_type> (*)(naming::id_type const&, naming::id_type const&)
+            future<naming::id_type> (*)(naming::id_type const&,
+                naming::address const&, naming::id_type const&)
           , &migrate_component<Component>
           , migrate_component_action<Component> >
     {};
@@ -115,29 +121,30 @@ namespace hpx { namespace components { namespace server
     {
         if (naming::get_locality_id_from_id(to_migrate) != get_locality_id())
         {
-            HPX_THROW_EXCEPTION(unexpected,
+            HPX_THROW_EXCEPTION(invalid_status,
                 "hpx::components::server::trigger_migrate_component",
                 "this function has to be executed on the locality responsible "
                 "for managing the address of the given object");
             return make_ready_future(naming::invalid_id);
         }
 
-        return agas::start_migration_async(to_migrate)
+        return agas::begin_migration(to_migrate)
             .then(
-                [to_migrate, target_locality](future<void> && f)
-                    -> future<naming::id_type>
+                [to_migrate, target_locality](
+                    future<std::pair<naming::id_type, naming::address> > && f)
+                        -> future<naming::id_type>
                 {
-                    f.get();        // rethrow errors
+                    std::pair<naming::id_type, naming::address> r = f.get();   // rethrow errors
 
                     typedef server::migrate_component_action<Component> action_type;
-                    return async_colocated<action_type>(to_migrate, to_migrate,
+                    return async<action_type>(r.first, to_migrate, r.second,
                         target_locality);
                 })
             .then(
-                [](future<id_type> && id) -> future<id_type>
+                [](future<id_type> && f) -> id_type
                 {
                     naming::id_type id = f.get();
-                    agas::end_migration_async(id).get();
+                    agas::end_migration(id).get();
                     return id;
                 });
     }
@@ -146,7 +153,7 @@ namespace hpx { namespace components { namespace server
     struct trigger_migrate_component_action
       : ::hpx::actions::action<
             future<naming::id_type> (*)(naming::id_type const&, naming::id_type const&)
-          , &migrate_component<Component>
+          , &trigger_migrate_component<Component>
           , trigger_migrate_component_action<Component> >
     {};
 }}}

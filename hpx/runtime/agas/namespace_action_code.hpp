@@ -42,7 +42,7 @@ enum namespace_action_code
     primary_ns_increment_credit             = BOOST_BINARY_U(1000110),
     primary_ns_decrement_credit             = BOOST_BINARY_U(1000111),
     primary_ns_allocate                     = BOOST_BINARY_U(1001000),
-    primary_ns_start_migration              = BOOST_BINARY_U(1001001),
+    primary_ns_begin_migration              = BOOST_BINARY_U(1001001),
     primary_ns_end_migration                = BOOST_BINARY_U(1001010),
     primary_ns_statistics_counter           = BOOST_BINARY_U(1001011),
 
@@ -305,10 +305,10 @@ namespace detail
           , counter_target_count
           , primary_ns_allocate
           , primary_ns_statistics_counter }
-      , {   "count/start_migration"
+      , {   "count/begin_migration"
           , ""
           , counter_target_count
-          , primary_ns_start_migration
+          , primary_ns_begin_migration
           , primary_ns_statistics_counter }
       , {   "count/end_migration"
           , ""
@@ -351,10 +351,10 @@ namespace detail
           , counter_target_time
           , primary_ns_allocate
           , primary_ns_statistics_counter }
-      , {   "time/start_migration"
+      , {   "time/begin_migration"
           , "ns"
           , counter_target_time
-          , primary_ns_start_migration
+          , primary_ns_begin_migration
           , primary_ns_statistics_counter }
       , {   "time/end_migration"
           , "ns"

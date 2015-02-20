@@ -108,7 +108,7 @@ namespace hpx { namespace agas
             // primary_ns_change_credit_one
             // primary_ns_free
             // primary_ns_resolve_locality
-            // primary_ns_start_migration
+            // primary_ns_begin_migration
             // primary_ns_end_migration
           , util::tuple<
                 naming::gid_type // gid

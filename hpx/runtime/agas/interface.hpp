@@ -304,7 +304,8 @@ HPX_API_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(
     bool call_for_past_events);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT hpx::future<bool> start_migration(naming::id_type const& id);
+HPX_API_EXPORT hpx::future<std::pair<naming::id_type, naming::address> >
+    begin_migration(naming::id_type const& id);
 HPX_API_EXPORT hpx::future<bool> end_migration(naming::id_type const& id);
 
 }}

@@ -167,7 +167,7 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_increment_credit_count(bool);
         boost::int64_t get_decrement_credit_count(bool);
         boost::int64_t get_allocate_count(bool);
-        boost::int64_t get_start_migration_count(bool);
+        boost::int64_t get_begin_migration_count(bool);
         boost::int64_t get_end_migration_count(bool);
         boost::int64_t get_overall_count(bool);
 
@@ -178,7 +178,7 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_increment_credit_time(bool);
         boost::int64_t get_decrement_credit_time(bool);
         boost::int64_t get_allocate_time(bool);
-        boost::int64_t get_start_migration_time(bool);
+        boost::int64_t get_begin_migration_time(bool);
         boost::int64_t get_end_migration_time(bool);
         boost::int64_t get_overall_time(bool);
 
@@ -190,7 +190,7 @@ struct HPX_EXPORT primary_namespace
         void increment_increment_credit_count();
         void increment_decrement_credit_count();
         void increment_allocate_count();
-        void increment_start_migration_count();
+        void increment_begin_migration_count();
         void increment_end_migration_count();
 
     private:
@@ -205,7 +205,7 @@ struct HPX_EXPORT primary_namespace
         api_counter_data increment_credit_;     // primary_ns_increment_credit
         api_counter_data decrement_credit_;     // primary_ns_decrement_credit
         api_counter_data allocate_;             // primary_ns_allocate
-        api_counter_data start_migration_;      // primary_ns_start_migration
+        api_counter_data begin_migration_;      // primary_ns_begin_migration
         api_counter_data end_migration_;        // primary_ns_end_migration
     };
     counter_data counter_data_;
@@ -243,14 +243,14 @@ struct HPX_EXPORT primary_namespace
 #endif
 
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-    response start_migration(
+    response begin_migration(
         request const& req
       , error_code& ec);
     response end_migration(
         request const& req
       , error_code& ec);
 
-    void wait_for_migration(
+    void wait_for_migration_locked(
         mutex_type::scoped_lock& l
       , naming::gid_type id
       , error_code& ec);
@@ -416,7 +416,7 @@ struct HPX_EXPORT primary_namespace
       , namespace_increment_credit              = primary_ns_increment_credit
       , namespace_decrement_credit              = primary_ns_decrement_credit
       , namespace_allocate                      = primary_ns_allocate
-      , namespace_start_migration               = primary_ns_start_migration
+      , namespace_begin_migration               = primary_ns_begin_migration
       , namespace_end_migration                 = primary_ns_end_migration
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
