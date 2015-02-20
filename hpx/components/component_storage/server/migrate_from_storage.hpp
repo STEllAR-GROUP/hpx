@@ -19,6 +19,7 @@ namespace hpx { namespace components { namespace server
 {
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
         template <typename Component>
         future<naming::id_type> migrate_from_storage_here_id(
             naming::id_type const& target_locality,
@@ -36,10 +37,10 @@ namespace hpx { namespace components { namespace server
 
         template <typename Component>
         future<naming::id_type> migrate_from_storage_here_address(
-            future<naming::address> && f, boost::shared_ptr<Component> ptr,
+            naming::address const& addr, boost::shared_ptr<Component> ptr,
             naming::id_type const& to_resurrect)
         {
-            naming::id_type id(f.get().locality_, id_type::unmanaged);
+            naming::id_type id(addr.locality_, id_type::unmanaged);
             return migrate_from_storage_here_id(id, ptr, to_resurrect);
         }
 
@@ -48,6 +49,7 @@ namespace hpx { namespace components { namespace server
         future<naming::id_type> migrate_from_storage_here(
             future<std::vector<char> > f,
             naming::id_type const& to_resurrect,
+            naming::address const& addr,
             naming::id_type const& target_locality)
         {
             // recreate the object
@@ -67,14 +69,8 @@ namespace hpx { namespace components { namespace server
             // the object was living on before
             if (target_locality == naming::invalid_id)
             {
-                // FIXME: This could be less efficient than possible if the
-                //        responsible AGAS locality is not the same as
-                //        the target locality where the object should be
-                //        resurrected.
-                return agas::resolve(to_resurrect).then(
-                    util::bind(
-                        &migrate_from_storage_here_address<Component>,
-                        util::placeholders::_1, ptr, to_resurrect));
+                return migrate_from_storage_here_address<Component>(addr, ptr,
+                    to_resurrect);
             }
 
             // otherwise directly refer to the locality where the object should
@@ -85,43 +81,70 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // This is executed on the locality responsible for managing the address
+    // resolution for the given object.
     template <typename Component>
-    future<naming::id_type> migrate_from_storage_here(
+    future<naming::id_type> trigger_migrate_from_storage_here(
         naming::id_type const& to_resurrect,
-        naming::id_type const& source_storage,
         naming::id_type const& target_locality)
     {
         if (!Component::supports_migration())
         {
             HPX_THROW_EXCEPTION(invalid_status,
-                "hpx::components::server::migrate_from_storage_here",
+                "hpx::components::server::trigger_migrate_from_storage_here",
                 "attempting to migrate an instance of a component which "
                 "does not support migration");
             return make_ready_future(naming::invalid_id);
         }
 
-        // retrieve the data from the given storage
-        typedef typename server::component_storage::migrate_from_here_action
-            action_type;
-        return async<action_type>(source_storage, to_resurrect.get_gid())
-            .then(util::bind(
-                &detail::migrate_from_storage_here<Component>,
-                util::placeholders::_1, to_resurrect, target_locality));
+        if (naming::get_locality_id_from_id(to_resurrect) != get_locality_id())
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::components::server::trigger_migrate_from_storage_here",
+                "this function has to be executed on the locality responsible "
+                "for managing the address of the given object");
+            return make_ready_future(naming::invalid_id);
+        }
+
+        return agas::begin_migration(to_resurrect)
+            .then(
+                [to_resurrect, target_locality](
+                    future<std::pair<naming::id_type, naming::address> > && f)
+                        -> future<naming::id_type>
+                {
+                    // rethrow errors
+                    std::pair<naming::id_type, naming::address> r = f.get();
+
+                    // retrieve the data from the given storage
+                    typedef typename server::component_storage::migrate_from_here_action
+                        action_type;
+                    return async<action_type>(r.first, to_resurrect.get_gid())
+                        .then(util::bind(
+                            &detail::migrate_from_storage_here<Component>,
+                            util::placeholders::_1, to_resurrect,
+                            r.second, target_locality));
+                })
+            .then(
+                [to_resurrect](future<naming::id_type> && f) -> naming::id_type
+                {
+                    agas::end_migration(to_resurrect).get();
+                    return f.get();
+                });
     }
 
     template <typename Component>
-    struct migrate_from_storage_here_action
+    struct trigger_migrate_from_storage_here_action
       : ::hpx::actions::action<
             future<naming::id_type> (*)(naming::id_type const&,
-                naming::id_type const&, naming::id_type const&)
-          , &migrate_from_storage_here<Component>
-          , migrate_from_storage_here_action<Component> >
+                naming::id_type const&)
+          , &trigger_migrate_from_storage_here<Component>
+          , trigger_migrate_from_storage_here_action<Component> >
     {};
 }}}
 
 HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
     (template <typename Component>),
-    (hpx::components::server::migrate_from_storage_here_action<Component>))
+    (hpx::components::server::trigger_migrate_from_storage_here_action<Component>))
 
 #endif
 

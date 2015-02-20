@@ -65,6 +65,42 @@ namespace hpx
             naming::id_type id_;                // holds component alive
         };
 
+        template <typename Component, typename Deleter>
+        boost::shared_ptr<Component>
+        get_ptr_postproc_helper(naming::address const& addr,
+            naming::id_type const& id)
+        {
+            if (get_locality() != addr.locality_)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "hpx::get_ptr_postproc<Component, Deleter>",
+                    "the given component id does not belong to a local object");
+                return boost::shared_ptr<Component>();
+            }
+
+            if (!traits::component_type_is_compatible<Component>::call(addr))
+            {
+                HPX_THROW_EXCEPTION(bad_component_type,
+                    "hpx::get_ptr_postproc<Component, Deleter>",
+                    "requested component type does not match the given component id");
+                return boost::shared_ptr<Component>();
+            }
+
+            Component* p = get_lva<Component>::call(addr.address_);
+            boost::shared_ptr<Component> ptr(p, Deleter(id));
+
+            ptr->pin();     // the shared_ptr pins the component
+            return ptr;
+        }
+
+        template <typename Component, typename Deleter>
+        boost::shared_ptr<Component>
+        get_ptr_postproc(hpx::future<naming::address> f,
+            naming::id_type const& id)
+        {
+            return get_ptr_postproc_helper<Component, Deleter>(f.get(), id);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // This is similar to get_ptr<> below, except that the shared_ptr will
         // delete the local instance when it goes out of scope.
@@ -73,27 +109,9 @@ namespace hpx
         get_ptr_for_migration(naming::address const& addr,
             naming::id_type const& id)
         {
-            if (get_locality() != addr.locality_)
-            {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "hpx::get_ptr_for_migration<Component>",
-                    "the given component id does not belong to a local object");
-                return boost::shared_ptr<Component>();
-            }
-
-            if (!traits::component_type_is_compatible<Component>::call(addr))
-            {
-                HPX_THROW_EXCEPTION(bad_component_type,
-                    "hpx::get_ptr_for_migration<Component>",
-                    "requested component type does not match the given component id");
-                return boost::shared_ptr<Component>();
-            }
-
-            Component* p = get_lva<Component>::call(addr.address_);
-            boost::shared_ptr<Component> ptr(p, get_ptr_for_migration_deleter(id));
-
-            ptr->pin();     // the shared_ptr pins the component
-            return ptr;
+            return get_ptr_postproc_helper<
+                    Component, get_ptr_for_migration_deleter
+                >(addr, id);
         }
     }
     /// \endcond

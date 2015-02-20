@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace server
     //       along the shared pointer to the object and recreates the object
     //       on the target locality and updates the association of the object's
     //       global id with the new local virtual address in AGAS.
-    //    c) Mark the old object (through the original shared pointer) as being
+    //    c) Mark the old object (through the original shared pointer) as
     //       migrated which will delete it once the shared pointer goes out of
     //       scope.
     //
@@ -148,6 +148,15 @@ namespace hpx { namespace components { namespace server
         naming::id_type const& to_migrate,
         naming::id_type const& target_locality)
     {
+        if (!Component::supports_migration())
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::components::server::trigger_migrate_component",
+                "attempting to migrate an instance of a component which "
+                "does not support migration");
+            return make_ready_future(naming::invalid_id);
+        }
+
         if (naming::get_locality_id_from_id(to_migrate) != get_locality_id())
         {
             HPX_THROW_EXCEPTION(invalid_status,
@@ -173,11 +182,10 @@ namespace hpx { namespace components { namespace server
                         target_locality);
                 })
             .then(
-                [](future<naming::id_type> && f) -> naming::id_type
+                [to_migrate](future<naming::id_type> && f) -> naming::id_type
                 {
-                    naming::id_type id = f.get();
-                    agas::end_migration(id).get();
-                    return id;
+                    agas::end_migration(to_migrate).get();
+                    return f.get();
                 });
     }
 
