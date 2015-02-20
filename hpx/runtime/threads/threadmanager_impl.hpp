@@ -254,6 +254,13 @@ namespace hpx { namespace threads
             return threads_.size();
         }
 
+        boost::thread & get_os_thread_handle(std::size_t num_thread)
+        {
+            HPX_ASSERT(num_thread < threads_.size());
+            //HPX_ASSERT(threads_[num_thread]);
+            return threads_[threads_.size() - num_thread - 1];
+        }
+
         /// The set_state function is part of the thread related API and allows
         /// to change the state of one of the threads managed by this
         /// threadmanager.

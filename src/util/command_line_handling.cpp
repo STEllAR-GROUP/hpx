@@ -189,30 +189,46 @@ namespace hpx { namespace util
             util::batch_environment& env, bool using_nodelist)
         {
             std::size_t batch_threads = env.retrieve_number_of_threads();
-            if(batch_threads == std::size_t(-1)) { batch_threads = 1; }
+            std::size_t default_threads = 1;
             std::string threads_str = cfgmap.get_value<std::string>(
                 "hpx.os_threads", "");
 
-            if ("all" == threads_str) {
-                cfgmap.config_["hpx.os_threads"] =
-                    boost::lexical_cast<std::string>(
-                        thread::hardware_concurrency());
+            if(batch_threads == std::size_t(-1))
+            {
+                if ("all" == threads_str)
+                {
+                    cfgmap.config_["hpx.os_threads"] =
+                        boost::lexical_cast<std::string>(
+                            thread::hardware_concurrency());
+                    batch_threads = thread::hardware_concurrency();
+                }
             }
+            else
+            {
+                if ("all" == threads_str)
+                {
+                    cfgmap.config_["hpx.os_threads"] =
+                        boost::lexical_cast<std::string>(
+                            batch_threads);
+                }
+                default_threads = batch_threads;
+            }
+
 
             std::size_t threads = cfgmap.get_value<std::size_t>(
-                "hpx.os_threads", batch_threads);
+                "hpx.os_threads", default_threads);
 
-            if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                using_nodelist && (threads > batch_threads))
-            {
-                detail::report_thread_warning(env.get_batch_name(),
-                    threads, batch_threads);
-            }
 
             if (vm.count("hpx:threads")) {
                 threads_str = vm["hpx:threads"].as<std::string>();
                 if ("all" == threads_str)
-                    threads = thread::hardware_concurrency(); //-V101
+                {
+                    if(batch_threads == std::size_t(-1))
+                    {
+                        batch_threads = thread::hardware_concurrency();
+                    }
+                    threads = batch_threads; //-V101
+                }
                 else
                     threads = hpx::util::safe_lexical_cast<std::size_t>(threads_str);
 
@@ -220,13 +236,6 @@ namespace hpx { namespace util
                 {
                     throw std::logic_error("Number of --hpx:threads "
                         "must be greater than 0");
-                }
-
-                if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                    using_nodelist && (threads > batch_threads))
-                {
-                    detail::report_thread_warning(env.get_batch_name(),
-                        threads, batch_threads);
                 }
 
 #if defined(HPX_MAX_CPU_COUNT)
@@ -237,6 +246,13 @@ namespace hpx { namespace util
                         "-DHPX_MAX_CPU_COUNT=<N> when configuring HPX.");
                 }
 #endif
+            }
+
+            if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                using_nodelist && (threads > batch_threads))
+            {
+                detail::report_thread_warning(env.get_batch_name(),
+                    threads, batch_threads);
             }
             return threads;
         }
@@ -773,7 +789,7 @@ namespace hpx { namespace util
                 // returned by the system (see #973: Would like option to
                 // report HWLOC bindings).
                 error_code ec(lightweight);
-                threads::mask_type boundcpu = top.get_cpubind_mask(ec);
+                threads::mask_type boundcpu = top.get_cpubind_mask(rt.get_thread_manager().get_os_thread_handle(i), ec);
 
                 // The masks reported by HPX must be the same as the ones
                 // reported from HWLOC.

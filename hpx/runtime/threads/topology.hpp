@@ -309,6 +309,7 @@ namespace hpx { namespace threads
             error_code& ec = throws) const = 0;
 
         virtual mask_type get_cpubind_mask(error_code& ec = throws) const = 0;
+        virtual mask_type get_cpubind_mask(boost::thread & handle, error_code& ec = throws) const = 0;
 
         virtual void write_to_log() const = 0;
     };
