@@ -162,7 +162,7 @@ struct HPX_EXPORT response
         error_code& ec = throws
         ) const;
 
-    naming::gid_type response::get_locality(
+    naming::gid_type get_locality(
         error_code& ec = throws
         ) const;
 
