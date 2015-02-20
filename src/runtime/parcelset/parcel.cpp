@@ -65,7 +65,7 @@ namespace hpx { namespace parcelset
                 ar >> source_id_;
 
             std::string action_name;
-            ar.load(action_name);
+            ar >> action_name;
 
             action_ = util::polymorphic_factory<
                 actions::base_action>::create(action_name);

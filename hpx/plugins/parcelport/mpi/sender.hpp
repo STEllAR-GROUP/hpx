@@ -94,7 +94,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
              , decrement_(false)
             {
                 if(!threads::get_self_ptr()) return;
-                
+
                 mutex_type::scoped_lock l(this_->connections_mtx_);
                 while(this_->num_connections_ >= this_->max_connections_)
                 {
@@ -103,7 +103,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 ++this_->num_connections_;
                 decrement_ = true;
             }
-            
+
             ~check_num_connections()
             {
                 if(decrement_)
@@ -186,9 +186,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
             }
 
-            BOOST_FOREACH(util::serialization_chunk & c, buffer.chunks_)
+            BOOST_FOREACH(serialization::serialization_chunk & c, buffer.chunks_)
             {
-                if(c.type_ == util::chunk_type_pointer)
+                if(c.type_ == serialization::chunk_type_pointer)
                 {
                     wait_done(wait_request, background);
                     if(stopped_) return;

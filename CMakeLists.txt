@@ -759,6 +759,10 @@ if(HPX_COMPILER_WARNINGS)
     if(MPI_FOUND)
       hpx_add_compile_flag(-wd4800)
     endif()
+
+    hpx_add_compile_flag(-wd4800)
+    hpx_add_compile_flag(-wd4251)
+
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall LANGUAGES CXX C Fortran)
     hpx_add_compile_flag_if_available(-Wextra LANGUAGES CXX C Fortran)
