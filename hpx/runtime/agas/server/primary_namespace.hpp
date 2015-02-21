@@ -243,6 +243,7 @@ struct HPX_EXPORT primary_namespace
 #endif
 
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+    // API
     response begin_migration(
         request const& req
       , error_code& ec);
@@ -250,6 +251,7 @@ struct HPX_EXPORT primary_namespace
         request const& req
       , error_code& ec);
 
+    // helper function
     void wait_for_migration_locked(
         mutex_type::scoped_lock& l
       , naming::gid_type id

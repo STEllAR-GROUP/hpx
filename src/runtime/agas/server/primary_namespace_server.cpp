@@ -119,8 +119,8 @@ response primary_namespace::service(
                     counter_data_
                   , counter_data_.begin_migration_.time_
                 );
-                counter_data_.increment_allocate_count();
-                return begin_migration(req, ec);
+                counter_data_.increment_begin_migration_count();
+                return this->primary_namespace::begin_migration(req, ec);
             }
         case primary_ns_end_migration:
             {
@@ -128,8 +128,8 @@ response primary_namespace::service(
                     counter_data_
                   , counter_data_.end_migration_.time_
                 );
-                counter_data_.increment_allocate_count();
-                return end_migration(req, ec);
+                counter_data_.increment_end_migration_count();
+                return this->primary_namespace::end_migration(req, ec);
             }
         case primary_ns_statistics_counter:
             return statistics_counter(req, ec);
