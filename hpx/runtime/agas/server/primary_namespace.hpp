@@ -29,6 +29,10 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/vector.hpp>
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
+#include <boost/shared_ptr.hpp>
+#endif
+
 namespace hpx { namespace agas
 {
 
@@ -131,11 +135,17 @@ struct HPX_EXPORT primary_namespace
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
     typedef std::map<naming::gid_type, lcos::local::condition_variable>
         migration_table_type;
-    migration_table_type migrating_objects_;
+#else
+    typedef std::map<
+            naming::gid_type
+          , boost::shared_ptr<lcos::local::condition_variable>
+        > migration_table_type;
 #endif
+
     std::string instance_name_;
     naming::gid_type next_id_;      // next available gid
     naming::gid_type locality_;     // our locality id
+    migration_table_type migrating_objects_;
 
     struct update_time_on_exit;
 
@@ -242,7 +252,6 @@ struct HPX_EXPORT primary_namespace
         );
 #endif
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
     // API
     response begin_migration(
         request const& req
@@ -256,7 +265,6 @@ struct HPX_EXPORT primary_namespace
         mutex_type::scoped_lock& l
       , naming::gid_type id
       , error_code& ec);
-#endif
 
   public:
     primary_namespace()

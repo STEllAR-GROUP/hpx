@@ -41,10 +41,9 @@ namespace hpx { namespace agas { namespace server
                 {
                     naming::gid_type gid(ids[i].get_gid());
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                     // wait for any migration to be completed
                     wait_for_migration_locked(l, gid, ec);
-#endif
+
                     cache_addresses.push_back(resolve_gid_locked(gid, ec));
                     resolved_type const& r = cache_addresses.back();
 

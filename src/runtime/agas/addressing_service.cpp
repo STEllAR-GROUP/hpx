@@ -3052,7 +3052,6 @@ void addressing_service::send_refcnt_requests_sync(
         ec = make_success_code();
 }
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
 hpx::future<std::pair<naming::id_type, naming::address> >
 addressing_service::begin_migration_async(
     naming::id_type const& id
@@ -3098,7 +3097,6 @@ hpx::future<bool> addressing_service::end_migration_async(
     return stubs::primary_namespace::service_async<bool>(
         service_target, req);
 }
-#endif
 
 }}
 

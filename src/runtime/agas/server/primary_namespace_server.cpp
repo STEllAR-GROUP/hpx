@@ -24,6 +24,10 @@
 #include <boost/foreach.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
+#include <boost/make_shared.hpp>
+#endif
+
 namespace hpx { namespace agas
 {
 
@@ -120,7 +124,7 @@ response primary_namespace::service(
                   , counter_data_.begin_migration_.time_
                 );
                 counter_data_.increment_begin_migration_count();
-                return this->primary_namespace::begin_migration(req, ec);
+                return begin_migration(req, ec);
             }
         case primary_ns_end_migration:
             {
@@ -129,7 +133,7 @@ response primary_namespace::service(
                   , counter_data_.end_migration_.time_
                 );
                 counter_data_.increment_end_migration_count();
-                return this->primary_namespace::end_migration(req, ec);
+                return end_migration(req, ec);
             }
         case primary_ns_statistics_counter:
             return statistics_counter(req, ec);
@@ -343,7 +347,6 @@ std::vector<response> primary_namespace::bulk_service(
     return r;
 }
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
 // start migration of the given object
 response primary_namespace::begin_migration(
     request const& req
@@ -377,8 +380,13 @@ response primary_namespace::begin_migration(
         return response();
     }
 
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
     migrating_objects_.emplace(std::piecewise_construct,
         std::forward_as_tuple(id), std::forward_as_tuple());
+#else
+    migrating_objects_.insert(migration_table_type::value_type(
+        id, boost::make_shared<lcos::local::condition_variable>()));
+#endif
 
     return response(primary_ns_begin_migration, at_c<0>(r), at_c<1>(r), at_c<2>(r));
 }
@@ -396,7 +404,12 @@ response primary_namespace::end_migration(
     if (it == migrating_objects_.end())
         return response(primary_ns_end_migration, no_success);
 
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
     it->second.notify_all(ec);
+#else
+    it->second->notify_all(ec);
+#endif
+
     migrating_objects_.erase(it);
 
     return response(primary_ns_end_migration, success);
@@ -410,9 +423,14 @@ void primary_namespace::wait_for_migration_locked(
 {
     migration_table_type::iterator it = migrating_objects_.find(id);
     if (it != migrating_objects_.end())
+    {
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
         it->second.wait(l, ec);
-}
+#else
+        it->second->wait(l, ec);
 #endif
+    }
+}
 
 response primary_namespace::bind_gid(
     request const& req
@@ -602,10 +620,8 @@ response primary_namespace::resolve_gid(
     {
         mutex_type::scoped_lock l(mutex_);
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
         // wait for any migration to be completed
         wait_for_migration_locked(l, id, ec);
-#endif
 
         // now, resolve the id
         r = resolve_gid_locked(id, ec);
@@ -960,10 +976,8 @@ void primary_namespace::resolve_free_list(
         // The mapping's key space.
         key_type gid = it->first;
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
         // wait for any migration to be completed
         wait_for_migration_locked(l, gid, ec);
-#endif
 
         // Resolve the query GID.
         resolved_type r = resolve_gid_locked(gid, ec);

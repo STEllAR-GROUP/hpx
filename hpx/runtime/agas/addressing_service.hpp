@@ -1423,12 +1423,10 @@ public:
         );
 
     // start/stop migration of an object
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
     /// \returns Current locality and address of the object to migrate
     hpx::future<std::pair<naming::id_type, naming::address> >
         begin_migration_async(naming::id_type const& id);
     hpx::future<bool> end_migration_async(naming::id_type const& id);
-#endif
 };
 
 }}
