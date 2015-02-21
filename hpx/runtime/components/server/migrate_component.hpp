@@ -53,7 +53,7 @@ namespace hpx { namespace components { namespace server
         // clean up (source) memory of migrated object
         template <typename Component>
         naming::id_type migrate_component_cleanup(
-            future<naming::id_type> f,
+            future<naming::id_type> && f,
             boost::shared_ptr<Component> ptr,
             naming::id_type const& to_migrate)
         {
