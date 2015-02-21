@@ -17,13 +17,46 @@
 
 namespace hpx { namespace components { namespace server
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // Migrate given component from the specified storage component
+    //
+    // Object migration is performed from the storage in several steps:
+    //
+    // 1) The migration is triggered by invoking the
+    //    trigger_migrate_from_storage_here_action on the locality which is
+    //    responsible for managing the address resolution for the object which
+    //    has to be migrated.
+    // 2) The trigger_migrate_from_storage_here_action performs 3 steps:
+    //    a) Invoke agas::begin_migration, which marks the global id in AGAS,
+    //       deferring all address resolution requests until end_migration is
+    //       called.
+    //    b) Invoke the actual migration operation (see step 3)
+    //    c) Invoke end_migration, which un-marks the global id and releases
+    //       all pending address resolution requests. Those requests now return
+    //       the new object location.
+    // 3) The actual migration (component_storage::migrate_from_here_action)
+    //    is executed on the storage facility where the object is currently
+    //    stored. This involves several steps as well:
+    //    a) Retrieve the byte stream representing the object from the storage
+    //    b) Deserialize the byte stream to re-create the object. The newly
+    //       recreated object is pinned immediately. The object is unpinned by
+    //       the deleter associated with the shared pointer.
+    //    c) Invoke the action runtime_support::migrate_component on the
+    //       locality where the object has to be moved to. This passes
+    //       along the shared pointer to the object and recreates the object
+    //       on the target locality and updates the association of the object's
+    //       global id with the new local virtual address in AGAS.
+    //    d) Mark the old object (through the original shared pointer) as
+    //       migrated which will delete it once the shared pointer goes out of
+    //       scope.
+    //
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename Component>
         future<naming::id_type> migrate_from_storage_here_id(
             naming::id_type const& target_locality,
-            boost::shared_ptr<Component> ptr,
+            boost::shared_ptr<Component> const& ptr,
             naming::id_type const& to_resurrect)
         {
             // and resurrect it on the specified locality
@@ -37,7 +70,8 @@ namespace hpx { namespace components { namespace server
 
         template <typename Component>
         future<naming::id_type> migrate_from_storage_here_address(
-            naming::address const& addr, boost::shared_ptr<Component> ptr,
+            naming::address const& addr,
+            boost::shared_ptr<Component> const& ptr,
             naming::id_type const& to_resurrect)
         {
             naming::id_type id(addr.locality_, id_type::unmanaged);
@@ -47,7 +81,7 @@ namespace hpx { namespace components { namespace server
         // convert the extracted data into a living component instance
         template <typename Component>
         future<naming::id_type> migrate_from_storage_here(
-            future<std::vector<char> > f,
+            future<std::vector<char> > && f,
             naming::id_type const& to_resurrect,
             naming::address const& addr,
             naming::id_type const& target_locality)
@@ -65,8 +99,8 @@ namespace hpx { namespace components { namespace server
             // make sure the migration code works properly
             ptr->pin();
 
-            // if target locality is not specified, ask AGAS for the address
-            // the object was living on before
+            // if target locality is not specified, use the address of the last
+            // locality where the object was living before
             if (target_locality == naming::invalid_id)
             {
                 return migrate_from_storage_here_address<Component>(addr, ptr,
