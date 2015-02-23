@@ -110,8 +110,6 @@ namespace hpx { namespace parcelset
                     buffer.data_point_;
 
                 {
-                    archive_flags |= serialization::disable_data_chunking; //TODO:bikineev
-                    archive_flags |= serialization::disable_array_optimization; //TODO:bikineev
                     // De-serialize the parcel data
                     serialization::input_archive archive(buffer.data_,
                         archive_flags, &chunks, inbound_data_size);

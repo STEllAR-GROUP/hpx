@@ -19,8 +19,8 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/serialization/map.hpp>
+#include <hpx/serialization/array.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-//#include <hpx/util/serialize_buffer.hpp>
 
 namespace hpx { namespace util
 {
@@ -41,10 +41,7 @@ namespace hpx { namespace util
             template <typename Archive, typename Element>
             static void serialize_element(Archive & ar, Element & e, boost::mpl::true_)
             {
-                //hpx::util::serialize_buffer<Element> buf(&e, 1,
-                    //hpx::util::serialize_buffer<Element>::reference);
-                //ar & buf;
-                static_assert(true, ""); // TODO:bikineev
+                ar & hpx::serialization::make_array(&e, 1);
             }
 
             template <typename Archive, typename Element>
@@ -131,10 +128,7 @@ namespace hpx { namespace util
         inline void
         serialize_sequence(Archive& ar, Sequence& seq, boost::mpl::true_)
         {
-            //hpx::util::serialize_buffer<Element> buf(&seq, 1,
-                //hpx::util::serialize_buffer<Element>::reference);
-            //ar & buf;
-            static_assert(true, ""); // TODO
+            ar & hpx::serialization::make_array(&seq, 1);
         }
     }
 

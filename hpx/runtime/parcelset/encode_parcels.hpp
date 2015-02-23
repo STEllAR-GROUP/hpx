@@ -111,8 +111,6 @@ namespace hpx
                             archive_flags |= serialization::enable_compression;
                         }
 
-                        archive_flags |= serialization::disable_array_optimization;
-                        archive_flags |= serialization::disable_data_chunking;
                         serialization::output_archive archive(
                             buffer.data_
                           , archive_flags
