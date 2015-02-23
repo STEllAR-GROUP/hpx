@@ -12,9 +12,6 @@
 
 #include <vector>
 
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/vector.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 const std::size_t vsize_default = 1024*1024;
 const std::size_t numiter_default = 5;

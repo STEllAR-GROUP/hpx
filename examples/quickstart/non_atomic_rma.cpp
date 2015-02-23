@@ -142,8 +142,9 @@ int hpx_main(po::variables_map &vm)
 hpx::actions::manage_object_action<data> const manage_data =
         hpx::actions::manage_object_action<data>();
 
-HPX_REGISTER_MANAGE_OBJECT_ACTION(
-    hpx::actions::manage_object_action<data>, manage_object_action_data)
+//TODO:bikineev
+//HPX_REGISTER_MANAGE_OBJECT_ACTION(
+    //hpx::actions::manage_object_action<data>, manage_object_action_data)
 
 naming::id_type set_initialdata (int i)
 {
