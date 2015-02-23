@@ -1440,6 +1440,10 @@ bool addressing_service::resolve_cached(
 
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
+    // force routing if target object was migrated
+    if (was_object_migrated_locked(id))
+        return false;
+
     // Check if the entry is currently in the cache
     if (gva_cache_->get_entry(k, idbase, e))
     {
@@ -1537,7 +1541,7 @@ hpx::future<naming::id_type> addressing_service::get_colocation_id_async(
     agas::request req(agas::primary_ns_resolve_gid, id.get_gid());
     naming::id_type service_target(
         agas::stubs::primary_namespace::get_service_instance(id.get_gid())
-        , naming::id_type::unmanaged);
+      , naming::id_type::unmanaged);
 
     return stubs::primary_namespace::service_async<naming::id_type>(
         service_target, req);
@@ -1569,7 +1573,6 @@ naming::address addressing_service::resolve_full_postproc(
     addr.locality_ = g.prefix;
     addr.type_ = g.type;
     addr.address_ = g.lva();
-
 
     if(range_caching_)
     {
@@ -1688,7 +1691,6 @@ bool addressing_service::resolve_full_local(
             addr.type_ = g.type;
             addr.address_ = g.lva();
 
-
             if(range_caching_)
             {
                 // Put the range into the cache.
@@ -1791,13 +1793,18 @@ void addressing_service::route(
             naming::id_type const route_target(
                 bootstrap_primary_namespace_gid(), naming::id_type::unmanaged);
 
-            parcelset::parcel route_p(route_target, primary_ns_addr_
+            parcelset::parcel route_p(
+                route_target, primary_ns_addr_
               , new hpx::actions::transfer_action<action_type>(action_priority_,
                     req));
 
             // send to the main AGAS instance for routing
             hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);
             return;
+        }
+        else
+        {
+            HPX_ASSERT(false);      // should not happen
         }
     }
 
@@ -2255,6 +2262,21 @@ void addressing_service::insert_cache_entry(
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
+// Removing entries from the table of migrated object is not safe as there is
+// no other way to reliably tell whether an object is still here or not (other
+// localities might have stale AGAS cache entries).
+//
+//         // remove the object from the table of migrated objects if the object's
+//         // new locality is the same as the locality where the object was
+//         // migrated to.
+//         migrated_objects_table_type::iterator mo_it =
+//             migrated_objects_table_.find(gid);
+//         if (mo_it != migrated_objects_table_.end() &&
+//             (!mo_it->second || mo_it->second == g.prefix))
+//         {
+//             migrated_objects_table_.erase(mo_it);
+//         }
+
         const gva_cache_key key(gid, count);
 
         if (!gva_cache_->insert(key, g))
@@ -2328,13 +2350,19 @@ void addressing_service::update_cache_entry(
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
-        // update cache only if it's currently not locked
-//         cache_mutex_type::scoped_try_lock lock(gva_cache_mtx_);
-//         if (!lock)
+// Removing entries from the table of migrated object is not safe as there is
+// no other way to reliably tell whether an object is still here or not (other
+// localities might have stale AGAS cache entries).
+//
+//         // remove the object from the table of migrated objects if the object's
+//         // new locality is the same as the locality where the object was
+//         // migrated to.
+//         migrated_objects_table_type::iterator mo_it =
+//             migrated_objects_table_.find(gid);
+//         if (mo_it != migrated_objects_table_.end() &&
+//             (!mo_it->second || mo_it->second == g.prefix))
 //         {
-//             if (&ec != &throws)
-//                 ec = make_success_code();
-//             return;
+//             migrated_objects_table_.erase(mo_it);
 //         }
 
         const gva_cache_key key(gid, count);
@@ -3055,6 +3083,7 @@ void addressing_service::send_refcnt_requests_sync(
 hpx::future<std::pair<naming::id_type, naming::address> >
 addressing_service::begin_migration_async(
     naming::id_type const& id
+  , naming::id_type const& target_locality
     )
 {
     typedef std::pair<naming::id_type, naming::address> result_type;
@@ -3067,9 +3096,28 @@ addressing_service::begin_migration_async(
         return make_ready_future(result_type(naming::invalid_id, naming::address()));
     }
 
-    agas::request req(agas::primary_ns_begin_migration, id.get_gid());
+    naming::gid_type gid = id.get_gid();
+
+    // insert the object's new locality into the map of migrated objects
+    {
+        cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
+        if (target_locality)
+        {
+            migrated_objects_table_.insert(
+                migrated_objects_table_type::value_type(
+                    gid, target_locality.get_gid()));
+        }
+        else
+        {
+            migrated_objects_table_.insert(
+                migrated_objects_table_type::value_type(
+                    gid, naming::invalid_gid));
+        }
+    }
+
+    agas::request req(agas::primary_ns_begin_migration, gid);
     naming::id_type service_target(
-        agas::stubs::primary_namespace::get_service_instance(id.get_gid())
+        agas::stubs::primary_namespace::get_service_instance(gid)
       , naming::id_type::unmanaged);
 
     return stubs::primary_namespace::service_async<
@@ -3096,6 +3144,31 @@ hpx::future<bool> addressing_service::end_migration_async(
 
     return stubs::primary_namespace::service_async<bool>(
         service_target, req);
+}
+
+bool addressing_service::was_object_migrated_locked(
+    naming::gid_type const& id
+    )
+{
+    return
+        migrated_objects_table_.find(id) !=
+        migrated_objects_table_.end();
+}
+
+bool addressing_service::was_object_migrated(
+    naming::id_type const* ids
+  , std::size_t size)
+{
+#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+    HPX_ASSERT(1 == size);
+
+    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
+    return was_object_migrated_locked(ids[0].get_gid());
+#else
+    // #FIXME: it's not really clear how to handle this situation
+    HPX_ASSERT(false);
+    return false;
+#endif
 }
 
 }}
