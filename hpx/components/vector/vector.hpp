@@ -19,6 +19,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/serialization.hpp>
 
 #include <hpx/components/vector/vector_segmented_iterator.hpp>
 #include <hpx/components/vector/partition_vector_component.hpp>
@@ -69,7 +70,7 @@ namespace hpx { namespace server
             boost::uint32_t locality_id_;
 
         private:
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
@@ -92,7 +93,7 @@ namespace hpx { namespace server
         std::vector<partition_data> partitions_;
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
