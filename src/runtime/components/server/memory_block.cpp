@@ -44,11 +44,6 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(
     hpx::components::memory_block_data,
     memory_data_type)
 
-//TODO:bikineev
-//HPX_REGISTER_MANAGE_OBJECT_ACTION(
-    //hpx::actions::manage_object_action<boost::uint8_t>,
-    //manage_object_action_uint8_t)
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail
 {

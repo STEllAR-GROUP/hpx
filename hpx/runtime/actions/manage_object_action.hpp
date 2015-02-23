@@ -205,13 +205,6 @@ namespace hpx { namespace actions
             return instance.get();
         }
 
-        ///// serialization support //TODO: delete this!
-        //static void register_base()
-        //{
-            //// TODO:bikineev: should be deleted
-            //util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
-        //}
-
     private:
         // serialization support, just serialize the type
         friend class hpx::serialization::access;
@@ -233,13 +226,6 @@ namespace hpx { namespace actions
     struct manage_object_action<boost::uint8_t> : manage_object_action_base
     {
         manage_object_action() {}
-
-        ///// serialization support //TODO: delete this!
-        //static void register_base()
-        //{
-            //// TODO:bikineev: should be deleted
-            //util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
-        //}
 
     private:
         // serialization support, just serialize the type
@@ -318,14 +304,6 @@ namespace hpx { namespace actions
             return instance.get();
         }
 
-        ///// serialization support //TODO:delete this!
-        //static void register_base()
-        //{
-            //// TODO:bikineev: should be deleted
-            //util::void_cast_register_nonvirt<manage_object_action, manage_object_action<T> >();
-            //manage_object_action<T>::register_base();
-        //}
-
     private:
         // serialization support, just serialize the type
         friend class hpx::serialization::access;
@@ -342,12 +320,6 @@ namespace hpx { namespace actions
         HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(manage_object_action);
     };
 }}
-
-////TODO:bikineev
-//#define HPX_REGISTER_MANAGE_OBJECT_ACTION(object_action, name)                \
-        //BOOST_CLASS_EXPORT(object_action)                                     \
-        //HPX_REGISTER_BASE_HELPER(object_action, name)                         \
-    //[>*<]
 
 #include <hpx/config/warnings_suffix.hpp>
 

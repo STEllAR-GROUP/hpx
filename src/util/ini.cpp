@@ -775,7 +775,7 @@ std::string section::expand_only(std::string value,
 template <typename Archive>
 void section::save(Archive& ar, const unsigned int version) const
 {
-    ar << name_; //TODO:bikineev look at this: I removed make_nvp
+    ar << name_;
     ar << parent_name_;
     ar << entries_;
     ar << sections_;

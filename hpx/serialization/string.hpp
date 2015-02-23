@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <iostream>
 
 #include <string>
 
@@ -23,14 +22,12 @@ namespace hpx { namespace serialization {
         size_type size = 0;
         ar >> size;
 
-        std::cout << "loading string size: " << size;
         s.clear();
         if(size == 0) return;
 
         s.resize(size);
 
         load_binary(ar, &s[0], size * sizeof(Char));
-        std::cout << " , string itself: " << s << std::endl;
     }
 
     // save string

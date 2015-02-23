@@ -358,7 +358,7 @@ namespace hpx { namespace util
             }
 
         private:
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
