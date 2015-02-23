@@ -44,6 +44,10 @@ struct hello_world
     typedef hpx::components::client_base<hello_world, stubs::hello_world>
         base_type;
 
+    hello_world(hpx::future<id_type> gid)
+      : base_type(std::move(gid))
+    {}
+
     void invoke()
     {
         this->base_type::invoke(this->get_gid());
