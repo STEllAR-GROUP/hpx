@@ -5,7 +5,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_policy(SET CMP0054 NEW)
+cmake_policy(PUSH)
+if(POLICY CMP0054)
+  cmake_policy(SET CMP0054 NEW)
+endif()
 
 function(hpx_setup_target target)
   # retrieve arguments
@@ -219,3 +222,5 @@ function(hpx_setup_target target)
     )
   endif()
 endfunction()
+
+cmake_policy(POP)
