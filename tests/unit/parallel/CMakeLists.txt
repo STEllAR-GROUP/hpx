@@ -29,6 +29,9 @@ set(tests
     generate
     generaten
     inclusive_scan
+    is_partitioned
+    is_sorted
+    is_sorted_until
     lexicographical_compare
     max_element
     min_element
