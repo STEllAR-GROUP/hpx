@@ -9,7 +9,7 @@ set(tests
     all_of
     any_of
     copy
-    #copyif
+    copyif
     copyn
     count
     countif
