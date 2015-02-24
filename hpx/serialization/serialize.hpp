@@ -10,7 +10,8 @@
 
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/access.hpp>
-#include <hpx/serialization/archive.hpp>
+#include <hpx/serialization/input_archive.hpp>
+#include <hpx/serialization/output_archive.hpp>
 
 #include <boost/type_traits/add_const.hpp>
 #include <boost/utility/enable_if.hpp>

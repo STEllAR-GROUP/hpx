@@ -11,6 +11,7 @@
 
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
+#include <hpx/serialization/string.hpp>
 
 namespace hpx { namespace serialization {
 

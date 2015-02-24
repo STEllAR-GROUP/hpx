@@ -8,14 +8,12 @@
 #define HPX_SERIALIZATION_ACCESS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
-#include <hpx/serialization/polymorphic_intrusive_factory.hpp>
 
 #include <boost/type_traits/is_polymorphic.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/identity.hpp>
 
 namespace hpx { namespace serialization {
 

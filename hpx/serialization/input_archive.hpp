@@ -224,7 +224,7 @@ namespace hpx { namespace serialization {
     }
 
     template <typename Helper>
-      Helper & tracked_pointer(input_archive & ar, std::size_t pos)
+    Helper & tracked_pointer(input_archive & ar, std::size_t pos)
     {
         return ar.tracked_pointer<Helper>(pos);
     }

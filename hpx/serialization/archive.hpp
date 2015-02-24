@@ -25,6 +25,7 @@
 #include <iostream>
 
 namespace hpx { namespace serialization {
+
     namespace detail
     {
         struct ptr_helper

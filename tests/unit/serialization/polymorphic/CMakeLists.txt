@@ -4,7 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    polymorphic/serialization_polymorphic
+    polymorphic/serialization_polymorphic_reference
+    polymorphic/serialization_polymorphic_pointer
     polymorphic/serialization_polymorphic_nonintrusive
     polymorphic/serialization_smart_ptr_polymorphic
     polymorphic/serialization_smart_ptr_polymorphic_nonintrusive

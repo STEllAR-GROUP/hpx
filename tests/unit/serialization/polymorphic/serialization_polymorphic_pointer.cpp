@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/raw_ptr.hpp>
 #include <hpx/serialization/polymorphic_intrusive_factory.hpp>
 
 #include <hpx/serialization/input_archive.hpp>
@@ -22,7 +23,6 @@ struct A
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
     {
-        //std::cout << __PRETTY_FUNCTION__ << std::endl;
         ar & a;
     }
     HPX_SERIALIZATION_POLYMORPHIC(A);
@@ -42,8 +42,7 @@ struct B
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
     {
-        //std::cout << __PRETTY_FUNCTION__ << std::endl;
-        //ar & b;
+        ar & b;
     }
     HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(B);
 };
@@ -59,9 +58,8 @@ struct D : B
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
     {
-        //b = 4711;
-        //ar & hpx::serialization::base_object<B>(*this);;
-        std::cout << __PRETTY_FUNCTION__ << std::endl;
+        b = 4711;
+        ar & hpx::serialization::base_object<B>(*this);;
         ar & d;
     }
     HPX_SERIALIZATION_POLYMORPHIC(D);
@@ -72,21 +70,23 @@ int main()
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(buffer);
     oarchive << A();
-    D d;
-    B const & b1 = d;
-    oarchive << b1;
+
+    B const * b1 = new D;
+    oarchive << hpx::serialization::raw_ptr(b1);
 
     hpx::serialization::input_archive iarchive(buffer);
     A a;
     iarchive >> a;
-    D d1;
-    B & b2 = d1;
-    iarchive >> b2;
+    B * b2 = 0;
+    iarchive >> hpx::serialization::raw_ptr(b2);
+
     HPX_TEST_EQ(a.a, 8);
-    HPX_TEST_EQ(&b2, &d1);
-    HPX_TEST_EQ(b2.b, d1.b);
-    HPX_TEST_EQ(d.b, d1.b);
-    HPX_TEST_EQ(d.d, d1.d);
+    HPX_TEST_NEQ(b2, b1);
+    HPX_TEST_EQ(b2->b, b1->b);
+
+    delete b2;
+
+    HPX_TEST_EQ(b1->b, 4711);
 
     return hpx::util::report_errors();
 }
