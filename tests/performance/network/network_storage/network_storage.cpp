@@ -144,7 +144,7 @@ class simple_profiler {
           int maxlevel = 0;
           std::for_each(this->_profiles.begin(), this->_profiles.end(),
               [&](std::map<const char *, valtype>::value_type &p) {
-              maxlevel = std::max(maxlevel, std::get<1>(p.second));
+              maxlevel = (std::max)(maxlevel, std::get<1>(p.second));
             }
           );
           // prepare format string for output
