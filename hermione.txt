@@ -1,0 +1,2 @@
+HermioneBot: force build --branch=is_sorted hpx_gcc_4_9_boost_1_55_debian_x86_64_release
+try on release and debug
