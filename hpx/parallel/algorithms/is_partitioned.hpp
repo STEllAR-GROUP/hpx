@@ -108,24 +108,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             });
                         return fst_bool;
                     },
-                    ////////////////////////////////////////////////////////////
-                    //    Using hpx::util::unwrapped
-                    /*hpx::util::unwrapped(
-                        [tok](std::vector<bool> && results) -> bool
-                        {
-                            if (tok.was_cancelled()) return false;
-                            return std::is_partitioned(boost::begin(results),
-                                boost::end(results),
-                                [](bool val) { return val; });
-                        })
-                    );*/
-                    ////////////////////////////////////////////////////////////
-                    //    Using impl_is_partitioned()
-                    //To only call hpx::future::get() once for each iterator.
-                    //std::is_partitioned calls pred twice for the first element
-                    //that is false so [](hpx::future<bool> a) { return
-                    //a.get();} cannot be used as a predicate. Alternatively,
-                    //hpx::util::unwrapped can be used with std::is_partition.
                     [tok](std::vector<hpx::future<bool> > && results) -> bool
                     {
                         if (tok.was_cancelled()) return false;
