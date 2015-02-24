@@ -101,8 +101,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    /// Determines if the range [first, last) is sorted. Uses pred or operator
-    /// < to compare elements.
+    /// Determines if the range [first, last) is sorted. Uses pred to
+    /// compare elements.
     ///
     /// \note   Complexity: at most (N+S-1) comparisons where
     ///         \a N = distance(first, last).
@@ -168,7 +168,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::forward<Pred>(pred));
     }
 
-    /// Determines if the range [first, last) is sorted. Uses pred or operator
+    /// Determines if the range [first, last) is sorted. Uses operator
     /// < to compare elements.
     /// elements.
     ///
@@ -303,7 +303,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             }
                         }
                     },
-                    //[&first, tok](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                     [first, tok](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                     {
                         difference_type loc = tok.get_data();
@@ -382,7 +381,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Returns the first element in the range [first, last) that is not sorted.
-    /// Uses a predicate to compare elements or the less than operator.
     ///
     /// \note   Complexity: at most (N+S-1) comparisons where
     ///         \a N = distance(first, last).
