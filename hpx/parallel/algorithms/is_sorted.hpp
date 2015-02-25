@@ -303,10 +303,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             }
                         }
                     },
-<<<<<<< HEAD
-=======
-                    //[&first, tok](std::vector<hpx::future<void> > &&) mutable -> FwdIter
->>>>>>> Adding is_sorted, is_sorted_until and is_partitioned.
                     [first, tok](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                     {
                         difference_type loc = tok.get_data();
@@ -385,10 +381,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Returns the first element in the range [first, last) that is not sorted.
-<<<<<<< HEAD
-=======
     /// Uses a predicate to compare elements or the less than operator.
->>>>>>> Adding is_sorted, is_sorted_until and is_partitioned.
     ///
     /// \note   Complexity: at most (N+S-1) comparisons where
     ///         \a N = distance(first, last).
