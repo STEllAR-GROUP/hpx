@@ -28,6 +28,7 @@
 #include <hpx/util/void_cast.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/raw_ptr.hpp>
 
 #include <boost/config.hpp>
 #include <boost/type_traits/is_reference.hpp>
@@ -311,7 +312,7 @@ namespace hpx { namespace util
                 base_type::stream_out = Vtable::stream_out;
 
                 // make sure the global gets instantiated;
-                hpx::actions::detail::guid_initialization<fxn_ptr>();
+                //hpx::actions::detail::guid_initialization<fxn_ptr>(); //TODO:bikineev
             }
 
             virtual base_type * get_ptr()
@@ -319,10 +320,11 @@ namespace hpx { namespace util
                 return Vtable::get_ptr();
             }
 
-            static void register_base()
-            {
-                util::void_cast_register_nonvirt<fxn_ptr, base_type>();
-            }
+            //TODO:bikineev
+            //static void register_base()
+            //{
+                //util::void_cast_register_nonvirt<fxn_ptr, base_type>();
+            //}
 
             void save_object(void *const* object, OArchive & ar, unsigned)
             {
@@ -699,7 +701,7 @@ namespace hpx { namespace util
             else
             {
                 typename detail::any::fxn_ptr_table<IArchive, OArchive, Char> *p = 0;
-                ar >> p;
+                ar >> hpx::serialization::raw_ptr(p);
                 table = p->get_ptr();
                 delete p;
                 table->load_object(&object, ar, version);
@@ -712,7 +714,7 @@ namespace hpx { namespace util
             ar & is_empty;
             if (!is_empty)
             {
-                ar << table;
+                ar << hpx::serialization::raw_ptr(table);
                 table->save_object(&object, ar, version);
             }
         }
@@ -1079,6 +1081,9 @@ namespace hpx { namespace util
             void load(void* dst, std::size_t dst_count)
             {}
 
+            template <class T> void serialize(T&, unsigned){}
+            HPX_SERIALIZATION_POLYMORPHIC(hash_binary_filter);
+
             std::size_t hash;
         };
     }
@@ -1097,7 +1102,7 @@ namespace hpx { namespace util
             {
                 std::vector<char> data;
                 serialization::output_archive ar (
-                        data, boost::archive::no_header, ~0U, 0, &hasher);
+                        data, 0U, ~0U, 0, &hasher);
                 ar << elem;
             }  // let archive go out of scope
 
