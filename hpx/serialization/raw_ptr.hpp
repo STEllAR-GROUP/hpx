@@ -54,11 +54,13 @@ namespace hpx { namespace serialization {
                 t(t)
             {}
 
+            raw_ptr_proxy(T* const & t):
+                t(const_cast<T*&>(t))
+            {}
+
             void serialize(output_archive& ar, unsigned n) const
             {
-                raw_ptr_type<T> ptr(t);
-                serialize_pointer(ar, ptr, n);
-                t = ptr.get();
+                serialize_pointer(ar, raw_ptr_type<T>(t), n);
             }
 
             void serialize(input_archive& ar, unsigned n)
@@ -75,6 +77,12 @@ namespace hpx { namespace serialization {
 
     template <class T> BOOST_FORCEINLINE
     detail::raw_ptr_proxy<T> raw_ptr(T*& t)
+    {
+        return detail::raw_ptr_proxy<T>(t);
+    }
+
+    template <class T> BOOST_FORCEINLINE
+    detail::raw_ptr_proxy<T> raw_ptr(T* const & t)
     {
         return detail::raw_ptr_proxy<T>(t);
     }
