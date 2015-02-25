@@ -9,8 +9,6 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/serialization/vector.hpp>
-
 void f()
 {}
 HPX_PLAIN_ACTION(f);
