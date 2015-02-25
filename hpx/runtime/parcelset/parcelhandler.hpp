@@ -39,11 +39,12 @@ namespace hpx { namespace parcelset
     /// parcel-handlers may be connected to a single parcelport.
     class HPX_EXPORT parcelhandler : boost::noncopyable
     {
-    private:
+    public:
         // default callback for put_parcel
         void default_write_handler(boost::system::error_code const&,
             parcel const& p);
 
+    private:
         void parcel_sink(parcel const& p);
 
         threads::thread_state_enum decode_parcel(

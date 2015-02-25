@@ -24,7 +24,8 @@ system and application performance.
             `iterate_names`, `iterate_types`, `localities`,
             `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
             `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
-            `route`, `unbind`, `unbind_gid`, `unbind_name`.
+            `route`, `unbind`, `unbind_gid`, `unbind_name`
+            `begin_migration`, `end_migration`.
         ]
         [`<agas_instance>/total`
 
@@ -67,7 +68,8 @@ system and application performance.
             `iterate_names`, `iterate_types`, `localities`,
             `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
             `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
-            `route`, `unbind`, `unbind_gid`, `unbind_name`.
+            `route`, `unbind`, `unbind_gid`, `unbind_name`,
+            `begin_migration`, `end_migration`.
         ]
         [`<agas_instance>/total`
 
@@ -552,10 +554,10 @@ system and application performance.
          instance name is `total` the counter returns the average time spent on
          overhead while executing one __hpx__-thread for all worker threads (cores)
          on that locality. If the instance name is `worker-thread#*` the counter
-         will return the average time spent on overhead executing 
-         one __hpx__-thread for all worker threads separately.  
-         This counter is available only if the configuration time constants 
-         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and 
+         will return the average time spent on overhead executing
+         one __hpx__-thread for all worker threads separately.
+         This counter is available only if the configuration time constants
+         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
          `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
     ]
     [   [`/threads/count/cumulative-phases`]
@@ -640,8 +642,8 @@ system and application performance.
         phase (invocation) for all worker threads (cores) on that locality.
         If the instance name is `worker-thread#*` the counter will return
         the average time spent on overhead executing one __hpx__-thread phase
-        for all worker threads separately.  This counter is available only 
-        if the configuration time constants 
+        for all worker threads separately.  This counter is available only
+        if the configuration time constants
         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
         `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
     ]

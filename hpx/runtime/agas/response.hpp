@@ -51,7 +51,7 @@ struct HPX_EXPORT response
         namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
-      , naming::gid_type locality_
+      , naming::gid_type const& locality_
       , error status_ = success
         );
 
@@ -162,6 +162,10 @@ struct HPX_EXPORT response
         error_code& ec = throws
         ) const;
 
+    naming::gid_type get_locality(
+        error_code& ec = throws
+        ) const;
+
     // primary_ns_change_credit_one
     boost::int64_t get_added_credits(
         error_code& ec = throws
@@ -264,18 +268,6 @@ struct get_remote_result<naming::id_type, agas::response>
     }
 };
 
-// TODO: verification of namespace_action_code
-template <>
-struct get_remote_result<bool, agas::response>
-{
-    static bool call(
-        agas::response const& rep
-        )
-    {
-        return success == rep.get_status();
-    }
-};
-
 template <>
 struct get_remote_result<boost::uint32_t, agas::response>
 {
@@ -324,6 +316,30 @@ struct get_remote_result<boost::int64_t, agas::response>
 };
 
 template <>
+struct get_remote_result<bool, agas::response>
+{
+    static bool call(
+        agas::response const& rep
+        )
+    {
+        switch(rep.get_action_code()) {
+        case agas::symbol_ns_bind:
+        case agas::symbol_ns_on_event:
+        case agas::primary_ns_end_migration:
+            return rep.get_status() == success;
+
+        default:
+            break;
+        }
+
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "get_remote_result<void, agas::response>::call",
+            "unexpected action code in result conversion");
+        return false;
+    }
+};
+
+template <>
 struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
 {
     static std::vector<boost::uint32_t> call(
@@ -337,10 +353,39 @@ struct get_remote_result<std::vector<boost::uint32_t>, agas::response>
         default:
             break;
         }
+
         HPX_THROW_EXCEPTION(bad_parameter,
             "get_remote_result<std::vector<boost::uint32_t>, agas::response>::call",
             "unexpected action code in result conversion");
         return std::vector<boost::uint32_t>();
+    }
+};
+
+template <>
+struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::response>
+{
+    static std::pair<naming::id_type, naming::address> call(
+        agas::response const& rep
+        )
+    {
+        switch(rep.get_action_code()) {
+        case agas::primary_ns_begin_migration:
+            {
+                agas::gva g = rep.get_gva();
+
+                naming::address addr(g.prefix, g.type, g.lva());
+                naming::id_type loc(rep.get_locality(), id_type::unmanaged);
+                return std::pair<naming::id_type, naming::address>(loc, addr);
+            }
+
+        default:
+            break;
+        }
+
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "get_remote_result<std::pair<naming::id_type, naming::address>, agas::response>::call",
+            "unexpected action code in result conversion");
+        return std::pair<naming::id_type, naming::address>();
     }
 };
 

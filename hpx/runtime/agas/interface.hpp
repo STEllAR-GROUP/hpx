@@ -302,6 +302,14 @@ HPX_API_EXPORT naming::id_type get_colocation_id_sync(
 HPX_API_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(
     std::string const& name, agas::namespace_action_code evt,
     bool call_for_past_events);
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT hpx::future<std::pair<naming::id_type, naming::address> >
+    begin_migration(
+        naming::id_type const& id,
+        naming::id_type const& target_locality);
+HPX_API_EXPORT hpx::future<bool> end_migration(naming::id_type const& id);
+
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

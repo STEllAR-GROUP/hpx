@@ -78,6 +78,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     > gva_cache_type;
     // }}}
 
+    typedef std::map<naming::gid_type, naming::gid_type> migrated_objects_table_type;
     typedef std::map<naming::gid_type, boost::int64_t> refcnt_requests_type;
 
     struct bootstrap_data_type;
@@ -85,6 +86,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     mutable cache_mutex_type gva_cache_mtx_;
     boost::shared_ptr<gva_cache_type> gva_cache_;
+    migrated_objects_table_type migrated_objects_table_;
 
     mutable mutex_type console_cache_mtx_;
     boost::uint32_t console_cache_;
@@ -136,7 +138,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         destroy_big_boot_barrier();
     }
 
-    void initialize(parcelset::parcelhandler& ph, boost::uint64_t rts_lva, boost::uint64_t mem_lva);
+    void initialize(parcelset::parcelhandler& ph, boost::uint64_t rts_lva,
+        boost::uint64_t mem_lva);
 
     void adjust_local_cache_size();
 
@@ -229,7 +232,12 @@ protected:
         future<response> f
       , naming::gid_type const& id
       , gva const& g
-    );
+        );
+
+    /// Maintain list of migrated objects
+    bool was_object_migrated_locked(
+        naming::gid_type const& id
+        );
 
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
@@ -1403,6 +1411,13 @@ public:
         error_code& ec = throws
         );
 
+    /// \warning This function is for internal use only. It is dangerous and
+    ///          may break your code if you use it.
+    void remove_cache_entry(
+        naming::gid_type const& gid
+      , error_code& ec = throws
+        );
+
     // Disable refcnt caching during shutdown
     void start_shutdown(
         error_code& ec = throws
@@ -1414,6 +1429,19 @@ public:
       , naming::gid_type& counter
       , error_code& ec = throws
         );
+
+    /// start/stop migration of an object
+    ///
+    /// \returns Current locality and address of the object to migrate
+    hpx::future<std::pair<naming::id_type, naming::address> >
+        begin_migration_async(
+            naming::id_type const& id
+          , naming::id_type const& target_locality
+            );
+    hpx::future<bool> end_migration_async(naming::id_type const& id);
+
+    /// Maintain list of migrated objects
+    bool was_object_migrated(naming::id_type const* ids, std::size_t size);
 };
 
 }}

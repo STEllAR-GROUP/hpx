@@ -21,13 +21,17 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
 
 #include <map>
 
 #include <boost/format.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/vector.hpp>
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
+#include <boost/shared_ptr.hpp>
+#endif
 
 namespace hpx { namespace agas
 {
@@ -125,11 +129,23 @@ struct HPX_EXPORT primary_namespace
     // REVIEW: Separate mutexes might reduce contention here. This has to be
     // investigated carefully.
     mutex_type mutex_;
+
     gva_table_type gvas_;
     refcnt_table_type refcnts_;
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+    typedef std::map<naming::gid_type, lcos::local::condition_variable>
+        migration_table_type;
+#else
+    typedef std::map<
+            naming::gid_type
+          , boost::shared_ptr<lcos::local::condition_variable>
+        > migration_table_type;
+#endif
+
     std::string instance_name_;
     naming::gid_type next_id_;      // next available gid
     naming::gid_type locality_;     // our locality id
+    migration_table_type migrating_objects_;
 
     struct update_time_on_exit;
 
@@ -161,6 +177,8 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_increment_credit_count(bool);
         boost::int64_t get_decrement_credit_count(bool);
         boost::int64_t get_allocate_count(bool);
+        boost::int64_t get_begin_migration_count(bool);
+        boost::int64_t get_end_migration_count(bool);
         boost::int64_t get_overall_count(bool);
 
         boost::int64_t get_route_time(bool);
@@ -170,6 +188,8 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_increment_credit_time(bool);
         boost::int64_t get_decrement_credit_time(bool);
         boost::int64_t get_allocate_time(bool);
+        boost::int64_t get_begin_migration_time(bool);
+        boost::int64_t get_end_migration_time(bool);
         boost::int64_t get_overall_time(bool);
 
         // increment counter values
@@ -180,6 +200,8 @@ struct HPX_EXPORT primary_namespace
         void increment_increment_credit_count();
         void increment_decrement_credit_count();
         void increment_allocate_count();
+        void increment_begin_migration_count();
+        void increment_end_migration_count();
 
     private:
         friend struct update_time_on_exit;
@@ -193,6 +215,8 @@ struct HPX_EXPORT primary_namespace
         api_counter_data increment_credit_;     // primary_ns_increment_credit
         api_counter_data decrement_credit_;     // primary_ns_decrement_credit
         api_counter_data allocate_;             // primary_ns_allocate
+        api_counter_data begin_migration_;      // primary_ns_begin_migration
+        api_counter_data end_migration_;        // primary_ns_end_migration
     };
     counter_data counter_data_;
 
@@ -227,6 +251,20 @@ struct HPX_EXPORT primary_namespace
       , const char* func_name
         );
 #endif
+
+    // API
+    response begin_migration(
+        request const& req
+      , error_code& ec);
+    response end_migration(
+        request const& req
+      , error_code& ec);
+
+    // helper function
+    void wait_for_migration_locked(
+        mutex_type::scoped_lock& l
+      , naming::gid_type id
+      , error_code& ec);
 
   public:
     primary_namespace()
@@ -388,6 +426,8 @@ struct HPX_EXPORT primary_namespace
       , namespace_increment_credit              = primary_ns_increment_credit
       , namespace_decrement_credit              = primary_ns_decrement_credit
       , namespace_allocate                      = primary_ns_allocate
+      , namespace_begin_migration               = primary_ns_begin_migration
+      , namespace_end_migration                 = primary_ns_end_migration
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
 

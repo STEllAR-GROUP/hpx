@@ -490,5 +490,20 @@ hpx::future<hpx::id_type> on_symbol_namespace_event(
     return resolver.on_symbol_namespace_event(name, evt, call_for_past_events);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+hpx::future<std::pair<naming::id_type, naming::address> >
+    begin_migration(naming::id_type const& id,
+        naming::id_type const& target_locality)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.begin_migration_async(id, target_locality);
+}
+
+hpx::future<bool> end_migration(naming::id_type const& id)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.end_migration_async(id);
+}
+
 }}
 
