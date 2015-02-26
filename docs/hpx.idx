@@ -45,6 +45,8 @@ find_all_ids_from_basename            "" "hpx\.find_all_ids_from_basename.*"
 find_ids_from_basename                "" "hpx\.find_ids_from_basename.*"
 register_id_with_basename             "" "hpx\.register_id_with_basename.*"
 unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
+set_parcel_write_handler              "" "hpx\.set_parcel_write_.*"
+parcel_write_handler_type             "" "hpx\.parcel_write_hand.*"
 
 # hpx/components/component_storage/migrate_from_storage.hpp
 migrate_from_storage                  "" "hpx\.components\.migrate_from_s.*"

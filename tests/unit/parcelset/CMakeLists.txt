@@ -7,9 +7,14 @@
 
 set(tests
   enable
+  set_parcel_write_handler
 )
-set(enable_PARAMETERS LOCALITIES 2)
-set(enable_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(enable_PARAMETERS
+    LOCALITIES 2 THREADS_PER_LOCALITY 4)
+
+set(set_parcel_write_handler_PARAMETERS
+    LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources
@@ -23,7 +28,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/LCOs")
+                     FOLDER "Tests/Unit/Parcelset")
 
   add_hpx_unit_test("parcelset" ${test} ${${test}_PARAMETERS})
 
