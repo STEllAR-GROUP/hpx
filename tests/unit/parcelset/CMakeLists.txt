@@ -7,13 +7,13 @@
 
 set(tests
   enable
-  set_default_parcel_write_handler
+  set_parcel_write_handler
 )
 
-set(enable_PARAMETERS 
+set(enable_PARAMETERS
     LOCALITIES 2 THREADS_PER_LOCALITY 4)
 
-set(set_default_parcel_write_handler_PARAMETERS 
+set(set_parcel_write_handler_PARAMETERS
     LOCALITIES 2)
 
 foreach(test ${tests})

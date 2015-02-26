@@ -422,7 +422,7 @@ namespace hpx { namespace applier
             parcelset::parcel const& p)
         {
             // invoke the original handler
-            ph.invoke_default_write_handler(ec, p);
+            ph.invoke_write_handler(ec, p);
 
             // inform termination detection of a sent message
             if (!p.does_termination_detection())

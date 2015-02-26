@@ -194,7 +194,7 @@ namespace hpx { namespace parcelset
             using util::placeholders::_1;
             using util::placeholders::_2;
             put_parcel(p, util::bind(
-                &parcelhandler::invoke_default_write_handler, this, _1, _2));
+                &parcelhandler::invoke_write_handler, this, _1, _2));
         }
 
         /// The function \a get_parcel returns the next available parcel
@@ -428,21 +428,21 @@ namespace hpx { namespace parcelset
             std::string const& ppname, int priority, bool bootstrap) const;
 
         // manage default exception handler
-        void invoke_default_write_handler(
+        void invoke_write_handler(
             boost::system::error_code const& ec, parcel const& p) const
         {
             write_handler_type f;
             {
                 mutex_type::scoped_lock l(mtx_);
-                f = default_write_handler_;
+                f = write_handler_;
             }
             f(ec, p);
         }
 
-        write_handler_type set_default_write_handler(write_handler_type f)
+        write_handler_type set_write_handler(write_handler_type f)
         {
             mutex_type::scoped_lock l(mtx_);
-            std::swap(f, default_write_handler_);
+            std::swap(f, write_handler_);
             return f;
         }
 
@@ -513,7 +513,7 @@ namespace hpx { namespace parcelset
         /// global exception handler for unhandled exceptions thrown from the
         /// parcel layer
         mutable mutex_type mtx_;
-        write_handler_type default_write_handler_;
+        write_handler_type write_handler_;
 
     private:
         static std::vector<plugins::parcelport_factory_base *> &

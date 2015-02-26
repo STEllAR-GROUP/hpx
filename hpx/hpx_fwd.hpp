@@ -1689,7 +1689,7 @@ namespace hpx
 
 // Including declarations of various API function declarations
 #include <hpx/runtime/get_locality_name.hpp>
-#include <hpx/runtime/set_default_parcel_write_handler.hpp>
+#include <hpx/runtime/set_parcel_write_handler.hpp>
 
 #include <hpx/lcos/async_fwd.hpp>
 

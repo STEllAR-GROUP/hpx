@@ -117,7 +117,7 @@ namespace hpx { namespace parcelset
         use_alternative_parcelports_(false),
         enable_parcel_handling_(true),
         count_routed_(0),
-        default_write_handler_(&parcelhandler::default_write_handler)
+        write_handler_(&parcelhandler::default_write_handler)
     {
         BOOST_FOREACH(plugins::parcelport_factory_base *factory,
             get_parcelport_factories())
