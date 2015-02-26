@@ -28,6 +28,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <cstddef>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -928,6 +929,25 @@ namespace hpx
 {
     // pull invalid id into the main namespace
     using naming::invalid_id;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace std
+{
+    // specialize std::hash for hpx::naming::gid_type
+    template <>
+    struct hash<hpx::naming::gid_type>
+    {
+        typedef hpx::naming::gid_type argument_type;
+        typedef std::size_t result_type;
+
+        result_type operator()(argument_type const& gid) const
+        {
+            result_type const h1 (std::hash<boost::uint64_t>()(gid.get_lsb()));
+            result_type const h2 (std::hash<boost::uint64_t>()(gid.get_msb()));
+            return h1 ^ (h2 << 1);
+        }
+    };
 }
 
 ///////////////////////////////////////////////////////////////////////////////

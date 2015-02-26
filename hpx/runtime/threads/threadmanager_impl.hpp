@@ -254,9 +254,17 @@ namespace hpx { namespace threads
             return threads_.size();
         }
 
+        boost::thread & get_os_thread_handle(std::size_t num_thread)
+        {
+            mutex_type::scoped_lock lk(mtx_);
+
+            HPX_ASSERT(num_thread < threads_.size());
+            return threads_[threads_.size() - num_thread - 1];
+        }
+
         /// The set_state function is part of the thread related API and allows
         /// to change the state of one of the threads managed by this
-        /// threadmanager.
+        /// thread-manager.
         ///
         /// \param id       [in] The thread id of the thread the state should
         ///                 be modified for.
@@ -271,7 +279,7 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. It will
         ///                 return one of the values as defined by the
         ///                 \a thread_state enumeration. If the
-        ///                 thread is not known to the threadmanager the return
+        ///                 thread is not known to the thread-manager the return
         ///                 value will be \a thread_state#unknown.
         ///
         /// \note           If the thread referenced by the parameter \a id

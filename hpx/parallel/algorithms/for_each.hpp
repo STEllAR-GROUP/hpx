@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <type_traits>
 
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -220,7 +221,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename InIter, typename F>
         inline typename detail::algorithm_result<ExPolicy>::type
         for_each_(ExPolicy && policy, InIter first, InIter last, F && f,
-            boost::mpl::false_)
+            std::false_type)
         {
             typedef typename std::iterator_traits<InIter>::iterator_category
                 iterator_category;
@@ -242,7 +243,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename SegIter, typename F>
         inline typename detail::algorithm_result<ExPolicy>::type
         for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
-            boost::mpl::true_);
+            std::true_type);
 
         /// \endcond
     }

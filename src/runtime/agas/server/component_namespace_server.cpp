@@ -130,6 +130,8 @@ response component_namespace::service(
         case primary_ns_increment_credit:
         case primary_ns_decrement_credit:
         case primary_ns_allocate:
+        case primary_ns_begin_migration:
+        case primary_ns_end_migration:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "

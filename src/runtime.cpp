@@ -1277,7 +1277,7 @@ namespace hpx
 
     /// \brief Sign the given parcel-suffix
     ///
-    /// \param suffix         The parcel suffoix to be signed
+    /// \param suffix         The parcel suffix to be signed
     /// \param signed_suffix  The signed parcel suffix will be placed here
     ///
     void sign_parcel_suffix(

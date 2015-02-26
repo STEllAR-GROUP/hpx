@@ -335,8 +335,6 @@ namespace hpx { namespace lcos
     lcos::future<std::vector<Future> > //-V659
     when_all(std::vector<Future>&& values)
     {
-        typedef std::vector<Future> result_type;
-
         typedef detail::when_all_frame<
                 hpx::util::tuple<std::vector<Future> >
             > frame_type;

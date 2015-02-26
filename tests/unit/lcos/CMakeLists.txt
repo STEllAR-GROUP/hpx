@@ -16,7 +16,6 @@ set(tests
     composable_guard
     condition_variable
     barrier
-    dataflow
     fold
     future
     future_ref
@@ -41,9 +40,6 @@ set(async_remote_PARAMETERS LOCALITIES 2)
 
 set(broadcast_PARAMETERS LOCALITIES 2)
 set(broadcast_apply_PARAMETERS LOCALITIES 2)
-
-set(dataflow_FLAGS DEPENDENCIES dataflow_component)
-set(dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(future_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -89,6 +85,3 @@ foreach(test ${tests})
                               ${test}_test_exe)
 endforeach()
 
-set_property(TARGET dataflow_test_exe APPEND
-    PROPERTY COMPILE_DEFINITIONS
-    "HPX_LIMIT=10")

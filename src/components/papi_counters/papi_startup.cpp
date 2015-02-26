@@ -285,7 +285,8 @@ namespace hpx { namespace performance_counters { namespace papi
         }
     }
 
-    bool check_startup(util::function_nonser<void()>& startup_func, bool& pre_startup)
+    bool check_startup(hpx::util::function_nonser<void()>& startup_func,
+        bool& pre_startup)
     {
         // PAPI initialization
         if (PAPI_is_initialized() == PAPI_NOT_INITED)

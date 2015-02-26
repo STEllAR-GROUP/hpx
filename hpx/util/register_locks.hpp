@@ -17,6 +17,7 @@
 #include <boost/thread/locks.hpp>
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
     struct register_lock_data {};
@@ -48,68 +49,68 @@ namespace hpx { namespace util
         >::type>
     {
         ignore_while_checking(Lock const* lock)
-          : lock_(lock->mutex())
+          : mtx_(lock->mutex())
         {
-            ignore_lock(lock_);
+            ignore_lock(mtx_);
         }
 
         ~ignore_while_checking()
         {
-            reset_ignored(lock_);
+            reset_ignored(mtx_);
         }
 
-        void const* lock_;
+        void const* mtx_;
     };
 #else
     template <typename Mutex>
     struct ignore_while_checking<boost::unique_lock<Mutex> >
     {
         ignore_while_checking(boost::unique_lock<Mutex> const* lock)
-          : lock_(lock->mutex())
+          : mtx_(lock->mutex())
         {
-            ignore_lock(lock_);
+            ignore_lock(mtx_);
         }
 
         ~ignore_while_checking()
         {
-            reset_ignored(lock_);
+            reset_ignored(mtx_);
         }
 
-        void const* lock_;
+        void const* mtx_;
     };
 
     template <typename Mutex>
     struct ignore_while_checking<boost::upgrade_lock<Mutex> >
     {
         ignore_while_checking(boost::upgrade_lock<Mutex> const* lock)
-          : lock_(lock->mutex())
+          : mtx_(lock->mutex())
         {
-            ignore_lock(lock_);
+            ignore_lock(mtx_);
         }
 
         ~ignore_while_checking()
         {
-            reset_ignored(lock_);
+            reset_ignored(mtx_);
         }
 
-        void const* lock_;
+        void const* mtx_;
     };
 
     template <typename Mutex>
     struct ignore_while_checking<boost::shared_lock<Mutex> >
     {
         ignore_while_checking(boost::shared_lock<Mutex> const* lock)
-          : lock_(lock->mutex())
+          : mtx_(lock->mutex())
         {
-            ignore_lock(lock_);
+            ignore_lock(mtx_);
         }
 
         ~ignore_while_checking()
         {
-            reset_ignored(lock_);
+            reset_ignored(mtx_);
         }
 
-        void const* lock_;
+        void const* mtx_;
     };
 
     template <typename Mutex>
@@ -117,17 +118,17 @@ namespace hpx { namespace util
     {
         ignore_while_checking(
                 boost::detail::try_lock_wrapper<Mutex> const* lock)
-          : lock_(lock->mutex())
+          : mtx_(lock->mutex())
         {
-            ignore_lock(lock_);
+            ignore_lock(mtx_);
         }
 
         ~ignore_while_checking()
         {
-            reset_ignored(lock_);
+            reset_ignored(mtx_);
         }
 
-        void const* lock_;
+        void const* mtx_;
     };
 #endif
 

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2014 Hartmut Kaiser
+//  Copyright (c) 2012-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -42,7 +42,9 @@ enum namespace_action_code
     primary_ns_increment_credit             = BOOST_BINARY_U(1000110),
     primary_ns_decrement_credit             = BOOST_BINARY_U(1000111),
     primary_ns_allocate                     = BOOST_BINARY_U(1001000),
-    primary_ns_statistics_counter           = BOOST_BINARY_U(1001001),
+    primary_ns_begin_migration              = BOOST_BINARY_U(1001001),
+    primary_ns_end_migration                = BOOST_BINARY_U(1001010),
+    primary_ns_statistics_counter           = BOOST_BINARY_U(1001011),
 
     component_ns_service                    = BOOST_BINARY_U(0100000),
     component_ns_bulk_service               = BOOST_BINARY_U(0100001),
@@ -303,6 +305,16 @@ namespace detail
           , counter_target_count
           , primary_ns_allocate
           , primary_ns_statistics_counter }
+      , {   "count/begin_migration"
+          , ""
+          , counter_target_count
+          , primary_ns_begin_migration
+          , primary_ns_statistics_counter }
+      , {   "count/end_migration"
+          , ""
+          , counter_target_count
+          , primary_ns_end_migration
+          , primary_ns_statistics_counter }
       // counters exposing API timings
       , {   "time/route"
           , "ns"
@@ -338,6 +350,16 @@ namespace detail
           , "ns"
           , counter_target_time
           , primary_ns_allocate
+          , primary_ns_statistics_counter }
+      , {   "time/begin_migration"
+          , "ns"
+          , counter_target_time
+          , primary_ns_begin_migration
+          , primary_ns_statistics_counter }
+      , {   "time/end_migration"
+          , "ns"
+          , counter_target_time
+          , primary_ns_end_migration
           , primary_ns_statistics_counter }
     };
     static std::size_t const num_primary_namespace_services =

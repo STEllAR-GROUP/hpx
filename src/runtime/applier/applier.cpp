@@ -24,6 +24,11 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace detail
+{
+    void dijkstra_make_black();     // forward declaration only
+}}
+
 namespace hpx { namespace applier
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -407,9 +412,45 @@ namespace hpx { namespace applier
         applier::applier_.reset();
     }
 
+    namespace detail
+    {
+        // The original parcel-sent handler is wrapped to keep the parcel alive
+        // until after the data has been reliably sent (which is needed for zero
+        // copy serialization).
+        void parcel_sent_handler(parcelset::parcelhandler& ph,
+            boost::system::error_code const& ec,
+            parcelset::parcel const& p)
+        {
+            // invoke the original handler
+            ph.invoke_write_handler(ec, p);
+
+            // inform termination detection of a sent message
+            if (!p.does_termination_detection())
+                hpx::detail::dijkstra_make_black();
+        }
+    }
+
     // schedule threads based on given parcel
     void applier::schedule_action(parcelset::parcel const& p)
     {
+        // fetch the set of destinations
+#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+        std::size_t const size = 1ul;
+#else
+        std::size_t const size = p.size();
+#endif
+        naming::id_type const* ids = p.get_destinations();
+        naming::address const* addrs = p.get_destination_addrs();
+
+        // make sure the target has not been migrated away
+        naming::resolver_client& client = hpx::naming::get_agas_client();
+        if (client.was_object_migrated(ids, size))
+        {
+            client.route(p, util::bind(&detail::parcel_sent_handler,
+                std::ref(parcel_handler_), util::placeholders::_1, p));
+            return;
+        }
+
         // decode the action-type in the parcel
         actions::continuation_type cont = p.get_continuation();
         actions::action_type act = p.get_action();
@@ -438,11 +479,6 @@ namespace hpx { namespace applier
 #endif
         int comptype = act->get_component_type();
         naming::gid_type dest = p.get_destination_locality();
-
-        // fetch the set of destinations
-        std::size_t size = p.size();
-        naming::id_type const* ids = p.get_destinations();
-        naming::address const* addrs = p.get_destination_addrs();
 
         // if the parcel carries a continuation it should be directed to a
         // single destination

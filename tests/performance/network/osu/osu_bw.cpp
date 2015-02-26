@@ -32,11 +32,9 @@ unsigned long getpagesize()
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#define LOOP_SMALL  100
-#define SKIP_SMALL  10
 
-#define LOOP_LARGE  20
-#define SKIP_LARGE  2
+#define LOOP_SMALL_MULTIPLIER 5
+#define SKIP  2
 
 #define LARGE_MESSAGE_SIZE  8192
 
@@ -49,14 +47,14 @@ void isend(hpx::util::serialize_buffer<char> const& receive_buffer) {}
 HPX_PLAIN_ACTION(isend);
 
 ///////////////////////////////////////////////////////////////////////////////
-double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
+double ireceive(hpx::naming::id_type dest, std::size_t loop, 
+                std::size_t size, std::size_t window_size)
 {
-    std::size_t loop = LOOP_SMALL;
-    std::size_t skip = SKIP_SMALL;
+    std::size_t skip = SKIP;
 
-    if (size > LARGE_MESSAGE_SIZE) {
-        loop = LOOP_LARGE;
-        skip = SKIP_LARGE;
+    if (size <= LARGE_MESSAGE_SIZE) {
+        loop *= LOOP_SMALL_MULTIPLIER;
+        skip *= LOOP_SMALL_MULTIPLIER;
     }
     
     typedef hpx::util::serialize_buffer<char> buffer_type;
@@ -118,10 +116,14 @@ void run_benchmark(boost::program_options::variables_map & vm)
     if (!localities.empty())
         there = localities[0];
 
+    std::size_t max_size = vm["max-size"].as<std::size_t>();
+    std::size_t min_size = vm["min-size"].as<std::size_t>();
+    std::size_t loop = vm["loop"].as<std::size_t>();
+
     // perform actual measurements
-    for (std::size_t size = 1; size <= MAX_MSG_SIZE; size *= 2)
+    for (std::size_t size = min_size; size <= max_size; size *= 2)
     {
-        double bw = ireceive(there, size, vm["window-size"].as<std::size_t>());
+        double bw = ireceive(there, loop, size, vm["window-size"].as<std::size_t>());
         hpx::cout << std::left << std::setw(10) << size
                   << bw << hpx::endl << hpx::flush;
     }

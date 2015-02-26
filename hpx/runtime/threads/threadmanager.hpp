@@ -417,6 +417,8 @@ namespace hpx { namespace threads
         /// is allowed to run on
         virtual std::size_t get_pu_num(std::size_t) const = 0;
 
+        virtual boost::thread & get_os_thread_handle(std::size_t) = 0;
+
         /// Return the mask for processing units the given thread is allowed
         /// to run on.
         virtual mask_cref_type get_pu_mask(topology const&, std::size_t) const = 0;

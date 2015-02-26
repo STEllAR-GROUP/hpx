@@ -45,6 +45,14 @@ find_all_ids_from_basename            "" "hpx\.find_all_ids_from_basename.*"
 find_ids_from_basename                "" "hpx\.find_ids_from_basename.*"
 register_id_with_basename             "" "hpx\.register_id_with_basename.*"
 unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
+set_parcel_write_handler              "" "hpx\.set_parcel_write_.*"
+parcel_write_handler_type             "" "hpx\.parcel_write_hand.*"
+
+# hpx/components/component_storage/migrate_from_storage.hpp
+migrate_from_storage                  "" "hpx\.components\.migrate_from_s.*"
+
+# hpx/components/component_storage/migrate_to_storage.hpp
+migrate_to_storage                    "" "hpx\.components\.migrate_to_s.*"
 
 # hpx/parallel/execution_policy.hpp
 parallel::execution_policy                 "execution_policy"               "hpx\.parallel\.v1\.execution_policy.*"
@@ -101,6 +109,13 @@ parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_
 
 # hpx/parallel/algorithms/inclusive_scan.hpp
 parallel::inclusive_scan              "inclusive_scan" "hpx\.parallel\.v1\.inclusive_scan.*"
+
+# hpx/parallel/algorithms/is_partitioned.hpp
+parallel::is_partitioned              "is_partitioned" "hpx\.parallel\.v1\.is_partitioned.*"
+
+# hpx/parallel/algorithms/is_sorted.hpp
+parallel::is_sorted                   "is_sorted"  "hpx\.parallel\.v1\.is_sorted$"
+parallel::is_sorted_until             "is_sorted_until"  "hpx\.parallel\.v1\.is_sorted_until.*"
 
 # hpx/parallel/algorithms/lexicographical_compare.hpp
 parallel::lexicographical_compare     "lexicographical_compare" "hpx\.parallel\.v1\.lexicographical_compare.*"
@@ -175,7 +190,7 @@ new_colocated                         "" "hpx\.components\.new_colocated.*"
 copy                                  "" "hpx\.components\.copy.*"
 
 # hpx/runtime/components/migrate_component.hpp
-migrate                               "" "hpx\.components\.migrate.*"
+migrate                               "" "hpx\.components\.migrate_id.*"
 
 # hpx/exception.hpp
 HPX_THROW_EXCEPTION                   "" "HPX_THROW_EXCEPTION"
@@ -352,4 +367,3 @@ HPX_DEFINE_COMPONENT_CONST_ACTION         "" "HPX_DEFINE_COMPONENT_CONST_ACTION"
 HPX_REGISTER_PLAIN_ACTION                 "" "HPX_REGISTER_PLAIN_ACTION"
 HPX_DEFINE_PLAIN_ACTION                   "" "HPX_DEFINE_PLAIN_ACTION"
 HPX_PLAIN_ACTION                          "" "HPX_PLAIN_ACTION"
-

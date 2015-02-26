@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,8 +7,7 @@
 #define HPX_SEGMENTED_ITERATOR_TRAITS_OCT_14_2014_0229PM
 
 #include <hpx/traits.hpp>
-
-#include <boost/mpl/bool.hpp>
+#include <type_traits>
 
 namespace hpx { namespace traits
 {
@@ -16,7 +15,7 @@ namespace hpx { namespace traits
     template <typename Iterator, typename Enable>
     struct segmented_iterator_traits
     {
-        typedef boost::mpl::false_ is_segmented_iterator;
+        typedef std::false_type is_segmented_iterator;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -25,7 +24,7 @@ namespace hpx { namespace traits
     template <typename Iterator, typename Enable>
     struct segmented_local_iterator_traits
     {
-        typedef boost::mpl::false_ is_segmented_local_iterator;
+        typedef std::false_type is_segmented_local_iterator;
 
         typedef Iterator iterator;
         typedef Iterator local_iterator;

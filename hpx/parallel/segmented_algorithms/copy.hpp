@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <type_traits>
 
 #include <boost/type_traits/is_same.hpp>
 
@@ -224,7 +225,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename InIter, typename OutIter>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         copy_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            boost::mpl::true_)
+            std::true_type)
         {
             if (first == last)
             {
@@ -248,7 +249,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename InIter, typename OutIter>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
         copy_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
-            boost::mpl::false_);
+            std::false_type);
 
         /// \endcond
     }
