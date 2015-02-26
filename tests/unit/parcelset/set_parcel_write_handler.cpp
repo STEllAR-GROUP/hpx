@@ -46,7 +46,7 @@ int main()
     }
 
     // test that handler is not called anymore
-    write_handler_called = 0;
+    write_handler_called.store(0);
     hpx::parcel_write_handler_type f2 = hpx::set_parcel_write_handler(f1);
 
     {
