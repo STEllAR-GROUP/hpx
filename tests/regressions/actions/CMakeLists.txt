@@ -9,7 +9,6 @@ set(tests
     plain_action_1330
     plain_action_move_semantics
     component_action_move_semantics
-    remote_object_move_semantics
    )
 
 set(plain_action_1330_FLAGS
@@ -24,13 +23,6 @@ set(plain_action_move_semantics_PARAMETERS
 set(component_action_move_semantics_FLAGS
     DEPENDENCIES action_move_semantics_component)
 set(component_action_move_semantics_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 1)
-
-set(remote_object_move_semantics_FLAGS
-    DEPENDENCIES iostreams_component dataflow_component
-                 action_move_semantics_component remote_object_component)
-set(remote_object_move_semantics_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 1)
 
