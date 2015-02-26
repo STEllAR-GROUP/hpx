@@ -10,6 +10,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/array.hpp>
 
 #include "certificate_signing_request.hpp"
 #include "public_key.hpp"
@@ -103,7 +104,7 @@ namespace hpx { namespace components { namespace security
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int)
         {
-            ar & boost::serialization::make_array(begin(), size()); // TODO:
+            ar & hpx::serialization::make_array(begin(), size());
         }
 
         naming::gid_type issuer_;

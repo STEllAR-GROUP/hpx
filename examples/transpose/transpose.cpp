@@ -88,8 +88,8 @@ struct sub_block
         if(size_ > 0)
         {
             data_ = new double[size_];
-            boost::serialization::array<double> arr(data_, size_);
-            ar.load_array(arr, version);
+            hpx::serialization::array<double> arr(data_, size_);
+            ar >> arr;
             mode_ = owning;
         }
     }
@@ -99,7 +99,8 @@ struct sub_block
         ar & size_;
         if(size_ > 0)
         {
-            boost::serialization::array<double> arr(data_, size_);
+            hpx::serialization::array<double> arr(data_, size_);
+            ar << arr;
             ar.save_array(arr, version);
         }
     }
