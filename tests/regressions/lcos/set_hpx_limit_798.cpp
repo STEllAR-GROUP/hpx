@@ -12,7 +12,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/components/dataflow/dataflow.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
@@ -32,7 +31,7 @@ int main()
     shared_future< double > f = make_ready_future( 1.0 );
     f = hpx::lcos::local::dataflow(
             hpx::launch::sync,
-            unwrapped( &func ), 
+            unwrapped(&func),
             f, f, f, f, f, f, f);
     return hpx::util::report_errors();
 }
