@@ -86,6 +86,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
+    "${hpx_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/basic_action.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
