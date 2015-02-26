@@ -63,6 +63,7 @@
 [def __tue__                    [@http://www.tui.nl Technische Universiteit Eindhoven]]
 [def __nmsu__                   [@http://www.nmsu.edu New Mexico State University]]
 [def __unlv__                   [@http://www.unlv.edu University of Nevada, Las Vegas]]
+[def __cscs__                   [@http://www.cscs.ch Swiss National Supercomputing Centre]]
 
 [def __gsoc__                   [@https://developers.google.com/open-source/soc/ Google Summer of Code]]
 

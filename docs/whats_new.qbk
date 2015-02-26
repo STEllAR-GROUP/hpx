@@ -51,6 +51,27 @@ structures (like `hpx::vector`) for testing purposes.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1384] - Fixing 1325
+* [issue 1383] - Fixed #504: Refactor Dataflow LCO to work with futures, this
+                 removes the dataflow component as it is obsolete
+* [issue 1382] - `is_sorted`, `is_sorted_until` and `is_partitioned`
+                 algorithms
+* [issue 1381] - fix for CMake versions prior to 3.1
+* [issue 1380] - resolved warning in CMake 3.1 and newer
+* [issue 1379] - Compilation error with papi
+* [issue 1378] - Towards safer migration
+* [issue 1377] - HPXConfig.cmake should include `TCMALLOC_LIBRARY` and
+                 `TCMALLOC_INCLUDE_DIR `
+* [issue 1376] - Warning on uninitialized member
+* [issue 1375] - Fixing 1163
+* [issue 1374] - Fixing the MSVC 12 release builder
+* [issue 1373] - Modifying parallel search algorithm for zero length searches
+* [issue 1372] - Modifying parallel search algorithm for zero length searches
+* [issue 1371] - Avoid holding a lock during agas::incref while doing a credit
+                 split
+* [issue 1370] - `--hpx:bind` throws unexpected error
+* [issue 1369] - Getting rid of (void) in loops
+* [issue 1368] - Variadic templates support for tuple
 * [issue 1367] - One last batch of variadic templates support
 * [issue 1366] - Fixing symbolic namespace hang
 * [issue 1365] - More held locks
