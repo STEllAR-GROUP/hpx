@@ -73,6 +73,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/mismatch.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/move.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/reduce.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/remove_copy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/replace.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/reverse.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/rotate.hpp"
