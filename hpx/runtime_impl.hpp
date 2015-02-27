@@ -29,6 +29,8 @@
 #include <boost/foreach.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/exception_ptr.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -192,6 +194,9 @@ namespace hpx
         ///
         /// \returns          This function will always return 0 (zero).
         int run();
+
+        /// Rethrow any stored exception (to be called after stop())
+        void rethrow_exception();
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Connection>
@@ -380,6 +385,9 @@ namespace hpx
         applier::applier applier_;
         actions::action_manager action_manager_;
         boost::signals2::scoped_connection default_error_sink_;
+
+        boost::mutex mtx_;
+        boost::exception_ptr exception_;
     };
 }
 

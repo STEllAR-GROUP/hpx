@@ -1125,13 +1125,23 @@ namespace hpx { namespace components { namespace server
         }
     }
 
+    void runtime_support::notify_waiting_main()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (!stopped_) {
+            stopped_ = true;
+            wait_condition_.notify_all();
+            stop_condition_.wait(l);        // wait for termination
+        }
+    }
+
     // this will be called after the thread manager has exited
     void runtime_support::stopped()
     {
         mutex_type::scoped_lock l(mtx_);
         if (!terminated_) {
-            stop_condition_.notify_all();   // finished cleanup/termination
             terminated_ = true;
+            stop_condition_.notify_all();   // finished cleanup/termination
         }
     }
 
@@ -1592,7 +1602,8 @@ namespace hpx { namespace components { namespace server
                     std::cout << options << std::endl;
                 }
                 else {
-                    throw std::logic_error("unknown help option: " + help_option);
+                    throw hpx::detail::command_line_error(
+                        "unknown help option: " + help_option);
                 }
                 return false;
             }

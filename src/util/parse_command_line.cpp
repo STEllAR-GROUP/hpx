@@ -362,7 +362,8 @@ namespace hpx { namespace util
 
             case runtime_mode_invalid:
             default:
-                throw std::logic_error("Invalid runtime mode specified");
+                throw hpx::detail::command_line_error(
+                    "Invalid runtime mode specified");
             }
 
             // general options definitions

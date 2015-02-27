@@ -84,6 +84,17 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT boost::exception_ptr access_exception(error_code const&);
 
+        ///////////////////////////////////////////////////////////////////////
+        struct command_line_error : std::logic_error
+        {
+            explicit command_line_error(char const* msg)
+              : std::logic_error(msg)
+            {}
+
+            explicit command_line_error(std::string const& msg)
+              : std::logic_error(msg)
+            {}
+        };
     } // namespace detail
     /// \endcond
 

@@ -284,6 +284,7 @@ namespace hpx { namespace components { namespace server
 
         /// called locally only
         void stopped();
+        void notify_waiting_main();
 
         bool was_stopped() const { return stopped_; }
 

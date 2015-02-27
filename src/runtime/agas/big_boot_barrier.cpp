@@ -86,8 +86,7 @@ void early_parcel_sink(
                 (threads::thread_state_ex(threads::wait_signaled));
         }
         catch (...) {
-            hpx::detail::report_exception_and_terminate(
-                boost::current_exception());
+            hpx::report_error(boost::current_exception());
         }
 //     }
 } // }}}

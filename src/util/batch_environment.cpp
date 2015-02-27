@@ -220,7 +220,8 @@ namespace hpx { namespace util
                 // if an AGAS host is specified, it needs to be in the list
                 // of nodes participating in this run
                 if (!agas_host.empty() && !found_agas_host) {
-                    throw std::logic_error("Requested AGAS host (" +
+                    throw hpx::detail::command_line_error(
+                        "Requested AGAS host (" +
                         agas_host + ") not found in node list");
                 }
 
@@ -247,7 +248,7 @@ namespace hpx { namespace util
                     std::cerr << "failed opening: " << nodefile << std::endl;
 
                 // raise hard error if nodefile could not be opened
-                throw std::logic_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Could not open nodefile: '%s'") % nodefile));
             }
         }
@@ -304,7 +305,8 @@ namespace hpx { namespace util
         // if an AGAS host is specified, it needs to be in the list
         // of nodes participating in this run
         if (!agas_host.empty() && !found_agas_host) {
-            throw std::logic_error("Requested AGAS host (" + agas_host +
+            throw hpx::detail::command_line_error(
+                "Requested AGAS host (" + agas_host +
                 ") not found in node list");
         }
 
@@ -531,7 +533,8 @@ namespace hpx { namespace util
 
             node_map_type::const_iterator it = nodes_.find(ep);
             if (it == nodes_.end()) {
-                throw std::logic_error("Cannot retrieve number of OS threads "
+                throw hpx::detail::command_line_error(
+                    "Cannot retrieve number of OS threads "
                     "for host_name: " + host_name());
             }
             result = (*it).second.second / num_tasks_;

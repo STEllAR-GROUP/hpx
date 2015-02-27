@@ -167,8 +167,8 @@ namespace hpx { namespace util
 
                 if (localities == 0)
                 {
-                    throw std::logic_error("Number of --hpx:localities "
-                        "must be greater than 0");
+                    throw hpx::detail::command_line_error(
+                        "Number of --hpx:localities must be greater than 0");
                 }
 
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
@@ -227,13 +227,13 @@ namespace hpx { namespace util
 
                 if (threads == 0)
                 {
-                    throw std::logic_error("Number of --hpx:threads "
+                    throw hpx::detail::command_line_error("Number of --hpx:threads "
                         "must be greater than 0");
                 }
 
 #if defined(HPX_MAX_CPU_COUNT)
                 if (threads > HPX_MAX_CPU_COUNT) {
-                    throw std::logic_error("Requested more than "
+                    throw hpx::detail::command_line_error("Requested more than "
                         BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
                         "-DHPX_MAX_CPU_COUNT=<N> when configuring HPX.");
@@ -345,7 +345,7 @@ namespace hpx { namespace util
 
             // Check for parsing failures
             if (!iftransform) {
-                throw std::logic_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Could not parse --hpx:iftransform argument '%1%'") %
                     vm["hpx:iftransform"].as<std::string>()));
             }
@@ -359,7 +359,8 @@ namespace hpx { namespace util
 
         if (vm.count("hpx:nodefile")) {
             if (vm.count("hpx:nodes")) {
-                throw std::logic_error("Ambiguous command line options. "
+                throw hpx::detail::command_line_error(
+                    "Ambiguous command line options. "
                     "Do not specify more than one of the --hpx:nodefile and "
                     "--hpx:nodes options at the same time.");
             }
@@ -413,7 +414,8 @@ namespace hpx { namespace util
             if (vm.count("hpx:console") + vm.count("hpx:worker") +
                 vm.count("hpx:connect") > 1)
             {
-                throw std::logic_error("Ambiguous command line options. "
+                throw hpx::detail::command_line_error(
+                    "Ambiguous command line options. "
                     "Do not specify more than one of --hpx:console, "
                     "--hpx:worker, or --hpx:connect");
             }
@@ -458,7 +460,8 @@ namespace hpx { namespace util
             // command line overwrites the environment
             if (vm.count("hpx:node")) {
                 if (vm.count("hpx:agas")) {
-                    throw std::logic_error("Command line option --hpx:node "
+                    throw hpx::detail::command_line_error(
+                        "Command line option --hpx:node "
                         "is not compatible with --hpx:agas");
                 }
                 node = vm["hpx:node"].as<std::size_t>();
@@ -566,7 +569,8 @@ namespace hpx { namespace util
         else if (vm.count("hpx:run-agas-server-only") &&
               !(env.run_with_pbs() || env.run_with_slurm()))
         {
-            throw std::logic_error("Command line option --hpx:run-agas-server-only "
+            throw hpx::detail::command_line_error(
+                "Command line option --hpx:run-agas-server-only "
                 "can be specified only for the node running the AGAS server.");
         }
 
@@ -578,7 +582,8 @@ namespace hpx { namespace util
 
         // we can't run the AGAS server while connecting
         if (run_agas_server && mode_ == runtime_mode_connect) {
-            throw std::logic_error("Command line option error: can't run AGAS server"
+            throw hpx::detail::command_line_error(
+                "Command line option error: can't run AGAS server"
                 "while connecting to a running application.");
         }
 
@@ -710,7 +715,7 @@ namespace hpx { namespace util
                 ini_config_ += "hpx.cmd_line_help_option!=" + help_option;
             }
             else {
-                throw std::logic_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Invalid argument for option --hpx:help: '%1%', allowed values: "
                     "'minimal' (default) and 'full'") % help_option));
             }
