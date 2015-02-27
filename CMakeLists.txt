@@ -165,7 +165,11 @@ hpx_option(HPX_BUILD_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests
 hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
-hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" ON ADVANCED)
+set(HPX_FULL_RPATH_DEFAULT ON)
+if(APPLE)
+  set(HPX_FULL_RPATH_DEFAULT OFF)
+endif()
+hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" OFF ADVANCED)
 hpx_option(HPX_BUILD_WITH_INSTALL_PREFIX BOOL "Always set the HPX_PREFIX default to the install directory (default: OFF)" OFF ADVANCED)
 
 ################################################################################
