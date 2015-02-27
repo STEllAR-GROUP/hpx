@@ -697,7 +697,7 @@ namespace hpx { namespace threads
                     tfunc_impl(num_thread);
                 }
                 catch (hpx::exception const& e) {
-                    state_ = terminating;
+                    state_.store(terminating);
                     LFATAL_ << "tfunc(" << num_thread //-V128
                             << "): caught hpx::exception: "
                             << e.what() << ", aborted thread execution";
@@ -705,7 +705,7 @@ namespace hpx { namespace threads
                     return;
                 }
                 catch (boost::system::system_error const& e) {
-                    state_ = terminating;
+                    state_.store(terminating);
                     LFATAL_ << "tfunc(" << num_thread //-V128
                             << "): caught boost::system::system_error: "
                             << e.what() << ", aborted thread execution";
@@ -719,7 +719,7 @@ namespace hpx { namespace threads
                 }
             }
             catch (...) {
-                state_ = terminating;
+                state_.store(terminating);
                 LFATAL_ << "tfunc(" << num_thread << "): caught unexpected " //-V128
                     "exception, aborted thread execution";
                 report_error(num_thread, boost::current_exception());
