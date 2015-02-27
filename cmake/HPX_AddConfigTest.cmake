@@ -74,6 +74,7 @@ macro(add_hpx_config_test variable)
 
       set(_msg "${_msg} - ${_run_msg}")
     else()
+      message("... ${${variable}_OUTPUT}")
       set(_msg "${_msg} - Failed")
       if(NOT MSVC)
         set(_msg "${_msg} \n ${${variable}_OUTPUT}")

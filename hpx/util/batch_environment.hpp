@@ -6,7 +6,8 @@
 #if !defined(HPX_UTIL_PBS_ENVIRONMENT_AUG_26_2011_0901AM)
 #define HPX_UTIL_PBS_ENVIRONMENT_AUG_26_2011_0901AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
 #include <hpx/util/asio_util.hpp>
 
 #include <map>
@@ -22,27 +23,17 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////
-    // Try to retrieve PBS related settings from the environment
+    // Try to retrieve default values from a batch environment
     struct HPX_EXPORT batch_environment
     {
-        // the constructor tries to read from a PBS node-file, filling our
+        // the constructor tries to read initial values from a batch environment, filling our
         // map of nodes and thread counts
-        batch_environment(bool debug = false)
-          : agas_node_num_(0), num_tasks_(1), num_localities_(-1), debug_(debug)
-        {}
-
-        // this function tries to read from a PBS node-file, filling our
-        // map of nodes and thread counts
-        std::string init_from_file(std::string const& nodefile,
-            std::string const& agas_host);
+        batch_environment(std::vector<std::string> & nodelist, bool debug = false);
 
         // this function initializes the map of nodes from the given (space
         // separated) list of nodes
         std::string init_from_nodelist(std::vector<std::string> const& nodes,
             std::string const& agas_host);
-
-        // this function initializes the map of nodes from the environment
-        std::string init_from_environment(std::string const& agas_host);
 
         // The number of threads is either one (if no PBS information was
         // found), or it is the same as the number of times this node has
@@ -69,14 +60,6 @@ namespace hpx { namespace util
         // been selected as the AGAS host.
         std::size_t agas_node() const { return agas_node_num_; }
 
-        // The function run_with_pbs returns true if the job was started using
-        // PBS, false otherwise
-        bool run_with_pbs() const;
-
-        // The function run_with_slurm returns true if the job was started using
-        // SLURM, false otherwise
-        bool run_with_slurm() const;
-
         // The function will analyze the current environment and return true
         // if it finds sufficient information to deduce its running as a batch
         // job.
@@ -91,9 +74,11 @@ namespace hpx { namespace util
 
         std::string agas_node_;
         std::size_t agas_node_num_;
+        std::size_t node_num_;
+        std::size_t num_threads_;
         node_map_type nodes_;
-        std::size_t num_tasks_;
         std::size_t num_localities_;
+        std::string batch_name_;
         bool debug_;
     };
 }}
