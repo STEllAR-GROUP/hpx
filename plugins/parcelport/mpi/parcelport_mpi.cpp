@@ -69,6 +69,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , chunk_pool_(4096, max_connections_)
           , sender_(stopped_, max_connections_)
           , receiver_(*this, chunk_pool_, stopped_, max_connections_)
+          , enable_parcel_handling_(true)
+          , handles_parcels_(0)
         {
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -187,12 +189,44 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         void enable(bool new_state)
         {
+            enable_parcel_handling_ = new_state;
+            if(!new_state)
+            {
+                while(handles_parcels_ != 0)
+                {
+                    if(threads::get_self_ptr())
+                        hpx::this_thread::suspend(hpx::threads::pending,
+                            "mpi::parcelport::enable");
+                }
+            }
+        }
+
+        void wait_for_enabled_put_parcel(parcelset::locality const & dest, parcel p,
+            write_handler_type f)
+        {
+            while(!enable_parcel_handling_)
+            {
+                if(threads::get_self_ptr())
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "mpi::parcelport::put_parcel");
+            }
+
+            put_parcel(dest, p, f);
         }
 
         void put_parcel(parcelset::locality const & dest, parcel p,
             write_handler_type f)
         {
             if(stopped_) return;
+            handles_parcels h(this);
+
+            if(!enable_parcel_handling_)
+            {
+                hpx::threads::register_thread(
+                    util::bind(&parcelport::wait_for_enabled_put_parcel, this, dest, p, f)
+                  , "mpi::parcelport::put_parcel");
+                return;
+            }
 
             util::high_resolution_timer timer;
 
@@ -224,6 +258,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if (stopped_)
                 return false;
+            handles_parcels h(this);
+
+            if(!enable_parcel_handling_)
+                return false;
+
             return receiver_.receive();
         }
 
@@ -251,6 +290,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         receiver receiver_;
 
         boost::thread receive_early_parcels_thread_;
+
+        boost::atomic<bool> enable_parcel_handling_;
+        boost::atomic<std::size_t> handles_parcels_;
+
+        struct handles_parcels
+        {
+            handles_parcels(parcelport *pp)
+              : this_(pp)
+            {
+                ++this_->handles_parcels_;
+            }
+
+            ~handles_parcels()
+            {
+                --this_->handles_parcels_;
+            }
+
+            parcelport *this_;
+        };
 
         void receive_early_parcels(hpx::runtime * rt)
         {

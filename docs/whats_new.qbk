@@ -19,30 +19,40 @@ functions ([funcref hpx::async_continue `hpx::async_continue`],
 [funcref hpx::apply_continue `hpx::apply_continue`],
 [funcref hpx::when_each `hpx::when_each`],
 [funcref hpx::wait_each `hpx::wait_each`]).
+We also removed the macro `HPX_STD_FUNCTION`. This shouldn't affect any user
+code as we replaced it with `hpx::util::function_nonser` which was the default
+expansion used for this macro. In future releases of __hpx__ we will allow for
+`std::function` to be used transparently as well.
 
-We removed `HPX_STD_FUNCTION`...
-
-A second foxus of this release was to improve the reliability of large scale
+A second focus of this release was to improve the reliability of large scale
 runs. We believe to have achieved this goal as we now can reliably run __hpx__
 applications on up to ~16k cores. This is a huge step forward in terms of
 the usability of __hpx__.
 
-The third very important improvement introduced with this release is the
+A very important improvement introduced with this release is the
 refactoring of the code representing our parcel-port implementation. Parcel-
-ports now can be implemented by 3rd parties as independent plug-ins which are
+ports can now be implemented by 3rd parties as independent plugins which are
 dynamically loaded at runtime (static linking of parcel-ports is also
-supported). This refactoring also include a massive improvement the performance
-of our existing parcel-ports. We were able to significantly reduce the
-networking latencies and to improve the available networking bandwidth.
+supported). This refactoring also includes a massive improvement of the
+performance of our existing parcel-ports. We were able to significantly reduce
+the networking latencies and to improve the available networking bandwidth.
+Please note that in this release we disabled the ibverbs and ipc parcel ports
+as those have not been ported to the new plugin system yet (see [issue 839]).
 
-A fourth corner stone of this release is our work towards a complete
+Another corner stone of this release is our work towards a complete
 implementation of __cpp11_n4104__ (Working Draft, Technical Specification for
-C++ Extensions for Parallelism), which defines a set of parallel algorithms.
-We hnow have implemented about 70% of all specified parallel algorithms (see
+C++ Extensions for Parallelism). This document defines a set of parallel
+algorithms to be added to the C++ standard library.
+We now have implemented about 75% of all specified parallel algorithms (see
 [link hpx.manual.parallel.parallel_algorithms Parallel Algorithms] for more
 details). We also implemented some extensions to __cpp11_n4104__ allowing to
-invoke all of the algorithms asynchronously. We started to work on allowing to
-use the parallel algorithms with `hpx::vector`. At this point we have
+invoke all of the algorithms asynchronously.
+
+This release adds a first implementation of `hpx::vector` which is a distributed
+data structure closely aligned to the functionality of `std::vector`. The
+difference is that `hpx::vector` stores the data in partitions where the
+partitions can be distributed over different localities. We started to work on
+allowing to use the parallel algorithms with `hpx::vector`. At this point we have
 implemented only a few of the parallel algorithms to support distributed data
 structures (like `hpx::vector`) for testing purposes.
 
@@ -51,6 +61,7 @@ structures (like `hpx::vector`) for testing purposes.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1385] - Adding Copy algorithms, fixing `parallel::copy_if`
 * [issue 1384] - Fixing 1325
 * [issue 1383] - Fixed #504: Refactor Dataflow LCO to work with futures, this
                  removes the dataflow component as it is obsolete
@@ -104,6 +115,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1339] - Update argument order for transform_reduce
 * [issue 1337] - Fix dataflow to handle properly ranges of futures
 * [issue 1336] - dataflow needs to hold onto futures passed to it
+* [issue 1335] - Fails to compile with msvc14
 * [issue 1334] - Examples build problem
 * [issue 1333] - Distributed transform reduce
 * [issue 1332] - Variadic templates support for actions
@@ -114,6 +126,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1329] - Distributed vector cleanup
 * [issue 1328] - Sync docs and comments with code in hello_world example
 * [issue 1327] - Typos in docs
+* [issue 1325] - Exceptions thrown during parcel handling are not handled
+                 correctly
 * [issue 1324] - fixed bandwidth calculation
 * [issue 1323] - mmap() failed to allocate thread stack due to insufficient
                  resources
@@ -132,16 +146,36 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1312] - Fixing #857: hpx::naming::locality leaks parcelport specific
                  information into the public interface
 * [issue 1311] - Distributed get'er/set'er_values for distributed vector
+* [issue 1310] - Crashing in hpx::parcelset::policies::mpi::connection_handler::handle_messages()
+                 on SuperMIC
 * [issue 1308] - Unable to execute an application with --hpx:threads
 * [issue 1307] - merge_graph linking issue
 * [issue 1306] - First batch of variadic templates support
 * [issue 1305] - Create a compiler wrapper
+* [issue 1304] - Provide a compiler wrapper for hpx
 * [issue 1303] - Drop support for GCC44
 * [issue 1302] - Fixing #1297
 * [issue 1301] - Compilation error when tried to use boost range iterators with
                  wait_all
 * [issue 1298] - Distributed vector
 * [issue 1297] - Unable to invoke component actions recursively
+* [issue 1294] - HDF5 build error
+* [issue 1275] - The parcelport implementation is non-optimal
+* [issue 1267] - Added classes and unit tests for local_file, orangefs_file and
+                 pxfs_file
+* [issue 1264] - Error "assertion '!m_fun' failed" randomly occurs when using TCP
+* [issue 1254] - thread binding seems to not work properly
+* [issue 1220] - parallel::copy_if is broken
+* [issue 1217] - Find a better way of fixing the issue patched by #1216
+* [issue 1085] - Replace startup and shutdown barriers with broadcasts
+* [issue 981]  - With SLURM, --hpx:threads=8 should not be necessary
+* [issue 857]  - hpx::naming::locality leaks parcelport specific information
+                 into the public interface
+* [issue 763]  - Create buildbot instance that uses std::bind as HPX_STD_BIND
+* [issue 680]  - Convert parcel ports into a plugin system
+* [issue 504]  - Refactor Dataflow LCO to work with futures
+* [issue 196]  - Don't store copies of the locality network metadata in the gva
+                 table
 
 [endsect]
 

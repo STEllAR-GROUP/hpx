@@ -53,9 +53,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return true;
         }
 
-        template <typename InpIter>
+        template <typename Iter>
         struct is_partitioned:
-            public detail::algorithm<is_partitioned<InpIter>, bool>
+            public detail::algorithm<is_partitioned<Iter>, bool>
         {
             is_partitioned()
                 : is_partitioned::algorithm("is_partitioned")
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template<typename ExPolicy, typename Pred>
             static bool
-            sequential(ExPolicy const&,InpIter first, InpIter last,
+            sequential(ExPolicy const&, Iter first, Iter last,
                 Pred && pred)
             {
                 return std::is_partitioned(first,
@@ -73,12 +73,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Pred>
             static typename detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, InpIter first, InpIter last,
+            parallel(ExPolicy const& policy, Iter first, Iter last,
                 Pred && pred)
             {
-                typedef typename std::iterator_traits<InpIter>::reference
+                typedef typename std::iterator_traits<Iter>::reference
                     reference;
-                typedef typename std::iterator_traits<InpIter>::difference_type
+                typedef typename std::iterator_traits<Iter>::difference_type
                     difference_type;
                 typedef typename detail::algorithm_result<ExPolicy, bool>
                     result;
@@ -90,14 +90,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
                     policy, first, count,
-                    [pred, tok](InpIter part_begin,
+                    [pred, tok](Iter part_begin,
                         std::size_t part_count) mutable -> bool
                     {
                         bool fst_bool = pred(*part_begin);
                         if (part_count == 1)
                             return fst_bool;
                         util::loop_n(++part_begin, --part_count, tok,
-                            [&fst_bool, &pred, &tok](InpIter const& a) {
+                            [&fst_bool, &pred, &tok](Iter const& a) {
                                 if (fst_bool != pred(*a))
                                 {
                                     if(fst_bool)
@@ -127,7 +127,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InpIter     The type of the source iterators used for the
+    /// \tparam InIter     The type of the source iterators used for the
     ///                     This iterator type must meet the requirements of a
     ///                     input iterator.
     /// \param policy       The execution policy to use for the scheduling of
@@ -160,14 +160,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           false. If the range [first, last) containes less than two
     ///           elements, the function is always true.
     ///
-    template <typename ExPolicy, typename InpIter, typename Pred>
+    template <typename ExPolicy, typename InIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, bool>::type
     >::type
-    is_partitioned(ExPolicy && policy, InpIter first, InpIter last, Pred && pred)
+    is_partitioned(ExPolicy && policy, InIter first, InIter last, Pred && pred)
     {
-        typedef typename std::iterator_traits<InpIter>::iterator_category
+        typedef typename std::iterator_traits<InIter>::iterator_category
             iterator_category;
         BOOST_STATIC_ASSERT_MSG(
             (boost::is_base_of<
@@ -175,9 +175,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                  >::value),
             "Requires at least input iterator.");
 
-        typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
+        typedef typename boost::mpl::or_<
+            parallel::is_sequential_execution_policy<ExPolicy>,
+            boost::is_same<std::input_iterator_tag, iterator_category>
+        >::type is_seq;
 
-        return detail::is_partitioned<InpIter>().call(
+        return detail::is_partitioned<InIter>().call(
             std::forward<ExPolicy>(policy), is_seq(), first, last,
             std::forward<Pred>(pred));
     }

@@ -9,19 +9,32 @@
 
 #include <boost/atomic.hpp>
 
-boost::atomic<std::size_t> write_handler_called(0);
-
-void write_handler(boost::system::error_code const&, hpx::parcelset::parcel const&)
-{
-    ++write_handler_called;
-}
-
+///////////////////////////////////////////////////////////////////////////////
 void test(hpx::id_type const& id)
 {
     hpx::trigger_lco_event(id);
 }
 HPX_PLAIN_ACTION(test);     // defines test_action
 
+///////////////////////////////////////////////////////////////////////////////
+boost::atomic<std::size_t> write_handler_called(0);
+
+bool is_test_action(hpx::parcelset::parcel const& p)
+{
+    hpx::actions::action_type act = p.get_action();
+    return dynamic_cast<
+            hpx::actions::transfer_action<test_action>*
+        >(act.get()) != 0;
+}
+
+void write_handler(boost::system::error_code const&,
+    hpx::parcelset::parcel const& p)
+{
+    if (is_test_action(p))
+        ++write_handler_called;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     hpx::parcel_write_handler_type wh(&write_handler);
