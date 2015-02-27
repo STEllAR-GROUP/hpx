@@ -503,7 +503,11 @@ namespace hpx {
         {
             boost::mutex::scoped_lock l(mtx_);
             if (exception_)
-                boost::rethrow_exception(exception_);
+            {
+                boost::exception_ptr e = exception_;
+                exception_ = boost::exception_ptr();
+                boost::rethrow_exception(e);
+            }
         }
     }
 
