@@ -381,7 +381,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Returns the first element in the range [first, last) that is not sorted.
-    /// Uses a predicate to compare elements or the less than operator.
     ///
     /// \note   Complexity: at most (N+S-1) comparisons where
     ///         \a N = distance(first, last).
