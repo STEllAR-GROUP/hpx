@@ -414,6 +414,10 @@ namespace hpx { namespace threads { namespace detail
                     cb_inner();
             }
 
+            // something went badly wrong, give up
+            if (global_state == terminating)
+                break;
+
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
             {
                 busy_loop_count = 0;

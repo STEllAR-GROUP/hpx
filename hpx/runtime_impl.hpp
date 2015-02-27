@@ -32,7 +32,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx {
+namespace hpx
+{
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized.
@@ -48,7 +49,8 @@ namespace hpx {
 
         //
         threads::thread_state run_helper(
-            util::function_nonser<runtime::hpx_main_function_type> func, int& result);
+            util::function_nonser<runtime::hpx_main_function_type> func,
+            int& result);
 
         void wait_helper(boost::mutex& mtx, boost::condition& cond,
             bool& running);

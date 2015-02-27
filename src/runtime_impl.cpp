@@ -450,7 +450,7 @@ namespace hpx {
         // Early and late exceptions, errors outside of HPX-threads
         if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
         {
-            detail::report_exception_and_terminate(e);
+            detail::report_exception_and_continue(e);
             return;
         }
 
