@@ -133,8 +133,8 @@ parallel::move                        "move" "hpx\.parallel\.v1\.move$"
 parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
 
 # hpx/parallel/algorithms/remove_copy.hpp
-parallel::remove                      "remove" "hpx\.parallel\.v1\.remove_copy$"
-parallel::remove                      "remove" "hpx\.parallel\.v1\.remove_copy_if.*"
+parallel::remove_copy                  "remove_copy" "hpx\.parallel\.v1\.remove_copy$"
+parallel::remove_copy_if               "remove_copy_if" "hpx\.parallel\.v1\.remove_copy_if.*"
 
 # hpx/parallel/algorithms/replace.hpp
 parallel::replace                     "replace" "hpx\.parallel\.v1\.replace$"

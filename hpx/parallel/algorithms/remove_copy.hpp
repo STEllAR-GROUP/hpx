@@ -51,7 +51,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 return copy_if<Iter>().call(
                     policy, boost::mpl::false_(), first, last, dest,
-                    [&val](T a){ return a != val; });
+                    [val](T const& a){ return a != val; });
             }
         };
         /// \endcond
@@ -174,7 +174,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<FwdIter>::value_type T;
                 return copy_if<Iter>().call(
                     policy, boost::mpl::false_(), first, last, dest,
-                    [&f](T a){ return !f(a); });
+                    [f](T const& a){ return !f(a); });
             }
         };
         /// \endcond
