@@ -215,6 +215,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             write_handler_type f)
         {
             if(stopped_) return;
+            handles_parcels h(this);
 
             if(!enable_parcel_handling_)
             {
@@ -235,15 +236,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             int dest_rank = dest.get<locality>().rank();
             HPX_ASSERT(dest_rank != util::mpi_environment::rank());
 
-            {
-                handles_parcels h(this);
-
-                sender_.send(
-                    dest_rank
-                  , buffer
-                  , hpx::util::bind(&receiver::receive, boost::ref(receiver_), false)
-                );
-            }
+            sender_.send(
+                dest_rank
+              , buffer
+              , hpx::util::bind(&receiver::receive, boost::ref(receiver_), false)
+            );
 
             error_code ec;
             f(ec, p);
@@ -258,10 +255,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if (stopped_)
                 return false;
+            handles_parcels h(this);
+
             if(!enable_parcel_handling_)
                 return false;
 
-            handles_parcels h(this);
             return receiver_.receive();
         }
 
