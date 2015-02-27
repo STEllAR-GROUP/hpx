@@ -154,7 +154,7 @@ namespace hpx { namespace util
                     num_localities = cfg_num_localities;
             }
 
-            if ((env.run_with_pbs() || env.run_with_slurm()) &&
+            if (env.found_batch_environment() &&
                 using_nodelist && (batch_localities != num_localities) &&
                 (num_localities != 1))
             {
@@ -171,7 +171,7 @@ namespace hpx { namespace util
                         "Number of --hpx:localities must be greater than 0");
                 }
 
-                if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                if (env.found_batch_environment() &&
                     using_nodelist && (localities != num_localities) &&
                     (num_localities != 1))
                 {
@@ -241,7 +241,7 @@ namespace hpx { namespace util
 #endif
             }
 
-            if ((env.run_with_pbs() || env.run_with_slurm()) &&
+            if (env.found_batch_environment() &&
                 using_nodelist && (threads > batch_threads))
             {
                 detail::report_thread_warning(env.get_batch_name(),
@@ -338,7 +338,6 @@ namespace hpx { namespace util
         }
 
         // Check command line arguments.
-        util::batch_environment env(debug_clp);
 
         if (vm.count("hpx:iftransform")) {
             util::sed_transform iftransform(vm["hpx:iftransform"].as<std::string>());
@@ -357,29 +356,53 @@ namespace hpx { namespace util
 
         bool using_nodelist = false;
 
-        if (vm.count("hpx:nodefile")) {
+        std::vector<std::string> nodelist;
+
+        if(vm.count("hpx:nodefile"))
+        {
             if (vm.count("hpx:nodes")) {
                 throw hpx::detail::command_line_error(
                     "Ambiguous command line options. "
                     "Do not specify more than one of the --hpx:nodefile and "
                     "--hpx:nodes options at the same time.");
             }
-            using_nodelist = true;
-            ini_config += "hpx.nodefile!=" +
-                env.init_from_file(vm["hpx:nodefile"].as<std::string>(), agas_host);
+            std::string node_file = vm["hpx:nodefile"].as<std::string>();
+            ini_config += "hpx.nodefile!=" + node_file;
+            std::ifstream ifs(node_file.c_str());
+            if (ifs.is_open())
+            {
+                if (debug_clp)
+                    std::cerr << "opened: " << node_file << std::endl;
+                std::string line;
+                while (std::getline(ifs, line)) {
+                    if (!line.empty()) {
+                        nodelist.push_back(line);
+                    }
+                }
+            }
+            else {
+                if (debug_clp)
+                    std::cerr << "failed opening: " << node_file << std::endl;
+
+                // raise hard error if nodefile could not be opened
+                throw std::logic_error(boost::str(boost::format(
+                    "Could not open nodefile: '%s'") % node_file));
+            }
         }
         else if (vm.count("hpx:nodes")) {
-            using_nodelist = true;
-            ini_config += "hpx.nodes!=" + env.init_from_nodelist(
-                vm["hpx:nodes"].as<std::vector<std::string> >(), agas_host);
-        }
-        // FIXME: What if I don't want to use the node list with SLURM?
-        else if (env.found_batch_environment()) {
-            using_nodelist = true;
-            ini_config += "hpx.nodes!=" + env.init_from_environment(agas_host);
+            nodelist = vm["hpx:nodes"].as<std::vector<std::string> >();
         }
 
-        // let the PBS environment decide about the AGAS host
+        util::batch_environment env(nodelist, debug_clp);
+
+        if(!nodelist.empty())
+        {
+            using_nodelist = true;
+            ini_config += "hpx.nodes!=" + env.init_from_nodelist(
+                nodelist, agas_host);
+        }
+
+        // let the batch environment decide about the AGAS host
         agas_host = env.agas_host_name(
             agas_host.empty() ? HPX_INITIAL_IP_ADDRESS : agas_host);
 
@@ -539,8 +562,8 @@ namespace hpx { namespace util
             agas_host = hpx_host;
             agas_port = hpx_port;
         }
-        else if (env.run_with_pbs() || env.run_with_slurm()) {
-            // in PBS mode, if the network addresses are different and we
+        else if (env.found_batch_environment()) {
+            // in batch mode, if the network addresses are different and we
             // should not run the AGAS server we assume to be in worker mode
             mode_ = hpx::runtime_mode_worker;
 
@@ -567,7 +590,7 @@ namespace hpx { namespace util
                 ini_config += "hpx.components.load_external=0";
         }
         else if (vm.count("hpx:run-agas-server-only") &&
-              !(env.run_with_pbs() || env.run_with_slurm()))
+              !(env.found_batch_environment()))
         {
             throw hpx::detail::command_line_error(
                 "Command line option --hpx:run-agas-server-only "
