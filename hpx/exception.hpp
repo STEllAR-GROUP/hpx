@@ -84,6 +84,17 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT boost::exception_ptr access_exception(error_code const&);
 
+        ///////////////////////////////////////////////////////////////////////
+        struct command_line_error : std::logic_error
+        {
+            explicit command_line_error(char const* msg)
+              : std::logic_error(msg)
+            {}
+
+            explicit command_line_error(std::string const& msg)
+              : std::logic_error(msg)
+            {}
+        };
     } // namespace detail
     /// \endcond
 
@@ -814,6 +825,12 @@ namespace hpx
         // isn't anything more we could do.
         HPX_EXPORT void report_exception_and_terminate(boost::exception_ptr const&);
         HPX_EXPORT void report_exception_and_terminate(hpx::exception const&);
+
+        // Report an early or late exception and locally exit execution. There
+        // isn't anything more we could do. The exception will be re-thrown
+        // from hpx::init
+        HPX_EXPORT void report_exception_and_continue(boost::exception_ptr const&);
+        HPX_EXPORT void report_exception_and_continue(hpx::exception const&);
     }
     /// \endcond
 
