@@ -94,7 +94,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         ~parcelport()
         {
-            receive_early_parcels_thread_.join();
+            if(receive_early_parcels_thread_.joinable())
+                receive_early_parcels_thread_.join();
             util::mpi_environment::finalize();
         }
 
