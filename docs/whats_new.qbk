@@ -61,6 +61,8 @@ structures (like `hpx::vector`) for testing purposes.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1387] - Failure with more than 4 localities
+* [issue 1386] - Dispatching unhandled exceptions to outer user code
 * [issue 1385] - Adding Copy algorithms, fixing `parallel::copy_if`
 * [issue 1384] - Fixing 1325
 * [issue 1383] - Fixed #504: Refactor Dataflow LCO to work with futures, this
@@ -126,6 +128,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1329] - Distributed vector cleanup
 * [issue 1328] - Sync docs and comments with code in hello_world example
 * [issue 1327] - Typos in docs
+* [issue 1326] - Documentation and code diverged in Fibonacci tutorial
 * [issue 1325] - Exceptions thrown during parcel handling are not handled
                  correctly
 * [issue 1324] - fixed bandwidth calculation
@@ -171,8 +174,11 @@ Here is a list of the important tickets we closed for this release.
 * [issue 981]  - With SLURM, --hpx:threads=8 should not be necessary
 * [issue 857]  - hpx::naming::locality leaks parcelport specific information
                  into the public interface
+* [issue 850]  - "flush" not documented
 * [issue 763]  - Create buildbot instance that uses std::bind as HPX_STD_BIND
 * [issue 680]  - Convert parcel ports into a plugin system
+* [issue 582]  - Make exception thrown from HPX threads available from
+                 `hpx::init`
 * [issue 504]  - Refactor Dataflow LCO to work with futures
 * [issue 196]  - Don't store copies of the locality network metadata in the gva
                  table
