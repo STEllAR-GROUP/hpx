@@ -137,15 +137,15 @@ printed out.
 
 [fib_hpx_main]
 
-Upon a closer look we see that the [classref hpx::lcos::future]`<>` we created is assigned
-the return of [funcref hpx::lcos::async]`<fibonacci_action>(`[funcref hpx::find_here]`(), n)`.
-[funcref hpx::lcos::async]`<>()` takes an action, in this case `fibonacci_action`, and
-asynchronously kicks of the computation of the action, returning a future which
+Upon a closer look we see that the [classref hpx::future]`<>` we created is assigned
+the return of [funcref hpx::async]`<fibonacci_action>(`[funcref hpx::find_here]`(), n)`.
+[funcref hpx::async]`<>()`, and
+asynchronously kicks of the computation of the action (`fibonacci_action`), returning a future which
 represents the result of the computation. But wait, what is an action? And what
 is this `fibonacci_action`? For starters, an action is a wrapper for a
 function. By wrapping functions, __hpx__ can send packets of work to different
 processing units. These vehicles allow users to calculate work now, later, or
-on certain nodes. The first argument to [funcref hpx::lcos::async]`<>()` is the location
+on certain nodes. The first argument to [funcref hpx::async]`<>()` is the location
 where the action should be run. In this case, we just want to run the action on
 the machine that we are currently on, so we use [funcref hpx::find_here]`()`. To further
 understand this we turn to the code to find where `fibonacci_action` was
@@ -164,7 +164,8 @@ creating.
 
 This picture should now start making sense. The function `fibonacci()` is
 wrapped in an action `fibonacci_action`, which was spawned
-by [funcref hpx::lcos::async]`<>()`, which returns a future. Now, lets look at the
+by [funcref hpx::async]`<>()`, where the action returns a future
+representing the result of the function `fibonacci()`. Now, lets look at the
 function `fibonacci()`:
 
 [fib_func]
@@ -268,7 +269,7 @@ of our actions. Here, we instead use [funcref hpx::find_all_localities]`()`, whi
 an `std::vector<>` containing the identifiers of all the machines in the system,
 including the one that we are on.
 
-As in the __fibonacci_example__ our futures are set using [funcref hpx::lcos::async]`<>()`.
+As in the __fibonacci_example__ our futures are set using [funcref hpx::async]`<>()`.
 The `hello_world_foreman_action` is declared here:
 
 [hello_world_action_wrapper]
@@ -285,7 +286,7 @@ the action above:
 Now, before we discuss `hello_world_foreman()`, let's talk about the
 [funcref hpx::lcos::wait_each]`()` function. [funcref hpx::lcos::wait_each]`()` provides a way to make sure
 that all of the futures have finished being calculated without having to call
-[memberref hpx::lcos::future::get]`()` for each one. The version of [funcref hpx::lcos::wait_each]`()` used here performs a
+[memberref hpx::future::get]`()` for each one. The version of [funcref hpx::lcos::wait_each]`()` used here performs a
 non-blocking wait, which acts on an `std::vector<>`. It queries the state of
 the futures, waiting for them to finish. Whenever a future becomes marked as
 ready, [funcref hpx::lcos::wait_each]`()` invokes a callback function provided by the user,
@@ -504,7 +505,7 @@ instances. There are a few different ways of invoking actions:
   fire-and-forget semantics. This means that once we have asked __hpx__ to compute
   the action, we forget about it completely and continue with our computation.
   We use [funcref hpx::applier::apply]`<>()` instead of
-  [funcref hpx::lcos::async]`<>()` to invoke an action in a non-blocking fashion.
+  [funcref hpx::async]`<>()` to invoke an action in a non-blocking fashion.
   Here's an example from the managed_accumulator stubs class:
 
 [managed_accumulator_stubs_reset_non_blocking]
@@ -516,7 +517,7 @@ instances. There are a few different ways of invoking actions:
 [managed_accumulator_stubs_query_async]
 
 * [*Synchronous]: To invoke an action in a fully synchronous manner, we can
-  simply call [classref hpx::lcos::async]`<>().get()` (e.g., create a future and
+  simply call [classref hpx::async]`<>().get()` (e.g., create a future and
   immediately wait on it to be ready). Here's an example from the
   managed_accumulator stubs class:
 
@@ -680,7 +681,7 @@ following statement:
     double result = principal.get_future().get();
 ``
 
-This statement calls [memberref hpx::lcos::future::get]`()` on the last dataflow
+This statement calls [memberref hpx::future::get]`()` on the last dataflow
 created by our for loop. The program will wait here until the entire dataflow
 tree has been calculated and the value assigned to result. The program then prints
 out the final value of the investment and the amount of interest made by subtracting
