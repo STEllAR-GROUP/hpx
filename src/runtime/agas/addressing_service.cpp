@@ -1802,10 +1802,6 @@ void addressing_service::route(
             hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);
             return;
         }
-        else
-        {
-            HPX_ASSERT(false);      // should not happen
-        }
     }
 
     // apply directly as we have the resolved destination address
