@@ -304,6 +304,10 @@ namespace hpx
             return this->base_type::connect_to(symbolic_name,
                 util::bind(&vector::connect_to_helper, this, _1));
         }
+        void connect_to_sync(std::string const& symbolic_name)
+        {
+            connect_to(symbolic_name).get();
+        }
 
         // Register this vector with AGAS using the given symbolic name
         future<void> register_as(std::string const& symbolic_name)
@@ -322,6 +326,10 @@ namespace hpx
 
             registered_name_ = symbolic_name;
             return this->base_type::register_as(symbolic_name);
+        }
+        void register_as_sync(std::string const& symbolic_name)
+        {
+            register_as(symbolic_name).get();
         }
 
     public:
