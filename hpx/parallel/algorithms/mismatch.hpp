@@ -115,7 +115,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
                         {
                             std::size_t mismatched = tok.get_data();
-                            if (mismatched != count1) {
+                            if (mismatched != static_cast<std::size_t>(count1)) {
                                 std::advance(first1, mismatched);
                                 std::advance(first2, mismatched);
                             }
@@ -389,7 +389,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
                         {
                             std::size_t mismatched = tok.get_data();
-                            if (mismatched != count)
+                            if (mismatched != static_cast<std::size_t>(count))
                                 std::advance(first1, mismatched);
                             else
                                 first1 = last1;
