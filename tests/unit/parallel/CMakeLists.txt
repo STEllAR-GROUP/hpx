@@ -41,6 +41,8 @@ set(tests
     move
     none_of
     reduce_
+    remove_copy
+    remove_copy_if
     replace
     replace_if
     replace_copy

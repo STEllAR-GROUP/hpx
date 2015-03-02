@@ -28,9 +28,6 @@ namespace hpx { namespace components
     /// component instance.
     ///
     /// \param to_copy         [in] The global id of the component to copy
-    /// \param target_locality [in, optional] The locality where the copy
-    ///                        should be created (default is same locality
-    ///                        as source).
     ///
     /// \tparam  The only template argument specifies the component type to
     ///          create.
@@ -38,8 +35,7 @@ namespace hpx { namespace components
     /// \returns A future representing the global id of the newly (copied)
     ///          component instance.
     ///
-    /// \note If the second argument is omitted (or is invalid_id) the
-    ///       new component instance is created on the locality of the
+    /// \note The new component instance is created on the locality of the
     ///       component instance which is to be copied.
     ///
     template <typename Component>
@@ -56,6 +52,23 @@ namespace hpx { namespace components
         return async_colocated<action_type>(to_copy, to_copy);
     }
 
+    /// \brief Copy given component to the specified target locality
+    ///
+    /// The function \a copy<Component> will create a copy of the component
+    /// referenced by \a to_copy on the locality specified with
+    /// \a target_locality. It returns a future referring to the newly created
+    /// component instance.
+    ///
+    /// \param to_copy         [in] The global id of the component to copy
+    /// \param target_locality [in ] The locality where the copy
+    ///                        should be created.
+    ///
+    /// \tparam  The only template argument specifies the component type to
+    ///          create.
+    ///
+    /// \returns A future representing the global id of the newly (copied)
+    ///          component instance.
+    ///
     template <typename Component>
 #if defined(DOXYGEN)
     future<naming::id_type>

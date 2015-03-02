@@ -123,11 +123,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 typedef detail::algorithm_result<ExPolicy, OutIter> result;
                 typedef hpx::util::zip_iterator<FwdIter, T*> zip_iterator;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
 
                 if (first == last)
                     return result::get(std::move(dest));
 
-                std::size_t count = std::distance(first, last);
+                difference_type count = std::distance(first, last);
                 boost::shared_array<T> data(new T[count]);
 
                 // The overall scan algorithm is performed by executing 2

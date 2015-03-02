@@ -50,8 +50,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 T const& val)
             {
                 typedef typename std::iterator_traits<InIter>::value_type type;
+                typedef typename std::iterator_traits<InIter>::difference_type
+                    difference_type;
 
-                std::size_t count = std::distance(first, last);
+                difference_type count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, InIter, void>::
@@ -177,8 +179,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
 
-                std::size_t count = std::distance(first, last);
+                difference_type count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
@@ -323,14 +327,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
 
-                std::size_t count = std::distance(first, last);
+                difference_type count = std::distance(first, last);
                 util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, first, count,
-                        [f, tok](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
+                        [f, tok](std::size_t base_idx, FwdIter it,
+                            std::size_t part_size) mutable
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,

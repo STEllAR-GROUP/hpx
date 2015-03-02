@@ -531,16 +531,6 @@ namespace hpx
         {
             create(policy);
         }
-        template <typename DistPolicy>
-        unordered_map(DistPolicy const& policy,
-                std::string const& symbolic_name,
-                typename std::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
-        {
-            create(policy);
-            register_as(symbolic_name).get();
-        }
 
         explicit unordered_map(std::size_t bucket_count,
                 Hash const& hash = Hash(), KeyEqual const& equal = KeyEqual())
@@ -548,28 +538,6 @@ namespace hpx
         {
             create(bucket_count, hpx::layout, hash, equal);
         }
-        unordered_map(std::size_t bucket_count,
-                std::string const& symbolic_name)
-          : hash_base_type(Hash(), KeyEqual())
-        {
-            create(bucket_count, hpx::layout);
-            register_as(symbolic_name).get();
-        }
-        unordered_map(std::size_t bucket_count,
-                Hash const& hash, std::string const& symbolic_name)
-          : hash_base_type(hash, KeyEqual())
-        {
-            create(bucket_count, hpx::layout, hash);
-            register_as(symbolic_name).get();
-        }
-        unordered_map(std::size_t bucket_count,
-                Hash const& hash, KeyEqual const& equal,
-                std::string const& symbolic_name)
-          : hash_base_type(hash, equal)
-        {
-            create(bucket_count, hpx::layout, hash, equal);
-            register_as(symbolic_name).get();
-        }
 
         template <typename DistPolicy>
         unordered_map(std::size_t bucket_count, DistPolicy const& policy,
@@ -578,16 +546,6 @@ namespace hpx
                     >::type* = 0)
         {
             create(bucket_count, policy);
-        }
-        template <typename DistPolicy>
-        unordered_map(std::size_t bucket_count, DistPolicy const& policy,
-                std::string const& symbolic_name,
-                typename std::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
-        {
-            create(bucket_count, policy);
-            register_as(symbolic_name).get();
         }
 
         template <typename DistPolicy>
@@ -600,48 +558,17 @@ namespace hpx
         {
             create(bucket_count, policy, hash);
         }
-        template <typename DistPolicy>
-        unordered_map(std::size_t bucket_count,
-                Hash const& hash, DistPolicy const& policy,
-                std::string const& symbolic_name,
-                typename std::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
-          : hash_base_type(hash, KeyEqual())
-        {
-            create(bucket_count, policy, hash);
-            register_as(symbolic_name).get();
-        }
-        template <typename DistPolicy>
-        unordered_map(std::size_t bucket_count,
-                Hash const& hash, KeyEqual const& equal,
-                DistPolicy const& policy,
-                typename std::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
-          : hash_base_type(hash, equal)
-        {
-            create(bucket_count, policy, hash, equal);
-        }
-        template <typename DistPolicy>
-        unordered_map(std::size_t bucket_count,
-                Hash const& hash, KeyEqual const& equal,
-                DistPolicy const& policy,
-                std::string const& symbolic_name,
-                typename std::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
-          : hash_base_type(hash, equal)
-        {
-            create(bucket_count, policy, hash, equal);
-            register_as(symbolic_name).get();
-        }
 
-        /// Construct a new unordered_map representation from the data
-        /// associated with the given symbolic name.
-        unordered_map(std::string const& symbolic_name)
+        template <typename DistPolicy>
+        unordered_map(std::size_t bucket_count,
+                Hash const& hash, KeyEqual const& equal,
+                DistPolicy const& policy,
+                typename std::enable_if<
+                        is_unordered_distribution_policy<DistPolicy>::value
+                    >::type* = 0)
+          : hash_base_type(hash, equal)
         {
-            connect_to(symbolic_name).get();
+            create(bucket_count, policy, hash, equal);
         }
 
         unordered_map(unordered_map const& rhs)

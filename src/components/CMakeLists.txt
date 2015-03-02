@@ -9,7 +9,6 @@ set(subdirs
     binpacking_factory
     component_storage
     containers
-    dataflow
     distributing_factory
     iostreams
     memory

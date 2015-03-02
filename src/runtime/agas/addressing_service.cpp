@@ -1802,10 +1802,6 @@ void addressing_service::route(
             hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);
             return;
         }
-        else
-        {
-            HPX_ASSERT(false);      // should not happen
-        }
     }
 
     // apply directly as we have the resolved destination address
@@ -2262,21 +2258,6 @@ void addressing_service::insert_cache_entry(
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
-// Removing entries from the table of migrated object is not safe as there is
-// no other way to reliably tell whether an object is still here or not (other
-// localities might have stale AGAS cache entries).
-//
-//         // remove the object from the table of migrated objects if the object's
-//         // new locality is the same as the locality where the object was
-//         // migrated to.
-//         migrated_objects_table_type::iterator mo_it =
-//             migrated_objects_table_.find(gid);
-//         if (mo_it != migrated_objects_table_.end() &&
-//             (!mo_it->second || mo_it->second == g.prefix))
-//         {
-//             migrated_objects_table_.erase(mo_it);
-//         }
-
         const gva_cache_key key(gid, count);
 
         if (!gva_cache_->insert(key, g))
@@ -2349,21 +2330,6 @@ void addressing_service::update_cache_entry(
             ) % gid % count);
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
-
-// Removing entries from the table of migrated object is not safe as there is
-// no other way to reliably tell whether an object is still here or not (other
-// localities might have stale AGAS cache entries).
-//
-//         // remove the object from the table of migrated objects if the object's
-//         // new locality is the same as the locality where the object was
-//         // migrated to.
-//         migrated_objects_table_type::iterator mo_it =
-//             migrated_objects_table_.find(gid);
-//         if (mo_it != migrated_objects_table_.end() &&
-//             (!mo_it->second || mo_it->second == g.prefix))
-//         {
-//             migrated_objects_table_.erase(mo_it);
-//         }
 
         const gva_cache_key key(gid, count);
 
@@ -3101,18 +3067,7 @@ addressing_service::begin_migration_async(
     // insert the object's new locality into the map of migrated objects
     {
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
-        if (target_locality)
-        {
-            migrated_objects_table_.insert(
-                migrated_objects_table_type::value_type(
-                    gid, target_locality.get_gid()));
-        }
-        else
-        {
-            migrated_objects_table_.insert(
-                migrated_objects_table_type::value_type(
-                    gid, naming::invalid_gid));
-        }
+        migrated_objects_table_.insert(gid);
     }
 
     agas::request req(agas::primary_ns_begin_migration, gid);

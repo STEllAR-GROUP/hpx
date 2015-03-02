@@ -18,33 +18,52 @@ find_root_locality                    "" "hpx\.find_root_locality.*"
 find_all_localities                   "" "hpx\.find_all_localities.*"
 find_remote_localities                "" "hpx\.find_remote_localities.*"
 find_locality                         "" "hpx\.find_locality.*"
-get_num_localities                    "" "hpx\.get_num_localities.*"
-get_num_localities_async              "" "hpx\.get_num_localities_async.*"
-register_pre_startup_function         "" "hpx\.register_pre_startup_function.*"
+
+find_all_ids_from_basename            "" "hpx\.find_all_ids_from_basename.*"
+find_ids_from_basename                "" "hpx\.find_ids_from_basename.*"
+find_id_from_basename                 "" "hpx\.find_id_from_basename.*"
+register_id_with_basename             "" "hpx\.register_id_with_basename.*"
+unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
+
+get_num_localities_sync               "" "hpx\.get_num_localitie_id.*"
+get_num_localities                    "" "hpx\.get_num_localitie_id.*"
+get_initial_num_localities            "" "hpx\.get_initial_num_localities.*"
+
+register_pre_startup_function         "" "hpx\.register_pre_star_id.*"
 register_startup_function             "" "hpx\.register_startup_function.*"
-register_pre_shutdown_function        "" "hpx\.register_pre_shutdown_function.*"
+register_pre_shutdown_function        "" "hpx\.register_pre_shut_id.*"
 register_shutdown_function            "" "hpx\.register_shutdown_function.*"
-get_worker_thread_num                 "" "hpx\.get_worker_thread_num.*"
+startup_function_type                 "" "hpx\.startup_function_type.*"
+shutdown_function_type                "" "hpx\.shutdown_function_type.*"
+
 get_locality_id                       "" "hpx\.get_locality_id.*"
+
 is_running                            "" "hpx\.is_running.*"
+is_starting                           "" "hpx\.is_starting.*"
+is_stopped                            "" "hpx\.is_stopped.*"
+is_stopped_or_shutting_down           "" "hpx\.is_stopped_or_shutting_down.*"
+
+get_worker_thread_num                 "" "hpx\.get_worker_thread_num.*"
 get_thread_name                       "" "hpx\.get_thread_name.*"
 get_locality_name                     "" "hpx\.get_locality_name.*"
 get_num_worker_threads                "" "hpx\.get_num_worker_threads.*"
+
 get_system_uptime                     "" "hpx\.get_system_uptime.*"
 get_colocation_id                     "" "hpx\.get_colocation_id.*"
-get_colocation_id_async               "" "hpx\.get_colocation_id_async.*"
+get_colocation_id_sync                "" "hpx\.get_colocation_id_sync.*"
+
 trigger_lco_event                     "" "hpx\.trigger_lco_event.*"
 set_lco_event                         "" "hpx\.set_lco_event.*"
 set_lco_value                         "" "hpx\.set_lco_value.*"
 set_lco_error                         "" "hpx\.set_lco_error.*"
+
 start_active_counters                 "" "hpx\.start_active_counters.*"
 reset_active_counters                 "" "hpx\.reset_active_counters.*"
 stop_active_counters                  "" "hpx\.stop_active_counters.*"
 evaluate_active_counters              "" "hpx\.evaluate_active_counters.*"
-find_all_ids_from_basename            "" "hpx\.find_all_ids_from_basename.*"
-find_ids_from_basename                "" "hpx\.find_ids_from_basename.*"
-register_id_with_basename             "" "hpx\.register_id_with_basename.*"
-unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
+
+set_parcel_write_handler              "" "hpx\.set_parcel_write_.*"
+parcel_write_handler_type             "" "hpx\.parcel_write_hand.*"
 
 # hpx/components/component_storage/migrate_from_storage.hpp
 migrate_from_storage                  "" "hpx\.components\.migrate_from_s.*"
@@ -74,6 +93,7 @@ parallel::none_of                     "none_of" "hpx\.parallel\.v1\.none_of.*"
 
 # hpx/parallel/algorithms/copy.hpp
 parallel::copy                        "copy" "hpx\.parallel\.v1\.copy_id.*"
+parallel::copy_if                     "copy_if" "hpx\.parallel\.v1\.copy_if.*"
 parallel::copy_n                      "copy_n" "hpx\.parallel\.v1\.copy_n.*"
 
 # hpx/parallel/algorithms/count.hpp
@@ -112,7 +132,7 @@ parallel::inclusive_scan              "inclusive_scan" "hpx\.parallel\.v1\.inclu
 parallel::is_partitioned              "is_partitioned" "hpx\.parallel\.v1\.is_partitioned.*"
 
 # hpx/parallel/algorithms/is_sorted.hpp
-parallel::is_sorted                   "is_sorted"  "hpx\.parallel\.v1\.is_sorted$"
+parallel::is_sorted                   "is_sorted"  "hpx\.parallel\.v1\.is_sorted_id.*"
 parallel::is_sorted_until             "is_sorted_until"  "hpx\.parallel\.v1\.is_sorted_until.*"
 
 # hpx/parallel/algorithms/lexicographical_compare.hpp
@@ -131,6 +151,10 @@ parallel::move                        "move" "hpx\.parallel\.v1\.move$"
 
 # hpx/parallel/algorithms/reduce.hpp
 parallel::reduce                      "reduce" "hpx\.parallel\.v1\.reduce.*"
+
+# hpx/parallel/algorithms/remove_copy.hpp
+parallel::remove_copy                  "remove_copy" "hpx\.parallel\.v1\.remove_copy$"
+parallel::remove_copy_if               "remove_copy_if" "hpx\.parallel\.v1\.remove_copy_if.*"
 
 # hpx/parallel/algorithms/replace.hpp
 parallel::replace                     "replace" "hpx\.parallel\.v1\.replace$"

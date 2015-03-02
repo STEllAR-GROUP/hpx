@@ -78,7 +78,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     > gva_cache_type;
     // }}}
 
-    typedef std::map<naming::gid_type, naming::gid_type> migrated_objects_table_type;
+    typedef std::set<naming::gid_type> migrated_objects_table_type;
     typedef std::map<naming::gid_type, boost::int64_t> refcnt_requests_type;
 
     struct bootstrap_data_type;

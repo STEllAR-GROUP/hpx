@@ -26,6 +26,7 @@
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/algorithms/move.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
+#include <hpx/parallel/algorithms/remove_copy.hpp>
 #include <hpx/parallel/algorithms/replace.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
 #include <hpx/parallel/algorithms/rotate.hpp>

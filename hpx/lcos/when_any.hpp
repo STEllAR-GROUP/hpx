@@ -18,8 +18,8 @@ namespace hpx
     template <typename Sequence>
     struct when_any_result
     {
-        std::size_t index;
-        Sequence futures;
+        std::size_t index;  ///< The index of a future which has become ready
+        Sequence futures;   ///< The sequence of futures as passed to \a hpx::when_any
     };
 
     /// The function \a when_any is a non-deterministic choice operator. It

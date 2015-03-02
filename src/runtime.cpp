@@ -809,7 +809,11 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            detail::report_exception_and_terminate(e);
+            hpx::runtime* rt = hpx::get_runtime_ptr();
+            if (rt)
+                rt->report_error(num_thread, e);
+            else
+                detail::report_exception_and_terminate(e);
             return;
         }
 
@@ -821,7 +825,11 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            detail::report_exception_and_terminate(e);
+            hpx::runtime* rt = hpx::get_runtime_ptr();
+            if (rt)
+                rt->report_error(std::size_t(-1), e);
+            else
+                detail::report_exception_and_terminate(e);
             return;
         }
 
@@ -1277,7 +1285,7 @@ namespace hpx
 
     /// \brief Sign the given parcel-suffix
     ///
-    /// \param suffix         The parcel suffoix to be signed
+    /// \param suffix         The parcel suffix to be signed
     /// \param signed_suffix  The signed parcel suffix will be placed here
     ///
     void sign_parcel_suffix(
