@@ -29,7 +29,7 @@ namespace hpx
     ///       supplied function.
     ///
     template <typename F, typename Future>
-    void wait_each(F&& f, std::vector<Future>&& futures),
+    void wait_each(F&& f, std::vector<Future>&& futures);
 
     /// The function \a wait_each is a operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
