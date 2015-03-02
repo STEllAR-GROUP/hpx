@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file action_support.hpp
+/// \file hpx/runtime/actions/basic_action.hpp
 
 #if !defined(HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM)
 #define HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM
@@ -226,7 +226,7 @@ namespace hpx { namespace actions
             > thread_function;
 
             return traits::action_decorate_function<Derived>::call(lva,
-                thread_function(std::move(cont), lva, invoker(), 
+                thread_function(std::move(cont), lva, invoker(),
                     lva, std::forward<Ts>(vs)...));
         }
 

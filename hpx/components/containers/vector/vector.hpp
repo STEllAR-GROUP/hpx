@@ -633,15 +633,6 @@ namespace hpx
             partition_size_(std::size_t(-1))
         {}
 
-        /// Construct a new vector representation from the data associated with
-        /// the given symbolic name.
-        vector(std::string const& symbolic_name)
-          : size_(0),
-            partition_size_(std::size_t(-1))
-        {
-            connect_to(symbolic_name).get();
-        }
-
         /// Constructor which create hpx::vector with the given overall \a size
         ///
         /// \param size             The overall size of the vector
@@ -669,14 +660,6 @@ namespace hpx
             if (size != 0)
                 create(val, hpx::layout);
         }
-        vector(size_type size, T const& val, std::string const& symbolic_name)
-          : size_(size)
-        {
-            if (size != 0)
-                create(val, hpx::layout);
-
-            register_as(symbolic_name).get();
-        }
 
         /// Constructor which create and initialize vector of size
         /// \a size using the given distribution policy.
@@ -696,20 +679,6 @@ namespace hpx
         {
             if (size != 0)
                 create(policy);
-        }
-        template <typename DistPolicy>
-        vector(size_type size, DistPolicy const& policy,
-                std::string const& symbolic_name,
-                typename std::enable_if<
-                        is_vector_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
-          : size_(size),
-            partition_size_(std::size_t(-1))
-        {
-            if (size != 0)
-                create(policy);
-
-            register_as(symbolic_name).get();
         }
 
         /// Constructor which create and initialize vector with the
@@ -732,20 +701,6 @@ namespace hpx
         {
             if (size != 0)
                 create(val, policy);
-        }
-        template <typename DistPolicy>
-        vector(size_type size, T const& val, DistPolicy const& policy,
-                std::string const& symbolic_name,
-                typename std::enable_if<
-                        is_vector_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
-          : size_(size),
-            partition_size_(std::size_t(-1))
-        {
-            if (size != 0)
-                create(val, policy);
-
-            register_as(symbolic_name).get();
         }
 
         ~vector()

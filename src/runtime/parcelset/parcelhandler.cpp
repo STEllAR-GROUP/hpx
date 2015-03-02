@@ -502,7 +502,7 @@ namespace hpx { namespace parcelset
                     "parcelhandler::default_write_handler", __FILE__,
                     __LINE__, parcelset::dump_parcel(p));
 
-            hpx::detail::report_exception_and_terminate(exception);
+            hpx::report_error(exception);
         }
     }
 

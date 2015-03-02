@@ -809,7 +809,11 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            detail::report_exception_and_terminate(e);
+            hpx::runtime* rt = hpx::get_runtime_ptr();
+            if (rt)
+                rt->report_error(num_thread, e);
+            else
+                detail::report_exception_and_terminate(e);
             return;
         }
 
@@ -821,7 +825,11 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            detail::report_exception_and_terminate(e);
+            hpx::runtime* rt = hpx::get_runtime_ptr();
+            if (rt)
+                rt->report_error(std::size_t(-1), e);
+            else
+                detail::report_exception_and_terminate(e);
             return;
         }
 

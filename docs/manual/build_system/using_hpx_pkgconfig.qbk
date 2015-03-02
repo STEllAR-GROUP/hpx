@@ -7,6 +7,7 @@
 ===============================================================================/]
 
 [section:pkgconfig Using HPX with pkg-config]
+
 [/////////////////////////////////////////////////////////////////////////////]
 [section:apps How to Build __hpx__ Applications with pkg-config]
 

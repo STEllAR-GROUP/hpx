@@ -71,12 +71,12 @@ namespace hpx { namespace components
     template <typename Derived, typename Stub>
     inline Derived
     migrate(client_base<Derived, Stub> const& to_migrate,
-        naming::id_type const& target_locality)
+        naming::id_type const& target_storage)
     {
         typedef typename client_base<Derived, Stub>::server_component_type
             component_type;
         return Derived(migrate<component_type>(to_migrate.get_gid(),
-            target_locality));
+            target_storage));
     }
 }}
 

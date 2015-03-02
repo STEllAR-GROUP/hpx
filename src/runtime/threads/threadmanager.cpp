@@ -1550,8 +1550,10 @@ namespace hpx { namespace threads
             util::bind(&threadmanager_impl::idle_callback, this, num_thread));
 
         // the OS thread is allowed to exit only if no more HPX threads exist
+        // or if some other thread has terminated
         HPX_ASSERT(!scheduler_.get_thread_count(
-            unknown, thread_priority_default, num_thread));
+            unknown, thread_priority_default, num_thread) ||
+            state_ == terminating);
     }
 
     ///////////////////////////////////////////////////////////////////////////

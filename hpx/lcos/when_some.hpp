@@ -18,8 +18,8 @@ namespace hpx
     template <typename Sequence>
     struct when_some_result
     {
-        std::vector<std::size_t> indices;
-        Sequence futures;
+        std::vector<std::size_t> indices;   ///< List of indices of futures which became ready
+        Sequence futures;   ///< The sequence of futures as passed to \a hpx::when_some
     };
 
     /// The function \a when_some is an operator allowing to join on the result

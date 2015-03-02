@@ -1786,8 +1786,8 @@ void addressing_service::route(
     // a service instance
     if (!addr)
     {
-//         if (stubs::primary_namespace::is_service_instance(ids[0]) ||
-//             stubs::symbol_namespace::is_service_instance(ids[0]))
+        if (stubs::primary_namespace::is_service_instance(ids[0]) ||
+            stubs::symbol_namespace::is_service_instance(ids[0]))
         {
             // construct wrapper parcel
             naming::id_type const route_target(
@@ -1802,10 +1802,6 @@ void addressing_service::route(
             hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);
             return;
         }
-//         else
-//         {
-//             HPX_ASSERT(false);      // should not happen
-//         }
     }
 
     // apply directly as we have the resolved destination address

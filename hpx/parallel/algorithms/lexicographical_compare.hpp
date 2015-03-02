@@ -243,7 +243,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of the second range the algorithm will be applied to.
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the second range the algorithm will be applied to.
-    /// \param op           Refers to the comparison function that the first
+    /// \param pred         Refers to the comparison function that the first
     ///                     and second ranges will be applied to
     ///
     /// The comparison operations in the parallel \a lexicographical_compare

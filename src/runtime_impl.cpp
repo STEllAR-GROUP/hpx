@@ -450,7 +450,19 @@ namespace hpx {
         // Early and late exceptions, errors outside of HPX-threads
         if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
         {
-            detail::report_exception_and_terminate(e);
+            // report the error to the local console
+            detail::report_exception_and_continue(e);
+
+            // store the exception to be able to rethrow it later
+            {
+                boost::mutex::scoped_lock l(mtx_);
+                exception_ = e;
+            }
+
+            // initiate stopping the runtime system
+            runtime_support_->notify_waiting_main();
+            stop(false);
+
             return;
         }
 
@@ -479,8 +491,24 @@ namespace hpx {
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
         boost::exception_ptr const& e)
     {
-        std::size_t num_thread = hpx::threads::threadmanager_base::get_worker_thread_num();
+        std::size_t num_thread =
+            hpx::threads::threadmanager_base::get_worker_thread_num();
         return report_error(num_thread, e);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::rethrow_exception()
+    {
+        if (state_.load() > running)
+        {
+            boost::mutex::scoped_lock l(mtx_);
+            if (exception_)
+            {
+                boost::exception_ptr e = exception_;
+                exception_ = boost::exception_ptr();
+                boost::rethrow_exception(e);
+            }
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -496,6 +524,8 @@ namespace hpx {
         stop();
 
         parcel_handler_.stop();      // stops parcelport for sure
+
+        rethrow_exception();
         return result_;
     }
 
@@ -511,6 +541,8 @@ namespace hpx {
         stop();
 
         parcel_handler_.stop();      // stops parcelport for sure
+
+        rethrow_exception();
         return result;
     }
 

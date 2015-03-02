@@ -324,15 +324,15 @@ namespace hpx { namespace parcelset
         {
             if (ec) {
                 // all errors during early parcel handling are fatal
-                try {
-                    HPX_THROW_EXCEPTION(network_error, "early_write_handler",
+                boost::exception_ptr exception =
+                    hpx::detail::get_exception(hpx::exception(ec),
+                        "early_pending_parcel_handler", __FILE__, __LINE__,
                         "error while handling early parcel: " +
                             ec.message() + "(" +
-                            boost::lexical_cast<std::string>(ec.value())+ ")");
-                }
-                catch (hpx::exception const& e) {
-                    hpx::detail::report_exception_and_terminate(e);
-                }
+                            boost::lexical_cast<std::string>(ec.value()) +
+                            ")" + parcelset::dump_parcel(p));
+
+                hpx::report_error(exception);
                 return;
             }
         }

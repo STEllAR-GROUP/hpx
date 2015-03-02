@@ -249,7 +249,9 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
 
         hpx::vector<T> base;
         base.register_as(empty);
-        hpx::vector<T> v(empty);
+
+        hpx::vector<T> v;
+        v.connect_to(empty);
 
         test_global_iteration(v, 0, T());
         test_segmented_iteration(v, 0, 0);
@@ -270,7 +272,8 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         hpx::vector<T> base(size);
         base.register_as(size_);
 
-        hpx::vector<T> v(size_);
+        hpx::vector<T> v;
+        v.connect_to(size_);
 
         test_global_iteration(v, size, T());
         test_segmented_iteration(v, size, 1);
@@ -288,8 +291,11 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         // create vector with initial size and values
         std::string size_value(prefix_ + "size_value");
 
-        hpx::vector<T> base(size, T(999), size_value);
-        hpx::vector<T> v(size_value);
+        hpx::vector<T> base(size, T(999));
+        base.register_as(size_value);
+
+        hpx::vector<T> v;
+        v.connect_to(size_value);
 
         test_global_iteration(v, size, T(999));
         test_segmented_iteration(v, size, 1);
@@ -312,8 +318,11 @@ void trivial_test_with_policy(std::size_t size, std::size_t parts,
     {
         std::string policy_(prefix_ + "policy");
 
-        hpx::vector<T> base(size, policy, policy_);
-        hpx::vector<T> v(policy_);
+        hpx::vector<T> base(size, policy);
+        base.register_as(policy_);
+
+        hpx::vector<T> v;
+        v.connect_to(policy_);
 
         test_global_iteration(v, size, T(0));
         test_segmented_iteration(v, size, parts);
@@ -329,8 +338,11 @@ void trivial_test_with_policy(std::size_t size, std::size_t parts,
     {
         std::string policy_value(prefix_ + "policy_value");
 
-        hpx::vector<T> base(size, T(999), policy, policy_value);
-        hpx::vector<T> v(policy_value);
+        hpx::vector<T> base(size, T(999), policy);
+        base.register_as(policy_value);
+
+        hpx::vector<T> v;
+        v.connect_to(policy_value);
 
         test_global_iteration(v, size, T(999));
         test_segmented_iteration(v, size, parts);

@@ -212,6 +212,14 @@ __hpx__ provides implementations of the following parallel algorithms:
     [[ [algoref generate_n] ]
      [Saves the result of N applications of a function.]
      [`<hpx/include/parallel_generate.hpp>`]]
+    [[ [algoref remove_copy] ]
+     [Copies the elements from a range to a new location that are not equal to
+      the given value.]
+     [`<hpx/include/parallel_remove_copy.hpp>`]]
+    [[ [algoref remove_copy_if] ]
+     [Copies the elements from a range to a new location for which the given
+      predicate is `false`.]
+     [`<hpx/include/parallel_remove_copy.hpp>`]]
     [[ [algoref replace] ]
      [Replaces all values satisfying specific criteria with another value.]
      [`<hpx/include/parallel_replace.hpp>`]]
