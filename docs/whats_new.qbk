@@ -60,7 +60,8 @@ difference is that `hpx::vector` stores the data in partitions where the
 partitions can be distributed over different localities. We started to work on
 allowing to use the parallel algorithms with `hpx::vector`. At this point we have
 implemented only a few of the parallel algorithms to support distributed data
-structures (like `hpx::vector`) for testing purposes.
+structures (like `hpx::vector`) for testing purposes (see [issue 1338] for
+a documentation of our progress).
 
 
 [heading Bug Fixes (Closed Tickets)]
