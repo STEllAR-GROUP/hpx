@@ -36,6 +36,9 @@ if(HPX_PARCELPORT_MPI)
     string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_PARCELPORT_MPI_ENV}")
     hpx_add_config_define(HPX_PARCELPORT_MPI_ENV "\"${hpx_parcelport_mpi_env_}\"")
   endif()
+  if(HPX_PARCELPORT_MPI_MULTITHREADED)
+    hpx_add_config_define(HPX_PARCELPORT_MPI_MULTITHREADED)
+  endif()
 
   macro(add_parcelport_mpi_module)
     hpx_debug("add_parcelport_mpi_module")
@@ -43,9 +46,15 @@ if(HPX_PARCELPORT_MPI)
       include_directories(${MPI_CXX_INCLUDE_PATH})
     endif()
 
-    set(_mpi_extra_library)
+    set(_mpi_libraries)
+    if(MPI_CXX_LIBRARIES)
+      set(_mpi_libraries ${_mpi_libraries} ${MPI_CXX_LIBRARIES})
+    endif()
+    if(MPI_LIBRARY)
+      set(_mpi_libraries ${_mpi_libraries} ${MPI_LIBRARY})
+    endif()
     if(MPI_EXTRA_LIBRARY)
-      set(_mpi_extra_library ${MPI_EXTRA_LIBRARY})
+      set(_mpi_libraries ${_mpi_libraries} ${MPI_EXTRA_LIBRARY})
     endif()
     add_parcelport(mpi
       STATIC
@@ -59,9 +68,7 @@ if(HPX_PARCELPORT_MPI)
         "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
         "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver.hpp"
       DEPENDENCIES
-        ${MPI_CXX_LIBRARIES}
-        ${MPI_LIBRARY}
-        ${_mpi_extra_library}
+        ${_mpi_libraries}
       FOLDER "Core/Plugins/Parcelport/MPI")
   endmacro()
 else()
