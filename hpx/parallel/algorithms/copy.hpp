@@ -346,6 +346,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
+                typedef typename detail::algorithm_result<ExPolicy, Iter>::type
+                    result_type;
 
                 difference_type count = std::distance(first, last);
                 boost::shared_array<char> flags(new char[count]);
@@ -384,6 +386,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     // Copy the elements into dest in parallel
                     [=](std::vector<hpx::shared_future<std::size_t> >&& r,
                         std::vector<std::size_t> const& chunk_sizes) mutable
+                            -> result_type
                     {
                         HPX_ASSERT(!r.empty());
                         std::size_t last_index = r[r.size()-1].get();
