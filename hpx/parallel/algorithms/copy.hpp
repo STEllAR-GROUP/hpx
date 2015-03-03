@@ -351,7 +351,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename detail::algorithm_result<ExPolicy, Iter>::type
                     result_type;
 
+                if (first == last)
+                    return result::get(std::move(dest));
+
                 difference_type count = std::distance(first, last);
+
+
                 boost::shared_array<char> flags(new char[count]);
                 std::size_t init = 0;
 
