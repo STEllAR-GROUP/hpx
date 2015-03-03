@@ -48,20 +48,24 @@ namespace hpx { namespace parallel { namespace util
 
                     // estimate a chunk size based on number of cores used
                     std::size_t count = count_;
+                    HPX_ASSERT(count > 0);
+
                     chunk_size = get_static_chunk_size(policy, workitems, f1,
                         first, count, chunk_size);
-
-                    HPX_ASSERT(workitems.size() == 2);
 
                     // schedule every chunk on a separate thread
                     workitems.reserve(count_ / chunk_size + 2);
                     chunk_sizes.reserve(workitems.capacity());
 
-                    chunk_sizes.push_back(count_ - count);
-
-                    // pre-initialize second intermediate result
-                    workitems[1] = lcos::local::dataflow(hpx::launch::sync,
-                        f2, workitems[0], workitems[1]);
+                    // If the size of count was enough to warrant testing for a
+                    // chunk_size, add to chunk_sizes and pre-initialize second
+                    // intermediate result.
+                    if (workitems.size() == 2)
+                    {
+                        chunk_sizes.push_back(count_ - count);
+                        workitems[1] = lcos::local::dataflow(hpx::launch::sync,
+                            f2, workitems[0], workitems[1]);
+                    }
 
                     std::size_t parts = 0;
 
@@ -134,20 +138,24 @@ namespace hpx { namespace parallel { namespace util
 
                     // estimate a chunk size based on number of cores used
                     std::size_t count = count_;
+                    HPX_ASSERT(count > 0);
+
                     chunk_size = get_static_chunk_size(policy, workitems, f1,
                         first, count, chunk_size);
-
-                    HPX_ASSERT(workitems.size() == 2);
 
                     // schedule every chunk on a separate thread
                     workitems.reserve(count_ / chunk_size + 2);
                     chunk_sizes.reserve(workitems.capacity());
 
-                    chunk_sizes.push_back(count_ - count);
-
-                    // pre-initialize second intermediate result
-                    workitems[1] = lcos::local::dataflow(hpx::launch::sync,
-                        f2, workitems[0], workitems[1]);
+                    // If the size of count was enough to warrant testing for a
+                    // chunk_size, add to chunk_sizes and pre-initialize second
+                    // intermediate result.
+                    if (workitems.size() == 2)
+                    {
+                        chunk_sizes.push_back(count_ - count);
+                        workitems[1] = lcos::local::dataflow(hpx::launch::sync,
+                            f2, workitems[0], workitems[1]);
+                    }
 
                     std::size_t parts = 0;
 
