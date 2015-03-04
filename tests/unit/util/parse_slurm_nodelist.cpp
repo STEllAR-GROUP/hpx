@@ -5,6 +5,8 @@
 
 #include <hpx/util/batch_environment.hpp>
 
+#include <iostream>
+
 int main()
 {
     std::vector<std::string> nodelist;
