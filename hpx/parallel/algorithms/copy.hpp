@@ -353,14 +353,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 boost::shared_array<char> flags(new char[count]);
                 std::size_t init = 0;
 
-                using hpx::util::get;
-                using hpx::util::make_zip_iterator;
-
                 typedef util::scan_partitioner<ExPolicy, Iter, std::size_t>
                     scan_partitioner_type;
                 return scan_partitioner_type::call(
                     policy,
-                    make_zip_iterator(first, flags.get()),
+                    hpx::util::make_zip_iterator(first, flags.get()),
                     count,
                     init,
                     // Flag the elements to be copied
@@ -371,6 +368,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         util::loop_n(part_begin, part_size,
                             [&f, &curr](zip_iterator d) mutable
                             {
+                                using hpx::util::get;
                                 get<1>(*d) = (f(get<0>(*d)) != 0) ? 1 : 0;
                                 curr += get<1>(*d);
                             });
