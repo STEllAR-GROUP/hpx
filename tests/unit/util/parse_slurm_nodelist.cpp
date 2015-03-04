@@ -7,7 +7,8 @@
 
 int main()
 {
-    hpx::util::batch_environment env(true);
+    std::vector<std::string> nodelist;
+    hpx::util::batch_environments::slurm_environment env(nodelist, true);
 
-    std::cout << env.init_from_environment("") << "\n";
+    std::cout << nodelist << "\n";
 }
