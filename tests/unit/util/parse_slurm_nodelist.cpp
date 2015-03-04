@@ -13,5 +13,6 @@ int main()
     std::vector<std::string> nodelist;
     hpx::util::batch_environments::slurm_environment env(nodelist, true);
 
-    std::cout << nodelist << "\n";
+    for (std::string const& s: nodelist)
+        std::cout << s << "\n";
 }
