@@ -5,6 +5,8 @@
 
 set(tests
     minimal_findend
+    scan_different_inits
+    scan_shortlength
     search_zerolength
    )
 

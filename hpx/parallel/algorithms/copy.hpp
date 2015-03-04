@@ -344,12 +344,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 Iter dest, F && f)
             {
                 typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator;
+                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
                 typedef typename detail::algorithm_result<ExPolicy, Iter>::type
                     result_type;
 
+                if (first == last)
+                    return result::get(std::move(dest));
+
                 difference_type count = std::distance(first, last);
+
+
                 boost::shared_array<char> flags(new char[count]);
                 std::size_t init = 0;
 
