@@ -113,7 +113,7 @@ namespace hpx { namespace util { namespace batch_environments {
                     std::cerr << "failed opening: " << node_file << std::endl;
 
                 // raise hard error if nodefile could not be opened
-                throw std::logic_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Could not open nodefile: '%s'") % node_file));
             }
         }
