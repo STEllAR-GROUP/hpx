@@ -57,8 +57,7 @@ response primary_namespace::service(
         case primary_ns_route:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.route_.time_
+                    counter_data_.route_.time_
                 );
                 counter_data_.increment_route_count();
                 return route(req, ec);
@@ -66,8 +65,7 @@ response primary_namespace::service(
         case primary_ns_bind_gid:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.bind_gid_.time_
+                    counter_data_.bind_gid_.time_
                 );
                 counter_data_.increment_bind_gid_count();
                 return bind_gid(req, ec);
@@ -75,8 +73,7 @@ response primary_namespace::service(
         case primary_ns_resolve_gid:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.resolve_gid_.time_
+                    counter_data_.resolve_gid_.time_
                 );
                 counter_data_.increment_resolve_gid_count();
                 return resolve_gid(req, ec);
@@ -84,8 +81,7 @@ response primary_namespace::service(
         case primary_ns_unbind_gid:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.unbind_gid_.time_
+                    counter_data_.unbind_gid_.time_
                 );
                 counter_data_.increment_unbind_gid_count();
                 return unbind_gid(req, ec);
@@ -93,8 +89,7 @@ response primary_namespace::service(
         case primary_ns_increment_credit:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.increment_credit_.time_
+                    counter_data_.increment_credit_.time_
                 );
                 counter_data_.increment_increment_credit_count();
                 return increment_credit(req, ec);
@@ -102,8 +97,7 @@ response primary_namespace::service(
         case primary_ns_decrement_credit:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.decrement_credit_.time_
+                    counter_data_.decrement_credit_.time_
                 );
                 counter_data_.increment_decrement_credit_count();
                 return decrement_credit(req, ec);
@@ -111,8 +105,7 @@ response primary_namespace::service(
         case primary_ns_allocate:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.allocate_.time_
+                    counter_data_.allocate_.time_
                 );
                 counter_data_.increment_allocate_count();
                 return allocate(req, ec);
@@ -120,8 +113,7 @@ response primary_namespace::service(
         case primary_ns_begin_migration:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.begin_migration_.time_
+                    counter_data_.begin_migration_.time_
                 );
                 counter_data_.increment_begin_migration_count();
                 return begin_migration(req, ec);
@@ -129,8 +121,7 @@ response primary_namespace::service(
         case primary_ns_end_migration:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.end_migration_.time_
+                    counter_data_.end_migration_.time_
                 );
                 counter_data_.increment_end_migration_count();
                 return end_migration(req, ec);
@@ -1441,61 +1432,51 @@ response primary_namespace::statistics_counter(
 // access current counter values
 boost::int64_t primary_namespace::counter_data::get_route_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(route_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_bind_gid_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_gid_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_resolve_gid_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolve_gid_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_unbind_gid_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(unbind_gid_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_increment_credit_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(increment_credit_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_decrement_credit_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(decrement_credit_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(allocate_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_begin_migration_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(begin_migration_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_end_migration_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(end_migration_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(route_.count_, reset) +
         util::get_and_reset_value(bind_gid_.count_, reset) +
         util::get_and_reset_value(resolve_gid_.count_, reset) +
@@ -1510,61 +1491,51 @@ boost::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
 // access execution time counters
 boost::int64_t primary_namespace::counter_data::get_route_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(route_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_bind_gid_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_gid_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_resolve_gid_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolve_gid_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_unbind_gid_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(unbind_gid_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_increment_credit_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(increment_credit_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_decrement_credit_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(decrement_credit_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(allocate_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_begin_migration_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(begin_migration_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_end_migration_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(end_migration_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(route_.time_, reset) +
         util::get_and_reset_value(bind_gid_.time_, reset) +
         util::get_and_reset_value(resolve_gid_.time_, reset) +
@@ -1579,55 +1550,46 @@ boost::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
 // increment counter values
 void primary_namespace::counter_data::increment_route_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++route_.count_;
 }
 
 void primary_namespace::counter_data::increment_bind_gid_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++bind_gid_.count_;
 }
 
 void primary_namespace::counter_data::increment_resolve_gid_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++resolve_gid_.count_;
 }
 
 void primary_namespace::counter_data::increment_unbind_gid_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++unbind_gid_.count_;
 }
 
 void primary_namespace::counter_data::increment_increment_credit_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++increment_credit_.count_;
 }
 
 void primary_namespace::counter_data::increment_decrement_credit_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++decrement_credit_.count_;
 }
 
 void primary_namespace::counter_data::increment_allocate_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++allocate_.count_;
 }
 
 void primary_namespace::counter_data::increment_begin_migration_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++begin_migration_.count_;
 }
 
 void primary_namespace::counter_data::increment_end_migration_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++end_migration_.count_;
 }
 

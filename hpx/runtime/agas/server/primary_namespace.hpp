@@ -28,6 +28,7 @@
 #include <boost/format.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/atomic.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
 #include <boost/shared_ptr.hpp>
@@ -152,17 +153,15 @@ struct HPX_EXPORT primary_namespace
     // data structure holding all counters for the omponent_namespace component
     struct counter_data :  boost::noncopyable
     {
-        typedef lcos::local::spinlock mutex_type;
-
         struct api_counter_data
         {
             api_counter_data()
-                : count_(0)
-                , time_(0)
+              : count_(0)
+              , time_(0)
             {}
 
-            boost::int64_t count_;
-            boost::int64_t time_;
+            boost::atomic<boost::int64_t> count_;
+            boost::atomic<boost::int64_t> time_;
         };
 
         counter_data()
@@ -207,7 +206,6 @@ struct HPX_EXPORT primary_namespace
         friend struct update_time_on_exit;
         friend struct primary_namespace;
 
-        mutable mutex_type mtx_;
         api_counter_data route_;                // primary_ns_
         api_counter_data bind_gid_;             // primary_ns_bind_gid
         api_counter_data resolve_gid_;          // primary_ns_resolve_gid
@@ -222,21 +220,18 @@ struct HPX_EXPORT primary_namespace
 
     struct update_time_on_exit
     {
-        update_time_on_exit(counter_data& data, boost::int64_t& t)
+        update_time_on_exit(boost::atomic<boost::int64_t>& t)
           : started_at_(hpx::util::high_resolution_clock::now())
-          , data_(data)
           , t_(t)
         {}
 
         ~update_time_on_exit()
         {
-            counter_data::mutex_type::scoped_lock l(data_.mtx_);
             t_ += (hpx::util::high_resolution_clock::now() - started_at_);
         }
 
         boost::uint64_t started_at_;
-        primary_namespace::counter_data& data_;
-        boost::int64_t& t_;
+        boost::atomic<boost::int64_t>& t_;
     };
 
 #if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)

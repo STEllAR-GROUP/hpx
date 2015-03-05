@@ -27,6 +27,7 @@
 
 #include <boost/format.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/atomic.hpp>
 
 namespace hpx { namespace agas
 {
@@ -77,12 +78,12 @@ struct HPX_EXPORT locality_namespace
         struct api_counter_data
         {
             api_counter_data()
-                : count_(0)
-                , time_(0)
+              : count_(0)
+              , time_(0)
             {}
 
-            boost::int64_t count_;
-            boost::int64_t time_;
+            boost::atomic<boost::int64_t> count_;
+            boost::atomic<boost::int64_t> time_;
         };
 
         counter_data()
@@ -121,7 +122,6 @@ struct HPX_EXPORT locality_namespace
         friend struct update_time_on_exit;
         friend struct locality_namespace;
 
-        mutable mutex_type mtx_;
         api_counter_data allocate_;             // locality_ns_allocate
         api_counter_data resolve_locality_;     // locality_ns_resolve_locality
         api_counter_data free_;                 // locality_ns_free
@@ -134,21 +134,18 @@ struct HPX_EXPORT locality_namespace
 
     struct update_time_on_exit
     {
-        update_time_on_exit(counter_data& data, boost::int64_t& t)
+        update_time_on_exit(boost::atomic<boost::int64_t>& t)
           : started_at_(hpx::util::high_resolution_clock::now())
-          , data_(data)
           , t_(t)
         {}
 
         ~update_time_on_exit()
         {
-            counter_data::mutex_type::scoped_lock l(data_.mtx_);
             t_ += (hpx::util::high_resolution_clock::now() - started_at_);
         }
 
         boost::uint64_t started_at_;
-        locality_namespace::counter_data& data_;
-        boost::int64_t& t_;
+        boost::atomic<boost::int64_t>& t_;
     };
 
   public:

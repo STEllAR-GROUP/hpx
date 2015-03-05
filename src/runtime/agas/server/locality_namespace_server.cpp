@@ -50,8 +50,7 @@ response locality_namespace::service(
         case locality_ns_allocate:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.allocate_.time_
+                    counter_data_.allocate_.time_
                 );
                 counter_data_.increment_allocate_count();
                 return allocate(req, ec);
@@ -59,8 +58,7 @@ response locality_namespace::service(
         case locality_ns_free:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.free_.time_
+                    counter_data_.free_.time_
                 );
                 counter_data_.increment_free_count();
                 return free(req, ec);
@@ -68,8 +66,7 @@ response locality_namespace::service(
         case locality_ns_localities:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.localities_.time_
+                    counter_data_.localities_.time_
                 );
                 counter_data_.increment_localities_count();
                 return localities(req, ec);
@@ -77,8 +74,7 @@ response locality_namespace::service(
         case locality_ns_resolve_locality:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.resolve_locality_.time_
+                    counter_data_.resolve_locality_.time_
                 );
                 counter_data_.increment_resolve_locality_count();
                 return resolve_locality(req, ec);
@@ -86,8 +82,7 @@ response locality_namespace::service(
         case locality_ns_resolved_localities:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.resolved_localities_.time_
+                    counter_data_.resolved_localities_.time_
                 );
                 counter_data_.increment_resolved_localities_count();
                 return resolved_localities(req, ec);
@@ -95,8 +90,7 @@ response locality_namespace::service(
         case locality_ns_num_localities:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.num_localities_.time_
+                    counter_data_.num_localities_.time_
                 );
                 counter_data_.increment_num_localities_count();
                 return get_num_localities(req, ec);
@@ -104,8 +98,7 @@ response locality_namespace::service(
         case locality_ns_num_threads:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.num_threads_.time_
+                    counter_data_.num_threads_.time_
                 );
                 counter_data_.increment_num_threads_count();
                 return get_num_threads(req, ec);
@@ -707,49 +700,41 @@ response locality_namespace::statistics_counter(
 // access current counter values
 boost::int64_t locality_namespace::counter_data::get_allocate_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(allocate_.count_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_resolve_locality_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolve_locality_.count_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_free_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(free_.count_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_localities_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(localities_.count_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_num_localities_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(num_localities_.count_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_num_threads_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(num_threads_.count_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_resolved_localities_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolved_localities_.count_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_overall_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(allocate_.count_, reset) +
         util::get_and_reset_value(resolve_locality_.count_, reset) +
         util::get_and_reset_value(free_.count_, reset) +
@@ -762,49 +747,41 @@ boost::int64_t locality_namespace::counter_data::get_overall_count(bool reset)
 // access execution time counters
 boost::int64_t locality_namespace::counter_data::get_allocate_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(allocate_.time_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_resolve_locality_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolve_locality_.time_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_free_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(free_.time_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_localities_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(localities_.time_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_num_localities_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(num_localities_.time_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_num_threads_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(num_threads_.time_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_resolved_localities_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolved_localities_.time_, reset);
 }
 
 boost::int64_t locality_namespace::counter_data::get_overall_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(allocate_.time_, reset) +
         util::get_and_reset_value(resolve_locality_.time_, reset) +
         util::get_and_reset_value(free_.time_, reset) +
@@ -817,43 +794,36 @@ boost::int64_t locality_namespace::counter_data::get_overall_time(bool reset)
 // increment counter values
 void locality_namespace::counter_data::increment_allocate_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++allocate_.count_;
 }
 
 void locality_namespace::counter_data::increment_resolve_locality_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++resolve_locality_.count_;
 }
 
 void locality_namespace::counter_data::increment_free_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++free_.count_;
 }
 
 void locality_namespace::counter_data::increment_localities_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++localities_.count_;
 }
 
 void locality_namespace::counter_data::increment_num_localities_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++num_localities_.count_;
 }
 
 void locality_namespace::counter_data::increment_num_threads_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++num_threads_.count_;
 }
 
 void locality_namespace::counter_data::increment_resolved_localities_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++resolved_localities_.count_;
 }
 
