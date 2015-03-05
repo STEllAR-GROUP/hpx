@@ -6,6 +6,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/config/defines.hpp>
+
+#if defined(HPX_PARCELPORT_MPI)
+#include <mpi.h>
+#endif
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/command_line_handling.hpp>
@@ -20,9 +26,6 @@
 
 #if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
-#endif
-#if defined(HPX_PARCELPORT_MPI)
-#include <mpi.h>
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
