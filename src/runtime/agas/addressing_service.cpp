@@ -1786,8 +1786,8 @@ void addressing_service::route(
     // a service instance
     if (!addr)
     {
-//         if (stubs::primary_namespace::is_service_instance(ids[0]) ||
-//             stubs::symbol_namespace::is_service_instance(ids[0]))
+        if (stubs::primary_namespace::is_service_instance(ids[0]) ||
+            stubs::symbol_namespace::is_service_instance(ids[0]))
         {
             // construct wrapper parcel
             naming::id_type const route_target(
