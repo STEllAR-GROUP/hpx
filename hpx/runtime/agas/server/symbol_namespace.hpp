@@ -25,6 +25,7 @@
 
 #include <boost/format.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/atomic.hpp>
 
 namespace hpx { namespace agas
 {
@@ -74,12 +75,12 @@ struct HPX_EXPORT symbol_namespace
         struct api_counter_data
         {
             api_counter_data()
-                : count_(0)
-                , time_(0)
+              : count_(0)
+              , time_(0)
             {}
 
-            boost::int64_t count_;
-            boost::int64_t time_;
+            boost::atomic<boost::int64_t> count_;
+            boost::atomic<boost::int64_t> time_;
         };
 
         counter_data()
@@ -112,7 +113,6 @@ struct HPX_EXPORT symbol_namespace
         friend struct update_time_on_exit;
         friend struct symbol_namespace;
 
-        mutable mutex_type mtx_;
         api_counter_data bind_;               // symbol_ns_bind
         api_counter_data resolve_;            // symbol_ns_resolve
         api_counter_data unbind_;             // symbol_ns_unbind
@@ -123,21 +123,18 @@ struct HPX_EXPORT symbol_namespace
 
     struct update_time_on_exit
     {
-        update_time_on_exit(counter_data& data, boost::int64_t& t)
+        update_time_on_exit(boost::atomic<boost::int64_t>& t)
           : started_at_(hpx::util::high_resolution_clock::now())
-          , data_(data)
           , t_(t)
         {}
 
         ~update_time_on_exit()
         {
-            counter_data::mutex_type::scoped_lock l(data_.mtx_);
             t_ += (hpx::util::high_resolution_clock::now() - started_at_);
         }
 
         boost::uint64_t started_at_;
-        symbol_namespace::counter_data& data_;
-        boost::int64_t& t_;
+        boost::atomic<boost::int64_t>& t_;
     };
 
   public:

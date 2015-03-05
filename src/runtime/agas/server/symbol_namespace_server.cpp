@@ -45,8 +45,7 @@ response symbol_namespace::service(
         case symbol_ns_bind:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.bind_.time_
+                    counter_data_.bind_.time_
                 );
                 counter_data_.increment_bind_count();
                 return bind(req, ec);
@@ -54,8 +53,7 @@ response symbol_namespace::service(
         case symbol_ns_resolve:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.resolve_.time_
+                    counter_data_.resolve_.time_
                 );
                 counter_data_.increment_resolve_count();
                 return resolve(req, ec);
@@ -63,8 +61,7 @@ response symbol_namespace::service(
         case symbol_ns_unbind:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.unbind_.time_
+                    counter_data_.unbind_.time_
                 );
                 counter_data_.increment_unbind_count();
                 return unbind(req, ec);
@@ -72,8 +69,7 @@ response symbol_namespace::service(
         case symbol_ns_iterate_names:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.iterate_names_.time_
+                    counter_data_.iterate_names_.time_
                 );
                 counter_data_.increment_iterate_names_count();
                 return iterate(req, ec);
@@ -81,8 +77,7 @@ response symbol_namespace::service(
         case symbol_ns_on_event:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.on_event_.time_
+                    counter_data_.on_event_.time_
                 );
                 counter_data_.increment_on_event_count();
                 return on_event(req, ec);
@@ -698,37 +693,31 @@ response symbol_namespace::statistics_counter(
 // access current counter values
 boost::int64_t symbol_namespace::counter_data::get_bind_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_.count_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_resolve_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolve_.count_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_unbind_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(unbind_.count_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_iterate_names_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(iterate_names_.count_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_on_event_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(on_event_.count_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_overall_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_.count_, reset) +
         util::get_and_reset_value(resolve_.count_, reset) +
         util::get_and_reset_value(unbind_.count_, reset) +
@@ -739,37 +728,31 @@ boost::int64_t symbol_namespace::counter_data::get_overall_count(bool reset)
 // access execution time counters
 boost::int64_t symbol_namespace::counter_data::get_bind_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_.time_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_resolve_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolve_.time_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_unbind_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(unbind_.time_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_iterate_names_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(iterate_names_.time_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_on_event_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(on_event_.time_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_overall_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_.time_, reset) +
         util::get_and_reset_value(resolve_.time_, reset) +
         util::get_and_reset_value(unbind_.time_, reset) +
@@ -780,31 +763,26 @@ boost::int64_t symbol_namespace::counter_data::get_overall_time(bool reset)
 // increment counter values
 void symbol_namespace::counter_data::increment_bind_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++bind_.count_;
 }
 
 void symbol_namespace::counter_data::increment_resolve_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++resolve_.count_;
 }
 
 void symbol_namespace::counter_data::increment_unbind_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++unbind_.count_;
 }
 
 void symbol_namespace::counter_data::increment_iterate_names_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++iterate_names_.count_;
 }
 
 void symbol_namespace::counter_data::increment_on_event_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++on_event_.count_;
 }
 

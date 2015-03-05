@@ -28,6 +28,7 @@
 
 #include <boost/format.hpp>
 #include <boost/bimap.hpp>
+#include <boost/atomic.hpp>
 
 namespace hpx { namespace agas
 {
@@ -84,8 +85,8 @@ struct HPX_EXPORT component_namespace
                 , time_(0)
             {}
 
-            boost::int64_t count_;
-            boost::int64_t time_;
+            boost::atomic<boost::int64_t> count_;
+            boost::atomic<boost::int64_t> time_;
         };
 
         counter_data()
@@ -124,7 +125,6 @@ struct HPX_EXPORT component_namespace
         friend struct update_time_on_exit;
         friend struct component_namespace;
 
-        mutable mutex_type mtx_;
         api_counter_data bind_prefix_;          // component_ns_bind_prefix
         api_counter_data bind_name_;            // component_ns_bind_name
         api_counter_data resolve_id_;           // component_ns_resolve_id
@@ -137,21 +137,18 @@ struct HPX_EXPORT component_namespace
 
     struct update_time_on_exit
     {
-        update_time_on_exit(counter_data& data, boost::int64_t& t)
+        update_time_on_exit(boost::atomic<boost::int64_t>& t)
           : started_at_(hpx::util::high_resolution_clock::now())
-          , data_(data)
           , t_(t)
         {}
 
         ~update_time_on_exit()
         {
-            counter_data::mutex_type::scoped_lock l(data_.mtx_);
             t_ += (hpx::util::high_resolution_clock::now() - started_at_);
         }
 
         boost::uint64_t started_at_;
-        component_namespace::counter_data& data_;
-        boost::int64_t& t_;
+        boost::atomic<boost::int64_t>& t_;
     };
 
   public:
