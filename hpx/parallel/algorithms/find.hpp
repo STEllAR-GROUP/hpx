@@ -76,7 +76,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable -> InIter
                         {
-                            std::size_t find_res = tok.get_data();
+                            difference_type find_res = tok.get_data();
                             if(find_res != static_cast<std::size_t>(count))
                                 std::advance(first, find_res);
                             else
@@ -209,7 +209,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                         {
-                            std::size_t find_res = tok.get_data();
+                            difference_type find_res = tok.get_data();
                             if(find_res != static_cast<std::size_t>(count))
                                 std::advance(first, find_res);
                             else
@@ -362,7 +362,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable -> FwdIter
                         {
-                            std::size_t find_res = tok.get_data();
+                            difference_type find_res = tok.get_data();
                             if(find_res != static_cast<std::size_t>(count))
                                 std::advance(first, find_res);
                             else
