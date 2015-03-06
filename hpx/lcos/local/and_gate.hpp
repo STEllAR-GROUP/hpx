@@ -153,7 +153,7 @@ namespace hpx { namespace lcos { namespace local
         {
             no_mutex mtx;
             no_mutex::scoped_lock lk(mtx);
-            set(which, lk, ec);
+            return set(which, lk, ec);
         }
 
     protected:
