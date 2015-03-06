@@ -19,7 +19,7 @@ void test_equal1(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c1(3);
+    std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
     std::size_t first_value = std::rand(); //-V101

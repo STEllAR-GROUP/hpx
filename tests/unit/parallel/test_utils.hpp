@@ -194,6 +194,13 @@ namespace test
         return c;
     }
 
+    inline std::vector<std::size_t> random_fill(std::size_t size)
+    {
+        std::vector<std::size_t> c(size);
+        std::generate(boost::begin(c), boost::end(c), std::rand);
+        return c;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     inline void make_ready(std::vector<hpx::promise<std::size_t> >& p,
         std::vector<std::size_t>& idx)

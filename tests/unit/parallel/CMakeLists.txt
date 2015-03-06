@@ -53,6 +53,7 @@ set(tests
     rotate_copy
     search
     searchn
+    set_union
     swapranges
     task_region
     transform
