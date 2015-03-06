@@ -6,10 +6,6 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_PARCELPORT_MPI)
-#include <mpi.h>
-#endif
-
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/plugins/parcelport_factory.hpp>
@@ -20,6 +16,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
+// Local parcelport plugin
 
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
@@ -27,6 +24,7 @@
 
 namespace hpx { namespace parcelset { namespace policies { namespace minimal
 {
+    // this example uses an integer rank for locality representation internally
     struct locality
     {
         static const char *type()
@@ -34,41 +32,53 @@ namespace hpx { namespace parcelset { namespace policies { namespace minimal
             return "minimal";
         }
 
-        locality() {}
+        explicit locality(boost::int32_t rank) : rank_(rank) {}
 
+        locality() : rank_(-1) {}
+
+        boost::int32_t rank() const
+        {
+            return rank_;
+        }
+
+        // some condition marking this locality as valid
         operator util::safe_bool<locality>::result_type() const
         {
-            return util::safe_bool<locality>()(/* some condition marking this locality as valid */);
+            return util::safe_bool<locality>()(rank_ != -1);
         }
 
         void save(util::portable_binary_oarchive & ar) const
         {
-            // save the state
+          // save the state
+          ar.save(rank_);
         }
 
         void load(util::portable_binary_iarchive & ar)
         {
-            // load the state
+          // load the state
+          ar.load(rank_);
         }
 
     private:
         friend bool operator==(locality const & lhs, locality const & rhs)
         {
-            return /*compare equalness*/;
+            return lhs.rank_ == rhs.rank_;
         }
 
         friend bool operator<(locality const & lhs, locality const & rhs)
         {
-            return /*compare smaller then*/;
+            return lhs.rank_ < rhs.rank_;
         }
 
         friend std::ostream & operator<<(std::ostream & os, locality const & loc)
         {
             boost::io::ios_flags_saver ifs(os);
-            //output
+            os << loc.rank_;
 
             return os;
         }
+
+        boost::int32_t rank_;
     };
 
     class parcelport
@@ -80,7 +90,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace minimal
             return
                 parcelset::locality(
                     locality(
-                        // whatever "here" means
+                       0 // whatever "here" means
                     )
                 );
         }
@@ -121,13 +131,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace minimal
 
         bool can_bootstrap() const
         {
-            return /* return true if this pp can be used at bootstrapping, otherwise omit */;
+            return false/* return true if this pp can be used at bootstrapping, otherwise omit */;
         }
 
         /// Return the name of this locality
         std::string get_locality_name() const
         {
-            return /* whatever this means for your pp */;
+            return "minimal"/* whatever this means for your pp */;
         }
 
         parcelset::locality
@@ -136,7 +146,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace minimal
             return
                 parcelset::locality(
                     locality(
-                        /* whatever it takes to address AGAS */
+                        0/* whatever it takes to address AGAS */
                     )
                 );
         }
@@ -206,6 +216,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace minimal
         bool do_background_work(std::size_t num_thread)
         {
             // This is called whenever a HPX OS thread is idling, can be used to poll for incoming messages
+          return true;
         }
 
     private:
@@ -266,3 +277,4 @@ namespace hpx { namespace traits
 HPX_REGISTER_PARCELPORT(
     hpx::parcelset::policies::minimal::parcelport,
     minimal);
+
