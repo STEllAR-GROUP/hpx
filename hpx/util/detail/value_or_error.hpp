@@ -221,20 +221,6 @@ namespace hpx { namespace util { namespace detail
             destruct_value();
             return res;
         }
-        /*
-#else
-        value_type && move_value()
-        {
-            if (!stores_value()) {
-                HPX_THROW_EXCEPTION(invalid_status,
-                    "value_or_error::move_value",
-                    "unexpected retrieval of value")
-            }
-            state_ = has_none_;
-            return std::move(*get_value_address());
-        }
-#endif
-*/
 
         value_type& get_value()
         {
