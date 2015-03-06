@@ -345,7 +345,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 Iter dest, F && f)
             {
                 typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator;
-                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef detail::algorithm_result<ExPolicy, Iter> result;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
 
@@ -410,7 +410,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 util::loop_n(part_begin, part_count,
                                     [&iter](zip_iterator d)
                                     {
-                                        using hpx::util::get;
                                         if(get<1>(*d))
                                             *iter++ = get<0>(*d);
                                     });
