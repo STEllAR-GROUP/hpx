@@ -17,6 +17,7 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
+#include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
@@ -349,6 +350,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type;
                 typedef typename detail::algorithm_result<ExPolicy, Iter>::type
                     result_type;
+
+                if (first == last)
+                    return result::get(std::move(dest));
 
                 if (first == last)
                     return result::get(std::move(dest));
