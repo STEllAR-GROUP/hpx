@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, InIter first, InIter last,
                 T const& val)
             {
-                typedef detail :: algorithm_result<ExPolicy, InIter> result;
+                typedef detail::algorithm_result<ExPolicy, InIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
                 typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
@@ -182,7 +182,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef detail :: algorithm_result<ExPolicy, FwdIter> result;
+                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
                 typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
@@ -334,7 +334,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef detail :: algorithm_result<ExPolicy, FwdIter> result;
+                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
                 typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
