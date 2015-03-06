@@ -355,7 +355,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 difference_type count = std::distance(first, last);
 
-
                 boost::shared_array<char> flags(new char[count]);
                 std::size_t init = 0;
 
@@ -412,6 +411,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 util::loop_n(part_begin, part_count,
                                     [&iter](zip_iterator d)
                                     {
+                                        using hpx::util::get;
                                         if(get<1>(*d))
                                             *iter++ = get<0>(*d);
                                     });

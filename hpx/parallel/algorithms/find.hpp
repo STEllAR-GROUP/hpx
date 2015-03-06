@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (count <= 0)
                     return result::get(std::move(last));
 
-                util::cancellation_token<difference_type> tok(count);
+                util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, InIter, void>::
                     call_with_index(
@@ -191,7 +191,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (count <= 0)
                     return result::get(std::move(last));
 
-                util::cancellation_token<difference_type> tok(count);
+                util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
@@ -343,7 +343,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (count <= 0)
                     return result::get(std::move(last));
 
-                util::cancellation_token<difference_type> tok(count);
+                util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
