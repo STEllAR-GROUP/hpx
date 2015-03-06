@@ -49,11 +49,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, InIter first, InIter last,
                 T const& val)
             {
+                typedef detail::algorithm_result<ExPolicy, InIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
                 typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
 
                 difference_type count = std::distance(first, last);
+                if (count <= 0)
+                    return result::get(std::move(last));
+
                 util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, InIter, void>::
@@ -178,11 +182,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef typename std::iterator_traits<FwdIter>::value_type type;
-                typedef typename std::iterator_traits<FwdIter>::difference_type
+                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef typename std::iterator_traits<InIter>::value_type type;
+                typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
 
                 difference_type count = std::distance(first, last);
+                if (count <= 0)
+                    return result::get(std::move(last));
+
                 util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
@@ -326,11 +334,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename detail::algorithm_result<ExPolicy, FwdIter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef typename std::iterator_traits<FwdIter>::value_type type;
-                typedef typename std::iterator_traits<FwdIter>::difference_type
+                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef typename std::iterator_traits<InIter>::value_type type;
+                typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
 
                 difference_type count = std::distance(first, last);
+                if (count <= 0)
+                    return result::get(std::move(last));
+
                 util::cancellation_token<std::size_t> tok(count);
 
                 return util::partitioner<ExPolicy, FwdIter, void>::
@@ -472,23 +484,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, FwdIter first1, FwdIter last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
+                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<FwdIter>::reference reference;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
 
                 difference_type diff = std::distance(first2, last2);
                 if (diff <= 0)
-                {
-                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
-                        std::move(last1));
-                }
+                    return result::get(std::move(last1));
 
                 difference_type count = std::distance(first1, last1);
                 if (diff > count)
-                {
-                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
-                        std::move(last1));
-                }
+                    return result::get(std::move(last1));
 
                 util::cancellation_token<
                     difference_type, std::greater<difference_type>
@@ -764,6 +771,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, InIter first, InIter last,
                 FwdIter s_first, FwdIter s_last, Pred && op)
             {
+                typedef detail::algorithm_result<ExPolicy, InIter> result;
                 typedef typename std::iterator_traits<InIter>::reference reference;
                 typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
@@ -771,16 +779,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     s_difference_type;
 
                 s_difference_type diff = std::distance(s_first, s_last);
-                if(diff <= 0) {
-                    return detail::algorithm_result<ExPolicy, InIter>::get(
-                        std::move(last));
-                }
+                if(diff <= 0)
+                    return result::get(std::move(last));
 
                 difference_type count = std::distance(first, last);
-                if(diff > count) {
-                    return detail::algorithm_result<ExPolicy, InIter>::get(
-                        std::move(last));
-                }
+                if(diff > count)
+                    return result::get(std::move(last));
 
                 util::cancellation_token<difference_type> tok(count);
 
