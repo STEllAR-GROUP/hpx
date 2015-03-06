@@ -12,7 +12,7 @@
 void test_zero()
 {
     using namespace hpx::parallel;
-    typedef typename std::vector<int>::iterator Iter;
+    typedef std::vector<int>::iterator Iter;
     std::vector<int> a;
     std::vector<int> b, c, d;
 
@@ -38,8 +38,8 @@ void test_zero()
 void test_async_zero()
 {
     using namespace hpx::parallel;
-    typedef typename std::vector<int>::iterator Iter;
-    typedef typename hpx::future<Iter> Fut_Iter;
+    typedef std::vector<int>::iterator Iter;
+    typedef hpx::future<Iter> Fut_Iter;
     std::vector<int> a;
     std::vector<int> b, c, d;
 
@@ -65,7 +65,7 @@ void test_async_zero()
 void test_one(std::vector<int> a)
 {
     using namespace hpx::parallel;
-    typedef typename std::vector<int>::iterator Iter;
+    typedef std::vector<int>::iterator Iter;
     std::size_t n = a.size();
     std::vector<int> b(n), c(n), d(n);
     std::vector<int> b_ans(n), c_ans(n), d_ans(n);
@@ -94,8 +94,8 @@ void test_one(std::vector<int> a)
 void test_async_one(std::vector<int> a)
 {
     using namespace hpx::parallel;
-    typedef typename std::vector<int>::iterator Iter;
-    typedef typename hpx::future<Iter> Fut_Iter;
+    typedef std::vector<int>::iterator Iter;
+    typedef hpx::future<Iter> Fut_Iter;
     std::size_t n = a.size();
     std::vector<int> b(n), c(n), d(n);
     std::vector<int> b_ans(n), c_ans(n), d_ans(n);
@@ -166,6 +166,7 @@ int main(int argc, char* argv[])
         ("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run")
         ;
+
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
