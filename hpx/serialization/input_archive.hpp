@@ -11,6 +11,7 @@
 
 #include <hpx/serialization/archive.hpp>
 #include <hpx/serialization/input_container.hpp>
+#include <hpx/serialization/raw_ptr.hpp>
 #include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
 
 #include <boost/shared_ptr.hpp>
@@ -46,7 +47,12 @@ namespace hpx { namespace serialization {
             const std::vector<serialization_chunk>* chunks = 0,
             std::size_t inbound_data_size = 0)
           : base_type(make_container(buffer, chunks, inbound_data_size), flags)
-        {}
+        {
+            bool has_filter = false;
+            load(has_filter);
+            util::binary_filter* filter = 0;
+            if (has_filter) *this >> raw_ptr(filter);
+        }
 
         template <typename T>
         void invoke_impl(T & t)
@@ -79,14 +85,14 @@ namespace hpx { namespace serialization {
         {
             BOOST_STATIC_ASSERT_MSG(!boost::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
-            //if(disable_array_optimization())
-            //{
-                //serialize(*this, t, 0);
-            //}
-            //else
-            //{
+            if(disable_array_optimization())
+            {
+                serialize(*this, t, 0);
+            }
+            else
+            {
                 load_binary(&t, sizeof(t));
-            //}
+            }
         }
 
         template <class T>
@@ -185,10 +191,19 @@ namespace hpx { namespace serialization {
         {
             if (0 == count) return;
 
+            buffer_->load_binary(address, count);
+
+            size_ += count;
+        }
+
+        void load_binary_chunk(void * address, std::size_t count)
+        {
+            if (0 == count) return;
+
             if(disable_data_chunking())
-              buffer_->load_binary(address, count);
+                buffer_->load_binary(address, count);
             else
-              buffer_->load_binary_chunk(address, count);
+                buffer_->load_binary_chunk(address, count);
 
             size_ += count;
         }

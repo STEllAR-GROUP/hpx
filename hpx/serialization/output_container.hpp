@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
+//  Copyright (c)      2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -53,7 +54,7 @@ namespace hpx { namespace serialization {
         output_container(Container& cont,
             std::vector<serialization_chunk>* chunks,
             util::binary_filter* filter)
-          : cont_(cont), current_(0), start_compressing_at_(0), filter_(filter),
+          : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
             chunks_(chunks), current_chunk_(std::size_t(-1))
         {
             if (chunks_)
@@ -62,7 +63,7 @@ namespace hpx { namespace serialization {
                 chunks_->push_back(create_index_chunk(0, 0));
                 current_chunk_ = 0;
             }
-            if (filter_) set_filter(filter_);
+            if (filter) set_filter(filter);
         }
 
         ~output_container()
