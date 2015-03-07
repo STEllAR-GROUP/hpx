@@ -86,7 +86,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1396] - Parallel scan algorithms with different initial values
 * [issue 1395] - Race Condition - 1d_stencil_8 - SuperMIC
 * [issue 1394] - "suspending thread while at least one lock is being held" - 1d_stencil_8 - SuperMIC
-* [issue 1394] - SEGFAULT in 1d_stencil_8 on SuperMIC
+* [issue 1393] - SEGFAULT in 1d_stencil_8 on SuperMIC
+* [issue 1387] - Failure with more than 4 localities
 * [issue 1387] - Failure with more than 4 localities
 * [issue 1386] - Dispatching unhandled exceptions to outer user code
 * [issue 1385] - Adding Copy algorithms, fixing `parallel::copy_if`
