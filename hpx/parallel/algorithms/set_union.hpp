@@ -18,6 +18,7 @@
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/algorithms/detail/set_operation.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -38,20 +39,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename RanIter1, typename RanIter2,
-            typename OutIter, typename F, typename Combiner, typename SetOp,
-            typename Buffer>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
-        set_impl(ExPolicy const& policy, RanIter1 first1, RanIter1 last1,
-            RanIter2 first2, RanIter2 last2, OutIter dest, F && f,
-            boost::shared_array<Buffer> buffer,
-            Combiner && comp, SetOp && setop)
-        {
-                typedef detail::algorithm_result<ExPolicy, OutIter> result;
-
-                return result::get(std::move(dest));
-        }
-
         template <typename OutIter>
         struct set_union : public detail::algorithm<set_union<OutIter>, OutIter>
         {
@@ -80,24 +67,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<RanIter2>::difference_type
                     difference_type2;
 
-                difference_type1 len1 = std::distance(first1, last1);
-                difference_type2 len2 = std::distance(first2, last2);
-
-                auto combiner =
+                return set_operation(policy,
+                    first1, last1, first2, last2, dest, std::forward<F>(f),
                     [](difference_type1 idx1, difference_type2 idx2)
                     {
                         return idx1 + idx2;
-                    };
-
-                typedef typename std::iterator_traits<OutIter>::value_type
-                    value_type;
-                typedef value_type* buffer_type;
-
-                boost::shared_array<buffer_type> buffer(
-                    new buffer_type[combiner(len1, len2)]);
-
-                return set_impl(policy, first1, last1, first2, last2, dest,
-                    std::forward<F>(f), buffer, combiner,
+                    },
                     [buffer](RanIter1 part_first1, RanIter1 part_last1,
                         RanIter2 part_first2, RanIter2 part_last2,
                         OutIter dest, F && f) -> OutIter
