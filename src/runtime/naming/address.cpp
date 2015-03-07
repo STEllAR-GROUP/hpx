@@ -13,9 +13,16 @@ namespace hpx { namespace naming { namespace detail
 {
     struct name_serialization_data
     {
-        address::address_type address_;
+        gid_type locality_;
         address::component_type type_;
+        address::address_type address_;
         address::address_type offset_;
+
+        template <class Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            ar & locality_ & type_ & address_ & offset_;
+        }
     };
 }}}
 
@@ -34,18 +41,9 @@ namespace hpx { namespace naming
     template <typename Archive>
     void address::save(Archive& ar, const unsigned int version) const
     {
-        if (ar.flags() & serialization::disable_array_optimization) {
-            ar << locality_ << type_ << address_ << offset_;
-        }
-        else {
-            ar << locality_;
-
-            detail::name_serialization_data data;
-            data.type_ = type_;
-            data.address_ = address_;
-            data.offset_ = offset_;
-            ar.save(data);
-        }
+        detail::name_serialization_data data{
+            locality_, type_, address_, offset_};
+        ar << data;
     }
 
     template <typename Archive>
@@ -58,18 +56,12 @@ namespace hpx { namespace naming
                 "trying to load address with unknown version");
         }
 
-        if (ar.flags() & serialization::disable_array_optimization) {
-            ar >> locality_ >> type_ >> address_ >> offset_;
-        }
-        else {
-            ar >> locality_;
-
-            detail::name_serialization_data data;
-            ar.load(data);
-            type_ = data.type_;
-            address_ = data.address_;
-            offset_ = data.offset_;
-        }
+        detail::name_serialization_data data;
+        ar >> data;
+        locality_ = data.locality_;
+        type_ = data.type_;
+        address_ = data.address_;
+        offset_ = data.offset_;
     }
 
     template HPX_EXPORT

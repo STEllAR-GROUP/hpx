@@ -346,14 +346,6 @@ namespace hpx { namespace parcelset
             friend std::ostream& operator<< (std::ostream& os,
                 single_destination_parcel_data const& req);
 
-            // serialization support
-            void save_optimized(serialization::output_archive& ar) const;
-            void save_normal(serialization::output_archive& ar) const;
-
-            void load_optimized(serialization::input_archive& ar);
-            void load_normal(serialization::input_archive& ar);
-
-        private:
             // the parcel data is wrapped into a separate struct to simplify
             // serialization
             struct parcel_buffer
@@ -367,6 +359,14 @@ namespace hpx { namespace parcelset
                 boost::uint64_t dest_size_;
                 mutable boost::uint8_t has_source_id_;
                 boost::uint8_t has_continuation_;
+
+                template <class Archive>
+                void serialize(Archive& ar, unsigned int)
+                {
+                  ar & parcel_id_ & start_time_ &
+                    creation_time_ & dest_size_ &
+                    has_source_id_ & has_continuation_;
+                }
             };
 
             parcel_buffer data_;
@@ -521,14 +521,6 @@ namespace hpx { namespace parcelset
             friend std::ostream& operator<< (std::ostream& os,
                 multi_destination_parcel_data const& req);
 
-            // serialization support
-            void save_optimized(serialization::output_archive& ar) const;
-            void save_normal(serialization::output_archive& ar) const;
-
-            void load_optimized(serialization::input_archive& ar);
-            void load_normal(serialization::input_archive& ar);
-
-        private:
             // the parcel data is wrapped into a separate struct to simplify
             // serialization
             struct parcel_buffer

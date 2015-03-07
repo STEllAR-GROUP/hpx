@@ -400,7 +400,13 @@ namespace hpx { namespace naming
         struct gid_serialization_data
         {
             gid_type gid_;
-            boost::uint16_t type_;
+            detail::id_type_management type_;
+
+            template <class Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                ar & gid_ & type_;
+            }
         };
 
         // serialization
@@ -412,33 +418,18 @@ namespace hpx { namespace naming
             if (managed_move_credit == type)
                 type = managed;
 
-            if(ar.flags() & serialization::disable_array_optimization) {
-                naming::gid_type split_id(preprocess_gid(dest_locality_id));
-                ar << split_id << type;
-            }
-            else {
-                gid_serialization_data data;
-                data.gid_ = preprocess_gid(dest_locality_id);
-                data.type_ = type;
-
-                ar.save(data);
-            }
+            gid_serialization_data data{
+                preprocess_gid(dest_locality_id), type};
+            ar << data;
         }
 
         void id_type_impl::load(serialization::input_archive& ar)
         {
-            if(ar.flags() & serialization::disable_array_optimization) {
-                // serialize base class and management type
-                ar >> static_cast<gid_type&>(*this);
-                ar >> type_;
-            }
-            else {
-                gid_serialization_data data;
-                ar.load(data);
+            gid_serialization_data data;
+            ar >> data;
 
-                static_cast<gid_type&>(*this) = data.gid_;
-                type_ = static_cast<id_type_management>(data.type_);
-            }
+            static_cast<gid_type&>(*this) = data.gid_;
+            type_ = static_cast<id_type_management>(data.type_);
 
             if (detail::unmanaged != type_ && detail::managed != type_) {
                 HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
@@ -465,10 +456,7 @@ namespace hpx { namespace naming
         T& ar
       , const unsigned int version) const
     {
-        if(ar.flags() & serialization::disable_array_optimization)
-            ar << id_msb_ << id_lsb_;
-        else
-            ar.save(*this);
+        ar << id_msb_ << id_lsb_;
     }
 
     template <class T>
@@ -476,10 +464,7 @@ namespace hpx { namespace naming
         T& ar
       , const unsigned int /*version*/)
     {
-        if(ar.flags() & serialization::disable_array_optimization)
-            ar >> id_msb_ >> id_lsb_;
-        else
-            ar.load(*this);
+        ar >> id_msb_ >> id_lsb_;
 
         id_msb_ &= ~is_locked_mask;     // strip lock-bit upon receive
     }

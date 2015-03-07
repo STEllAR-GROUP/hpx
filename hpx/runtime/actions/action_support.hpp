@@ -35,30 +35,37 @@ namespace hpx { namespace actions { namespace detail
     struct action_serialization_data
     {
         action_serialization_data()
-          : parent_id_(0)
+          : parent_locality_(naming::invalid_locality_id)
+          , parent_id_(static_cast<boost::uint64_t>(-1))
           , parent_phase_(0)
-          , parent_locality_(0)
-          , priority_(0)
-          , stacksize_(0)
+          , priority_(static_cast<threads::thread_priority>(0))
+          , stacksize_(static_cast<threads::thread_stacksize>(0))
         {}
 
-        action_serialization_data(boost::uint64_t parent_id,
+        action_serialization_data(boost::uint32_t parent_locality,
+                boost::uint64_t parent_id,
                 boost::uint64_t parent_phase,
-                boost::uint32_t parent_locality,
-                boost::uint16_t priority,
-                boost::uint16_t stacksize)
-          : parent_id_(parent_id)
+                threads::thread_priority priority,
+                threads::thread_stacksize stacksize)
+          : parent_locality_(parent_locality)
+          , parent_id_(parent_id)
           , parent_phase_(parent_phase)
-          , parent_locality_(parent_locality)
           , priority_(priority)
           , stacksize_(stacksize)
         {}
 
+        boost::uint32_t parent_locality_;
         boost::uint64_t parent_id_;
         boost::uint64_t parent_phase_;
-        boost::uint32_t parent_locality_;
-        boost::uint16_t priority_;
-        boost::uint16_t stacksize_;
+        threads::thread_priority priority_;
+        threads::thread_stacksize stacksize_;
+
+        template <class Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            ar & parent_id_ & parent_phase_ & parent_locality_
+               & priority_ & stacksize_;
+        }
     };
 }}}
 
