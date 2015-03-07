@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/unique_function_template.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/decay.hpp>

@@ -10,7 +10,6 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/void_cast.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)

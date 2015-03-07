@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
-#include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>

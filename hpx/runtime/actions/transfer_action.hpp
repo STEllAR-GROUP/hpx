@@ -33,7 +33,6 @@
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
 
 #include <boost/cstdint.hpp>
 

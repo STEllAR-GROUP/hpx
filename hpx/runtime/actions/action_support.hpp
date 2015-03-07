@@ -20,7 +20,6 @@
 #include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/mpl/bool.hpp>

@@ -27,7 +27,6 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
 
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -652,7 +651,7 @@ namespace hpx { namespace actions
 /// action, thus it is recommended to place it into the header file defining the
 /// component.
 #define HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(TEMPLATE, TYPE)              \
-    HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(TEMPLATE, TYPE)                \
+    //HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(TEMPLATE, TYPE)                \ //TODO:bikineev
 /**/
 
 /// \def HPX_REGISTER_ACTION(action)

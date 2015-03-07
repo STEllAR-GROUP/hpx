@@ -5,8 +5,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
-#include <hpx/util/void_cast.hpp>
 
 #include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/binary_filter_factory.hpp>

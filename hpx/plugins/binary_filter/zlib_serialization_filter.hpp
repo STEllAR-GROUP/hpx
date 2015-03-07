@@ -12,7 +12,6 @@
 
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/binary_filter.hpp>
 #include <hpx/serialization/serialize.hpp>
 

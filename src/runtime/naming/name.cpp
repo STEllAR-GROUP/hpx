@@ -8,7 +8,6 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/base_object.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>

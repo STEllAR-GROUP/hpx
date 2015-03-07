@@ -19,7 +19,6 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/plain_function.hpp>
 #include <hpx/util/unused.hpp>
-#include <hpx/util/void_cast.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
 

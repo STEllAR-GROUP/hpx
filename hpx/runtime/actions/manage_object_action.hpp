@@ -14,8 +14,6 @@
 #include <hpx/exception.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/util/void_cast.hpp>
-#include <hpx/util/base_object.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/serialize_buffer.hpp>
 

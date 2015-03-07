@@ -50,11 +50,13 @@ namespace hpx { namespace serialization {
     }                                                                               \
 /**/
 #define HPX_SERIALIZATION_SPLIT_FREE(T)                                             \
-    static void serialize(hpx::serialization::input_archive & ar, T & t, unsigned)  \
+    BOOST_FORCEINLINE                                                               \
+    void serialize(hpx::serialization::input_archive & ar, T & t, unsigned)         \
     {                                                                               \
         load(ar, t, 0);                                                             \
     }                                                                               \
-    static void serialize(hpx::serialization::output_archive & ar, T & t, unsigned) \
+    BOOST_FORCEINLINE                                                               \
+    void serialize(hpx::serialization::output_archive & ar, T & t, unsigned)        \
     {                                                                               \
         save(ar, const_cast<typename boost::add_const<T>::type &>(t), 0);           \
     }                                                                               \
