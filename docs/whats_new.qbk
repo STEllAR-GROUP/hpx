@@ -15,10 +15,10 @@
 The major focus of this release was to improve the reliability of large scale
 runs. We believe to have achieved this goal as we now can reliably run __hpx__
 applications on up to ~24k cores. This is a huge step forward in terms of
-the usability of __hpx__. The main focus of this work involed isolating 
-the causes of the segmentation faults at start up and shut down.  Many of 
-these issues were discovered to be the result of the suspention of threads 
-which hold locks. 
+the usability of __hpx__. The main focus of this work involed isolating
+the causes of the segmentation faults at start up and shut down.  Many of
+these issues were discovered to be the result of the suspention of threads
+which hold locks.
 
 A very important improvement introduced with this release is the
 refactoring of the code representing our parcel-port implementation. Parcel-
@@ -51,7 +51,7 @@ a documentation of our progress).
 [heading Breaking Changes]
 
 With this release we put a lot of effort into changing the code base to be more
-compatible to C++11. These changes have caused the following issues for 
+compatible to C++11. These changes have caused the following issues for
 backward compatiblility:
 
 * Move to Variadics- All of the API now uses variadic templates. However, this
@@ -61,20 +61,20 @@ functions ([funcref hpx::async_continue `hpx::async_continue`],
 [funcref hpx::when_each `hpx::when_each`],
 [funcref hpx::wait_each `hpx::wait_each`]).
 
-* Changes to Macros- We also removed the macro `HPX_STD_FUNCTION`. 
+* Changes to Macros- We also removed the macro `HPX_STD_FUNCTION`.
 This shouldn't affect any user
 code as we replaced it with `hpx::util::function_nonser` which was the default
 expansion used for this macro. In future releases of __hpx__ we will allow for
 `std::function` to be used transparently as well.
 
-* Changes to `Unique_future`- `Unique_future`, which was depricated 
-in the previous release for 
+* Changes to `Unique_future`- `Unique_future`, which was depricated
+in the previous release for
 [funcref hpx::future `hpx::future`] will now be completely removed from __hpx__.
 This completes the transition to a completely standards conforming future
 implementation.
 
-* Changes to Supported Compilers- Finally, in order to utilize more 
-C++11 semantics, we have officially 
+* Changes to Supported Compilers- Finally, in order to utilize more
+C++11 semantics, we have officially
 dropped support for GCC 4.4 and MSVC 2012. Please see our __prerequisites__
 page for more details.
 
@@ -82,6 +82,11 @@ page for more details.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1398] - Tests using the scan partitioner are broken on at least gcc 4.7 and intel compiler
+* [issue 1396] - Parallel scan algorithms with different initial values
+* [issue 1395] - Race Condition - 1d_stencil_8 - SuperMIC
+* [issue 1394] - "suspending thread while at least one lock is being held" - 1d_stencil_8 - SuperMIC
+* [issue 1394] - SEGFAULT in 1d_stencil_8 on SuperMIC
 * [issue 1387] - Failure with more than 4 localities
 * [issue 1386] - Dispatching unhandled exceptions to outer user code
 * [issue 1385] - Adding Copy algorithms, fixing `parallel::copy_if`
