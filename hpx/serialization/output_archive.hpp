@@ -12,6 +12,7 @@
 #include <hpx/serialization/archive.hpp>
 #include <hpx/serialization/output_container.hpp>
 #include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/serialization/raw_ptr.hpp>
 
 #include <boost/mpl/or.hpp>
 #include <boost/type_traits/is_integral.hpp>
@@ -45,6 +46,9 @@ namespace hpx { namespace serialization {
           : base_type(make_container(buffer, chunks, filter), flags),
             dest_locality_id_(dest_locality_id)
         {
+            bool has_filter = filter != 0;
+            save(has_filter);
+            if (has_filter) *this << raw_ptr(filter);
         }
 
         template <typename T>
@@ -80,14 +84,14 @@ namespace hpx { namespace serialization {
         {
             BOOST_STATIC_ASSERT_MSG(!boost::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
-            //if(disable_array_optimization()) //TODO
-            //{
-                //serialize(*this, const_cast<T &>(t), 0);
-            //}
-            //else
-            //{
+            if(disable_array_optimization())
+            {
+                serialize(*this, const_cast<T &>(t), 0);
+            }
+            else
+            {
                 save_binary(&t, sizeof(t));
-            //}
+            }
         }
 
         template <typename T>
@@ -180,6 +184,12 @@ namespace hpx { namespace serialization {
         }
 
         void save_binary(void const * address, std::size_t count)
+        {
+            size_ += count;
+            buffer_->save_binary(address, count);
+        }
+
+        void save_binary_chunk(void const * address, std::size_t count)
         {
             size_ += count;
             if(disable_data_chunking())

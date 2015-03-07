@@ -236,8 +236,7 @@ namespace hpx { namespace util
             typedef typename hpx::traits::is_bitwise_serializable<
               typename boost::remove_const<T>::type>::type use_optimized;
 
-            //save_optimized(ar, version, use_optimized());
-            save_optimized(ar, version, boost::mpl::false_());
+            save_optimized(ar, version, use_optimized());
         }
 
         template <typename Archive>
@@ -272,9 +271,7 @@ namespace hpx { namespace util
             typedef typename hpx::traits::is_bitwise_serializable<
               typename boost::remove_const<T>::type>::type use_optimized;
 
-
-            //load_optimized(ar, version, use_optimized());
-            load_optimized(ar, version, boost::mpl::false_());
+            load_optimized(ar, version, use_optimized());
         }
 
         template <typename Archive>
@@ -291,7 +288,7 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                ar << hpx::serialization::make_array(data_.get(), size_);
+                ar >> hpx::serialization::make_array(data_.get(), size_);
             }
         }
 
@@ -453,16 +450,10 @@ namespace hpx { namespace util
         {
             ar << size_; //-V128
 
-            //typedef typename
-                //boost::serialization::use_array_optimization<Archive>::template apply< // TODO:
-                    //typename boost::remove_const<T>::type
-                //>::type use_optimized;
-
             typedef typename hpx::traits::is_bitwise_serializable<
               typename boost::remove_const<T>::type>::type use_optimized;
 
-            //save_optimized(ar, version, use_optimized());
-            save_optimized(ar, version, boost::mpl::false_());
+            save_optimized(ar, version, use_optimized());
         }
 
         template <typename Archive>
@@ -493,8 +484,7 @@ namespace hpx { namespace util
             typedef typename hpx::traits::is_bitwise_serializable<
               typename boost::remove_const<T>::type>::type use_optimized;
 
-            //load_optimized(ar, version, use_optimized());
-            load_optimized(ar, version, boost::mpl::false_());
+            load_optimized(ar, version, use_optimized());
         }
 
         template <typename Archive>
@@ -511,7 +501,7 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                ar << hpx::serialization::make_array(data_.get(), size_);
+                ar >> hpx::serialization::make_array(data_.get(), size_);
             }
         }
 

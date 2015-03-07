@@ -38,26 +38,26 @@ namespace hpx { namespace serialization {
     input_archive & operator&(input_archive & ar, T & t);
 
 }}
-#define HPX_SERIALIZATION_SPLIT_MEMBER()                                        \
-    void serialize(hpx::serialization::input_archive & ar, unsigned)            \
-    {                                                                           \
-        load(ar, 0);                                                            \
-    }                                                                           \
-    void serialize(hpx::serialization::output_archive & ar, unsigned) const     \
-    {                                                                           \
-        save(ar, 0);                                                            \
-    }                                                                           \
+
+#define HPX_SERIALIZATION_SPLIT_MEMBER()                                            \
+    void serialize(hpx::serialization::input_archive & ar, unsigned)                \
+    {                                                                               \
+        load(ar, 0);                                                                \
+    }                                                                               \
+    void serialize(hpx::serialization::output_archive & ar, unsigned) const         \
+    {                                                                               \
+        save(ar, 0);                                                                \
+    }                                                                               \
 /**/
-#define HPX_SERIALIZATION_SPLIT_FREE(T)                                         \
-    void serialize(hpx::serialization::input_archive & ar, T & t, unsigned)     \
-    {                                                                           \
-        load(ar, t, 0);                                                         \
-    }                                                                           \
-    void serialize(hpx::serialization::output_archive & ar, T & t, unsigned)    \
-    {                                                                           \
-        save(ar, const_cast<typename boost::add_const<T>::type &>(t)            \
-            , 0);                                                               \
-    }                                                                           \
+#define HPX_SERIALIZATION_SPLIT_FREE(T)                                             \
+    static void serialize(hpx::serialization::input_archive & ar, T & t, unsigned)  \
+    {                                                                               \
+        load(ar, t, 0);                                                             \
+    }                                                                               \
+    static void serialize(hpx::serialization::output_archive & ar, T & t, unsigned) \
+    {                                                                               \
+        save(ar, const_cast<typename boost::add_const<T>::type &>(t), 0);           \
+    }                                                                               \
 /**/
 
-#endif // HPX_SERIALIZATION_FWD_HPP
+#endif // HPX_SERIALIZATION_FWD_HPP                                                  
