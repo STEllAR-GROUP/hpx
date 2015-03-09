@@ -178,7 +178,7 @@ namespace hpx { namespace lcos
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #include <vector>
 

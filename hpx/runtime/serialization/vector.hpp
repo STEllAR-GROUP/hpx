@@ -7,7 +7,7 @@
 #define HPX_SERIALIZATION_VECTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/foreach.hpp>

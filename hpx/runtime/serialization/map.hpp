@@ -14,8 +14,8 @@
 #include <boost/type_traits/add_reference.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
+#include <hpx/runtime/serialization/input_archive.hpp>
+#include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 namespace hpx { namespace traits {

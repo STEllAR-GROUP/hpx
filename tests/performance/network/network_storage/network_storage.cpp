@@ -18,7 +18,7 @@
 #include <memory>
 #include <cstdio>
 
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 //
 // This is a test program which reads and writes chunks of memory to storage

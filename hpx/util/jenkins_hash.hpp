@@ -10,7 +10,7 @@
 #include <boost/cstdint.hpp>
 
 #if defined(JENKINS_HASH_HAS_SERIALIZATION_SUPPORT)
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

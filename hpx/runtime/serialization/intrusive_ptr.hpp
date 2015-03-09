@@ -7,7 +7,7 @@
 #ifndef HPX_SERIALIZATION_INTRUSIVE_PTR_HPP
 #define HPX_SERIALIZATION_INTRUSIVE_PTR_HPP
 
-#include <hpx/serialization/detail/pointer.hpp>
+#include <hpx/runtime/serialization/detail/pointer.hpp>
 
 namespace hpx { namespace serialization {
 

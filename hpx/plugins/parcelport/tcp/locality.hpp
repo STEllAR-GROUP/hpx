@@ -12,7 +12,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <boost/asio/ip/tcp.hpp>

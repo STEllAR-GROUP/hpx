@@ -11,7 +11,7 @@
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 
 #include <boost/variant.hpp>

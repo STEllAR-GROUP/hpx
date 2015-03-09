@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/shared_ptr.hpp>
 

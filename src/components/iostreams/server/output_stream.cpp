@@ -12,14 +12,13 @@
 
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
 
 #include <hpx/util/io_service_pool.hpp>
 
 #include <iostream>
-
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
 
 namespace hpx { namespace iostreams { namespace detail
 {

@@ -9,8 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/array.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/array.hpp>
 
 #include "certificate_signing_request.hpp"
 #include "public_key.hpp"

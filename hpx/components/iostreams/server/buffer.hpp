@@ -13,7 +13,7 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 namespace hpx { namespace iostreams { namespace detail
 {

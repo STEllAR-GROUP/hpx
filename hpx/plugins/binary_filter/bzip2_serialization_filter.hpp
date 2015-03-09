@@ -13,7 +13,6 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/util/binary_filter.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 #include <boost/iostreams/filter/bzip2.hpp>
 

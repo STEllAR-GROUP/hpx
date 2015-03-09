@@ -10,6 +10,7 @@
 #define INT128_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <exception>
 #include <cstdlib>
@@ -17,7 +18,6 @@
 #include <new>
 
 #include <boost/cstdint.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 namespace hpx { namespace util { namespace numerics
 {

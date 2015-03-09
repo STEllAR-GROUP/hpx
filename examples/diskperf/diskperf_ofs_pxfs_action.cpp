@@ -15,8 +15,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/array.hpp>
+#include <hpx/include/serialization.hpp>
 
 #include <fstream>
 #include <cstdlib>

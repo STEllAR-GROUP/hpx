@@ -10,9 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/input_archive.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/serialize_buffer.hpp>
 

@@ -9,7 +9,8 @@
 
 #include <memory>
 
-#include <hpx/serialization/polymorphic_intrusive_factory.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/polymorphic_intrusive_factory.hpp>
 
 namespace hpx { namespace util
 {

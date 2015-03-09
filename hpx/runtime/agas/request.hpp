@@ -18,8 +18,8 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/serialize_as_future.hpp>
 
 // The number of types that the request's variant can represent.

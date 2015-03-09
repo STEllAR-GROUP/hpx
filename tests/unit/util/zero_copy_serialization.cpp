@@ -5,8 +5,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/array.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/array.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/serialize_buffer.hpp>
 #include <hpx/util/lightweight_test.hpp>

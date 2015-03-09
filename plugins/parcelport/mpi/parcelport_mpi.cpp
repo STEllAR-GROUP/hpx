@@ -29,7 +29,6 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/archive/basic_archive.hpp>
-#include <hpx/serialization/archive.hpp>
 
 namespace hpx
 {

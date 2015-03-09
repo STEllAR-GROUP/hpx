@@ -16,10 +16,10 @@
 #include <boost/fusion/iterator/equal_to.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
 
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/serialization/map.hpp>
-#include <hpx/serialization/array.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/runtime/serialization/map.hpp>
+#include <hpx/runtime/serialization/array.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 namespace hpx { namespace util

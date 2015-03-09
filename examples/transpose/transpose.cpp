@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/lcos/local/detail/invoke_when_ready.hpp>
 
 #include <hpx/include/parallel_algorithm.hpp>

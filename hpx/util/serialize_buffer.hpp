@@ -9,8 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/array.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/array.hpp>
 #include <hpx/util/serialize_allocator.hpp>
 
 #include <boost/shared_array.hpp>

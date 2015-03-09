@@ -7,7 +7,7 @@
 #define HPX_UTIL_SERIALIZE_ALLOCATOR_FEB_19_2014_0711PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace serialization

@@ -11,10 +11,10 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/access.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/access.hpp>
+#include <hpx/runtime/serialization/input_archive.hpp>
+#include <hpx/runtime/serialization/output_archive.hpp>
 
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/decay.hpp>

@@ -7,11 +7,11 @@
 #ifndef HPX_SERIALIZATION_POLYMORPHIC_NONINTRUSIVE_FACTORY_IPP
 #define HPX_SERIALIZATION_POLYMORPHIC_NONINTRUSIVE_FACTORY_IPP
 
-#include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/runtime/serialization/polymorphic_nonintrusive_factory.hpp>
 
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/string.hpp>
+#include <hpx/runtime/serialization/input_archive.hpp>
+#include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/runtime/serialization/string.hpp>
 
 namespace hpx { namespace serialization {
 

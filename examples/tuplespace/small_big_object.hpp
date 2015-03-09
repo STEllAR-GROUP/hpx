@@ -8,7 +8,7 @@
 #ifndef HPX_SMALL_BIG_OBJECT_HPP
 #define HPX_SMALL_BIG_OBJECT_HPP
 
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #define ENABLE_DEBUG false
 

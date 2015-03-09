@@ -10,8 +10,8 @@
 
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>

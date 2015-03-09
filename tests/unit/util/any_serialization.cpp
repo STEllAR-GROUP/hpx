@@ -22,7 +22,7 @@ namespace std
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/any.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include "small_big_object.hpp"
 

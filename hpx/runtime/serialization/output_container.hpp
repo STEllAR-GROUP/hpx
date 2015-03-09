@@ -11,8 +11,8 @@
 #include <hpx/util/assert.hpp>
 
 #include <hpx/util/binary_filter.hpp>
-#include <hpx/serialization/container.hpp>
-#include <hpx/serialization/serialization_chunk.hpp>
+#include <hpx/runtime/serialization/container.hpp>
+#include <hpx/runtime/serialization/serialization_chunk.hpp>
 
 #include <cstddef> // for size_t
 #include <cstring> // for memcpy
