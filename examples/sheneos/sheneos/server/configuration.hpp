@@ -58,14 +58,14 @@ namespace sheneos { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // Non-intrusive serialization.
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive& ar,
+    serialize(input_archive& ar,
         sheneos::config_data& cfg, unsigned int const);
 
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive& ar,
+    serialize(output_archive& ar,
         sheneos::config_data& cfg, unsigned int const);
 }}
 

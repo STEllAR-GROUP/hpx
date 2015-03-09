@@ -16,8 +16,6 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/mpl/eval_if.hpp>
@@ -273,12 +271,12 @@ namespace hpx { namespace traits
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     // serialization of the bound action object
     template <typename Action, typename BoundArgs>
     void serialize(
-        ::hpx::util::portable_binary_iarchive& ar
+        ::hpx::serialization::input_archive& ar
       , ::hpx::util::detail::bound_action<Action, BoundArgs>& bound
       , unsigned int const /*version*/)
     {
@@ -287,7 +285,7 @@ namespace boost { namespace serialization
 
     template <typename Action, typename BoundArgs>
     void serialize(
-        ::hpx::util::portable_binary_oarchive& ar
+        ::hpx::serialization::output_archive& ar
       , ::hpx::util::detail::bound_action<Action, BoundArgs>& bound
       , unsigned int const /*version*/)
     {

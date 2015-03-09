@@ -1,35 +1,26 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c)      2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_ICHUNK_MANAGER_JUL_31_2013_0723PM)
-#define HPX_UTIL_ICHUNK_MANAGER_JUL_31_2013_0723PM
+#ifndef HPX_SERIALIZATION_INPUT_CONTAINER_HPP
+#define HPX_SERIALIZATION_INPUT_CONTAINER_HPP
+
+#include <hpx/util/assert.hpp>
 
 #include <hpx/util/binary_filter.hpp>
+#include <hpx/serialization/container.hpp>
+#include <hpx/serialization/serialization_chunk.hpp>
 
 #include <cstddef> // for size_t
 #include <cstring> // for memcpy
 #include <vector>
 
-#if defined(BOOST_MSVC)
-#  include <intrin.h>
-#  pragma intrinsic(memcpy)
-#endif
-
-namespace hpx { namespace util { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////////
-    struct erase_icontainer_type
-    {
-        virtual ~erase_icontainer_type() {}
-        virtual void set_filter(binary_filter* filter) = 0;
-        virtual void load_binary(void* address, std::size_t count) = 0;
-        virtual void load_binary_chunk(void* address, std::size_t count) = 0;
-    };
-
+namespace hpx { namespace serialization {
     template <typename Container>
-    struct icontainer_type : erase_icontainer_type
+    struct input_container
+      : container
     {
     private:
         std::size_t get_chunk_size(std::size_t chunk) const
@@ -53,13 +44,13 @@ namespace hpx { namespace util { namespace detail
         }
 
     public:
-        icontainer_type(Container const& cont, std::size_t inbound_data_size)
+        input_container(Container const& cont, std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
             chunks_(0), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
         {}
 
-        icontainer_type(Container const& cont,
+        input_container(Container const& cont,
                 std::vector<serialization_chunk> const* chunks,
                 std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
@@ -73,9 +64,9 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        ~icontainer_type() {}
+        ~input_container() {}
 
-        void set_filter(binary_filter* filter)
+        void set_filter(util::binary_filter* filter) // override
         {
             filter_.reset(filter);
             if (filter) {
@@ -84,10 +75,12 @@ namespace hpx { namespace util { namespace detail
 
                 if (decompressed_size_ < current_)
                 {
+                  /*
                     BOOST_THROW_EXCEPTION(
                         boost::archive::archive_exception(
                             boost::archive::archive_exception::input_stream_error,
                             "archive data bstream is too short"));
+                      */
                     return;
                 }
             }
@@ -95,18 +88,18 @@ namespace hpx { namespace util { namespace detail
 
         void load_binary(void* address, std::size_t count)
         {
-            HPX_ASSERT((boost::int64_t)count >= 0);
-
-            if (filter_.get()) {
+            if (filter_) {
                 filter_->load(address, count);
             }
             else {
                 if (current_+count > cont_.size())
                 {
+                  /*
                     BOOST_THROW_EXCEPTION(
                         boost::archive::archive_exception(
                             boost::archive::archive_exception::input_stream_error,
                             "archive data bstream is too short"));
+                            */
                     return;
                 }
 
@@ -118,7 +111,6 @@ namespace hpx { namespace util { namespace detail
 
                 if (chunks_) {
                     current_chunk_size_ += count;
-
                     // make sure we switch to the next serialization_chunk if necessary
                     std::size_t current_chunk_size = get_chunk_size(current_chunk_);
                     if (current_chunk_size != 0 && current_chunk_size_ >= current_chunk_size)
@@ -126,10 +118,12 @@ namespace hpx { namespace util { namespace detail
                         // raise an error if we read past the serialization_chunk
                         if (current_chunk_size_ > current_chunk_size)
                         {
+                            /*
                             BOOST_THROW_EXCEPTION(
                                 boost::archive::archive_exception(
                                     boost::archive::archive_exception::input_stream_error,
                                     "archive data bstream structure mismatch"));
+                            */
                             return;
                         }
                         ++current_chunk_;
@@ -139,13 +133,13 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void load_binary_chunk(void* address, std::size_t count)
+        void load_binary_chunk(void* address, std::size_t count) // override
         {
             HPX_ASSERT((boost::int64_t)count >= 0);
 
             if (filter_.get() || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
                 // fall back to serialization_chunk-less archive
-                this->icontainer_type::load_binary(address, count);
+                this->input_container::load_binary(address, count);
             }
             else {
                 HPX_ASSERT(current_chunk_ != std::size_t(-1));
@@ -153,10 +147,12 @@ namespace hpx { namespace util { namespace detail
 
                 if (get_chunk_size(current_chunk_) != count)
                 {
+                  /*
                     BOOST_THROW_EXCEPTION(
                         boost::archive::archive_exception(
                             boost::archive::archive_exception::input_stream_error,
                             "archive data bstream data chunk size mismatch"));
+                    */
                     return;
                 }
 
@@ -169,14 +165,13 @@ namespace hpx { namespace util { namespace detail
 
         Container const& cont_;
         std::size_t current_;
-        HPX_STD_UNIQUE_PTR<binary_filter> filter_;
+        HPX_STD_UNIQUE_PTR<util::binary_filter> filter_;
         std::size_t decompressed_size_;
 
         std::vector<serialization_chunk> const* chunks_;
         std::size_t current_chunk_;
         std::size_t current_chunk_size_;
     };
-}}}
+}}
 
 #endif
-

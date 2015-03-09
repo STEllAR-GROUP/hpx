@@ -36,9 +36,10 @@
 #include <hpx/lcos/reduce.hpp>
 #endif
 
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
+
 #include <hpx/util/assert.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
@@ -52,11 +53,6 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
 
 #include <algorithm>
 #include <set>

@@ -9,13 +9,12 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/bind.hpp>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/array.hpp>
-#include <boost/serialization/split_member.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/array.hpp>
+#include <hpx/util/serialize_allocator.hpp>
+
 #include <boost/shared_array.hpp>
 #include <boost/mpl/bool.hpp>
-
-#include <hpx/util/serialize_allocator.hpp>
 
 #include <algorithm>
 
@@ -226,7 +225,7 @@ namespace hpx { namespace util
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Archive>
@@ -234,10 +233,8 @@ namespace hpx { namespace util
         {
             ar << size_ << alloc_; //-V128
 
-            typedef typename
-                boost::serialization::use_array_optimization<Archive>::template apply<
-                    typename boost::remove_const<T>::type
-                >::type use_optimized;
+            typedef typename hpx::traits::is_bitwise_serializable<
+              typename boost::remove_const<T>::type>::type use_optimized;
 
             save_optimized(ar, version, use_optimized());
         }
@@ -256,8 +253,7 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                boost::serialization::array<T> arr(data_.get(), size_);
-                ar.save_array(arr, version);
+                ar << hpx::serialization::make_array(data_.get(), size_);
             }
         }
 
@@ -272,10 +268,8 @@ namespace hpx { namespace util
                 util::bind(&serialize_buffer::deleter<allocator_type>, _1,
                     alloc_, size_));
 
-            typedef typename
-                boost::serialization::use_array_optimization<Archive>::template apply<
-                    typename boost::remove_const<T>::type
-                >::type use_optimized;
+            typedef typename hpx::traits::is_bitwise_serializable<
+              typename boost::remove_const<T>::type>::type use_optimized;
 
             load_optimized(ar, version, use_optimized());
         }
@@ -294,12 +288,11 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                boost::serialization::array<T> arr(data_.get(), size_);
-                ar.load_array(arr, version);
+                ar >> hpx::serialization::make_array(data_.get(), size_);
             }
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
         // this is needed for util::any
         friend bool
@@ -449,7 +442,7 @@ namespace hpx { namespace util
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Archive>
@@ -457,10 +450,8 @@ namespace hpx { namespace util
         {
             ar << size_; //-V128
 
-            typedef typename
-                boost::serialization::use_array_optimization<Archive>::template apply<
-                    typename boost::remove_const<T>::type
-                >::type use_optimized;
+            typedef typename hpx::traits::is_bitwise_serializable<
+              typename boost::remove_const<T>::type>::type use_optimized;
 
             save_optimized(ar, version, use_optimized());
         }
@@ -479,8 +470,7 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                boost::serialization::array<T> arr(data_.get(), size_);
-                ar.save_array(arr, version);
+                ar << hpx::serialization::make_array(data_.get(), size_);
             }
         }
 
@@ -491,10 +481,8 @@ namespace hpx { namespace util
             ar >> size_; //-V128
             data_.reset(new T[size_]);
 
-            typedef typename
-                boost::serialization::use_array_optimization<Archive>::template apply<
-                    typename boost::remove_const<T>::type
-                >::type use_optimized;
+            typedef typename hpx::traits::is_bitwise_serializable<
+              typename boost::remove_const<T>::type>::type use_optimized;
 
             load_optimized(ar, version, use_optimized());
         }
@@ -513,12 +501,11 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                boost::serialization::array<T> arr(data_.get(), size_);
-                ar.load_array(arr, version);
+                ar >> hpx::serialization::make_array(data_.get(), size_);
             }
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
         // this is needed for util::any
         friend bool

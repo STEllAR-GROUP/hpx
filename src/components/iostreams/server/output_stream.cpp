@@ -18,11 +18,12 @@
 
 #include <iostream>
 
-#include <boost/serialization/serialization.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/shared_ptr.hpp>
 
 namespace hpx { namespace iostreams { namespace detail
 {
-    void buffer::save(hpx::util::portable_binary_oarchive & ar, unsigned) const
+    void buffer::save(serialization::output_archive & ar, unsigned) const
     {
         bool valid = (data_.get() && !data_->empty());
         ar & valid;
@@ -32,7 +33,7 @@ namespace hpx { namespace iostreams { namespace detail
         }
     }
 
-    void buffer::load(hpx::util::portable_binary_iarchive& ar, unsigned)
+    void buffer::load(serialization::input_archive& ar, unsigned)
     {
         bool valid = false;
         ar & valid;

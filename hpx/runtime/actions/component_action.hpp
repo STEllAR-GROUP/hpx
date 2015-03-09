@@ -16,7 +16,6 @@
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/util/unused.hpp>
-#include <hpx/util/void_cast.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 

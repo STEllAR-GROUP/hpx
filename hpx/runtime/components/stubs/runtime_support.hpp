@@ -19,7 +19,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/async.hpp>
 
-#include <boost/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {

@@ -17,6 +17,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/util/bind.hpp>
@@ -26,10 +27,8 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
 
 #include <boost/mpl/if.hpp>
-#include <boost/serialization/access.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -314,7 +313,7 @@ namespace hpx { namespace actions
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
@@ -652,7 +651,7 @@ namespace hpx { namespace actions
 /// action, thus it is recommended to place it into the header file defining the
 /// component.
 #define HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(TEMPLATE, TYPE)              \
-    HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(TEMPLATE, TYPE)                \
+    //HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(TEMPLATE, TYPE)                \ //TODO:bikineev
 /**/
 
 /// \def HPX_REGISTER_ACTION(action)

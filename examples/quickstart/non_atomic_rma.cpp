@@ -15,13 +15,12 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 
 //Boost includes
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
 
 #include <boost/thread/locks.hpp>
 #include <boost/foreach.hpp>
@@ -49,7 +48,7 @@ struct data
 
 private:
     // serialization support
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
@@ -143,8 +142,9 @@ int hpx_main(po::variables_map &vm)
 hpx::actions::manage_object_action<data> const manage_data =
         hpx::actions::manage_object_action<data>();
 
-HPX_REGISTER_MANAGE_OBJECT_ACTION(
-    hpx::actions::manage_object_action<data>, manage_object_action_data)
+//TODO:bikineev
+//HPX_REGISTER_MANAGE_OBJECT_ACTION(
+    //hpx::actions::manage_object_action<data>, manage_object_action_data)
 
 naming::id_type set_initialdata (int i)
 {

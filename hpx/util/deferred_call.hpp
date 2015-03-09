@@ -9,10 +9,9 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>
@@ -96,12 +95,12 @@ namespace hpx { namespace util
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     // serialization of the deferred_call_impl object
     template <typename F, typename Args>
     void serialize(
-        ::hpx::util::portable_binary_iarchive& ar
+        ::hpx::serialization::input_archive& ar
       , ::hpx::util::detail::deferred_call_impl<F, Args>& deferred_call_impl
       , unsigned int const /*version*/)
     {
@@ -111,7 +110,7 @@ namespace boost { namespace serialization
 
     template <typename F, typename Args>
     void serialize(
-        ::hpx::util::portable_binary_oarchive& ar
+        ::hpx::serialization::output_archive& ar
       , ::hpx::util::detail::deferred_call_impl<F, Args>& deferred_call_impl
       , unsigned int const /*version*/)
     {

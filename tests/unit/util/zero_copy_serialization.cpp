@@ -5,6 +5,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/array.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/serialize_buffer.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -26,7 +28,7 @@ struct data_buffer
     {
         boost::uint64_t size = data_.size();
         ar & size;
-        ar & boost::serialization::make_array(data_.data(), size);
+        ar & hpx::serialization::make_array(data_.data(), size);
         ar & flag_;
     }
 
@@ -36,11 +38,11 @@ struct data_buffer
         boost::uint64_t size = 0;
         ar & size;
         data_.resize(size);
-        ar & boost::serialization::make_array(data_.data(), size);
+        ar & hpx::serialization::make_array(data_.data(), size);
         ar & flag_;
     }
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    HPX_SERIALIZATION_SPLIT_MEMBER()
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,16 +81,15 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     // serialize data
     std::size_t arg_size = hpx::traits::get_type_size(outp);
     std::vector<char> out_buffer;
-    std::vector<hpx::util::serialization_chunk> out_chunks;
+    std::vector<hpx::serialization::serialization_chunk> out_chunks;
     boost::uint32_t dest_locality_id = outp.get_destination_locality_id();
 
     out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
     {
         // create an output archive and serialize the parcel
-        hpx::util::portable_binary_oarchive archive(
-            out_buffer, zero_copy ? &out_chunks : 0, dest_locality_id, 0,
-            out_archive_flags);
+        hpx::serialization::output_archive archive(
+            out_buffer, out_archive_flags, dest_locality_id, zero_copy ? &out_chunks : 0);
         archive << outp;
 
         arg_size = archive.bytes_written();
@@ -101,8 +102,8 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
 
     {
         // create an input archive and deserialize the parcel
-        hpx::util::portable_binary_iarchive archive(
-            out_buffer, &out_chunks, arg_size, in_archive_flags);
+        hpx::serialization::input_archive archive(
+            out_buffer, in_archive_flags, &out_chunks, arg_size);
 
         archive >> inp;
     }
@@ -149,12 +150,12 @@ void test_normal_serialization(T& arg)
         reinterpret_cast<boost::uint64_t>(&test_function1));
 
     // compose archive flags
-    int in_archive_flags = boost::archive::no_header;
-    int out_archive_flags = boost::archive::no_header;
+    unsigned in_archive_flags = 0U;
+    unsigned out_archive_flags = 0U;
 #ifdef BOOST_BIG_ENDIAN
-    out_archive_flags |= hpx::util::endian_big;
+    out_archive_flags |= hpx::serialization::endian_big;
 #else
-    out_archive_flags |= hpx::util::endian_little;
+    out_archive_flags |= hpx::serialization::endian_little;
 #endif
 
     // create a parcel with/without continuation
@@ -178,12 +179,12 @@ void test_normal_serialization(T1& arg1, T2& arg2)
         reinterpret_cast<boost::uint64_t>(&test_function2));
 
     // compose archive flags
-    int in_archive_flags = boost::archive::no_header;
-    int out_archive_flags = boost::archive::no_header;
+    unsigned in_archive_flags = 0U;
+    unsigned out_archive_flags = 0U;
 #ifdef BOOST_BIG_ENDIAN
-    out_archive_flags |= hpx::util::endian_big;
+    out_archive_flags |= hpx::serialization::endian_big;
 #else
-    out_archive_flags |= hpx::util::endian_little;
+    out_archive_flags |= hpx::serialization::endian_little;
 #endif
 
     // create a parcel with/without continuation
@@ -208,12 +209,12 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
         reinterpret_cast<boost::uint64_t>(&test_function2));
 
     // compose archive flags
-    int in_archive_flags = boost::archive::no_header;
-    int out_archive_flags = boost::archive::no_header;
+    unsigned in_archive_flags = 0U;
+    unsigned out_archive_flags = 0U;
 #ifdef BOOST_BIG_ENDIAN
-    out_archive_flags |= hpx::util::endian_big;
+    out_archive_flags |= hpx::serialization::endian_big;
 #else
-    out_archive_flags |= hpx::util::endian_little;
+    out_archive_flags |= hpx::serialization::endian_little;
 #endif
 
     // create a parcel with/without continuation
@@ -238,12 +239,12 @@ void test_zero_copy_serialization(T& arg)
         reinterpret_cast<boost::uint64_t>(&test_function1));
 
     // compose archive flags
-    int in_archive_flags = boost::archive::no_header;
-    int out_archive_flags = boost::archive::no_header;
+    unsigned in_archive_flags = 0U;
+    unsigned out_archive_flags = 0U;
 #ifdef BOOST_BIG_ENDIAN
-    out_archive_flags |= hpx::util::endian_big;
+    out_archive_flags |= hpx::serialization::endian_big;
 #else
-    out_archive_flags |= hpx::util::endian_little;
+    out_archive_flags |= hpx::serialization::endian_little;
 #endif
 
     // create a parcel with/without continuation
@@ -267,12 +268,12 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
         reinterpret_cast<boost::uint64_t>(&test_function2));
 
     // compose archive flags
-    int in_archive_flags = boost::archive::no_header;
-    int out_archive_flags = boost::archive::no_header;
+    unsigned in_archive_flags = 0U;
+    unsigned out_archive_flags = 0U;
 #ifdef BOOST_BIG_ENDIAN
-    out_archive_flags |= hpx::util::endian_big;
+    out_archive_flags |= hpx::serialization::endian_big;
 #else
-    out_archive_flags |= hpx::util::endian_little;
+    out_archive_flags |= hpx::serialization::endian_little;
 #endif
 
     // create a parcel with/without continuation
@@ -297,12 +298,12 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
         reinterpret_cast<boost::uint64_t>(&test_function2));
 
     // compose archive flags
-    int in_archive_flags = boost::archive::no_header;
-    int out_archive_flags = boost::archive::no_header;
+    unsigned in_archive_flags = 0U;
+    unsigned out_archive_flags = 0U;
 #ifdef BOOST_BIG_ENDIAN
-    out_archive_flags |= hpx::util::endian_big;
+    out_archive_flags |= hpx::serialization::endian_big;
 #else
-    out_archive_flags |= hpx::util::endian_little;
+    out_archive_flags |= hpx::serialization::endian_little;
 #endif
 
     // create a parcel with/without continuation

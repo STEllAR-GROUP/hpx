@@ -90,7 +90,7 @@ namespace hpx { namespace lcos
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-#include <boost/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 
 #include <vector>
 

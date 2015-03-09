@@ -21,7 +21,7 @@ namespace hpx { namespace parcelset {
     boost::uint64_t get_max_inbound_size(parcelport&);
 
     template <typename Connection, typename BufferType,
-        typename ChunkType = util::serialization_chunk>
+        typename ChunkType = serialization::serialization_chunk>
     struct parcelport_connection
       : boost::enable_shared_from_this<Connection>
       , private boost::noncopyable

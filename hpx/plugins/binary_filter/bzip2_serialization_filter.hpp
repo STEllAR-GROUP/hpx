@@ -12,12 +12,9 @@
 
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/binary_filter.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
+#include <hpx/serialization/serialize.hpp>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 
 #include <memory>
@@ -82,9 +79,6 @@ namespace hpx { namespace plugins { namespace compression
         void save(void const* src, std::size_t src_count);
         bool flush(void* dst, std::size_t dst_count, std::size_t& written);
 
-        /// serialization support
-        static void register_base();
-
         void set_max_length(std::size_t size);
         std::size_t init_data(char const* buffer,
             std::size_t size, std::size_t buffer_size);
@@ -95,10 +89,12 @@ namespace hpx { namespace plugins { namespace compression
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
+
+        HPX_SERIALIZATION_POLYMORPHIC(bzip2_serialization_filter);
 
         detail::bzip2_compdecomp compdecomp_;
         std::vector<char> buffer_;
@@ -107,9 +103,6 @@ namespace hpx { namespace plugins { namespace compression
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>
-
-HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
-    hpx::plugins::compression::bzip2_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_USES_BZIP2_COMPRESSION(action)                             \

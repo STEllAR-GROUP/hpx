@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 
 #include <boost/mpl/bool.hpp>
-#include <boost/serialization/serialization.hpp>
 
 #include <string>
 
@@ -193,7 +193,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     private:
         char const* const name_;
 
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive&, unsigned int)

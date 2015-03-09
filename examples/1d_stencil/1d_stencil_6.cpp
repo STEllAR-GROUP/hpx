@@ -10,6 +10,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <boost/shared_array.hpp>
 
@@ -88,7 +89,7 @@ private:
     // Serialization support: even if all of the code below runs on one
     // locality only, we need to provide an (empty) implementation for the
     // serialization as all arguments passed to actions have to support this.
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int version)

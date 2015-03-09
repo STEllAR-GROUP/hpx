@@ -12,12 +12,9 @@
 
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/binary_filter.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
+#include <hpx/serialization/serialize.hpp>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/iostreams/filter/zlib.hpp>
 
 #include <memory>
@@ -84,10 +81,12 @@ namespace hpx { namespace plugins { namespace compression
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
+
+        HPX_SERIALIZATION_POLYMORPHIC(zlib_serialization_filter);
 
         detail::zlib_compdecomp compdecomp_;
         std::vector<char> buffer_;
@@ -96,9 +95,6 @@ namespace hpx { namespace plugins { namespace compression
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>
-
-HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
-    hpx::plugins::compression::zlib_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_USES_ZLIB_COMPRESSION(action)                              \

@@ -6,6 +6,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 
+#include <hpx/serialization/serialize.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 #define ZEROCOPY_DATASIZE   1024*1024
 
@@ -52,7 +54,7 @@ public:
 
 private:
     // serialization support
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template <typename Archive>
     void load(Archive& ar, unsigned int const version)
@@ -69,7 +71,7 @@ private:
         ar << size_ << t;
     }
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    HPX_SERIALIZATION_SPLIT_MEMBER()
 
 private:
     pointer pointer_;

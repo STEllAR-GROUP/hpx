@@ -15,6 +15,8 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/array.hpp>
 
 #include <fstream>
 #include <cstdlib>
@@ -66,7 +68,7 @@ struct RESULT {
     double	user;
     double	sys;
 
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -86,7 +88,7 @@ struct ofs_test_info_type
     std::string pvfs2tab_file;
 
 
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {

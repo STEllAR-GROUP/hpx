@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
@@ -186,14 +187,14 @@ namespace sheneos { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // Non-intrusive serialization.
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive& ar,
+    serialize(input_archive& ar,
         sheneos::sheneos_coord& coord, unsigned int const);
 
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive& ar,
+    serialize(output_archive& ar,
         sheneos::sheneos_coord& coord, unsigned int const);
 }}
 

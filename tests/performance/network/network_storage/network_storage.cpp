@@ -18,6 +18,8 @@
 #include <memory>
 #include <cstdio>
 
+#include <hpx/serialization/serialize.hpp>
+
 //
 // This is a test program which reads and writes chunks of memory to storage
 // distributed across localities.
@@ -201,7 +203,7 @@ public:
 
 private:
   // serialization support
-  friend class boost::serialization::access;
+  friend class hpx::serialization::access;
 
   template <typename Archive>
   void load(Archive& ar, unsigned int const version)
@@ -218,7 +220,7 @@ private:
     ar << size_ << t;
   }
 
-  BOOST_SERIALIZATION_SPLIT_MEMBER()
+  HPX_SERIALIZATION_SPLIT_MEMBER()
 
 private:
   pointer pointer_;

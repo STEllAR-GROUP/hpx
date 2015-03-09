@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -76,7 +77,7 @@ namespace hpx { namespace util { namespace functional
 
         private:
             // serialization support
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
             BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
@@ -132,7 +133,7 @@ namespace hpx { namespace util { namespace functional
 
         private:
             // serialization support
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
             BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)

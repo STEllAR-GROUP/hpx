@@ -9,6 +9,7 @@
 #define HPX_UTIL_DETAIL_FUNCTION_TEMPLATE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
@@ -16,13 +17,7 @@
 #include <hpx/util/detail/vtable/copyable_vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/tracking.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -113,22 +108,22 @@ namespace hpx { namespace util { namespace detail
             >();
 }}}
 
-namespace boost { namespace serialization
-{
-    template <typename Sig, typename IArchive, typename OArchive>
-    struct tracking_level< ::hpx::util::detail::function_vtable_ptr<
-        Sig, IArchive, OArchive
-    > > : boost::mpl::int_<boost::serialization::track_never>
-    {};
-}}
+//namespace boost { namespace serialization //TODO:bikineev
+//{
+    //template <typename Sig, typename IArchive, typename OArchive>
+    //struct tracking_level< ::hpx::util::detail::function_vtable_ptr<
+        //Sig, IArchive, OArchive
+    //> > : boost::mpl::int_<boost::serialization::track_never>
+    //{};
+//}}
 
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Sig
-      , typename IArchive = portable_binary_iarchive
-      , typename OArchive = portable_binary_oarchive
+      , typename IArchive = serialization::input_archive
+      , typename OArchive = serialization::output_archive
     >
     class function
       : public detail::basic_function<
@@ -212,18 +207,18 @@ namespace hpx { namespace util
         using base_type::target;
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         void load(IArchive& ar, const unsigned version)
         {
             reset();
 
             bool is_empty = false;
-            ar.load(is_empty);
+            ar >> is_empty;
             if (!is_empty)
             {
                 std::string name;
-                ar.load(name);
+                ar >> name;
 
                 this->vptr = detail::get_table_ptr<vtable_ptr>(name);
                 this->vptr->load_object(&this->object, ar, version);
@@ -233,17 +228,17 @@ namespace hpx { namespace util
         void save(OArchive& ar, const unsigned version) const
         {
             bool is_empty = empty();
-            ar.save(is_empty);
+            ar << is_empty;
             if (!is_empty)
             {
                 std::string function_name = this->vptr->name;
-                ar.save(function_name);
+                ar << function_name;
 
                 this->vptr->save_object(&this->object, ar, version);
             }
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
     };
 
     ///////////////////////////////////////////////////////////////////////////

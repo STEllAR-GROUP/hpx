@@ -5,8 +5,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
-#include <hpx/util/void_cast.hpp>
 
 #include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/binary_filter_factory.hpp>
@@ -23,24 +21,11 @@ HPX_REGISTER_BINARY_FILTER_FACTORY(
     snappy_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_SERIALIZATION_REGISTER_TYPE_DEFINITION(
-    hpx::plugins::compression::snappy_serialization_filter);
-HPX_REGISTER_BASE_HELPER(
-    hpx::plugins::compression::snappy_serialization_filter,
-    snappy_serialization_filter);
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins { namespace compression
 {
     snappy_serialization_filter::~snappy_serialization_filter()
     {
         hpx::actions::detail::guid_initialization<snappy_serialization_filter>();
-    }
-
-    void snappy_serialization_filter::register_base()
-    {
-        util::void_cast_register_nonvirt<
-            snappy_serialization_filter, util::binary_filter>();
     }
 
     void snappy_serialization_filter::set_max_length(std::size_t size)

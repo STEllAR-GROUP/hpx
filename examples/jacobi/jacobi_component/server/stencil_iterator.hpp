@@ -14,8 +14,6 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/lcos.hpp>
 
-#include <boost/serialization/vector.hpp>
-
 #include <vector>
 
 namespace jacobi

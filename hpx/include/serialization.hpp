@@ -7,10 +7,6 @@
 #define HPX_SERIALIZATION_2012_JAN_25_1236PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #endif

@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
@@ -57,11 +58,11 @@ namespace hpx { namespace util
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
-        HPX_EXPORT void serialize(hpx::util::portable_binary_oarchive& ar,
+        HPX_EXPORT void serialize(hpx::serialization::output_archive& ar,
             const unsigned int);
-        HPX_EXPORT void serialize(hpx::util::portable_binary_iarchive& ar,
+        HPX_EXPORT void serialize(hpx::serialization::input_archive& ar,
             const unsigned int);
     };
 

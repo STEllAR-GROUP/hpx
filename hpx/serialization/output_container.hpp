@@ -1,35 +1,28 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c)      2014 Thomas Heller
+//  Copyright (c)      2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_OCHUNK_MANAGER_JUL_31_2013_1158AM)
-#define HPX_UTIL_OCHUNK_MANAGER_JUL_31_2013_1158AM
+#ifndef HPX_SERIALIZATION_OUTPUT_CONTAINER_HPP
+#define HPX_SERIALIZATION_OUTPUT_CONTAINER_HPP
+
+#include <hpx/util/assert.hpp>
 
 #include <hpx/util/binary_filter.hpp>
+#include <hpx/serialization/container.hpp>
+#include <hpx/serialization/serialization_chunk.hpp>
 
 #include <cstddef> // for size_t
 #include <cstring> // for memcpy
 #include <vector>
 
-#if defined(BOOST_MSVC)
-#  include <intrin.h>
-#  pragma intrinsic(memcpy)
-#endif
-
-namespace hpx { namespace util { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////
-    struct erase_ocontainer_type
-    {
-        virtual ~erase_ocontainer_type() {}
-        virtual void set_filter(binary_filter* filter) = 0;
-        virtual void save_binary(void const* address, std::size_t count) = 0;
-        virtual void save_binary_chunk(void const* address, std::size_t count) = 0;
-    };
+namespace hpx { namespace serialization {
 
     template <typename Container>
-    struct ocontainer_type : erase_ocontainer_type
+    struct output_container
+      : container
     {
     private:
         std::size_t get_chunk_size(std::size_t chunk) const
@@ -58,12 +51,9 @@ namespace hpx { namespace util { namespace detail
         }
 
     public:
-        ocontainer_type(Container& cont)
-          : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
-            chunks_(0), current_chunk_(std::size_t(-1))
-        {}
-
-        ocontainer_type(Container& cont, std::vector<serialization_chunk>* chunks)
+        output_container(Container& cont,
+            std::vector<serialization_chunk>* chunks,
+            util::binary_filter* filter)
           : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
             chunks_(chunks), current_chunk_(std::size_t(-1))
         {
@@ -73,9 +63,10 @@ namespace hpx { namespace util { namespace detail
                 chunks_->push_back(create_index_chunk(0, 0));
                 current_chunk_ = 0;
             }
+            if (filter) set_filter(filter);
         }
 
-        ~ocontainer_type()
+        ~output_container()
         {
             if (filter_) {
                 std::size_t written = 0;
@@ -116,7 +107,7 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void set_filter(binary_filter* filter)
+        void set_filter(util::binary_filter* filter) // override
         {
             HPX_ASSERT(0 == filter_);
             filter_ = filter;
@@ -128,7 +119,7 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void save_binary(void const* address, std::size_t count)
+        void save_binary(void const* address, std::size_t count) // override
         {
             HPX_ASSERT(count != 0);
             {
@@ -162,11 +153,11 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void save_binary_chunk(void const* address, std::size_t count)
+        void save_binary_chunk(void const* address, std::size_t count) // override
         {
             if (filter_ || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
                 // fall back to serialization_chunk-less archive
-                this->ocontainer_type::save_binary(address, count);
+                this->output_container::save_binary(address, count);
             }
             else {
                 HPX_ASSERT(get_num_chunks() > current_chunk_);
@@ -192,12 +183,12 @@ namespace hpx { namespace util { namespace detail
         Container& cont_;
         std::size_t current_;
         std::size_t start_compressing_at_;
-        binary_filter* filter_;
+        util::binary_filter* filter_;
 
         std::vector<serialization_chunk>* chunks_;
         std::size_t current_chunk_;
     };
-}}}
+
+}}
 
 #endif
-

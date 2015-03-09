@@ -17,8 +17,6 @@
 #include <hpx/util/move.hpp>
 #include <hpx/runtime.hpp>
 
-#include <boost/serialization/vector.hpp>
-
 namespace hpx { namespace components { namespace stubs
 {
     /// \brief  The function \a get_factory_properties is used to

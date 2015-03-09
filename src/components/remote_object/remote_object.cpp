@@ -6,14 +6,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <hpx/components/remote_object/server/remote_object.hpp>
 #include <hpx/components/remote_object/new.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
