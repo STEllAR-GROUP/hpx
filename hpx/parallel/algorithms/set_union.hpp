@@ -12,6 +12,7 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -19,6 +20,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/set_operation.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -67,18 +69,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typedef typename std::iterator_traits<RanIter2>::difference_type
                     difference_type2;
 
+                if (first1 == last1)
+                {
+                    return detail::copy<OutIter>().call(
+                        policy, boost::mpl::false_(), first2, last2, dest);
+                }
+                if (first2 == last2)
+                {
+                    return detail::copy<OutIter>().call(
+                        policy, boost::mpl::false_(), first1, last1, dest);
+                }
+
+                typedef typename set_operations_buffer<OutIter>::type buffer_type;
+                typedef typename hpx::util::decay<F>::type func_type;
+
                 return set_operation(policy,
                     first1, last1, first2, last2, dest, std::forward<F>(f),
+                    // calculate destination approximate index
                     [](difference_type1 idx1, difference_type2 idx2)
                     {
                         return idx1 + idx2;
                     },
-                    [buffer](RanIter1 part_first1, RanIter1 part_last1,
+                    // perform required set operation for one chunk
+                    [](RanIter1 part_first1, RanIter1 part_last1,
                         RanIter2 part_first2, RanIter2 part_last2,
-                        OutIter dest, F && f) -> OutIter
+                        buffer_type* dest, func_type const& f)
                     {
                         return std::set_union(part_first1, part_last1,
-                            part_first2, part_last2, dest, std::forward<F>(f));
+                            part_first2, part_last2, dest, f);
                     });
             }
         };

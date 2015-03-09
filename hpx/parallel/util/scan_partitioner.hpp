@@ -19,6 +19,8 @@
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 
+#include <algorithm>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util
 {
