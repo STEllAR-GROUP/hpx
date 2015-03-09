@@ -55,6 +55,6 @@ namespace hpx { namespace serialization {
 }}
 
 #include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/polymorphic_nonintrusive_factory.ipp>
+#include <hpx/runtime/serialization/polymorphic_nonintrusive_factory_impl.hpp>
 
 #endif
