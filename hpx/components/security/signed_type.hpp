@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <hpx/components/security/signature.hpp>

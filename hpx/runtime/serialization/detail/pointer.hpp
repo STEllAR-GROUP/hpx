@@ -7,10 +7,10 @@
 #ifndef HPX_SERIALIZATION_DETAIL_POINTER_HPP
 #define HPX_SERIALIZATION_DETAIL_POINTER_HPP
 
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/polymorphic_intrusive_factory.hpp>
-#include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
-#include <hpx/serialization/string.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/polymorphic_intrusive_factory.hpp>
+#include <hpx/runtime/serialization/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/runtime/serialization/string.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 
 #include <boost/shared_ptr.hpp>

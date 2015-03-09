@@ -14,8 +14,7 @@
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
+#include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 

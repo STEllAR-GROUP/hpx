@@ -12,7 +12,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/serialize_buffer.hpp>

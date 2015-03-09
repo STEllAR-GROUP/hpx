@@ -16,9 +16,9 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/binary_filter.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/traits/serialize_as_future.hpp>
 

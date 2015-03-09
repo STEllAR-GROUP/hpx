@@ -6,7 +6,14 @@
 #if !defined(HPX_SERIALIZATION_2012_JAN_25_1236PM)
 #define HPX_SERIALIZATION_2012_JAN_25_1236PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+
+#include <hpx/runtime/serialization/array.hpp>
+#include <hpx/runtime/serialization/intrusive_ptr.hpp>
+#include <hpx/runtime/serialization/map.hpp>
+#include <hpx/runtime/serialization/string.hpp>
+#include <hpx/runtime/serialization/shared_ptr.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #endif

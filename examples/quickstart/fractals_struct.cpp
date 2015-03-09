@@ -11,8 +11,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
+#include <hpx/include/serialization.hpp>
 
 #include <vector>
 

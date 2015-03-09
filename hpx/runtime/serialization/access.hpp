@@ -8,7 +8,7 @@
 #define HPX_SERIALIZATION_ACCESS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 
 #include <boost/type_traits/is_polymorphic.hpp>

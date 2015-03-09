@@ -11,7 +11,7 @@
 #include <map>
 #include <iosfwd>
 
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/lexical_cast.hpp>
 

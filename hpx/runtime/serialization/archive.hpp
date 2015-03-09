@@ -8,7 +8,7 @@
 #define HPX_SERIALIZATION_ARCHIVE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/container.hpp>
+#include <hpx/runtime/serialization/container.hpp>
 
 #include <hpx/traits/is_bitwise_serializable.hpp>
 

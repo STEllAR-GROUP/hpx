@@ -8,7 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/function.hpp>
 
-#include <hpx/serialization/access.hpp>
+#include <hpx/runtime/serialization/access.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

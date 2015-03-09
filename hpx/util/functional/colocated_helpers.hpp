@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
 

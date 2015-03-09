@@ -7,7 +7,7 @@
 #define HPX_UTIL_SERIALIZE_EMPTY_TYPE_JAN_28_2013_0623AM
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/type_traits/is_empty.hpp>
 #include <boost/utility/enable_if.hpp>

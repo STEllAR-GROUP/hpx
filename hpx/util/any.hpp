@@ -24,8 +24,8 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/raw_ptr.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/raw_ptr.hpp>
 
 #include <boost/config.hpp>
 #include <boost/type_traits/is_reference.hpp>

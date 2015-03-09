@@ -11,15 +11,14 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/runtime/applier/apply_colocated.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/runtime/applier/apply_colocated.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/async.hpp>
-
-#include <hpx/serialization/vector.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {

@@ -7,8 +7,8 @@
 #define HPX_COMPONENTS_SECURITY_SERVER_PUBLIC_KEY_HPP
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/array.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/array.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/array.hpp>

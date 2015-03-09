@@ -9,7 +9,7 @@
 #define HPX_UTIL_TUPLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>

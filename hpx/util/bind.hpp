@@ -7,7 +7,7 @@
 #ifndef HPX_UTIL_BIND_HPP
 #define HPX_UTIL_BIND_HPP
 
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_callable.hpp>

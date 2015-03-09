@@ -6,12 +6,12 @@
 #ifndef HPX_UTIL_DEFERRED_CALL_HPP
 #define HPX_UTIL_DEFERRED_CALL_HPP
 
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>

@@ -11,9 +11,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>

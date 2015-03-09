@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/shared_ptr.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>

@@ -9,7 +9,7 @@
 #include <boost/move/move.hpp>
 #include <boost/ref.hpp>
 
-#include <hpx/serialization/access.hpp>
+#include <hpx/runtime/serialization/access.hpp>
 
 namespace hpx { namespace test
 {

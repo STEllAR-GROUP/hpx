@@ -22,8 +22,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/map.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/map.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>

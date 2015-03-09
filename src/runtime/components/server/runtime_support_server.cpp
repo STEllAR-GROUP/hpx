@@ -29,15 +29,14 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
 #include <hpx/lcos/broadcast.hpp>
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/reduce.hpp>
 #endif
-
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <hpx/util/assert.hpp>
 #include <hpx/util/parse_command_line.hpp>

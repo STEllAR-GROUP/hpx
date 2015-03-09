@@ -12,6 +12,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/register_locks_globally.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
@@ -22,7 +23,6 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
-#include <hpx/serialization/serialize.hpp>
 #include <ios>
 #include <iomanip>
 #include <iostream>

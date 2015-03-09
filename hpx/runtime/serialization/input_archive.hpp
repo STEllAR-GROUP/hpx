@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/serialization/archive.hpp>
-#include <hpx/serialization/input_container.hpp>
-#include <hpx/serialization/raw_ptr.hpp>
-#include <hpx/serialization/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/runtime/serialization/archive.hpp>
+#include <hpx/runtime/serialization/input_container.hpp>
+#include <hpx/runtime/serialization/raw_ptr.hpp>
+#include <hpx/runtime/serialization/polymorphic_nonintrusive_factory.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/is_integral.hpp>

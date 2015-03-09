@@ -9,9 +9,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/cstdint.hpp>

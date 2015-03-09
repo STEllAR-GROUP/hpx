@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <hpx/util/assert.hpp>
 

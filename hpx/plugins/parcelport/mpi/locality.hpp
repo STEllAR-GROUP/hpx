@@ -9,7 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/util/safe_bool.hpp>
 

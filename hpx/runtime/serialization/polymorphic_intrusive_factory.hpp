@@ -12,7 +12,7 @@
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/static.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/noncopyable.hpp>
