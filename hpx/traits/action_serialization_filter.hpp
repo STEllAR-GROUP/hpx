@@ -7,7 +7,7 @@
 #define HPX_TRAITS_ACTION_SERIALIZATION_FILTER_FEB_14_2013_0903PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/binary_filter.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
@@ -18,7 +18,7 @@ namespace hpx { namespace traits
     struct action_serialization_filter
     {
         // return a new instance of a serialization filter
-        static util::binary_filter* call(parcelset::parcel const& /*p*/)
+        static serialization::binary_filter* call(parcelset::parcel const& /*p*/)
         {
             return 0;   // by default actions don't have a serialization filter
         }

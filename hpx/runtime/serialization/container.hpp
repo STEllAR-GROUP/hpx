@@ -7,8 +7,8 @@
 #ifndef HPX_SERIALIZATION_CONTAINER_HPP
 #define HPX_SERIALIZATION_CONTAINER_HPP
 
+#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/binary_filter.hpp>
 
 namespace hpx { namespace serialization {
     struct container

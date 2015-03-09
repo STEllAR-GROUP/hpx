@@ -10,7 +10,6 @@
 
 #include <hpx/util/assert.hpp>
 
-#include <hpx/util/binary_filter.hpp>
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 
