@@ -10,9 +10,9 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/serialization/exception_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/serialize_exception.hpp>
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::int64_t, int64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::uint64_t, uint64_t)

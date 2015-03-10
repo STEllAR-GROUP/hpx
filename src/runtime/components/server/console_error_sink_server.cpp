@@ -11,7 +11,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
-#include <hpx/runtime/serialization/exception_ptr.hpp>
+#include <hpx/util/serialize_exception.hpp>
 
 #include <boost/lexical_cast.hpp>
 

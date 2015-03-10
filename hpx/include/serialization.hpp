@@ -12,7 +12,6 @@
 #include <hpx/runtime/serialization/allocator.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/empty_type.hpp>
-#include <hpx/runtime/serialization/exception_ptr.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/serialization/map.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>

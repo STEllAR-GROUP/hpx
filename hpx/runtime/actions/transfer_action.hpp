@@ -17,7 +17,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/serialization/serialize_sequence.hpp>
-#include <hpx/runtime/serialization/exception_ptr.hpp>
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/traits/action_capability_provider.hpp>
 #endif
@@ -31,6 +30,7 @@
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 

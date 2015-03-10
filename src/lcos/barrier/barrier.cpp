@@ -8,8 +8,8 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
-#include <hpx/runtime/serialization/exception_ptr.hpp>
 #include <hpx/lcos/server/barrier.hpp>
+#include <hpx/util/serialize_exception.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Barrier
