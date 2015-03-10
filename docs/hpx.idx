@@ -181,10 +181,10 @@ parallel::set_difference              "set_difference" "hpx\.parallel\.v1\.set_d
 parallel::set_intersection            "set_intersection" "hpx\.parallel\.v1\.set_intersection.*"
 
 # hpx/parallel/algorithms/set_symmetric_difference.hpp
-parallel::set_symmetric_difference    "set_symmetric_difference" "hpx\.parallel\.v1\.set_symmetric_difference.*"
+parallel::set_symmetric_difference    "set_symmetric_difference" "hpx\.parallel\.v1\.set_symmetric_dif.*"
 
 # hpx/parallel/algorithms/set_union.hpp
-parallel::set_union                 "set_union" "hpx\.parallel\.v1\.set_union.*"
+parallel::set_union                   "set_union" "hpx\.parallel\.v1\.set_union.*"
 
 # hpx/parallel/algorithms/swap_ranges.hpp
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"
