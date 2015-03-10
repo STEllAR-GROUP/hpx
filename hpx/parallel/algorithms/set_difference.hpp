@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/set_union.hpp
+/// \file parallel/algorithms/set_difference.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_SET_UNION_MAR_06_2015_1028AM)
-#define HPX_PARALLEL_DETAIL_SET_UNION_MAR_06_2015_1028AM
+#if !defined(HPX_PARALLEL_DETAIL_SET_DIFFERENCE_MAR_10_2015_0158PM)
+#define HPX_PARALLEL_DETAIL_SET_DIFFERENCE_MAR_10_2015_0158PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
@@ -36,15 +36,16 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
-    // set_union
+    // set_difference
     namespace detail
     {
         /// \cond NOINTERNAL
         template <typename OutIter>
-        struct set_union : public detail::algorithm<set_union<OutIter>, OutIter>
+        struct set_difference
+          : public detail::algorithm<set_difference<OutIter>, OutIter>
         {
-            set_union()
-              : set_union::algorithm("set_union")
+            set_difference()
+              : set_difference::algorithm("set_difference")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
@@ -53,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, OutIter dest, F && f)
             {
-                return std::set_union(first1, last1, first2, last2, dest,
+                return std::set_difference(first1, last1, first2, last2, dest,
                     std::forward<F>(f));
             }
 
@@ -70,8 +71,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 if (first1 == last1)
                 {
-                    return detail::copy<OutIter>().call(
-                        policy, boost::mpl::false_(), first2, last2, dest);
+                    return detail::algorithm_result<ExPolicy, OutIter>::get(dest);
                 }
                 if (first2 == last2)
                 {
@@ -87,14 +87,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     // calculate approximate destination index
                     [](difference_type1 idx1, difference_type2 idx2)
                     {
-                        return idx1 + idx2;
+                        return idx1;
                     },
                     // perform required set operation for one chunk
                     [](RanIter1 part_first1, RanIter1 part_last1,
                         RanIter2 part_first2, RanIter2 part_last2,
                         buffer_type* dest, func_type const& f)
                     {
-                        return std::set_union(part_first1, part_last1,
+                        return std::set_difference(part_first1, part_last1,
                             part_first2, part_last2, dest, f);
                     });
             }
@@ -103,7 +103,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Constructs a sorted range beginning at dest consisting of all elements
-    /// present in one or both sorted ranges [first1, last1) and
+    /// present in both sorted ranges [first1, last1) and
     /// [first2, last2). This algorithm expects both input ranges to be sorted
     /// with the given binary predicate \a f.
     ///
@@ -112,10 +112,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///         second sequence.
     ///
     /// If some element is found \a m times in [first1, last1) and \a n times
-    /// in [first2, last2), then all \a m elements will be copied from
-    /// [first1, last1) to dest, preserving order, and then exactly
-    /// std::max(n-m, 0) elements will be copied from [first2, last2) to dest,
-    /// also preserving order.
+    /// in [first2, last2), the first std::min(m, n) elements will be copied
+    /// from the first range to the destination range. The order of equivalent
+    /// elements is preserved. The resulting range cannot overlap with either
+    /// of the input ranges.
     ///
     /// The resulting range cannot overlap with either of the input ranges.
     ///
@@ -132,7 +132,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     output iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a set_union requires \a F to meet the
+    ///                     overload of \a set_difference requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -172,12 +172,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a set_union algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a set_difference algorithm returns a \a hpx::future<OutIter>
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
-    ///           The \a set_union algorithm returns the output iterator to the
+    ///           The \a set_difference algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
@@ -187,7 +187,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    set_union(ExPolicy && policy, InIter1 first1, InIter1 last1,
+    set_difference(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, OutIter dest, F && f)
     {
         typedef typename std::iterator_traits<InIter1>::iterator_category
@@ -210,13 +210,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             > >
         >::type is_seq;
 
-        return detail::set_union<OutIter>().call(
+        return detail::set_difference<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2, last2, dest, std::forward<F>(f));
     }
 
     /// Constructs a sorted range beginning at dest consisting of all elements
-    /// present in one or both sorted ranges [first1, last1) and
+    /// present in both sorted ranges [first1, last1) and
     /// [first2, last2). This algorithm expects both input ranges to be sorted
     /// with operator<
     ///
@@ -225,10 +225,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///         second sequence.
     ///
     /// If some element is found \a m times in [first1, last1) and \a n times
-    /// in [first2, last2), then all \a m elements will be copied from
-    /// [first1, last1) to dest, preserving order, and then exactly
-    /// std::max(n-m, 0) elements will be copied from [first2, last2) to dest,
-    /// also preserving order.
+    /// in [first2, last2), the first std::min(m, n) elements will be copied
+    /// from the first range to the destination range. The order of equivalent
+    /// elements is preserved. The resulting range cannot overlap with either
+    /// of the input ranges.
     ///
     /// The resulting range cannot overlap with either of the input ranges.
     ///
@@ -268,12 +268,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a set_union algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a set_difference algorithm returns a \a hpx::future<OutIter>
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
-    ///           The \a set_union algorithm returns the output iterator to the
+    ///           The \a set_difference algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
@@ -283,7 +283,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         is_execution_policy<ExPolicy>,
         typename detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-    set_union(ExPolicy && policy, InIter1 first1, InIter1 last1,
+    set_difference(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, OutIter dest)
     {
         typedef typename std::iterator_traits<InIter1>::iterator_category
@@ -306,7 +306,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             > >
         >::type is_seq;
 
-        return detail::set_union<OutIter>().call(
+        return detail::set_difference<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2, last2, dest,
             std::less<typename std::iterator_traits<InIter1>::value_type>());
