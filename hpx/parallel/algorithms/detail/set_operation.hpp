@@ -149,7 +149,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                     ) - buffer_dest;
             },
             // second step, is executed after all partitions are done running
-            [buffer, chunks, cores, dest](std::vector<future<void> >&&)
+            [buffer, chunks, cores, dest](std::vector<future<void> >&&) -> OutIter
             {
                 // accumulate real length
                 set_chunk_data* chunk = chunks.get();
