@@ -9,9 +9,14 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <hpx/runtime/serialization/allocator.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+#include <hpx/runtime/serialization/empty_type.hpp>
+#include <hpx/runtime/serialization/exception_ptr.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/serialization/map.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/vector.hpp>

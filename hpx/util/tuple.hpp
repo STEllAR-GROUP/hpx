@@ -10,10 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
 
@@ -951,7 +951,7 @@ namespace hpx { namespace serialization {
       , unsigned int const version
     )
     {
-        ::hpx::util::serialize_sequence(ar, t);
+        ::hpx::serialization::serialize_sequence(ar, t);
     }
 
     // These are needed to avoid conflicts with serialize_empty_type

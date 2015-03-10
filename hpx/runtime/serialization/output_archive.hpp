@@ -31,7 +31,7 @@ namespace hpx { namespace serialization {
         static HPX_STD_UNIQUE_PTR<container> make_container(
             Container & buffer,
             std::vector<serialization_chunk>* chunks = 0,
-            util::binary_filter* filter = 0)
+            binary_filter* filter = 0)
         {
             return HPX_STD_UNIQUE_PTR<container>(
                 new output_container<Container>(buffer, chunks, filter));
@@ -42,7 +42,7 @@ namespace hpx { namespace serialization {
           boost::uint32_t flags = 0U,
           boost::uint32_t dest_locality_id = ~0U,
           std::vector<serialization_chunk>* chunks = 0,
-          util::binary_filter* filter = 0)
+          binary_filter* filter = 0)
           : base_type(make_container(buffer, chunks, filter), flags),
             dest_locality_id_(dest_locality_id)
         {

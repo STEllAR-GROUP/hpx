@@ -11,10 +11,10 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/empty_type.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/serialize_empty_type.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>

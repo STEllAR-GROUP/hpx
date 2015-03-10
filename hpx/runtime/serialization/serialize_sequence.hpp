@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_SERIALIZE_SEQUENCE_MAY_17_2008_0545PM)
-#define HPX_UTIL_SERIALIZE_SEQUENCE_MAY_17_2008_0545PM
+#if !defined(HPX_SERIALIZATION_SERIALIZE_SEQUENCE_MAY_17_2008_0545PM)
+#define HPX_SERIALIZATION_SERIALIZE_SEQUENCE_MAY_17_2008_0545PM
 
 #include <hpx/hpx_fwd.hpp>
 
@@ -22,7 +22,7 @@
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
-namespace hpx { namespace util
+namespace hpx { namespace serialization
 {
     template <typename Archive, typename Sequence>
     void serialize_sequence(Archive& ar, Sequence& seq);
@@ -63,12 +63,12 @@ namespace hpx { namespace util
             }
 
             template <typename Archive>
-            static void serialize(Archive&, unused_type&, boost::mpl::false_)
+            static void serialize(Archive&, util::unused_type&, boost::mpl::false_)
             {
             }
 
             template <typename Archive>
-            static void serialize(Archive&, unused_type const&, boost::mpl::false_)
+            static void serialize(Archive&, util::unused_type const&, boost::mpl::false_)
             {
             }
 

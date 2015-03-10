@@ -137,7 +137,7 @@ namespace hpx { namespace parcelset
                 return action_->get_thread_priority();
             }
 
-            util::binary_filter* get_serialization_filter(parcelset::parcel const& p) const
+            serialization::binary_filter* get_serialization_filter(parcelset::parcel const& p) const
             {
                 return action_->get_serialization_filter(p);
             }
@@ -702,7 +702,7 @@ namespace hpx { namespace parcelset
             data_->set_parcel_id(id);
         }
 
-        util::binary_filter* get_serialization_filter() const
+        serialization::binary_filter* get_serialization_filter() const
         {
             return data_->get_serialization_filter(*this);
         }

@@ -23,10 +23,10 @@
 namespace hpx { namespace plugins { namespace compression
 {
     struct HPX_LIBRARY_EXPORT snappy_serialization_filter
-      : public util::binary_filter
+      : public serialization::binary_filter
     {
         snappy_serialization_filter(bool compress = false,
-                util::binary_filter* next_filter = 0)
+                serialization::binary_filter* next_filter = 0)
           : current_(0), compress_(compress)
         {}
         ~snappy_serialization_filter();
@@ -68,7 +68,8 @@ namespace hpx { namespace plugins { namespace compression
         {                                                                     \
             /* Note that the caller is responsible for deleting the filter */ \
             /* instance returned from this function */                        \
-            static util::binary_filter* call(parcelset::parcel const& p)      \
+            static serialization::binary_filter* call(                        \
+                    parcelset::parcel const& p)                               \
             {                                                                 \
                 return hpx::create_binary_filter(                             \
                     "snappy_serialization_filter", true);                     \

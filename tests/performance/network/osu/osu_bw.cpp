@@ -9,7 +9,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/parallel/algorithm.hpp>
 
 #include <boost/assert.hpp>
@@ -43,7 +43,7 @@ unsigned long getpagesize()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-void isend(hpx::util::serialize_buffer<char> const& receive_buffer) {}
+void isend(hpx::serialization::serialize_buffer<char> const& receive_buffer) {}
 HPX_PLAIN_ACTION(isend);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop,
         skip *= LOOP_SMALL_MULTIPLIER;
     }
     
-    typedef hpx::util::serialize_buffer<char> buffer_type;
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();

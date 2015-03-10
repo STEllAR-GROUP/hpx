@@ -10,7 +10,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/serialize_sequence.hpp>
+#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
@@ -361,7 +361,7 @@ namespace hpx { namespace util
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
             {
-                util::serialize_sequence(ar, iterators_);
+                serialization::serialize_sequence(ar, iterators_);
             }
 
         private:

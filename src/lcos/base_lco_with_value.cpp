@@ -10,9 +10,9 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/exception_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/serialize_exception.hpp>
 
 namespace hpx { namespace lcos
 {

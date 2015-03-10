@@ -9,7 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/parallel/algorithm.hpp>
 
 #include <boost/assert.hpp>
@@ -44,15 +44,15 @@ unsigned long getpagesize()
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::serialize_buffer<char>
-message(hpx::util::serialize_buffer<char> const& receive_buffer)
+hpx::serialization::serialize_buffer<char>
+message(hpx::serialization::serialize_buffer<char> const& receive_buffer)
 {
     return receive_buffer;
 }
 HPX_PLAIN_ACTION(message);
 
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::serialize_buffer<char>, serialization_buffer_char);
-HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::util::serialize_buffer<char>, serialization_buffer_char);
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::serialization::serialize_buffer<char>, serialization_buffer_char);
+HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::serialization::serialize_buffer<char>, serialization_buffer_char);
 
 ///////////////////////////////////////////////////////////////////////////////
 double receive(
@@ -64,7 +64,7 @@ double receive(
 {
     std::size_t skip = SKIP_LARGE;
 
-    typedef hpx::util::serialize_buffer<char> buffer_type;
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
     buffer_type recv_buffer;
 
     hpx::util::high_resolution_timer t;

@@ -16,6 +16,8 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/serialization/serialize_sequence.hpp>
+#include <hpx/runtime/serialization/exception_ptr.hpp>
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/traits/action_capability_provider.hpp>
 #endif
@@ -29,8 +31,6 @@
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/serialize_exception.hpp>
-#include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 
@@ -354,7 +354,7 @@ namespace hpx { namespace actions
 
         /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.
-        util::binary_filter* get_serialization_filter(
+        serialization::binary_filter* get_serialization_filter(
             parcelset::parcel const& p) const
         {
             return traits::action_serialization_filter<derived_type>::call(p);
@@ -389,7 +389,7 @@ namespace hpx { namespace actions
         // serialization support
         void load(hpx::serialization::input_archive & ar)
         {
-            util::serialize_sequence(ar, arguments_);
+            serialization::serialize_sequence(ar, arguments_);
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
@@ -408,7 +408,7 @@ namespace hpx { namespace actions
 
         void save(hpx::serialization::output_archive & ar) const
         {
-            util::serialize_sequence(ar, arguments_);
+            serialization::serialize_sequence(ar, arguments_);
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.

@@ -1049,7 +1049,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        struct hash_binary_filter : util::binary_filter
+        struct hash_binary_filter : serialization::binary_filter
         {
             explicit hash_binary_filter(std::size_t seed = 0)
               : hash(seed)

@@ -15,7 +15,7 @@ namespace hpx { namespace serialization {
     {
         virtual ~container() {}
 
-        virtual void set_filter(util::binary_filter* filter) = 0;
+        virtual void set_filter(binary_filter* filter) = 0;
         virtual void save_binary(void const* address, std::size_t count)
         {
             HPX_ASSERT(false

@@ -13,8 +13,8 @@
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/util/reinitializable_static.hpp>
-#include <hpx/util/serialize_buffer.hpp>
 
 #define HPX_SINGLE_ARG(...) __VA_ARGS__
 #define HPX_COMMA ,
@@ -58,7 +58,7 @@ namespace hpx { namespace actions
             oarchive_type& ar, const unsigned int,
             boost::uint8_t const*)
         {
-            typedef hpx::util::serialize_buffer<boost::uint8_t> buffer_type;
+            typedef hpx::serialization::serialize_buffer<boost::uint8_t> buffer_type;
             buffer_type buf = buffer_type(data, size, buffer_type::reference);
             ar << buf;
         }
@@ -66,7 +66,7 @@ namespace hpx { namespace actions
             iarchive_type& ar, const unsigned int,
             boost::uint8_t const*)
         {
-            typedef hpx::util::serialize_buffer<boost::uint8_t> buffer_type;
+            typedef hpx::serialization::serialize_buffer<boost::uint8_t> buffer_type;
             buffer_type buf = buffer_type(data, size, buffer_type::reference);
             ar >> buf;
         }

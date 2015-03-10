@@ -115,7 +115,7 @@ namespace hpx { namespace serialization {
             return flags_;
         }
 
-        void set_filter(util::binary_filter* filter)
+        void set_filter(binary_filter* filter)
         {
             buffer_->set_filter(filter);
         }

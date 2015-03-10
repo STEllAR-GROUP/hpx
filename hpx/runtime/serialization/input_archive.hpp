@@ -50,7 +50,7 @@ namespace hpx { namespace serialization {
         {
             bool has_filter = false;
             load(has_filter);
-            util::binary_filter* filter = 0;
+            serialization::binary_filter* filter = 0;
             if (has_filter) *this >> raw_ptr(filter);
         }
 

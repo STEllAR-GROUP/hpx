@@ -1277,9 +1277,9 @@ namespace hpx { namespace components { namespace server
         return mh;
     }
 
-    util::binary_filter* runtime_support::create_binary_filter(
+    serialization::binary_filter* runtime_support::create_binary_filter(
         char const* binary_filter_type, bool compress,
-        util::binary_filter* next_filter, error_code& ec)
+        serialization::binary_filter* next_filter, error_code& ec)
     {
         // locate the factory for the requested plugin type
         plugin_map_mutex_type::scoped_lock l(p_mtx_);
@@ -1303,7 +1303,7 @@ namespace hpx { namespace components { namespace server
             boost::static_pointer_cast<plugins::binary_filter_factory_base>(
                 (*it).second.first));
 
-        util::binary_filter* bf = factory->create(compress, next_filter);
+        serialization::binary_filter* bf = factory->create(compress, next_filter);
         if (0 == bf) {
             std::ostringstream strm;
             strm << "couldn't to create binary filter plugin of type: "

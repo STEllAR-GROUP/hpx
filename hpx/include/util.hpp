@@ -18,7 +18,6 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/locality_result.hpp>
 #include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/serialize_buffer.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/util/zip_iterator.hpp>

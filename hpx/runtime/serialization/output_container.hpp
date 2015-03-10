@@ -52,7 +52,7 @@ namespace hpx { namespace serialization {
     public:
         output_container(Container& cont,
             std::vector<serialization_chunk>* chunks,
-            util::binary_filter* filter)
+            binary_filter* filter)
           : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
             chunks_(chunks), current_chunk_(std::size_t(-1))
         {
@@ -106,7 +106,7 @@ namespace hpx { namespace serialization {
             }
         }
 
-        void set_filter(util::binary_filter* filter) // override
+        void set_filter(binary_filter* filter) // override
         {
             HPX_ASSERT(0 == filter_);
             filter_ = filter;
@@ -182,7 +182,7 @@ namespace hpx { namespace serialization {
         Container& cont_;
         std::size_t current_;
         std::size_t start_compressing_at_;
-        util::binary_filter* filter_;
+        binary_filter* filter_;
 
         std::vector<serialization_chunk>* chunks_;
         std::size_t current_chunk_;

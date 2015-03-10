@@ -6,13 +6,13 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::util::serialize_buffer<char> buffer_plain_type;
+typedef hpx::serialization::serialize_buffer<char> buffer_plain_type;
 
 buffer_plain_type bounce_plain(buffer_plain_type const& receive_buffer)
 {
@@ -26,7 +26,7 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(
     buffer_plain_type, serialization_buffer_char);
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::util::serialize_buffer<char, std::allocator<char> >
+typedef hpx::serialization::serialize_buffer<char, std::allocator<char> >
     buffer_allocator_type;
 
 buffer_allocator_type bounce_allocator(buffer_allocator_type const& receive_buffer)
