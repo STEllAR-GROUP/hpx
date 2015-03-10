@@ -67,11 +67,11 @@ code as we replaced it with `hpx::util::function_nonser` which was the default
 expansion used for this macro. In future releases of __hpx__ we will allow for
 `std::function` to be used transparently as well.
 
-* Changes to `Unique_future`- `Unique_future`, which was depricated
+* Changes to `hpx::unique_future`- `hpx::unique_future`, which was deprecated
 in the previous release for
-[funcref hpx::future `hpx::future`] will now be completely removed from __hpx__.
-This completes the transition to a completely standards conforming future
-implementation.
+[funcref hpx::future `hpx::future`] is now completely removed from __hpx__.
+This completes the transition to a completely standards conforming
+implementation of `hpx::future`.
 
 * Changes to Supported Compilers- Finally, in order to utilize more
 C++11 semantics, we have officially
