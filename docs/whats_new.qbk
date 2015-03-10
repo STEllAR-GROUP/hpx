@@ -82,14 +82,19 @@ page for more details.
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1402] - Internal shared_future serialization copies
 * [issue 1399] - Build takes unusually long time...
 * [issue 1398] - Tests using the scan partitioner are broken on at least gcc 4.7
                  and intel compiler
+* [issue 1397] - Completely remove hpx::unique_future
 * [issue 1396] - Parallel scan algorithms with different initial values
 * [issue 1395] - Race Condition - 1d_stencil_8 - SuperMIC
 * [issue 1394] - "suspending thread while at least one lock is being held" -
                  1d_stencil_8 - SuperMIC
 * [issue 1393] - SEGFAULT in 1d_stencil_8 on SuperMIC
+* [issue 1392] - Fixing #1168
+* [issue 1391] - Parallel Algorithms for scan partitioner for small number of
+                 elements
 * [issue 1387] - Failure with more than 4 localities
 * [issue 1386] - Dispatching unhandled exceptions to outer user code
 * [issue 1385] - Adding Copy algorithms, fixing `parallel::copy_if`
@@ -199,6 +204,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1254] - thread binding seems to not work properly
 * [issue 1220] - parallel::copy_if is broken
 * [issue 1217] - Find a better way of fixing the issue patched by #1216
+* [issue 1168] - Starting HPX on Cray machines using aprun isn't working correctly
 * [issue 1085] - Replace startup and shutdown barriers with broadcasts
 * [issue 981]  - With SLURM, --hpx:threads=8 should not be necessary
 * [issue 857]  - hpx::naming::locality leaks parcelport specific information
