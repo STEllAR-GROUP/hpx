@@ -6,6 +6,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHMS_SET_OPERATION_MAR_06_2015_0704PM)
 #define HPX_PARALLEL_ALGORITHMS_SET_OPERATION_MAR_06_2015_0704PM
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
