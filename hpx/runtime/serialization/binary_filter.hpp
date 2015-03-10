@@ -1,18 +1,19 @@
 // Copyright (c) 2007-2013 Hartmut Kaiser
+// Copyright (c) 2015 Anton Bikineev
 //
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_BINARY_FILTER_FEB_14_2013_0809PM)
-#define HPX_UTIL_BINARY_FILTER_FEB_14_2013_0809PM
+#if !defined(HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM)
+#define HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM
 
 #include <memory>
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/polymorphic_intrusive_factory.hpp>
 
-namespace hpx { namespace util
+namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // Base class for all serialization filters.

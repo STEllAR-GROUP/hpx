@@ -3,22 +3,22 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_SERIALIZE_BUFFER_APR_05_2013_0312PM)
-#define HPX_UTIL_SERIALIZE_BUFFER_APR_05_2013_0312PM
+#if !defined(HPX_SERIALIZATION_SERIALIZE_BUFFER_APR_05_2013_0312PM)
+#define HPX_SERIALIZATION_SERIALIZE_BUFFER_APR_05_2013_0312PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
-#include <hpx/util/serialize_allocator.hpp>
+#include <hpx/runtime/serialization/allocator.hpp>
 
 #include <boost/shared_array.hpp>
 #include <boost/mpl/bool.hpp>
 
 #include <algorithm>
 
-namespace hpx { namespace util
+namespace hpx { namespace serialization
 {
     namespace detail
     {
@@ -524,18 +524,18 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for streaming with util::any, we don't want
-    // util::serialize_buffer to be streamable
+    // serialization::serialize_buffer to be streamable
     template <typename T, typename Allocator>
-    struct supports_streaming_with_any<util::serialize_buffer<T, Allocator> >
+    struct supports_streaming_with_any<serialization::serialize_buffer<T, Allocator> >
       : boost::mpl::false_
     {};
 
     ///////////////////////////////////////////////////////////////////////////
     // Calculate the required amount of raw memory for serialization.
     template <typename T, typename Allocator>
-    struct type_size<util::serialize_buffer<T, Allocator> >
+    struct type_size<serialization::serialize_buffer<T, Allocator> >
     {
-        static std::size_t call(util::serialize_buffer<T, Allocator> const& b)
+        static std::size_t call(serialization::serialize_buffer<T, Allocator> const& b)
         {
             return b.size() * sizeof(T) + sizeof(std::size_t) + sizeof(Allocator); //-V119
         }

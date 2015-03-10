@@ -81,10 +81,10 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 // Buffer object used on the client side to specify where to place the received
 // data
-typedef hpx::util::serialize_buffer<double> general_buffer_type;
+typedef hpx::serialization::serialize_buffer<double> general_buffer_type;
 
 // Buffer object used for sending the data back to the receiver.
-typedef hpx::util::serialize_buffer<double, pointer_allocator<double> >
+typedef hpx::serialization::serialize_buffer<double, pointer_allocator<double> >
     transfer_buffer_type;
 
 ///////////////////////////////////////////////////////////////////////////////

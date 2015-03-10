@@ -7,8 +7,8 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/serialize_buffer.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/foreach.hpp>
@@ -46,23 +46,23 @@ struct data_buffer
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int test_function1(hpx::util::serialize_buffer<double> const& b)
+int test_function1(hpx::serialization::serialize_buffer<double> const& b)
 {
     return 42;
 }
 HPX_PLAIN_ACTION(test_function1, test_action1)
 
-int test_function2(hpx::util::serialize_buffer<double> const& b1,
-    hpx::util::serialize_buffer<int> const& b2)
+int test_function2(hpx::serialization::serialize_buffer<double> const& b1,
+    hpx::serialization::serialize_buffer<int> const& b2)
 {
     return 42;
 }
 HPX_PLAIN_ACTION(test_function2, test_action2)
 
 int test_function3(double d,
-    hpx::util::serialize_buffer<double> const& b1,
+    hpx::serialization::serialize_buffer<double> const& b1,
     std::string const& s, int i,
-    hpx::util::serialize_buffer<int> const& b2)
+    hpx::serialization::serialize_buffer<int> const& b2)
 {
     return 42;
 }
@@ -327,8 +327,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::vector<double> data1;
         data1.resize(size << i);
 
-        hpx::util::serialize_buffer<double> buffer1(data1.data(), data1.size(),
-            hpx::util::serialize_buffer<double>::reference);
+        hpx::serialization::serialize_buffer<double> buffer1(data1.data(), data1.size(),
+            hpx::serialization::serialize_buffer<double>::reference);
 
         test_normal_serialization<test_action1>(buffer1);
         test_zero_copy_serialization<test_action1>(buffer1);
@@ -336,8 +336,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::vector<int> data2;
         data2.resize(size << i);
 
-        hpx::util::serialize_buffer<int> buffer2(data2.data(), data2.size(),
-            hpx::util::serialize_buffer<int>::reference);
+        hpx::serialization::serialize_buffer<int> buffer2(data2.data(), data2.size(),
+            hpx::serialization::serialize_buffer<int>::reference);
 
         test_normal_serialization(buffer1, buffer2);
         test_zero_copy_serialization(buffer1, buffer2);

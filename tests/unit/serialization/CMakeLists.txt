@@ -8,6 +8,8 @@ set(tests
     serialization_builtins
     serialization_smart_ptr
     serialization_vector
+    serialize_buffer
+    zero_copy_serialization
 )
 
 foreach(test ${tests})

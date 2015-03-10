@@ -231,14 +231,14 @@ private:
 // A simple Buffer for sending data, it does not need any special allocator
 // user data may be sent to another locality using zero copy by wrapping
 // it in one of these buffers
-typedef hpx::util::serialize_buffer<char> general_buffer_type;
+typedef hpx::serialization::serialize_buffer<char> general_buffer_type;
 
 
 // When receiving data, we receive a hpx::serialize_buffer, we try to minimize
 // copying of data by providing a receive buffer with a fixed data pointer
 // so that data is placed directly into it.
 typedef pointer_allocator<char>                             PointerAllocator;
-typedef hpx::util::serialize_buffer<char, PointerAllocator> transfer_buffer_type;
+typedef hpx::serialization::serialize_buffer<char, PointerAllocator> transfer_buffer_type;
 
 //----------------------------------------------------------------------------
 //

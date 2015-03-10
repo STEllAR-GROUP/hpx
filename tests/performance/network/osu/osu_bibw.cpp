@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
@@ -31,7 +31,7 @@
 char send_buffer[SEND_BUFSIZE];
 
 ///////////////////////////////////////////////////////////////////////////////
-void isend(hpx::util::serialize_buffer<char> const& receive_buffer) {}
+void isend(hpx::serialization::serialize_buffer<char> const& receive_buffer) {}
 HPX_PLAIN_ACTION(isend);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ send_async(hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
     isend_action send;
     for (std::size_t j = 0; j < window_size; ++j)
     {
-        typedef hpx::util::serialize_buffer<char> buffer_type;
+        typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
         // Note: The original benchmark uses MPI_Isend which does not
         //       create a copy of the passed buffer.
@@ -55,18 +55,18 @@ send_async(hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::serialize_buffer<char> irecv(std::size_t size)
+hpx::serialization::serialize_buffer<char> irecv(std::size_t size)
 {
-    typedef hpx::util::serialize_buffer<char> buffer_type;
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
     return buffer_type(send_buffer, size, buffer_type::reference);
 }
 HPX_PLAIN_ACTION(irecv);
 
 ///////////////////////////////////////////////////////////////////////////////
-std::vector<hpx::future<hpx::util::serialize_buffer<char> > >
+std::vector<hpx::future<hpx::serialization::serialize_buffer<char> > >
 recv_async(hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
 {
-    typedef hpx::util::serialize_buffer<char> buffer_type;
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
     std::vector<hpx::future<buffer_type> > lazy_results;
     lazy_results.reserve(window_size);
     irecv_action recv;
@@ -114,7 +114,7 @@ void run_benchmark(boost::program_options::variables_map & vm)
         {
             if(i == skip) t.restart();
 
-            typedef hpx::util::serialize_buffer<char> buffer_type;
+            typedef hpx::serialization::serialize_buffer<char> buffer_type;
             hpx::future<std::vector<hpx::future<buffer_type> > >recv_futures
                 = hpx::async(&recv_async, there, size, window_size);
 

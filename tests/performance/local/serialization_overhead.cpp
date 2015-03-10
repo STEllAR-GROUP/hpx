@@ -12,12 +12,11 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/serialize_buffer.hpp>
 
 #include <boost/format.hpp>
 
 // This function will never be called
-int test_function(hpx::util::serialize_buffer<double> const& b)
+int test_function(hpx::serialization::serialize_buffer<double> const& b)
 {
     return 42;
 }
@@ -76,8 +75,8 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     std::vector<double> data;
     data.resize(data_size);
 
-    hpx::util::serialize_buffer<double> buffer(data.data(), data.size(),
-        hpx::util::serialize_buffer<double>::reference);
+    hpx::serialization::serialize_buffer<double> buffer(data.data(), data.size(),
+        hpx::serialization::serialize_buffer<double>::reference);
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp;

@@ -12,7 +12,7 @@
 
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/util/binary_filter.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 
 #include <boost/iostreams/filter/bzip2.hpp>
 
@@ -62,14 +62,14 @@ namespace hpx { namespace plugins { namespace compression
         };
     }
 
-    struct HPX_LIBRARY_EXPORT bzip2_serialization_filter : public util::binary_filter
+    struct HPX_LIBRARY_EXPORT bzip2_serialization_filter : public serialization::binary_filter
     {
         bzip2_serialization_filter()
           : current_(0)
         {}
 
         bzip2_serialization_filter(bool compress,
-                util::binary_filter* next_filter = 0)
+                serialization::binary_filter* next_filter = 0)
           : compdecomp_(compress), current_(0)
         {}
         ~bzip2_serialization_filter();
@@ -112,7 +112,8 @@ namespace hpx { namespace plugins { namespace compression
         {                                                                     \
             /* Note that the caller is responsible for deleting the filter */ \
             /* instance returned from this function */                        \
-            static util::binary_filter* call(parcelset::parcel const& p)      \
+            static serialization::binary_filter* call(                        \
+                    parcelset::parcel const& p)                               \
             {                                                                 \
                 return hpx::create_binary_filter(                             \
                     "bzip2_serialization_filter", true);                      \

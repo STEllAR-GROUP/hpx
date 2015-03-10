@@ -20,11 +20,11 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/binary_filter.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/runtime/serialization/raw_ptr.hpp>
 
 #include <boost/config.hpp>
@@ -1049,7 +1049,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        struct hash_binary_filter : util::binary_filter
+        struct hash_binary_filter : serialization::binary_filter
         {
             explicit hash_binary_filter(std::size_t seed = 0)
               : hash(seed)

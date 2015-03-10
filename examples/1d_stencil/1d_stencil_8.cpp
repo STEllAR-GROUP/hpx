@@ -85,7 +85,7 @@ private:
 struct partition_data
 {
 private:
-    typedef hpx::util::serialize_buffer<double> buffer_type;
+    typedef hpx::serialization::serialize_buffer<double> buffer_type;
 
     struct hold_reference
     {

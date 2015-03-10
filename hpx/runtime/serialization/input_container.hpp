@@ -9,7 +9,6 @@
 
 #include <hpx/util/assert.hpp>
 
-#include <hpx/util/binary_filter.hpp>
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 
@@ -66,7 +65,7 @@ namespace hpx { namespace serialization {
 
         ~input_container() {}
 
-        void set_filter(util::binary_filter* filter) // override
+        void set_filter(binary_filter* filter) // override
         {
             filter_.reset(filter);
             if (filter) {
@@ -165,7 +164,7 @@ namespace hpx { namespace serialization {
 
         Container const& cont_;
         std::size_t current_;
-        HPX_STD_UNIQUE_PTR<util::binary_filter> filter_;
+        HPX_STD_UNIQUE_PTR<binary_filter> filter_;
         std::size_t decompressed_size_;
 
         std::vector<serialization_chunk> const* chunks_;

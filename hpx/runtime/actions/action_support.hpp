@@ -309,7 +309,7 @@ namespace hpx { namespace actions
 
         /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.
-        virtual util::binary_filter* get_serialization_filter(
+        virtual serialization::binary_filter* get_serialization_filter(
             parcelset::parcel const& p) const = 0;
 
         /// Return a pointer to the message handler to be used for this action.

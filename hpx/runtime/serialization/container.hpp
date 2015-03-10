@@ -7,15 +7,15 @@
 #ifndef HPX_SERIALIZATION_CONTAINER_HPP
 #define HPX_SERIALIZATION_CONTAINER_HPP
 
+#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/binary_filter.hpp>
 
 namespace hpx { namespace serialization {
     struct container
     {
         virtual ~container() {}
 
-        virtual void set_filter(util::binary_filter* filter) = 0;
+        virtual void set_filter(binary_filter* filter) = 0;
         virtual void save_binary(void const* address, std::size_t count)
         {
             HPX_ASSERT(false

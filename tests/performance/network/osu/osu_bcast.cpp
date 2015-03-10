@@ -9,8 +9,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
-#include <hpx/util/serialize_buffer.hpp>
 #include <hpx/util/any.hpp>
 
 #include <boost/assert.hpp>
@@ -38,7 +38,7 @@ struct broadcast_component
 
     HPX_DEFINE_COMPONENT_ACTION(broadcast_component, init);
 
-    typedef hpx::util::serialize_buffer<char> buffer_type;
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
     double run(std::size_t size, std::size_t iterations, std::size_t skip)
     {

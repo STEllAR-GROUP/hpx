@@ -37,7 +37,7 @@ inline std::size_t locidx(std::size_t i, std::size_t np, std::size_t nl)
 struct partition_data
 {
 private:
-    typedef hpx::util::serialize_buffer<double> buffer_type;
+    typedef hpx::serialization::serialize_buffer<double> buffer_type;
 
 public:
     partition_data()
