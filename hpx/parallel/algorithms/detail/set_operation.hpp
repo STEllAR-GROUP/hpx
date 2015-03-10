@@ -53,8 +53,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
     struct set_chunk_data
     {
-        std::size_t start_index;
+        std::size_t start;
         std::size_t len;
+        std::size_t start_index;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -87,11 +88,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         return parallel::util::partitioner<ExPolicy, OutIter, void>::call(
             policy, chunks.get(), cores,
             // first step, is applied to all partitions
-            [
-                first1, first2, len1, len2, dest,
-                buffer, chunks, step, combiner, setop, f
-            ]
-                (set_chunk_data* curr_chunk, std::size_t part_size)
+            [=](set_chunk_data* curr_chunk, std::size_t part_size)
             {
                 HPX_ASSERT(part_size == 1);
 
@@ -99,12 +96,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 std::size_t start1 = (curr_chunk - chunks.get()) * step;
                 std::size_t end1 = (std::min)(start1 + step, std::size_t(len1));
 
+                bool first_partition = (start1 == 0);
+                bool last_partition = (end1 == std::size_t(len1));
+
                 // all but the last chunk require special handling
-                if (end1 != std::size_t(len1))
+                if (!last_partition)
                 {
                     // this chunk will be handled by the next one if all
                     // elements of this partition are equal
-                    if (!f(first1[start1], first1[end1]))
+                    if (!f(first1[start1], first1[end1 + 1]))
                         return;
 
                     // move backwards to find earliest element which is equal to
@@ -118,44 +118,57 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 while (start1 != 0 && !f(first1[start1 - 1], first1[start1]))
                     --start1;
 
-                // find start in sequence 2
+                // find start and end in sequence 2
                 std::size_t start2 = 0;
+                if (!first_partition)
+                {
+                    start2 =
+                        std::lower_bound(
+                            first2, first2 + len2, first1[start1], f
+                        ) - first2;
+                }
+
                 std::size_t end2 = len2;
-
-                if (start1 != 0)
+                if (!last_partition)
                 {
-                    start2 = std::lower_bound(first2, first2 + len2,
-                        first1[start1], f) - first2;
-                }
-                if (end1 != len1)
-                {
-                    end2 = std::upper_bound(first2, first2 + len2,
-                        first1[end1 - 1], f) - first2;
+                    end2 =
+                        std::lower_bound(
+                            first2 + start2, first2 + len2, first1[end1], f
+                        ) - first2;
                 }
 
-                // perform requested set operation into the proper place of the
+                // perform requested set-operation into the proper place of the
                 // intermediate buffer
-                auto buffer_dest = buffer.get() + combiner(start1, start2);
+                curr_chunk->start = combiner(start1, start2);
+                auto buffer_dest = buffer.get() + curr_chunk->start;
                 curr_chunk->len =
                     setop(first1 + start1, first1 + end1,
                           first2 + start2, first2 + end2, buffer_dest, f
                     ) - buffer_dest;
             },
             // second step, is executed after all partitions are done running
-            [chunks, cores, dest](std::vector<future<void> >&&)
+            [buffer, chunks, cores, dest](std::vector<future<void> >&&)
             {
                 // accumulate real length
-                set_chunk_data* curr_chunk = chunks.get();
-                curr_chunk->start_index = 0;
+                set_chunk_data* chunk = chunks.get();
+                chunk->start_index = 0;
                 for (size_t i = 1; i != cores; ++i)
                 {
-                    set_chunk_data* next_chunk = ++curr_chunk;
-                    next_chunk->start_index =
+                    set_chunk_data* curr_chunk = chunk++;
+                    chunk->start_index =
                         curr_chunk->start_index + curr_chunk->len;
-                    curr_chunk = next_chunk;
                 }
 
                 // finally, copy data to destination
+                parallel::util::foreach_n_partitioner<
+                        hpx::parallel::parallel_execution_policy
+                    >::call(par, chunks.get(), cores,
+                        [buffer, dest](set_chunk_data* chunk, std::size_t)
+                        {
+                            std::copy(buffer.get() + chunk->start,
+                                buffer.get() + chunk->start + chunk->len,
+                                dest + chunk->start_index);
+                        });
 
                 return dest;
             },

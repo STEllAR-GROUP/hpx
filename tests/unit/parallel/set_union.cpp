@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,7 +25,7 @@ void test_set_union1(ExPolicy const& policy, IteratorTag)
     std::sort(boost::begin(c1), boost::end(c1));
     std::sort(boost::begin(c2), boost::end(c2));
 
-    std::vector<std::size_t> c3(c1.size()), c4(c1.size());
+    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size());
 
     hpx::parallel::set_union(policy,
         iterator(boost::begin(c1)), iterator(boost::end(c1)),
@@ -126,7 +126,7 @@ void test_set_union2(ExPolicy const& policy, IteratorTag)
     std::sort(boost::begin(c1), boost::end(c1), comp);
     std::sort(boost::begin(c2), boost::end(c2), comp);
 
-    std::vector<std::size_t> c3(c1.size()), c4(c1.size());
+    std::vector<std::size_t> c3(2*c1.size()), c4(2*c1.size());
 
     hpx::parallel::set_union(policy,
         iterator(boost::begin(c1)), iterator(boost::end(c1)),
