@@ -226,7 +226,7 @@ namespace hpx { namespace lcos { namespace detail
         boost::is_void<typename traits::future_traits<Future>::type>
     >::type serialize_future_save(Archive& ar, Future const& f)
     {
-        typedef typename traits::future_traits<Future>::type value_type;
+        typedef typename traits::future_traits<Future>::result_type value_type;
 
         if(f.valid())
         {
