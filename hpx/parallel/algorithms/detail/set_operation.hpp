@@ -10,6 +10,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/foreach_partitioner.hpp>
 
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_scalar.hpp>
