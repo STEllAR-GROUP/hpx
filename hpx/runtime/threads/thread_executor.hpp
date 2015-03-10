@@ -167,7 +167,7 @@ namespace hpx { namespace threads
     //
     class HPX_EXPORT executor
     {
-        friend std::size_t hpx::get_os_thread_count(threads::executor& exec);
+        friend std::size_t hpx::get_os_thread_count(threads::executor const& exec);
 
     protected:
         // generic executors can't be created directly
