@@ -71,7 +71,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 if (first1 == last1)
                 {
-                    return detail::algorithm_result<ExPolicy, OutIter>::get(dest);
+                    typedef algorithm_result<ExPolicy, OutIter> result;
+                    return result::get(std::move(dest));
                 }
                 if (first2 == last2)
                 {
@@ -103,7 +104,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Constructs a sorted range beginning at dest consisting of all elements
-    /// present in both sorted ranges [first1, last1) and
+    /// present in the range [first1, last1) and not present in the range
     /// [first2, last2). This algorithm expects both input ranges to be sorted
     /// with the given binary predicate \a f.
     ///
@@ -111,11 +112,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///         the length of the first sequence and \a N2 is the length of the
     ///         second sequence.
     ///
-    /// If some element is found \a m times in [first1, last1) and \a n times
-    /// in [first2, last2), the first std::min(m, n) elements will be copied
-    /// from the first range to the destination range. The order of equivalent
-    /// elements is preserved. The resulting range cannot overlap with either
-    /// of the input ranges.
+    /// Equivalent elements are treated individually, that is, if some element
+    /// is found \a m times in [first1, last1) and \a n times in
+    /// [first2, last2), it will be copied to \a dest exactly std::max(m-n, 0)
+    /// times. The resulting range cannot overlap with either of the input
+    /// ranges.
     ///
     /// The resulting range cannot overlap with either of the input ranges.
     ///
@@ -216,7 +217,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Constructs a sorted range beginning at dest consisting of all elements
-    /// present in both sorted ranges [first1, last1) and
+    /// present in the range [first1, last1) and not present in the range
     /// [first2, last2). This algorithm expects both input ranges to be sorted
     /// with operator<
     ///
@@ -224,11 +225,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///         the length of the first sequence and \a N2 is the length of the
     ///         second sequence.
     ///
-    /// If some element is found \a m times in [first1, last1) and \a n times
-    /// in [first2, last2), the first std::min(m, n) elements will be copied
-    /// from the first range to the destination range. The order of equivalent
-    /// elements is preserved. The resulting range cannot overlap with either
-    /// of the input ranges.
+    /// Equivalent elements are treated individually, that is, if some element
+    /// is found \a m times in [first1, last1) and \a n times in
+    /// [first2, last2), it will be copied to \a dest exactly std::max(m-n, 0)
+    /// times. The resulting range cannot overlap with either of the input
+    /// ranges.
     ///
     /// The resulting range cannot overlap with either of the input ranges.
     ///

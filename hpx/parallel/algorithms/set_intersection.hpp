@@ -70,7 +70,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type2;
 
                 if (first1 == last1 || first2 == last2)
-                    return detail::algorithm_result<ExPolicy, OutIter>::get(dest);
+                {
+                    typedef algorithm_result<ExPolicy, OutIter> result;
+                    return result::get(std::move(dest));
+                }
 
                 typedef typename set_operations_buffer<OutIter>::type buffer_type;
                 typedef typename hpx::util::decay<F>::type func_type;
