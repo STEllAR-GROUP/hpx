@@ -1057,7 +1057,7 @@ namespace hpx
         return rt->get_config().get_os_thread_count();
     }
 
-    std::size_t get_os_thread_count(threads::executor& exec)
+    std::size_t get_os_thread_count(threads::executor const& exec)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL == rt)
