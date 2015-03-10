@@ -59,13 +59,17 @@ change required to modify the argument sequence for some of the exiting API
 functions ([funcref hpx::async_continue `hpx::async_continue`],
 [funcref hpx::apply_continue `hpx::apply_continue`],
 [funcref hpx::when_each `hpx::when_each`],
-[funcref hpx::wait_each `hpx::wait_each`]).
+[funcref hpx::wait_each `hpx::wait_each`], synchronous invocation of actions).
 
-* Changes to Macros- We also removed the macro `HPX_STD_FUNCTION`.
+* Changes to Macros- We also removed the macros `HPX_STD_FUNCTION` and
+`HPX_STD_TUPLE`.
 This shouldn't affect any user
-code as we replaced it with `hpx::util::function_nonser` which was the default
-expansion used for this macro. In future releases of __hpx__ we will allow for
-`std::function` to be used transparently as well.
+code as we replaced `HPX_STD_FUNCTION` with `hpx::util::function_nonser` which
+was the default expansion used for this macro. All __hpx__ API functions which
+expect a `hpx::util::function_nonser` (or a `hpx::util::unique_function_nonser`)
+can now be transparently called with a compatible `std::function` instead.
+Similarly, `HPX_STD_TUPLE` was replaced by its default expansion as well:
+`hpx::util::tuple`.
 
 * Changes to `hpx::unique_future`- `hpx::unique_future`, which was deprecated
 in the previous release for
