@@ -127,6 +127,8 @@ namespace hpx { namespace naming
             {
                 hpx::runtime *rt = hpx::get_runtime_ptr();
                 if(!rt) return;
+                // FIXME: This is still happening and leading to strange errors
+                // on shutdown.
                 if(hpx::is_stopped()) return;
 
                 // guard for wait_abort and other shutdown issues
