@@ -6,6 +6,7 @@
 #if !defined(HPX_PARALLEL_SET_OPERATIONS_MARCH_06_2015_1040AM)
 #define HPX_PARALLEL_SET_OPERATIONS_MARCH_06_2015_1040AM
 
+#include <hpx/parallel/algorithms/includes.hpp>
 #include <hpx/parallel/algorithms/set_difference.hpp>
 #include <hpx/parallel/algorithms/set_intersection.hpp>
 #include <hpx/parallel/algorithms/set_symmetric_difference.hpp>

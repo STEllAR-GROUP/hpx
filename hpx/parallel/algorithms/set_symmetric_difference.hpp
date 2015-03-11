@@ -5,8 +5,8 @@
 
 /// \file parallel/algorithms/set_symmetric_difference.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_SET_SYMMETRIC_DIFFERENCE_MAR_10_2015_0204PM)
-#define HPX_PARALLEL_DETAIL_SET_SYMMETRIC_DIFFERENCE_MAR_10_2015_0204PM
+#if !defined(HPX_PARALLEL_ALGORITHM_SET_SYMMETRIC_DIFFERENCE_MAR_10_2015_0204PM)
+#define HPX_PARALLEL_ALGORITHM_SET_SYMMETRIC_DIFFERENCE_MAR_10_2015_0204PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>

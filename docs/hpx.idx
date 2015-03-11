@@ -125,6 +125,9 @@ parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_
 parallel::generate                    "generate" "hpx\.parallel\.v1\.generate$"
 parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_n.*"
 
+# hpx/parallel/algorithms/includes.hpp
+parallel::includes                    "includes" "hpx\.parallel\.v1\.includes.*"
+
 # hpx/parallel/algorithms/inclusive_scan.hpp
 parallel::inclusive_scan              "inclusive_scan" "hpx\.parallel\.v1\.inclusive_scan.*"
 

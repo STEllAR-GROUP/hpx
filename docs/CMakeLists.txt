@@ -65,6 +65,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/find.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/for_each.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/includes.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/is_partitioned.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/is_sorted.hpp"

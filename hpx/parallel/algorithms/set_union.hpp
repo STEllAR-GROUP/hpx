@@ -5,8 +5,8 @@
 
 /// \file parallel/algorithms/set_union.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_SET_UNION_MAR_06_2015_1028AM)
-#define HPX_PARALLEL_DETAIL_SET_UNION_MAR_06_2015_1028AM
+#if !defined(HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM)
+#define HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
