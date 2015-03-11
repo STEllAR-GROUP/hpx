@@ -15,6 +15,8 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
@@ -31,6 +33,87 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename FwdIter, typename T, typename F, typename CancelToken>
+        FwdIter lower_bound(FwdIter first, FwdIter last, T const& value,
+            F && f, CancelToken& tok)
+        {
+            typedef typename std::iterator_traits<FwdIter>::difference_type
+                difference_type;
+
+            difference_type count = std::distance(first, last);
+            while (count > 0)
+            {
+                if (tok.was_cancelled())
+                    break;
+
+                difference_type step = count / 2;
+                FwdIter it = next(first, step);
+
+                if (f(*it, value))
+                {
+                    first = ++it;
+                    count -= step + 1;
+                }
+                else
+                {
+                    count = step;
+                }
+            }
+            return first;
+        }
+
+        template <typename FwdIter, typename T, typename F, typename CancelToken>
+        FwdIter upper_bound(FwdIter first, FwdIter last, T const& value,
+            F && f, CancelToken& tok)
+        {
+            typedef typename std::iterator_traits<FwdIter>::difference_type
+                difference_type;
+
+            difference_type count = std::distance(first, last);
+            while (count > 0)
+            {
+                if (tok.was_cancelled())
+                    break;
+
+                difference_type step = count / 2;
+                FwdIter it = next(first, step);
+
+                if (!f(*it, value))
+                {
+                    first = ++it;
+                    count -= step + 1;
+                }
+                else
+                {
+                    count = step;
+                }
+            }
+            return first;
+        }
+
+        template <typename InIter1, typename InIter2, typename F,
+            typename CancelToken>
+        bool includes(InIter1 first1, InIter1 last1, InIter2 first2,
+            InIter2 last2, F && f, CancelToken& tok)
+        {
+            while (first2 != last2)
+            {
+                if (tok.was_cancelled())
+                    return false;
+
+                if (first1 == last1 || f(*first2, *first1))
+                    return false;
+                if (!f(*first1, *first2))
+                    ++first2;
+
+                ++first1;
+            }
+            return true;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         struct includes : public detail::algorithm<includes, bool>
         {
             includes()
@@ -66,19 +149,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             FwdIter2 part_begin, std::size_t part_count
                         ) mutable -> bool
                     {
-                        auto part_end = part_begin;
-                        std::advance(part_end, part_count);
-
+                        FwdIter2 part_end = next(part_begin, part_count);
                         if (first2 != part_begin)
                         {
-                            part_begin = std::upper_bound(part_begin, part_end,
-                                *part_begin, f);
+                            part_begin = upper_bound(part_begin, part_end,
+                                *part_begin, f, tok);
+                            if (tok.was_cancelled())
+                                return false;
                             if (part_begin == part_end)
                                 return true;
                         }
 
-                        FwdIter1 low = std::lower_bound(first1, last1,
-                            *part_begin, f);
+                        FwdIter1 low = lower_bound(first1, last1,
+                            *part_begin, f, tok);
+                        if (tok.was_cancelled())
+                            return false;
+
                         if (low == last1 || f(*part_begin, *low))
                         {
                             tok.cancel();
@@ -88,12 +174,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         FwdIter1 high = last1;
                         if (part_end != last2)
                         {
-                            high = std::upper_bound(low, last1, *part_end, f);
-                            part_end = std::upper_bound(part_end, last2,
-                                *part_end, f);
+                            high = upper_bound(low, last1, *part_end, f, tok);
+                            part_end = upper_bound(part_end, last2,
+                                *part_end, f, tok);
+                            if (tok.was_cancelled())
+                                return false;
                         }
 
-                        if (!std::includes(low, high, part_begin, part_end, f))
+                        if (!includes(low, high, part_begin, part_end, f, tok))
                             tok.cancel();
 
                         return !tok.was_cancelled();
