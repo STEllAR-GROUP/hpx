@@ -488,6 +488,7 @@ namespace hpx { namespace parcelset
             if (hpx::is_stopped_or_shutting_down())
             {
                 if (ec == boost::asio::error::connection_aborted ||
+                    ec == boost::asio::error::connection_reset ||
                     ec == boost::asio::error::broken_pipe ||
                     ec == boost::asio::error::not_connected ||
                     ec == boost::asio::error::eof)
