@@ -1188,20 +1188,10 @@ namespace hpx
         if (std::abs(shutdown_timeout + 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
-        using components::server::runtime_support;
-
-        hpx::id_type root = hpx::find_root_locality();
-        if (hpx::find_here() == root)
-        {
-            runtime_support* p = get_runtime_support_ptr();
-            p->shutdown_all(shutdown_timeout);
-        }
-        else
-        {
-            // tell main locality to start application exit, duplicate requests
-            // will be ignored
-            apply<runtime_support::shutdown_all_action>(root, shutdown_timeout);
-        }
+        // tell main locality to start application exit, duplicated requests
+        // will be ignored
+        apply<components::server::runtime_support::shutdown_all_action>(
+            hpx::find_root_locality(), shutdown_timeout);
 
         util::apex_finalize();
         return 0;
