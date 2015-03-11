@@ -1231,9 +1231,18 @@ namespace hpx
         if (std::abs(shutdown_timeout + 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
+        util::apex_finalize();
+
         components::server::runtime_support* p =
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
+
+        if (0 == p) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
 
         p->call_shutdown_functions(true);
         p->call_shutdown_functions(false);
@@ -1266,6 +1275,12 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int stop(error_code& ec)
     {
+        if (threads::get_self_ptr()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+                "this function cannot be called from an HPX thread");
+            return -1;
+        }
+
         HPX_STD_UNIQUE_PTR<runtime> rt(get_runtime_ptr());    // take ownership!
         if (0 == rt.get()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
