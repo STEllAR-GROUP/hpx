@@ -83,10 +83,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             new_header();
         }
 
-        void stop()
-        {
-        }
-
         struct check_num_connections
         {
             check_num_connections(receiver *r)

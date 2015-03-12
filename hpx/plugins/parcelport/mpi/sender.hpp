@@ -80,10 +80,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , num_connections_(0)
         {}
 
-        void stop()
-        {
-        }
-
         struct check_num_connections
         {
             check_num_connections(sender *s)
