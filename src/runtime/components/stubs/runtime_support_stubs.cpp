@@ -196,7 +196,9 @@ namespace hpx { namespace components { namespace stubs
         typedef server::runtime_support::shutdown_action action_type;
 
         lcos::promise<void> value;
-        hpx::apply<action_type>(targetgid, timeout, value.get_gid());
+        // We need to make it unmanaged to avoid late refcnt requests
+        id_type gid(value.get_gid().get_gid(), id_type::unmanaged);
+        hpx::apply<action_type>(targetgid, timeout, gid);
         return value.get_future();
     }
 
