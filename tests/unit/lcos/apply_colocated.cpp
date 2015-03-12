@@ -103,7 +103,6 @@ int hpx_main()
     // register function which will verify final result
     hpx::register_shutdown_function(on_shutdown);
 
-    // finalize will synchronize with all pending operations
     HPX_TEST_EQ(hpx::finalize(), 0);
 
     return 0;
