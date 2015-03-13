@@ -783,6 +783,7 @@ namespace hpx { namespace parcelset
             }
             else
             {
+                ++operations_in_flight_;
                 HPX_ASSERT(num_parcels < parcels.size());
 
                 std::vector<write_handler_type> handled_handlers;
