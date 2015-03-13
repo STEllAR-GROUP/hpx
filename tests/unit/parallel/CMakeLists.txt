@@ -28,6 +28,7 @@ set(tests
     foreachn
     generate
     generaten
+    includes
     inclusive_scan
     is_partitioned
     is_sorted

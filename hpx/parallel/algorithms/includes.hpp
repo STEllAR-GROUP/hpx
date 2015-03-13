@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     break;
 
                 difference_type step = count / 2;
-                FwdIter it = next(first, step);
+                FwdIter it = detail::next(first, step);
 
                 if (f(*it, value))
                 {
@@ -78,7 +78,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     break;
 
                 difference_type step = count / 2;
-                FwdIter it = next(first, step);
+                FwdIter it = detail::next(first, step);
 
                 if (!f(*it, value))
                 {
@@ -95,7 +95,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         template <typename InIter1, typename InIter2, typename F,
             typename CancelToken>
-        bool includes(InIter1 first1, InIter1 last1, InIter2 first2,
+        bool sequential_includes(InIter1 first1, InIter1 last1, InIter2 first2,
             InIter2 last2, F && f, CancelToken& tok)
         {
             while (first2 != last2)
@@ -149,7 +149,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             FwdIter2 part_begin, std::size_t part_count
                         ) mutable -> bool
                     {
-                        FwdIter2 part_end = next(part_begin, part_count);
+                        FwdIter2 part_end = detail::next(part_begin, part_count);
                         if (first2 != part_begin)
                         {
                             part_begin = upper_bound(part_begin, part_end,
@@ -181,9 +181,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 return false;
                         }
 
-                        if (!includes(low, high, part_begin, part_end, f, tok))
+                        if (!sequential_includes(low, high, part_begin,
+                            part_end, f, tok))
+                        {
                             tok.cancel();
-
+                        }
                         return !tok.was_cancelled();
                     },
                     [](std::vector<hpx::future<bool> > && results)
