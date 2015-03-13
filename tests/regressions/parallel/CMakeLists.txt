@@ -21,6 +21,7 @@ foreach(test ${tests})
   # add example executable
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
+                     EXCLUDE_FROM_ALL
                      ${${test}_FLAGS}
                      FOLDER "Tests/Regressions/Parallel/")
 
