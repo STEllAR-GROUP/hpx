@@ -742,11 +742,13 @@ if(MSVC)
 
   hpx_add_config_define(BOOST_USE_WINDOWS_H)
   hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+  if(NOT CMAKE_CL_64)
+    hpx_add_config_define(BOOST_NO_ALIGNMENT)
+  endif()
   if(NOT HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
   endif()
   hpx_add_config_define(PSAPI_VERSION 1)
-
 endif()
 
 # Configure Warnings
