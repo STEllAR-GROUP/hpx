@@ -458,6 +458,10 @@ namespace hpx { namespace parcelset
             typedef pending_parcels_map::mapped_type mapped_type;
 
             lcos::local::spinlock::scoped_lock l(mtx_);
+            // We ignore the lock here. It might happen that while enqueuing,
+            // we need to acquire a lock. This should not cause any problems
+            // (famous last words)
+            util::ignore_while_checking<lcos::local::spinlock::scoped_lock> il(&l);
 
             mapped_type& e = pending_parcels_[locality_id];
             e.first.push_back(std::move(p));
@@ -473,6 +477,10 @@ namespace hpx { namespace parcelset
             typedef pending_parcels_map::mapped_type mapped_type;
 
             lcos::local::spinlock::scoped_lock l(mtx_);
+            // We ignore the lock here. It might happen that while enqueuing,
+            // we need to acquire a lock. This should not cause any problems
+            // (famous last words)
+            util::ignore_while_checking<lcos::local::spinlock::scoped_lock> il(&l);
 
             HPX_ASSERT(parcels.size() == handlers.size());
 
