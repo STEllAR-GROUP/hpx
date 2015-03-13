@@ -91,7 +91,7 @@ namespace hpx { namespace threads
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
             // Return an estimate of the number of waiting closures.
-            virtual std::size_t num_pending_closures(error_code& ec) const = 0;
+            virtual boost::uint64_t num_pending_closures(error_code& ec) const = 0;
 
             // Return the requested policy element
             virtual std::size_t get_policy_element(
@@ -194,7 +194,7 @@ namespace hpx { namespace threads
         }
 
         /// Return an estimate of the number of waiting closures.
-        std::size_t num_pending_closures(error_code& ec = throws) const
+        boost::uint64_t num_pending_closures(error_code& ec = throws) const
         {
             return executor_data_->num_pending_closures(ec);
         }

@@ -271,7 +271,7 @@ namespace hpx { namespace threads { namespace detail
         for (bounds_type::const_iterator it = b.begin(); it != b.end(); ++it, ++pu_index)
         {
             if (index == std::size_t(-1) || pu_index == index)
-                pu_mask |= t.init_thread_affinity_mask(*it+pu_base_index);
+                pu_mask |= t.init_thread_affinity_mask(std::size_t(*it+pu_base_index));
         }
 
         return mask & pu_mask;
@@ -324,11 +324,11 @@ namespace hpx { namespace threads { namespace detail
             if (index == std::size_t(-1) || core_index == index)
             {
                 core_mask |= t.init_core_affinity_mask_from_core(
-                    *it+core_base_index, mask_type());
+                    std::size_t(*it+core_base_index), mask_type());
             }
         }
 
-        core_base_index += *b.begin();
+        core_base_index += std::size_t(*b.begin());
         if (thread_index != std::size_t(-1) && b.size() > 1)
             core_base_index += thread_index;
 
@@ -395,10 +395,10 @@ namespace hpx { namespace threads { namespace detail
         for (bounds_type::const_iterator it = b.begin(); it != b.end(); ++it, ++socket_index)
         {
             if (index == std::size_t(-1) || socket_index == index)
-                mask |= t.init_socket_affinity_mask_from_socket(*it);
+                mask |= t.init_socket_affinity_mask_from_socket(std::size_t(*it));
         }
 
-        std::size_t socket_base_index = *b.begin();
+        std::size_t socket_base_index = std::size_t(*b.begin());
         if (thread_index != std::size_t(-1) && b.size() > 1)
             socket_base_index += thread_index;
 
@@ -432,10 +432,10 @@ namespace hpx { namespace threads { namespace detail
         for (bounds_type::const_iterator it = b.begin(); it != b.end(); ++it, ++node_index)
         {
             if (index == std::size_t(-1) || node_index == index)
-                mask |= t.init_numa_node_affinity_mask_from_numa_node(*it);
+                mask |= t.init_numa_node_affinity_mask_from_numa_node(std::size_t(*it));
         }
 
-        std::size_t node_base_index = *b.begin();
+        std::size_t node_base_index = std::size_t(*b.begin());
         if (thread_index != std::size_t(-1) && b.size() > 1)
             node_base_index += thread_index;
 
@@ -547,8 +547,8 @@ namespace hpx { namespace threads { namespace detail
             if (ec) return;
 
             // set each thread affinity only once
-            HPX_ASSERT(*it < static_cast<boost::int64_t>(affinities.size()));
-            if (any(affinities[*it]))
+            HPX_ASSERT(std::size_t(*it) < affinities.size());
+            if (any(affinities[std::size_t(*it)]))
             {
                 HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
                     boost::str(boost::format("affinity mask for thread %1% has "
@@ -557,7 +557,7 @@ namespace hpx { namespace threads { namespace detail
             }
 
             // set result
-            affinities[*it] = mask;
+            affinities[std::size_t(*it)] = mask;
 
             if (index != std::size_t(-1))
                 ++index;

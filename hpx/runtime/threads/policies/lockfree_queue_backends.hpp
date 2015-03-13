@@ -35,7 +35,7 @@ struct basic_lockfree_queue_backend
         size_type initial_size = 0
       , size_type num_thread = size_type(-1)
         )
-      : queue_(initial_size)
+      : queue_(std::size_t(initial_size))
     {}
 
     bool push(const_reference val, bool /*other_end*/ = false)
@@ -98,7 +98,7 @@ struct lockfree_abp_fifo_backend
         size_type initial_size = 0
       , size_type num_thread = size_type(-1)
         )
-      : queue_(initial_size)
+      : queue_(std::size_t(initial_size))
     {}
 
     bool push(const_reference val, bool /*other_end*/ = false)
@@ -146,7 +146,7 @@ struct lockfree_abp_lifo_backend
         size_type initial_size = 0
       , size_type num_thread = size_type(-1)
         )
-      : queue_(initial_size)
+      : queue_(std::size_t(initial_size))
     {}
 
     bool push(const_reference val, bool other_end = false)

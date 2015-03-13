@@ -237,7 +237,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     // Return an estimate of the number of waiting tasks.
     template <typename Scheduler>
-    std::size_t thread_pool_executor<Scheduler>::num_pending_closures(
+    boost::uint64_t thread_pool_executor<Scheduler>::num_pending_closures(
         error_code& ec) const
     {
         if (&ec != &throws)

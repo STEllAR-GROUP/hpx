@@ -313,9 +313,9 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
-        std::size_t get_num_pending_misses(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
-            std::size_t num_pending_misses = 0;
+            boost::uint64_t num_pending_misses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -333,9 +333,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_misses;
         }
 
-        std::size_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
         {
-            std::size_t num_pending_accesses = 0;
+            boost::uint64_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -353,9 +353,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_accesses;
         }
 
-        std::size_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::uint64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -373,9 +373,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::uint64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -393,9 +393,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::uint64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -413,9 +413,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::uint64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -521,8 +521,8 @@ namespace hpx { namespace threads { namespace policies
             boost::int64_t count = tq->get_pending_queue_length()/d + 1;
             dest->move_work_items_from(tq, count);
 
-            tq->increment_num_stolen_from_pending(count);
-            dest->increment_num_stolen_to_pending(count);
+            tq->increment_num_stolen_from_pending(std::size_t(count));
+            dest->increment_num_stolen_to_pending(std::size_t(count));
         }
 
         /// Return the next thread to be executed, return false if none is

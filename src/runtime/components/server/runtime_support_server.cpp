@@ -468,7 +468,7 @@ namespace hpx { namespace components { namespace server
         // ones here.
 #if defined(HPX_DEBUG)
         std::vector<naming::address> freed_components;
-        freed_components.reserve(count);
+        freed_components.reserve(std::size_t(count));
 #endif
 
         for (std::size_t i = 0; i != count; ++i)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -36,7 +36,7 @@ namespace hpx { namespace threads { namespace executors
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Return an estimate of the number of waiting tasks.
-            std::size_t num_pending_closures(error_code& ec) const;
+            boost::uint64_t num_pending_closures(error_code& ec) const;
 
         protected:
             static threads::thread_state_enum thread_function_nullary(
