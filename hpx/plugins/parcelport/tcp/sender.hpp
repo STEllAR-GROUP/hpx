@@ -156,7 +156,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             state_ = state_handle_write;
 #endif
             // just call initial handler
-            if(e==boost::asio::error::not_connected) std::cout << "handle_write\n";
             boost::get<0>(handler)(e, bytes);
             if (e)
             {
@@ -193,7 +192,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_handle_read_ack;
 #endif
-                if(e==boost::asio::error::not_connected) std::cout << "handle_read_ack\n";
             buffer_.clear();
             // Call post-processing handler, which will send remaining pending
             // parcels. Pass along the connection so it can be reused if more

@@ -224,7 +224,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             boost::tuple<Handler> handler)
         {
             if (e) {
-                if(e==boost::asio::error::not_connected) std::cout << "handle_read_chunk_data\n";
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
@@ -281,7 +280,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             boost::tuple<Handler> handler)
         {
             if (e) {
-                if(e==boost::asio::error::not_connected) std::cout << "handle_read_data\n";
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
@@ -324,7 +322,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         void handle_write_ack(boost::system::error_code const& e,
             boost::tuple<Handler> handler)
         {
-            if(e==boost::asio::error::not_connected) std::cout << "handle_write_ack\n";
             // Inform caller that data has been received ok.
             boost::get<0>(handler)(e);
 
