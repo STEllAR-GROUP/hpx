@@ -15,7 +15,7 @@
     static const std::size_t management_space = 0x1600;
 #else
 #if defined(HPX_INTEL_VERSION)
-    static const std::size_t management_space = 0x1900;
+    static const std::size_t management_space = 0x2000;
 #else
     static const std::size_t management_space = 0x800;
 #endif
