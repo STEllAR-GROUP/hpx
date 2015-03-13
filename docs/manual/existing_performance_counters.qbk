@@ -657,13 +657,13 @@ system and application performance.
 
           where:[br]
           `locality#*` is defining the locality for which the
-          overall number of retired __hpx__-threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          current number of threads with the given state should be queried for.
+          The locality id (given by `*`) is a (zero based) number identifying 
+          the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          overall number of retired __hpx__-threads should be queried for. The
-          worker thread number (given by the `*`) is a (zero based) number
+          current number of threads with the given state should be queried for.
+          The worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
           option [hpx_cmdline `--hpx:threads`].
@@ -690,12 +690,12 @@ system and application performance.
 
           where:[br]
           `locality#*` is defining the locality for which the
-          overall number of retired __hpx__-threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          average wait time of __hpx__-threads (pending) or thread descriptions
+          (staged) with the given state should be queried for.  The locality 
+          id (given by `*`) is a (zero based) number identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          overall number of retired __hpx__-threads should be queried for. The
+          average wait time for the given state should be queried for. The
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
@@ -751,9 +751,9 @@ system and application performance.
 
           where:[br]
           `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          creation idle rate of all (or one) worker threads should be queried 
+          for. The locality id (given by `*`) is a (zero based) number 
+          identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
           averaged idle rate should be queried for. The
@@ -778,12 +778,12 @@ system and application performance.
 
           where:[br]
           `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          cleanup idle rate of all (or one) worker threads should be queried 
+          for. The locality id (given by `*`) is a (zero based) number 
+          identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
+          averaged cleanup idle rate should be queried for. The
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
@@ -835,8 +835,8 @@ system and application performance.
     [   [`/threads/count/stack-recycles`]
         [`locality#*/total`
 
-          where:[br] `*` is the locality id of the locality the unbind
-          (madvise) operations should be queried for. The locality id is a
+          where:[br] `*` is the locality id of the locality the recylcling
+          operations should be queried for. The locality id is a
           (zero based) number identifying the locality.
         ]
         [None]
@@ -864,13 +864,13 @@ system and application performance.
          `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
+          `locality#*` is defining the locality for which the number of pending queue
+          misses of all (or one) worker threads should be queried for. The
           locality id (given by `*`) is a (zero based) number identifying the
           locality
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
+          number of pending queue misses should be queried for. The
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
@@ -878,7 +878,7 @@ system and application performance.
         ]
         [None]
         [Returns the total number of times that the referenced worker-thread
-         on the referenced locality failed to find pending HPX-threads in its
+         on the referenced locality failed to find pending __hpx__-threads in its
          associated queue.
          This counter is available only if the configuration time constant
          `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
@@ -889,13 +889,13 @@ system and application performance.
          `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
+          `locality#*` is defining the locality for which the number of pending queue
+          accesses of all (or one) worker threads should be queried for. The
           locality id (given by `*`) is a (zero based) number identifying the
           locality
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
+          number of pending queue accesses should be queried for. The
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
@@ -903,7 +903,7 @@ system and application performance.
         ]
         [None]
         [Returns the total number of times that the referenced worker-thread
-         on the referenced locality looked for pending HPX-threads in its
+         on the referenced locality looked for pending __hpx__-threads in its
          associated queue.
          This counter is available only if the configuration time constant
          `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
@@ -914,17 +914,17 @@ system and application performance.
          `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          `locality#*` is defining the locality for which the number of
+          __hpx__-threads stolen from the staged queue of all (or one) worker
+          threads should be queried for. The locality id (given by `*`) 
+          is a (zero based) number identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
-          worker thread number (given by the `*`) is a (zero based) number
-          identifying the worker thread. The number of available worker threads
-          is usually specified on the command line for the application using the
-          option [hpx_cmdline `--hpx:threads`].
+          number of __hpx__-threads stolen from the staged queue should be queried 
+          for. The worker thread number (given by the `*`) is a (zero based) 
+          number identifying the worker thread. The number of available worker 
+          threads is usually specified on the command line for the application 
+          using the option [hpx_cmdline `--hpx:threads`].
         ]
         [None]
         [Returns the total number of __hpx__-threads 'stolen' from the staged
@@ -940,21 +940,21 @@ system and application performance.
          `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          `locality#*` is defining the locality for which the number of
+          __hpx__-threads stolen to the pending queue of all (or one) worker
+          threads should be queried for. The locality id (given by `*`) 
+          is a (zero based) number identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
-          worker thread number (given by the `*`) is a (zero based) number
-          identifying the worker thread. The number of available worker threads
-          is usually specified on the command line for the application using the
-          option [hpx_cmdline `--hpx:threads`].
+          number of __hpx__-threads stolen to the pending queue should be queried 
+          for. The worker thread number (given by the `*`) is a (zero based) 
+          number identifying the worker thread. The number of available worker 
+          threads is usually specified on the command line for the application 
+          using the option [hpx_cmdline `--hpx:threads`].
         ]
         [None]
-        [Returns the total number of __hpx__-threads 'stolen' from the pending
-         thread queue of a neighboring worker thread (these threads are
+        [Returns the total number of __hpx__-threads 'stolen' to the pending
+         thread queue of the worker thread (these threads are
          executed by a different worker thread than they were initially
          scheduled on).
          This counter is available only if the configuration time constant
@@ -966,20 +966,21 @@ system and application performance.
          `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          `locality#*` is defining the locality for which the number of
+          __hpx__-threads stolen to the staged queue of all (or one) worker
+          threads should be queried for. The locality id (given by `*`) 
+          is a (zero based) number identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
+          number of __hpx__-threads stolen to the staged queue should be queried 
+          for. The worker thread number (given by the `*`) is a (zero based) 
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
           option [hpx_cmdline `--hpx:threads`].
         ]
         [None]
-        [Returns the total number of __hpx__-threads 'stolen' from the staged
+        [Returns the total number of __hpx__-threads 'stolen' to the staged
          thread queue of a neighboring worker thread (these threads are
          executed by a different worker thread than they were initially
          scheduled on).
