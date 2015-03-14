@@ -25,6 +25,8 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/is_base_of.hpp>
+#include <boost/mpl/or.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -346,11 +348,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a includes algorithm returns a \a hpx::future<bool> if the
-    ///           execution policy is of type
-    ///           \a sequential_task_execution_policy or
-    ///           \a parallel_task_execution_policy and
-    ///           returns \a bool otherwise.
     /// \returns  The \a includes algorithm returns a \a hpx::future<bool> if the
     ///           execution policy is of type
     ///           \a sequential_task_execution_policy or

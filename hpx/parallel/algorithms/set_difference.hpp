@@ -30,6 +30,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/is_base_of.hpp>
 #include <boost/mpl/or.hpp>
 #include <boost/mpl/not.hpp>
 
@@ -198,6 +199,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<OutIter>::iterator_category
             output_iterator_category;
 
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category1>::value),
+            "Requires at least input iterator.");
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category2>::value),
+            "Requires at least input iterator.");
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, output_iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, output_iterator_category>
+            >::value),
+            "Requires at least output iterator.");
+
         typedef typename boost::mpl::or_<
             parallel::is_sequential_execution_policy<ExPolicy>,
             boost::mpl::not_<boost::is_same<
@@ -293,6 +312,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             input_iterator_category2;
         typedef typename std::iterator_traits<OutIter>::iterator_category
             output_iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category1>::value),
+            "Requires at least input iterator.");
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::input_iterator_tag, input_iterator_category2>::value),
+            "Requires at least input iterator.");
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::mpl::or_<
+                boost::is_base_of<
+                    std::forward_iterator_tag, output_iterator_category>,
+                boost::is_same<
+                    std::output_iterator_tag, output_iterator_category>
+            >::value),
+            "Requires at least output iterator.");
 
         typedef typename boost::mpl::or_<
             parallel::is_sequential_execution_policy<ExPolicy>,
