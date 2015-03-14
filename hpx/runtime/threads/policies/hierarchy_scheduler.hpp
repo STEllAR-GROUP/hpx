@@ -276,6 +276,7 @@ namespace hpx { namespace threads { namespace policies
                 for(size_type j = 0; j < tree[i].size(); ++j)
                 {
                     result += tree[i][j]->get_average_thread_wait_time();
+                    ++count;
                 }
             }
 
@@ -311,6 +312,7 @@ namespace hpx { namespace threads { namespace policies
                 for(size_type j = 0; j < tree[i].size(); ++j)
                 {
                     result += tree[i][j]->get_average_task_wait_time();
+                    ++count;
                 }
             }
 
