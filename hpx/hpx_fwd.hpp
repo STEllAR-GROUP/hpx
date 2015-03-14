@@ -784,7 +784,7 @@ namespace hpx
     /// threads used by HPX.
     ///
     /// \param id [in] The id of the object to locate.
-    HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor& exec);
+    HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor const& exec);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool is_scheduler_numa_sensitive();

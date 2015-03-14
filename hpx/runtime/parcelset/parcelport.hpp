@@ -208,25 +208,25 @@ namespace hpx { namespace parcelset
         /// Performance counter data
 
         /// number of parcels sent
-        std::size_t get_parcel_send_count(bool reset)
+        boost::uint64_t get_parcel_send_count(bool reset)
         {
             return parcels_sent_.num_parcels(reset);
         }
 
         /// number of messages sent
-        std::size_t get_message_send_count(bool reset)
+        boost::uint64_t get_message_send_count(bool reset)
         {
             return parcels_sent_.num_messages(reset);
         }
 
         /// number of parcels received
-        std::size_t get_parcel_receive_count(bool reset)
+        boost::uint64_t get_parcel_receive_count(bool reset)
         {
             return parcels_received_.num_parcels(reset);
         }
 
         /// number of messages received
-        std::size_t get_message_receive_count(bool reset)
+        boost::uint64_t get_message_receive_count(bool reset)
         {
             return parcels_received_.num_messages(reset);
         }
@@ -276,19 +276,19 @@ namespace hpx { namespace parcelset
 #endif
 
         /// total data sent (bytes)
-        std::size_t get_data_sent(bool reset)
+        boost::uint64_t get_data_sent(bool reset)
         {
             return parcels_sent_.total_bytes(reset);
         }
 
         /// total data (uncompressed) sent (bytes)
-        std::size_t get_raw_data_sent(bool reset)
+        boost::uint64_t get_raw_data_sent(bool reset)
         {
             return parcels_sent_.total_raw_bytes(reset);
         }
 
         /// total data received (bytes)
-        std::size_t get_data_received(bool reset)
+        boost::uint64_t get_data_received(bool reset)
         {
             return parcels_received_.total_bytes(reset);
         }
@@ -304,12 +304,12 @@ namespace hpx { namespace parcelset
         }
 
         /// total data (uncompressed) received (bytes)
-        std::size_t get_raw_data_received(bool reset)
+        boost::uint64_t get_raw_data_received(bool reset)
         {
             return parcels_received_.total_raw_bytes(reset);
         }
 
-        std::size_t get_pending_parcels_count(bool /*reset*/)
+        boost::uint64_t get_pending_parcels_count(bool /*reset*/)
         {
             lcos::local::spinlock::scoped_lock l(mtx_);
             return pending_parcels_.size();

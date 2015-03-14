@@ -54,7 +54,7 @@ namespace hpx { namespace threads { namespace executors
             }
 
             // Return an estimate of the number of waiting tasks.
-            std::size_t num_pending_closures(error_code& ec) const;
+            boost::uint64_t num_pending_closures(error_code& ec) const;
 
         protected:
             // Return the requested policy element

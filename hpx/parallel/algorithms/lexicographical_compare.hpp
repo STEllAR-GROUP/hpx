@@ -114,8 +114,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// the second range [first2, last2). uses operator< to comapre elements.
     ///
     /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation <, where \code N1 = std::distance(first1, last) \endcode
-    ///         and \code N2 = std::distance(first2, last2) \endcode .
+    ///         operation <, where N1 = std::distance(first1, last)
+    ///         and N2 = std::distance(first2, last2).
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -215,8 +215,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// elements.
     ///
     /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where \code N1 = std::distance(first1, last) \endcode
-    ///         and \code N2 = std::distance(first2, last2) \endcode .
+    ///         operation, where N1 = std::distance(first1, last)
+    ///         and N2 = std::distance(first2, last2).
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution

@@ -58,7 +58,7 @@ namespace hpx { namespace threads { namespace executors
                 threads::thread_stacksize stacksize, error_code& ec);
 
             // Return an estimate of the number of waiting tasks.
-            std::size_t num_pending_closures(error_code& ec) const;
+            boost::uint64_t num_pending_closures(error_code& ec) const;
 
         protected:
             friend class manage_thread_pool_executor<Scheduler>;

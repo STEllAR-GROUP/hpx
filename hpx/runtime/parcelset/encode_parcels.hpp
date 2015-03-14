@@ -70,7 +70,7 @@ namespace hpx
         template <typename Buffer>
         std::size_t
         encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
-            int archive_flags_, std::size_t max_outbound_size)
+            int archive_flags_, boost::uint64_t max_outbound_size)
         {
             HPX_ASSERT(buffer.data_.empty());
             // collect argument sizes from parcels
@@ -78,7 +78,7 @@ namespace hpx
             boost::uint32_t dest_locality_id = ps[0].get_destination_locality_id();
 
             std::size_t parcels_sent = 0;
-            
+
             std::size_t parcels_size = 1;
             if(num_parcels != std::size_t(-1))
                 parcels_size = num_parcels;
@@ -93,7 +93,7 @@ namespace hpx
                             break;
                         arg_size += traits::get_type_size(ps[parcels_sent]);
                     }
-                    
+
                     buffer.data_.reserve(arg_size);
 
                     // mark start of serialization

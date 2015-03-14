@@ -365,19 +365,19 @@ namespace hpx { namespace parcelset
         // Performance counter data
 
         // number of parcels sent
-        std::size_t get_parcel_send_count(std::string const&, bool) const;
+        boost::int64_t get_parcel_send_count(std::string const&, bool) const;
 
         // number of messages sent
-        std::size_t get_message_send_count(std::string const&, bool) const;
+        boost::int64_t get_message_send_count(std::string const&, bool) const;
 
         // number of parcels routed
         boost::int64_t get_parcel_routed_count(bool);
 
         // number of parcels received
-        std::size_t get_parcel_receive_count(std::string const&, bool) const;
+        boost::int64_t get_parcel_receive_count(std::string const&, bool) const;
 
         // number of messages received
-        std::size_t get_message_receive_count(std::string const&, bool) const;
+        boost::int64_t get_message_receive_count(std::string const&, bool) const;
 
         // the total time it took for all sends, from async_write to the
         // completion handler (nanoseconds)
@@ -406,16 +406,16 @@ namespace hpx { namespace parcelset
 #endif
 
         // total data sent (bytes)
-        std::size_t get_data_sent(std::string const&, bool) const;
+        boost::int64_t get_data_sent(std::string const&, bool) const;
 
         // total data (uncompressed) sent (bytes)
-        std::size_t get_raw_data_sent(std::string const&, bool) const;
+        boost::int64_t get_raw_data_sent(std::string const&, bool) const;
 
         // total data received (bytes)
-        std::size_t get_data_received(std::string const&, bool) const;
+        boost::int64_t get_data_received(std::string const&, bool) const;
 
         // total data (uncompressed) received (bytes)
-        std::size_t get_raw_data_received(std::string const&, bool) const;
+        boost::int64_t get_raw_data_received(std::string const&, bool) const;
 
         boost::int64_t get_buffer_allocate_time_sent(std::string const&, bool) const;
         boost::int64_t get_buffer_allocate_time_received(std::string const&, bool) const;

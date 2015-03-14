@@ -2585,74 +2585,74 @@ bool addressing_service::retrieve_statistics_counter(
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions to access the current cache statistics
-std::size_t addressing_service::get_cache_hits(bool reset)
+boost::uint64_t addressing_service::get_cache_hits(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().hits(reset);
 }
 
-std::size_t addressing_service::get_cache_misses(bool reset)
+boost::uint64_t addressing_service::get_cache_misses(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().misses(reset);
 }
 
-std::size_t addressing_service::get_cache_evictions(bool reset)
+boost::uint64_t addressing_service::get_cache_evictions(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().evictions(reset);
 }
 
-std::size_t addressing_service::get_cache_insertions(bool reset)
+boost::uint64_t addressing_service::get_cache_insertions(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().insertions(reset);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-std::size_t addressing_service::get_cache_get_entry_count(bool reset)
+boost::uint64_t addressing_service::get_cache_get_entry_count(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_get_entry_count(reset);
 }
 
-std::size_t addressing_service::get_cache_insert_entry_count(bool reset)
+boost::uint64_t addressing_service::get_cache_insert_entry_count(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_insert_entry_count(reset);
 }
 
-std::size_t addressing_service::get_cache_update_entry_count(bool reset)
+boost::uint64_t addressing_service::get_cache_update_entry_count(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_update_entry_count(reset);
 }
 
-std::size_t addressing_service::get_cache_erase_entry_count(bool reset)
+boost::uint64_t addressing_service::get_cache_erase_entry_count(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_erase_entry_count(reset);
 }
 
-std::size_t addressing_service::get_cache_get_entry_time(bool reset)
+boost::uint64_t addressing_service::get_cache_get_entry_time(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_get_entry_time(reset);
 }
 
-std::size_t addressing_service::get_cache_insert_entry_time(bool reset)
+boost::uint64_t addressing_service::get_cache_insert_entry_time(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_insert_entry_time(reset);
 }
 
-std::size_t addressing_service::get_cache_update_entry_time(bool reset)
+boost::uint64_t addressing_service::get_cache_update_entry_time(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_update_entry_time(reset);
 }
 
-std::size_t addressing_service::get_cache_erase_entry_time(bool reset)
+boost::uint64_t addressing_service::get_cache_erase_entry_time(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
     return gva_cache_->get_statistics().get_erase_entry_time(reset);

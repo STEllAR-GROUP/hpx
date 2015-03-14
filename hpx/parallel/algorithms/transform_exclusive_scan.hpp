@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         OutIter sequential_transform_exclusive_scan(InIter first, InIter last,
             OutIter dest, Conv && conv, T init, Op && op)
         {
-            for (/**/; first != last; (void) ++first, ++dest)
+            for (/* */; first != last; (void) ++first, ++dest)
             {
                 *dest = init;
                 init = op(init, conv(*first));

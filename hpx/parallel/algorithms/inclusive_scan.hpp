@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         OutIter sequential_inclusive_scan(InIter first, InIter last,
             OutIter dest, T init, Op && op)
         {
-            for (/**/; first != last; (void) ++first, ++dest)
+            for (/* */; first != last; (void) ++first, ++dest)
             {
                 init = op(init, *first);
                 *dest = init;
@@ -53,7 +53,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         T sequential_inclusive_scan_n(InIter first, std::size_t count,
             OutIter dest, T init, Op && op)
         {
-            for (/**/; count-- != 0; (void) ++first, ++dest)
+            for (/* */; count-- != 0; (void) ++first, ++dest)
             {
                 init = op(init, *first);
                 *dest = init;

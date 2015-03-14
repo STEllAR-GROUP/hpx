@@ -16,8 +16,8 @@
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
-#include <hpx/parallel/algorithms/remote/dispatch.hpp>
 #include <hpx/parallel/algorithms/count.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
@@ -65,8 +65,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result =
-                        util::remote::dispatch(traits::get_id(sit),
+                    overall_result = dispatch(traits::get_id(sit),
                             std::forward<Algo>(algo), policy, true_(),
                             beg, end, value);
                 }
@@ -77,8 +76,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    overall_result +=
-                        util::remote::dispatch(traits::get_id(sit),
+                    overall_result += dispatch(traits::get_id(sit),
                             std::forward<Algo>(algo), policy, true_(),
                             beg, end, value);
                 }
@@ -90,8 +88,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        overall_result +=
-                            util::remote::dispatch(traits::get_id(sit),
+                        overall_result += dispatch(traits::get_id(sit),
                                 std::forward<Algo>(algo), policy, true_(),
                                 beg, end, value);
                     }
@@ -102,8 +99,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result +=
-                        util::remote::dispatch(traits::get_id(sit),
+                    overall_result += dispatch(traits::get_id(sit),
                             std::forward<Algo>(algo), policy, true_(),
                             beg, end, value);
                 }
@@ -147,10 +143,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, value));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, forced_seq(),
+                        beg, end, value));
                 }
             }
             else {
@@ -159,10 +154,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, value));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, forced_seq(),
+                        beg, end, value));
                 }
 
                 // handle all of the full partitions
@@ -172,10 +166,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        segments.push_back(
-                            util::remote::dispatch_async(traits::get_id(sit),
-                                std::forward<Algo>(algo), policy, forced_seq(),
-                                beg, end, value));
+                        segments.push_back(dispatch_async(traits::get_id(sit),
+                            std::forward<Algo>(algo), policy, forced_seq(),
+                            beg, end, value));
                     }
                 }
 
@@ -184,10 +177,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, value));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, forced_seq(),
+                        beg, end, value));
                 }
             }
 
@@ -275,10 +267,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result =
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, std::forward<F>(f));
+                    overall_result = dispatch(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, true_(),
+                        beg, end, std::forward<F>(f));
                 }
             }
             else {
@@ -287,10 +278,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    overall_result +=
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, std::forward<F>(f));
+                    overall_result += dispatch(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, true_(),
+                        beg, end, std::forward<F>(f));
                 }
 
                 // handle all of the full partitions
@@ -300,10 +290,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        overall_result +=
-                            util::remote::dispatch(traits::get_id(sit),
-                                std::forward<Algo>(algo), policy, true_(),
-                                beg, end, std::forward<F>(f));
+                        overall_result += dispatch(traits::get_id(sit),
+                            std::forward<Algo>(algo), policy, true_(),
+                            beg, end, std::forward<F>(f));
                     }
                 }
 
@@ -312,10 +301,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result +=
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, std::forward<F>(f));
+                    overall_result += dispatch(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, true_(),
+                        beg, end, std::forward<F>(f));
                 }
             }
 
@@ -357,10 +345,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, std::forward<F>(f)));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, forced_seq(),
+                        beg, end, std::forward<F>(f)));
                 }
             }
             else {
@@ -369,10 +356,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, std::forward<F>(f)));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, forced_seq(),
+                        beg, end, std::forward<F>(f)));
                 }
 
                 // handle all of the full partitions
@@ -382,10 +368,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        segments.push_back(
-                            util::remote::dispatch_async(traits::get_id(sit),
-                                std::forward<Algo>(algo), policy, forced_seq(),
-                                beg, end, std::forward<F>(f)));
+                        segments.push_back(dispatch_async(traits::get_id(sit),
+                            std::forward<Algo>(algo), policy, forced_seq(),
+                            beg, end, std::forward<F>(f)));
                     }
                 }
 
@@ -394,10 +379,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, std::forward<F>(f)));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        std::forward<Algo>(algo), policy, forced_seq(),
+                        beg, end, std::forward<F>(f)));
                 }
             }
 
