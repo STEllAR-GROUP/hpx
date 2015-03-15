@@ -434,7 +434,7 @@ void test_exclusive_scan_validate(ExPolicy const& p, std::vector<int> &a, std::v
   std::copy(b.end()-DISPLAY, b.end(), std::ostream_iterator<int>(std::cout, ", "));
 #endif
   //
-  for (int i=0; i<b.size(); ++i) {
+  for (std::size_t i=0; i<b.size(); ++i) {
     // counting from zero,
     int value = b[i];
     int expected_value  = INITIAL_VAL + check_n_triangle(i-1);
@@ -460,7 +460,7 @@ void test_exclusive_scan_validate(ExPolicy const& p, std::vector<int> &a, std::v
   std::copy(b.end()-DISPLAY, b.end(), std::ostream_iterator<int>(std::cout, ", "));
 #endif
   //
-  for (int i=0; i<b.size(); ++i) {
+  for (std::size_t i=0; i<b.size(); ++i) {
     // counting from 1, use i+1
     int value = b[i];
     int expected_value  = INITIAL_VAL + check_n_triangle(i);
@@ -487,7 +487,7 @@ void test_exclusive_scan_validate(ExPolicy const& p, std::vector<int> &a, std::v
   std::cout << std::endl;
 #endif
   //
-  for (int i=0; i<b.size(); ++i) {
+  for (std::size_t i=0; i<b.size(); ++i) {
     // counting from zero,
     int value = b[i];
     int expected_value  = INITIAL_VAL + check_n_const(i, FILL_VALUE);
