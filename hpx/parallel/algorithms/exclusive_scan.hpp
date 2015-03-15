@@ -88,9 +88,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type;
                 difference_type count = std::distance(first, last) - 1;
 
-                *dest++ = init;
-                if (count == 0)
+                // The scan may use the same array for output as input
+                // don't write initial value until after sum to avoid trampling on input
+                OutIter iout = dest++;
+                T temp = init;
+              
+                if (count == 0) {
+                    *dest = temp;
                     return result::get(std::move(dest));
+                }
 
                 boost::shared_array<T> data(new T[count]);
 
@@ -99,7 +105,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 // results for each partition and the second produces the
                 // overall result
                 using hpx::util::make_zip_iterator;
-                return
+                auto ret =
                     util::scan_partitioner<ExPolicy, OutIter, T>::call(
                         policy, make_zip_iterator(first, data.get()), count, init,
                         // step 1 performs first part of scan algorithm
@@ -129,6 +135,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 data, count, dest, op, chunk_sizes);
                         }
                     );
+                // write output initial value
+                *iout = temp;
+                return ret;
             }
         };
         /// \endcond
