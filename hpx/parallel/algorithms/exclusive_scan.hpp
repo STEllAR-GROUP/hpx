@@ -45,10 +45,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         OutIter sequential_exclusive_scan(InIter first, InIter last,
             OutIter dest, T init, Op && op)
         {
+            T temp = init;
             for (/**/; first != last; (void) ++first, ++dest)
             {
-                *dest = init;
-                init = op(init, *first);
+                init  = op(init, *first);
+                *dest = temp;
+                temp  = init;
             }
             return dest;
         }
