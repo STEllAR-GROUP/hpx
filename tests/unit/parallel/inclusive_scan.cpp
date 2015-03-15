@@ -474,7 +474,8 @@ int check_n_const(int n, int x) {
 }
 
 // run scan algorithm, validate that output array hold expected answers.
-void test_inclusive_scan_validate(std::vector<int> &a, std::vector<int> &b)
+template <typename ExPolicy>
+void test_inclusive_scan_validate(ExPolicy const& p, std::vector<int> &a, std::vector<int> &b)
 {
   using namespace hpx::parallel;
   typedef std::vector<int>::iterator Iter;
@@ -483,7 +484,7 @@ void test_inclusive_scan_validate(std::vector<int> &a, std::vector<int> &b)
   a.clear();
   std::copy(boost::counting_iterator<int>(0), boost::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
   b.resize(a.size());
-  hpx::parallel::inclusive_scan(hpx::parallel::par, a.begin(), a.end(), b.begin(), 0,
+  hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(), 0,
                                 [](int bar, int baz){ return bar+baz; });
   //
   for (int i=0; i<b.size(); ++i) {
@@ -497,7 +498,7 @@ void test_inclusive_scan_validate(std::vector<int> &a, std::vector<int> &b)
   a.clear();
   std::copy(boost::counting_iterator<int>(1), boost::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
   b.resize(a.size());
-  hpx::parallel::inclusive_scan(hpx::parallel::par, a.begin(), a.end(), b.begin(), 0,
+  hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(), 0,
                                 [](int bar, int baz){ return bar+baz; });
   //
   for (int i=0; i<b.size(); ++i) {
@@ -511,7 +512,7 @@ void test_inclusive_scan_validate(std::vector<int> &a, std::vector<int> &b)
   a.clear();
   std::fill_n(std::back_inserter(a), ARRAY_SIZE, FILL_VALUE);
   b.resize(a.size());
-  hpx::parallel::inclusive_scan(hpx::parallel::par, a.begin(), a.end(), b.begin(), 0,
+  hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(), 0,
                                 [](int bar, int baz){ return bar+baz; });
   //
   for (int i=0; i<b.size(); ++i) {
@@ -527,10 +528,12 @@ void inclusive_scan_validate()
   std::vector<int> a, b;
   // test scan algorithms using separate array for output
   //  std::cout << " Validating dual arrays " <<std::endl;
-  test_inclusive_scan_validate(a,b);
+  test_inclusive_scan_validate(hpx::parallel::seq, a, b);
+  test_inclusive_scan_validate(hpx::parallel::par, a, b);
   // test scan algorithms using same array for input and output
   //  std::cout << " Validating in_place arrays " <<std::endl;
-  test_inclusive_scan_validate(a,a);
+  test_inclusive_scan_validate(hpx::parallel::seq, a, a);
+  test_inclusive_scan_validate(hpx::parallel::par, a, a);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
