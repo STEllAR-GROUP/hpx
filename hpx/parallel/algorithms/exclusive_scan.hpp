@@ -88,15 +88,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type;
                 difference_type count = std::distance(first, last) - 1;
 
+                if (count == 0) {
+                  *dest = init;
+                  return result::get(std::move(dest));
+                }
+              
                 // The scan may use the same array for output as input
                 // don't write initial value until after sum to avoid trampling on input
                 OutIter iout = dest++;
                 T temp = init;
               
-                if (count == 0) {
-                    *dest = temp;
-                    return result::get(std::move(dest));
-                }
 
                 boost::shared_array<T> data(new T[count]);
 
