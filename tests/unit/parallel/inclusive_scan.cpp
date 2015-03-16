@@ -7,6 +7,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/util/lightweight_test.hpp>
+//
+#include <boost/iterator/counting_iterator.hpp>
 
 #include "test_utils.hpp"
 
@@ -458,6 +460,82 @@ void inclusive_scan_bad_alloc_test()
     test_inclusive_scan_bad_alloc<std::input_iterator_tag>();
 }
 
+#define FILL_VALUE 10
+#define ARRAY_SIZE 10000
+
+// n'th value of sum of 1+2+3+...
+int check_n_triangle(int n) {
+    return n<0 ? 0 : (n)*(n+1)/2;
+}
+
+// n'th value of sum of x+x+x+...
+int check_n_const(int n, int x) {
+    return n<0 ? 0 : n*x;
+}
+
+// run scan algorithm, validate that output array hold expected answers.
+template <typename ExPolicy>
+void test_inclusive_scan_validate(ExPolicy const& p, std::vector<int> &a, std::vector<int> &b)
+{
+    using namespace hpx::parallel;
+    typedef std::vector<int>::iterator Iter;
+
+    // test 1, fill array with numbers counting from 0, then run scan algorithm
+    a.clear();
+    std::copy(boost::counting_iterator<int>(0), boost::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
+    b.resize(a.size());
+    hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(), 0,
+                                  [](int bar, int baz){ return bar+baz; });
+    //
+    for (std::size_t i=0; i<b.size(); ++i) {
+        // counting from zero,
+        int value = b[i];
+        int expected_value  = check_n_triangle(i);
+        if (!HPX_TEST(value == expected_value)) break;
+    }
+
+    // test 2, fill array with numbers counting from 1, then run scan algorithm
+    a.clear();
+    std::copy(boost::counting_iterator<int>(1), boost::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
+    b.resize(a.size());
+    hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(), 0,
+                                  [](int bar, int baz){ return bar+baz; });
+    //
+    for (std::size_t i=0; i<b.size(); ++i) {
+        // counting from 1, use i+1
+        int value = b[i];
+        int expected_value  = check_n_triangle(i+1);
+        if (!HPX_TEST(value == expected_value)) break;
+    }
+
+    // test 3, fill array with constant
+    a.clear();
+    std::fill_n(std::back_inserter(a), ARRAY_SIZE, FILL_VALUE);
+    b.resize(a.size());
+    hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(), 0,
+                                  [](int bar, int baz){ return bar+baz; });
+    //
+    for (std::size_t i=0; i<b.size(); ++i) {
+        int value = b[i];
+        int expected_value  = check_n_const(i+1, FILL_VALUE);
+        if (!HPX_TEST(value == expected_value)) break;
+    }
+}
+
+
+void inclusive_scan_validate()
+{
+    std::vector<int> a, b;
+    // test scan algorithms using separate array for output
+    //  std::cout << " Validating dual arrays " <<std::endl;
+    test_inclusive_scan_validate(hpx::parallel::seq, a, b);
+    test_inclusive_scan_validate(hpx::parallel::par, a, b);
+    // test scan algorithms using same array for input and output
+    //  std::cout << " Validating in_place arrays " <<std::endl;
+    test_inclusive_scan_validate(hpx::parallel::seq, a, a);
+    test_inclusive_scan_validate(hpx::parallel::par, a, a);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -474,6 +552,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     inclusive_scan_exception_test();
     inclusive_scan_bad_alloc_test();
+
+    inclusive_scan_validate();
 
     return hpx::finalize();
 }
