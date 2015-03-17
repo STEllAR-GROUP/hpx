@@ -111,7 +111,7 @@ endif()
 
 hpx_option(HPX_MALLOC
   STRING
-  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc and tbbmalloc (default is: tcmalloc)"
+  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
   ${DEFAULT_MALLOC} ADVANCED)
 
 hpx_option(HPX_WITH_HWLOC
