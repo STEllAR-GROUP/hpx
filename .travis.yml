@@ -13,11 +13,13 @@ before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -qq cmake
     - sudo apt-get install -qq libboost-all-dev
+    - export NUM_BUILDCORES=`grep -c ^processor /proc/cpuinfo`
 
 script:
     - mkdir build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DHPX_MALLOC=jemalloc
+    - echo ${NUM_BUILDCORES}
 
 notifications:
     email: false
