@@ -1,8 +1,21 @@
 language: cpp
 
+compiler:
+    - gcc
+    - clang
+
+branches:
+    only:
+        - travis
+
 before_install:
- - sudo apt-get update -qq
- - sudo apt-get install -qq cmake
+    - sudo apt-get update -qq
+    - sudo apt-get install -qq cmake
 
+script:
+    - mkdir build
+    - cd build
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DHPX_MALLOC=jemalloc
 
-script: ls -la
+notifications:
+    email: false
