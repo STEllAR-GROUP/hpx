@@ -187,6 +187,9 @@ struct HPX_EXPORT locality_namespace
     static void register_counter_types(
         error_code& ec = throws
         );
+    static void register_global_counter_types(
+        error_code& ec = throws
+        );
 
     void register_server_instance(
         char const* servicename

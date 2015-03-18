@@ -95,6 +95,13 @@ namespace hpx { namespace performance_counters
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
+        // restrict to locality zero
+        if (p.parentinstancename_ == "locality#*")
+        {
+            p.parentinstancename_ = "locality";
+            p.parentinstanceindex_ = 0;
+        }
+
         if (mode == discover_counters_minimal ||
             p.parentinstancename_.empty() || p.instancename_.empty())
         {
@@ -109,14 +116,11 @@ namespace hpx { namespace performance_counters
                 p.instancename_ = "total";
                 p.instanceindex_ = -1;
             }
+        }
 
-            status = get_counter_name(p, i.fullname_, ec);
-            if (!status_is_valid(status) || !f(i, ec) || ec)
-                return false;
-        }
-        else if (!f(i, ec) || ec) {
+        status = get_counter_name(p, i.fullname_, ec);
+        if (!status_is_valid(status) || !f(i, ec) || ec)
             return false;
-        }
 
         if (&ec != &throws)
             ec = make_success_code();
