@@ -19,7 +19,7 @@ before_install:
     - sudo apt-get install -qq cmake
     - sudo apt-get install -qq libboost1.53-all-dev
     - sudo apt-get install -qq libjemalloc-dev
-    - sudo apt-get install -qq hwloc
+    - sudo apt-get install -qq libhwloc-dev
     - export NUM_BUILDCORES=`grep -c ^processor /proc/cpuinfo`
 
 script:
