@@ -26,11 +26,13 @@ before_install:
     - sudo apt-get install -qq libhwloc-dev
     - export NUM_BUILDCORES=`grep -c ^processor /proc/cpuinfo`
 
-script:
+before_script:
     - mkdir build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=On
     - make core -j 2
+
+script:
     - make -k components -j 2
     - make -k examples -j 2
     - make -k tests.unit -j 2
