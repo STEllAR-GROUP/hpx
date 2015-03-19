@@ -10,7 +10,8 @@ env:
     
 branches:
     only:
-        - travis
+        - master
+        - release
 
 before_install:
     # more recent gcc
