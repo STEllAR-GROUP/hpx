@@ -4,6 +4,10 @@ compiler:
     - gcc
     - clang
 
+env:
+    - BUILD_TYPE=Debug
+    - BUILD_TYPE=Release
+    
 branches:
     only:
         - travis
@@ -25,7 +29,7 @@ before_install:
 script:
     - mkdir build
     - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=Release -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=$PWD/../ -DHPX_BUILD_EXAMPLES=On
+    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=On
     - make core -j 2
     - make -k components -j 2
     - make -k examples -j 2
