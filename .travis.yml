@@ -13,19 +13,23 @@ branches:
         - travis
 
 before_install:
-    # more recent compilers
+    # more recent gcc
     - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    # more recent clang
+    wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+    sudo apt-add-repository 'deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.5 main'
     # more recent cmake
     - sudo add-apt-repository -y ppa:kalakris/cmake
     # more recent boost
-    - sudo add-apt-repository -y ppa:apokluda/boost1.53
+    - sudo add-apt-repository -y ppa:boost-latest/ppa
     - sudo apt-get update -qq
-    - sudo apt-get install -qq cmake
-    - sudo apt-get install -qq libboost1.53-all-dev
-    - sudo apt-get install -qq libjemalloc-dev
-    - sudo apt-get install -qq libhwloc-dev
-    - if [ "$CXX" = "clang++" ]; then sudo apt-get install -y clang-3.5 libstdc++-4.8-dev; fi
-    - if [ "$CXX" = "clang++" ]; then export CXX="/usr/bin/clang++" CC="/usr/bin/clang"; fi
+    - sudo apt-get install -qq --force-yes cmake
+    - sudo apt-get install -qq --force-yes libboost1.55-all-dev
+    - sudo apt-get install -qq --force-yes libjemalloc-dev
+    - sudo apt-get install -qq --force-yes libhwloc-dev
+    - if [ "$CXX" = "clang++" ]; then sudo apt-get install -y --force-yes clang-3.5 libstdc++-4.8-dev; fi
+    - if [ "$CXX" = "clang++" ]; then sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.5 1; fi
+    - if [ "$CXX" = "clang++" ]; then sudo rm -rf /usr/local/clang-3.4; fi
     - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq libstdc++-4.9-dev g++-4.9; fi
     - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
     #- export NUM_BUILDCORES=`grep -c ^processor /proc/cpuinfo`
