@@ -24,20 +24,23 @@ before_install:
     - sudo apt-get install -qq libboost1.53-all-dev
     - sudo apt-get install -qq libjemalloc-dev
     - sudo apt-get install -qq libhwloc-dev
-    - export NUM_BUILDCORES=`grep -c ^processor /proc/cpuinfo`
+    - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev clang-3.5; fi
+    - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq libstdc++-4.9-dev g++-4.9; fi
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+    #- export NUM_BUILDCORES=`grep -c ^processor /proc/cpuinfo`
 
 before_script:
     - mkdir build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=On
-    - make core -j 2
+    - make core
 
 script:
-    - make -k components -j 2
-    - make -k examples -j 2
-    - make -k tests.unit -j 2
-    - make -k tests.regressions -j 2
-    - make -k tests.performance -j 2
+    - make -k components
+    #- make -k examples
+    #- make -k tests.unit
+    #- make -k tests.regressions
+    #- make -k tests.performance
     - make install
     
 notifications:
