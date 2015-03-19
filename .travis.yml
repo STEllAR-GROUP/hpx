@@ -41,14 +41,15 @@ before_install:
 before_script:
     - mkdir build
     - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=Off
+    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=On
     - make core -j ${BUILD_CORES}
     - make -k components -j ${BUILD_CORES}
     #- make -k examples -j ${BUILD_CORES}
     #- make -k tests.unit -j ${BUILD_CORES}
     #- make -k tests.regressions -j ${BUILD_CORES}
     #- make -k tests.performance -j ${BUILD_CORES}
-    - make install
+    - make examples.quickstart.hello_world
+    - ./bin/hello_world
 
 script:
     - echo "Done!"
