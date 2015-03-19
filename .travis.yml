@@ -49,10 +49,9 @@ before_script:
     #- make -k tests.regressions -j ${BUILD_CORES}
     #- make -k tests.performance -j ${BUILD_CORES}
     - make examples.quickstart.hello_world
-    - ./bin/hello_world
 
 script:
-    - echo "Done!"
+    - ./bin/hello_world
     
 notifications:
     email: false
