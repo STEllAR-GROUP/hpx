@@ -24,8 +24,8 @@ before_install:
     - sudo apt-get install -qq libboost1.53-all-dev
     - sudo apt-get install -qq libjemalloc-dev
     - sudo apt-get install -qq libhwloc-dev
-    - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev clang-3.5; fi
-    - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.5" CC="clang-3.5"; fi
+    - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq clang-3.5 libstdc++-4.8-dev; fi
+    - if [ "$CXX" = "clang++" ]; then which clang++; fi
     - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq libstdc++-4.9-dev g++-4.9; fi
     - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
     #- export NUM_BUILDCORES=`grep -c ^processor /proc/cpuinfo`
