@@ -41,7 +41,7 @@ before_install:
 before_script:
     - mkdir build
     - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=On
+    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=Off
     - make core
 
 script:
