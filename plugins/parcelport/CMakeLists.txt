@@ -13,20 +13,25 @@ set(parcelport_plugins
 
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
 set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES "" CACHE INTERNAL "" FORCE)
+set(HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES "" CACHE INTERNAL "" FORCE)
 
 macro(add_parcelport name)
   set(name_short ${name})
   set(name "parcelport_${name}")
   set(options STATIC)
   set(one_value_args FOLDER)
-  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
+  set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INCLUDE_DIRECTORIES)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  set_source_files_properties(
-    ${${name}_SOURCES}
-    PROPERTIES
-    INCLUDE_DIRECTORIES "${${name}_INCLUDE_DIRECTORIES}"
-  )
+  if (_parcelport_${name}_INCLUDE_DIRECTORIES)
+
+    set(HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES_${name} 
+#      ${HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES_${name}}
+      "${${name}_SOURCES}"
+      APPEND PROPERTY INCLUDE_DIRECTORIES 
+      "${_parcelport_${name}_INCLUDE_DIRECTORIES}"
+    )
+  endif()
 
   if(${${name}_STATIC})
     hpx_debug("adding static parcelport: ${name}")

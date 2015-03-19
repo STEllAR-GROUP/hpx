@@ -26,13 +26,42 @@ if(HPX_PARCELPORT_VERBS)
     NO_UPDATE
   )
 
+  ## ibverbs parcelport settings
+  hpx_option(HPX_PARCELPORT_VERBS_IFNAME STRING "The interface name of the ibverbs capable network adapter (default: ib0)" "ib0" CATEGORY "Parcelport" ADVANCED)
+  hpx_option(HPX_PARCELPORT_VERBS_DEVICE STRING "The device name of the ibverbs capable network adapter (default: roq0)" "roq" CATEGORY "Parcelport" ADVANCED)
+  hpx_option(HPX_PARCELPORT_VERBS_INTERFACE STRING "The interface name of the ibverbs capable network adapter (default: roq0)" "roq0" CATEGORY "Parcelport" ADVANCED)
+  hpx_option(HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD STRING "Size of the message payload not sent with RDMA (default: 512 byte)" "512" CATEGORY "Parcelport" ADVANCED)
+  hpx_option(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE STRING "Number of bytes a chunk in the memory pool can hold (default: 64MB)" "67108864" CATEGORY "Parcelport" ADVANCED)
+  hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of chunks that can be allocated (default: 100)" "100" CATEGORY "Parcelport" ADVANCED)
+
+  hpx_add_config_define(HPX_PARCELPORT_VERBS)
+  hpx_add_config_define(HPX_PARCELPORT_VERBS_IFNAME "\"${HPX_PARCELPORT_VERBS_IFNAME}\"")
+  hpx_add_config_define(HPX_PARCELPORT_VERBS_DEVICE "\"${HPX_PARCELPORT_VERBS_DEVICE}\"")
+  hpx_add_config_define(HPX_PARCELPORT_VERBS_INTERFACE "\"${HPX_PARCELPORT_VERBS_INTERFACE}\"")
+  hpx_add_config_define(HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD "${HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD}")
+  hpx_add_config_define(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE "${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE}")
+  hpx_add_config_define(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS "${HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS}")
+
   message("Adding subproject")
+  set(rdmahelper_EXPORTED_TARGETS HPXTargets)
   add_subproject(rdmahelper rdmahelper)
 
-  # this parcelport is defined entirely locally, 
-  # so headers are not part of the public API
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+  find_package(rdmahelper REQUIRED)
   
+  set(_parcelport_verbs_SOURCES 
+    "${hpx_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp" 
+    CACHE INTERNAL "global variable" FORCE)
+  set(_parcelport_verbs_INCLUDE_DIRECTORIES 
+    "${rdmahelper_INCLUDE_DIRS}" 
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    CACHE INTERNAL "global variable" FORCE)
+  set(_parcelport_verbs_LINKMODE 
+    "STATIC" 
+    CACHE INTERNAL "global variable" FORCE)
+  set(_parcelport_verbs_LIBRARIES 
+    "rdmahelper" 
+    CACHE INTERNAL "global variable" FORCE)
+
   macro(add_parcelport_verbs_module)
     hpx_debug("add_parcelport_verbs_module")
 
@@ -40,9 +69,12 @@ if(HPX_PARCELPORT_VERBS)
       STATIC
       SOURCES
         "${hpx_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
+      INCLUDE_DIRECTORIES
+        "${_parcelport_verbs_INCLUDE_DIRECTORIES}"
       HEADERS
       DEPENDENCIES
-      FOLDER "Core/Plugins/Parcelport/verbs")
+      FOLDER 
+        "Core/Plugins/Parcelport/verbs")
   endmacro()
 else()
   macro(add_parcelport_verbs_module)
