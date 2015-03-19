@@ -5,8 +5,8 @@ compiler:
     - clang
 
 env:
-    - BUILD_TYPE=Debug
-    - BUILD_TYPE=Release
+    - BUILD_TYPE=Debug BUILD_CORES=1
+    - BUILD_TYPE=Release BUILD_CORES=2
     
 branches:
     only:
@@ -42,14 +42,14 @@ before_script:
     - mkdir build
     - cd build
     - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=Off
-    - make core
+    - make core -j ${BUILD_CORES}
 
 script:
-    - make -k components
-    #- make -k examples
-    #- make -k tests.unit
-    #- make -k tests.regressions
-    #- make -k tests.performance
+    - make -k components -j ${BUILD_CORES}
+    #- make -k examples -j ${BUILD_CORES}
+    #- make -k tests.unit -j ${BUILD_CORES}
+    #- make -k tests.regressions -j ${BUILD_CORES}
+    #- make -k tests.performance -j ${BUILD_CORES}
     - make install
     
 notifications:
