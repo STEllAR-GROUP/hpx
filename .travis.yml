@@ -51,6 +51,7 @@ before_script:
     - make examples.quickstart.hello_world
 
 script:
+    - ldd ./bin/hello_world
     - ./bin/hello_world
     
 notifications:
