@@ -108,7 +108,7 @@ Linux
       cmake -DBOOST_ROOT=~/packages/boost \
             -DHWLOC_ROOT=/packages/hwloc \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.9
+            ~/downloads/hpx_0.9.10
 
 4) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores
