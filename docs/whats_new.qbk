@@ -12,9 +12,15 @@
 
 [heading General Changes]
 
+This is the 12th official release of __hpx__. It coincides with the 7th
+anniversary of the first commit to our source code repository. Since then,
+we have seen over 12300 commits amounting to more than 220000 lines of C++ code.
+
 The major focus of this release was to improve the reliability of large scale
 runs. We believe to have achieved this goal as we now can reliably run __hpx__
-applications on up to ~24k cores. This is a huge step forward in terms of
+applications on up to ~24k cores. We have also shown that HPX can be used with
+success for symmetric runs (applications using both, host cores and Intel
+Xeon/Phi coprocessors). This is a huge step forward in terms of
 the usability of __hpx__. The main focus of this work involed isolating
 the causes of the segmentation faults at start up and shut down.  Many of
 these issues were discovered to be the result of the suspention of threads
