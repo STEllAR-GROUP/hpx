@@ -42,7 +42,7 @@ before_install:
 before_script:
     - mkdir build
     - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=On
+    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=system -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=On
     - make core -j ${BUILD_CORES}
     - make -k components -j ${BUILD_CORES}
     #- make -k examples -j ${BUILD_CORES}
