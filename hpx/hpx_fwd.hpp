@@ -49,10 +49,12 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
+/// \cond NOINTERNAL
 namespace boost
 {
     class exception_ptr;
 }
+/// \endcond
 
 /// \namespace hpx
 ///
