@@ -38,10 +38,26 @@ set(example_programs
     zerocopy_rdma
    )
 
+set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_in_executable_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_inheritance_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_inheritance_simple_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(customize_async_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(simplest_hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
+
 if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
   set(example_programs ${example_programs}
       fractals_executor
      )
+  set(fractals_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
 
 if(HPX_WITH_CXX11_LAMBDAS)
@@ -50,35 +66,22 @@ if(HPX_WITH_CXX11_LAMBDAS)
       hello_world
       fibonacci_dataflow
       pipeline1
-      vector_zip_dotproduct
       vector_counting_dotproduct
+      vector_stencil_operations
+      vector_zip_dotproduct
      )
-endif()
 
-set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(component_in_executable_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(customize_async_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)
-
-set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(fractals_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
-if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
-  set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams DEPENDENCIES compress_snappy_lib)
-else()
-  set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
+  set(1d_wave_equation_FLAGS COMPONENT_DEPENDENCIES iostreams)
+  if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
+    set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams DEPENDENCIES compress_snappy_lib)
+  else()
+    set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
+  endif()
+  set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
+  set(vector_stencil_operations_FLAGS
+      COMPONENT_DEPENDENCIES iostreams vector_component)
+  set(vector_zip_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
-set(1d_wave_equation_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(simplest_hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(component_inheritance_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(component_inheritance_simple_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(vector_zip_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 foreach(example_program ${example_programs})
   set(sources
