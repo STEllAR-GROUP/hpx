@@ -16,6 +16,9 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
+//
+#include <hpx/util/memory_chunk_pool.hpp>
+
 // Local parcelport plugin
 #include <connection_handler_verbs.hpp>
 
@@ -26,6 +29,15 @@
 #include "RdmaLogging.h"
 #include "RdmaController.h"
 #include "RdmaDevice.h"
+#include "RdmaMemoryPool.h"
+
+//
+#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
+
+#include <boost/integer/endian.hpp>
+
+#define JB_MEM_POOL
 
 namespace hpx { namespace parcelset { namespace policies { namespace verbs {
 
@@ -107,7 +119,19 @@ private:
         }
       }
     }
-
+    if (ini.has_section("hpx.agas")) {
+      util::section const* sec = ini.get_section("hpx.agas");
+      if (NULL != sec) {
+        LOG_DEBUG_MSG("hpx.agas port number " << hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT));
+        _port = hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT);
+      }
+    }
+    if (ini.has_section("hpx.parcel")) {
+      util::section const* sec = ini.get_section("hpx.parcel");
+      if (NULL != sec) {
+        LOG_DEBUG_MSG("hpx.parcel port number " << hpx::util::get_entry_as<boost::uint16_t>(*sec, "port", HPX_INITIAL_IP_PORT));
+      }
+    }
     FUNC_END_DEBUG_MSG;
     return parcelset::locality(locality(_ibv_ip, _ibv_ip));
   }
@@ -117,14 +141,16 @@ public:
       util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
       util::function_nonser<void()> const& on_stop_thread) :
       parcelset::parcelport(ini, here(ini), "verbs"), archive_flags_(boost::archive::no_header)
+#ifndef JB_MEM_POOL
+  , chunk_pool_(4096, 32)
+#endif
   {
     FUNC_START_DEBUG_MSG;
-    _port   = 0;
+//    _port   = 0;
 #ifdef BOOST_BIG_ENDIAN
     std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
 #else
-    std::string
-    endian_out = get_config_entry("hpx.parcel.endian_out", "little");
+    std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
 #endif
     if (endian_out == "little")
       archive_flags_ |= util::endian_little;
@@ -137,14 +163,14 @@ public:
     if (!this->allow_array_optimizations()) {
       archive_flags_ |= util::disable_array_optimization;
       archive_flags_ |= util::disable_data_chunking;
-      std::cout << "Disabling array optimization and data chunking " << std::endl;
+      LOG_DEBUG_MSG("Disabling array optimization and data chunking");
     } else {
       if (!this->allow_zero_copy_optimizations()) {
         archive_flags_ |= util::disable_data_chunking;
-        std::cout << "Disabling data chunking " << std::endl;
+        LOG_DEBUG_MSG("Disabling data chunking");
       }
     }
-    _rdmaController = std::make_shared<RdmaController>(_ibverbs_device.c_str(), _ibverbs_interface.c_str(), 0);
+    _rdmaController = std::make_shared<RdmaController>(_ibverbs_device.c_str(), _ibverbs_interface.c_str(), _port);
 
     FUNC_END_DEBUG_MSG;
   }
@@ -246,6 +272,11 @@ public:
   bool run(bool blocking = true) {
     FUNC_START_DEBUG_MSG;
     _rdmaController->startup();
+#ifdef JB_MEM_POOL
+    LOG_DEBUG_MSG("Inside run, creating memory pool");
+    chunk_pool_ = _rdmaController->getMemoryPool();
+#endif
+
     FUNC_END_DEBUG_MSG;
     // This should start the receiving side of your PP
     return true;
@@ -263,6 +294,140 @@ public:
     // enable/disable sending and receiving of parcels
   }
 
+  int archive_flags_;
+#ifdef JB_MEM_POOL
+  typedef hpx::lcos::local::spinlock                      mutex_type;
+  typedef char                                            memory_type;
+  typedef RdmaMemoryPool                                     memory_pool_type;
+  typedef std::shared_ptr<memory_pool_type>               memory_pool_ptr_type;
+  typedef hpx::util::detail::memory_chunk_pool_allocator
+      <memory_type, mutex_type, memory_pool_type>         allocator_type;
+
+  typedef std::vector<memory_type, allocator_type>        data_type;
+  typedef parcel_buffer<data_type>                        snd_buffer_type;
+  memory_pool_ptr_type                                    chunk_pool_;
+#else
+  typedef util::memory_chunk_pool<>                       memory_pool_type;
+  typedef util::detail::memory_chunk_pool_allocator<char> allocator_type;
+  typedef std::vector<char, allocator_type>               data_type;
+  typedef parcel_buffer<data_type>                        snd_buffer_type;
+  typedef parcel_buffer<data_type, data_type>             rcv_buffer_type;
+  typedef lcos::local::spinlock                           mutex_type;
+  memory_pool_type                                        chunk_pool_;
+#endif
+
+/*
+
+  template <typename Buffer>
+  std::size_t
+  encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
+      int archive_flags_, std::size_t max_outbound_size)
+  {
+//      HPX_ASSERT(buffer.data_.empty());
+      // collect argument sizes from parcels
+      std::size_t arg_size = 0;
+      boost::uint32_t dest_locality_id = ps[0].get_destination_locality_id();
+
+      std::size_t parcels_sent = 0;
+
+      std::size_t parcels_size = 1;
+      if(num_parcels != std::size_t(-1))
+          parcels_size = num_parcels;
+
+      // guard against serialization errors
+      try {
+          try {
+              // preallocate data
+              for (; parcels_sent != parcels_size; ++parcels_sent)
+              {
+                  if (arg_size >= max_outbound_size)
+                      break;
+                  arg_size += traits::get_type_size(ps[parcels_sent]);
+              }
+
+LOG_DEBUG_MSG("Arg size for encoding is " << decnumber(arg_size));
+HPX_ASSERT(buffer->getLength()>arg_size);
+//              buffer.data_.reserve(arg_size);
+              // mark start of serialization
+              util::high_resolution_timer timer;
+
+              {
+                  // Serialize the data
+                  HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
+                      ps[0].get_serialization_filter());
+
+                  int archive_flags = archive_flags_;
+                  if (filter.get() != 0) {
+                      filter->set_max_length( buffer->getLength() ); // buffer.data_.capacity());
+                      archive_flags |= util::enable_compression;
+                  }
+
+                  util::portable_binary_oarchive archive(
+                      buffer->getAddress()
+                    , &buffer.chunks_
+                    , dest_locality_id
+                    , filter.get()
+                    , archive_flags);
+
+                  if(num_parcels != std::size_t(-1))
+                      archive << parcels_sent;
+
+                  for(std::size_t i = 0; i != parcels_sent; ++i)
+                      archive << ps[i];
+
+                  arg_size = archive.bytes_written();
+              }
+
+              // store the time required for serialization
+              buffer.data_point_.serialization_time_ = timer.elapsed_nanoseconds();
+          }
+          catch (hpx::exception const& e) {
+              LPT_(fatal)
+                  << "encode_parcels: "
+                     "caught hpx::exception: "
+                  << e.what();
+              hpx::report_error(boost::current_exception());
+              return 0;
+          }
+          catch (boost::system::system_error const& e) {
+              LPT_(fatal)
+                  << "encode_parcels: "
+                     "caught boost::system::error: "
+                  << e.what();
+              hpx::report_error(boost::current_exception());
+              return 0;
+          }
+          catch (boost::exception const&) {
+              LPT_(fatal)
+                  << "encode_parcels: "
+                     "caught boost::exception";
+              hpx::report_error(boost::current_exception());
+              return 0;
+          }
+          catch (std::exception const& e) {
+              // We have to repackage all exceptions thrown by the
+              // serialization library as otherwise we will loose the
+              // e.what() description of the problem, due to slicing.
+              boost::throw_exception(boost::enable_error_info(
+                  hpx::exception(serialization_error, e.what())));
+              return 0;
+          }
+      }
+      catch (...) {
+          LPT_(fatal)
+                  << "encode_parcels: "
+                 "caught unknown exception";
+          hpx::report_error(boost::current_exception());
+              return 0;
+      }
+
+      buffer.data_point_.num_parcels_ = parcels_sent;
+      encode_finalize(buffer, arg_size);
+
+      return parcels_sent;
+  }
+*/
+
   void put_parcel(parcelset::locality const & dest, parcel p, write_handler_type f) {
     FUNC_START_DEBUG_MSG;
     boost::uint32_t dest_ip = dest.get<locality>().ip_;
@@ -271,13 +436,54 @@ public:
     ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
     if (ip_it!=ip_qp_map.end()) {
       LOG_DEBUG_MSG("Connection found with qp " << ip_it->second);
+      RdmaClientPtr client = _rdmaController->getClient(ip_it->second);
+//      client->
     }
     else {
       LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
       RdmaClientPtr client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
       ip_qp_map[dest_ip] = client->getQpNum();
+
+      // copied from MPI parcelport
+      {
+            util::high_resolution_timer timer;
+
+#ifdef JB_MEM_POOL
+            allocator_type alloc(*chunk_pool_.get());
+            snd_buffer_type buffer(alloc);
+#else
+            allocator_type alloc(chunk_pool_);
+            snd_buffer_type buffer(alloc);
+#endif
+            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, this->get_max_outbound_message_size());
+
+
+//            allocator_type alloc(chunk_pool_);
+//            snd_buffer_type buffer(alloc);
+//            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, this->get_max_outbound_message_size());
+
+//            buffer.data_point_.time_ = timer.elapsed_nanoseconds();
+
+//            int dest_rank = dest.get<locality>().rank();
+//            HPX_ASSERT(dest_rank != util::mpi_environment::rank());
+
+//            sender_.send(
+//                dest_rank
+//              , buffer
+//              , hpx::util::bind(&receiver::receive, boost::ref(receiver_), false)
+//            );
+
+            error_code ec;
+            f(ec, p);
+//            buffer.data_point_.time_ =
+//                timer.elapsed_nanoseconds() - buffer.data_point_.time_;
+//            parcels_sent_.add_data(buffer.data_point_);
+
+            //do_background_work();
+      }
+
     }
-    // Send a single parcel, after succesful sending, f should be called.
+    // Send a single parcel, after successful sending, f should be called.
     FUNC_END_DEBUG_MSG;
   }
 
@@ -290,7 +496,6 @@ public:
   }
 
 private:
-  int archive_flags_;
 
   // Only needed for bootstrapping
   void early_write_handler(boost::system::error_code const& ec, parcel const & p) {

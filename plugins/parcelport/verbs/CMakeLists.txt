@@ -44,6 +44,10 @@ if(HPX_PARCELPORT_VERBS)
 
   message("Adding subproject")
   set(rdmahelper_EXPORTED_TARGETS HPXTargets)
+  
+  # build rdma helperlibrary with HPX support
+  add_definitions(-DRDMAHELPER_HPX_COMPATIBILITY)
+  
   add_subproject(rdmahelper rdmahelper)
 
   find_package(rdmahelper REQUIRED)
