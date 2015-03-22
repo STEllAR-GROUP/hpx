@@ -14,7 +14,7 @@
 
 This is the 12th official release of __hpx__. It coincides with the 7th
 anniversary of the first commit to our source code repository. Since then,
-we have seen over 12300 commits amounting to more than 220000 lines of C++ code.
+we have seen over 12,300 commits amounting to more than 220,000 lines of C++ code.
 
 The major focus of this release was to improve the reliability of large scale
 runs. We believe this goal has been achieved as we now can reliably run __hpx__
@@ -36,11 +36,11 @@ the networking latencies and to improve the available networking bandwidth.
 Please note that in this release we disabled the ibverbs and ipc parcel ports
 as those have not been ported to the new plugin system yet (see [issue 839]).
 
-Another corner stone of this release is our work towards a complete
+Another cornerstone of this release is our work towards a complete
 implementation of __cpp11_n4104__ (Working Draft, Technical Specification for
 C++ Extensions for Parallelism). This document defines a set of parallel
 algorithms to be added to the C++ standard library.
-We now have implemented about 75% of all specified parallel algorithms (see
+We have now implemented about 75% of all specified parallel algorithms (see
 [link hpx.manual.parallel.parallel_algorithms Parallel Algorithms] for more
 details). We also implemented some extensions to __cpp11_n4104__ allowing to
 invoke all of the algorithms asynchronously.
