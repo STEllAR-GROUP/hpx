@@ -7,7 +7,6 @@
 #define HPX_UTIL_TRANSFORM_ITERATOR_MAR_19_2015_0813AM
 
 #include <hpx/util/result_of.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <boost/iterator/iterator_adaptor.hpp>
 
@@ -39,9 +38,12 @@ namespace hpx { namespace util
                     Value
                 >::type value_type;
 
+            typedef typename std::iterator_traits<Iterator>::iterator_category
+                iterator_category;
+
             typedef boost::iterator_adaptor<
                 transform_iterator<Iterator, Transformer, Reference, Value>,
-                Iterator, value_type, boost::use_default, value_type
+                Iterator, value_type, iterator_category, reference_type
             > type;
         };
     }

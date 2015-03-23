@@ -285,10 +285,10 @@ namespace hpx { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename IteratorTuple>
+        template <typename IteratorTuple, typename Derived>
         class zip_iterator_base
           : public boost::iterator_facade<
-                zip_iterator_base<IteratorTuple>
+                Derived
               , typename zip_iterator_value<IteratorTuple>::type
               , typename zip_iterator_category<IteratorTuple>::type
               , typename zip_iterator_reference<IteratorTuple>::type
@@ -296,7 +296,7 @@ namespace hpx { namespace util
         {
             typedef
                 boost::iterator_facade<
-                    zip_iterator_base<IteratorTuple>
+                    zip_iterator_base<IteratorTuple, Derived>
                   , typename zip_iterator_value<IteratorTuple>::type
                   , typename zip_iterator_category<IteratorTuple>::type
                   , typename zip_iterator_reference<IteratorTuple>::type
@@ -371,9 +371,11 @@ namespace hpx { namespace util
 
     template<typename ...Ts>
     class zip_iterator
-      : public detail::zip_iterator_base<tuple<Ts...> >
+      : public detail::zip_iterator_base<
+            tuple<Ts...>, zip_iterator<Ts...> >
     {
-        typedef detail::zip_iterator_base<tuple<Ts...> > base_type;
+        typedef detail::zip_iterator_base<tuple<Ts...>, zip_iterator<Ts...> >
+            base_type;
 
     public:
         zip_iterator() : base_type() {}
