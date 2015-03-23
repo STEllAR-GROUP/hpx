@@ -8,13 +8,8 @@
 
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/vector.hpp>
 
 #include <hpx/util/transform_iterator.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-// Define the vector types to be used.
-HPX_REGISTER_VECTOR(double);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
@@ -37,11 +32,10 @@ struct identity
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Iterator>
+template <typename IteratorBase, typename IteratorValue = IteratorBase>
 struct previous
 {
-    typedef Iterator iterator;
-    typedef typename std::iterator_traits<Iterator>::reference reference;
+    typedef typename std::iterator_traits<IteratorBase>::reference reference;
 
     template <typename T>
     struct result;
@@ -49,82 +43,45 @@ struct previous
     template <typename This, typename Iterator>
     struct result<This(Iterator)>
     {
-        typedef reference type;
+        typedef typename std::iterator_traits<Iterator>::reference type;
     };
 
     previous() {}
 
-    previous(Iterator begin, Iterator value)
+    // at position 'begin' it will dereference 'value', otherwise 'it-1'
+    previous(IteratorBase const& begin, IteratorValue const& value)
       : begin_(begin), value_(value)
     {}
 
     template <typename Iterator>
-    reference operator()(Iterator const& it) const
+    typename std::iterator_traits<Iterator>::reference
+    operator()(Iterator const& it) const
     {
         if (it == begin_)
             return *value_;
         return *(it - 1);
     }
 
-    Iterator base() const { return begin_; }
-    Iterator value() const { return value_; }
+    IteratorBase base() const { return begin_; }
+    IteratorValue value() const { return value_; }
 
 private:
-    friend class boost::serialization::access;
-
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned)
-    {
-        ar & begin_ & value_;
-    }
-
-private:
-    Iterator begin_;
-    Iterator value_;
+    IteratorBase begin_;
+    IteratorValue value_;
 };
 
-// namespace hpx { namespace traits
-// {
-//     template <typename Iterator>
-//     struct transform_iterator_transformer_traits<
-//         previous<Iterator>,
-//         typename boost::enable_if<
-//             typename segmented_iterator_traits<Iterator>::is_segmented_iterator
-//         >::type>
-//     {
-//         template <typename T>
-//         struct result;
-//
-//         template <typename This, typename Transformer, typename F>
-//         struct result<This(Transformer, F)>
-//         {
-//             typedef typename F::template apply<Iterator>::type iterator;
-//             typedef previous<iterator> type;
-//         };
-//
-//         template <typename Transformer, typename F>
-//         typename result<
-//                 transform_iterator_transformer_traits(Transformer, F)
-//             >::type
-//         operator()(Transformer const& tr, F const&) const
-//         {
-//             typedef typename result<
-//                     transform_iterator_transformer_traits(Transformer, F)
-//                 >::type transformer;
-//
-//             typedef typename Transformer::iterator iterator;
-//             typename F::template apply<iterator> f;
-//             return transformer(f(tr.base()), f(tr.value()));
-//         }
-//     };
-// }}
+template <typename IteratorBase, typename IteratorValue>
+inline previous<IteratorBase, IteratorValue>
+make_previous_transformer(IteratorBase const& base, IteratorValue const& value)
+{
+    return previous<IteratorBase, IteratorValue>(base, value);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Iterator>
+template <typename IteratorBase, typename IteratorValue = IteratorBase>
 struct next
 {
-    typedef Iterator iterator;
-    typedef typename std::iterator_traits<Iterator>::reference reference;
+    typedef typename std::iterator_traits<IteratorBase>::reference reference;
 
     template <typename T>
     struct result;
@@ -132,95 +89,54 @@ struct next
     template <typename This, typename Iterator>
     struct result<This(Iterator)>
     {
-        typedef reference type;
+        typedef typename std::iterator_traits<Iterator>::reference type;
     };
 
     next() {}
 
-    next(Iterator end, Iterator value)
-      : value_(value), end_(end)
+    // at position 'end' it will dereference 'value', otherwise 'it+1'
+    next(IteratorBase const& end, IteratorValue const& value)
+      : end_(end), value_(value)
     {}
 
     template <typename Iterator>
-    reference operator()(Iterator const& it) const
+    typename std::iterator_traits<Iterator>::reference
+    operator()(Iterator const& it) const
     {
-        if (it == (end_ - 1))
+        if (it == end_)
             return *value_;
         return *(it + 1);
     }
 
-    Iterator base() const { return end_; }
-    Iterator value() const { return value_; }
+    IteratorBase base() const { return end_; }
+    IteratorValue value() const { return value_; }
 
 private:
-    friend class boost::serialization::access;
-
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned)
-    {
-        ar & value_ & end_;
-    }
-
-private:
-    Iterator value_;
-    Iterator end_;
+    IteratorBase end_;
+    IteratorValue value_;
 };
 
-// namespace hpx { namespace traits
-// {
-//     template <typename Iterator>
-//     struct transform_iterator_transformer_traits<
-//         next<Iterator>,
-//         typename boost::enable_if<
-//             typename segmented_iterator_traits<Iterator>::is_segmented_iterator
-//         >::type>
-//     {
-//         template <typename T>
-//         struct result;
-//
-//         template <typename This, typename Transformer, typename F>
-//         struct result<This(Transformer, F)>
-//         {
-//             typedef typename F::template apply<Iterator>::type iterator;
-//             typedef next<iterator> type;
-//         };
-//
-//         template <typename Transformer, typename F>
-//         typename result<
-//                 transform_iterator_transformer_traits(Transformer, F)
-//             >::type
-//         operator()(Transformer const& tr, F const& f) const
-//         {
-//             typedef typename result<
-//                     transform_iterator_transformer_traits(Transformer, F)
-//                 >::type transformer;
-//
-//             return transformer(tr.base(), tr.value());
-//         }
-//     };
-// }}
+template <typename IteratorBase, typename IteratorValue>
+inline next<IteratorBase, IteratorValue>
+make_next_transformer(IteratorBase const& base, IteratorValue const& value)
+{
+    return next<IteratorBase, IteratorValue>(base, value);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // print element to the left of current
 template <typename Container>
 void print_left_element(Container const& values)
 {
-    typedef typename Container::const_iterator base_iterator;
     typedef typename Container::value_type value_type;
 
-    typedef previous<base_iterator> transformer_type;
-
-    typedef hpx::util::transform_iterator<
-        base_iterator, previous<base_iterator>
-    > iterator;
-
-    transformer_type transformer = transformer_type(
-        std::begin(values), std::end(values));
+    auto transformer = make_previous_transformer(
+        std::begin(values), &values.back());
 
     hpx::parallel::for_each(
         hpx::parallel::seq,
-        iterator(std::begin(values), transformer),
-        iterator(std::end(values)),
+        hpx::util::make_transform_iterator(std::begin(values), transformer),
+        hpx::util::make_transform_iterator(std::end(values), transformer),
         [](value_type d)
         {
             hpx::cout << d << " ";
@@ -232,22 +148,15 @@ void print_left_element(Container const& values)
 template <typename Container>
 void print_right_element(Container const& values)
 {
-    typedef typename Container::const_iterator base_iterator;
     typedef typename Container::value_type value_type;
 
-    typedef next<base_iterator> transformer_type;
-
-    typedef hpx::util::transform_iterator<
-        base_iterator, transformer_type
-    > iterator;
-
-    transformer_type transformer = transformer_type(
-        std::begin(values), std::end(values));
+    auto transformer = make_next_transformer(
+        std::end(values)-1, &values.front());
 
     hpx::parallel::for_each(
         hpx::parallel::seq,
-        iterator(std::begin(values), transformer),
-        iterator(std::end(values)),
+        hpx::util::make_transform_iterator(std::begin(values), transformer),
+        hpx::util::make_transform_iterator(std::end(values), transformer),
         [](value_type d)
         {
             hpx::cout << d << " ";
@@ -258,18 +167,9 @@ void print_right_element(Container const& values)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    // demonstrate use of std::vector
+    // demonstrate use of 'previous' and 'next' transformers
     {
         std::vector<double> values(10);
-        std::iota(std::begin(values), std::end(values), 1.0);
-
-        print_left_element(values);
-        print_right_element(values);
-    }
-
-    // demonstrate use of hpx::vector
-    {
-        hpx::vector<double> values(10);
         std::iota(std::begin(values), std::end(values), 1.0);
 
         print_left_element(values);
