@@ -90,7 +90,7 @@ void print_results(
     if (csv_header)
     {
         header = false;
-        cout << "Delay,Tasks,STasks,OS_Threads,WTIME,WARMUP\n";
+        cout << "Delay,Tasks,STasks,OS_Threads,Execution_Time,Warmup_Time\n";
     }
 
     if (header)
