@@ -11,6 +11,7 @@ set(tests
     thread_rescheduling
     thread_suspend_pending
     thread_suspend_duration
+    threads_all_1422
    )
 
 if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
