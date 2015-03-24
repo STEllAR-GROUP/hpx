@@ -199,9 +199,11 @@ namespace hpx { namespace performance_counters
                     types += "  " + (*it).first + "\n";
                 }
 
-                HPX_THROWS_IF(ec, bad_parameter, "registry::discover_counter_type",
-                    boost::str(boost::format("unknown counter type: %s, known counter types: \n%s") %
-                        type_name % types));
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "registry::discover_counter_type",
+                    boost::str(boost::format(
+                        "unknown counter type: %s, known counter "
+                        "types: \n%s") % type_name % types));
                 return status_counter_type_unknown;
             }
 
@@ -263,8 +265,9 @@ namespace hpx { namespace performance_counters
                 }
 
                 HPX_THROWS_IF(ec, bad_parameter, "registry::discover_counter_type",
-                    boost::str(boost::format("counter type: %s does not match any known type"
-                        ", known counter types: \n%s") % type_name % types));
+                    boost::str(boost::format(
+                        "counter type %s does not match any known type, "
+                        "known counter types: \n%s") % type_name % types));
                 return status_counter_type_unknown;
             }
         }
@@ -315,14 +318,29 @@ namespace hpx { namespace performance_counters
 
         counter_type_map_type::const_iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::get_counter_create_function",
-                "counter type is not defined");
+            // compose a list of known counter types
+            std::string types;
+            counter_type_map_type::const_iterator end = countertypes_.end();
+            for (counter_type_map_type::const_iterator it = countertypes_.begin();
+                    it != end; ++it)
+            {
+                types += "  " + (*it).first + "\n";
+            }
+
+            HPX_THROWS_IF(ec, bad_parameter,
+                "registry::get_counter_create_function",
+                boost::str(boost::format(
+                    "counter type %s is not defined, known counter "
+                    "types: \n%s") % type_name % types));
             return status_counter_type_unknown;
         }
 
         if ((*it).second.create_counter_.empty()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::get_counter_create_function",
-                "counter type has no associated create function");
+            HPX_THROWS_IF(ec, bad_parameter,
+                "registry::get_counter_create_function",
+                boost::str(boost::format(
+                    "counter type %s has no associated create "
+                    "function") % type_name));
             return status_invalid_data;
         }
 
@@ -345,14 +363,19 @@ namespace hpx { namespace performance_counters
 
         counter_type_map_type::const_iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::get_counter_discovery_function",
-                "counter type is not defined");
+            HPX_THROWS_IF(ec, bad_parameter,
+                "registry::get_counter_discovery_function",
+                boost::str(boost::format(
+                    "counter type %s is not defined") % type_name));
             return status_counter_type_unknown;
         }
 
         if ((*it).second.discover_counters_.empty()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::get_counter_discovery_function",
-                "counter type has no associated discovery function");
+            HPX_THROWS_IF(ec, bad_parameter,
+                "registry::get_counter_discovery_function",
+                boost::str(boost::format(
+                    "counter type %s has no associated discovery "
+                    "function") % type_name));
             return status_invalid_data;
         }
 

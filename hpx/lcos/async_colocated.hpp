@@ -66,7 +66,7 @@ namespace hpx { namespace detail
       , (hpx::util::functional::detail::apply_continuation_impl<              \
             hpx::util::detail::bound_action<                                  \
                 Action                                                        \
-              , hpx::detail::apply_colocated_bound_tuple<                     \
+              , hpx::detail::async_colocated_bound_tuple<                     \
                     Action ::arguments_type                                   \
                 >::type                                                       \
             >                                                                 \

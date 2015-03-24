@@ -18,25 +18,36 @@ system and application performance.
     [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
     [   [`/agas/count/<agas_service>`
 
-          where:[br] `<agas_service>` is one of the following:
-            `allocate`, `bind`, `bind_gid`, `bind_name`, `bind_prefix`,
-            `increment_credit`, `decrement_credit`, `free`, `get_component_typename`,
-            `iterate_names`, `iterate_types`, `localities`,
-            `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
-            `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
-            `route`, `unbind`, `unbind_gid`, `unbind_name`
-            `begin_migration`, `end_migration`.
+          where:[br] `<agas_service>` is one of the following:[br]
+            /primary namespace services/: `route`, `bind_gid`, `resolve_gid`,
+            `unbind_gid`, `increment_credit`, `decrement_credit`, `allocate`,
+            `begin_migration`, `end_migration`
+            [br]
+
+            /component namespace services/: `bind_prefix`, `bind_name`,
+            `resolve_id`, `unbind_name`, `iterate_types`, `get_component_typename`,
+            `num_localities_type`
+            [br]
+
+            /locality namespace services/: `free`, `localities`, `num_localities`,
+            `num_threads`, `resolve_locality`, `resolved_localities`
+            [br]
+
+            /symbol namespace services/: `bind`, `resolve`, `unbind`,
+            `iterate_names`, `on_symbol_namespace_event`
         ]
         [`<agas_instance>/total`
 
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
           Currently, this value will be `locality#0`, where `0` is the root locality
-          (the id of the locality hosting the AGAS service). Except for `<agas_service>`
+          (the id of the locality hosting the AGAS service).
+
+          The value for `*` can be any locality id for the following `<agas_service>`:
           `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, `increment_credit`,
-          `decrement_credit`, `bind`, `resolve`, `unbind`, and `iterate_names`
-          for which the value for `*` can be any locality id (only the primary and
-          symbol AGAS service components live on all localities, whereas all other AGAS services
-          are available on `locality#0` only).
+          `decrement_credit`,`bind`, `resolve`, `unbind`, and `iterate_names`
+          (only the primary and symbol AGAS service components live on all
+          localities, whereas all other AGAS services are available on
+          `locality#0` only).
         ]
         [None]
         [Returns the total number of invocations of the specified AGAS service
@@ -62,25 +73,36 @@ system and application performance.
     ]
     [   [`/agas/time/<agas_service>`
 
-          where:[br] `<agas_service>` is one of the following:
-            `allocate`, `bind`, `bind_gid`, `bind_name`, `bind_prefix`,
-            `increment_credit`, `decrement_credit`, `free`, `get_component_typename`,
-            `iterate_names`, `iterate_types`, `localities`,
-            `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
-            `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
-            `route`, `unbind`, `unbind_gid`, `unbind_name`,
-            `begin_migration`, `end_migration`.
+          where:[br] `<agas_service>` is one of the following:[br]
+            /primary namespace services/: `route`, `bind_gid`, `resolve_gid`,
+            `unbind_gid`, `increment_credit`, `decrement_credit`, `allocate`,
+            `begin_migration`, `end_migration`
+            [br]
+
+            /component namespace services/: `bind_prefix`, `bind_name`,
+            `resolve_id`, `unbind_name`, `iterate_types`, `get_component_typename`,
+            `num_localities_type`
+            [br]
+
+            /locality namespace services/: `free`, `localities`, `num_localities`,
+            `num_threads`, `resolve_locality`, `resolved_localities`
+            [br]
+
+            /symbol namespace services/: `bind`, `resolve`, `unbind`,
+            `iterate_names`, `on_symbol_namespace_event`
         ]
         [`<agas_instance>/total`
 
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
           Currently, this value will be `locality#0`, where `0` is the root locality
-          (the id of the locality hosting the AGAS service). Except for `<agas_service>`
+          (the id of the locality hosting the AGAS service).
+
+          The value for `*` can be any locality id for the following `<agas_service>`:
           `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, `increment_credit`,
           `decrement_credit`,`bind`, `resolve`, `unbind`, and `iterate_names`
-          for which the value for `*` can be any locality id (only the primary and symbol AGAS
-          service components live on all localities, whereas all other AGAS services
-          are available on `locality#0` only).
+          (only the primary and symbol AGAS service components live on all
+          localities, whereas all other AGAS services are available on
+          `locality#0` only).
         ]
         [None]
         [Returns the overall execution time of the specified AGAS service
@@ -107,7 +129,7 @@ system and application performance.
     [   [`/agas/count/<cache_statistics>`
 
           where:[br] `<cache_statistics>` is one of the following:
-          `cache-evictions`, `cache-hits`, `cache-inserts`, `cache-misses`
+          `cache/evictions`, `cache/hits`, `cache/inserts`, `cache/misses`
         ]
         [`locality#*/total`
 
@@ -123,8 +145,8 @@ system and application performance.
     [   [`/agas/count/<full_cache_statistics>`
 
           where:[br] `<full_cache_statistics>` is one of the following:
-          `cache_get_entry`, `cache_insert_entry`, `cache_update_entry`,
-          `cache_erase_entry`
+          `cache/get_entry`, `cache/insert_entry`, `cache/update_entry`,
+          `cache/erase_entry`
         ]
         [`locality#*/total`
 
@@ -139,8 +161,8 @@ system and application performance.
     [   [`/agas/time/<full_cache_statistics>`
 
           where:[br] `<full_cache_statistics>` is one of the following:
-          `cache_get_entry`, `cache_insert_entry`, `cache_update_entry`,
-          `cache_erase_entry`
+          `cache/get_entry`, `cache/insert_entry`, `cache/update_entry`,
+          `cache/erase_entry`
         ]
         [`locality#*/total`
 
@@ -423,8 +445,8 @@ system and application performance.
     [   [`/parcelport/count/<connection_type>/<cache_statistics>`
 
           where:[br] `<cache_statistics>` is one of the following:
-          `cache-insertions`, `cache-evictions`, `cache-hits`, `cache-misses`,
-          `cache-misses`[br]
+          `cache/insertions`, `cache/evictions`, `cache/hits`, `cache/misses`,
+          `cache/misses`[br]
           `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
         ]
         [`locality#*/total`
@@ -436,8 +458,8 @@ system and application performance.
         [None]
         [Returns the overall number cache events (evictions, hits, inserts,
          misses, and reclaims) for the connection cache of the given connection
-         type on the given locality (see `<cache_statistics>`, e.g. `cache-insertions`,
-         `cache-evictions`, `cache-hits`, `cache-misses`, or `cache-reclaims`).
+         type on the given locality (see `<cache_statistics>`, e.g. `cache/insertions`,
+         `cache/evictions`, `cache/hits`, `cache/misses`, or `cache/reclaims`).
 
          The performance counters for the connection type `ipc` are available
          only if the compile time constant `HPX_PARCELPORT_IPC` was
@@ -657,13 +679,13 @@ system and application performance.
 
           where:[br]
           `locality#*` is defining the locality for which the
-          overall number of retired __hpx__-threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          current number of threads with the given state should be queried for.
+          The locality id (given by `*`) is a (zero based) number identifying
+          the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          overall number of retired __hpx__-threads should be queried for. The
-          worker thread number (given by the `*`) is a (zero based) number
+          current number of threads with the given state should be queried for.
+          The worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
           option [hpx_cmdline `--hpx:threads`].
@@ -690,12 +712,12 @@ system and application performance.
 
           where:[br]
           `locality#*` is defining the locality for which the
-          overall number of retired __hpx__-threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          average wait time of __hpx__-threads (pending) or thread descriptions
+          (staged) with the given state should be queried for.  The locality
+          id (given by `*`) is a (zero based) number identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          overall number of retired __hpx__-threads should be queried for. The
+          average wait time for the given state should be queried for. The
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
@@ -751,9 +773,9 @@ system and application performance.
 
           where:[br]
           `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          creation idle rate of all (or one) worker threads should be queried
+          for. The locality id (given by `*`) is a (zero based) number
+          identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
           averaged idle rate should be queried for. The
@@ -778,12 +800,12 @@ system and application performance.
 
           where:[br]
           `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          cleanup idle rate of all (or one) worker threads should be queried
+          for. The locality id (given by `*`) is a (zero based) number
+          identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
+          averaged cleanup idle rate should be queried for. The
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
@@ -835,8 +857,8 @@ system and application performance.
     [   [`/threads/count/stack-recycles`]
         [`locality#*/total`
 
-          where:[br] `*` is the locality id of the locality the unbind
-          (madvise) operations should be queried for. The locality id is a
+          where:[br] `*` is the locality id of the locality the recylcling
+          operations should be queried for. The locality id is a
           (zero based) number identifying the locality.
         ]
         [None]
@@ -864,13 +886,13 @@ system and application performance.
          `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
+          `locality#*` is defining the locality for which the number of pending queue
+          misses of all (or one) worker threads should be queried for. The
           locality id (given by `*`) is a (zero based) number identifying the
           locality
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
+          number of pending queue misses should be queried for. The
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
@@ -878,7 +900,7 @@ system and application performance.
         ]
         [None]
         [Returns the total number of times that the referenced worker-thread
-         on the referenced locality failed to find pending HPX-threads in its
+         on the referenced locality failed to find pending __hpx__-threads in its
          associated queue.
          This counter is available only if the configuration time constant
          `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
@@ -889,13 +911,13 @@ system and application performance.
          `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
+          `locality#*` is defining the locality for which the number of pending queue
+          accesses of all (or one) worker threads should be queried for. The
           locality id (given by `*`) is a (zero based) number identifying the
           locality
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
+          number of pending queue accesses should be queried for. The
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
@@ -903,7 +925,7 @@ system and application performance.
         ]
         [None]
         [Returns the total number of times that the referenced worker-thread
-         on the referenced locality looked for pending HPX-threads in its
+         on the referenced locality looked for pending __hpx__-threads in its
          associated queue.
          This counter is available only if the configuration time constant
          `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
@@ -914,17 +936,17 @@ system and application performance.
          `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          `locality#*` is defining the locality for which the number of
+          __hpx__-threads stolen from the staged queue of all (or one) worker
+          threads should be queried for. The locality id (given by `*`)
+          is a (zero based) number identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
-          worker thread number (given by the `*`) is a (zero based) number
-          identifying the worker thread. The number of available worker threads
-          is usually specified on the command line for the application using the
-          option [hpx_cmdline `--hpx:threads`].
+          number of __hpx__-threads stolen from the staged queue should be queried
+          for. The worker thread number (given by the `*`) is a (zero based)
+          number identifying the worker thread. The number of available worker
+          threads is usually specified on the command line for the application
+          using the option [hpx_cmdline `--hpx:threads`].
         ]
         [None]
         [Returns the total number of __hpx__-threads 'stolen' from the staged
@@ -940,21 +962,21 @@ system and application performance.
          `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          `locality#*` is defining the locality for which the number of
+          __hpx__-threads stolen to the pending queue of all (or one) worker
+          threads should be queried for. The locality id (given by `*`)
+          is a (zero based) number identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
-          worker thread number (given by the `*`) is a (zero based) number
-          identifying the worker thread. The number of available worker threads
-          is usually specified on the command line for the application using the
-          option [hpx_cmdline `--hpx:threads`].
+          number of __hpx__-threads stolen to the pending queue should be queried
+          for. The worker thread number (given by the `*`) is a (zero based)
+          number identifying the worker thread. The number of available worker
+          threads is usually specified on the command line for the application
+          using the option [hpx_cmdline `--hpx:threads`].
         ]
         [None]
-        [Returns the total number of __hpx__-threads 'stolen' from the pending
-         thread queue of a neighboring worker thread (these threads are
+        [Returns the total number of __hpx__-threads 'stolen' to the pending
+         thread queue of the worker thread (these threads are
          executed by a different worker thread than they were initially
          scheduled on).
          This counter is available only if the configuration time constant
@@ -966,20 +988,21 @@ system and application performance.
          `locality#*/worker-thread#*`
 
           where:[br]
-          `locality#*` is defining the locality for which the average
-          idle rate of all (or one) worker threads should be queried for. The
-          locality id (given by `*`) is a (zero based) number identifying the
-          locality
+          `locality#*` is defining the locality for which the number of
+          __hpx__-threads stolen to the staged queue of all (or one) worker
+          threads should be queried for. The locality id (given by `*`)
+          is a (zero based) number identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
-          averaged idle rate should be queried for. The
+          number of __hpx__-threads stolen to the staged queue should be queried
+          for. The worker thread number (given by the `*`) is a (zero based)
           worker thread number (given by the `*`) is a (zero based) number
           identifying the worker thread. The number of available worker threads
           is usually specified on the command line for the application using the
           option [hpx_cmdline `--hpx:threads`].
         ]
         [None]
-        [Returns the total number of __hpx__-threads 'stolen' from the staged
+        [Returns the total number of __hpx__-threads 'stolen' to the staged
          thread queue of a neighboring worker thread (these threads are
          executed by a different worker thread than they were initially
          scheduled on).

@@ -218,10 +218,6 @@ if(NOT HPX_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_config_define(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
-hpx_option(HPX_UNIQUE_FUTURE_ALIAS BOOL
-  "HPX will defined unique_future<R> as a template alias to future<R>. (default OFF)."
-  OFF ADVANCED)
-
 ## Thread Manager related build options
 
 set(HPX_MAX_CPU_COUNT_DEFAULT "64")
@@ -981,13 +977,6 @@ if(MSVC)
       hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     endif()
   endif()
-endif()
-
-if(HPX_UNIQUE_FUTURE_ALIAS)
-  if(NOT HPX_WITH_CXX11_ALIAS_TEMPLATES)
-    hpx_error("template aliases are not available for this compiler. Can't create a unique_future<R> alias. Please set HPX_UNIQUE_FUTURE_ALIAS to OFF or use a modern compiler")
-  endif()
-  hpx_add_config_define(HPX_UNIQUE_FUTURE_ALIAS)
 endif()
 
 ################################################################################

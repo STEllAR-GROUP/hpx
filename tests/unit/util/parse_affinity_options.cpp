@@ -1046,10 +1046,10 @@ namespace test
     void bad()
     {
         int i = 0;
+        hpx::error_code ec;
         for (char const* t = data_bad[0]; NULL != t; t = data_bad[++i])
         {
             std::vector<hpx::threads::mask_type> affinities;
-            hpx::error_code ec;
             hpx::threads::parse_affinity_options(t, affinities, ec);
             HPX_TEST(ec);
         }

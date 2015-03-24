@@ -116,8 +116,7 @@ namespace hpx { namespace util
         // if an AGAS host is specified, it needs to be in the list
         // of nodes participating in this run
         if (!agas_host.empty() && !found_agas_host) {
-            throw hpx::detail::command_line_error(
-                "Requested AGAS host (" + agas_host +
+            throw hpx::detail::command_line_error("Requested AGAS host (" + agas_host +
                 ") not found in node list");
         }
 

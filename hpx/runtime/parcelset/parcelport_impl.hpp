@@ -93,6 +93,7 @@ namespace hpx { namespace parcelset
                 on_start_thread, on_stop_thread, pool_name(), pool_name_postfix())
           , connection_cache_(max_connections(ini), max_connections_per_loc(ini))
           , archive_flags_(boost::archive::no_header)
+          , operations_in_flight_(0)
         {
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -148,6 +149,13 @@ namespace hpx { namespace parcelset
 
             // make sure no more work is pending, wait for service pool to get
             // empty
+            while(operations_in_flight_ != 0)
+            {
+                if(threads::get_self_ptr())
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "parcelport_impl::stop");
+            }
+
             io_service_pool_.stop();
             if (blocking) {
                 connection_cache_.shutdown();
@@ -450,6 +458,10 @@ namespace hpx { namespace parcelset
             typedef pending_parcels_map::mapped_type mapped_type;
 
             lcos::local::spinlock::scoped_lock l(mtx_);
+            // We ignore the lock here. It might happen that while enqueuing,
+            // we need to acquire a lock. This should not cause any problems
+            // (famous last words)
+            util::ignore_while_checking<lcos::local::spinlock::scoped_lock> il(&l);
 
             mapped_type& e = pending_parcels_[locality_id];
             e.first.push_back(std::move(p));
@@ -465,6 +477,10 @@ namespace hpx { namespace parcelset
             typedef pending_parcels_map::mapped_type mapped_type;
 
             lcos::local::spinlock::scoped_lock l(mtx_);
+            // We ignore the lock here. It might happen that while enqueuing,
+            // we need to acquire a lock. This should not cause any problems
+            // (famous last words)
+            util::ignore_while_checking<lcos::local::spinlock::scoped_lock> il(&l);
 
             HPX_ASSERT(parcels.size() == handlers.size());
 
@@ -709,6 +725,7 @@ namespace hpx { namespace parcelset
             locality const& locality_id,
             boost::shared_ptr<connection> sender_connection)
         {
+            --operations_in_flight_;
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             client_connection->set_state(parcelport_connection::state_scheduled_thread);
 #endif
@@ -765,6 +782,7 @@ namespace hpx { namespace parcelset
             using hpx::parcelset::detail::call_for_each;
             if (num_parcels == parcels.size())
             {
+                ++operations_in_flight_;
                 // send all of the parcels
                 sender_connection->async_write(
                     call_for_each(std::move(handlers), parcels[0]),
@@ -773,6 +791,7 @@ namespace hpx { namespace parcelset
             }
             else
             {
+                ++operations_in_flight_;
                 HPX_ASSERT(num_parcels < parcels.size());
 
                 std::vector<write_handler_type> handled_handlers;
@@ -819,6 +838,7 @@ namespace hpx { namespace parcelset
         std::set<threads::thread_id_type> sender_threads_;
 
         int archive_flags_;
+        boost::atomic<std::size_t> operations_in_flight_;
     };
 }}
 

@@ -32,7 +32,7 @@
 [:for instance:]
 
 ``
-    cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.9.9
+    cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.9.10
 ``
 
 * Invoke GNU make. If you are on a machine with multiple cores, add the -jN flag to

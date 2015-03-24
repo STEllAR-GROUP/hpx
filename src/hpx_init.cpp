@@ -1188,20 +1188,10 @@ namespace hpx
         if (std::abs(shutdown_timeout + 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
-        using components::server::runtime_support;
-
-        hpx::id_type root = hpx::find_root_locality();
-        if (hpx::find_here() == root)
-        {
-            runtime_support* p = get_runtime_support_ptr();
-            p->shutdown_all(shutdown_timeout);
-        }
-        else
-        {
-            // tell main locality to start application exit, duplicate requests
-            // will be ignored
-            apply<runtime_support::shutdown_all_action>(root, shutdown_timeout);
-        }
+        // tell main locality to start application exit, duplicated requests
+        // will be ignored
+        apply<components::server::runtime_support::shutdown_all_action>(
+            hpx::find_root_locality(), shutdown_timeout);
 
         util::apex_finalize();
         return 0;
@@ -1241,9 +1231,18 @@ namespace hpx
         if (std::abs(shutdown_timeout + 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
+        util::apex_finalize();
+
         components::server::runtime_support* p =
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
+
+        if (0 == p) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
 
         p->call_shutdown_functions(true);
         p->call_shutdown_functions(false);
@@ -1276,6 +1275,12 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int stop(error_code& ec)
     {
+        if (threads::get_self_ptr()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+                "this function cannot be called from an HPX thread");
+            return -1;
+        }
+
         HPX_STD_UNIQUE_PTR<runtime> rt(get_runtime_ptr());    // take ownership!
         if (0 == rt.get()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
