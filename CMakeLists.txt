@@ -976,6 +976,12 @@ hpx_check_for_cxx11_std_initializer_list(
 hpx_check_for_cxx11_std_chrono(
   DEFINITIONS HPX_HAVE_CXX11_STD_CHRONO)
 
+hpx_check_for_cxx14_constexpr(
+  DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
+
+hpx_check_for_cxx14_lambdas(
+  DEFINITIONS HPX_HAVE_CXX14_LAMBDAS)
+
 ##############################################################################
 
 ################################################################################

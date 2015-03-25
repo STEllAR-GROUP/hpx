@@ -265,6 +265,20 @@ macro(hpx_check_for_cxx11_std_chrono)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx14_constexpr)
+  add_hpx_config_test(HPX_WITH_CXX14_CONSTEXPR
+    SOURCE cmake/tests/cxx14_constexpr.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx14_lambdas)
+  add_hpx_config_test(HPX_WITH_CXX14_LAMBDAS
+    SOURCE cmake/tests/cxx14_lambdas.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_thread_safe_hdf5)
   add_hpx_config_test(WITH_HDF5_THREAD_SAFE
     SOURCE cmake/tests/hdf5_thread_safe.cpp
