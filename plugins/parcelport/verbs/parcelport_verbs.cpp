@@ -16,7 +16,7 @@
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
-//#define JB_MEM_POOL
+#define JB_MEM_POOL
 #ifdef JB_MEM_POOL
  #include "RdmaMemoryPool.h"
 #else
@@ -320,117 +320,12 @@ public:
 #endif
   tag_provider tag_provider_;
 
-  /*
 
-  template <typename Buffer>
-  std::size_t
-  encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
-      int archive_flags_, std::size_t max_outbound_size)
-  {
-//      HPX_ASSERT(buffer.data_.empty());
-      // collect argument sizes from parcels
-      std::size_t arg_size = 0;
-      boost::uint32_t dest_locality_id = ps[0].get_destination_locality_id();
+  typedef std::pair<parcelset::parcel, parcelset::parcelhandler::write_handler_type> handler_pair;
+  typedef std::map<uint64_t, handler_pair> operation_map;
 
-      std::size_t parcels_sent = 0;
-
-      std::size_t parcels_size = 1;
-      if(num_parcels != std::size_t(-1))
-          parcels_size = num_parcels;
-
-      // guard against serialization errors
-      try {
-          try {
-              // preallocate data
-              for (; parcels_sent != parcels_size; ++parcels_sent)
-              {
-                  if (arg_size >= max_outbound_size)
-                      break;
-                  arg_size += traits::get_type_size(ps[parcels_sent]);
-              }
-
-LOG_DEBUG_MSG("Arg size for encoding is " << decnumber(arg_size));
-HPX_ASSERT(buffer->getLength()>arg_size);
-//              buffer.data_.reserve(arg_size);
-              // mark start of serialization
-              util::high_resolution_timer timer;
-
-              {
-                  // Serialize the data
-                  HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
-                      ps[0].get_serialization_filter());
-
-                  int archive_flags = archive_flags_;
-                  if (filter.get() != 0) {
-                      filter->set_max_length( buffer->getLength() ); // buffer.data_.capacity());
-                      archive_flags |= util::enable_compression;
-                  }
-
-                  util::portable_binary_oarchive archive(
-                      buffer->getAddress()
-                    , &buffer.chunks_
-                    , dest_locality_id
-                    , filter.get()
-                    , archive_flags);
-
-                  if(num_parcels != std::size_t(-1))
-                      archive << parcels_sent;
-
-                  for(std::size_t i = 0; i != parcels_sent; ++i)
-                      archive << ps[i];
-
-                  arg_size = archive.bytes_written();
-              }
-
-              // store the time required for serialization
-              buffer.data_point_.serialization_time_ = timer.elapsed_nanoseconds();
-          }
-          catch (hpx::exception const& e) {
-              LPT_(fatal)
-                  << "encode_parcels: "
-                     "caught hpx::exception: "
-                  << e.what();
-              hpx::report_error(boost::current_exception());
-              return 0;
-          }
-          catch (boost::system::system_error const& e) {
-              LPT_(fatal)
-                  << "encode_parcels: "
-                     "caught boost::system::error: "
-                  << e.what();
-              hpx::report_error(boost::current_exception());
-              return 0;
-          }
-          catch (boost::exception const&) {
-              LPT_(fatal)
-                  << "encode_parcels: "
-                     "caught boost::exception";
-              hpx::report_error(boost::current_exception());
-              return 0;
-          }
-          catch (std::exception const& e) {
-              // We have to repackage all exceptions thrown by the
-              // serialization library as otherwise we will loose the
-              // e.what() description of the problem, due to slicing.
-              boost::throw_exception(boost::enable_error_info(
-                  hpx::exception(serialization_error, e.what())));
-              return 0;
-          }
-      }
-      catch (...) {
-          LPT_(fatal)
-                  << "encode_parcels: "
-                 "caught unknown exception";
-          hpx::report_error(boost::current_exception());
-              return 0;
-      }
-
-      buffer.data_point_.num_parcels_ = parcels_sent;
-      encode_finalize(buffer, arg_size);
-
-      return parcels_sent;
-  }
-   */
+  // store na_verbs_op_id objects using a map referenced by verbs work request ID
+  operation_map WorkRequestCompletionMap;
 
   void put_parcel(parcelset::locality const & dest, parcel p, write_handler_type f) {
     FUNC_START_DEBUG_MSG;
@@ -448,8 +343,8 @@ HPX_ASSERT(buffer->getLength()>arg_size);
       client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
       ip_qp_map[dest_ip] = client->getQpNum();
     }
-    // we can now do a send to the remote client (or server, we don't distinguish here)
 
+    // we can now do a send to the remote client (or server, we don't distinguish here)
     {
       util::high_resolution_timer timer;
 #ifdef JB_MEM_POOL
@@ -465,11 +360,25 @@ HPX_ASSERT(buffer->getLength()>arg_size);
 
       tag_provider::tag tag(tag_provider_());
       LOG_DEBUG_MSG("Tag generated is " << tag.tag_);
-      header h(buffer, tag);
-      h.assert_valid();
 
+      LOG_DEBUG_MSG("Grabbing a block for the header ");
+      RdmaMemoryRegion *region = chunk_pool_->allocateRegion();
+      char *header_memory = (char*)(region->getAddress());
+      LOG_DEBUG_MSG("Placement new for the header ");
+      header *h = new(header_memory) header(buffer, tag);
+      h->assert_valid();
+      LOG_DEBUG_MSG(
+             "buffer size is " << decnumber(h->size())
+          << "numbytes is " << decnumber(h->numbytes())
+          << "num_chunks is " << decnumber(h->num_chunks().first) << "," << decnumber(h->num_chunks().second)
+          << "tag is " << decnumber(h->tag())
+          );
+      region->setMessageLength(h->size());
+      uint64_t wr_id = client->postSend(region, true, false, 0);
 
-      //      client->send
+      WorkRequestCompletionMap[wr_id] = std::make_pair(p,f);
+      LOG_DEBUG_MSG("wr_id for send added to WR completion map "
+          << hexpointer(wr_id) << " Entries " ); // <<  pd->WorkRequestCompletionMap.size());
 
       //            _rdmaController
       //            sender_.send(
@@ -478,8 +387,8 @@ HPX_ASSERT(buffer->getLength()>arg_size);
       //              , hpx::util::bind(&receiver::receive, boost::ref(receiver_), false)
       //            );
 
-      error_code ec;
-      f(ec, p);
+//      error_code ec;
+//      f(ec, p);
       //            buffer.data_point_.time_ =
       //                timer.elapsed_nanoseconds() - buffer.data_point_.time_;
       //            parcels_sent_.add_data(buffer.data_point_);
