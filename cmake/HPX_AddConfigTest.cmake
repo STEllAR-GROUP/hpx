@@ -9,7 +9,7 @@ set(HPX_ADDCONFIGTEST_LOADED TRUE)
 macro(add_hpx_config_test variable)
   set(options FILE)
   set(one_value_args SOURCE ROOT)
-  set(multi_value_args INCLUDE_DIRECTORIES LINK_DIRECTORIES COMPILE_DEFINITIONS LIBRARIES ARGS DEFINITIONS)
+  set(multi_value_args INCLUDE_DIRECTORIES LINK_DIRECTORIES COMPILE_DEFINITIONS LIBRARIES ARGS DEFINITIONS REQUIRED)
   cmake_parse_arguments(${variable} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT DEFINED ${variable})
@@ -90,6 +90,8 @@ macro(add_hpx_config_test variable)
     foreach(definition ${${variable}_DEFINITIONS})
       hpx_add_config_define(${definition})
     endforeach()
+  elseif(${variable}_REQUIRED)
+    hpx_error(${${variable}_REQUIRED})
   endif()
 endmacro()
 
@@ -102,23 +104,9 @@ macro(hpx_cpuid target variable)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_rvalue_references)
-  add_hpx_config_test(HPX_WITH_CXX11_RVALUE_REFERENCES
-    SOURCE cmake/tests/cxx11_rvalue_references.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
-macro(hpx_check_for_cxx11_variadic_templates)
-  add_hpx_config_test(HPX_WITH_CXX11_VARIADIC_TEMPLATES
-    SOURCE cmake/tests/cxx11_variadic_templates.cpp
-    FILE ${ARGN})
-endmacro()
-
-###############################################################################
-macro(hpx_check_for_cxx11_lambdas)
-  add_hpx_config_test(HPX_WITH_CXX11_LAMBDAS
-    SOURCE cmake/tests/cxx11_lambdas.cpp
+macro(hpx_check_for_cxx11_alias_templates)
+  add_hpx_config_test(HPX_WITH_CXX11_ALIAS_TEMPLATES
+    SOURCE cmake/tests/cxx11_alias_templates.cpp
     FILE ${ARGN})
 endmacro()
 
@@ -130,6 +118,13 @@ macro(hpx_check_for_cxx11_auto)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_constexpr)
+  add_hpx_config_test(HPX_WITH_CXX11_CONSTEXPR
+    SOURCE cmake/tests/cxx11_constexpr.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_decltype)
   add_hpx_config_test(HPX_WITH_CXX11_DECLTYPE
     SOURCE cmake/tests/cxx11_decltype.cpp
@@ -137,16 +132,100 @@ macro(hpx_check_for_cxx11_decltype)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_alias_templates)
-  add_hpx_config_test(HPX_WITH_CXX11_ALIAS_TEMPLATES
-    SOURCE cmake/tests/cxx11_alias_templates.cpp
+macro(hpx_check_for_cxx11_defaulted_functions)
+  add_hpx_config_test(HPX_WITH_CXX11_DEFAULTED_FUNCTIONS
+    SOURCE cmake/tests/cxx11_defaulted_functions.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_defaulted_deleted_functions)
-  add_hpx_config_test(HPX_WITH_CXX11_DEFAULTED_DELETED_FUNCTIONS
-    SOURCE cmake/tests/cxx11_defaulted_deleted_functions.cpp
+macro(hpx_check_for_cxx11_deleted_functions)
+  add_hpx_config_test(HPX_WITH_CXX11_DELETED_FUNCTIONS
+    SOURCE cmake/tests/cxx11_deleted_functions.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_explicit_cvt_ops)
+  add_hpx_config_test(HPX_WITH_CXX11_EXPLICIT_CONVERSION_OPERATORS
+    SOURCE cmake/tests/cxx11_explicit_cvt_ops.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_function_template_default_args)
+  add_hpx_config_test(HPX_WITH_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
+    SOURCE cmake/tests/cxx11_function_template_default_args.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_inline_namespaces)
+  add_hpx_config_test(HPX_WITH_CXX11_INLINE_NAMESPACES
+    SOURCE cmake/tests/cxx11_inline_namespaces.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_lambdas)
+  add_hpx_config_test(HPX_WITH_CXX11_LAMBDAS
+    SOURCE cmake/tests/cxx11_lambdas.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_noexcept)
+  add_hpx_config_test(HPX_WITH_CXX11_NOEXCEPT
+    SOURCE cmake/tests/cxx11_noexcept.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_nullptr)
+  add_hpx_config_test(HPX_WITH_CXX11_NULLPTR
+    SOURCE cmake/tests/cxx11_nullptr.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_range_based_for)
+  add_hpx_config_test(HPX_WITH_CXX11_RANGE_BASED_FOR
+    SOURCE cmake/tests/cxx11_range_based_for.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_rvalue_references)
+  add_hpx_config_test(HPX_WITH_CXX11_RVALUE_REFERENCES
+    SOURCE cmake/tests/cxx11_rvalue_references.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_scoped_enums)
+  add_hpx_config_test(HPX_WITH_CXX11_SCOPED_ENUMS
+    SOURCE cmake/tests/cxx11_scoped_enums.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_static_assert)
+  add_hpx_config_test(HPX_WITH_CXX11_STATIC_ASSERT
+    SOURCE cmake/tests/cxx11_static_assert.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_variadic_macros)
+  add_hpx_config_test(HPX_WITH_CXX11_VARIADIC_MACROS
+    SOURCE cmake/tests/cxx11_variadic_macros.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_variadic_templates)
+  add_hpx_config_test(HPX_WITH_CXX11_VARIADIC_TEMPLATES
+    SOURCE cmake/tests/cxx11_variadic_templates.cpp
     FILE ${ARGN})
 endmacro()
 
@@ -191,4 +270,3 @@ macro(hpx_check_for_thread_safe_hdf5)
     SOURCE cmake/tests/hdf5_thread_safe.cpp
     FILE ${ARGN})
 endmacro()
-

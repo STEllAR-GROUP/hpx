@@ -910,29 +910,59 @@ endif()
 ##############################################################################
 # Check the availability of certain C++11 language features
 
-hpx_check_for_cxx11_rvalue_references()
-
-if(NOT HPX_WITH_CXX11_RVALUE_REFERENCES)
-  hpx_error("HPX needs support for C++11 rvalue references")
-endif()
-
-hpx_check_for_cxx11_variadic_templates(
-  DEFINITIONS HPX_HAVE_CXX11_VARIADIC_TEMPLATES)
-
-hpx_check_for_cxx11_lambdas(
-  DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
+hpx_check_for_cxx11_alias_templates(
+  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
 
 hpx_check_for_cxx11_auto(
-  DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
+  DEFINITIONS HPX_HAVE_CXX11_AUTO)
+
+hpx_check_for_cxx11_constexpr(
+  DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
 
 hpx_check_for_cxx11_decltype(
   DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
 
-hpx_check_for_cxx11_alias_templates(
-  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
+hpx_check_for_cxx11_defaulted_functions(
+  DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
 
-hpx_check_for_cxx11_defaulted_deleted_functions(
-  DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS)
+hpx_check_for_cxx11_deleted_functions(
+  DEFINITIONS HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+
+hpx_check_for_cxx11_explicit_cvt_ops(
+  DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS)
+
+hpx_check_for_cxx11_function_template_default_args(
+  REQUIRED "HPX needs support for C++11 defaulted function template arguments")
+
+hpx_check_for_cxx11_inline_namespaces(
+  DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
+
+hpx_check_for_cxx11_lambdas(
+  DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
+
+hpx_check_for_cxx11_noexcept(
+  DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
+
+hpx_check_for_cxx11_nullptr(
+  DEFINITIONS HPX_HAVE_CXX11_NULLPTR)
+
+hpx_check_for_cxx11_range_based_for(
+  DEFINITIONS HPX_HAVE_CXX11_RANGE_BASED_FOR)
+
+hpx_check_for_cxx11_rvalue_references(
+  REQUIRED "HPX needs support for C++11 rvalue references")
+
+hpx_check_for_cxx11_scoped_enums(
+  DEFINITIONS HPX_HAVE_CXX11_SCOPED_ENUMS)
+
+hpx_check_for_cxx11_static_assert(
+  DEFINITIONS HPX_HAVE_CXX11_STATIC_ASSERT)
+
+hpx_check_for_cxx11_variadic_macros(
+  REQUIRED "HPX needs support for C++11 variadic macros")
+
+hpx_check_for_cxx11_variadic_templates(
+  REQUIRED "HPX needs support for C++11 variadic templates")
 
 hpx_check_for_cxx11_std_unique_ptr()
 
