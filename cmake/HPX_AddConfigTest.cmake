@@ -230,23 +230,23 @@ macro(hpx_check_for_cxx11_variadic_templates)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_std_unique_ptr)
-  add_hpx_config_test(HPX_WITH_CXX11_UNIQUE_PTR
-    SOURCE cmake/tests/cxx11_std_unique_ptr.cpp
+macro(hpx_check_for_cxx11_std_chrono)
+  add_hpx_config_test(HPX_WITH_CXX11_CHRONO
+    SOURCE cmake/tests/cxx11_std_chrono.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_std_tuple)
-  add_hpx_config_test(HPX_WITH_CXX11_STD_TUPLE
-    SOURCE cmake/tests/cxx11_std_tuple.cpp
+macro(hpx_check_for_cxx11_std_is_final)
+  add_hpx_config_test(HPX_WITH_CXX11_IS_FINAL
+    SOURCE cmake/tests/cxx11_std_is_final.cpp
     FILE ${ARGN})
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_std_function)
-  add_hpx_config_test(HPX_WITH_CXX11_STD_FUNCTION
-    SOURCE cmake/tests/cxx11_std_function.cpp
+macro(hpx_check_for_cxx11_std_is_null_pointer)
+  add_hpx_config_test(HPX_WITH_CXX11_IS_NULL_POINTER
+    SOURCE cmake/tests/cxx11_std_is_null_pointer.cpp
     FILE ${ARGN})
 endmacro()
 
@@ -258,9 +258,16 @@ macro(hpx_check_for_cxx11_std_initializer_list)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_std_chrono)
-  add_hpx_config_test(HPX_WITH_CXX11_CHRONO
-    SOURCE cmake/tests/cxx11_std_chrono.cpp
+macro(hpx_check_for_cxx11_std_type_traits)
+  add_hpx_config_test(HPX_WITH_CXX11_TYPE_TRAITS
+    SOURCE cmake/tests/cxx11_std_type_traits.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_unique_ptr)
+  add_hpx_config_test(HPX_WITH_CXX11_UNIQUE_PTR
+    SOURCE cmake/tests/cxx11_std_unique_ptr.cpp
     FILE ${ARGN})
 endmacro()
 
@@ -275,6 +282,20 @@ endmacro()
 macro(hpx_check_for_cxx14_lambdas)
   add_hpx_config_test(HPX_WITH_CXX14_LAMBDAS
     SOURCE cmake/tests/cxx14_lambdas.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx14_std_integer_sequence)
+  add_hpx_config_test(HPX_WITH_CXX14_INTEGER_SEQUENCE
+    SOURCE cmake/tests/cxx14_std_integer_sequence.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx14_std_result_of_sfinae)
+  add_hpx_config_test(HPX_WITH_CXX14_RESULT_OF_SFINAE
+    SOURCE cmake/tests/cxx14_std_result_of_sfinae.cpp
     FILE ${ARGN})
 endmacro()
 
