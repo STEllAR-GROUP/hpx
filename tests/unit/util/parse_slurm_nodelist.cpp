@@ -4,14 +4,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/util/batch_environment.hpp>
-#include <hpx/util/batch_environments/slurm_environment.hpp>
 
 #include <iostream>
 
 int main()
 {
     std::vector<std::string> nodelist;
-    hpx::util::batch_environments::slurm_environment env(nodelist, true);
+    hpx::util::batch_environment env(nodelist, true);
 
     for (std::string const& s: nodelist)
         std::cout << s << "\n";
