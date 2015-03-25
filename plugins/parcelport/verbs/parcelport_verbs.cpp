@@ -4,40 +4,44 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// config
 #include <hpx/config/defines.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 
-#include <hpx/plugins/parcelport_factory.hpp>
+// util
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/safe_bool.hpp>
+#include <hpx/util/memory_chunk_pool_allocator.hpp>
+
+// The memory pool specialization need to be pulled in before encode_parcels
+//#define JB_MEM_POOL
+#ifdef JB_MEM_POOL
+ #include "RdmaMemoryPool.h"
+#else
+ #include <hpx/util/memory_chunk_pool.hpp>
+#endif
 
 // parcelport
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
-//
-#include <hpx/util/memory_chunk_pool.hpp>
+#include <hpx/plugins/parcelport_factory.hpp>
 
 // Local parcelport plugin
 #include <connection_handler_verbs.hpp>
-
-#include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+//
+#include <hpx/plugins/parcelport/header.hpp>
 
 // rdmahelper library
 #include "RdmaLogging.h"
 #include "RdmaController.h"
 #include "RdmaDevice.h"
-#include "RdmaMemoryPool.h"
 
-//
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+using namespace hpx::parcelset::policies;
 
-#include <boost/integer/endian.hpp>
-
-#define JB_MEM_POOL
 
 namespace hpx { namespace parcelset { namespace policies { namespace verbs {
 
@@ -49,14 +53,14 @@ struct locality {
   }
 
   explicit locality(boost::uint32_t ip, boost::uint32_t port) :
-    ip_(ip), port_(port), qp_(0xFFFF) {}
+        ip_(ip), port_(port), qp_(0xFFFF) {}
 
   locality() : ip_(0xFFFF), port_(0), qp_(0xFFFF) {}
 
   // some condition marking this locality as valid
   operator util::safe_bool<locality>::result_type() const {
-//    FUNC_START_DEBUG_MSG;
-//    FUNC_END_DEBUG_MSG;
+    //    FUNC_START_DEBUG_MSG;
+    //    FUNC_END_DEBUG_MSG;
     return util::safe_bool<locality>()(ip_ != boost::uint32_t(0xFFFF));
   }
 
@@ -140,13 +144,13 @@ public:
   parcelport(util::runtime_configuration const& ini,
       util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
       util::function_nonser<void()> const& on_stop_thread) :
-      parcelset::parcelport(ini, here(ini), "verbs"), archive_flags_(boost::archive::no_header)
+        parcelset::parcelport(ini, here(ini), "verbs"), archive_flags_(boost::archive::no_header)
 #ifndef JB_MEM_POOL
   , chunk_pool_(4096, 32)
 #endif
   {
     FUNC_START_DEBUG_MSG;
-//    _port   = 0;
+    //    _port   = 0;
 #ifdef BOOST_BIG_ENDIAN
     std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
 #else
@@ -195,8 +199,8 @@ public:
 
   /// return true if this pp can be used at bootstrapping, otherwise omit
   bool can_bootstrap() const {
-//    FUNC_START_DEBUG_MSG;
-//    FUNC_END_DEBUG_MSG;
+    //    FUNC_START_DEBUG_MSG;
+    //    FUNC_END_DEBUG_MSG;
     return false;
   }
 
@@ -213,17 +217,17 @@ public:
     FUNC_START_DEBUG_MSG;
     // load all components as described in the configuration information
     if (ini.has_section("hpx.agas")) {
-        util::section const* sec = ini.get_section("hpx.agas");
-        if (NULL != sec) {
-          LOG_DEBUG_MSG("Returning some made up agas locality")
-            return
-                parcelset::locality(
-                    locality(
-                        _ibv_ip
-                      , _port
-                    )
-                );
-        }
+      util::section const* sec = ini.get_section("hpx.agas");
+      if (NULL != sec) {
+        LOG_DEBUG_MSG("Returning some made up agas locality")
+                return
+                    parcelset::locality(
+                        locality(
+                            _ibv_ip
+                            , _port
+                        )
+                    );
+      }
     }
     FUNC_END_DEBUG_MSG;
     // ibverbs can't be used for bootstrapping
@@ -295,28 +299,28 @@ public:
   }
 
   int archive_flags_;
-#ifdef JB_MEM_POOL
   typedef hpx::lcos::local::spinlock                      mutex_type;
+#ifdef JB_MEM_POOL
   typedef char                                            memory_type;
-  typedef RdmaMemoryPool                                     memory_pool_type;
+  typedef RdmaMemoryPool                                  memory_pool_type;
   typedef std::shared_ptr<memory_pool_type>               memory_pool_ptr_type;
   typedef hpx::util::detail::memory_chunk_pool_allocator
-      <memory_type, mutex_type, memory_pool_type>         allocator_type;
-
+      <memory_type, memory_pool_type, mutex_type>         allocator_type;
   typedef std::vector<memory_type, allocator_type>        data_type;
   typedef parcel_buffer<data_type>                        snd_buffer_type;
   memory_pool_ptr_type                                    chunk_pool_;
 #else
   typedef util::memory_chunk_pool<>                       memory_pool_type;
-  typedef util::detail::memory_chunk_pool_allocator<char> allocator_type;
+  typedef hpx::util::detail::memory_chunk_pool_allocator
+      <char, memory_pool_type, mutex_type> allocator_type;
   typedef std::vector<char, allocator_type>               data_type;
   typedef parcel_buffer<data_type>                        snd_buffer_type;
   typedef parcel_buffer<data_type, data_type>             rcv_buffer_type;
-  typedef lcos::local::spinlock                           mutex_type;
   memory_pool_type                                        chunk_pool_;
 #endif
+  tag_provider tag_provider_;
 
-/*
+  /*
 
   template <typename Buffer>
   std::size_t
@@ -426,71 +430,70 @@ HPX_ASSERT(buffer->getLength()>arg_size);
 
       return parcels_sent;
   }
-*/
+   */
 
   void put_parcel(parcelset::locality const & dest, parcel p, write_handler_type f) {
     FUNC_START_DEBUG_MSG;
     boost::uint32_t dest_ip = dest.get<locality>().ip_;
     LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " Sending packet to " << ipaddress(dest_ip) );
     //
+    RdmaClientPtr client;
     ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
     if (ip_it!=ip_qp_map.end()) {
       LOG_DEBUG_MSG("Connection found with qp " << ip_it->second);
-      RdmaClientPtr client = _rdmaController->getClient(ip_it->second);
-//      client->
+      client = _rdmaController->getClient(ip_it->second);
     }
     else {
       LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
-      RdmaClientPtr client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
+      client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
       ip_qp_map[dest_ip] = client->getQpNum();
+    }
+    // we can now do a send to the remote client (or server, we don't distinguish here)
 
-      // copied from MPI parcelport
-      {
-            util::high_resolution_timer timer;
-
+    {
+      util::high_resolution_timer timer;
 #ifdef JB_MEM_POOL
-            allocator_type alloc(*chunk_pool_.get());
-            snd_buffer_type buffer(alloc);
+      allocator_type alloc(*chunk_pool_.get());
+      snd_buffer_type buffer(alloc);
 #else
-            allocator_type alloc(chunk_pool_);
-            snd_buffer_type buffer(alloc);
+      allocator_type alloc(chunk_pool_);
+      snd_buffer_type buffer(alloc);
 #endif
-            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, this->get_max_outbound_message_size());
+      LOG_DEBUG_MSG("this->get_max_outbound_message_size() is " << hexnumber(this->get_max_outbound_message_size()));
+      encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, this->get_max_outbound_message_size());
+      buffer.data_point_.time_ = timer.elapsed_nanoseconds();
+
+      tag_provider::tag tag(tag_provider_());
+      LOG_DEBUG_MSG("Tag generated is " << tag.tag_);
+      header h(buffer, tag);
+      h.assert_valid();
 
 
-//            allocator_type alloc(chunk_pool_);
-//            snd_buffer_type buffer(alloc);
-//            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, this->get_max_outbound_message_size());
+      //      client->send
 
-//            buffer.data_point_.time_ = timer.elapsed_nanoseconds();
+      //            _rdmaController
+      //            sender_.send(
+      //                dest_rank
+      //              , buffer
+      //              , hpx::util::bind(&receiver::receive, boost::ref(receiver_), false)
+      //            );
 
-//            int dest_rank = dest.get<locality>().rank();
-//            HPX_ASSERT(dest_rank != util::mpi_environment::rank());
+      error_code ec;
+      f(ec, p);
+      //            buffer.data_point_.time_ =
+      //                timer.elapsed_nanoseconds() - buffer.data_point_.time_;
+      //            parcels_sent_.add_data(buffer.data_point_);
 
-//            sender_.send(
-//                dest_rank
-//              , buffer
-//              , hpx::util::bind(&receiver::receive, boost::ref(receiver_), false)
-//            );
-
-            error_code ec;
-            f(ec, p);
-//            buffer.data_point_.time_ =
-//                timer.elapsed_nanoseconds() - buffer.data_point_.time_;
-//            parcels_sent_.add_data(buffer.data_point_);
-
-            //do_background_work();
-      }
-
+      //do_background_work();
     }
     // Send a single parcel, after successful sending, f should be called.
     FUNC_END_DEBUG_MSG;
   }
 
   bool do_background_work(std::size_t num_thread) {
-//    FUNC_START_DEBUG_MSG;
+    //    FUNC_START_DEBUG_MSG;
     _rdmaController->eventMonitor(0);
-//    FUNC_END_DEBUG_MSG;
+    //    FUNC_END_DEBUG_MSG;
     // This is called whenever a HPX OS thÍread is idling, can be used to poll for incoming messages
     return true;
   }
@@ -505,7 +508,7 @@ private:
       boost::exception_ptr exception = hpx::detail::get_exception(hpx::exception(ec), "mpi::early_write_handler",
           __FILE__, __LINE__,
           "error while handling early parcel: " + ec.message() + "(" + boost::lexical_cast < std::string
-              > (ec.value()) + ")" + parcelset::dump_parcel(p));
+          > (ec.value()) + ")" + parcelset::dump_parcel(p));
 
       hpx::report_error(exception);
     }
@@ -551,32 +554,32 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
     FUNC_START_DEBUG_MSG;
     FUNC_END_DEBUG_MSG;
 
-  LOG_DEBUG_MSG("\n"
-      "ifname = ${HPX_PARCELPORT_VERBS_IFNAME:" HPX_PARCELPORT_VERBS_IFNAME "}\n"
-      "device = ${HPX_PARCELPORT_VERBS_DEVICE:" HPX_PARCELPORT_VERBS_DEVICE "}\n"
-      "interface = ${HPX_PARCELPORT_VERBS_INTERFACE:" HPX_PARCELPORT_VERBS_INTERFACE "}\n"
-      "memory_chunk_size = ${HPX_PARCEL_IBVERBS_MEMORY_CHUNK_SIZE:"
-      BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
-      "max_memory_chunks = ${HPX_PARCEL_IBVERBS_MAX_MEMORY_CHUNKS:"
-      BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
-      "zero_copy_optimization = 0\n"
-      "io_pool_size = 2\n"
-      "use_io_pool = 1\n"
-      "enable = 0");
-  return
-  "ifname = ${HPX_PARCELPORT_VERBS_IFNAME:" HPX_PARCELPORT_VERBS_IFNAME "}\n"
-  "device = ${HPX_PARCELPORT_VERBS_DEVICE:" HPX_PARCELPORT_VERBS_DEVICE "}\n"
-  "interface = ${HPX_PARCELPORT_VERBS_INTERFACE:" HPX_PARCELPORT_VERBS_INTERFACE "}\n"
-  "memory_chunk_size = ${HPX_PARCEL_IBVERBS_MEMORY_CHUNK_SIZE:"
-  BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
-  "max_memory_chunks = ${HPX_PARCEL_IBVERBS_MAX_MEMORY_CHUNKS:"
-  BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
-  "zero_copy_optimization = 0\n"
-  "io_pool_size = 2\n"
-  "use_io_pool = 1\n"
-  "enable = 0"
-  ;
-}
+      LOG_DEBUG_MSG("\n"
+          "ifname = ${HPX_PARCELPORT_VERBS_IFNAME:" HPX_PARCELPORT_VERBS_IFNAME "}\n"
+          "device = ${HPX_PARCELPORT_VERBS_DEVICE:" HPX_PARCELPORT_VERBS_DEVICE "}\n"
+          "interface = ${HPX_PARCELPORT_VERBS_INTERFACE:" HPX_PARCELPORT_VERBS_INTERFACE "}\n"
+          "memory_chunk_size = ${HPX_PARCEL_IBVERBS_MEMORY_CHUNK_SIZE:"
+          BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
+          "max_memory_chunks = ${HPX_PARCEL_IBVERBS_MAX_MEMORY_CHUNKS:"
+          BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
+          "zero_copy_optimization = 0\n"
+          "io_pool_size = 2\n"
+          "use_io_pool = 1\n"
+          "enable = 0");
+    return
+        "ifname = ${HPX_PARCELPORT_VERBS_IFNAME:" HPX_PARCELPORT_VERBS_IFNAME "}\n"
+        "device = ${HPX_PARCELPORT_VERBS_DEVICE:" HPX_PARCELPORT_VERBS_DEVICE "}\n"
+        "interface = ${HPX_PARCELPORT_VERBS_INTERFACE:" HPX_PARCELPORT_VERBS_INTERFACE "}\n"
+        "memory_chunk_size = ${HPX_PARCEL_IBVERBS_MEMORY_CHUNK_SIZE:"
+        BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
+    "max_memory_chunks = ${HPX_PARCEL_IBVERBS_MAX_MEMORY_CHUNKS:"
+    BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
+    "zero_copy_optimization = 0\n"
+    "io_pool_size = 2\n"
+    "use_io_pool = 1\n"
+    "enable = 0"
+    ;
+  }
 };
 }
 }
