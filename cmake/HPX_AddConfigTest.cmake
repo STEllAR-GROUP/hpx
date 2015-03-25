@@ -80,7 +80,7 @@ macro(add_hpx_config_test variable)
       endif()
     endif()
 
-    set(${variable} ${${variable}_RESULT} CACHE BOOL INTERNAL)
+    set(${variable} ${${variable}_RESULT} CACHE INTERNAL "")
     hpx_info(${_msg})
   else()
     set(${variable}_RESULT ${${variable}})
