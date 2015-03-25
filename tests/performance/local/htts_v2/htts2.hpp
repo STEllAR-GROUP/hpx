@@ -112,7 +112,7 @@ struct timer : clocksource<BaseClock>
 struct driver
 {
     // Parses the command line.
-    driver(int argc, char** argv);
+    driver(int argc, char** argv, bool allow_unregistered = false);
 
     virtual ~driver() {}
 
@@ -122,6 +122,11 @@ struct driver
     boost::uint64_t tasks_;
     boost::uint64_t payload_duration_;
     io_type         io_;
+
+    // hold on to command line
+    int argc_;
+    char** argv_;
+    bool allow_unregistered_;
 };
 
 }
