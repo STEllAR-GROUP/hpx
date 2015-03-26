@@ -29,7 +29,8 @@ before_install:
     - sudo apt-get install -qq --force-yes libjemalloc-dev
     - sudo apt-get install -qq --force-yes libhwloc-dev
     # update clang
-    - if [ "$CXX" = "clang++" ]; then sudo apt-get install -y --force-yes clang-3.5 libstdc++-4.8-dev; fi
+    #- if [ "$CXX" = "clang++" ]; then sudo apt-get install -y --force-yes clang-3.5 libstdc++-4.8-dev; fi
+    - if [ "$CXX" = "clang++" ]; then sudo apt-get install -y --force-yes clang-3.5; fi
     - if [ "$CXX" = "clang++" ]; then sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.5 1; fi
     - if [ "$CXX" = "clang++" ]; then sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.5 1; fi
     - if [ "$CXX" = "clang++" ]; then sudo rm /usr/local/clang-3.4/bin/clang++; fi
