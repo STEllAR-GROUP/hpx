@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
+//  Copyright (c) 2014-2015 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +29,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
+#include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
 
 // Local parcelport plugin
@@ -145,6 +147,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
           util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
           util::function_nonser<void()> const& on_stop_thread) :
             parcelset::parcelport(ini, here(ini), "verbs"), archive_flags_(boost::archive::no_header)
+      , stopped_(false)
+//      , parcels_sent_(0)
     #ifndef JB_MEM_POOL
       , chunk_pool_(4096, 32)
     #endif
@@ -201,15 +205,130 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         uint64_t wr_id = completion->wr_id;
         RdmaMemoryRegion *region = (RdmaMemoryRegion *)completion->wr_id;
         //
-        operation_map::iterator it = WorkRequestCompletionMap.find(wr_id);
-        if (it!=WorkRequestCompletionMap.end()) {
+        send_wr_map::iterator it_s;
+        get_wr_map::iterator  it_z;
+        if ((it_s = SendCompletionMap.find(wr_id)) != SendCompletionMap.end()) {
+          // a send has completed successfully
           error_code ec;
           // call the write_handler
-          it->second.second.operator()(ec,it->second.first);
+          std::get<1>(it_s->second).operator()(ec, std::get<0>(it_s->second));
           // it is now safe to release the memory for this region
-          WorkRequestCompletionMap.erase(it);
+          SendCompletionMap.erase(it_s);
+          chunk_pool_->deallocate(region);
+          // if this message had multiple SGEs then release other regions
+          if (std::get<2>(it_s->second)) {
+            chunk_pool_->deallocate(reinterpret_cast<RdmaMemoryRegion*>(std::get<2>(it_s->second)));
+          }
+          chunk_pool_->deallocate(region);
         }
-        chunk_pool_->deallocate(region);
+        if ((it_z = ZeroCopyGetCompletionMap.find(wr_id)) != ZeroCopyGetCompletionMap.end()) {
+          LOG_ERROR_MSG("A zero copy get has completed, implement this");
+        }
+        else {
+          // this was an unexpected receive, i.e a new parcel
+          LOG_DEBUG_MSG("Entering receive section");
+          // decrement counter that keeps preposted queue full
+          client->popReceive();
+          //
+          util::high_resolution_timer timer;
+          // get the header
+          header_type *h = (header_type*)region->getAddress();
+
+          LOG_DEBUG_MSG( "received " <<
+                 "buffer size is " << decnumber(h->size())
+              << "numbytes is " << decnumber(h->numbytes())
+              << "num_chunks is zerocopy( " << decnumber(h->num_chunks().first) << ") "
+              << ", normal( " << decnumber(h->num_chunks().second) << ") "
+              << " piggyback " << decnumber((h->piggy_back()!=NULL))
+              << " tag is " << decnumber(h->tag())
+              );
+
+          char *piggy_back = h->piggy_back();
+          char *main_chunk = &((char*)h)[header_type::pos_piggy_back_data];
+          // if the main serialization chunk is piggybacked in second SGE
+
+          // determine the size of the chunk buffer
+          std::size_t num_zero_copy_chunks =
+              static_cast<std::size_t>(
+                  static_cast<boost::uint32_t>(h->num_chunks().first));
+          std::size_t num_non_zero_copy_chunks =
+              static_cast<std::size_t>(
+                  static_cast<boost::uint32_t>(h->num_chunks().second)) - (piggy_back ? 1 : 0);
+          //
+          std::size_t total_chunks = num_zero_copy_chunks + num_non_zero_copy_chunks;
+
+          // since not all code is implemented, setting this flag to false disables final parcel receive call
+          bool parcel_complete = true;
+
+          // @TODO : implement this chunk get handling
+          std::allocator<char> alloc;
+          rcv_buffer_type buffer(alloc);
+
+          performance_counters::parcels::data_point& data = buffer.data_point_;
+          data.time_ = timer.elapsed_nanoseconds();
+          data.bytes_ = static_cast<std::size_t>(buffer.size_);
+
+          buffer.data_.resize(static_cast<std::size_t>(h->size()));
+          buffer.num_chunks_ = h->num_chunks();
+          int tag = h->tag();
+
+          // allocate space for chunks
+          buffer.transmission_chunks_.resize(total_chunks);
+
+          // for each zerocopy chunk, we must do an rdma get
+          if (num_zero_copy_chunks != 0) {
+              parcel_complete = false;
+              // allocate a parcel_buffer for each chunk
+              buffer.chunks_.resize(num_zero_copy_chunks, rcv_data_type(alloc));
+              for (std::size_t z=0; z<num_zero_copy_chunks; z++) {
+                LOG_ERROR_MSG("Implement RDMA GET operation for zerocopy");
+              }
+          }
+
+          if (piggy_back) {
+              std::memcpy(&buffer.data_[0], piggy_back, buffer.data_.size());
+              LOG_DEBUG_MSG("Copied piggyback data into buffer - WHY we want zero-copy");
+              if (num_non_zero_copy_chunks != 0) {
+                LOG_DEBUG_MSG("Should not ever receive extra chunks when piggybacked data present");
+              }
+          }
+
+          // for each normal chunk, we must do an rdma get
+          if (num_non_zero_copy_chunks != 0) {
+              parcel_complete = false;
+              // allocate a parcel_buffer for each chunk
+              buffer.chunks_.resize(num_non_zero_copy_chunks, rcv_data_type(alloc));
+              for (std::size_t z=0; z<num_non_zero_copy_chunks; z++) {
+                LOG_ERROR_MSG("Implement RDMA GET operation for normal");
+              }
+          }
+
+
+
+/*
+          std::size_t chunk_idx = 0;
+          for(auto & c: buffer.chunks_)
+          {
+              std::size_t chunk_size = buffer.transmission_chunks_[chunk_idx++].second;
+              c.resize(chunk_size);
+              {
+                parcel_complete = false;
+                LOG_DEBUG_MSG("Must receive a chunk/message (multiple chunks)");
+              }
+          }
+
+          data.time_ = timer.elapsed_nanoseconds() - data.time_;
+*/
+          if (parcel_complete) {
+            decode_message(*this, std::move(buffer), 1);
+//            decode_parcel(*this, std::move(buffer));
+            LOG_DEBUG_MSG("parcel decode called for complete parcel");
+          }
+          else {
+            LOG_DEBUG_MSG("incomplete parcel");
+          }
+        }
+        _rdmaController->refill_client_receives();
         return 0;
       }
 
@@ -319,6 +438,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
       void stop(bool blocking = true) {
         FUNC_START_DEBUG_MSG;
+            stopped_ = true;
         FUNC_END_DEBUG_MSG;
         // Stop receiving and sending of parcels
       }
@@ -330,6 +450,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
       }
 
       int archive_flags_;
+      boost::atomic<bool> stopped_;
+
+      typedef header<DEFAULT_MEMORY_POOL_CHUNK_SIZE>          header_type;
       typedef hpx::lcos::local::spinlock                      mutex_type;
     #ifdef JB_MEM_POOL
       typedef char                                            memory_type;
@@ -337,8 +460,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
       typedef std::shared_ptr<memory_pool_type>               memory_pool_ptr_type;
       typedef hpx::util::detail::memory_chunk_pool_allocator
           <memory_type, memory_pool_type, mutex_type>         allocator_type;
-      typedef std::vector<memory_type, allocator_type>        data_type;
-      typedef parcel_buffer<data_type>                        snd_buffer_type;
+      typedef std::vector<memory_type, allocator_type>        snd_data_type;
+      typedef std::vector<memory_type, std::allocator<memory_type>>  rcv_data_type;
+      typedef parcel_buffer<snd_data_type>                        snd_buffer_type;
+      typedef parcel_buffer<rcv_data_type, rcv_data_type>         rcv_buffer_type;
       memory_pool_ptr_type                                    chunk_pool_;
     #else
       typedef util::memory_chunk_pool<>                       memory_pool_type;
@@ -351,12 +476,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
     #endif
       tag_provider tag_provider_;
 
+//      performance_counters::parcels::gatherer& parcels_sent_;
+
+      typedef std::tuple<parcelset::parcel, parcelset::parcelhandler::write_handler_type, uint64_t> handler_tuple;
+      typedef std::map<uint64_t, handler_tuple> send_wr_map;
 
       typedef std::pair<parcelset::parcel, parcelset::parcelhandler::write_handler_type> handler_pair;
-      typedef std::map<uint64_t, handler_pair> operation_map;
+      typedef std::map<uint64_t, handler_pair> get_wr_map;
 
       // store na_verbs_op_id objects using a map referenced by verbs work request ID
-      operation_map WorkRequestCompletionMap;
+      send_wr_map SendCompletionMap;
+      get_wr_map ZeroCopyGetCompletionMap;
 
       void put_parcel(parcelset::locality const & dest, parcel p, write_handler_type f) {
         FUNC_START_DEBUG_MSG;
@@ -375,7 +505,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
           ip_qp_map[dest_ip] = client->getQpNum();
         }
 
-        // we can now do a send to the remote client (or server, we don't distinguish here)
+        // connection ok, we can now send required info to the remote peer
         {
           util::high_resolution_timer timer;
     #ifdef JB_MEM_POOL
@@ -385,49 +515,93 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
           allocator_type alloc(chunk_pool_);
           snd_buffer_type buffer(alloc);
     #endif
-          LOG_DEBUG_MSG("this->get_max_outbound_message_size() is " << hexnumber(this->get_max_outbound_message_size()));
-          encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, this->get_max_outbound_message_size());
+          // encode the parcel directly into an rdma pinned memory block
+          // if the serialization overflows the block, panic and rewrite this.
+          LOG_DEBUG_MSG("Encoding parcel");
+          encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, chunk_pool_->default_chunk_size());
           buffer.data_point_.time_ = timer.elapsed_nanoseconds();
 
+          // create a tag (not used at the moment)
           tag_provider::tag tag(tag_provider_());
           LOG_DEBUG_MSG("Tag generated is " << tag.tag_);
 
-          LOG_DEBUG_MSG("Grabbing a block for the header ");
-          RdmaMemoryRegion *region = chunk_pool_->allocateRegion();
-          char *header_memory = (char*)(region->getAddress());
-          LOG_DEBUG_MSG("Placement new for the header ");
-          header *h = new(header_memory) header(buffer, tag);
+          // Get the block of pinned memory where the message was encoded
+          LOG_DEBUG_MSG("Marking block for the header ");
+          RdmaMemoryRegion *chunk_region = chunk_pool_->RegionFromAddress((char*)buffer.data_.data());
+
+          RdmaMemoryRegion *header_region = chunk_pool_->allocateRegion();
+          char *header_memory = (char*)(header_region->getAddress());
+
+          // create the header in the pinned memory block
+          LOG_DEBUG_MSG("Placement new for the header with piggyback copy disabled");
+          header_type *h = new(header_memory) header_type(buffer, tag, true);
           h->assert_valid();
           LOG_DEBUG_MSG(
                  "buffer size is " << decnumber(h->size())
               << "numbytes is " << decnumber(h->numbytes())
-              << "num_chunks is " << decnumber(h->num_chunks().first) << "," << decnumber(h->num_chunks().second)
+              << "num_chunks is zerocopy( " << decnumber(h->num_chunks().first) << ") "
+              << ", normal( " << decnumber(h->num_chunks().second) << ") "
               << "tag is " << decnumber(h->tag())
               );
-          region->setMessageLength(h->size());
-          uint64_t wr_id = client->postSend(region, true, false, 0);
 
-          WorkRequestCompletionMap[wr_id] = std::make_pair(p,f);
+          // for each zerocopy chunk, we must create a memory region
+          if (h->num_chunks().first>0) {
+            for (int c=0; c<h->num_chunks().first; c++) {
+              LOG_ERROR_MSG("Implement zero copy registered block info for chunk " << c);
+            }
+          }
+
+          auto & chunks = buffer.transmission_chunks_;
+          if (!chunks.empty())
+          {
+            if (chunks.size())
+              {
+              LOG_DEBUG_MSG("Chunks size is " << chunks.size() << " and sizeof transmission_chunk_type is "
+                  << sizeof(typename snd_buffer_type::transmission_chunk_type));
+
+//                  util::mpi_environment::scoped_lock l;
+//                  MPI_Isend(
+//                      chunks.data()
+//                    , static_cast<int>(
+//                          chunks.size()
+//                        * sizeof(typename Buffer::transmission_chunk_type)
+//                      )
+//                    , MPI_BYTE
+//                    , dest
+//                    , tag
+//                    , util::mpi_environment::communicator()
+//                    , &request
+//                  );
+//                  wait_request = &request;
+              }
+          }
+
+          // send the header to the destination, add wr_id to completion map
+          chunk_region->setMessageLength(h->size());
+          header_region->setMessageLength(header_type::pos_piggy_back_data);
+          RdmaMemoryRegion *rlist[] = { header_region, chunk_region };
+          uint64_t wr_id = client->postSend_xN(rlist, 2, true, false, 0);
+          SendCompletionMap[wr_id] = std::make_tuple(p, f, (uint64_t)(chunk_region));
           LOG_DEBUG_MSG("wr_id for send added to WR completion map "
-              << hexpointer(wr_id) << " Entries " << WorkRequestCompletionMap.size());
+              << hexpointer(wr_id) << " Entries " << SendCompletionMap.size());
 
-    //      error_code ec;
-    //      f(ec, p);
-                      buffer.data_point_.time_ =
-                          timer.elapsed_nanoseconds() - buffer.data_point_.time_;
-          //            parcels_sent_.add_data(buffer.data_point_);
+          // log the time spent in performance counter
+          buffer.data_point_.time_ =
+              timer.elapsed_nanoseconds() - buffer.data_point_.time_;
+//          parcels_sent_.add_data(buffer.data_point_);
 
-          //do_background_work();
         }
         // Send a single parcel, after successful sending, f should be called.
         FUNC_END_DEBUG_MSG;
       }
 
       bool do_background_work(std::size_t num_thread) {
-        //    FUNC_START_DEBUG_MSG;
+            if (stopped_)
+                return false;
+         //    FUNC_START_DEBUG_MSG;
         _rdmaController->eventMonitor(0);
         //    FUNC_END_DEBUG_MSG;
-        // This is called whenever a HPX OS thÍread is idling, can be used to poll for incoming messages
+        // This is called whenever a HPX OS thread is idling, can be used to poll for incoming messages
         return true;
       }
 

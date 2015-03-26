@@ -16,6 +16,7 @@
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
+    template <int SIZE>
     struct header
     {
         typedef int value_type;
@@ -30,10 +31,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             pos_piggy_back_data  = 5 * sizeof(value_type) + 1
         };
 
-        static int const data_size_ = 512;
+        static int const data_size_ = SIZE;
 
         template <typename Buffer>
-        header(Buffer const & buffer, int tag)
+        header(Buffer const & buffer, int tag, bool disable_piggyback_copy=false)
         {
             boost::int64_t size = static_cast<boost::int64_t>(buffer.size_);
             boost::int64_t numbytes = static_cast<boost::int64_t>(buffer.data_size_);
@@ -50,14 +51,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
 LOG_DEBUG_MSG("Buffer data size is " << buffer.data_.size() << " (data_size_ - pos_piggy_back_data) is " << (data_size_ - pos_piggy_back_data));
 
-            if(buffer.data_.size() <= (data_size_ - pos_piggy_back_data))
+            if(!disable_piggyback_copy && buffer.data_.size() <= (data_size_ - pos_piggy_back_data))
             {
                 data_[pos_piggy_back_flag] = 1;
                 std::memcpy(&data_[pos_piggy_back_data], &buffer.data_[0],
                     buffer.data_.size());
+                LOG_DEBUG_MSG("Copying piggy_back data_[pos_piggy_back_flag] = " << decnumber((int)(data_[pos_piggy_back_flag])));
             }
-            else
-            {
+            else {
                 data_[pos_piggy_back_flag] = 0;
             }
         }
