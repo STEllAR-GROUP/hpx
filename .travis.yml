@@ -1,6 +1,6 @@
 language: cpp
 
-root: false
+sudo: false
 
 compiler:
     #- gcc
