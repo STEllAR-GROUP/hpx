@@ -12,6 +12,7 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 
 #include <hpx/util/memory_chunk_pool.hpp>
+#include <hpx/util/memory_chunk_pool_allocator.hpp>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
@@ -22,8 +23,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef hpx::lcos::local::spinlock mutex_type;
         typedef std::list<std::pair<int, header> > header_list;
         typedef std::set<std::pair<int, int> > handles_header_type;
-        typedef util::memory_chunk_pool<> memory_pool_type;
-        typedef util::detail::memory_chunk_pool_allocator<char> allocator_type;
+        typedef util::memory_chunk_pool<mutex_type> memory_pool_type;
+        typedef util::detail::memory_chunk_pool_allocator<char,memory_pool_type> allocator_type;
         typedef
             std::vector<char, allocator_type>
             data_type;
