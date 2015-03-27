@@ -2,10 +2,6 @@ language: cpp
 
 sudo: false
 
-compiler:
-    #- gcc
-    - clang
-
 env:
     global:
         - GCC_VERSION="4.9.2"
