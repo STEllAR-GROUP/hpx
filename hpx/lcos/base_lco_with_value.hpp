@@ -184,6 +184,7 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<hpx::naming::gid_type>,
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::id_type, id_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<hpx::naming::id_type>,
     vector_id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::unused_type, unused_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(float, float)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(double, double)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::int8_t, int8_t)

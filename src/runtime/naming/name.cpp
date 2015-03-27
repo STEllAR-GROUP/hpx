@@ -125,10 +125,6 @@ namespace hpx { namespace naming
             if ((gid_was_split(*p) ||
                 !naming::get_agas_client().resolve_cached(*p, addr)))
             {
-                hpx::runtime *rt = hpx::get_runtime_ptr();
-                if(!rt) return;
-                if(hpx::is_stopped()) return;
-
                 // guard for wait_abort and other shutdown issues
                 try {
                     // decrement global reference count for the given gid,

@@ -1065,7 +1065,8 @@ namespace hpx { namespace components { namespace server
 
             stopped_ = true;
 
-            while (tm.get_thread_count() > 1) {
+            while (tm.get_thread_count() > 1)
+            {
                 // let thread-manager clean up threads
                 cleanup_threads(tm, l);
 
@@ -1081,7 +1082,8 @@ namespace hpx { namespace components { namespace server
             // well.
             if (timed_out) {
                 // now we have to wait for all threads to be aborted
-                while (tm.get_thread_count() > 1) {
+                while (tm.get_thread_count() > 1)
+                {
                     // abort all suspended threads
                     tm.abort_all_suspended_threads();
 
@@ -1108,10 +1110,8 @@ namespace hpx { namespace components { namespace server
 
                 naming::address addr;
                 if (agas::is_local_address_cached(respond_to, addr)) {
-                    // execute locally, action is executed immediately as it is
-                    // a direct_action
-                    hpx::applier::detail::apply_l<action_type>(respond_to,
-                        std::move(addr));
+                    // this should never happen
+                    HPX_ASSERT(false);
                 }
                 else {
                     // apply remotely, parcel is sent synchronously

@@ -93,6 +93,11 @@ namespace hpx { namespace util { namespace batch_environments {
             {
                 num_localities_ = safe_lexical_cast<std::size_t>(total_num_tasks);
             }
+            else
+            {
+                num_localities_ = 1;
+            }
+
             std::size_t task_count = 0;
             if (tasks_per_node)
             {
@@ -152,6 +157,12 @@ namespace hpx { namespace util { namespace batch_environments {
                     }
                 }
             }
+            else
+            {
+                num_tasks_ = 1;
+                task_count = 1;
+            }
+
             if (task_count != num_localities_ && num_nodes)
             {
                 num_tasks_
@@ -356,22 +367,24 @@ namespace hpx { namespace util { namespace batch_environments {
                     else
                         num_threads_ = num_pus / num_tasks_;
                 }
-
-                std::size_t num_cores = 0;
-                if(slurm_cpus_per_task)
-                {
-                    num_cores = safe_lexical_cast<std::size_t>(slurm_cpus_per_task);
-                }
                 else
                 {
-                    num_cores = slurm_num_cpus / num_tasks_;
-                }
-                HPX_ASSERT(num_cores <= top.get_number_of_cores());
+                    std::size_t num_cores = 0;
+                    if(slurm_cpus_per_task)
+                    {
+                        num_cores
+                            = safe_lexical_cast<std::size_t>(slurm_cpus_per_task);
+                    }
+                    else
+                    {
+                        num_cores = slurm_num_cpus / num_tasks_;
+                    }
+                    HPX_ASSERT(num_cores <= top.get_number_of_cores());
 
-                num_threads_ = 0;
-                for(std::size_t core = 0; core != num_cores; ++core)
-                {
-                    num_threads_ += top.get_number_of_core_pus(core);
+                    for(std::size_t core = 0; core != num_cores; ++core)
+                    {
+                        num_threads_ += top.get_number_of_core_pus(core);
+                    }
                 }
             }
         }

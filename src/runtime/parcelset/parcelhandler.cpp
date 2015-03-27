@@ -63,29 +63,17 @@ namespace hpx { namespace parcelset
     // A parcel is submitted for transport at the source locality site to
     // the parcel set of the locality with the put-parcel command
     // This function is synchronous.
-
-    struct wait_for_put_parcel
-    {
-        wait_for_put_parcel() : sema_(new lcos::local::counting_semaphore) {}
-
-        void operator()(boost::system::error_code const&, parcel const&)
-        {
-            sema_->signal();
-        }
-
-        void wait()
-        {
-            sema_->wait();
-        }
-
-        boost::shared_ptr<lcos::local::counting_semaphore> sema_;
-    };
-
     void parcelhandler::sync_put_parcel(parcel& p) //-V669
     {
-        wait_for_put_parcel wfp;
-        put_parcel(p, wfp);  // schedule parcel send
-        wfp.wait();          // wait for the parcel to be sent
+        lcos::local::promise<void> promise;
+        put_parcel(
+            p
+          , [&promise](boost::system::error_code const&, parcel const&)
+            {
+                promise.set_value();
+            }
+        );  // schedule parcel send
+        promise.get_future().wait(); // wait for the parcel to be sent
     }
 
     void parcelhandler::parcel_sink(parcel const& p)
@@ -488,6 +476,7 @@ namespace hpx { namespace parcelset
             if (hpx::is_stopped_or_shutting_down())
             {
                 if (ec == boost::asio::error::connection_aborted ||
+                    ec == boost::asio::error::connection_reset ||
                     ec == boost::asio::error::broken_pipe ||
                     ec == boost::asio::error::not_connected ||
                     ec == boost::asio::error::eof)

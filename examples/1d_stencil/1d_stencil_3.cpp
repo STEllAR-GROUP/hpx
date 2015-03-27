@@ -24,9 +24,16 @@ double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
-inline std::size_t idx(std::size_t i, std::size_t size)
+inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
+    if(i == 0 && dir == -1)
+        return size-1;
+    if(i == size-1 && dir == +1)
+        return 0;
+
+    HPX_ASSERT((i + dir) < size);
+
+    return i + dir;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,7 +125,7 @@ struct stepper
             space& next = U[(t + 1) % 2];
 
             for (std::size_t i = 0; i != np; ++i)
-                next[i] = heat_part(current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
+                next[i] = heat_part(current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]);
         }
 
         // Return the solution at time-step 'nt'.

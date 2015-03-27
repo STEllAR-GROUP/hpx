@@ -96,7 +96,7 @@ void test_stateful_allocator(hpx::id_type dest, char* send_buffer,
 int hpx_main(int argc, char* argv[])
 {
     std::size_t const max_size = 1 << 22;
-    boost::scoped_ptr<char> send_buffer(new char[max_size]);
+    std::unique_ptr<char[]> send_buffer(new char[max_size]);
 
     BOOST_FOREACH(hpx::id_type loc, hpx::find_all_localities())
     {

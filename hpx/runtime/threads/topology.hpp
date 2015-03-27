@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -287,7 +287,8 @@ namespace hpx { namespace threads
             naming::address::address_type, error_code& ec = throws) const = 0;
 
         /// \brief Prints the \param m to os in a human readable form
-        virtual void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const = 0;
+        virtual void print_affinity_mask(std::ostream& os,
+            std::size_t num_thread, mask_type const& m) const = 0;
 
         /// \brief Reduce thread priority of the current thread.
         ///
@@ -309,7 +310,8 @@ namespace hpx { namespace threads
             error_code& ec = throws) const = 0;
 
         virtual mask_type get_cpubind_mask(error_code& ec = throws) const = 0;
-        virtual mask_type get_cpubind_mask(boost::thread & handle, error_code& ec = throws) const = 0;
+        virtual mask_type get_cpubind_mask(boost::thread & handle,
+            error_code& ec = throws) const = 0;
 
         virtual void write_to_log() const = 0;
     };
