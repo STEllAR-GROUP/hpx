@@ -1,58 +1,61 @@
 language: cpp
 
+root: false
+
 compiler:
     #- gcc
     - clang
 
 env:
-    - BUILD_TYPE=Debug BUILD_CORES=1
-    - BUILD_TYPE=Release BUILD_CORES=2
-    
+    global:
+        - GCC_VERSION="4.9.2"
+        - CLANG_VERSION="3.6.0"
+    matrix:
+        - HPX_BUILD_TYPE=Debug
+        - HPX_BUILD_TYPE=Release
+
 branches:
     only:
         - master
         - release
 
+cache:
+    ccache: false
+    directories:
+        - deps
+
 before_install:
-    # more recent gcc
-    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-    # more recent clang
-    - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
-    - sudo apt-add-repository 'deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.5 main'
-    # more recent cmake
-    - sudo add-apt-repository -y ppa:kalakris/cmake
-    # more recent boost
-    - sudo add-apt-repository -y ppa:boost-latest/ppa
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq --force-yes cmake
-    - sudo apt-get install -qq --force-yes libboost1.55-all-dev
-    - sudo apt-get install -qq --force-yes libjemalloc-dev
-    - sudo apt-get install -qq --force-yes libhwloc-dev
-    # update clang
-    #- if [ "$CXX" = "clang++" ]; then sudo apt-get install -y --force-yes clang-3.5 libstdc++-4.8-dev; fi
-    - if [ "$CXX" = "clang++" ]; then sudo apt-get install -y --force-yes clang-3.5; fi
-    - if [ "$CXX" = "clang++" ]; then sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.5 1; fi
-    - if [ "$CXX" = "clang++" ]; then sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.5 1; fi
-    - if [ "$CXX" = "clang++" ]; then sudo rm /usr/local/clang-3.4/bin/clang++; fi
-    - if [ "$CXX" = "clang++" ]; then sudo rm /usr/local/clang-3.4/bin/clang; fi
-    # update gcc
-    - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq --force-yes libstdc++-4.9-dev g++-4.9; fi
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+    - export GCC_DIR="${TRAVIS_BUILD_DIR}/deps/gcc-${GCC_VERSION}"
+    - export CLANG_DIR="${TRAVIS_BUILD_DIR}/deps/clang-${CLANG_VERSION}"
+
+install:
+    - FAILURE="0"
+    - printenv
+    - if [[ "$FAILURE" == "0" ]]; then ./travis/gcc.sh ${GCC_VERSION} || FAILURE="1"; fi
+    - export CFLAGS="-I${GCC_DIR}/include"
+    - export LDFLAGS="-L${GCC_DIR}/lib64"
+    - export CPATH="${GCC_DIR}/include"
+    - export LIBRARY_PATH="${GCC_DIR}/lib64"
+    - export LD_LIBRARY_PATH="${GCC_DIR}/lib64"
+    - export CC="${GCC_DIR}/bin/gcc"
+    - export CXX="${GCC_DIR}/bin/g++"
+    - if [[ "$FAILURE" == "0" ]]; then ./travis/clang.sh ${CLANG_VERSION} || FAILURE="1"; fi
+    - export CC="${CLANG_DIR}/bin/clang"
+    - export CXX="${CLANG_DIR}/bin/clang++"
 
 before_script:
-    - mkdir build
-    - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DHPX_MALLOC=jemalloc -DCMAKE_INSTALL_PREFIX:PATH=${PWD}/../ -DHPX_BUILD_EXAMPLES=On
-    - make core -j ${BUILD_CORES}
-    - make -k components -j ${BUILD_CORES}
-    #- make -k examples -j ${BUILD_CORES}
-    #- make -k tests.unit -j ${BUILD_CORES}
-    #- make -k tests.regressions -j ${BUILD_CORES}
-    #- make -k tests.performance -j ${BUILD_CORES}
-    - make examples.quickstart.hello_world
+    - mkdir ${TRAVIS_BUILD_DIR}/build
+    - cd ${TRAVIS_BUILD_DIR}/build
 
 script:
-    - echo "Done!" #./bin/hello_world
-    
+    - if [[ "$FAILURE" == "0" ]]; then gcc --version; fi
+    - if [[ "$FAILURE" == "0" ]]; then clang --version; fi
+    - if [[ "$FAILURE" == "0" ]]; then cmake .. -DCMAKE_BUILD_TYPE=${HPX_BUILD_TYPE} -DHPX_MALLOC="system" -DHPX_BUILD_EXAMPLES=On -Wdev || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then make core -j2 || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then make -k components -j2 || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then make -k examples -j2 || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then ./bin/hello_world || FAILURE="1"; fi
+    - test "$FAILURE" == "0"
+
 notifications:
     email: false
