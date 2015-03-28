@@ -49,8 +49,6 @@ install:
     - export CPATH="${CPATH}:${GCC_DIR}/include/c++/${GCC_VERSION}"
     - export CPATH="${CPATH}:${GCC_DIR}/include/c++/${GCC_VERSION}/x86_64-unknown-linux-gnu"
     - export CPATH="${CPATH}:${GCC_DIR}/include/c++/${GCC_VERSION}/backward"
-    - export CPATH="${CPATH}:${GCC_DIR}/lib/gcc/x86_64-unknown-linux-gnu/${GCC_VERSION}/include"
-    - export CPATH="${CPATH}:${GCC_DIR}/lib/gcc/x86_64-unknown-linux-gnu/${GCC_VERSION}/include-fixed"
     - export LDFLAGS="-L${GCC_DIR}/lib64"
     - export LIBRARY_PATH="${GCC_DIR}/lib64"
     - export LD_LIBRARY_PATH="${GCC_DIR}/lib64"
@@ -59,7 +57,6 @@ install:
     ### CLANG ###
     - if [[ "$FAILURE" == "0" ]]; then ./travis/clang.sh ${CLANG_VERSION} || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${CLANG_DIR}/bin:$PATH"; fi
-    - if [[ "$COMPILER" == "clang" ]]; then export CPATH="${CLANG_DIR}/lib/clang/${CLANG_VERSION}/include:$CPATH"; fi
     - export CC="${CLANG_CC}"
     - export CXX="${CLANG_CXX}"
     ### TOOLS ###
