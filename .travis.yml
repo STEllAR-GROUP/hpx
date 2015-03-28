@@ -15,6 +15,9 @@ branches:
         - master
         - release
 
+before_cache:
+    ls -la ${TRAVIS_BUILD_DIR}/deps
+
 cache:
     ccache: false
     directories:
@@ -46,7 +49,7 @@ install:
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${CLANG_DIR}/bin:$PATH"; fi
     - export CC="${CLANG_CC}"
     - export CXX="${CLANG_CXX}"
-    - if [[ "$FAILURE" == "0" ]]; then ./travis/tools.sh || FAILURE="1"; fi
+#    - if [[ "$FAILURE" == "0" ]]; then ./travis/tools.sh || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${TOOLS_DIR}/bin:$PATH"; fi
 
 before_script:
@@ -54,14 +57,14 @@ before_script:
     - cd ${TRAVIS_BUILD_DIR}/build
 
 script:
-    - if [[ "$FAILURE" == "0" ]]; then gcc --version; fi
-    - if [[ "$FAILURE" == "0" ]]; then clang --version; fi
-    - if [[ "$FAILURE" == "0" ]]; then cmake --version; fi
-    - if [[ "$FAILURE" == "0" ]]; then cmake .. -DCMAKE_BUILD_TYPE=${HPX_BUILD_TYPE} -DHPX_MALLOC="system" -DHPX_BUILD_EXAMPLES=On -Wdev || FAILURE="1"; fi
-    - if [[ "$FAILURE" == "0" ]]; then make core -j2 || FAILURE="1"; fi
-    - if [[ "$FAILURE" == "0" ]]; then make -k components -j2 || FAILURE="1"; fi
-    - if [[ "$FAILURE" == "0" ]]; then make -k examples -j2 || FAILURE="1"; fi
-    - if [[ "$FAILURE" == "0" ]]; then ./bin/hello_world || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then gcc --version; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then clang --version; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then cmake --version; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then cmake .. -DCMAKE_BUILD_TYPE=${HPX_BUILD_TYPE} -DHPX_MALLOC="system" -DHPX_BUILD_EXAMPLES=On -Wdev || FAILURE="1"; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then make core -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then make -k components -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then make -k examples -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then ./bin/hello_world || FAILURE="1"; test "$FAILURE" == "0"; fi
     - test "$FAILURE" == "0"
 
 notifications:
