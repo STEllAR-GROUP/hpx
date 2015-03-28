@@ -5,13 +5,13 @@ sudo: false
 env:
     global:
         - GCC_VERSION="4.9.2"
-        - CLANG_VERSION="3.6.0"
+        - CLANG_VERSION="3.5.1"
         - BOOST_VERSION="1.57.0"
     matrix:
-        - HPX_BUILD_TYPE=Debug COMPILER=gcc
-        - HPX_BUILD_TYPE=Release COMPILER=gcc
-        - HPX_BUILD_TYPE=Debug COMPILER=clang
-        - HPX_BUILD_TYPE=Release COMPILER=clang
+        #- COMPILER=gcc HPX_BUILD_TYPE=Debug
+        #- COMPILER=gcc HPX_BUILD_TYPE=Release
+        - COMPILER=clang HPX_BUILD_TYPE=Debug
+        - COMPILER=clang HPX_BUILD_TYPE=Release
 
 branches:
     only:
