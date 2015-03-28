@@ -385,7 +385,7 @@ namespace hpx { namespace util
                     std::cerr << "failed opening: " << node_file << std::endl;
 
                 // raise hard error if nodefile could not be opened
-                throw std::logic_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Could not open nodefile: '%s'") % node_file));
             }
         }
@@ -513,9 +513,13 @@ namespace hpx { namespace util
                 }
             }
 
-            // store node number in configuration
-            ini_config += "hpx.locality!=" +
-                boost::lexical_cast<std::string>(node);
+            // store node number in configuration, don't do that if we're on a
+            // worker and the node number is zero
+            if (!vm.count("hpx:worker") || node != 0)
+            {
+                ini_config += "hpx.locality!=" +
+                    boost::lexical_cast<std::string>(node);
+            }
         }
 
         if (vm.count("hpx:hpx")) {

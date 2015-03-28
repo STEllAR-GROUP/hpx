@@ -209,7 +209,6 @@ namespace hpx { namespace util { namespace detail
         }
 
         // access stored data
-#if __GNUC__ == 4 && __GNUC_MINOR__ == 4
         value_type move_value()
         {
             if (!stores_value()) {
@@ -217,19 +216,11 @@ namespace hpx { namespace util { namespace detail
                     "value_or_error::move_value",
                     "unexpected retrieval of value")
             }
-            return std::move(*get_value_address());
+            state_ = has_none;
+            value_type res(std::move(*get_value_address()));
+            destruct_value();
+            return res;
         }
-#else
-        value_type && move_value()
-        {
-            if (!stores_value()) {
-                HPX_THROW_EXCEPTION(invalid_status,
-                    "value_or_error::move_value",
-                    "unexpected retrieval of value")
-            }
-            return std::move(*get_value_address());
-        }
-#endif
 
         value_type& get_value()
         {

@@ -13,14 +13,14 @@
 
 #include "htts2.hpp"
 
-#include <boost/assign/std/vector.hpp> 
+#include <boost/assign/std/vector.hpp>
 #include <boost/lexical_cast.hpp>
 
 template <typename BaseClock = boost::chrono::steady_clock>
 struct hpx_driver : htts2::driver
 {
     hpx_driver(int argc, char** argv)
-      : htts2::driver(argc, argv)
+      : htts2::driver(argc, argv, true)
 //      , count_(0)
     {}
 
@@ -30,22 +30,17 @@ struct hpx_driver : htts2::driver
         std::vector<std::string> cfg;
         cfg += "hpx.os_threads=" + boost::lexical_cast<std::string>(osthreads_);
         cfg += "hpx.run_hpx_main!=0";
-    
-        int argc = 1;
-        char** argv = new char*[argc];
-        argv[0] = const_cast<char*>("htts2_hpx");
-    
-        hpx::util::function_nonser<int(boost::program_options::variables_map& vm)> f;
-        boost::program_options::options_description desc; 
-    
-        hpx::init(boost::bind(&hpx_driver::run_impl, boost::ref(*this), _1),
-            desc, argc, argv, cfg);
+        cfg += "hpx.commandline.allow_unknown!=1";
 
-        delete argv; 
+        hpx::util::function_nonser<int(boost::program_options::variables_map& vm)> f;
+        boost::program_options::options_description desc;
+
+        hpx::init(boost::bind(&hpx_driver::run_impl, boost::ref(*this), _1),
+            desc, argc_, argv_, cfg);
     }
 
   private:
-    int run_impl(boost::program_options::variables_map&) 
+    int run_impl(boost::program_options::variables_map&)
     {
         // Cold run
         //kernel();
@@ -66,12 +61,12 @@ struct hpx_driver : htts2::driver
         return hpx::threads::terminated;
     }
 
-    void stage_tasks(boost::uint64_t target_osthread) 
+    void stage_tasks(boost::uint64_t target_osthread)
     {
         boost::uint64_t const this_osthread = hpx::get_worker_thread_num();
 
         // This branch is very rarely taken (I've measured); this only occurs
-        // if we are unlucky enough to be stolen from our intended queue. 
+        // if we are unlucky enough to be stolen from our intended queue.
         if (this_osthread != target_osthread)
         {
             // Reschedule in an attempt to correct.
@@ -81,7 +76,7 @@ struct hpx_driver : htts2::driver
               , NULL // No HPX-thread name.
               , hpx::threads::pending
               , hpx::threads::thread_priority_normal
-              , target_osthread // Place in the target OS-thread's queue. 
+              , target_osthread // Place in the target OS-thread's queue.
                 );
         }
 
@@ -122,13 +117,13 @@ struct hpx_driver : htts2::driver
                 return;
             }
         }
-    
+
         finished.wait();
     }
 
     typedef double results_type;
 
-    results_type kernel() 
+    results_type kernel()
     {
         ///////////////////////////////////////////////////////////////////////
 
@@ -139,38 +134,38 @@ struct hpx_driver : htts2::driver
         boost::uint64_t const this_osthread = hpx::get_worker_thread_num();
 
         htts2::timer<BaseClock> t;
-    
+
         ///////////////////////////////////////////////////////////////////////
         // Warmup Phase
         for (boost::uint64_t i = 0; i < this->osthreads_; ++i)
         {
             if (this_osthread == i) continue;
-    
+
             hpx::threads::register_work(
                 boost::bind(&hpx_driver::stage_tasks, boost::ref(*this), i)
               , NULL // No HPX-thread name.
               , hpx::threads::pending
               , hpx::threads::thread_priority_normal
-              , i // Place in the target OS-thread's queue. 
+              , i // Place in the target OS-thread's queue.
                 );
         }
 
         stage_tasks(this_osthread);
 
         ///////////////////////////////////////////////////////////////////////
-        // Compute + Cooldown Phase 
+        // Compute + Cooldown Phase
 
         // The use of an atomic and live waiting here does not add any noticable
         // overhead, as compared to the more complicated continuation-style
         // detection method that checks the threadmanager internal counters
         // (I've measured). Using this technique is preferable as it is more
-        // comparable to the other implementations (especially qthreads). 
+        // comparable to the other implementations (especially qthreads).
 //        do {
-//            hpx::this_thread::suspend(); 
+//            hpx::this_thread::suspend();
 //        } while (count_ < (this->tasks_ * this->osthreads_));
 
         // Schedule a low-priority thread; when it is executed, it checks to
-        // make sure all the tasks (which are normal priority) have been 
+        // make sure all the tasks (which are normal priority) have been
         // executed, and then it
         hpx::lcos::local::barrier finished(2);
 
@@ -203,12 +198,12 @@ struct hpx_driver : htts2::driver
 
         std::cout
             << ( boost::format("%lu,%lu,%lu,%.14g\n")
-               % this->osthreads_ 
-               % this->tasks_ 
-               % this->payload_duration_ 
+               % this->osthreads_
+               % this->tasks_
+               % this->payload_duration_
                % results
                )
-            ; 
+            ;
     }
 
 //    boost::atomic<boost::uint64_t> count_;

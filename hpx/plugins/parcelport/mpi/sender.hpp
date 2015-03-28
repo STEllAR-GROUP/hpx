@@ -75,17 +75,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     struct sender
     {
         typedef hpx::lcos::local::spinlock mutex_type;
-        sender(
-                boost::atomic<bool> & stopped
-              , std::size_t max_connections)
-          : stopped_(stopped)
-          , max_connections_(max_connections)
+        sender(std::size_t max_connections)
+          : max_connections_(max_connections)
           , num_connections_(0)
         {}
-
-        void stop()
-        {
-        }
 
         struct check_num_connections
         {
@@ -94,7 +87,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
              , decrement_(false)
             {
                 if(!threads::get_self_ptr()) return;
-                
+
                 mutex_type::scoped_lock l(this_->connections_mtx_);
                 while(this_->num_connections_ >= this_->max_connections_)
                 {
@@ -103,7 +96,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 ++this_->num_connections_;
                 decrement_ = true;
             }
-            
+
             ~check_num_connections()
             {
                 if(decrement_)
@@ -148,7 +141,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(!chunks.empty())
             {
                 wait_done(wait_request, background);
-                if(stopped_) return;
                 {
                     util::mpi_environment::scoped_lock l;
                     MPI_Isend(
@@ -170,7 +162,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(!h.piggy_back())
             {
                 wait_done(wait_request, background);
-                if(stopped_) return;
                 {
                     util::mpi_environment::scoped_lock l;
                     MPI_Isend(
@@ -191,7 +182,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 if(c.type_ == util::chunk_type_pointer)
                 {
                     wait_done(wait_request, background);
-                    if(stopped_) return;
                     {
                         util::mpi_environment::scoped_lock l;
                         MPI_Isend(
@@ -209,12 +199,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
 
             wait_done(wait_request, background);
-            if(stopped_) return;
         }
 
     private:
         tag_provider tag_provider_;
-        boost::atomic<bool> & stopped_;
 
         mutex_type connections_mtx_;
         lcos::local::detail::condition_variable connections_cond_;
@@ -249,8 +237,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     background();
                 }
                 ++k;
-
-                if(stopped_) return;
             }
             request = NULL;
         }
@@ -258,11 +244,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool request_done(MPI_Request & r)
         {
             util::mpi_environment::scoped_lock l;
-            if(stopped_)
-            {
-                MPI_Cancel(&r);
-                return false;
-            }
 
             int completed = 0;
             MPI_Status status;

@@ -188,9 +188,16 @@ std::ostream& operator<<(std::ostream& os, partition_data const& c)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-inline std::size_t idx(std::size_t i, std::size_t size)
+inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
+    if(i == 0 && dir == -1)
+        return size-1;
+    if(i == size-1 && dir == +1)
+        return 0;
+
+    HPX_ASSERT((i + dir) < size);
+
+    return i + dir;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -314,8 +321,8 @@ struct stepper_server : hpx::components::simple_component_base<stepper_server>
     stepper_server() {}
 
     stepper_server(std::size_t nl)
-      : left_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id()-1, nl))),
-        right_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id()+1, nl))),
+      : left_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id(), -1, nl))),
+        right_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id(), +1, nl))),
         U_(2)
     {
     }

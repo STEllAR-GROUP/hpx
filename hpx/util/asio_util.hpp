@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,12 +29,13 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
-    HPX_API_EXPORT bool split_ip_address(std::string const& v, std::string& host,
-        boost::uint16_t& port);
+    HPX_API_EXPORT bool split_ip_address(std::string const& v,
+        std::string& host, boost::uint16_t& port);
 
     typedef boost::asio::ip::tcp::resolver::iterator endpoint_iterator_type;
 
-    endpoint_iterator_type HPX_EXPORT connect_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type HPX_EXPORT connect_begin(
+        std::string const & address, boost::uint16_t port,
         boost::asio::io_service& io_service);
 
     /// \brief Returns an iterator which when dereferenced will give an
@@ -52,7 +53,8 @@ namespace hpx { namespace util
         return endpoint_iterator_type();
     }
 
-    endpoint_iterator_type HPX_EXPORT accept_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type HPX_EXPORT accept_begin(
+        std::string const & address, boost::uint16_t port,
         boost::asio::io_service& io_service);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -70,7 +72,6 @@ namespace hpx { namespace util
     {
         return endpoint_iterator_type();
     }
-
 }}
 
 #endif

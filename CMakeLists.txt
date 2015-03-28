@@ -111,7 +111,7 @@ endif()
 
 hpx_option(HPX_MALLOC
   STRING
-  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc and tbbmalloc (default is: tcmalloc)"
+  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
   ${DEFAULT_MALLOC} ADVANCED)
 
 hpx_option(HPX_WITH_HWLOC
@@ -217,10 +217,6 @@ hpx_option(HPX_AUTOMATIC_SERIALIZATION_REGISTRATION BOOL
 if(NOT HPX_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_config_define(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
-
-hpx_option(HPX_UNIQUE_FUTURE_ALIAS BOOL
-  "HPX will defined unique_future<R> as a template alias to future<R>. (default OFF)."
-  OFF ADVANCED)
 
 ## Thread Manager related build options
 
@@ -399,8 +395,8 @@ hpx_option(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of ch
 
 ## mpi parcelport settings
 hpx_option(HPX_PARCELPORT_MPI_ENV STRING
-  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE)."
-  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
+  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE)."
+  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
 hpx_option(HPX_PARCELPORT_MPI_MULTITHREADED BOOL
   "Turn on MPI multithreading support (default: ON)."
   ON CATEGORY "Parcelport" ADVANCED)
@@ -981,13 +977,6 @@ if(MSVC)
       hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     endif()
   endif()
-endif()
-
-if(HPX_UNIQUE_FUTURE_ALIAS)
-  if(NOT HPX_WITH_CXX11_ALIAS_TEMPLATES)
-    hpx_error("template aliases are not available for this compiler. Can't create a unique_future<R> alias. Please set HPX_UNIQUE_FUTURE_ALIAS to OFF or use a modern compiler")
-  endif()
-  hpx_add_config_define(HPX_UNIQUE_FUTURE_ALIAS)
 endif()
 
 ################################################################################
