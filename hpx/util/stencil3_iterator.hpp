@@ -25,6 +25,52 @@ namespace hpx { namespace util
 
     namespace detail
     {
+        template <typename Iterator>
+        struct is_random_access_iterator
+            : boost::is_same<
+                std::random_access_iterator_tag,
+                typename std::iterator_traits<Iterator>::iterator_category
+              >
+        {};
+
+        template <typename Iterator>
+        Iterator previous(Iterator const& it, boost::mpl::false_)
+        {
+            Iterator prev = it;
+            return --prev;
+        }
+
+        template <typename Iterator>
+        Iterator previous(Iterator const& it, boost::mpl::true_)
+        {
+            return it - 1;
+        }
+
+        template <typename Iterator>
+        Iterator previous(Iterator const& it)
+        {
+            return previous(it, is_random_access_iterator<Iterator>());
+        }
+
+        template <typename Iterator>
+        Iterator next(Iterator const& it, boost::mpl::false_)
+        {
+            Iterator prev = it;
+            return ++prev;
+        }
+
+        template <typename Iterator>
+        Iterator next(Iterator const& it, boost::mpl::true_)
+        {
+            return it + 1;
+        }
+
+        template <typename Iterator>
+        Iterator next(Iterator const& it)
+        {
+            return next(it, is_random_access_iterator<Iterator>());
+        }
+
         ///////////////////////////////////////////////////////////////////////
         template <typename IteratorBase, typename IteratorValue>
         struct previous_transformer
@@ -51,7 +97,7 @@ namespace hpx { namespace util
             {
                 if (it == begin_)
                     return *value_;
-                return *(it - 1);
+                return *detail::previous(it);
             }
 
         private:
@@ -84,7 +130,7 @@ namespace hpx { namespace util
             typename std::iterator_traits<Iterator>::reference
             operator()(Iterator const& it) const
             {
-                return *(it - 1);
+                return *detail::previous(it);
             }
         };
 
@@ -120,7 +166,7 @@ namespace hpx { namespace util
             {
                 if (it == end_)
                     return *value_;
-                return *(it + 1);
+                return *detail::next(it);
             }
 
         private:
@@ -153,7 +199,7 @@ namespace hpx { namespace util
             typename std::iterator_traits<Iterator>::reference
             operator()(Iterator const& it) const
             {
-                return *(it + 1);
+                return *detail::next(it);
             }
         };
 
@@ -274,7 +320,8 @@ namespace hpx { namespace util
     make_stencil3_range(Iterator const& begin, Iterator const& end,
         IterValue const& begin_val, IterValue const& end_val)
     {
-        auto b = make_stencil3_iterator(begin, begin, begin_val, end-1, end_val);
+        auto b = make_stencil3_iterator(begin, begin, begin_val,
+            detail::previous(end), end_val);
         return std::make_pair(b, make_stencil3_iterator<decltype(b)>(end));
     }
 
