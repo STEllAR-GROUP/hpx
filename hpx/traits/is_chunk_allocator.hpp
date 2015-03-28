@@ -8,24 +8,32 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits.hpp>
-#include <type_traits>
+
 #include <boost/utility/enable_if.hpp>
+#include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace traits
 {
-    template <typename A>
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename A, typename Enable>
     struct is_chunk_allocator : boost::mpl::false_ {};
 
-    template <typename A, typename Enable = void>
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename A, typename Enable>
     struct default_chunk_size
     {
         static std::size_t call(A const &a) { return 0; }
     };
 
     template <typename A>
-    struct default_chunk_size<A, typename boost::enable_if<is_chunk_allocator<A>>::type>
+    struct default_chunk_size<
+            A, typename boost::enable_if<is_chunk_allocator<A> >::type
+        >
     {
-        static std::size_t call(A const &a) { return a.memory_pool_->chunk_size_; }
+        static std::size_t call(A const &a)
+        {
+            return a.memory_pool_->chunk_size_;
+        }
     };
 }}
 

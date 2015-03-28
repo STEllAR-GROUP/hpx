@@ -102,6 +102,12 @@ namespace hpx { namespace traits
     template <typename T, typename Enable = void>
     struct type_size;
 
+    template <typename A, typename Enable = void>
+    struct is_chunk_allocator;
+
+    template <typename A, typename Enable = void>
+    struct default_chunk_size;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename Enable = void>
     struct is_future;
