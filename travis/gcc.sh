@@ -70,9 +70,9 @@ function download_and_extract {
     fi
     rm -rf $TARGET_DIR
     echo "Downloading $URL ..."
-    wget -qO- ${URL} | tar -xz -C $TMP_DIR/wget | exit 1
+    wget -qO- ${URL} | tar -xz -C $TMP_DIR/wget --checkpoint=1000 || exit 1
     assert_single_entry $TMP_DIR/wget
-    mv $TMP_DIR/wget/* $TARGET_DIR | exit 1
+    mv $TMP_DIR/wget/* ${TARGET_DIR} || exit 1
 }
 
 GCC_URL="http://ftpmirror.gnu.org/gcc/gcc-${VERSION}/gcc-${VERSION}.tar.gz"

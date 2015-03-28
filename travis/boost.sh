@@ -2,7 +2,7 @@
 
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
 DEPS_PATH=$SCRIPTPATH/../deps
-PROGRAM_NAME="clang"
+PROGRAM_NAME="boost"
 
 while getopts ":" opt; do
   case $opt in
@@ -41,6 +41,7 @@ fi
 
 
 VERSION=${@:${OPTIND}:1}
+UNDERSCORE_VERSION=${VERSION//./_}
 
 ROOT_DIR=${DEPS_PATH}/${PROGRAM_NAME}-${VERSION}
 TMP_DIR=/tmp/${PROGRAM_NAME}-${VERSION}
@@ -70,33 +71,34 @@ function download_and_extract {
     fi
     rm -rf $TARGET_DIR
     echo "Downloading $URL ..."
-    wget -qO- ${URL} | tar -xJ -C $TMP_DIR/wget --checkpoint=1000 || exit 1
+    wget -qO- ${URL} | tar -xz -C $TMP_DIR/wget --checkpoint=1000 || exit 1
     assert_single_entry $TMP_DIR/wget
     mv $TMP_DIR/wget/* $TARGET_DIR || exit 1
 }
 
-LLVM_URL="http://llvm.org/releases/${VERSION}/llvm-${VERSION}.src.tar.xz"
-CLANG_URL="http://llvm.org/releases/${VERSION}/cfe-${VERSION}.src.tar.xz"
-COMPILER_RT_URL="http://llvm.org/releases/${VERSION}/compiler-rt-${VERSION}.src.tar.xz"
+BOOST_URL="http://downloads.sourceforge.net/sourceforge/boost/boost/${VERSION}/boost_${UNDERSCORE_VERSION}.tar.gz"
+download_and_extract $BOOST_URL $TMP_DIR/src
+cd $TMP_DIR/src || exit 1
 
-download_and_extract $LLVM_URL $TMP_DIR/src
-download_and_extract $CLANG_URL $TMP_DIR/src/tools/clang
-download_and_extract $COMPILER_RT_URL $TMP_DIR/src/projects/compiler-rt
+echo "Bootstrapping ..."
+EXCLUDES="mpi,graph_parallel,python"
+./bootstrap.sh --without-libraries=${EXCLUDES} --prefix=${ROOT_DIR} || exit 1
 
-echo "Creating build directory ..."
-mkdir $TMP_DIR/build || exit 1
-cd $TMP_DIR/build || exit 1
-
-echo "Configuring ..."
-../src/configure --prefix=${ROOT_DIR} || exit 1
-
-echo "Building ..."
 trap 'kill $(jobs -p)' EXIT
 while true; do sleep 300; echo "Still building ..."; done &
-make -j2 || exit 1
 
-echo "Installing to deps folder ..."
-make install || exit 1
+echo "Building Debug ..."
+./b2 variant=debug --prefix=${ROOT_DIR}/Debug -j2 >/dev/null || exit 1
+
+echo "Building Release ..."
+./b2 variant=release --prefix=${ROOT_DIR}/Release -j2 >/dev/null || exit 1
+
+
+echo "Installing Debug to deps folder ..."
+./b2 variant=debug --prefix=${ROOT_DIR}/Debug install >/dev/null || exit 1
+
+echo "Installing Release to deps folder ..."
+./b2 variant=release --prefix=${ROOT_DIR}/Release install >/dev/null || exit 1
 
 touch $EXISTS_FILE
 

@@ -6,6 +6,7 @@ env:
     global:
         - GCC_VERSION="4.9.2"
         - CLANG_VERSION="3.6.0"
+        - BOOST_VERSION="1.57.0"
     matrix:
         - HPX_BUILD_TYPE=Debug
         - HPX_BUILD_TYPE=Release
@@ -16,7 +17,9 @@ branches:
         - release
 
 before_cache:
-    ls -la ${TRAVIS_BUILD_DIR}/deps
+    - ls -lha ${TRAVIS_BUILD_DIR}/deps
+    - du -sh ${TRAVIS_BUILD_DIR}/deps
+    - du -sh ${TRAVIS_BUILD_DIR}/deps/*
 
 cache:
     ccache: false
@@ -26,6 +29,7 @@ cache:
 before_install:
     - export GCC_DIR="${TRAVIS_BUILD_DIR}/deps/gcc-${GCC_VERSION}"
     - export CLANG_DIR="${TRAVIS_BUILD_DIR}/deps/clang-${CLANG_VERSION}"
+    - export BOOST_DIR="${TRAVIS_BUILD_DIR}/deps/boost-${BOOST_VERSION}"
     - export TOOLS_DIR="${TRAVIS_BUILD_DIR}/deps/tools"
     - export REQUESTED_COMPILER=${CXX}
     - export GCC_CC="${GCC_DIR}/bin/gcc"
@@ -36,6 +40,7 @@ before_install:
 install:
     - FAILURE="0"
     - printenv
+    ### GCC ###
     - if [[ "$FAILURE" == "0" ]]; then ./travis/gcc.sh ${GCC_VERSION} || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${GCC_DIR}/bin:$PATH"; fi
     - export CFLAGS="-I${GCC_DIR}/include"
@@ -45,12 +50,16 @@ install:
     - export LD_LIBRARY_PATH="${GCC_DIR}/lib64"
     - export CC="${GCC_CC}"
     - export CXX="${GCC_CXX}"
+    ### CLANG ###
     - if [[ "$FAILURE" == "0" ]]; then ./travis/clang.sh ${CLANG_VERSION} || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${CLANG_DIR}/bin:$PATH"; fi
     - export CC="${CLANG_CC}"
     - export CXX="${CLANG_CXX}"
+    ### TOOLS ###
 #    - if [[ "$FAILURE" == "0" ]]; then ./travis/tools.sh || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${TOOLS_DIR}/bin:$PATH"; fi
+    ### BOOST ###
+    - if [[ "$FAILURE" == "0" ]]; then ./travis/boost.sh ${BOOST_VERSION} || FAILURE="1"; fi
 
 before_script:
     - mkdir ${TRAVIS_BUILD_DIR}/build
