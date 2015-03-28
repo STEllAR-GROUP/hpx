@@ -2,7 +2,7 @@
 
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
 DEPS_PATH=$SCRIPTPATH/../deps
-PROGRAM_NAME="clang"
+PROGRAM_NAME="tools"
 
 while getopts ":" opt; do
   case $opt in
@@ -34,23 +34,21 @@ function assert_single_entry {
 
 NUM_NONOPT_ARGS=$(expr $# - $OPTIND + 1)
 
-if [[ "$NUM_NONOPT_ARGS" != "1" ]]; then
-    echo "Needs exactly one argument!"
+if [[ "$NUM_NONOPT_ARGS" != "0" ]]; then
+    echo "Needs exactly 0 arguments!"
     exit 1
 fi
 
 
-VERSION=${@:${OPTIND}:1}
-
-ROOT_DIR=${DEPS_PATH}/${PROGRAM_NAME}-${VERSION}
-TMP_DIR=/tmp/${PROGRAM_NAME}-${VERSION}
-EXISTS_FILE=${DEPS_PATH}/${PROGRAM_NAME}-${VERSION}.exists
+ROOT_DIR=${DEPS_PATH}/${PROGRAM_NAME}
+TMP_DIR=/tmp/${PROGRAM_NAME}
+EXISTS_FILE=${DEPS_PATH}/${PROGRAM_NAME}.exists
 if [ -f $EXISTS_FILE ]; then
     echo "${PROGRAM_NAME} ${VERSION} already cached."
     exit 0
 fi
 
-echo "${PROGRAM_NAME} ${VERSION} not cached, building ..."
+echo "${PROGRAM_NAME} not cached, building ..."
 
 rm -rf $ROOT_DIR
 mkdir -p $ROOT_DIR || exit 1
@@ -70,33 +68,31 @@ function download_and_extract {
     fi
     rm -rf $TARGET_DIR
     echo "Downloading $URL ..."
-    wget -qO- ${URL} | tar -xJ -C $TMP_DIR/wget | exit 1
+    wget -qO- ${URL} | tar -xz -C $TMP_DIR/wget | exit 1
     assert_single_entry $TMP_DIR/wget
     mv $TMP_DIR/wget/* $TARGET_DIR | exit 1
 }
 
-LLVM_URL="http://llvm.org/releases/${VERSION}/llvm-${VERSION}.src.tar.xz"
-CLANG_URL="http://llvm.org/releases/${VERSION}/cfe-${VERSION}.src.tar.xz"
-COMPILER_RT_URL="http://llvm.org/releases/${VERSION}/compiler-rt-${VERSION}.src.tar.xz"
 
-download_and_extract $LLVM_URL $TMP_DIR/src
-download_and_extract $CLANG_URL $TMP_DIR/src/tools/clang
-download_and_extract $COMPILER_RT_URL $TMP_DIR/src/projects/compiler-rt
+# cmake
+echo "### CMAKE ###"
 
-echo "Creating build directory ..."
-mkdir $TMP_DIR/build || exit 1
-cd $TMP_DIR/build || exit 1
+echo "Cloning ..."
+git clone git://cmake.org/cmake.git --depth 1 --branch release $TMP_DIR/cmake || exit 1
+cd $TMP_DIR/cmake || exit 1
 
 echo "Configuring ..."
-../src/configure --prefix=${ROOT_DIR} || exit 1
+./configure --prefix=${ROOT_DIR} || exit 1
 
 echo "Building ..."
-trap 'kill $(jobs -p)' EXIT
-while true; do sleep 300; echo "Still building ..."; done &
 make -j2 || exit 1
 
-echo "Installing to deps folder ..."
+echo "Installing ..."
 make install || exit 1
+
+exit 0
+
+
 
 touch $EXISTS_FILE
 

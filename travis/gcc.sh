@@ -1,7 +1,5 @@
 #!/bin/bash
 
-trap 'kill $(jobs -p)' EXIT
-
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
 DEPS_PATH=$SCRIPTPATH/../deps
 PROGRAM_NAME="gcc"
@@ -98,6 +96,7 @@ echo "Configuring ..."
 
 echo "Building ..."
 # Prevent travis timeout
+trap 'kill $(jobs -p)' EXIT
 while true; do sleep 300; echo "Still building ..."; done &
 make -j2 >/dev/null || exit 1
 

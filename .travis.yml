@@ -23,22 +23,31 @@ cache:
 before_install:
     - export GCC_DIR="${TRAVIS_BUILD_DIR}/deps/gcc-${GCC_VERSION}"
     - export CLANG_DIR="${TRAVIS_BUILD_DIR}/deps/clang-${CLANG_VERSION}"
+    - export TOOLS_DIR="${TRAVIS_BUILD_DIR}/deps/tools"
     - export REQUESTED_COMPILER=${CXX}
+    - export GCC_CC="${GCC_DIR}/bin/gcc"
+    - export GCC_CXX="${GCC_DIR}/bin/g++"
+    - export CLANG_CC="${CLANG_DIR}/bin/clang"
+    - export CLANG_CXX="${CLANG_DIR}/bin/clang++"
 
 install:
     - FAILURE="0"
     - printenv
     - if [[ "$FAILURE" == "0" ]]; then ./travis/gcc.sh ${GCC_VERSION} || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then export PATH="${GCC_DIR}/bin:$PATH"; fi
     - export CFLAGS="-I${GCC_DIR}/include"
     - export LDFLAGS="-L${GCC_DIR}/lib64"
     - export CPATH="${GCC_DIR}/include"
     - export LIBRARY_PATH="${GCC_DIR}/lib64"
     - export LD_LIBRARY_PATH="${GCC_DIR}/lib64"
-    - export CC="${GCC_DIR}/bin/gcc"
-    - export CXX="${GCC_DIR}/bin/g++"
+    - export CC="${GCC_CC}"
+    - export CXX="${GCC_CXX}"
     - if [[ "$FAILURE" == "0" ]]; then ./travis/clang.sh ${CLANG_VERSION} || FAILURE="1"; fi
-    - export CC="${CLANG_DIR}/bin/clang"
-    - export CXX="${CLANG_DIR}/bin/clang++"
+    - if [[ "$FAILURE" == "0" ]]; then export PATH="${CLANG_DIR}/bin:$PATH"; fi
+    - export CC="${CLANG_CC}"
+    - export CXX="${CLANG_CXX}"
+    - if [[ "$FAILURE" == "0" ]]; then ./travis/tools.sh || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then export PATH="${TOOLS_DIR}/bin:$PATH"; fi
 
 before_script:
     - mkdir ${TRAVIS_BUILD_DIR}/build
@@ -47,6 +56,7 @@ before_script:
 script:
     - if [[ "$FAILURE" == "0" ]]; then gcc --version; fi
     - if [[ "$FAILURE" == "0" ]]; then clang --version; fi
+    - if [[ "$FAILURE" == "0" ]]; then cmake --version; fi
     - if [[ "$FAILURE" == "0" ]]; then cmake .. -DCMAKE_BUILD_TYPE=${HPX_BUILD_TYPE} -DHPX_MALLOC="system" -DHPX_BUILD_EXAMPLES=On -Wdev || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then make core -j2 || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then make -k components -j2 || FAILURE="1"; fi
