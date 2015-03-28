@@ -106,9 +106,6 @@ make -j2 || exit 1
 echo "Installing ..."
 make install || exit 1
 
-exit 0
-
-
 touch $EXISTS_FILE
 
-exit 2
+exit 0
