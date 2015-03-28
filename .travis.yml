@@ -59,6 +59,7 @@ install:
     ### CLANG ###
     - if [[ "$FAILURE" == "0" ]]; then ./travis/clang.sh ${CLANG_VERSION} || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${CLANG_DIR}/bin:$PATH"; fi
+    - if [[ "$COMPILER" == "clang" ]]; then export CPATH="${CLANG_DIR}/lib/clang/${CLANG_VERSION}/include:$CPATH"; fi
     - export CC="${CLANG_CC}"
     - export CXX="${CLANG_CXX}"
     ### TOOLS ###
