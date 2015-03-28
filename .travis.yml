@@ -64,6 +64,8 @@ install:
 before_script:
     - mkdir ${TRAVIS_BUILD_DIR}/build
     - cd ${TRAVIS_BUILD_DIR}/build
+    - if [[ "$FAILURE" == "0" ]]; then g++ -E -x c++ - -v < /dev/null; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then clang++ -E -x c++ - -v < /dev/null; test "$FAILURE" == "0"; fi
 
 script:
     - if [[ "$FAILURE" == "0" ]]; then gcc --version; test "$FAILURE" == "0"; fi
