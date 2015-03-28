@@ -45,15 +45,13 @@ install:
     ### GCC ###
     - if [[ "$FAILURE" == "0" ]]; then ./travis/gcc.sh ${GCC_VERSION} || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${GCC_DIR}/bin:$PATH"; fi
-    - export CFLAGS="-I${GCC_DIR}/include"
-    #     ${GCC_DIR}/include/c++/${GCC_VERSION}
-    #     ${GCC_DIR}/include/c++/${GCC_VERSION}/x86_64-unknown-linux-gnu
-    #     ${GCC_DIR}/include/c++/${GCC_VERSION}/backward
-    #     ${GCC_DIR}/lib/gcc/x86_64-unknown-linux-gnu/${GCC_VERSION}/include
-    #     ${GCC_DIR}/lib/gcc/x86_64-unknown-linux-gnu/${GCC_VERSION}/include-fixed
-    #     ${GCC_DIR}/include
-    - export LDFLAGS="-L${GCC_DIR}/lib64"
     - export CPATH="${GCC_DIR}/include"
+    - export CPATH="${CPATH}:${GCC_DIR}/include/c++/${GCC_VERSION}"
+    - export CPATH="${CPATH}:${GCC_DIR}/include/c++/${GCC_VERSION}/x86_64-unknown-linux-gnu"
+    - export CPATH="${CPATH}:${GCC_DIR}/include/c++/${GCC_VERSION}/backward"
+    - export CPATH="${CPATH}:${GCC_DIR}/lib/gcc/x86_64-unknown-linux-gnu/${GCC_VERSION}/include"
+    - export CPATH="${CPATH}:${GCC_DIR}/lib/gcc/x86_64-unknown-linux-gnu/${GCC_VERSION}/include-fixed"
+    - export LDFLAGS="-L${GCC_DIR}/lib64"
     - export LIBRARY_PATH="${GCC_DIR}/lib64"
     - export LD_LIBRARY_PATH="${GCC_DIR}/lib64"
     - export CC="${GCC_CC}"
