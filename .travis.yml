@@ -23,6 +23,7 @@ cache:
 before_install:
     - export GCC_DIR="${TRAVIS_BUILD_DIR}/deps/gcc-${GCC_VERSION}"
     - export CLANG_DIR="${TRAVIS_BUILD_DIR}/deps/clang-${CLANG_VERSION}"
+    - export REQUESTED_COMPILER=${CXX}
 
 install:
     - FAILURE="0"
