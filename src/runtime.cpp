@@ -198,11 +198,11 @@ namespace hpx
         };
     }
 
-    char const* get_runtime_state_name(runtime::state state)
+    char const* get_runtime_state_name(state st)
     {
-        if (state < runtime::state_invalid || state >= runtime::state_last)
+        if (st < invalid || st >= last)
             return "invalid (value out of bounds)";
-        return strings::runtime_state_names[state+1];
+        return strings::runtime_state_names[st+1];
     }
 
 #if defined(HPX_HAVE_SECURITY)
@@ -471,7 +471,7 @@ namespace hpx
         thread_support_(new util::thread_mapper),
         affinity_init_(affinity_init),
         topology_(threads::create_topology()),
-        state_(state_invalid),
+        state_(invalid),
         memory_(new components::server::memory),
         runtime_support_(new components::server::runtime_support(ini_))
 #if defined(HPX_HAVE_SECURITY)
@@ -1122,7 +1122,7 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
-            return rt->get_state() == runtime::state_running;
+            return rt->get_state() == running;
         return false;
     }
 
@@ -1130,7 +1130,7 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
-            return rt->get_state() == runtime::state_stopped;
+            return rt->get_state() == state_stopped;
         return true;        // assume stopped
     }
 
@@ -1139,8 +1139,8 @@ namespace hpx
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
         {
-            runtime::state state = rt->get_state();
-            return state == runtime::state_stopped || state == runtime::state_shutdown;
+            state st = rt->get_state();
+            return st == state_stopped || st == state_shutdown;
         }
         return true;        // assume stopped
     }
@@ -1148,7 +1148,7 @@ namespace hpx
     bool HPX_EXPORT is_starting()
     {
         runtime* rt = get_runtime_ptr();
-        return NULL != rt ? rt->get_state() <= runtime::state_startup : true;
+        return NULL != rt ? rt->get_state() <= startup : true;
     }
 }
 
@@ -1227,8 +1227,8 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (0 == rt ||
-            rt->get_state() < runtime::state_initialized ||
-            rt->get_state() >= runtime::state_stopped)
+            rt->get_state() < initialized ||
+            rt->get_state() >= state_stopped)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
@@ -1251,8 +1251,8 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (0 == rt ||
-            rt->get_state() < runtime::state_initialized ||
-            rt->get_state() >= runtime::state_stopped)
+            rt->get_state() < initialized ||
+            rt->get_state() >= state_stopped)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",

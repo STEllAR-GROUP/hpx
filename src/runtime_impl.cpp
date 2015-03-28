@@ -51,7 +51,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_pre_startup) {
+            if (rt->get_state() > pre_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_startup_function",
                     "Too late to register a new pre-startup function.");
@@ -68,7 +68,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_startup) {
+            if (rt->get_state() > startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_startup_function",
                     "Too late to register a new startup function.");
@@ -85,7 +85,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_pre_shutdown) {
+            if (rt->get_state() > pre_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_shutdown_function",
                     "Too late to register a new pre-shutdown function.");
@@ -102,7 +102,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_shutdown) {
+            if (rt->get_state() > state_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_shutdown_function",
                     "Too late to register a new shutdown function.");
@@ -199,7 +199,7 @@ namespace hpx {
         global_shutdown_functions.clear();
 
         // set state to initialized
-        set_state(state_initialized);
+        set_state(initialized);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -239,7 +239,7 @@ namespace hpx {
         }
 
         LBT_(info) << "(4th stage) runtime_impl::run_helper: bootstrap complete";
-        set_state(state_running);
+        set_state(running);
 
         parcel_handler_.enable_alternative_parcelports();
 
