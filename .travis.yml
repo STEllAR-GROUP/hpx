@@ -56,7 +56,7 @@ install:
     - export CC="${CLANG_CC}"
     - export CXX="${CLANG_CXX}"
     ### TOOLS ###
-#    - if [[ "$FAILURE" == "0" ]]; then ./travis/tools.sh || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then ./travis/tools.sh || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${TOOLS_DIR}/bin:$PATH"; fi
     ### BOOST ###
     - if [[ "$FAILURE" == "0" ]]; then ./travis/boost.sh ${BOOST_VERSION} || FAILURE="1"; fi

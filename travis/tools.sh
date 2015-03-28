@@ -90,8 +90,23 @@ make -j2 || exit 1
 echo "Installing ..."
 make install || exit 1
 
-exit 0
 
+# hwloc
+echo "### HWLOC ###"
+
+download_and_extract "http://www.open-mpi.org/software/hwloc/v1.10/downloads/hwloc-1.10.1.tar.gz" $TMP_DIR/hwloc
+cd $TMP_DIR/hwloc || exit 1
+
+echo "Configuring ..."
+./configure --prefix=${ROOT_DIR} || exit 1
+
+echo "Building ..."
+make -j2 || exit 1
+
+echo "Installing ..."
+make install || exit 1
+
+exit 0
 
 
 touch $EXISTS_FILE
