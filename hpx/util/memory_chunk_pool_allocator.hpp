@@ -36,19 +36,19 @@ namespace hpx { namespace util { namespace detail
         };
 
         memory_chunk_pool_allocator() throw()
-          : memory_pool_(0)
+          : memory_pool_(0), disable_deallocate(false)
         {}
         memory_chunk_pool_allocator(Pool & mp) throw()
-          : memory_pool_(&mp)
+          : memory_pool_(&mp), disable_deallocate(false)
         {}
         memory_chunk_pool_allocator(
                 memory_chunk_pool_allocator const & other) throw()
-          : memory_pool_(other.memory_pool_)
+          : memory_pool_(other.memory_pool_), disable_deallocate(other.disable_deallocate)
         {}
         template <typename U>
         memory_chunk_pool_allocator(
                 memory_chunk_pool_allocator<U, Pool, Mutex> const & other) throw()
-          : memory_pool_(other.memory_pool_)
+          : memory_pool_(other.memory_pool_), disable_deallocate(other.disable_deallocate)
         {}
 
         pointer address(reference x) const
@@ -70,7 +70,8 @@ namespace hpx { namespace util { namespace detail
         void deallocate(pointer p, size_type n)
         {
             HPX_ASSERT(memory_pool_);
-            memory_pool_->deallocate(reinterpret_cast<char*>(p), sizeof(T) * n);
+            if (!disable_deallocate)
+              memory_pool_->deallocate(reinterpret_cast<char*>(p), sizeof(T) * n);
         }
 
         size_type max_size() const throw()
@@ -106,6 +107,7 @@ namespace hpx { namespace util { namespace detail
         }
 
         Pool * memory_pool_;
+        bool   disable_deallocate;
     };
 }}}
 
