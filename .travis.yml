@@ -88,4 +88,3 @@ script:
 
 notifications:
     email: false
-
