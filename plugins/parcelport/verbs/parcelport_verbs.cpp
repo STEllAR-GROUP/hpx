@@ -204,29 +204,40 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         LOG_DEBUG_MSG("Completion yay!!!");
         uint64_t wr_id = completion->wr_id;
         RdmaMemoryRegion *region = (RdmaMemoryRegion *)completion->wr_id;
+        LOG_DEBUG_MSG("completion wr_id " << hexpointer(region) << " address " << hexpointer(region->getAddress()));
         //
         send_wr_map::iterator it_s;
         get_wr_map::iterator  it_z;
         if ((it_s = SendCompletionMap.find(wr_id)) != SendCompletionMap.end()) {
+          LOG_DEBUG_MSG("Entering send (completion handler) section");
+          // get the chunk region used in 2nd scatter gather entry (do this before erasing iterator)
+          RdmaMemoryRegion *chunk_region = (RdmaMemoryRegion*)(std::get<2>(it_s->second));
           // a send has completed successfully
           error_code ec;
           // call the write_handler
+          LOG_DEBUG_MSG("Calling write_handler for completed send");
           std::get<1>(it_s->second).operator()(ec, std::get<0>(it_s->second));
-          // it is now safe to release the memory for this region
+
+          // release iterator before memory to avoid race on memory region reuse
+          LOG_DEBUG_MSG("erasing iterator for completed send");
           SendCompletionMap.erase(it_s);
+
+          LOG_DEBUG_MSG("deallocating region 1 for completed send " << hexpointer(region));
           chunk_pool_->deallocate(region);
-          // if this message had multiple SGEs then release other regions
-          if (std::get<2>(it_s->second)) {
-            chunk_pool_->deallocate(reinterpret_cast<RdmaMemoryRegion*>(std::get<2>(it_s->second)));
+          // if this message had multiple (2) SGEs then release other regions
+          if (chunk_region) {
+            LOG_DEBUG_MSG("deallocating region 2 for completed send " << hexpointer(chunk_region));
+            chunk_pool_->deallocate(chunk_region);
           }
-          chunk_pool_->deallocate(region);
+          return 0;
         }
         if ((it_z = ZeroCopyGetCompletionMap.find(wr_id)) != ZeroCopyGetCompletionMap.end()) {
           LOG_ERROR_MSG("A zero copy get has completed, implement this");
         }
         else {
           // this was an unexpected receive, i.e a new parcel
-          LOG_DEBUG_MSG("Entering receive section");
+          LOG_DEBUG_MSG("Entering receive (completion handler) section with received size " << decnumber(completion->byte_len));
+
           // decrement counter that keeps preposted queue full
           client->popReceive();
           //
@@ -510,6 +521,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
           util::high_resolution_timer timer;
     #ifdef JB_MEM_POOL
           allocator_type alloc(*chunk_pool_.get());
+          alloc.disable_deallocate = true;
           snd_buffer_type buffer(alloc);
     #else
           allocator_type alloc(chunk_pool_);
@@ -525,17 +537,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
           tag_provider::tag tag(tag_provider_());
           LOG_DEBUG_MSG("Tag generated is " << tag.tag_);
 
-          // Get the block of pinned memory where the message was encoded
-          LOG_DEBUG_MSG("Marking block for the header ");
-          RdmaMemoryRegion *chunk_region = chunk_pool_->RegionFromAddress((char*)buffer.data_.data());
-
-          RdmaMemoryRegion *header_region = chunk_pool_->allocateRegion();
+          RdmaMemoryRegion *header_region = chunk_pool_->allocateRegion(chunk_pool_->default_chunk_size());
           char *header_memory = (char*)(header_region->getAddress());
 
           // create the header in the pinned memory block
           LOG_DEBUG_MSG("Placement new for the header with piggyback copy disabled");
           header_type *h = new(header_memory) header_type(buffer, tag, true);
           h->assert_valid();
+          header_region->setMessageLength(header_type::pos_piggy_back_data);
           LOG_DEBUG_MSG(
                  "buffer size is " << decnumber(h->size())
               << "numbytes is " << decnumber(h->numbytes())
@@ -576,11 +585,20 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
               }
           }
 
-          // send the header to the destination, add wr_id to completion map
+          // Get the block of pinned memory where the message was encoded
+          RdmaMemoryRegion *chunk_region = chunk_pool_->RegionFromAddress((char*)buffer.data_.data());
+          LOG_DEBUG_MSG("Finding region allocated during encode_parcel " << hexpointer(chunk_region));
           chunk_region->setMessageLength(h->size());
-          header_region->setMessageLength(header_type::pos_piggy_back_data);
+
+          // send the header/main_chunk to the destination, add wr_id's to completion map
           RdmaMemoryRegion *rlist[] = { header_region, chunk_region };
           uint64_t wr_id = client->postSend_xN(rlist, 2, true, false, 0);
+          LOG_TRACE_MSG("Block header_region"
+              << " region "    << hexpointer(header_region)
+              << " buffer "    << hexpointer(header_region->getAddress()));
+          LOG_TRACE_MSG("Block chunk_region"
+              << " region "    << hexpointer(chunk_region)
+              << " buffer "    << hexpointer(chunk_region->getAddress()));
           SendCompletionMap[wr_id] = std::make_tuple(p, f, (uint64_t)(chunk_region));
           LOG_DEBUG_MSG("wr_id for send added to WR completion map "
               << hexpointer(wr_id) << " Entries " << SendCompletionMap.size());
@@ -591,7 +609,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 //          parcels_sent_.add_data(buffer.data_point_);
 
         }
-        // Send a single parcel, after successful sending, f should be called.
         FUNC_END_DEBUG_MSG;
       }
 
