@@ -37,6 +37,7 @@
 #include <sstream>
 #include <vector>
 #include <new>
+#include <memory>
 
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
@@ -628,7 +629,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
@@ -736,7 +737,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
@@ -849,7 +850,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
@@ -902,7 +903,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
@@ -940,7 +941,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
@@ -992,7 +993,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
@@ -1281,7 +1282,7 @@ namespace hpx
             return -1;
         }
 
-        HPX_STD_UNIQUE_PTR<runtime> rt(get_runtime_ptr());    // take ownership!
+        std::unique_ptr<runtime> rt(get_runtime_ptr());    // take ownership!
         if (0 == rt.get()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
                 "the runtime system is not active (did you already "

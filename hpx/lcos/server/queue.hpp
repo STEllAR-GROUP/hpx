@@ -98,7 +98,7 @@ namespace hpx { namespace lcos { namespace server
         void set_value (RemoteType && result)
         {
             // push back the new value onto the queue
-            HPX_STD_UNIQUE_PTR<queue_entry> node(
+            std::unique_ptr<queue_entry> node(
                 new queue_entry(
                     traits::get_remote_result<ValueType, RemoteType>::call(result)));
 
