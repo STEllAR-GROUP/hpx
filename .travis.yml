@@ -20,20 +20,20 @@ branches:
         - release
 
 before_cache:
-    - ls -lha ${TRAVIS_BUILD_DIR}/deps
-    - du -sh ${TRAVIS_BUILD_DIR}/deps
-    - du -sh ${TRAVIS_BUILD_DIR}/deps/*
+    - ls -lha ${TRAVIS_BUILD_DIR}/.deps
+    - du -sh ${TRAVIS_BUILD_DIR}/.deps
+    - du -sh ${TRAVIS_BUILD_DIR}/.deps/*
 
 cache:
     ccache: false
     directories:
-        - deps
+        - .deps
 
 before_install:
-    - export GCC_DIR="${TRAVIS_BUILD_DIR}/deps/gcc-${GCC_VERSION}"
-    - export CLANG_DIR="${TRAVIS_BUILD_DIR}/deps/clang-${CLANG_VERSION}"
-    - export BOOST_DIR="${TRAVIS_BUILD_DIR}/deps/boost-${BOOST_VERSION}"
-    - export TOOLS_DIR="${TRAVIS_BUILD_DIR}/deps/tools"
+    - export GCC_DIR="${TRAVIS_BUILD_DIR}/.deps/gcc-${GCC_VERSION}"
+    - export CLANG_DIR="${TRAVIS_BUILD_DIR}/.deps/clang-${CLANG_VERSION}"
+    - export BOOST_DIR="${TRAVIS_BUILD_DIR}/.deps/boost-${BOOST_VERSION}"
+    - export TOOLS_DIR="${TRAVIS_BUILD_DIR}/.deps/tools"
     - export REQUESTED_COMPILER=${CXX}
     - export GCC_CC="${GCC_DIR}/bin/gcc"
     - export GCC_CXX="${GCC_DIR}/bin/g++"

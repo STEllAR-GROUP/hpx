@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
-DEPS_PATH=$SCRIPTPATH/../deps
+DEPS_PATH=$SCRIPTPATH/../.deps
 PROGRAM_NAME="tools"
 
 while getopts ":" opt; do
