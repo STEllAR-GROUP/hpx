@@ -90,7 +90,7 @@ void print_results(
     if (csv_header)
     {
         header = false;
-        cout << "Delay,Tasks,STasks,OS_Threads,WTIME,WARMUP\n";
+        cout << "Delay,Tasks,STasks,OS_Threads,Execution_Time_sec,Warmup_sec\n";
     }
 
     if (header)
@@ -131,7 +131,7 @@ void print_results(
         }
     }
 
-    cout << ( boost::format("%lu %lu %lu %lu %.14g %.14g")
+    cout << ( boost::format("%lu, %lu, %lu, %lu, %.14g, %.14g")
             % delay
             % tasks
             % suspended_tasks
