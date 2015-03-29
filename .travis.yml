@@ -34,7 +34,6 @@ before_install:
     - export CLANG_DIR="${TRAVIS_BUILD_DIR}/.deps/clang-${CLANG_VERSION}"
     - export BOOST_DIR="${TRAVIS_BUILD_DIR}/.deps/boost-${BOOST_VERSION}"
     - export TOOLS_DIR="${TRAVIS_BUILD_DIR}/.deps/tools"
-    - export REQUESTED_COMPILER=${CXX}
     - export GCC_CC="${GCC_DIR}/bin/gcc"
     - export GCC_CXX="${GCC_DIR}/bin/g++"
     - export CLANG_CC="${CLANG_DIR}/bin/clang"
@@ -88,4 +87,3 @@ script:
 
 notifications:
     email: false
-
