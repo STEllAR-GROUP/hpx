@@ -7,6 +7,7 @@ env:
         - GCC_VERSION="4.9.2"
         - CLANG_VERSION="3.5.1"
         - BOOST_VERSION="1.57.0"
+        - COMPILER_FLAGS="-Wno-redeclared-class-member" # Hide Warnings caused by boost
     matrix:
         #- COMPILER=gcc HPX_BUILD_TYPE=Debug
         #- COMPILER=gcc HPX_BUILD_TYPE=Release
@@ -78,7 +79,7 @@ script:
     - if [[ "$FAILURE" == "0" ]]; then gcc --version; test "$FAILURE" == "0"; fi
     - if [[ "$FAILURE" == "0" ]]; then clang --version; test "$FAILURE" == "0"; fi
     - if [[ "$FAILURE" == "0" ]]; then cmake --version; test "$FAILURE" == "0"; fi
-    - if [[ "$FAILURE" == "0" ]]; then cmake .. -DCMAKE_BUILD_TYPE=${HPX_BUILD_TYPE} -DHPX_MALLOC="system" -DHPX_BUILD_EXAMPLES=On -DBOOST_ROOT="${BOOST_DIR}/${HPX_BUILD_TYPE}" -Wdev || FAILURE="1"; test "$FAILURE" == "0"; fi
+    - if [[ "$FAILURE" == "0" ]]; then cmake .. -DCMAKE_BUILD_TYPE=${HPX_BUILD_TYPE} -DHPX_MALLOC="system" -DHPX_BUILD_EXAMPLES=On -DBOOST_ROOT="${BOOST_DIR}/${HPX_BUILD_TYPE}" -DCMAKE_CXX_FLAGS="$COMPILER_FLAGS" -Wdev || FAILURE="1"; test "$FAILURE" == "0"; fi
     - if [[ "$FAILURE" == "0" ]]; then make core -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
     - if [[ "$FAILURE" == "0" ]]; then make -k components -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
     - if [[ "$FAILURE" == "0" ]]; then make -k examples -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
