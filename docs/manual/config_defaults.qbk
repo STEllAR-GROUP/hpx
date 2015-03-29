@@ -501,7 +501,7 @@ to `ON`).
 ``
     [hpx.parcel.mpi]
     enable = ${HPX_PARCELPORT_MPI:1}
-    env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}
+    env = ${HPX_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE}
     multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}
     rank = <MPI_rank>
     processor_name = <MPI_processor_name>
