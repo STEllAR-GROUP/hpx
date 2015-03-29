@@ -20,9 +20,6 @@ namespace hpx { namespace util
         typename IterEnd = IterBegin, typename IterValueEnd = IterValueBegin>
     class stencil3_iterator;
 
-    template <typename Iterator>
-    class stencil3_iterator_nocheck;
-
     namespace detail
     {
         template <typename Iterator>
@@ -113,33 +110,6 @@ namespace hpx { namespace util
             return previous_transformer<IteratorBase, IteratorValue>(base, value);
         }
 
-        // the user handles the left boundary case explicitly
-        struct previous_transformer_nocheck
-        {
-            template <typename T>
-            struct result;
-
-            template <typename This, typename Iterator>
-            struct result<This(Iterator)>
-            {
-                typedef typename std::iterator_traits<Iterator>::reference type;
-            };
-
-            // this transformer will always dereference 'it-1'
-            template <typename Iterator>
-            typename std::iterator_traits<Iterator>::reference
-            operator()(Iterator const& it) const
-            {
-                return *detail::previous(it);
-            }
-        };
-
-        inline previous_transformer_nocheck
-        make_previous_transformer()
-        {
-            return previous_transformer_nocheck();
-        }
-
         ///////////////////////////////////////////////////////////////////////
         template <typename IteratorBase, typename IteratorValue>
         struct next_transformer
@@ -180,33 +150,6 @@ namespace hpx { namespace util
             IteratorBase const& base, IteratorValue const& value)
         {
             return next_transformer<IteratorBase, IteratorValue>(base, value);
-        }
-
-        // the user handles the right boundary case explicitly
-        struct next_transformer_nocheck
-        {
-            template <typename T>
-            struct result;
-
-            template <typename This, typename Iterator>
-            struct result<This(Iterator)>
-            {
-                typedef typename std::iterator_traits<Iterator>::reference type;
-            };
-
-            // this transformer will always dereference 'it+1'
-            template <typename Iterator>
-            typename std::iterator_traits<Iterator>::reference
-            operator()(Iterator const& it) const
-            {
-                return *detail::next(it);
-            }
-        };
-
-        inline next_transformer_nocheck
-        make_next_transformer()
-        {
-            return next_transformer_nocheck();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -326,48 +269,25 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename Iterator>
-        struct stencil3_iterator_nocheck_base
-        {
-            typedef previous_transformer_nocheck left_transformer;
-            typedef next_transformer_nocheck right_transformer;
-
-            typedef transform_iterator<Iterator, left_transformer> left_iterator;
-            typedef transform_iterator<Iterator, right_transformer> right_iterator;
-
-            typedef zip_iterator_base<
-                    tuple<left_iterator, Iterator, right_iterator>,
-                    stencil3_iterator_nocheck<Iterator>
-                > type;
-
-            static type create(Iterator const& it)
-            {
-                return type(util::make_tuple(
-                    make_transform_iterator(it, make_previous_transformer()), it,
-                    make_transform_iterator(it, make_next_transformer())));
-            }
-        };
-    }
-
     template <typename Iterator>
     class stencil3_iterator_nocheck
-      : public detail::stencil3_iterator_nocheck_base<Iterator>::type
+      : public detail::zip_iterator_base<
+                tuple<Iterator, Iterator, Iterator>,
+                stencil3_iterator_nocheck<Iterator>
+            >
     {
     private:
-        typedef detail::stencil3_iterator_nocheck_base<Iterator> base_maker;
-        typedef typename base_maker::type base_type;
+        typedef detail::zip_iterator_base<
+                tuple<Iterator, Iterator, Iterator>,
+                stencil3_iterator_nocheck<Iterator>
+            > base_type;
 
     public:
         stencil3_iterator_nocheck() {}
 
         explicit stencil3_iterator_nocheck(Iterator const& it)
-          : base_type(base_maker::create(it))
-        {}
-
-        stencil3_iterator_nocheck(tuple<Iterator, Iterator, Iterator> const& t)
-          : base_type(t)
+          : base_type(util::make_tuple(
+                detail::previous(it), it, detail::next(it)))
         {}
 
     private:
