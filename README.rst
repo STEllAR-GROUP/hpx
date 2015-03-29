@@ -63,12 +63,18 @@ our `contiguous integration results website <http://hermione.cct.lsu.edu/console
 While we try to keep the master branch stable and usable, sometimes new bugs
 trick their way into the code base - you have been warned!
 
+Travis tracks the current build status for the master branch: |travis_status|.
+
+.. |travis_status| image:: https://api.travis-ci.org/STEllAR-GROUP/hpx.svg?branch=master
+     :target: https://travis-ci.org/STEllAR-GROUP/hpx
+     :alt: HPX master branch build status
+
 In any case, if you happen to run into problems we very much encourage and appreciate
 any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
 
 Also, if you have any questions feel free to ask it over at `stackoverflow <http://stackoverflow.com>`_
-and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_. 
+and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_.
 
 ********************
  Build Instructions
