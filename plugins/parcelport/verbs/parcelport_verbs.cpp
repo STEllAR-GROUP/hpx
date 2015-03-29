@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
-//  Copyright (c) 2014-2015 John Biddiscombe
+//  Copyright (c) 2015 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,12 +17,7 @@
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
-#define JB_MEM_POOL
-#ifdef JB_MEM_POOL
- #include "RdmaMemoryPool.h"
-#else
- #include <hpx/util/memory_chunk_pool.hpp>
-#endif
+#include "RdmaMemoryPool.h"
 
 // parcelport
 #include <hpx/runtime.hpp>
@@ -33,7 +28,8 @@
 #include <hpx/plugins/parcelport_factory.hpp>
 
 // Local parcelport plugin
-#include <connection_handler_verbs.hpp>
+#include "connection_handler_verbs.hpp"
+#include "pointer_wrapper_vector.hpp"
 //
 #include <hpx/plugins/parcelport/header.hpp>
 
@@ -149,9 +145,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             parcelset::parcelport(ini, here(ini), "verbs"), archive_flags_(boost::archive::no_header)
       , stopped_(false)
 //      , parcels_sent_(0)
-    #ifndef JB_MEM_POOL
-      , chunk_pool_(4096, 32)
-    #endif
       {
         FUNC_START_DEBUG_MSG;
         //    _port   = 0;
@@ -256,6 +249,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
           char *piggy_back = h->piggy_back();
           char *main_chunk = &((char*)h)[header_type::pos_piggy_back_data];
+          LOG_DEBUG_MSG("piggy_back is " << hexpointer(piggy_back) << " main_chunk is " << hexpointer(main_chunk));
           // if the main serialization chunk is piggybacked in second SGE
 
           // determine the size of the chunk buffer
@@ -266,20 +260,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
               static_cast<std::size_t>(
                   static_cast<boost::uint32_t>(h->num_chunks().second)) - (piggy_back ? 1 : 0);
           //
+          if (num_non_zero_copy_chunks>0) {
+            LOG_ERROR_MSG("There should not be any normal chunks after piggybacking");
+          }
           std::size_t total_chunks = num_zero_copy_chunks + num_non_zero_copy_chunks;
 
           // since not all code is implemented, setting this flag to false disables final parcel receive call
           bool parcel_complete = true;
 
           // @TODO : implement this chunk get handling
-          std::allocator<char> alloc;
-          rcv_buffer_type buffer(alloc);
+          rcv_data_type wrapped_pointer(piggy_back, h->size());
+          rcv_buffer_type buffer(wrapped_pointer);
 
           performance_counters::parcels::data_point& data = buffer.data_point_;
           data.time_ = timer.elapsed_nanoseconds();
           data.bytes_ = static_cast<std::size_t>(buffer.size_);
 
+          LOG_DEBUG_MSG("Calling buffer resize");
           buffer.data_.resize(static_cast<std::size_t>(h->size()));
+          LOG_DEBUG_MSG("Called buffer resize");
           buffer.num_chunks_ = h->num_chunks();
           int tag = h->tag();
 
@@ -290,31 +289,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
           if (num_zero_copy_chunks != 0) {
               parcel_complete = false;
               // allocate a parcel_buffer for each chunk
-              buffer.chunks_.resize(num_zero_copy_chunks, rcv_data_type(alloc));
+       //       buffer.chunks_.resize(num_zero_copy_chunks, rcv_data_type(alloc));
               for (std::size_t z=0; z<num_zero_copy_chunks; z++) {
                 LOG_ERROR_MSG("Implement RDMA GET operation for zerocopy");
               }
           }
 
-          if (piggy_back) {
-              std::memcpy(&buffer.data_[0], piggy_back, buffer.data_.size());
-              LOG_DEBUG_MSG("Copied piggyback data into buffer - WHY we want zero-copy");
-              if (num_non_zero_copy_chunks != 0) {
-                LOG_DEBUG_MSG("Should not ever receive extra chunks when piggybacked data present");
-              }
+          if (piggy_back &&num_non_zero_copy_chunks != 0) {
+              LOG_DEBUG_MSG("Should not ever receive extra chunks when piggybacked data present");
           }
-
-          // for each normal chunk, we must do an rdma get
-          if (num_non_zero_copy_chunks != 0) {
-              parcel_complete = false;
-              // allocate a parcel_buffer for each chunk
-              buffer.chunks_.resize(num_non_zero_copy_chunks, rcv_data_type(alloc));
-              for (std::size_t z=0; z<num_non_zero_copy_chunks; z++) {
-                LOG_ERROR_MSG("Implement RDMA GET operation for normal");
-              }
-          }
-
-
 
 /*
           std::size_t chunk_idx = 0;
@@ -334,6 +317,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             decode_message(*this, std::move(buffer), 1);
 //            decode_parcel(*this, std::move(buffer));
             LOG_DEBUG_MSG("parcel decode called for complete parcel");
+            chunk_pool_->deallocate(region);
           }
           else {
             LOG_DEBUG_MSG("incomplete parcel");
@@ -433,10 +417,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
       bool run(bool blocking = true) {
         FUNC_START_DEBUG_MSG;
         _rdmaController->startup();
-    #ifdef JB_MEM_POOL
         LOG_DEBUG_MSG("Fetching memory pool");
         chunk_pool_ = _rdmaController->getMemoryPool();
-    #endif
         LOG_DEBUG_MSG("Setting Completion function");
         // need to use std:bind here as rdmahelper lib uses it too
         auto completion_function = std::bind( &parcelport::handle_verbs_completion, this, std::placeholders::_1, std::placeholders::_2);
@@ -465,26 +447,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
       typedef header<DEFAULT_MEMORY_POOL_CHUNK_SIZE>          header_type;
       typedef hpx::lcos::local::spinlock                      mutex_type;
-    #ifdef JB_MEM_POOL
       typedef char                                            memory_type;
       typedef RdmaMemoryPool                                  memory_pool_type;
       typedef std::shared_ptr<memory_pool_type>               memory_pool_ptr_type;
       typedef hpx::util::detail::memory_chunk_pool_allocator
           <memory_type, memory_pool_type, mutex_type>         allocator_type;
       typedef std::vector<memory_type, allocator_type>        snd_data_type;
-      typedef std::vector<memory_type, std::allocator<memory_type>>  rcv_data_type;
-      typedef parcel_buffer<snd_data_type>                        snd_buffer_type;
-      typedef parcel_buffer<rcv_data_type, rcv_data_type>         rcv_buffer_type;
+      typedef util::detail::pointer_wrapper_vector<memory_type>  rcv_data_type;
+      typedef parcel_buffer<snd_data_type>                       snd_buffer_type;
+      typedef parcel_buffer<rcv_data_type, std::vector<memory_type>>         rcv_buffer_type;
       memory_pool_ptr_type                                    chunk_pool_;
-    #else
-      typedef util::memory_chunk_pool<>                       memory_pool_type;
-      typedef hpx::util::detail::memory_chunk_pool_allocator
-          <char, memory_pool_type, mutex_type> allocator_type;
-      typedef std::vector<char, allocator_type>               data_type;
-      typedef parcel_buffer<data_type>                        snd_buffer_type;
-      typedef parcel_buffer<data_type, data_type>             rcv_buffer_type;
-      memory_pool_type                                        chunk_pool_;
-    #endif
       tag_provider tag_provider_;
 
 //      performance_counters::parcels::gatherer& parcels_sent_;
@@ -519,14 +491,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // connection ok, we can now send required info to the remote peer
         {
           util::high_resolution_timer timer;
-    #ifdef JB_MEM_POOL
           allocator_type alloc(*chunk_pool_.get());
           alloc.disable_deallocate = true;
           snd_buffer_type buffer(alloc);
-    #else
-          allocator_type alloc(chunk_pool_);
-          snd_buffer_type buffer(alloc);
-    #endif
+
           // encode the parcel directly into an rdma pinned memory block
           // if the serialization overflows the block, panic and rewrite this.
           LOG_DEBUG_MSG("Encoding parcel");
@@ -612,13 +580,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         FUNC_END_DEBUG_MSG;
       }
 
+      // This is called whenever a HPX OS thread is idling, can be used to poll for incoming messages
       bool do_background_work(std::size_t num_thread) {
-            if (stopped_)
-                return false;
-         //    FUNC_START_DEBUG_MSG;
-        _rdmaController->eventMonitor(0);
-        //    FUNC_END_DEBUG_MSG;
-        // This is called whenever a HPX OS thread is idling, can be used to poll for incoming messages
+        if (stopped_)
+          return false;
+        // if an event comes in, we may spend time processing/handling it and another may arrive
+        // during this handling, so keep checking until non are received
+        bool done = false;
+        do {
+          done = (_rdmaController->eventMonitor(0) == 0);
+        } while (!done);
         return true;
       }
 
