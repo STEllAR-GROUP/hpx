@@ -48,7 +48,7 @@ install:
     - FAILURE="0"
     - printenv
     ### GCC ###
-    - if [[ "$FAILURE" == "0" ]]; then ./travis/gcc.sh ${GCC_VERSION} || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then ./tools/travis/gcc.sh ${GCC_VERSION} || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${GCC_DIR}/bin:$PATH"; fi
     - export CPATH="${GCC_DIR}/include"
     - export CPATH="${CPATH}:${GCC_DIR}/include/c++/${GCC_VERSION}"
@@ -60,13 +60,13 @@ install:
     - export CC="${GCC_CC}"
     - export CXX="${GCC_CXX}"
     ### CLANG ###
-    - if [[ "$FAILURE" == "0" ]]; then ./travis/clang.sh ${CLANG_VERSION} || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then ./tools/travis/clang.sh ${CLANG_VERSION} || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${CLANG_DIR}/bin:$PATH"; fi
     ### TOOLS ###
-    - if [[ "$FAILURE" == "0" ]]; then ./travis/tools.sh || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then ./tools/travis/tools.sh || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${TOOLS_DIR}/bin:$PATH"; fi
     ### BOOST ###
-    - if [[ "$FAILURE" == "0" ]]; then ./travis/boost.sh ${BOOST_VERSION} || FAILURE="1"; fi
+    - if [[ "$FAILURE" == "0" ]]; then ./tools/travis/boost.sh ${BOOST_VERSION} || FAILURE="1"; fi
 
 before_script:
     - export CC="${CLANG_CC}"

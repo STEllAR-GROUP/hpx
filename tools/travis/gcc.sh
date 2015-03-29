@@ -5,10 +5,9 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
-DEPS_PATH=$SCRIPTPATH/../.deps
-PROGRAM_NAME="boost"
+DEPS_PATH=$SCRIPTPATH/../../.deps
+PROGRAM_NAME="gcc"
 
 while getopts ":" opt; do
   case $opt in
@@ -47,7 +46,6 @@ fi
 
 
 VERSION=${@:${OPTIND}:1}
-UNDERSCORE_VERSION=${VERSION//./_}
 
 ROOT_DIR=${DEPS_PATH}/${PROGRAM_NAME}-${VERSION}
 TMP_DIR=/tmp/${PROGRAM_NAME}-${VERSION}
@@ -79,32 +77,36 @@ function download_and_extract {
     echo "Downloading $URL ..."
     wget -qO- ${URL} | tar -xz -C $TMP_DIR/wget --checkpoint=1000 || exit 1
     assert_single_entry $TMP_DIR/wget
-    mv $TMP_DIR/wget/* $TARGET_DIR || exit 1
+    mv $TMP_DIR/wget/* ${TARGET_DIR} || exit 1
 }
 
-BOOST_URL="http://downloads.sourceforge.net/sourceforge/boost/boost/${VERSION}/boost_${UNDERSCORE_VERSION}.tar.gz"
-download_and_extract $BOOST_URL $TMP_DIR/src
-cd $TMP_DIR/src || exit 1
+GCC_URL="http://ftpmirror.gnu.org/gcc/gcc-${VERSION}/gcc-${VERSION}.tar.gz"
+download_and_extract $GCC_URL $TMP_DIR/src
 
-echo "Bootstrapping ..."
-EXCLUDES="mpi,graph_parallel,python"
-./bootstrap.sh --without-libraries=${EXCLUDES} --prefix=${ROOT_DIR} || exit 1
+echo "Downloading prerequisites ..."
+cd $TMP_DIR/src
+./contrib/download_prerequisites
 
+echo "Creating build directory ..."
+mkdir $TMP_DIR/build || exit 1
+cd $TMP_DIR/build || exit 1
+
+
+
+echo "Configuring ..."
+../src/configure --prefix=${ROOT_DIR}                               \
+                 --enable-languages=c,c++                           \
+                 --disable-multilib                                 \
+                 || exit 1
+
+echo "Building ..."
+# Prevent travis timeout
 trap 'kill $(jobs -p)' EXIT
 while true; do sleep 300; echo "Still building ..."; done &
+make -j2 >/dev/null || exit 1
 
-echo "Building Debug ..."
-./b2 variant=debug --prefix=${ROOT_DIR}/Debug -j2 >/dev/null || exit 1
-
-echo "Building Release ..."
-./b2 variant=release --prefix=${ROOT_DIR}/Release -j2 >/dev/null || exit 1
-
-
-echo "Installing Debug to deps folder ..."
-./b2 variant=debug --prefix=${ROOT_DIR}/Debug install >/dev/null || exit 1
-
-echo "Installing Release to deps folder ..."
-./b2 variant=release --prefix=${ROOT_DIR}/Release install >/dev/null || exit 1
+echo "Installing to deps folder ..."
+make install || exit 1
 
 touch $EXISTS_FILE
 
