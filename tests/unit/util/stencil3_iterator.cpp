@@ -12,28 +12,6 @@
 
 #include <strstream>
 
-void test_stencil3_iterator_full()
-{
-    std::vector<int> values(10);
-    std::iota(std::begin(values), std::end(values), 0);
-
-    auto r = hpx::util::make_stencil3_range(
-        values.begin(), values.end(), &values.back(), &values.front());
-
-    typedef std::iterator_traits<decltype(r.first)>::reference reference;
-
-    std::ostringstream str;
-
-    std::for_each(r.first, r.second,
-        [&str](reference val)
-        {
-            using hpx::util::get;
-            str << get<0>(val) << get<1>(val) << get<2>(val) << " ";
-        });
-
-    HPX_TEST_EQ(str.str(), std::string("901 012 123 234 345 456 567 678 789 890 "));
-}
-
 void test_stencil3_iterator()
 {
     std::vector<int> values(10);
@@ -58,8 +36,7 @@ void test_stencil3_iterator()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    test_stencil3_iterator_full();
-//     test_stencil3_iterator();
+    test_stencil3_iterator();
 
     return hpx::finalize();
 }

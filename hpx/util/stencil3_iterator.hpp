@@ -6,13 +6,16 @@
 #if !defined(HPX_UTIL_STENCIL_ITERATOR_MAR_23_2015_1123AM)
 #define HPX_UTIL_STENCIL_ITERATOR_MAR_23_2015_1123AM
 
-#include <hpx/util/zip_iterator.hpp>
+#include <hpx/config/forceinline.hpp>
+#include <hpx/util/transform_iterator.hpp>
 
-#include <type_traits>
 #include <iterator>
+
+#include <boost/type_traits/is_same.hpp>
 
 namespace hpx { namespace util
 {
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         template <typename Iterator>
@@ -24,38 +27,42 @@ namespace hpx { namespace util
         {};
 
         template <typename Iterator>
-        Iterator previous(Iterator const& it, boost::mpl::false_)
+        BOOST_FORCEINLINE
+        Iterator previous(Iterator it, boost::mpl::false_)
         {
-            Iterator prev = it;
-            return --prev;
+            return --it;
         }
 
         template <typename Iterator>
+        BOOST_FORCEINLINE
         Iterator previous(Iterator const& it, boost::mpl::true_)
         {
             return it - 1;
         }
 
         template <typename Iterator>
+        BOOST_FORCEINLINE
         Iterator previous(Iterator const& it)
         {
             return previous(it, is_random_access_iterator<Iterator>());
         }
 
         template <typename Iterator>
-        Iterator next(Iterator const& it, boost::mpl::false_)
+        BOOST_FORCEINLINE
+        Iterator next(Iterator it, boost::mpl::false_)
         {
-            Iterator prev = it;
-            return ++prev;
+            return ++it;
         }
 
         template <typename Iterator>
+        BOOST_FORCEINLINE
         Iterator next(Iterator const& it, boost::mpl::true_)
         {
             return it + 1;
         }
 
         template <typename Iterator>
+        BOOST_FORCEINLINE
         Iterator next(Iterator const& it)
         {
             return next(it, is_random_access_iterator<Iterator>());
@@ -63,38 +70,49 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        struct stencil_transformer
+        {
+            template <typename T>
+            struct result;
+
+            template <typename This, typename Iterator>
+            struct result<This(Iterator)>
+            {
+                typedef typename std::iterator_traits<Iterator>::reference
+                    element_type;
+                typedef tuple<element_type, element_type, element_type> type;
+            };
+
+            // it will dereference tuple(it-1, it, it+1)
+            template <typename Iterator>
+            typename result<stencil_transformer(Iterator)>::type
+            operator()(Iterator const& it) const
+            {
+                typedef typename result<stencil_transformer(Iterator)>::type type;
+                return type(*detail::previous(it), *it, *detail::next(it));
+            }
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     class stencil3_iterator
-      : public detail::zip_iterator_base<
-                tuple<Iterator, Iterator, Iterator>,
-                stencil3_iterator<Iterator>
-            >
+      : public transform_iterator<Iterator, detail::stencil_transformer>
     {
     private:
-        typedef detail::zip_iterator_base<
-                tuple<Iterator, Iterator, Iterator>,
-                stencil3_iterator<Iterator>
-            > base_type;
+        typedef transform_iterator<Iterator, detail::stencil_transformer>
+            base_type;
 
     public:
         stencil3_iterator() {}
 
         explicit stencil3_iterator(Iterator const& it)
-          : base_type(util::make_tuple(
-                detail::previous(it), it, detail::next(it)))
+          : base_type(it, detail::stencil_transformer())
         {}
-
-    private:
-        friend class boost::iterator_core_access;
-
-        bool equal(stencil3_iterator const& other) const
-        {
-            return util::get<1>(this->get_iterator_tuple()) ==
-                   util::get<1>(other.get_iterator_tuple());
-        }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     inline stencil3_iterator<Iterator>
     make_stencil3_iterator(Iterator const& it)

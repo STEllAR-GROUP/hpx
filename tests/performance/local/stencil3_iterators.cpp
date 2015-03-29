@@ -18,6 +18,7 @@ int test_count = 100;
 int partition_size = 10000;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Version of stencil3_iterator which handles boundary elements internally
 namespace hpx { namespace experimental
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -224,7 +225,6 @@ namespace hpx { namespace experimental
     }
 }}
 
-///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t bench_stencil3_iterator_full()
 {
     std::vector<int> values(partition_size);
@@ -251,14 +251,68 @@ boost::uint64_t bench_stencil3_iterator_full()
 
 ///////////////////////////////////////////////////////////////////////////////
 // compare with unchecked stencil3_iterator (version 1)
-boost::uint64_t bench_stencil3_iterator()
+namespace hpx { namespace experimental
+{
+    template <typename Iterator>
+    class stencil3_iterator_v1
+      : public util::detail::zip_iterator_base<
+                util::tuple<Iterator, Iterator, Iterator>,
+                stencil3_iterator_v1<Iterator>
+            >
+    {
+    private:
+        typedef util::detail::zip_iterator_base<
+                util::tuple<Iterator, Iterator, Iterator>,
+                stencil3_iterator_v1<Iterator>
+            > base_type;
+
+    public:
+        stencil3_iterator_v1() {}
+
+        explicit stencil3_iterator_v1(Iterator const& it)
+          : base_type(util::make_tuple(
+                util::detail::previous(it), it, util::detail::next(it)))
+        {}
+
+    private:
+        friend class boost::iterator_core_access;
+
+        bool equal(stencil3_iterator_v1 const& other) const
+        {
+            return util::get<1>(this->get_iterator_tuple()) ==
+                   util::get<1>(other.get_iterator_tuple());
+        }
+    };
+
+    template <typename Iterator>
+    inline stencil3_iterator_v1<Iterator>
+    make_stencil3_iterator_v1(Iterator const& it)
+    {
+        return stencil3_iterator_v1<Iterator>(it);
+    }
+
+    template <typename Iterator>
+    inline std::pair<
+        stencil3_iterator_v1<Iterator>,
+        stencil3_iterator_v1<Iterator>
+    >
+    make_stencil3_range_v1(Iterator const& begin, Iterator const& end)
+    {
+        return std::make_pair(
+            make_stencil3_iterator_v1(begin),
+            make_stencil3_iterator_v1(end));
+    }
+}}
+
+boost::uint64_t bench_stencil3_iterator_v1()
 {
     std::vector<int> values(partition_size);
     std::iota(std::begin(values), std::end(values), 0);
 
     boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-    auto r = hpx::util::make_stencil3_range(values.begin()+1, values.end()-1);
+    auto r = hpx::experimental::make_stencil3_range_v1(
+        values.begin()+1, values.end()-1);
 
     typedef std::iterator_traits<decltype(r.first)>::reference reference;
 
@@ -278,73 +332,7 @@ boost::uint64_t bench_stencil3_iterator()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace experimental
-{
-    namespace detail
-    {
-        struct stencil_transformer
-        {
-            template <typename T>
-            struct result;
-
-            template <typename This, typename Iterator>
-            struct result<This(Iterator)>
-            {
-                typedef typename std::iterator_traits<Iterator>::reference
-                    element_type;
-                typedef util::tuple<element_type, element_type, element_type>
-                    type;
-            };
-
-            // it will dereference tuple(it-1, it, it+1)
-            template <typename Iterator>
-            typename result<stencil_transformer(Iterator)>::type
-            operator()(Iterator const& it) const
-            {
-                typedef typename result<stencil_transformer(Iterator)>::type type;
-                return type(*util::detail::previous(it), *it, *util::detail::next(it));
-            }
-        };
-    }
-
-    template <typename Iterator>
-    class stencil3_iterator_v2
-      : public util::transform_iterator<Iterator, detail::stencil_transformer>
-    {
-    private:
-        typedef util::transform_iterator<Iterator, detail::stencil_transformer>
-            base_type;
-
-    public:
-        stencil3_iterator_v2() {}
-
-        explicit stencil3_iterator_v2(Iterator const& it)
-          : base_type(it, detail::stencil_transformer())
-        {}
-    };
-
-    template <typename Iterator>
-    inline stencil3_iterator_v2<Iterator>
-    make_stencil3_iterator_v2(Iterator const& it)
-    {
-        return stencil3_iterator_v2<Iterator>(it);
-    }
-
-    template <typename Iterator>
-    inline std::pair<
-        stencil3_iterator_v2<Iterator>,
-        stencil3_iterator_v2<Iterator>
-    >
-    make_stencil3_range_v2(Iterator const& begin, Iterator const& end)
-    {
-        return std::make_pair(
-            make_stencil3_iterator_v2(begin),
-            make_stencil3_iterator_v2(end));
-    }
-}}
-
-///////////////////////////////////////////////////////////////////////////////
-// compare with unchecked stencil3_iterator (version 2)
+// compare with unchecked stencil3_iterator (version 2, included in HPX)
 boost::uint64_t bench_stencil3_iterator_v2()
 {
     std::vector<int> values(partition_size);
@@ -352,7 +340,7 @@ boost::uint64_t bench_stencil3_iterator_v2()
 
     boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-    auto r = hpx::experimental::make_stencil3_range_v2(
+    auto r = hpx::util::make_stencil3_range(
         values.begin()+1, values.end()-1);
 
     typedef std::iterator_traits<decltype(r.first)>::reference reference;
@@ -424,7 +412,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         {
             boost::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
-                t += bench_stencil3_iterator();
+                t += bench_stencil3_iterator_v1();
             hpx::cout << "nocheck(v1): " << (t * 1e-9) / test_count << std::endl;
         }
 
