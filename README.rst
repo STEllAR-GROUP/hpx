@@ -67,7 +67,9 @@ our `contiguous integration results website <http://hermione.cct.lsu.edu/console
 While we try to keep the master branch stable and usable, sometimes new bugs
 trick their way into the code base - you have been warned!
 
-Travis tracks the current build status for the master branch: |travis_status|.
+The `Travis CI <https://travis-ci.org/STEllAR-GROUP/hpx>`_ contiguous
+integration service tracks the current build status for the master branch:
+|travis_status|.
 
 .. |travis_status| image:: https://api.travis-ci.org/STEllAR-GROUP/hpx.svg?branch=master
      :target: https://travis-ci.org/STEllAR-GROUP/hpx
