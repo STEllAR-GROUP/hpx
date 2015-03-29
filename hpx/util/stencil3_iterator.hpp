@@ -8,6 +8,8 @@
 
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/transform_iterator.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/move.hpp>
 
 #include <iterator>
 
@@ -97,22 +99,48 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator>
+    template <typename Iterator,
+        typename Transformer = detail::stencil_transformer>
     class stencil3_iterator
-      : public transform_iterator<Iterator, detail::stencil_transformer>
+      : public transform_iterator<Iterator, Transformer>
     {
     private:
-        typedef transform_iterator<Iterator, detail::stencil_transformer>
-            base_type;
+        typedef transform_iterator<Iterator, Transformer> base_type;
 
     public:
         stencil3_iterator() {}
 
         explicit stencil3_iterator(Iterator const& it)
-          : base_type(it, detail::stencil_transformer())
+          : base_type(it, Transformer())
+        {}
+
+        stencil3_iterator(Iterator const& it, Transformer const& t)
+          : base_type(it, t)
         {}
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator, typename Transformer>
+    inline stencil3_iterator<Iterator, Transformer>
+    make_stencil3_iterator(Iterator const& it, Transformer const& t)
+    {
+        return stencil3_iterator<Iterator, Transformer>(it, t);
+    }
+
+    template <typename Iterator, typename Transformer>
+    inline std::pair<
+        stencil3_iterator<Iterator, Transformer>,
+        stencil3_iterator<Iterator, Transformer>
+    >
+    make_stencil3_range(Iterator const& begin, Iterator const& end,
+        Transformer const& t)
+    {
+        return std::make_pair(
+            make_stencil3_iterator(begin, t),
+            make_stencil3_iterator(end, t));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     inline stencil3_iterator<Iterator>
     make_stencil3_iterator(Iterator const& it)
