@@ -57,8 +57,6 @@ install:
     ### CLANG ###
     - if [[ "$FAILURE" == "0" ]]; then ./travis/clang.sh ${CLANG_VERSION} || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${CLANG_DIR}/bin:$PATH"; fi
-    - export CC="${CLANG_CC}"
-    - export CXX="${CLANG_CXX}"
     ### TOOLS ###
     - if [[ "$FAILURE" == "0" ]]; then ./travis/tools.sh || FAILURE="1"; fi
     - if [[ "$FAILURE" == "0" ]]; then export PATH="${TOOLS_DIR}/bin:$PATH"; fi
@@ -66,6 +64,8 @@ install:
     - if [[ "$FAILURE" == "0" ]]; then ./travis/boost.sh ${BOOST_VERSION} || FAILURE="1"; fi
 
 before_script:
+    - export CC="${CLANG_CC}"
+    - export CXX="${CLANG_CXX}"
     - mkdir ${TRAVIS_BUILD_DIR}/build
     - cd ${TRAVIS_BUILD_DIR}/build
     - if [[ "$FAILURE" == "0" ]]; then g++ -E -x c++ - -v < /dev/null; test "$FAILURE" == "0"; fi
