@@ -5,7 +5,7 @@ sudo: false
 env:
     global:
         - GCC_VERSION="4.9.2"
-        - CLANG_VERSION="3.5.1"
+        - CLANG_VERSION="3.6.0"
         - BOOST_VERSION="1.57.0"
         - COMPILER_FLAGS="-Wno-redeclared-class-member" # Hide Warnings caused by boost
     matrix:
