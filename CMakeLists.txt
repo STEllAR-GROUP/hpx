@@ -935,9 +935,11 @@ hpx_check_for_cxx11_alias_templates(
 hpx_check_for_cxx11_defaulted_deleted_functions(
   DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS)
 
-hpx_check_for_cxx11_std_unique_ptr(
-  DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
-              BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
+hpx_check_for_cxx11_std_unique_ptr()
+
+if(NOT HPX_WITH_CXX11_UNIQUE_PTR)
+  hpx_error("HPX needs support for C++11 std::unique_ptr")
+endif()
 
 hpx_check_for_cxx11_std_initializer_list(
   DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
