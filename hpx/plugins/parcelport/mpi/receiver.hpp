@@ -172,7 +172,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             performance_counters::parcels::data_point& data = buffer.data_point_;
             data.time_ = timer.elapsed_nanoseconds();
-            data.bytes_ = static_cast<std::size_t>(buffer.size_);
+            data.bytes_ = static_cast<std::size_t>(h.numbytes());
 
             buffer.data_.resize(static_cast<std::size_t>(h.size()));
             buffer.num_chunks_ = h.num_chunks();
