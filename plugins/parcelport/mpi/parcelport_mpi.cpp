@@ -239,7 +239,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             allocator_type alloc(chunk_pool_);
             snd_buffer_type buffer(alloc);
-            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, this->get_max_outbound_message_size());
+            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_,
+                this->get_max_outbound_message_size());
 
             buffer.data_point_.time_ = timer.elapsed_nanoseconds();
 
@@ -382,7 +383,9 @@ namespace hpx { namespace traits
 #if defined(HPX_PARCELPORT_MPI_ENV)
                 "env = ${HPX_PARCELPORT_MPI_ENV:" HPX_PARCELPORT_MPI_ENV "}\n"
 #else
-                "env = ${HPX_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE}\n"
+                "env = ${HPX_PARCELPORT_MPI_ENV:"
+                        "MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE"
+                    "}\n"
 #endif
                 "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:1}\n"
                 "max_connections = ${HPX_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"

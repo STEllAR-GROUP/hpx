@@ -90,8 +90,10 @@ namespace hpx
             try {
                 try {
                     // Get the chunk size from the allocator if it supports it
-                    size_t chunk_default =
-                        hpx::traits::default_chunk_size<typename Buffer::allocator_type>::call(buffer.data_.get_allocator());
+                    size_t chunk_default = hpx::traits::default_chunk_size<
+                            typename Buffer::allocator_type
+                        >::call(buffer.data_.get_allocator());
+
                     // preallocate data
                     for (/**/; parcels_sent != parcels_size; ++parcels_sent)
                     {
@@ -99,8 +101,8 @@ namespace hpx
                             break;
                         arg_size += traits::get_type_size(ps[parcels_sent]);
                     }
-                    
-                    buffer.data_.reserve(std::max(chunk_default,arg_size));
+
+                    buffer.data_.reserve((std::max)(chunk_default, arg_size));
 
                     // mark start of serialization
                     util::high_resolution_timer timer;
@@ -133,7 +135,8 @@ namespace hpx
                     }
 
                     // store the time required for serialization
-                    buffer.data_point_.serialization_time_ = timer.elapsed_nanoseconds();
+                    buffer.data_point_.serialization_time_ =
+                        timer.elapsed_nanoseconds();
                 }
                 catch (hpx::exception const& e) {
                     LPT_(fatal)
