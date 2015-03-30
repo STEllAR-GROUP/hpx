@@ -87,7 +87,7 @@ download_and_extract $BOOST_URL $TMP_DIR/src
 cd $TMP_DIR/src || exit 1
 
 echo "Bootstrapping ..."
-EXCLUDES="mpi,graph_parallel,python"
+EXCLUDES="mpi,graph_parallel,python,log"
 ./bootstrap.sh --without-libraries=${EXCLUDES} --prefix=${ROOT_DIR} || exit 1
 
 trap 'kill $(jobs -p)' EXIT
