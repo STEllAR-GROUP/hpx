@@ -1136,6 +1136,10 @@ configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
 ################################################################################
 # installation instructions
 ################################################################################
+install(
+  FILES "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+  DESTINATION bin
+  COMPONENT core)
 
 install( # install all hpx header files
   DIRECTORY hpx/
