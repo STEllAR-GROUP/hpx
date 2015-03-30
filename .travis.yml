@@ -87,7 +87,7 @@ script:
     - if [[ "$FAILURE" == "0" ]]; then make core -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
     - if [[ "$FAILURE" == "0" ]]; then make -k components -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
     - if [[ "$FAILURE" == "0" ]]; then make -k examples -j2 || FAILURE="1"; test "$FAILURE" == "0"; fi
-    - if [[ "$FAILURE" == "0" ]]; then ./bin/hello_world; echo "Sanity test exited with $?."; fi
+    - if [[ "$FAILURE" == "0" ]]; then ./bin/hello_world || FAILURE="1"; test "$FAILURE" == "0"; fi
     - test "$FAILURE" == "0"
 
 notifications:
