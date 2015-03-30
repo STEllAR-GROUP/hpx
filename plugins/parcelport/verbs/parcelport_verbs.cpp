@@ -22,14 +22,14 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 
-namespace hpx { namespace parcelset { namespace policies { namespace minimal
+namespace hpx { namespace parcelset { namespace policies { namespace verbs
 {
     // this example uses an integer rank for locality representation internally
     struct locality
     {
         static const char *type()
         {
-            return "minimal";
+            return "verbs";
         }
 
         explicit locality(boost::int32_t rank) : rank_(rank) {}
@@ -99,7 +99,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace minimal
         parcelport(util::runtime_configuration const& ini,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
             util::function_nonser<void()> const& on_stop_thread)
-          : parcelset::parcelport(ini, here(), "minimal")
+          : parcelset::parcelport(ini, here(), "verbs")
           , archive_flags_(boost::archive::no_header)
         {
 #ifdef BOOST_BIG_ENDIAN
@@ -137,7 +137,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace minimal
         /// Return the name of this locality
         std::string get_locality_name() const
         {
-            return "minimal"/* whatever this means for your pp */;
+            return "verbs"/* whatever this means for your pp */;
         }
 
         parcelset::locality
@@ -248,12 +248,12 @@ namespace hpx { namespace traits
     // type. This information ends up in the system wide configuration database
     // under the plugin specific section:
     //
-    //      [hpx.parcel.minimal]
+    //      [hpx.parcel.verbs]
     //      ...
     //      priority = 100
     //
     template <>
-    struct plugin_config_data<hpx::parcelset::policies::minimal::parcelport>
+    struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport>
     {
         static char const* priority()
         {
@@ -275,6 +275,6 @@ namespace hpx { namespace traits
 }}
 
 HPX_REGISTER_PARCELPORT(
-    hpx::parcelset::policies::minimal::parcelport,
-    minimal);
+    hpx::parcelset::policies::verbs::parcelport,
+    verbs);
 
