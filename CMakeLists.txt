@@ -394,8 +394,8 @@ hpx_option(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of ch
 
 ## mpi parcelport settings
 hpx_option(HPX_PARCELPORT_MPI_ENV STRING
-  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE)."
-  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
+  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE)."
+  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
 hpx_option(HPX_PARCELPORT_MPI_MULTITHREADED BOOL
   "Turn on MPI multithreading support (default: ON)."
   ON CATEGORY "Parcelport" ADVANCED)
