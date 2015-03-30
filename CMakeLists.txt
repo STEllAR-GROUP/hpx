@@ -1124,7 +1124,6 @@ configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
-
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp"
                @ONLY)
@@ -1137,14 +1136,6 @@ configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
 ################################################################################
 # installation instructions
 ################################################################################
-install(
-  DIRECTORY ${CMAKE_BINARY_DIR}/bin/
-  DESTINATION hpx/bin/
-  COMPONENT core
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                   GROUP_READ GROUP_EXECUTE
-                   WORLD_READ WORLD_EXECUTE
-  FILES_MATCHING PATTERN "hpxcxx" EXCLUDE)
 
 install( # install all hpx header files
   DIRECTORY hpx/
