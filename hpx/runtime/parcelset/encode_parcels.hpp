@@ -16,6 +16,8 @@
 
 #include <boost/integer/endian.hpp>
 
+#include <memory>
+
 namespace hpx
 {
     namespace parcelset
@@ -107,7 +109,7 @@ namespace hpx
 
                     {
                         // Serialize the data
-                        HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
+                        std::unique_ptr<util::binary_filter> filter(
                             ps[0].get_serialization_filter());
 
                         int archive_flags = archive_flags_;
