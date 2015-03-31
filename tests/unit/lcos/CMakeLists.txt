@@ -38,7 +38,9 @@ set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(apply_remote_PARAMETERS LOCALITIES 2)
 
 set(async_continue_PARAMETERS LOCALITIES 2)
+set(async_continue_cb_PARAMETERS LOCALITIES 2)
 set(async_remote_PARAMETERS LOCALITIES 2)
+set(async_cb_remote_PARAMETERS LOCALITIES 2)
 
 set(broadcast_PARAMETERS LOCALITIES 2)
 set(broadcast_apply_PARAMETERS LOCALITIES 2)
