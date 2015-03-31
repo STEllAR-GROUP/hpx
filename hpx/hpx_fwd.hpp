@@ -1686,6 +1686,7 @@ namespace hpx
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 
 #include <hpx/lcos/async_fwd.hpp>
+#include <hpx/lcos/async_callback_fwd.hpp>
 
 #endif
 

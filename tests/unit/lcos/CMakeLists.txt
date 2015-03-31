@@ -9,8 +9,10 @@ set(tests
     apply_local
     apply_remote
     async_continue
+    async_continue_cb
     async_local
     async_remote
+    async_cb_remote
     broadcast
     broadcast_apply
     composable_guard
