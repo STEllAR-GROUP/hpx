@@ -426,7 +426,8 @@ namespace hpx { namespace util
                   "the detailed affinity description for the OS threads, see "
                   "the documentation for a detailed description of possible "
                   "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
-                  "--hpx:affinity options. Implies --hpx:numa-sensitive.")
+                  "--hpx:affinity options. Implies --hpx:numa-sensitive "
+                  "(--hpx:bind=none disables defining thread affinities).")
                 ("hpx:print-bind",
                   "print to the console the bit masks calculated from the "
                   "arguments specified to all --hpx:bind options.")

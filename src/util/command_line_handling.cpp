@@ -808,7 +808,15 @@ namespace hpx { namespace util
                 threads::mask_cref_type pu_mask =
                     rt.get_thread_manager().get_pu_mask(top, i);
 
-                top.print_affinity_mask(strm, i, pu_mask);
+                if (!threads::any(pu_mask))
+                {
+                    strm << std::setw(4) << i << ": thread binding disabled"
+                         << std::endl;
+                }
+                else
+                {
+                    top.print_affinity_mask(strm, i, pu_mask);
+                }
 
                 // Make sure the mask does not contradict the CPU bindings
                 // returned by the system (see #973: Would like option to
