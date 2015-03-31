@@ -170,7 +170,6 @@ if(APPLE)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" OFF ADVANCED)
-hpx_option(HPX_BUILD_WITH_INSTALL_PREFIX BOOL "Always set the HPX_PREFIX default to the install directory (default: OFF)" OFF ADVANCED)
 
 ################################################################################
 # Native TLS configuration
@@ -1118,18 +1117,13 @@ foreach(def ${HPX_CONFIG_DEFINITIONS_VAR})
 endforeach()
 
 # Generate a defines.hpp to be used in the build directory ...
-if(HPX_BUILD_WITH_INSTALL_PREFIX)
-  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-else()
-  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-endif()
+set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
                @ONLY)
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
-
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp"
                @ONLY)
@@ -1143,13 +1137,12 @@ configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
 # installation instructions
 ################################################################################
 install(
-  DIRECTORY ${CMAKE_BINARY_DIR}/bin/
-  DESTINATION hpx/bin/
+  FILES "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+  DESTINATION bin
   COMPONENT core
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                   GROUP_READ GROUP_EXECUTE
-                   WORLD_READ WORLD_EXECUTE
-  FILES_MATCHING PATTERN "hpxcxx" EXCLUDE)
+  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+  GROUP_READ GROUP_EXECUTE
+  WORLD_READ WORLD_EXECUTE)
 
 install( # install all hpx header files
   DIRECTORY hpx/
