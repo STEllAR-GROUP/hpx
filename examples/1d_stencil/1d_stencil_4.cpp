@@ -59,6 +59,11 @@ public:
             data_[i] = base_value + double(i);
     }
 
+    partition_data(partition_data && other)
+      : data_(std::move(other.data_))
+      , size_(other.size_)
+    {}
+
     double& operator[](std::size_t idx) { return data_[idx]; }
     double operator[](std::size_t idx) const { return data_[idx]; }
 
@@ -67,6 +72,8 @@ public:
 private:
     std::unique_ptr<double[]> data_;
     std::size_t size_;
+
+    HPX_MOVABLE_BUT_NOT_COPYABLE(partition_data);
 };
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
