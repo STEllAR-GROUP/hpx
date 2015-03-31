@@ -14,7 +14,7 @@
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
-#include <hpx/runtime/serialization/shared_ptr.hpp>
+#include <hpx/runtime/serialization/raw_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
@@ -280,15 +280,14 @@ namespace hpx { namespace components
             server::detail::memory_block_header* config = 0)
         {
             std::size_t size = data->get_size();
-            boost::shared_ptr<actions::manage_object_action_base> act( //TODO:bikineev
+            actions::manage_object_action_base* act =
                 const_cast<actions::manage_object_action_base*>(
-                    &data->get_managing_object().get_instance())
-            );
+                    &data->get_managing_object().get_instance());
 
             HPX_ASSERT(act);
 
             ar << size; //-V128
-            ar << act;
+            ar << hpx::serialization::raw_ptr(act);
 
             HPX_ASSERT(act->save());
             if (config) {
@@ -317,10 +316,10 @@ namespace hpx { namespace components
             server::detail::memory_block_header* config = 0)
         {
             std::size_t size = 0;
-            boost::shared_ptr<actions::manage_object_action_base> act; //TODO:bikineev raw_pointer has been changed to shared_ptr
+            actions::manage_object_action_base* act = 0;
 
             ar >> size; //-V128
-            ar >> act;
+            ar >> hpx::serialization::raw_ptr(act);
 
             typedef server::detail::memory_block_header alloc_type;
             alloc_type* p =
@@ -335,6 +334,8 @@ namespace hpx { namespace components
             else {
                 act->load()(p->get_ptr(), size, ar, version, 0);
             }
+
+            delete act;
 
             return p;
         }

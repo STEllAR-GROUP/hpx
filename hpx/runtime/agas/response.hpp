@@ -411,20 +411,6 @@ struct get_remote_result<parcelset::endpoints_type, agas::response>
 
 }}
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-//BOOST_CLASS_VERSION(hpx::agas::response, HPX_AGAS_VERSION) //TODO:bikineev 
-//BOOST_CLASS_TRACKING(hpx::agas::response, boost::serialization::track_never)
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
-
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::agas::response,
     agas_response_type)

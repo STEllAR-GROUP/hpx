@@ -307,21 +307,12 @@ namespace hpx { namespace util
                 base_type::equal_to = Vtable::equal_to;
                 base_type::stream_in = Vtable::stream_in;
                 base_type::stream_out = Vtable::stream_out;
-
-                // make sure the global gets instantiated;
-                //hpx::actions::detail::guid_initialization<fxn_ptr>(); //TODO:bikineev
             }
 
             virtual base_type * get_ptr()
             {
                 return Vtable::get_ptr();
             }
-
-            //TODO:bikineev
-            //static void register_base()
-            //{
-                //util::void_cast_register_nonvirt<fxn_ptr, base_type>();
-            //}
 
             void save_object(void *const* object, OArchive & ar, unsigned)
             {
@@ -434,13 +425,6 @@ namespace hpx { namespace util
 }}  // namespace hpx::util
 
 //TODO:bikineev
-///////////////////////////////////////////////////////////////////////////////
-// Make sure any serialization is properly initialized
-//HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    //(template <typename IArchive, typename OArchive, typename Vtable, typename Char>)
-  //, (hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char>)
-//)
-
 ///////////////////////////////////////////////////////////////////////////////
 // disable tracking for function pointer table
 //namespace boost { namespace serialization

@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/container.hpp>
-
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/static_assert.hpp>
@@ -41,18 +40,14 @@ namespace hpx { namespace serialization {
         endian_little               = 0x00008000,
         disable_array_optimization  = 0x00010000,
         disable_data_chunking       = 0x00020000,
-
         all_archive_flags           = 0x0003e000    // all of the above
     };
 
-    inline void
+    void BOOST_FORCEINLINE
     reverse_bytes(char size, char* address)
     {
         std::reverse(address, address + size);
     }
-
-    struct output_archive;
-    struct input_archive;
 
     template <typename Helper>
     Helper & tracked_pointer(input_archive & ar, std::size_t pos);

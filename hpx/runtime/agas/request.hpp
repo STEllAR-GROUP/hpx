@@ -285,19 +285,5 @@ HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
   , request_iterate_types_function_type
 )
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-//BOOST_CLASS_VERSION(hpx::agas::request, HPX_AGAS_VERSION) // TODO:bikineev 
-//BOOST_CLASS_TRACKING(hpx::agas::request, boost::serialization::track_never)
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
-
 #endif // HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 

@@ -169,19 +169,5 @@ operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 
 }}
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#   if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#       pragma GCC diagnostic push
-#   endif
-#   pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-//BOOST_CLASS_VERSION(hpx::agas::gva, HPX_AGAS_VERSION) //TODO:bikineev
-//BOOST_CLASS_TRACKING(hpx::agas::gva, boost::serialization::track_never)
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
-
 #endif // HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4
 

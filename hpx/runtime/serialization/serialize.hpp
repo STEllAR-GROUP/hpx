@@ -7,15 +7,10 @@
 #ifndef HPX_SERIALIZATION_SERIALIZE_HPP
 #define HPX_SERIALIZATION_SERIALIZE_HPP
 
-#include <hpx/config.hpp>
-
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/access.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
-
-#include <boost/type_traits/add_const.hpp>
-#include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace serialization {
 
@@ -54,7 +49,6 @@ namespace hpx { namespace serialization {
     }
 }}
 
-#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/polymorphic_nonintrusive_factory_impl.hpp>
 
 #endif

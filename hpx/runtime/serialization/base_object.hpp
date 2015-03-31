@@ -9,8 +9,6 @@
 #ifndef HPX_SERIALIZATION_BASE_OBJECT_HPP
 #define HPX_SERIALIZATION_BASE_OBJECT_HPP
 
-#include <hpx/config.hpp>
-
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/access.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>

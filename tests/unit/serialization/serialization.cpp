@@ -49,6 +49,7 @@ namespace foo
     struct bap
     {
     };
+
     template <typename Archive>
     void save(Archive & ar, bap const &, unsigned)
     {

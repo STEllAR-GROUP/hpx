@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
 
