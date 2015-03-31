@@ -422,7 +422,7 @@ namespace hpx { namespace lcos
 
         template <typename Callback, typename ...Ts>
         void apply_cb(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::address&& addr,
-            naming::id_type const& gid, Ts&&... vs)
+            naming::id_type const& gid, Callback && cb, Ts&&... vs)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
