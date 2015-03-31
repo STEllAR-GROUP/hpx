@@ -83,21 +83,10 @@ namespace hpx { namespace components { namespace server
 #pragma warning(pop)
 #endif
 
-//TODO:bikineev
-//HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(
-    //(template <typename F>)
-  //, (hpx::components::server::remote_object_apply_action1<F>)
-//)
-
-//HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(
-    //(template <typename F, typename A>)
-  //, (hpx::components::server::remote_object_apply_action2<F, A>)
-//)
-
-//HPX_REGISTER_ACTION_DECLARATION(
-    //hpx::components::server::remote_object::set_dtor_action
-  //, remote_object_set_dtor_action
-//)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::remote_object::set_dtor_action
+  , remote_object_set_dtor_action
+)
 
 HPX_UTIL_REGISTER_FUNCTION_DECLARATION(void(void**), hpx::util::function<void(void**)>, hpx_remote_object_dtor_functor)
 

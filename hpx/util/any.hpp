@@ -424,24 +424,6 @@ namespace hpx { namespace util
     }} // namespace hpx::util::detail::any
 }}  // namespace hpx::util
 
-//TODO:bikineev
-///////////////////////////////////////////////////////////////////////////////
-// disable tracking for function pointer table
-//namespace boost { namespace serialization
-//{
-    //template <typename IArchive, typename OArchive, typename Char>
-    //struct tracking_level<
-            //hpx::util::detail::any::fxn_ptr_table<IArchive, OArchive, Char> >
-      //: boost::mpl::int_<boost::serialization::track_never>
-    //{};
-
-    //template <typename IArchive, typename OArchive, typename Vtable, typename Char>
-    //struct tracking_level<
-            //hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char> >
-      //: boost::mpl::int_<boost::serialization::track_never>
-    //{};
-//}}
-
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////

@@ -949,27 +949,6 @@ namespace std
     };
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// this is the current version of the id_type serialization format
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-
-//BOOST_CLASS_VERSION(hpx::naming::gid_type, HPX_GIDTYPE_VERSION) //TODO:bikineev
-//BOOST_CLASS_TRACKING(hpx::naming::gid_type, boost::serialization::track_never)
-//BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
-//BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
-//BOOST_SERIALIZATION_INTRUSIVE_PTR(hpx::naming::detail::id_type_impl)
-
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
-
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif

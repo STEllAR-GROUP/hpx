@@ -108,15 +108,6 @@ namespace hpx { namespace util { namespace detail
             >();
 }}}
 
-//namespace boost { namespace serialization //TODO:bikineev
-//{
-    //template <typename Sig, typename IArchive, typename OArchive>
-    //struct tracking_level< ::hpx::util::detail::function_vtable_ptr<
-        //Sig, IArchive, OArchive
-    //> > : boost::mpl::int_<boost::serialization::track_never>
-    //{};
-//}}
-
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////

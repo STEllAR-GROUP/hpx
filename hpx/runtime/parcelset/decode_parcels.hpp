@@ -15,7 +15,6 @@
 
 #include <vector>
 
-// TODO:bikineev: delete chunks stuff
 namespace hpx { namespace parcelset
 {
     template <typename Buffer>

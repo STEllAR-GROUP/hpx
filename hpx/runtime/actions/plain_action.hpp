@@ -152,7 +152,6 @@ namespace hpx { namespace actions
 ///       HPX_REGISTER_PLAIN_ACTION_TEMPLATE((template <typename T>), (app::some_global_action<T>));
 /// \endcode
 ///
-//TODO:bikineev
 #define HPX_REGISTER_PLAIN_ACTION_TEMPLATE(template_, action_type)            \
     HPX_DEFINE_GET_COMPONENT_TYPE_TEMPLATE(template_,                         \
         (hpx::components::server::plain_function<HPX_UTIL_STRIP(action_type)>)) \
