@@ -13,7 +13,6 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/compression_snappy.hpp>
 
 #include <vector>
 #include <list>
