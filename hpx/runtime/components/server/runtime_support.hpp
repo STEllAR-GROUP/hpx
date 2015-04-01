@@ -148,14 +148,14 @@ namespace hpx { namespace components { namespace server
         naming::gid_type create_component();
 
         template <typename Component, typename T, typename ...Ts>
-        naming::gid_type create_component(T v, Ts... vs);
+        naming::gid_type create_component(T v, Ts&&... vs);
 
         template <typename Component>
         std::vector<naming::gid_type> bulk_create_component(std::size_t count);
 
         template <typename Component, typename T, typename ...Ts>
         std::vector<naming::gid_type> bulk_create_component(
-            std::size_t count, T v, Ts... vs);
+            std::size_t count, T v, Ts&&... vs);
 
         template <typename Component>
         naming::gid_type copy_create_component(
@@ -493,7 +493,7 @@ namespace hpx { namespace components { namespace server
     }
 
     template <typename Component, typename T, typename ...Ts>
-    naming::gid_type runtime_support::create_component(T v, Ts... vs)
+    naming::gid_type runtime_support::create_component(T v, Ts&&... vs)
     {
         components::component_type const type =
             components::get_component_type<
@@ -595,7 +595,7 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component, typename T, typename ...Ts>
     std::vector<naming::gid_type>
-    runtime_support::bulk_create_component(std::size_t count, T v, Ts... vs)
+    runtime_support::bulk_create_component(std::size_t count, T v, Ts&&... vs)
     {
         components::component_type const type =
             components::get_component_type<
@@ -851,9 +851,9 @@ namespace hpx { namespace components { namespace server
     template <typename Component, typename ...Ts>
     struct create_component_action
       : ::hpx::actions::action<
-            naming::gid_type (runtime_support::*)(Ts...)
-          , &runtime_support::create_component<Component, Ts...>
-          , create_component_action<Component, Ts...> >
+            naming::gid_type (runtime_support::*)(Ts&&...)
+          , &runtime_support::create_component<Component, Ts&&...>
+          , create_component_action<Component, Ts&&...> >
     {};
 
     template <typename Component>
@@ -867,9 +867,9 @@ namespace hpx { namespace components { namespace server
     template <typename Component, typename ...Ts>
     struct create_component_direct_action
       : ::hpx::actions::direct_action<
-            naming::gid_type (runtime_support::*)(Ts...)
-          , &runtime_support::create_component<Component, Ts...>
-          , create_component_direct_action<Component, Ts...> >
+            naming::gid_type (runtime_support::*)(Ts&&...)
+          , &runtime_support::create_component<Component, Ts&&...>
+          , create_component_direct_action<Component, Ts&&...> >
     {};
 
     template <typename Component>
@@ -884,9 +884,9 @@ namespace hpx { namespace components { namespace server
     template <typename Component, typename ...Ts>
     struct bulk_create_component_action
       : ::hpx::actions::action<
-            std::vector<naming::gid_type> (runtime_support::*)(std::size_t, Ts...)
-          , &runtime_support::bulk_create_component<Component, Ts...>
-          , bulk_create_component_action<Component, Ts...> >
+            std::vector<naming::gid_type> (runtime_support::*)(std::size_t, Ts&&...)
+          , &runtime_support::bulk_create_component<Component, Ts&&...>
+          , bulk_create_component_action<Component, Ts&&...> >
     {};
 
     template <typename Component>
@@ -900,9 +900,9 @@ namespace hpx { namespace components { namespace server
     template <typename Component, typename ...Ts>
     struct bulk_create_component_direct_action
       : ::hpx::actions::direct_action<
-            std::vector<naming::gid_type> (runtime_support::*)(std::size_t, Ts...)
-          , &runtime_support::bulk_create_component<Component, Ts...>
-          , bulk_create_component_direct_action<Component, Ts...> >
+            std::vector<naming::gid_type> (runtime_support::*)(std::size_t, Ts&&...)
+          , &runtime_support::bulk_create_component<Component, Ts&&...>
+          , bulk_create_component_direct_action<Component, Ts&&...> >
     {};
 
     template <typename Component>
