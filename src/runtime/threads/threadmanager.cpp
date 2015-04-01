@@ -660,11 +660,19 @@ namespace hpx { namespace threads
             topology_.write_to_log();
 
         error_code ec(lightweight);
-        topology_.set_thread_affinity_mask(mask, ec);
-        if (ec)
+        if (any(mask))
         {
-            LTM_(warning) << "run: setting thread affinity on OS thread " //-V128
-                << num_thread << " failed with: " << ec.get_message();
+            topology_.set_thread_affinity_mask(mask, ec);
+            if (ec)
+            {
+                LTM_(warning) << "run: setting thread affinity on OS thread " //-V128
+                    << num_thread << " failed with: " << ec.get_message();
+            }
+        }
+        else
+        {
+            LTM_(debug) << "run: setting thread affinity on OS thread " //-V128
+                << num_thread << " was explicitly disabled.";
         }
 
         // Setting priority of worker threads to a lower priority, this needs to
@@ -1631,13 +1639,21 @@ namespace hpx { namespace threads
                         boost::ref(topology_))));
 
                 // set the new threads affinity (on Windows systems)
-                error_code ec(lightweight);
-                topology_.set_thread_affinity_mask(threads_.back(), mask, ec);
-                if (ec)
+                if (any(mask))
                 {
-                    LTM_(warning) << "run: setting thread affinity on OS " //-V128
-                                     "thread " << thread_num << " failed with: "
-                                  << ec.get_message();
+                    error_code ec(lightweight);
+                    topology_.set_thread_affinity_mask(threads_.back(), mask, ec);
+                    if (ec)
+                    {
+                        LTM_(warning) << "run: setting thread affinity on OS " //-V128
+                                         "thread " << thread_num << " failed with: "
+                                      << ec.get_message();
+                    }
+                }
+                else
+                {
+                    LTM_(debug) << "run: setting thread affinity on OS thread " //-V128
+                        << thread_num << " was explicitly disabled.";
                 }
             }
 
