@@ -1296,5 +1296,46 @@ namespace hpx
 
         return result;
     }
+
+    namespace detail
+    {
+        HPX_EXPORT int init_helper(
+            boost::program_options::variables_map& /*vm*/,
+            util::function_nonser<int(int, char**)> const& f)
+        {
+            hpx::util::section const& ini = hpx::get_runtime().get_config();
+            std::string cmdline(ini.get_entry("hpx.reconstructed_cmd_line", ""));
+
+            using namespace boost::program_options;
+#if defined(BOOST_WINDOWS)
+            std::vector<std::string> args = split_winmain(cmdline);
+#else
+            std::vector<std::string> args = split_unix(cmdline);
+#endif
+
+            // Copy all arguments which are not hpx related to a temporary array
+            boost::scoped_array<char*> argv(new char*[args.size()+1]);
+            std::size_t argcount = 0;
+            for (std::size_t i = 0; i != args.size(); ++i)
+            {
+                if (0 != args[i].find("--hpx:")) {
+                    argv[argcount++] = const_cast<char*>(args[i].data());
+                }
+                else if (6 == args[i].find("positional", 6)) {
+                    std::string::size_type p = args[i].find_first_of("=");
+                    if (p != std::string::npos) {
+                        args[i] = args[i].substr(p+1);
+                        argv[argcount++] = const_cast<char*>(args[i].data());
+                    }
+                }
+            }
+
+            // add a single nullptr in the end as some application rely on that
+            argv[argcount] = 0;
+
+            // Invoke custom startup functions
+            return f(static_cast<int>(argcount), argv.get());
+        }
+    }
 }
 
