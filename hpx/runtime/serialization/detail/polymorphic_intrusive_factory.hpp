@@ -20,8 +20,8 @@
 #include <boost/atomic/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization { namespace detail
+{
     class HPX_EXPORT polymorphic_intrusive_factory: boost::noncopyable
     {
     public:
@@ -51,40 +51,36 @@ namespace hpx { namespace serialization {
         ctor_map_type map_;
     };
 
-    namespace detail {
-
-        template <class T>
-        struct register_class_name
+    template <class T>
+    struct register_class_name
+    {
+        register_class_name()
         {
-            register_class_name()
-            {
-                T* t = 0; //dirty
-                polymorphic_intrusive_factory::instance().
-                  register_class(
-                    t->T::hpx_serialization_get_name(), //non-virtual call
-                    &factory_function
-                  );
-            }
+            T* t = 0; //dirty
+            polymorphic_intrusive_factory::instance().
+              register_class(
+                t->T::hpx_serialization_get_name(), //non-virtual call
+                &factory_function
+              );
+        }
 
-            static void* factory_function()
-            {
-                return new T;
-            }
+        static void* factory_function()
+        {
+            return new T;
+        }
 
-            register_class_name& instantiate()
-            {
-                return *this;
-            }
+        register_class_name& instantiate()
+        {
+            return *this;
+        }
 
-            static register_class_name instance;
-        };
+        static register_class_name instance;
+    };
 
-        template <class T>
-        register_class_name<T> register_class_name<T>::instance;
+    template <class T>
+    register_class_name<T> register_class_name<T>::instance;
 
-    } // namespace detail
-
-}}
+}}}
 
 #define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name)        \
   template <class> friend                                                     \

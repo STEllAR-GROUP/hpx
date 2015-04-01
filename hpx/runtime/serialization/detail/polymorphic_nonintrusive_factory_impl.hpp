@@ -7,14 +7,14 @@
 #ifndef HPX_SERIALIZATION_POLYMORPHIC_NONINTRUSIVE_FACTORY_IMPL_HPP
 #define HPX_SERIALIZATION_POLYMORPHIC_NONINTRUSIVE_FACTORY_IMPL_HPP
 
-#include <hpx/runtime/serialization/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization { namespace detail
+{
    template <class T>
    void polymorphic_nonintrusive_factory::save(output_archive& ar, const T& t)
    {
@@ -46,6 +46,6 @@ namespace hpx { namespace serialization {
        return t;
    }
 
-}}
+}}}
 
 #endif

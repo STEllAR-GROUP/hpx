@@ -8,7 +8,7 @@
 #ifndef HPX_SERIALIZATION_POLYMORPHIC_NONINTRUSIVE_FACTORY_HPP
 #define HPX_SERIALIZATION_POLYMORPHIC_NONINTRUSIVE_FACTORY_HPP
 
-#include <hpx/config.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/demangle_helper.hpp>
@@ -19,11 +19,8 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_abstract.hpp>
 
-namespace hpx { namespace serialization {
-
-    struct input_archive;
-    struct output_archive;
-
+namespace hpx { namespace serialization { namespace detail
+{
     struct function_bunch_type
     {
         typedef void (*save_function_type) (output_archive& , const void* base);
@@ -158,12 +155,12 @@ namespace hpx { namespace serialization {
         register_class<T, typename boost::enable_if<boost::is_abstract<T> >::type>::
             instance;
 
-}}
+}}}
 
 #define HPX_SERIALIZATION_REGISTER_CLASS(Class)                               \
     HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class);                               \
-    template hpx::serialization::register_class<Class>                        \
-        hpx::serialization::register_class<Class>::instance;                  \
+    template hpx::serialization::detail::register_class<Class>                \
+        hpx::serialization::detail::register_class<Class>::instance;          \
 /**/
 
 #endif

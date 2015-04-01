@@ -8,8 +8,8 @@
 #define HPX_SERIALIZATION_DETAIL_POINTER_HPP
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/runtime/serialization/polymorphic_intrusive_factory.hpp>
-#include <hpx/runtime/serialization/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 

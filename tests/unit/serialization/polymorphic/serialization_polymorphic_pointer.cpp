@@ -7,7 +7,6 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/raw_ptr.hpp>
-#include <hpx/runtime/serialization/polymorphic_intrusive_factory.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>

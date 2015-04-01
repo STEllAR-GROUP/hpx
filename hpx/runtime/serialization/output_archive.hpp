@@ -9,7 +9,7 @@
 
 #include <hpx/runtime/serialization/archive.hpp>
 #include <hpx/runtime/serialization/output_container.hpp>
-#include <hpx/runtime/serialization/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/raw_ptr.hpp>
 
 #include <boost/mpl/or.hpp>
@@ -106,7 +106,7 @@ namespace hpx { namespace serialization {
         template <typename T>
         void save_nonintrusively_polymorphic(T const & t, boost::mpl::true_)
         {
-            polymorphic_nonintrusive_factory::instance().save(*this, t);
+            detail::polymorphic_nonintrusive_factory::instance().save(*this, t);
         }
 
         template <typename T>

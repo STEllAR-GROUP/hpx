@@ -10,7 +10,7 @@
 #include <hpx/runtime/serialization/archive.hpp>
 #include <hpx/runtime/serialization/input_container.hpp>
 #include <hpx/runtime/serialization/raw_ptr.hpp>
-#include <hpx/runtime/serialization/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/is_integral.hpp>
@@ -107,7 +107,7 @@ namespace hpx { namespace serialization {
         template <class T>
         void load_nonintrusively_polymorphic(T& t, boost::mpl::true_)
         {
-            polymorphic_nonintrusive_factory::instance().load(*this, t);
+            detail::polymorphic_nonintrusive_factory::instance().load(*this, t);
         }
 
         template <typename T>
