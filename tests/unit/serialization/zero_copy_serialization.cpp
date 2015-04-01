@@ -103,7 +103,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     {
         // create an input archive and deserialize the parcel
         hpx::serialization::input_archive archive(
-            out_buffer, in_archive_flags, &out_chunks, arg_size);
+            out_buffer, in_archive_flags, arg_size, &out_chunks);
 
         archive >> inp;
     }

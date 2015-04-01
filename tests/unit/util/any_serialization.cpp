@@ -49,7 +49,7 @@ void out(std::vector<char> & out_buffer, A & a)
 template <typename A>
 void in(std::vector<char> & in_buffer, A & a)
 {
-    hpx::serialization::input_archive archive(in_buffer, 0, 0, in_buffer.size());
+    hpx::serialization::input_archive archive(in_buffer, 0, in_buffer.size());
     archive >> a;
 }
 

@@ -16,13 +16,13 @@ namespace hpx { namespace serialization
 {
     // This is a default implementation of serialization which kicks in for
     // empty types.
-    template <typename T>
-    BOOST_FORCEINLINE typename boost::enable_if<boost::is_empty<T> >::type
-    serialize(output_archive&, T&, unsigned int const) {}
+    //template <typename T>
+    //BOOST_FORCEINLINE typename boost::enable_if<boost::is_empty<T> >::type
+    //serialize(output_archive&, T&, unsigned int const) {}
 
-    template <typename T>
-    BOOST_FORCEINLINE typename boost::enable_if<boost::is_empty<T> >::type
-    serialize(input_archive&, T&, unsigned int const) {}
+    //template <typename T>
+    //BOOST_FORCEINLINE typename boost::enable_if<boost::is_empty<T> >::type
+    //serialize(input_archive&, T&, unsigned int const) {}
 }}
 
 #endif

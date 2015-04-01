@@ -8,8 +8,6 @@
 #if !defined(HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM)
 #define HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM
 
-#include <memory>
-
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/polymorphic_intrusive_factory.hpp>
 
@@ -19,8 +17,6 @@ namespace hpx { namespace serialization
     // Base class for all serialization filters.
     struct binary_filter
     {
-        virtual ~binary_filter() {}
-
         // compression API
         virtual void set_max_length(std::size_t size) = 0;
         virtual void save(void const* src, std::size_t src_count) = 0;
@@ -34,6 +30,8 @@ namespace hpx { namespace serialization
 
         template <class T> void serialize(T& ar, unsigned){}
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(binary_filter);
+
+        virtual ~binary_filter() {}
     };
 }}
 

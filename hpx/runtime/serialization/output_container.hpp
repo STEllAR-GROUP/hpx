@@ -53,8 +53,8 @@ namespace hpx { namespace serialization {
         output_container(Container& cont,
             std::vector<serialization_chunk>* chunks,
             binary_filter* filter)
-          : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
-            chunks_(chunks), current_chunk_(std::size_t(-1))
+            : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
+              chunks_(chunks), current_chunk_(std::size_t(-1))
         {
             if (chunks_)
             {
@@ -62,7 +62,6 @@ namespace hpx { namespace serialization {
                 chunks_->push_back(create_index_chunk(0, 0));
                 current_chunk_ = 0;
             }
-            if (filter) set_filter(filter);
         }
 
         ~output_container()

@@ -233,24 +233,6 @@ namespace hpx { namespace serialization
         {
             ar << size_ << alloc_; //-V128
 
-            typedef typename hpx::traits::is_bitwise_serializable<
-              typename boost::remove_const<T>::type>::type use_optimized;
-
-            save_optimized(ar, version, use_optimized());
-        }
-
-        template <typename Archive>
-        void save_optimized(Archive& ar, const unsigned int, boost::mpl::false_) const
-        {
-            std::size_t c = size_;
-            T* t = data_.get();
-            while(c-- > 0)
-                ar << *t++;
-        }
-
-        template <typename Archive>
-        void save_optimized(Archive& ar, const unsigned int version, boost::mpl::true_) const
-        {
             if (size_ != 0)
             {
                 ar << hpx::serialization::make_array(data_.get(), size_);
@@ -268,24 +250,6 @@ namespace hpx { namespace serialization
                 util::bind(&serialize_buffer::deleter<allocator_type>, _1,
                     alloc_, size_));
 
-            typedef typename hpx::traits::is_bitwise_serializable<
-              typename boost::remove_const<T>::type>::type use_optimized;
-
-            load_optimized(ar, version, use_optimized());
-        }
-
-        template <typename Archive>
-        void load_optimized(Archive& ar, const unsigned int, boost::mpl::false_)
-        {
-            std::size_t c = size_;
-            T* t = data_.get();
-            while(c-- > 0)
-                ar >> *t++;
-        }
-
-        template <typename Archive>
-        void load_optimized(Archive& ar, const unsigned int version, boost::mpl::true_)
-        {
             if (size_ != 0)
             {
                 ar >> hpx::serialization::make_array(data_.get(), size_);
@@ -450,24 +414,6 @@ namespace hpx { namespace serialization
         {
             ar << size_; //-V128
 
-            typedef typename hpx::traits::is_bitwise_serializable<
-              typename boost::remove_const<T>::type>::type use_optimized;
-
-            save_optimized(ar, version, use_optimized());
-        }
-
-        template <typename Archive>
-        void save_optimized(Archive& ar, const unsigned int, boost::mpl::false_) const
-        {
-            std::size_t c = size_;
-            T* t = data_.get();
-            while(c-- > 0)
-                ar << *t++;
-        }
-
-        template <typename Archive>
-        void save_optimized(Archive& ar, const unsigned int version, boost::mpl::true_) const
-        {
             if (size_ != 0)
             {
                 ar << hpx::serialization::make_array(data_.get(), size_);
@@ -481,24 +427,6 @@ namespace hpx { namespace serialization
             ar >> size_; //-V128
             data_.reset(new T[size_]);
 
-            typedef typename hpx::traits::is_bitwise_serializable<
-              typename boost::remove_const<T>::type>::type use_optimized;
-
-            load_optimized(ar, version, use_optimized());
-        }
-
-        template <typename Archive>
-        void load_optimized(Archive& ar, const unsigned int, boost::mpl::false_)
-        {
-            std::size_t c = size_;
-            T* t = data_.get();
-            while(c-- > 0)
-                ar >> *t++;
-        }
-
-        template <typename Archive>
-        void load_optimized(Archive& ar, const unsigned int version, boost::mpl::true_)
-        {
             if (size_ != 0)
             {
                 ar >> hpx::serialization::make_array(data_.get(), size_);

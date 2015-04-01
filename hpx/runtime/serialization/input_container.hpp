@@ -8,6 +8,7 @@
 #define HPX_SERIALIZATION_INPUT_CONTAINER_HPP
 
 #include <hpx/util/assert.hpp>
+#include <hpx/exception.hpp>
 
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
@@ -74,12 +75,9 @@ namespace hpx { namespace serialization {
 
                 if (decompressed_size_ < current_)
                 {
-                  /*
-                    BOOST_THROW_EXCEPTION(
-                        boost::archive::archive_exception(
-                            boost::archive::archive_exception::input_stream_error,
-                            "archive data bstream is too short"));
-                      */
+                    HPX_THROW_EXCEPTION(serialization_error
+                      , "input_container::set_filter"
+                      , "archive data bstream is too short");
                     return;
                 }
             }
@@ -93,12 +91,9 @@ namespace hpx { namespace serialization {
             else {
                 if (current_+count > cont_.size())
                 {
-                  /*
-                    BOOST_THROW_EXCEPTION(
-                        boost::archive::archive_exception(
-                            boost::archive::archive_exception::input_stream_error,
-                            "archive data bstream is too short"));
-                            */
+                    HPX_THROW_EXCEPTION(serialization_error
+                      , "input_container::load_binary"
+                      , "archive data bstream is too short");
                     return;
                 }
 
@@ -117,12 +112,9 @@ namespace hpx { namespace serialization {
                         // raise an error if we read past the serialization_chunk
                         if (current_chunk_size_ > current_chunk_size)
                         {
-                            /*
-                            BOOST_THROW_EXCEPTION(
-                                boost::archive::archive_exception(
-                                    boost::archive::archive_exception::input_stream_error,
-                                    "archive data bstream structure mismatch"));
-                            */
+                            HPX_THROW_EXCEPTION(serialization_error
+                              , "input_container::load_binary"
+                              , "archive data bstream structure mismatch")
                             return;
                         }
                         ++current_chunk_;
@@ -146,12 +138,9 @@ namespace hpx { namespace serialization {
 
                 if (get_chunk_size(current_chunk_) != count)
                 {
-                  /*
-                    BOOST_THROW_EXCEPTION(
-                        boost::archive::archive_exception(
-                            boost::archive::archive_exception::input_stream_error,
-                            "archive data bstream data chunk size mismatch"));
-                    */
+                    HPX_THROW_EXCEPTION(serialization_error
+                      , "input_container::load_binary_chunk"
+                      , "archive data bstream data chunk size mismatch");
                     return;
                 }
 

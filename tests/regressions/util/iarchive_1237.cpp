@@ -28,7 +28,7 @@ int hpx_main()
         hpx::serialization::output_archive oa(out_buffer);
         oa << int_vector;
 
-        hpx::serialization::input_archive ia(out_buffer, 0, 0, out_buffer.size());
+        hpx::serialization::input_archive ia(out_buffer, 0, out_buffer.size());
         std::vector<int> copy_vector;
         ia >> copy_vector;
 

@@ -7,8 +7,6 @@
 #ifndef HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 
-#include <hpx/config.hpp>
-
 #include <hpx/runtime/serialization/archive.hpp>
 #include <hpx/runtime/serialization/input_container.hpp>
 #include <hpx/runtime/serialization/raw_ptr.hpp>
@@ -44,14 +42,19 @@ namespace hpx { namespace serialization {
         template <typename Container>
         input_archive(Container & buffer,
             boost::uint32_t flags = 0U,
-            const std::vector<serialization_chunk>* chunks = 0,
-            std::size_t inbound_data_size = 0)
+            std::size_t inbound_data_size = 0,
+            const std::vector<serialization_chunk>* chunks = 0)
           : base_type(make_container(buffer, chunks, inbound_data_size), flags)
         {
             bool has_filter = false;
             load(has_filter);
+
             serialization::binary_filter* filter = 0;
-            if (has_filter) *this >> raw_ptr(filter);
+            if (has_filter && enable_compression())
+            {
+                *this >> raw_ptr(filter);
+                set_filter(filter);
+            }
         }
 
         template <typename T>
@@ -210,7 +213,7 @@ namespace hpx { namespace serialization {
 
         std::size_t bytes_read() const
         {
-          return size_;
+            return size_;
         }
 
         void register_pointer(std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper)

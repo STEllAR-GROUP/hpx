@@ -7,8 +7,6 @@
 #ifndef HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 
-#include <hpx/config.hpp>
-
 #include <hpx/runtime/serialization/archive.hpp>
 #include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/runtime/serialization/polymorphic_nonintrusive_factory.hpp>
@@ -30,8 +28,8 @@ namespace hpx { namespace serialization {
         template <typename Container>
         static HPX_STD_UNIQUE_PTR<container> make_container(
             Container & buffer,
-            std::vector<serialization_chunk>* chunks = 0,
-            binary_filter* filter = 0)
+            std::vector<serialization_chunk>* chunks,
+            binary_filter* filter)
         {
             return HPX_STD_UNIQUE_PTR<container>(
                 new output_container<Container>(buffer, chunks, filter));
@@ -39,16 +37,21 @@ namespace hpx { namespace serialization {
 
         template <typename Container>
         output_archive(Container & buffer,
-          boost::uint32_t flags = 0U,
-          boost::uint32_t dest_locality_id = ~0U,
-          std::vector<serialization_chunk>* chunks = 0,
-          binary_filter* filter = 0)
-          : base_type(make_container(buffer, chunks, filter), flags),
-            dest_locality_id_(dest_locality_id)
+            boost::uint32_t flags = 0U,
+            boost::uint32_t dest_locality_id = ~0U,
+            std::vector<serialization_chunk>* chunks = 0,
+            binary_filter* filter = 0)
+            : base_type(make_container(buffer, chunks, filter), flags),
+              dest_locality_id_(dest_locality_id)
         {
             bool has_filter = filter != 0;
             save(has_filter);
-            if (has_filter) *this << raw_ptr(filter);
+
+            if (has_filter && enable_compression())
+            {
+                *this << raw_ptr(filter);
+                set_filter(filter);
+            }
         }
 
         template <typename T>
@@ -211,12 +214,12 @@ namespace hpx { namespace serialization {
 
         boost::uint32_t get_dest_locality_id() const
         {
-          return dest_locality_id_;
+            return dest_locality_id_;
         }
 
         std::size_t bytes_written() const
         {
-          return size_;
+            return size_;
         }
 
         pointer_tracker pointer_tracker_;

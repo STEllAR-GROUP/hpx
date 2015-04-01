@@ -9,6 +9,8 @@
 
 #include <hpx/config.hpp>
 
+#include <memory>
+
 namespace hpx { namespace serialization {
 
     namespace detail

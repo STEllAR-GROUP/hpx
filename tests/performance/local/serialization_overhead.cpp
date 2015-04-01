@@ -114,6 +114,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
             hpx::serialization::output_archive archive(
                 out_buffer, out_archive_flags, dest_locality_id, chunks);
             archive << outp;
+            arg_size = archive.bytes_written();
         }
 
         hpx::parcelset::parcel inp;
@@ -121,7 +122,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         {
             // create an input archive and deserialize the parcel
             hpx::serialization::input_archive archive(
-                out_buffer, in_archive_flags, chunks);
+                out_buffer, in_archive_flags, arg_size, chunks);
 
             archive >> inp;
         }

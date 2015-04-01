@@ -20,7 +20,7 @@
 namespace hpx { namespace serialization {
 
     template <typename Derived, typename Base, typename Enable =
-      typename hpx::traits::is_intrusive_polymorphic<Derived>::type>
+        typename hpx::traits::is_intrusive_polymorphic<Derived>::type>
     struct base_object_type
     {
         base_object_type(Derived & d) : d_(d) {}
@@ -29,8 +29,8 @@ namespace hpx { namespace serialization {
         template <class Archive>
         void serialize(Archive & ar, unsigned)
         {
-          access::serialize(ar, static_cast<Base&>(
-            const_cast<typename hpx::util::decay<Derived>::type&>(d_)), 0);
+            access::serialize(ar, static_cast<Base&>(
+                const_cast<typename hpx::util::decay<Derived>::type&>(d_)), 0);
         }
     };
 

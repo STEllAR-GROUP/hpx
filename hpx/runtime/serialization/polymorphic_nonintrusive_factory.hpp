@@ -82,43 +82,43 @@ namespace hpx { namespace serialization {
     struct register_class<Derived,
       typename boost::disable_if<boost::is_abstract<Derived> >::type>
     {
-      static void save(output_archive& ar, const void* base)
-      {
-        serialize(ar, *static_cast<Derived*>(const_cast<void*>(base)), 0);
-      }
+        static void save(output_archive& ar, const void* base)
+        {
+            serialize(ar, *static_cast<Derived*>(const_cast<void*>(base)), 0);
+        }
 
-      static void load(input_archive& ar, void* base)
-      {
-        serialize(ar, *static_cast<Derived*>(base), 0);
-      }
+        static void load(input_archive& ar, void* base)
+        {
+            serialize(ar, *static_cast<Derived*>(base), 0);
+        }
 
-      // this function is needed for pointer type serialization
-      static void* create()
-      {
-        return new Derived;
-      }
+        // this function is needed for pointer type serialization
+        static void* create()
+        {
+            return new Derived;
+        }
 
-      register_class()
-      {
-        function_bunch_type bunch = {
-          &register_class<Derived>::save,
-          &register_class<Derived>::load,
-          &register_class<Derived>::create
-        };
+        register_class()
+        {
+            function_bunch_type bunch = {
+                &register_class<Derived>::save,
+                &register_class<Derived>::load,
+                &register_class<Derived>::create
+            };
 
-        polymorphic_nonintrusive_factory::instance().
-          register_class(
-            typeid(Derived).name(),
-            bunch
-          );
-      }
+            polymorphic_nonintrusive_factory::instance().
+                register_class(
+                   typeid(Derived).name(),
+                   bunch
+                );
+        }
 
-      static register_class instance;
+        static register_class instance;
     };
 
     template <class Derived>
     struct register_class<Derived,
-      typename boost::enable_if<boost::is_abstract<Derived> >::type >
+        typename boost::enable_if<boost::is_abstract<Derived> >::type >
     {
         static void save(output_archive& ar, const void* base)
         {

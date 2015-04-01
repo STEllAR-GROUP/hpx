@@ -17,8 +17,8 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/eval_if.hpp>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     namespace detail
     {
         template <class Pointer>
@@ -189,7 +189,6 @@ namespace hpx { namespace serialization {
         }
 
     } // detail
-
 }}
 
 #endif // HPX_SERIALIZATION_DETAIL_POINTER_HPP

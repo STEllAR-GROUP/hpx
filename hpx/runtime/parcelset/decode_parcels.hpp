@@ -111,7 +111,7 @@ namespace hpx { namespace parcelset
                 {
                     // De-serialize the parcel data
                     serialization::input_archive archive(buffer.data_,
-                        archive_flags, &chunks, inbound_data_size);
+                        archive_flags, inbound_data_size, &chunks);
 
                     if(parcel_count == 0)
                         archive >> parcel_count; //-V128a
