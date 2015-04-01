@@ -337,13 +337,15 @@ namespace hpx { namespace components { namespace stubs
         /// \brief Retrieve configuration information
         static lcos::future<util::section> get_config_async(
             naming::id_type const& targetgid);
-        static void get_config(naming::id_type const& targetgid, util::section& ini);
+        static void get_config(naming::id_type const& targetgid,
+            util::section& ini);
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve instance count for given component type
         static lcos::future<boost::int32_t > get_instance_count_async(
             naming::id_type const& targetgid, components::component_type type);
-        static boost::int32_t  get_instance_count(naming::id_type const& targetgid,
+        static boost::int32_t  get_instance_count(
+            naming::id_type const& targetgid,
             components::component_type type);
 
         ///////////////////////////////////////////////////////////////////////
