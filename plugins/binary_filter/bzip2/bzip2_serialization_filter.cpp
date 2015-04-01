@@ -97,11 +97,6 @@ namespace hpx { namespace plugins { namespace compression
         }
     }
 
-    bzip2_serialization_filter::~bzip2_serialization_filter()
-    {
-        hpx::actions::detail::guid_initialization<bzip2_serialization_filter>();
-    }
-
     void bzip2_serialization_filter::set_max_length(std::size_t size)
     {
         buffer_.reserve(size);
@@ -141,10 +136,9 @@ namespace hpx { namespace plugins { namespace compression
     {
         if (current_+dst_count > buffer_.size()) 
         {
-            BOOST_THROW_EXCEPTION(
-                boost::archive::archive_exception(
-                    boost::archive::archive_exception::input_stream_error,
-                    "archive data bstream is too short"));
+            HPX_THROW_EXCEPTION(serialization_error,
+                    "bzip2_serialization_filter::load",
+                    "archive data bstream is too short");
             return;
         }
 

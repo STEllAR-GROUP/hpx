@@ -72,7 +72,6 @@ namespace hpx { namespace plugins { namespace compression
                 serialization::binary_filter* next_filter = 0)
           : compdecomp_(compress), current_(0)
         {}
-        ~bzip2_serialization_filter();
 
         void load(void* dst, std::size_t dst_count);
         void save(void const* src, std::size_t src_count);

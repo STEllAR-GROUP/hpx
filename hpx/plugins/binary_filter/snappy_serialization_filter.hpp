@@ -29,7 +29,6 @@ namespace hpx { namespace plugins { namespace compression
                 serialization::binary_filter* next_filter = 0)
           : current_(0), compress_(compress)
         {}
-        ~snappy_serialization_filter();
 
         void load(void* dst, std::size_t dst_count);
         void save(void const* src, std::size_t src_count);
@@ -38,9 +37,6 @@ namespace hpx { namespace plugins { namespace compression
         void set_max_length(std::size_t size);
         std::size_t init_data(char const* buffer,
             std::size_t size, std::size_t buffer_size);
-
-        /// serialization support
-        static void register_base();
 
     private:
         // serialization support
