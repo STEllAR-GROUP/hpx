@@ -59,7 +59,7 @@ namespace hpx { namespace components { namespace stubs
             }
 
             typedef server::create_component_action<
-                Component, Ts&&...
+                Component, typename server::detail::decay_if_lvalue<Ts>::type...
             > action_type;
             return hpx::async<action_type>(gid, std::forward<Ts>(vs)...);
         }
@@ -91,7 +91,7 @@ namespace hpx { namespace components { namespace stubs
             }
 
             typedef server::bulk_create_component_action<
-                Component, Ts&&...
+                Component, typename hpx::util::decay<Ts>::type...
             > action_type;
             return hpx::async<action_type>(gid, count,
                 std::forward<Ts>(vs)...);
