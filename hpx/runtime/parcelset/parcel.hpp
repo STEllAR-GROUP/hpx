@@ -796,32 +796,6 @@ namespace hpx { namespace traits
 #endif
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-// this is the current version of the parcel serialization format
-// this definition needs to be in the global namespace
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-
-//BOOST_CLASS_TRACKING(hpx::parcelset::parcel, boost::serialization::track_never) //TODO
-//BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
-
-//BOOST_CLASS_TRACKING(hpx::parcelset::detail::single_destination_parcel_data,
-    //boost::serialization::track_never)
-//#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-//BOOST_CLASS_TRACKING(hpx::parcelset::detail::multi_destination_parcel_data,
-    //boost::serialization::track_never)
-//#endif
-
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
-
 #include <hpx/traits/type_size.hpp>
 
 #include <hpx/config/warnings_suffix.hpp>
