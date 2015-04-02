@@ -69,7 +69,7 @@ trick their way into the code base - you have been warned!
 
 The `CircleCI <https://circleci.com/gh/STEllAR-GROUP/hpx>`_ contiguous
 integration service tracks the current build status for the master branch:
-|circleci_status|.
+|circleci_status|
 
 .. |circleci_status| image:: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master.svg?style=svg
      :target: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master
