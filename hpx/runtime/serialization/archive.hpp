@@ -55,7 +55,7 @@ namespace hpx { namespace serialization {
     {
         static const std::size_t npos = -1;
 
-        archive(HPX_STD_UNIQUE_PTR<container> buffer, boost::uint32_t flags)
+        archive(std::unique_ptr<container> buffer, boost::uint32_t flags)
           : flags_(flags)
           , buffer_(std::move(buffer))
           , size_(0)
@@ -114,7 +114,7 @@ namespace hpx { namespace serialization {
         }
 
         boost::uint32_t flags_;
-        HPX_STD_UNIQUE_PTR<container> buffer_;
+        std::unique_ptr<container> buffer_;
         std::size_t size_;
     };
 

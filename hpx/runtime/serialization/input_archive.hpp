@@ -26,16 +26,16 @@ namespace hpx { namespace serialization {
         typedef archive<input_archive> base_type;
 
         typedef
-            std::map<std::size_t, HPX_STD_UNIQUE_PTR<detail::ptr_helper> >
+            std::map<std::size_t, std::unique_ptr<detail::ptr_helper> >
             pointer_tracker;
 
         template <typename Container>
-        static HPX_STD_UNIQUE_PTR<container> make_container(
+        static std::unique_ptr<container> make_container(
             Container & buffer,
             const std::vector<serialization_chunk>* chunks,
             std::size_t inbound_data_size)
         {
-            return HPX_STD_UNIQUE_PTR<container>(
+            return std::unique_ptr<container>(
                 new input_container<Container>(buffer, chunks, inbound_data_size));
         }
 
@@ -216,7 +216,7 @@ namespace hpx { namespace serialization {
             return size_;
         }
 
-        void register_pointer(std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper)
+        void register_pointer(std::size_t pos, std::unique_ptr<detail::ptr_helper> helper)
         {
             HPX_ASSERT(pointer_tracker_.find(pos) == pointer_tracker_.end());
 
@@ -236,7 +236,7 @@ namespace hpx { namespace serialization {
     };
 
     BOOST_FORCEINLINE
-    void register_pointer(input_archive & ar, std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper)
+    void register_pointer(input_archive & ar, std::size_t pos, std::unique_ptr<detail::ptr_helper> helper)
     {
         ar.register_pointer(pos, std::move(helper));
     }

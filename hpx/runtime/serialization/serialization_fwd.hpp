@@ -22,7 +22,7 @@ namespace hpx { namespace serialization {
     struct output_archive;
 
     BOOST_FORCEINLINE
-    void register_pointer(input_archive & ar, std::size_t pos, HPX_STD_UNIQUE_PTR<detail::ptr_helper> helper);
+    void register_pointer(input_archive & ar, std::size_t pos, std::unique_ptr<detail::ptr_helper> helper);
 
     template <typename Archive, typename T>
     void serialize(Archive & ar, T & t, unsigned);

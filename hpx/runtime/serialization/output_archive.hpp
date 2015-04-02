@@ -26,12 +26,12 @@ namespace hpx { namespace serialization {
         typedef std::map<const void *, std::size_t> pointer_tracker;
 
         template <typename Container>
-        static HPX_STD_UNIQUE_PTR<container> make_container(
+        static std::unique_ptr<container> make_container(
             Container & buffer,
             std::vector<serialization_chunk>* chunks,
             binary_filter* filter)
         {
-            return HPX_STD_UNIQUE_PTR<container>(
+            return std::unique_ptr<container>(
                 new output_container<Container>(buffer, chunks, filter));
         }
 

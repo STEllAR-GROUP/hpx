@@ -93,7 +93,7 @@ namespace hpx { namespace util { namespace detail
         std::pair<
             hpx::util::detail::function_vtable_ptr<
                 Sig
-              , hpx::util::portable_binary_iarchive, hpx::util::portable_binary_oarchive
+              , hpx::serialization::input_archive, hpx::serialization::output_archive
             >
           , hpx::util::detail::empty_function<Sig>
         >
@@ -115,7 +115,7 @@ namespace hpx { namespace traits {
         std::pair<
             hpx::util::detail::function_vtable_ptr<
                 Sig
-              , hpx::util::portable_binary_iarchive, hpx::util::portable_binary_oarchive
+              , hpx::serialization::input_archive, hpx::serialization::output_archive
             >
           , hpx::util::detail::empty_function<Sig>
         >

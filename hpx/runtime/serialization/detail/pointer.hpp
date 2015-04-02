@@ -56,7 +56,7 @@ namespace hpx { namespace serialization
                     register_pointer(
                           ar
                         , pos
-                        , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
+                        , std::unique_ptr<detail::ptr_helper>(
                               new detail::erase_ptr_helper<Pointer>(std::move(t), ptr)
                           )
                     );
@@ -74,7 +74,7 @@ namespace hpx { namespace serialization
                     register_pointer(
                         ar
                       , pos
-                      , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
+                      , std::unique_ptr<detail::ptr_helper>(
                             new detail::erase_ptr_helper<Pointer>(std::move(t), ptr)
                         )
                     );
@@ -92,7 +92,7 @@ namespace hpx { namespace serialization
                     register_pointer(
                         ar
                       , pos
-                      , HPX_STD_UNIQUE_PTR<detail::ptr_helper>(
+                      , std::unique_ptr<detail::ptr_helper>(
                             new detail::erase_ptr_helper<Pointer>(std::move(t), ptr)
                         )
                     );
