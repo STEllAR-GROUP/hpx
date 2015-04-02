@@ -67,12 +67,12 @@ our `contiguous integration results website <http://hermione.cct.lsu.edu/console
 While we try to keep the master branch stable and usable, sometimes new bugs
 trick their way into the code base - you have been warned!
 
-The `Travis CI <https://travis-ci.org/STEllAR-GROUP/hpx>`_ contiguous
+The `CircleCI <https://circleci.com/gh/STEllAR-GROUP/hpx>`_ contiguous
 integration service tracks the current build status for the master branch:
-|travis_status|.
+|circleci_status|
 
-.. |travis_status| image:: https://api.travis-ci.org/STEllAR-GROUP/hpx.svg?branch=master
-     :target: https://travis-ci.org/STEllAR-GROUP/hpx
+.. |circleci_status| image:: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master.svg?style=svg
+     :target: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master
      :alt: HPX master branch build status
 
 In any case, if you happen to run into problems we very much encourage and appreciate
