@@ -101,7 +101,6 @@ struct sub_block
         {
             hpx::serialization::array<double> arr(data_, size_);
             ar << arr;
-            ar.save_array(arr, version);
         }
     }
 
