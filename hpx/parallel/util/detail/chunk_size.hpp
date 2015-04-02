@@ -96,13 +96,22 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             count -= startup_size;
         }
         
+        std::vector<Future> bench_futures(32);
         // run the benchmark iteration
-        boost::uint64_t t = add_ready_future(workitems, f1, first, test_chunk_size);
+        boost::uint64_t t = hpx::util::high_resolution_clock::now();
+        for(int i = 0; i < cores; i++){
+            bench_futures[i] = std::move(hpx::async(f1, first, test_chunk_size));
+            // mark benchmarked items as processed
+            std::advance(first, test_chunk_size);
+            count -= test_chunk_size;
+        }
+        hpx::wait_any(bench_futures); 
+        t = (hpx::util::high_resolution_clock::now() - t);
         
-        // mark benchmarked items as processed
-        std::advance(first, test_chunk_size);
-        count -= test_chunk_size;
-        
+        for(int i = 0; i < cores; i++){
+            workitems.push_back(std::move(bench_futures[i]));
+        }
+
         // get the timer step size
         boost::uint64_t t_min = hpx::util::high_resolution_clock::min();
         
@@ -160,7 +169,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             chunk_size = policy.get_chunk_size();
             if (chunk_size == 0)
             {
-                std::size_t const cores = hpx::get_os_thread_count(exec);
+                std::size_t const cores = hpx::get_os_thread_count(exec) * 2;
                 if (count > 100*cores)
                     chunk_size = auto_chunk_size(policy, workitems, f1,
                                                  first, count);
