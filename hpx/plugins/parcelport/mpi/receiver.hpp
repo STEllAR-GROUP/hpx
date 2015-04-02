@@ -38,6 +38,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
               : receiver_(receiver)
               , handles_(false)
             {
+                mutex_type::scoped_lock lk(receiver_.handles_header_mtx_);
                 std::pair<int, int> p(it->first, it->second.tag());
                 header_handle_ = receiver_.handles_header_.find(p);
 
@@ -51,8 +52,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
             }
 
+            handle_header(handle_header && other)
+              : receiver_(other.receiver_)
+              , handles_(other.handles_)
+              , header_handle_(other.header_handle_)
+            {
+                other.handles_ = false;
+            }
+
             ~handle_header()
             {
+                mutex_type::scoped_lock lk(receiver_.handles_header_mtx_);
                 if(handles_)
                 {
                     HPX_ASSERT(header_handle_ != receiver_.handles_header_.end());
@@ -69,8 +79,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             receiver &receiver_;
             bool handles_;
-            header h_;
             handles_header_type::iterator header_handle_;
+            HPX_MOVABLE_BUT_NOT_COPYABLE(handle_header);
         };
 
         receiver(parcelport & pp, memory_pool_type & chunk_pool
@@ -122,6 +132,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 check_num_connections chk(this);
                 if(!chk.decrement_) break;
                 mutex_type::scoped_lock l(headers_mtx_);
+                // as handle_header tries to acquire a mutex as well, we need to
+                // ignore the headers_mtx_ here
+                util::ignore_while_checking<mutex_type::scoped_lock> il(&l);
                 accept_locked();
                 iterator it = headers_.begin();
                 while(it != headers_.end())
@@ -136,7 +149,26 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
                         {
                             hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-                            receive_message(source, h);
+
+                            std::size_t num_thread(-1);
+                            if(threads::get_self_ptr())
+                                num_thread = hpx::get_worker_thread_num();
+
+                            error_code ec(lightweight);
+                            if(hpx::is_starting())
+                            {
+                                receive_message(source, h, std::move(handle));
+                            }
+                            else
+                            {
+                                hpx::applier::register_thread_nullary(
+                                    util::bind(
+                                        util::one_shot(&receiver::receive_message),
+                                        this, source, h, std::move(handle)),
+                                    "mpi::receiver::receive_message",
+                                    threads::pending, true, threads::thread_priority_boost,
+                                    num_thread, threads::thread_stacksize_default, ec);
+                            }
                             h.reset();
                         }
 
@@ -157,7 +189,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return did_some_work;
         }
 
-        void receive_message(int source, header h)
+        void receive_message(int source, header h, handle_header)
         {
             util::high_resolution_timer timer;
             MPI_Request request;
