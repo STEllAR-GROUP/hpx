@@ -13,7 +13,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/serialization/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
@@ -59,17 +59,13 @@ namespace hpx { namespace actions
             oarchive_type& ar, const unsigned int,
             boost::uint8_t const*)
         {
-            typedef hpx::serialization::serialize_buffer<boost::uint8_t> buffer_type;
-            buffer_type buf = buffer_type(data, size, buffer_type::reference);
-            ar << buf;
+            ar << hpx::serialization::make_array(data, size);
         }
         static void load_(boost::uint8_t* data, std::size_t size,
             iarchive_type& ar, const unsigned int,
             boost::uint8_t const*)
         {
-            typedef hpx::serialization::serialize_buffer<boost::uint8_t> buffer_type;
-            buffer_type buf = buffer_type(data, size, buffer_type::reference);
-            ar >> buf;
+            ar >> hpx::serialization::make_array(data, size);
         }
 
     public:
