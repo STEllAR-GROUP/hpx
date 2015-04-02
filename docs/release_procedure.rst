@@ -56,11 +56,13 @@ Note: If you are using commandline git to change branches use:
     branch in the next step.
 
 #.  Delete the old release branch, and create a new one by branching a stable
-    point from master. 
+    point from master.
+    
     *   ``git push origin --delete [branch name]``
     *   ``git branch -D [branch name]``
     *   ``git branch [new branch name]``
     *   ``git push origin [new branch name]``
+    
 #.  Checkout the main branch, and bump the HPX version to the next release
     target. The following files contain version info:
 
@@ -94,8 +96,10 @@ Note: If you are using commandline git to change branches use:
     checking out the release candidate tag.
 
 #.  Switch Buildbot over to test the release branch
+
     *   https://github.com/STEllAR-GROUP/hermione-buildbot/blob/master/master/master.cfg
-    *Line 117
+    *   Line 117
+    
 #.  Allow at least a week for testing of the release candidate. Pull in changes
     as needed from master to resolve bug fixes, etc.
 
@@ -103,6 +107,7 @@ Note: If you are using commandline git to change branches use:
         when needed.
 
 #.  Update ``$HPX_SOURCE/README.rst`` 
+
     *   Update version
     *   Update links to documentation
      
@@ -127,6 +132,7 @@ Note: If you are using commandline git to change branches use:
 #.  Write a new blog post announcing the release.
 
 #.  Create a DOI number using Zenodo
+   
     *   https://zenodo.org/
 
 #.  Announce the release on hpx-users@stellar.cct.lsu.edu, 
