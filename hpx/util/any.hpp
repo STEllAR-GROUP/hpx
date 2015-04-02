@@ -24,7 +24,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/binary_filter.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/raw_ptr.hpp>
 
 #include <boost/config.hpp>
