@@ -13,11 +13,14 @@
 namespace htts2
 {
 
-driver::driver(int argc, char** argv)
+driver::driver(int argc, char** argv, bool allow_unregistered)
   : osthreads_(1)
   , tasks_(500000)
   , payload_duration_(5000)
   , io_(csv_with_headers)
+  , argc_(argc)
+  , argv_(argv)
+  , allow_unregistered_(allow_unregistered)
 {
     boost::program_options::variables_map vm;
 
@@ -47,9 +50,18 @@ driver::driver(int argc, char** argv)
         , "don't print out column headers")
         ;
 
-    boost::program_options::store(
-        boost::program_options::command_line_parser
-            (argc, argv).options(cmdline).run(), vm);
+    if (allow_unregistered_)
+    {
+        boost::program_options::store(
+            boost::program_options::command_line_parser(argc, argv)
+                .options(cmdline).allow_unregistered().run(), vm);
+    }
+    else
+    {
+        boost::program_options::store(
+            boost::program_options::command_line_parser(argc, argv)
+                .options(cmdline).run(), vm);
+    }
 
     boost::program_options::notify(vm);
 

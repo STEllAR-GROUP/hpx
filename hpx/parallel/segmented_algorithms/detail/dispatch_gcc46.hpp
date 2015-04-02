@@ -14,7 +14,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (2, 6, "hpx/parallel/algorithms/remote/dispatch_gcc46.hpp"))          \
+    (3, (2, 6, "hpx/parallel/segmented_algorithms/detail/dispatch_gcc46.hpp"))\
     /**/
 
 #define HPX_DISPATCH_CONST_ARG(Z, N, D) BOOST_PP_CAT(D, N) const&             \
@@ -36,7 +36,7 @@
 HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
     (template <typename Algo, typename ExPolicy, typename IsSeq, typename R,
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>),
-    (hpx::parallel::util::remote::algorithm_invoker_action<
+    (hpx::parallel::v1::detail::algorithm_invoker_action<
         Algo, ExPolicy, IsSeq, R(BOOST_PP_ENUM(N, HPX_DISPATCH_CONST_ARG, Arg))>))
 
 #undef N

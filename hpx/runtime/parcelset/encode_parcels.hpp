@@ -13,8 +13,11 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/traits/is_chunk_allocator.hpp>
 
 #include <boost/integer/endian.hpp>
+
+#include <memory>
 
 namespace hpx
 {
@@ -71,7 +74,7 @@ namespace hpx
         template <typename Buffer>
         std::size_t
         encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
-            int archive_flags_, std::size_t max_outbound_size)
+            int archive_flags_, boost::uint64_t max_outbound_size)
         {
             HPX_ASSERT(buffer.data_.empty());
             // collect argument sizes from parcels
@@ -79,7 +82,7 @@ namespace hpx
             boost::uint32_t dest_locality_id = ps[0].get_destination_locality_id();
 
             std::size_t parcels_sent = 0;
-            
+
             std::size_t parcels_size = 1;
             if(num_parcels != std::size_t(-1))
                 parcels_size = num_parcels;
@@ -87,6 +90,11 @@ namespace hpx
             // guard against serialization errors
             try {
                 try {
+                    // Get the chunk size from the allocator if it supports it
+                    size_t chunk_default = hpx::traits::default_chunk_size<
+                            typename Buffer::allocator_type
+                        >::call(buffer.data_.get_allocator());
+
                     // preallocate data
                     for (/**/; parcels_sent != parcels_size; ++parcels_sent)
                     {
@@ -94,15 +102,15 @@ namespace hpx
                             break;
                         arg_size += traits::get_type_size(ps[parcels_sent]);
                     }
-                    
-                    buffer.data_.reserve(arg_size);
+
+                    buffer.data_.reserve((std::max)(chunk_default, arg_size));
 
                     // mark start of serialization
                     util::high_resolution_timer timer;
 
                     {
                         // Serialize the data
-                        HPX_STD_UNIQUE_PTR<serialization::binary_filter> filter(
+                        std::unique_ptr<serialization::binary_filter> filter(
                             ps[0].get_serialization_filter());
 
                         int archive_flags = archive_flags_;
@@ -128,7 +136,8 @@ namespace hpx
                     }
 
                     // store the time required for serialization
-                    buffer.data_point_.serialization_time_ = timer.elapsed_nanoseconds();
+                    buffer.data_point_.serialization_time_ =
+                        timer.elapsed_nanoseconds();
                 }
                 catch (hpx::exception const& e) {
                     LPT_(fatal)

@@ -5,12 +5,16 @@
 
 set(HPX_GITCOMMIT_LOADED TRUE)
 
-execute_process(
-  COMMAND "git" "log" "--pretty=%H" "-1" "${hpx_SOURCE_DIR}"
-  WORKING_DIRECTORY "${hpx_SOURCE_DIR}"
-  OUTPUT_VARIABLE HPX_GIT_COMMIT ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+find_package(Git)
 
-if(NOT HPX_GIT_COMMIT OR "${HPX_GIT_COMMIT}" STREQUAL "None")
+if(GIT_FOUND)
+  execute_process(
+    COMMAND "${GIT_EXECUTABLE}" "log" "--pretty=%H" "-1" "${hpx_SOURCE_DIR}"
+    WORKING_DIRECTORY "${hpx_SOURCE_DIR}"
+    OUTPUT_VARIABLE HPX_GIT_COMMIT ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
+
+if(NOT GIT_FOUND OR NOT HPX_GIT_COMMIT OR "${HPX_GIT_COMMIT}" STREQUAL "None")
   hpx_warn("GIT commit not found (set to 'unknown').")
   set(HPX_GIT_COMMIT "unknown")
 else()

@@ -65,12 +65,13 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             std::size_t hardware_concurrency) const;
 
     private:
-        std::size_t num_threads_;   ///< number of punits managed
-        std::size_t pu_offset_; ///< offset of the first processing unit to use
-        std::size_t pu_step_;   ///< step between used processing units
+        std::size_t num_threads_;   ///< number of processing units managed
+        std::size_t pu_offset_;     ///< offset of the first processing unit to use
+        std::size_t pu_step_;       ///< step between used processing units
         std::string affinity_domain_;
         std::vector<mask_type> affinity_masks_;
         std::vector<std::size_t> pu_nums_;
+        mask_type no_affinity_;     ///< mask of processing units which have no affinity
     };
 }}}}
 

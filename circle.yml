@@ -1,0 +1,34 @@
+#  Copyright (c) 2015  Martin Stumpf
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+machine:
+    services:
+        - docker
+    environment:
+        IMAGE_NAME: stellargroup/build_env:debian_clang
+
+general:
+    branches:
+        ignore:
+            - gh-pages
+
+dependencies:
+    pre:
+        - docker pull ${IMAGE_NAME}
+        - mkdir build
+    override:
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} cmake .. -DHPX_MALLOC=system -DCMAKE_CXX_FLAGS="-fcolor-diagnostics"
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 core
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k components
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k examples
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance
+
+test:
+    override:
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ./bin/hello_world --hpx:bind=none
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.unit --output-on-failure
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.regressions --output-on-failure

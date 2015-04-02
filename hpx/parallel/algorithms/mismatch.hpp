@@ -112,10 +112,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                         tok.cancel(i);
                                 });
                         },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
+                        [=](std::vector<hpx::future<void> > &&) mutable
+                            -> std::pair<FwdIter1, FwdIter2>
                         {
-                            std::size_t mismatched = tok.get_data();
-                            if (mismatched != static_cast<std::size_t>(count1)) {
+                            difference_type1 mismatched =
+                                static_cast<difference_type1>(tok.get_data());
+                            if (mismatched != count1) {
                                 std::advance(first1, mismatched);
                                 std::advance(first2, mismatched);
                             }
@@ -388,8 +390,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
                         {
-                            std::size_t mismatched = tok.get_data();
-                            if (mismatched != static_cast<std::size_t>(count))
+                            difference_type mismatched =
+                                static_cast<difference_type>(tok.get_data());
+                            if (mismatched != count)
                                 std::advance(first1, mismatched);
                             else
                                 first1 = last1;

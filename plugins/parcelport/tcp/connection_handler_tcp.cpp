@@ -117,12 +117,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             BOOST_FOREACH(boost::shared_ptr<receiver> c,
                 accepted_connections_)
             {
-                boost::system::error_code ec;
-                boost::asio::ip::tcp::socket& s = c->socket();
-                if (s.is_open()) {
-                    s.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-                    s.close(ec);    // close the socket to give it back to the OS
-                }
+                c->shutdown();
             }
 
             accepted_connections_.clear();

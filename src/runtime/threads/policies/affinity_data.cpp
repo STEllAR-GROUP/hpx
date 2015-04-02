@@ -43,7 +43,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
     affinity_data::affinity_data(std::size_t num_threads)
       : num_threads_(num_threads), pu_offset_(0), pu_step_(1),
-        affinity_domain_("pu"), affinity_masks_(), pu_nums_()
+        affinity_domain_("pu"), affinity_masks_(), pu_nums_(),
+        no_affinity_()
     {}
 
     std::size_t affinity_data::init(init_affinity_data const& data,
@@ -68,7 +69,14 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                 get_runtime().get_config().get_entry("hpx.cores", used_cores),
                 used_cores);
 
-        if (!data.affinity_desc_.empty())
+        if (data.affinity_desc_ == "none")
+        {
+            // don't use any affinity for any of the os-threads
+            threads::resize(no_affinity_, num_threads_);
+            for (std::size_t i = 0; i != num_threads_; ++i)
+                threads::set(no_affinity_, i);
+        }
+        else if (!data.affinity_desc_.empty())
         {
             affinity_masks_.clear();
             affinity_masks_.resize(num_threads_);
@@ -147,6 +155,14 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     mask_cref_type affinity_data::get_pu_mask(topology const& topology,
         std::size_t num_thread, bool numa_sensitive) const
     {
+        // --hpx:bind=none disables all affinity
+        if (threads::test(no_affinity_, num_thread))
+        {
+            threads::mask_type m = threads::mask_type();
+            threads::resize(m, hardware_concurrency());
+            return m;
+        }
+
         // if we have individual, predefined affinity masks, return those
         if (!affinity_masks_.empty())
             return affinity_masks_[num_thread];

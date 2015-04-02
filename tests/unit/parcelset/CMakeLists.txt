@@ -11,7 +11,7 @@ set(tests
 )
 
 set(enable_PARAMETERS
-    LOCALITIES 2 THREADS_PER_LOCALITY 4)
+    LOCALITIES 2 THREADS_PER_LOCALITY 4 PARCELPORTS "mpi")
 
 set(set_parcel_write_handler_PARAMETERS
     LOCALITIES 2)

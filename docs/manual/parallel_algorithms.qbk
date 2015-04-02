@@ -251,6 +251,25 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_swap_ranges.hpp>`]]
 ]
 
+[table Set operations on sorted sequences(In Header: <hpx/include/parallel_algortithm.hpp>)
+    [[Name]     [Description]   [In Header]]
+    [[ [algoref includes] ]
+     [Returns true if one set is a subset of another.]
+     [`<hpx/include/parallel_set_operations.hpp>`]]
+    [[ [algoref set_difference] ]
+     [Computes the difference between two sets.]
+     [`<hpx/include/parallel_set_operations.hpp>`]]
+    [[ [algoref set_intersection] ]
+     [Computes the intersection of two sets.]
+     [`<hpx/include/parallel_set_operations.hpp>`]]
+    [[ [algoref set_symmetric_difference] ]
+     [Computes the symmetric difference between two sets.]
+     [`<hpx/include/parallel_set_operations.hpp>`]]
+    [[ [algoref set_union] ]
+     [Computes the union of two sets.]
+     [`<hpx/include/parallel_set_operations.hpp>`]]
+]
+
 [table Minimum/maximum operations (In Header: <hpx/include/parallel_algortithm.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref max_element] ]
@@ -264,7 +283,7 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_minmax.hpp>`]]
 ]
 
-[table Is Sorted opererations (In Header: <hpx/include/parallel_algorithm.hpp>)
+[table Operations checking various sorting criteria (In Header: <hpx/include/parallel_algorithm.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref is_sorted] ]
      [Returns `true` if each element in a range is sorted]

@@ -49,10 +49,12 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
+/// \cond NOINTERNAL
 namespace boost
 {
     class exception_ptr;
 }
+/// \endcond
 
 /// \namespace hpx
 ///
@@ -691,11 +693,6 @@ namespace hpx
         template <typename R>
         class shared_future;
 
-#if defined(HPX_UNIQUE_FUTURE_ALIAS)
-        template <typename R>
-        using unique_future = future<R>;
-#endif
-
         template <typename ValueType>
         struct object_semaphore;
 
@@ -784,7 +781,7 @@ namespace hpx
     /// threads used by HPX.
     ///
     /// \param id [in] The id of the object to locate.
-    HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor& exec);
+    HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor const& exec);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool is_scheduler_numa_sensitive();
@@ -802,9 +799,6 @@ namespace hpx
 
     using lcos::future;
     using lcos::shared_future;
-#if defined(HPX_UNIQUE_FUTURE_ALIAS)
-    using lcos::unique_future;
-#endif
     using lcos::promise;
 
     /// \endcond
@@ -1692,6 +1686,7 @@ namespace hpx
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 
 #include <hpx/lcos/async_fwd.hpp>
+#include <hpx/lcos/async_callback_fwd.hpp>
 
 #endif
 

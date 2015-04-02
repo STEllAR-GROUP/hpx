@@ -42,6 +42,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     class receiver
       : public parcelport_connection<receiver, std::vector<char>, std::vector<char> >
     {
+        typedef hpx::lcos::local::spinlock mutex_type;
     public:
         receiver(boost::asio::io_service& io_service, connection_handler& parcelport)
           : socket_(io_service)
@@ -52,13 +53,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         ~receiver()
         {
-            // gracefully and portably shutdown the socket
-            if(socket_.is_open())
-            {
-                boost::system::error_code ec;
-                socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-                socket_.close(ec);    // close the socket to give it back to the OS
-            }
+            shutdown();
         }
 
         /// Get the socket associated with the parcelport_connection.
@@ -87,21 +82,43 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             buffers.push_back(buffer(&buffer_.num_chunks_,
                 sizeof(buffer_.num_chunks_)));
 
+            {
+                mutex_type::scoped_lock lk(mtx_);
+                if(!socket_.is_open())
+                {
+                    lk.unlock();
+                    // report this problem back to the handler
+                    handler(boost::asio::error::make_error_code(
+                        boost::asio::error::not_connected));
+                    return;
+                }
 #if defined(__linux) || defined(linux) || defined(__linux__)
-            boost::asio::detail::socket_option::boolean<
-                IPPROTO_TCP, TCP_QUICKACK> quickack(true);
-            socket_.set_option(quickack);
+                boost::asio::detail::socket_option::boolean<
+                    IPPROTO_TCP, TCP_QUICKACK> quickack(true);
+                socket_.set_option(quickack);
 #endif
 
-            void (receiver::*f)(boost::system::error_code const&,
-                    std::size_t, boost::tuple<Handler>)
-                = &receiver::handle_read_header<Handler>;
+                void (receiver::*f)(boost::system::error_code const&,
+                        std::size_t, boost::tuple<Handler>)
+                    = &receiver::handle_read_header<Handler>;
 
-            boost::asio::async_read(socket_, buffers,
-                boost::bind(f, shared_from_this(),
-                    boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred,
-                    boost::make_tuple(handler)));
+                boost::asio::async_read(socket_, buffers,
+                    boost::bind(f, shared_from_this(),
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::bytes_transferred,
+                        boost::make_tuple(handler)));
+            }
+        }
+
+        void shutdown()
+        {
+            mutex_type::scoped_lock lk(mtx_);
+            // gracefully and portably shutdown the socket
+            boost::system::error_code ec;
+            if (socket_.is_open()) {
+                socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                socket_.close(ec);    // close the socket to give it back to the OS
+            }
         }
 
     private:
@@ -115,6 +132,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             std::size_t bytes_transferred, boost::tuple<Handler> handler)
         {
             if (e) {
+                if(e==boost::asio::error::not_connected) std::cout << "handle_read_header\n";
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
@@ -178,14 +196,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     f = &receiver::handle_read_data<Handler>;
                 }
 
+                {
+                    mutex_type::scoped_lock lk(mtx_);
+                    if(!socket_.is_open())
+                    {
+                        lk.unlock();
+                        // report this problem back to the handler
+                        boost::get<0>(handler)(boost::asio::error::make_error_code(
+                            boost::asio::error::not_connected));
+                        return;
+                    }
 #if defined(__linux) || defined(linux) || defined(__linux__)
-                boost::asio::detail::socket_option::boolean<
-                    IPPROTO_TCP, TCP_QUICKACK> quickack(true);
-                socket_.set_option(quickack);
+                    boost::asio::detail::socket_option::boolean<
+                        IPPROTO_TCP, TCP_QUICKACK> quickack(true);
+                    socket_.set_option(quickack);
 #endif
-                boost::asio::async_read(socket_, buffers,
-                    boost::bind(f, shared_from_this(),
-                        boost::asio::placeholders::error, handler));
+                    boost::asio::async_read(socket_, buffers,
+                        boost::bind(f, shared_from_this(),
+                            boost::asio::placeholders::error, handler));
+                }
             }
         }
 
@@ -223,14 +252,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         boost::tuple<Handler>)
                     = &receiver::handle_read_data<Handler>;
 
+                {
+                    mutex_type::scoped_lock lk(mtx_);
+                    if(!socket_.is_open())
+                    {
+                        lk.unlock();
+                        // report this problem back to the handler
+                        boost::get<0>(handler)(boost::asio::error::make_error_code(
+                            boost::asio::error::not_connected));
+                        return;
+                    }
 #if defined(__linux) || defined(linux) || defined(__linux__)
-                boost::asio::detail::socket_option::boolean<
-                    IPPROTO_TCP, TCP_QUICKACK> quickack(true);
-                socket_.set_option(quickack);
+                    boost::asio::detail::socket_option::boolean<
+                        IPPROTO_TCP, TCP_QUICKACK> quickack(true);
+                    socket_.set_option(quickack);
 #endif
-                boost::asio::async_read(socket_, buffers,
-                    boost::bind(f, shared_from_this(),
-                        boost::asio::placeholders::error, handler));
+                    boost::asio::async_read(socket_, buffers,
+                        boost::bind(f, shared_from_this(),
+                            boost::asio::placeholders::error, handler));
+                }
             }
         }
 
@@ -260,10 +300,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 buffer_ = parcel_buffer_type();
 
                 ack_ = true;
-                boost::asio::async_write(socket_,
-                    boost::asio::buffer(&ack_, sizeof(ack_)),
-                    boost::bind(f, shared_from_this(),
-                        boost::asio::placeholders::error, handler));
+                {
+                    mutex_type::scoped_lock lk(mtx_);
+                    if(!socket_.is_open())
+                    {
+                        lk.unlock();
+                        // report this problem back to the handler
+                        boost::get<0>(handler)(boost::asio::error::make_error_code(
+                            boost::asio::error::not_connected));
+                        return;
+                    }
+                    boost::asio::async_write(socket_,
+                        boost::asio::buffer(&ack_, sizeof(ack_)),
+                        boost::bind(f, shared_from_this(),
+                            boost::asio::placeholders::error, handler));
+                }
             }
         }
 
@@ -276,7 +327,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
             // Issue a read operation to read the next parcel.
             if (!e)
+            {
                 async_read(boost::get<0>(handler));
+            }
         }
 
 
@@ -292,6 +345,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         /// Counters and timers for parcels received.
         util::high_resolution_timer timer_;
+
+        mutex_type mtx_;
     };
 
     // this makes sure we can store our connections in a set

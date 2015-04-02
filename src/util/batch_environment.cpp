@@ -29,7 +29,7 @@ namespace hpx { namespace util
 {
     batch_environment::batch_environment(std::vector<std::string> & nodelist, bool debug)
       : agas_node_num_(0)
-      , node_num_(0)
+      , node_num_(-1)
       , num_threads_(-1)
       , num_localities_(-1)
       , debug_(debug)
@@ -116,8 +116,7 @@ namespace hpx { namespace util
         // if an AGAS host is specified, it needs to be in the list
         // of nodes participating in this run
         if (!agas_host.empty() && !found_agas_host) {
-            throw hpx::detail::command_line_error(
-                "Requested AGAS host (" + agas_host +
+            throw hpx::detail::command_line_error("Requested AGAS host (" + agas_host +
                 ") not found in node list");
         }
 

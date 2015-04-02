@@ -75,7 +75,8 @@ described in the table below:
                                  [link hpx.manual.init.commandline.details the additional documentation]
                                  for a detailed description of possible
                                  values. Do not use with `--hpx:pu-step`, `--hpx:pu-offset`, or
-                                 `--hpx:affinity` options. Implies `--hpx:numa-sensitive`.]]
+                                 `--hpx:affinity` options. Implies `--hpx:numa-sensitive`
+                                 (--hpx:bind=none disables defining thread affinities).]]
     [[`--hpx:print-bind`]       [print to the console the bit masks calculated from the
                                  arguments specified to all `--hpx:bind` options.]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
@@ -255,6 +256,10 @@ threads will run only on the processing units identified by the corresponding
 bind specification. The affinity settings are to be specified using
 `--hpx:bind=<BINDINGS>`, where `<BINDINGS>` have to be formatted as described
 below.
+
+In addition to the syntax described below one can use `--hpx:bind=none` to
+disable all binding of any threads to a particular core. This is mostly
+supported for debugging purposes.
 
 [note This command line option is only available if __hpx__ was built with
       support for HWLOC (__hwloc__) enabled. Please see __cmake_options__ for more

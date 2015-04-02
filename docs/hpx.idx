@@ -125,6 +125,9 @@ parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_
 parallel::generate                    "generate" "hpx\.parallel\.v1\.generate$"
 parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_n.*"
 
+# hpx/parallel/algorithms/includes.hpp
+parallel::includes                    "includes" "hpx\.parallel\.v1\.includes.*"
+
 # hpx/parallel/algorithms/inclusive_scan.hpp
 parallel::inclusive_scan              "inclusive_scan" "hpx\.parallel\.v1\.inclusive_scan.*"
 
@@ -173,6 +176,18 @@ parallel::rotate_copy                 "rotate_copy" "hpx\.parallel\.v1\.rotate_c
 # hpx/parallel/algorithms/swap_ranges.hpp
 parallel::search                      "search" "hpx\.parallel\.v1\.search_id.*"
 parallel::search_n                    "search_n" "hpx\.parallel\.v1\.search_n.*"
+
+# hpx/parallel/algorithms/set_difference.hpp
+parallel::set_difference              "set_difference" "hpx\.parallel\.v1\.set_difference.*"
+
+# hpx/parallel/algorithms/set_intersection.hpp
+parallel::set_intersection            "set_intersection" "hpx\.parallel\.v1\.set_intersection.*"
+
+# hpx/parallel/algorithms/set_symmetric_difference.hpp
+parallel::set_symmetric_difference    "set_symmetric_difference" "hpx\.parallel\.v1\.set_symmetric_dif.*"
+
+# hpx/parallel/algorithms/set_union.hpp
+parallel::set_union                   "set_union" "hpx\.parallel\.v1\.set_union.*"
 
 # hpx/parallel/algorithms/swap_ranges.hpp
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"

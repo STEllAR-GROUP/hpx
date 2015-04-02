@@ -47,28 +47,22 @@ namespace hpx { namespace parallel { namespace util
                     workitems.reserve(count / chunk_size + 1);
 
                     threads::executor exec = policy.get_executor();
-                    while (count > chunk_size)
+                    while(count != 0)
                     {
+                        std::size_t chunk = (std::min)(count, chunk_size);
                         if (exec)
                         {
                             workitems.push_back(hpx::async(exec, f1, first,
-                                chunk_size));
+                                chunk));
                         }
                         else
                         {
                             workitems.push_back(hpx::async(hpx::launch::fork, f1,
-                                first, chunk_size));
+                                first, chunk));
                         }
-                        count -= chunk_size;
-                        std::advance(first, chunk_size);
-                    }
 
-                    // execute last chunk directly
-                    if (count != 0)
-                    {
-                        workitems.push_back(hpx::async(hpx::launch::sync,
-                            std::forward<F1>(f1), first, count));
-                        std::advance(first, count);
+                        count -= chunk;
+                        std::advance(first, chunk);
                     }
                 }
                 catch (...) {
@@ -105,9 +99,9 @@ namespace hpx { namespace parallel { namespace util
                     workitems.reserve(chunk_sizes.size());
 
                     threads::executor exec = policy.get_executor();
-                    while (count > *chunk_size_it)
+                    while(count != 0)
                     {
-                        std::size_t chunk = *chunk_size_it;
+                        std::size_t chunk = (std::min)(count, *chunk_size_it);
                         HPX_ASSERT(chunk != 0);
 
                         if (exec)
@@ -126,20 +120,6 @@ namespace hpx { namespace parallel { namespace util
 
                         ++data_it;
                         ++chunk_size_it;
-                    }
-
-                    // execute last chunk directly
-                    if (count != 0)
-                    {
-                        std::size_t chunk = *chunk_size_it;
-
-                        HPX_ASSERT(count == chunk);
-                        workitems.push_back(hpx::async(hpx::launch::sync,
-                            std::forward<F1>(f1), *data_it, first, chunk));
-                        std::advance(first, chunk);
-#if defined(HPX_DEBUG)
-                        ++chunk_size_it;
-#endif
                     }
 
                     HPX_ASSERT(chunk_size_it == chunk_sizes.end());
@@ -174,29 +154,23 @@ namespace hpx { namespace parallel { namespace util
                     workitems.reserve(count / chunk_size + 1);
 
                     threads::executor exec = policy.get_executor();
-                    while (count > chunk_size)
+                    while(count != 0)
                     {
+                        std::size_t chunk = (std::min)(count, chunk_size);
                         if (exec)
                         {
                             workitems.push_back(hpx::async(exec, f1, base_idx,
-                                first, chunk_size));
+                                first, chunk));
                         }
                         else
                         {
                             workitems.push_back(hpx::async(hpx::launch::fork,
-                                f1, base_idx, first, chunk_size));
+                                f1, base_idx, first, chunk));
                         }
-                        count -= chunk_size;
-                        std::advance(first, chunk_size);
-                        base_idx += chunk_size;
-                    }
 
-                    // execute last chunk directly
-                    if (count != 0)
-                    {
-                        workitems.push_back(hpx::async(hpx::launch::sync,
-                            std::forward<F1>(f1), base_idx, first, count));
-                        std::advance(first, count);
+                        count -= chunk;
+                        std::advance(first, chunk);
+                        base_idx += chunk;
                     }
                 }
                 catch (...) {
@@ -234,35 +208,22 @@ namespace hpx { namespace parallel { namespace util
                     workitems.reserve(count / chunk_size + 1);
 
                     threads::executor exec = policy.get_executor();
-                    while (count > chunk_size)
+                    while(count != 0)
                     {
+                        std::size_t chunk = (std::min)(count, chunk_size);
                         if (exec)
                         {
                             workitems.push_back(hpx::async(exec, f1, first,
-                                chunk_size));
+                                chunk));
                         }
                         else
                         {
                             workitems.push_back(hpx::async(hpx::launch::fork,
-                                f1, first, chunk_size));
+                                f1, first, chunk));
                         }
-                        count -= chunk_size;
-                        std::advance(first, chunk_size);
-                    }
 
-                    // add last chunk
-                    if (count != 0)
-                    {
-                        if (exec)
-                        {
-                            workitems.push_back(hpx::async(exec, f1, first, count));
-                        }
-                        else
-                        {
-                            workitems.push_back(hpx::async(hpx::launch::fork,
-                                f1, first, count));
-                        }
-                        std::advance(first, count);
+                        count -= chunk;
+                        std::advance(first, chunk);
                     }
                 }
                 catch (std::bad_alloc const&) {
@@ -372,37 +333,23 @@ namespace hpx { namespace parallel { namespace util
                     workitems.reserve(count / chunk_size + 1);
 
                     threads::executor exec = policy.get_executor();
-                    while (count > chunk_size)
+                    while(count != 0)
                     {
+                        std::size_t chunk = (std::min)(count, chunk_size);
                         if (exec)
                         {
                             workitems.push_back(hpx::async(exec, f1, base_idx,
-                                first, chunk_size));
+                                first, chunk));
                         }
                         else
                         {
                             workitems.push_back(hpx::async(hpx::launch::fork,
-                                f1, base_idx, first, chunk_size));
+                                f1, base_idx, first, chunk));
                         }
-                        count -= chunk_size;
-                        std::advance(first, chunk_size);
-                        base_idx += chunk_size;
-                    }
 
-                    // add last chunk
-                    if (count != 0)
-                    {
-                        if (exec)
-                        {
-                            workitems.push_back(hpx::async(exec, f1, base_idx,
-                                first, count));
-                        }
-                        else
-                        {
-                            workitems.push_back(hpx::async(hpx::launch::fork,
-                                f1, base_idx, first, count));
-                        }
-                        std::advance(first, count);
+                        count -= chunk;
+                        std::advance(first, chunk);
+                        base_idx += chunk;
                     }
                 }
                 catch (std::bad_alloc const&) {
@@ -415,7 +362,8 @@ namespace hpx { namespace parallel { namespace util
 
                 // wait for all tasks to finish
                 return hpx::lcos::local::dataflow(
-                    [f2, errors](std::vector<hpx::future<Result> > && r) mutable -> R
+                    [f2, errors](std::vector<hpx::future<Result> > && r)
+                        mutable -> R
                     {
                         detail::handle_local_exceptions<
                                 parallel_task_execution_policy

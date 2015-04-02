@@ -29,6 +29,8 @@
 #include <boost/foreach.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
+#include <memory>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -415,7 +417,7 @@ namespace hpx
 #if defined(HPX_HAVE_SECURITY)
         // allocate dynamically to reduce dependencies
         mutable lcos::local::spinlock security_mtx_;
-        HPX_STD_UNIQUE_PTR<detail::manage_security_data> security_data_;
+        std::unique_ptr<detail::manage_security_data> security_data_;
         components::security::certificate_store const * cert_store(error_code& ec) const;
 #endif
     };

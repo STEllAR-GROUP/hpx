@@ -22,6 +22,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#include <memory>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
@@ -191,7 +193,7 @@ namespace hpx { namespace parcelset
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
 
-        HPX_STD_UNIQUE_PTR<impl_base> impl_;
+        std::unique_ptr<impl_base> impl_;
 
         template <typename Impl>
         class impl : public impl_base

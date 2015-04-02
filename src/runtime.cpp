@@ -34,6 +34,7 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
@@ -215,7 +216,7 @@ namespace hpx
             util::security::subordinate_certificate_authority subordinate_certificate_authority_;
 
             // certificate store
-            HPX_STD_UNIQUE_PTR<components::security::certificate_store> cert_store_;
+            std::unique_ptr<components::security::certificate_store> cert_store_;
             components::security::signed_certificate locality_certificate_;
         };
     }
@@ -1057,7 +1058,7 @@ namespace hpx
         return rt->get_config().get_os_thread_count();
     }
 
-    std::size_t get_os_thread_count(threads::executor& exec)
+    std::size_t get_os_thread_count(threads::executor const& exec)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL == rt)

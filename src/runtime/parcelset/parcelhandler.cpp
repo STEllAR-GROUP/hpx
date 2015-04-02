@@ -62,29 +62,17 @@ namespace hpx { namespace parcelset
     // A parcel is submitted for transport at the source locality site to
     // the parcel set of the locality with the put-parcel command
     // This function is synchronous.
-
-    struct wait_for_put_parcel
-    {
-        wait_for_put_parcel() : sema_(new lcos::local::counting_semaphore) {}
-
-        void operator()(boost::system::error_code const&, parcel const&)
-        {
-            sema_->signal();
-        }
-
-        void wait()
-        {
-            sema_->wait();
-        }
-
-        boost::shared_ptr<lcos::local::counting_semaphore> sema_;
-    };
-
     void parcelhandler::sync_put_parcel(parcel& p) //-V669
     {
-        wait_for_put_parcel wfp;
-        put_parcel(p, wfp);  // schedule parcel send
-        wfp.wait();          // wait for the parcel to be sent
+        lcos::local::promise<void> promise;
+        put_parcel(
+            p
+          , [&promise](boost::system::error_code const&, parcel const&)
+            {
+                promise.set_value();
+            }
+        );  // schedule parcel send
+        promise.get_future().wait(); // wait for the parcel to be sent
     }
 
     void parcelhandler::parcel_sink(parcel const& p)
@@ -469,7 +457,7 @@ namespace hpx { namespace parcelset
 
     boost::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const
     {
-        std::size_t parcel_count = 0;
+        boost::int64_t parcel_count = 0;
         BOOST_FOREACH(pports_type::value_type const& pp, pports_)
         {
             parcel_count += pp.second->get_pending_parcels_count(reset);
@@ -487,6 +475,7 @@ namespace hpx { namespace parcelset
             if (hpx::is_stopped_or_shutting_down())
             {
                 if (ec == boost::asio::error::connection_aborted ||
+                    ec == boost::asio::error::connection_reset ||
                     ec == boost::asio::error::broken_pipe ||
                     ec == boost::asio::error::not_connected ||
                     ec == boost::asio::error::eof)
@@ -612,7 +601,7 @@ namespace hpx { namespace parcelset
     // Performance counter data
 
     // number of parcels sent
-    std::size_t parcelhandler::get_parcel_send_count(
+    boost::int64_t parcelhandler::get_parcel_send_count(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -627,7 +616,7 @@ namespace hpx { namespace parcelset
     }
 
     // number of messages sent
-    std::size_t parcelhandler::get_message_send_count(
+    boost::int64_t parcelhandler::get_message_send_count(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -636,7 +625,7 @@ namespace hpx { namespace parcelset
     }
 
     // number of parcels received
-    std::size_t parcelhandler::get_parcel_receive_count(
+    boost::int64_t parcelhandler::get_parcel_receive_count(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -645,7 +634,7 @@ namespace hpx { namespace parcelset
     }
 
     // number of messages received
-    std::size_t parcelhandler::get_message_receive_count(
+    boost::int64_t parcelhandler::get_message_receive_count(
         std::string const& pp_type, bool reset) const
     {
         error_code ec(lightweight);
@@ -716,7 +705,7 @@ namespace hpx { namespace parcelset
 #endif
 
     // total data sent (bytes)
-    std::size_t parcelhandler::get_data_sent(std::string const& pp_type,
+    boost::int64_t parcelhandler::get_data_sent(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -725,7 +714,7 @@ namespace hpx { namespace parcelset
     }
 
     // total data (uncompressed) sent (bytes)
-    std::size_t parcelhandler::get_raw_data_sent(std::string const& pp_type,
+    boost::int64_t parcelhandler::get_raw_data_sent(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -734,7 +723,7 @@ namespace hpx { namespace parcelset
     }
 
     // total data received (bytes)
-    std::size_t parcelhandler::get_data_received(std::string const& pp_type,
+    boost::int64_t parcelhandler::get_data_received(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);
@@ -743,7 +732,7 @@ namespace hpx { namespace parcelset
     }
 
     // total data (uncompressed) received (bytes)
-    std::size_t parcelhandler::get_raw_data_received(std::string const& pp_type,
+    boost::int64_t parcelhandler::get_raw_data_received(std::string const& pp_type,
         bool reset) const
     {
         error_code ec(lightweight);

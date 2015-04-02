@@ -6,7 +6,7 @@
 macro(add_hpx_test category name)
   set(options FAILURE_EXPECTED)
   set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY)
-  set(multi_value_args ARGS)
+  set(multi_value_args ARGS PARCELPORTS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT ${name}_LOCALITIES)
@@ -53,24 +53,72 @@ macro(add_hpx_test category name)
       COMMAND ${cmd} ${args})
     else()
       if(HPX_PARCELPORT_IBVERBS)
-        add_test(
-          NAME "${category}.distributed.ibverbs.${name}"
-          COMMAND ${cmd} "-p" "ibverbs" ${args})
+        set(_add_test FALSE)
+        if(DEFINED ${name}_PARCELPORTS)
+          set(PP_FOUND -1)
+          list(FIND ${name}_PARCELPORTS "ibverbs" PP_FOUND)
+          if(NOT PP_FOUND EQUAL -1)
+            set(_add_test TRUE)
+          endif()
+        else()
+          set(_add_test TRUE)
+        endif()
+        if(_add_test)
+          add_test(
+            NAME "${category}.distributed.ibverbs.${name}"
+            COMMAND ${cmd} "-p" "ibverbs" ${args})
+        endif()
       endif()
       if(HPX_PARCELPORT_IPC)
-        add_test(
-          NAME "${category}.distributed.ipc.${name}"
-          COMMAND ${cmd} "-p" "ipc" ${args})
+        set(_add_test FALSE)
+        if(DEFINED ${name}_PARCELPORTS)
+          set(PP_FOUND -1)
+          list(FIND ${name}_PARCELPORTS "ipc" PP_FOUND)
+          if(NOT PP_FOUND EQUAL -1)
+            set(_add_test TRUE)
+          endif()
+        else()
+          set(_add_test TRUE)
+        endif()
+        if(_add_test)
+          add_test(
+            NAME "${category}.distributed.ipc.${name}"
+            COMMAND ${cmd} "-p" "ipc" ${args})
+        endif()
       endif()
       if(HPX_PARCELPORT_MPI)
-        add_test(
-          NAME "${category}.distributed.mpi.${name}"
-          COMMAND ${cmd} "-p" "mpi" "-r" "mpi" ${args})
+        set(_add_test FALSE)
+        if(DEFINED ${name}_PARCELPORTS)
+          set(PP_FOUND -1)
+          list(FIND ${name}_PARCELPORTS "mpi" PP_FOUND)
+          if(NOT PP_FOUND EQUAL -1)
+            set(_add_test TRUE)
+          endif()
+        else()
+          set(_add_test TRUE)
+        endif()
+        if(_add_test)
+          add_test(
+            NAME "${category}.distributed.mpi.${name}"
+            COMMAND ${cmd} "-p" "mpi" "-r" "mpi" ${args})
+        endif()
       endif()
       if(HPX_PARCELPORT_TCP)
-        add_test(
-          NAME "${category}.distributed.tcp.${name}"
-          COMMAND ${cmd} "-p" "tcp" ${args})
+        set(_add_test FALSE)
+        if(DEFINED ${name}_PARCELPORTS)
+          set(PP_FOUND -1)
+          list(FIND ${name}_PARCELPORTS "tcp" PP_FOUND)
+          if(NOT PP_FOUND EQUAL -1)
+            set(_add_test TRUE)
+          endif()
+        else()
+          set(_add_test TRUE)
+        endif()
+        if(_add_test)
+          add_test(
+            NAME "${category}.distributed.tcp.${name}"
+            COMMAND ${cmd} "-p" "tcp" ${args})
+        endif()
       endif()
     endif()
 endmacro()

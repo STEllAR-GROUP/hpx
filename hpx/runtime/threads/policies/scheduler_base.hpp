@@ -121,18 +121,18 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
-        virtual std::size_t get_num_pending_misses(std::size_t num_thread,
+        virtual boost::uint64_t get_num_pending_misses(std::size_t num_thread,
             bool reset) = 0;
-        virtual std::size_t get_num_pending_accesses(std::size_t num_thread,
+        virtual boost::uint64_t get_num_pending_accesses(std::size_t num_thread,
             bool reset) = 0;
 
-        virtual std::size_t get_num_stolen_from_pending(std::size_t num_thread,
+        virtual boost::uint64_t get_num_stolen_from_pending(std::size_t num_thread,
             bool reset) = 0;
-        virtual std::size_t get_num_stolen_to_pending(std::size_t num_thread,
+        virtual boost::uint64_t get_num_stolen_to_pending(std::size_t num_thread,
             bool reset) = 0;
-        virtual std::size_t get_num_stolen_from_staged(std::size_t num_thread,
+        virtual boost::uint64_t get_num_stolen_from_staged(std::size_t num_thread,
             bool reset) = 0;
-        virtual std::size_t get_num_stolen_to_staged(std::size_t num_thread,
+        virtual boost::uint64_t get_num_stolen_to_staged(std::size_t num_thread,
             bool reset) = 0;
 #endif
 

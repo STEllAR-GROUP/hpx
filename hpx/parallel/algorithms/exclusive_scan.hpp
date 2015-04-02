@@ -10,6 +10,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -27,6 +29,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -42,10 +45,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         OutIter sequential_exclusive_scan(InIter first, InIter last,
             OutIter dest, T init, Op && op)
         {
-            for (/**/; first != last; (void) ++first, ++dest)
+            T temp = init;
+            for (/* */; first != last; (void) ++first, ++dest)
             {
-                *dest = init;
-                init = op(init, *first);
+                init  = op(init, *first);
+                *dest = temp;
+                temp  = init;
             }
             return dest;
         }
@@ -83,9 +88,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type;
                 difference_type count = std::distance(first, last) - 1;
 
-                *dest++ = init;
-                if (count == 0)
-                    return result::get(std::move(dest));
+                if (count == 0) {
+                  *dest = init;
+                  return result::get(std::move(dest));
+                }
+              
+                // The scan may use the same array for output as input
+                // don't write initial value until after sum to avoid trampling on input
+                OutIter iout = dest++;
+                T temp = init;
+              
 
                 boost::shared_array<T> data(new T[count]);
 
@@ -94,7 +106,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 // results for each partition and the second produces the
                 // overall result
                 using hpx::util::make_zip_iterator;
-                return
+                auto ret =
                     util::scan_partitioner<ExPolicy, OutIter, T>::call(
                         policy, make_zip_iterator(first, data.get()), count, init,
                         // step 1 performs first part of scan algorithm
@@ -124,6 +136,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 data, count, dest, op, chunk_sizes);
                         }
                     );
+                // write output initial value
+                *iout = temp;
+                return ret;
             }
         };
         /// \endcond

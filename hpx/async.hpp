@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/async.hpp>
-#include <hpx/lcos/async_colocated.hpp>
 #include <hpx/lcos/async_continue.hpp>
+#include <hpx/lcos/async_colocated.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>

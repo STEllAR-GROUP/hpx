@@ -28,6 +28,7 @@ set(tests
     foreachn
     generate
     generaten
+    includes
     inclusive_scan
     is_partitioned
     is_sorted
@@ -53,6 +54,10 @@ set(tests
     rotate_copy
     search
     searchn
+    set_difference
+    set_intersection
+    set_symmetric_difference
+    set_union
     swapranges
     task_region
     transform

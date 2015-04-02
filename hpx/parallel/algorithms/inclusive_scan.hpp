@@ -10,6 +10,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -26,6 +28,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -41,7 +44,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         OutIter sequential_inclusive_scan(InIter first, InIter last,
             OutIter dest, T init, Op && op)
         {
-            for (/**/; first != last; (void) ++first, ++dest)
+            for (/* */; first != last; (void) ++first, ++dest)
             {
                 init = op(init, *first);
                 *dest = init;
@@ -53,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         T sequential_inclusive_scan_n(InIter first, std::size_t count,
             OutIter dest, T init, Op && op)
         {
-            for (/**/; count-- != 0; (void) ++first, ++dest)
+            for (/* */; count-- != 0; (void) ++first, ++dest)
             {
                 init = op(init, *first);
                 *dest = init;

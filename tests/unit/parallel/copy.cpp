@@ -389,5 +389,4 @@ int main(int argc, char* argv[])
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
-
 }

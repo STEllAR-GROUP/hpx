@@ -180,9 +180,9 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
-        std::size_t get_num_pending_misses(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
-            std::size_t num_pending_misses = 0;
+            boost::uint64_t num_pending_misses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
@@ -201,12 +201,23 @@ namespace hpx { namespace threads { namespace policies
 
             num_pending_misses += queues_[num_thread]->
                 get_num_pending_misses(reset);
+
+            if (num_thread < high_priority_queues_.size())
+            {
+                num_pending_misses += high_priority_queues_[num_thread]->
+                    get_num_pending_misses(reset);
+            }
+            if (num_thread == 0)
+            {
+                num_pending_misses += low_priority_queue_.
+                    get_num_pending_misses(reset);
+            }
             return num_pending_misses;
         }
 
-        std::size_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
         {
-            std::size_t num_pending_accesses = 0;
+            boost::uint64_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
@@ -225,86 +236,157 @@ namespace hpx { namespace threads { namespace policies
 
             num_pending_accesses += queues_[num_thread]->
                 get_num_pending_accesses(reset);
+
+            if (num_thread < high_priority_queues_.size())
+            {
+                num_pending_accesses += high_priority_queues_[num_thread]->
+                    get_num_pending_accesses(reset);
+            }
+            if (num_thread == 0)
+            {
+                num_pending_accesses += low_priority_queue_.
+                    get_num_pending_accesses(reset);
+            }
             return num_pending_accesses;
         }
 
-        std::size_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::uint64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                    num_stolen_threads +=
-                        high_priority_queues_[i]->get_num_stolen_from_pending(reset);
-
-                num_stolen_threads += low_priority_queue_.get_num_stolen_from_pending(reset);
+                    num_stolen_threads += high_priority_queues_[i]->
+                        get_num_stolen_from_pending(reset);
 
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += queues_[i]->get_num_stolen_from_pending(reset);
+                    num_stolen_threads += queues_[i]->
+                        get_num_stolen_from_pending(reset);
+
+                num_stolen_threads += low_priority_queue_.
+                    get_num_stolen_from_pending(reset);
+
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += queues_[num_thread]->get_num_stolen_from_pending(reset);
+            num_stolen_threads += queues_[num_thread]->
+                get_num_stolen_from_pending(reset);
+
+            if (num_thread < high_priority_queues_.size())
+            {
+                num_stolen_threads += high_priority_queues_[num_thread]->
+                    get_num_stolen_from_pending(reset);
+            }
+            if (num_thread == 0)
+            {
+                num_stolen_threads += low_priority_queue_.
+                    get_num_stolen_from_pending(reset);
+            }
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::uint64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                    num_stolen_threads +=
-                        high_priority_queues_[i]->get_num_stolen_to_pending(reset);
-
-                num_stolen_threads += low_priority_queue_.get_num_stolen_to_pending(reset);
+                    num_stolen_threads += high_priority_queues_[i]->
+                        get_num_stolen_to_pending(reset);
 
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += queues_[i]->get_num_stolen_to_pending(reset);
+                    num_stolen_threads += queues_[i]->
+                        get_num_stolen_to_pending(reset);
+
+                num_stolen_threads += low_priority_queue_.
+                    get_num_stolen_to_pending(reset);
+
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += queues_[num_thread]->get_num_stolen_to_pending(reset);
+            num_stolen_threads += queues_[num_thread]->
+                get_num_stolen_to_pending(reset);
+
+            if (num_thread < high_priority_queues_.size())
+            {
+                num_stolen_threads += high_priority_queues_[num_thread]->
+                    get_num_stolen_to_pending(reset);
+            }
+            if (num_thread == 0)
+            {
+                num_stolen_threads += low_priority_queue_.
+                    get_num_stolen_to_pending(reset);
+            }
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::uint64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                    num_stolen_threads +=
-                        high_priority_queues_[i]->get_num_stolen_from_staged(reset);
-
-                num_stolen_threads += low_priority_queue_.get_num_stolen_from_staged(reset);
+                    num_stolen_threads += high_priority_queues_[i]->
+                        get_num_stolen_from_staged(reset);
 
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += queues_[i]->get_num_stolen_from_staged(reset);
+                    num_stolen_threads += queues_[i]->
+                        get_num_stolen_from_staged(reset);
+
+                num_stolen_threads += low_priority_queue_.
+                    get_num_stolen_from_staged(reset);
+
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += queues_[num_thread]->get_num_stolen_from_staged(reset);
+            num_stolen_threads += queues_[num_thread]->
+                get_num_stolen_from_staged(reset);
+
+            if (num_thread < high_priority_queues_.size())
+            {
+                num_stolen_threads += high_priority_queues_[num_thread]->
+                    get_num_stolen_from_staged(reset);
+            }
+            if (num_thread == 0)
+            {
+                num_stolen_threads += low_priority_queue_.
+                    get_num_stolen_from_staged(reset);
+            }
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::uint64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                    num_stolen_threads +=
-                        high_priority_queues_[i]->get_num_stolen_to_staged(reset);
-
-                num_stolen_threads += low_priority_queue_.get_num_stolen_to_staged(reset);
+                    num_stolen_threads += high_priority_queues_[i]->
+                        get_num_stolen_to_staged(reset);
 
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += queues_[i]->get_num_stolen_to_staged(reset);
+                    num_stolen_threads += queues_[i]->
+                        get_num_stolen_to_staged(reset);
+
+                num_stolen_threads += low_priority_queue_.
+                    get_num_stolen_to_staged(reset);
+
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += queues_[num_thread]->get_num_stolen_to_staged(reset);
+            num_stolen_threads += queues_[num_thread]->
+                get_num_stolen_to_staged(reset);
+
+            if (num_thread < high_priority_queues_.size())
+            {
+                num_stolen_threads += high_priority_queues_[num_thread]->
+                    get_num_stolen_to_staged(reset);
+            }
+            if (num_thread == 0)
+            {
+                num_stolen_threads += low_priority_queue_.
+                    get_num_stolen_to_staged(reset);
+            }
             return num_stolen_threads;
         }
 #endif
@@ -331,7 +413,8 @@ namespace hpx { namespace threads { namespace policies
                 return empty;
 
             for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
-                empty = high_priority_queues_[i]->cleanup_terminated(delete_all) && empty;
+                empty = high_priority_queues_[i]->
+                    cleanup_terminated(delete_all) && empty;
 
             empty = low_priority_queue_.cleanup_terminated(delete_all) && empty;
             return empty;
@@ -499,7 +582,8 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data_base* thrd, std::size_t num_thread,
+        void schedule_thread(threads::thread_data_base* thrd,
+            std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
             if (std::size_t(-1) == num_thread)
@@ -520,7 +604,8 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
+        void schedule_thread_last(threads::thread_data_base* thrd,
+            std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
             if (std::size_t(-1) == num_thread)
@@ -611,7 +696,8 @@ namespace hpx { namespace threads { namespace policies
                 case thread_priority_default:
                     {
                         if (num_thread < high_priority_queues_.size())
-                            count = high_priority_queues_[num_thread]->get_thread_count(state);
+                            count = high_priority_queues_[num_thread]->
+                                get_thread_count(state);
 
                         if (queues_.size()-1 == num_thread)
                             count += low_priority_queue_.get_thread_count(state);

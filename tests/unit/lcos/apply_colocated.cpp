@@ -10,16 +10,17 @@
 #include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::int32_t final_result;
+bool on_shutdown_executed = false;
+boost::uint32_t locality_id = boost::uint32_t(-1);
+
+boost::int32_t final_result = 0;
 hpx::util::spinlock result_mutex;
-hpx::lcos::local::condition_variable result_cv;
 
 void receive_result(boost::int32_t i)
 {
     hpx::util::spinlock::scoped_lock l(result_mutex);
     if (i > final_result)
         final_result = i;
-    result_cv.notify_one();
 }
 HPX_PLAIN_ACTION(receive_result);
 
@@ -28,6 +29,8 @@ boost::atomic<boost::int32_t> accumulator;
 
 void increment(hpx::id_type const& there, boost::int32_t i)
 {
+    locality_id = hpx::get_locality_id();
+
     accumulator += i;
     hpx::apply(receive_result_action(), there, accumulator.load());
 }
@@ -54,8 +57,19 @@ HPX_REGISTER_ACTION_DECLARATION(call_action);
 HPX_REGISTER_ACTION(call_action);
 
 ///////////////////////////////////////////////////////////////////////////////
+void on_shutdown()
+{
+    hpx::util::spinlock::scoped_lock l(result_mutex);
+    HPX_TEST_EQ(final_result, 3);
+
+    on_shutdown_executed = true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
+    locality_id = hpx::get_locality_id();
+
     hpx::id_type here = hpx::find_here();
     hpx::id_type there = here;
     if (hpx::get_num_localities_sync() > 1)
@@ -86,16 +100,12 @@ int hpx_main()
         hpx::apply_colocated<increment_action>(where, here, 1);
     }
 
-    // finalize will synchronize with all pending operations
-    int result = hpx::finalize();
+    // register function which will verify final result
+    hpx::register_shutdown_function(on_shutdown);
 
-    hpx::util::spinlock::scoped_lock l(result_mutex);
-    result_cv.wait_for(l, boost::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(final_result), 3));
+    HPX_TEST_EQ(hpx::finalize(), 0);
 
-    HPX_TEST_EQ(final_result, 3);
-
-    return result;
+    return 0;
 }
 
 int main(int argc, char* argv[])
@@ -105,6 +115,9 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
+
+    HPX_TEST_NEQ(boost::uint32_t(-1), locality_id);
+    HPX_TEST(on_shutdown_executed || 0 != locality_id);
 
     return hpx::util::report_errors();
 }

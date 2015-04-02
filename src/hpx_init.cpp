@@ -37,6 +37,7 @@
 #include <sstream>
 #include <vector>
 #include <new>
+#include <memory>
 
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
@@ -628,7 +629,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
@@ -736,7 +737,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
@@ -849,7 +850,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
@@ -902,7 +903,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
@@ -940,7 +941,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
@@ -992,7 +993,7 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
+            std::unique_ptr<hpx::runtime> rt(
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
 
             if (blocking) {
@@ -1188,20 +1189,10 @@ namespace hpx
         if (std::abs(shutdown_timeout + 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
-        using components::server::runtime_support;
-
-        hpx::id_type root = hpx::find_root_locality();
-        if (hpx::find_here() == root)
-        {
-            runtime_support* p = get_runtime_support_ptr();
-            p->shutdown_all(shutdown_timeout);
-        }
-        else
-        {
-            // tell main locality to start application exit, duplicate requests
-            // will be ignored
-            apply<runtime_support::shutdown_all_action>(root, shutdown_timeout);
-        }
+        // tell main locality to start application exit, duplicated requests
+        // will be ignored
+        apply<components::server::runtime_support::shutdown_all_action>(
+            hpx::find_root_locality(), shutdown_timeout);
 
         util::apex_finalize();
         return 0;
@@ -1241,9 +1232,18 @@ namespace hpx
         if (std::abs(shutdown_timeout + 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
+        util::apex_finalize();
+
         components::server::runtime_support* p =
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
+
+        if (0 == p) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
 
         p->call_shutdown_functions(true);
         p->call_shutdown_functions(false);
@@ -1276,7 +1276,13 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int stop(error_code& ec)
     {
-        HPX_STD_UNIQUE_PTR<runtime> rt(get_runtime_ptr());    // take ownership!
+        if (threads::get_self_ptr()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+                "this function cannot be called from an HPX thread");
+            return -1;
+        }
+
+        std::unique_ptr<runtime> rt(get_runtime_ptr());    // take ownership!
         if (0 == rt.get()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
                 "the runtime system is not active (did you already "
@@ -1289,6 +1295,47 @@ namespace hpx
         rt->rethrow_exception();
 
         return result;
+    }
+
+    namespace detail
+    {
+        HPX_EXPORT int init_helper(
+            boost::program_options::variables_map& /*vm*/,
+            util::function_nonser<int(int, char**)> const& f)
+        {
+            hpx::util::section const& ini = hpx::get_runtime().get_config();
+            std::string cmdline(ini.get_entry("hpx.reconstructed_cmd_line", ""));
+
+            using namespace boost::program_options;
+#if defined(BOOST_WINDOWS)
+            std::vector<std::string> args = split_winmain(cmdline);
+#else
+            std::vector<std::string> args = split_unix(cmdline);
+#endif
+
+            // Copy all arguments which are not hpx related to a temporary array
+            boost::scoped_array<char*> argv(new char*[args.size()+1]);
+            std::size_t argcount = 0;
+            for (std::size_t i = 0; i != args.size(); ++i)
+            {
+                if (0 != args[i].find("--hpx:")) {
+                    argv[argcount++] = const_cast<char*>(args[i].data());
+                }
+                else if (6 == args[i].find("positional", 6)) {
+                    std::string::size_type p = args[i].find_first_of("=");
+                    if (p != std::string::npos) {
+                        args[i] = args[i].substr(p+1);
+                        argv[argcount++] = const_cast<char*>(args[i].data());
+                    }
+                }
+            }
+
+            // add a single nullptr in the end as some application rely on that
+            argv[argcount] = 0;
+
+            // Invoke custom startup functions
+            return f(static_cast<int>(argcount), argv.get());
+        }
     }
 }
 

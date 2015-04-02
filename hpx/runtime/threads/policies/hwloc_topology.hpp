@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -21,7 +21,7 @@
 
 namespace hpx { namespace threads
 {
-    struct hwloc_topology : topology
+    struct HPX_EXPORT hwloc_topology : topology
     {
         hwloc_topology();
         ~hwloc_topology();

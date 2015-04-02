@@ -385,7 +385,7 @@ namespace hpx { namespace util
                     std::cerr << "failed opening: " << node_file << std::endl;
 
                 // raise hard error if nodefile could not be opened
-                throw std::logic_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Could not open nodefile: '%s'") % node_file));
             }
         }
@@ -513,9 +513,13 @@ namespace hpx { namespace util
                 }
             }
 
-            // store node number in configuration
-            ini_config += "hpx.locality!=" +
-                boost::lexical_cast<std::string>(node);
+            // store node number in configuration, don't do that if we're on a
+            // worker and the node number is zero
+            if (!vm.count("hpx:worker") || node != 0)
+            {
+                ini_config += "hpx.locality!=" +
+                    boost::lexical_cast<std::string>(node);
+            }
         }
 
         if (vm.count("hpx:hpx")) {
@@ -804,7 +808,15 @@ namespace hpx { namespace util
                 threads::mask_cref_type pu_mask =
                     rt.get_thread_manager().get_pu_mask(top, i);
 
-                top.print_affinity_mask(strm, i, pu_mask);
+                if (!threads::any(pu_mask))
+                {
+                    strm << std::setw(4) << i << ": thread binding disabled"
+                         << std::endl;
+                }
+                else
+                {
+                    top.print_affinity_mask(strm, i, pu_mask);
+                }
 
                 // Make sure the mask does not contradict the CPU bindings
                 // returned by the system (see #973: Would like option to

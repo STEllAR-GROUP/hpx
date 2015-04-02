@@ -16,6 +16,7 @@ if(NOT MSVC)
 endif()
 
 set(benchmarks
+    async_overheads
     timed_task_spawn
     hpx_homogeneous_timed_task_spawn_executors
     hpx_heterogeneous_timed_task_spawn

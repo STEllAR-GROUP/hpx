@@ -111,7 +111,7 @@ endif()
 
 hpx_option(HPX_MALLOC
   STRING
-  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc and tbbmalloc (default is: tcmalloc)"
+  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
   ${DEFAULT_MALLOC} ADVANCED)
 
 hpx_option(HPX_WITH_HWLOC
@@ -170,7 +170,6 @@ if(APPLE)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" OFF ADVANCED)
-hpx_option(HPX_BUILD_WITH_INSTALL_PREFIX BOOL "Always set the HPX_PREFIX default to the install directory (default: OFF)" OFF ADVANCED)
 
 ################################################################################
 # Native TLS configuration
@@ -217,10 +216,6 @@ hpx_option(HPX_AUTOMATIC_SERIALIZATION_REGISTRATION BOOL
 if(NOT HPX_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_config_define(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
-
-hpx_option(HPX_UNIQUE_FUTURE_ALIAS BOOL
-  "HPX will defined unique_future<R> as a template alias to future<R>. (default OFF)."
-  OFF ADVANCED)
 
 ## Thread Manager related build options
 
@@ -399,8 +394,8 @@ hpx_option(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of ch
 
 ## mpi parcelport settings
 hpx_option(HPX_PARCELPORT_MPI_ENV STRING
-  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE)."
-  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
+  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE)."
+  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
 hpx_option(HPX_PARCELPORT_MPI_MULTITHREADED BOOL
   "Turn on MPI multithreading support (default: ON)."
   ON CATEGORY "Parcelport" ADVANCED)
@@ -742,11 +737,13 @@ if(MSVC)
 
   hpx_add_config_define(BOOST_USE_WINDOWS_H)
   hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+  if(NOT CMAKE_CL_64)
+    hpx_add_config_define(BOOST_NO_ALIGNMENT)
+  endif()
   if(NOT HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
   endif()
   hpx_add_config_define(PSAPI_VERSION 1)
-
 endif()
 
 # Configure Warnings
@@ -941,9 +938,11 @@ hpx_check_for_cxx11_alias_templates(
 hpx_check_for_cxx11_defaulted_deleted_functions(
   DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS)
 
-hpx_check_for_cxx11_std_unique_ptr(
-  DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
-              BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
+hpx_check_for_cxx11_std_unique_ptr()
+
+if(NOT HPX_WITH_CXX11_UNIQUE_PTR)
+  hpx_error("HPX needs support for C++11 std::unique_ptr")
+endif()
 
 hpx_check_for_cxx11_std_initializer_list(
   DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
@@ -983,13 +982,6 @@ if(MSVC)
       hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     endif()
   endif()
-endif()
-
-if(HPX_UNIQUE_FUTURE_ALIAS)
-  if(NOT HPX_WITH_CXX11_ALIAS_TEMPLATES)
-    hpx_error("template aliases are not available for this compiler. Can't create a unique_future<R> alias. Please set HPX_UNIQUE_FUTURE_ALIAS to OFF or use a modern compiler")
-  endif()
-  hpx_add_config_define(HPX_UNIQUE_FUTURE_ALIAS)
 endif()
 
 ################################################################################
@@ -1131,18 +1123,13 @@ foreach(def ${HPX_CONFIG_DEFINITIONS_VAR})
 endforeach()
 
 # Generate a defines.hpp to be used in the build directory ...
-if(HPX_BUILD_WITH_INSTALL_PREFIX)
-  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-else()
-  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-endif()
+set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
                @ONLY)
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
-
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp"
                @ONLY)
@@ -1156,13 +1143,12 @@ configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
 # installation instructions
 ################################################################################
 install(
-  DIRECTORY ${CMAKE_BINARY_DIR}/bin/
-  DESTINATION hpx/bin/
+  FILES "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+  DESTINATION bin
   COMPONENT core
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                   GROUP_READ GROUP_EXECUTE
-                   WORLD_READ WORLD_EXECUTE
-  FILES_MATCHING PATTERN "hpxcxx" EXCLUDE)
+  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+  GROUP_READ GROUP_EXECUTE
+  WORLD_READ WORLD_EXECUTE)
 
 install( # install all hpx header files
   DIRECTORY hpx/

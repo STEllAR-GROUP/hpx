@@ -16,6 +16,7 @@
 #include <cstddef> // for size_t
 #include <cstring> // for memcpy
 #include <vector>
+#include <memory>
 
 namespace hpx { namespace serialization {
     template <typename Container>
@@ -153,7 +154,7 @@ namespace hpx { namespace serialization {
 
         Container const& cont_;
         std::size_t current_;
-        HPX_STD_UNIQUE_PTR<binary_filter> filter_;
+        std::unique_ptr<binary_filter> filter_;
         std::size_t decompressed_size_;
 
         std::vector<serialization_chunk> const* chunks_;

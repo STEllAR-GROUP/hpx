@@ -91,7 +91,7 @@ namespace hpx { namespace lcos
             {
                 gate_.synchronize(1, l);
                 data_[which] = std::move(t);
-                gate_.set(which);
+                gate_.set(which, l);
             }
 
         private:

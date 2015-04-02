@@ -83,4 +83,45 @@
       , Name)                                                                 \
 /**/
 
+
+// Pseudo registration for empty functions.
+// We don't want to serialize empty functions.
+namespace hpx { namespace util { namespace detail
+{
+    template <typename Sig>
+    struct get_function_name_impl<
+        std::pair<
+            hpx::util::detail::function_vtable_ptr<
+                Sig
+              , hpx::util::portable_binary_iarchive, hpx::util::portable_binary_oarchive
+            >
+          , hpx::util::detail::empty_function<Sig>
+        >
+    >
+    {
+        static char const * call()
+        {
+            hpx::throw_exception(bad_function_call,
+                "empty function object should not be used",
+                "get_function_name<empty_function>");
+            return "";
+        }
+    };
+}}}
+
+namespace hpx { namespace traits {
+    template <typename Sig>
+    struct needs_automatic_registration<
+        std::pair<
+            hpx::util::detail::function_vtable_ptr<
+                Sig
+              , hpx::util::portable_binary_iarchive, hpx::util::portable_binary_oarchive
+            >
+          , hpx::util::detail::empty_function<Sig>
+        >
+    >
+      : boost::mpl::false_
+    {};
+}}
+
 #endif
