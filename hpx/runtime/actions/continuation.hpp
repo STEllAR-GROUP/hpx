@@ -11,7 +11,6 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/empty_type.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/logging.hpp>
