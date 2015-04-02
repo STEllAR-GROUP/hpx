@@ -14,6 +14,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #define HPX_SINGLE_ARG(...) __VA_ARGS__
@@ -209,10 +210,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            //ar & util::base_object_nonvirt<manage_object_action<T> >(*this);
-            hpx::serialization::base_object_type<
-              manage_object_action<T, void>, manage_object_action_base> base(*this);
-            ar & base;
+            ar & hpx::serialization::base_object<manage_object_action_base>(*this);
         }
 
         HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(manage_object_action);
@@ -231,10 +229,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            //ar & util::base_object_nonvirt<manage_object_action<T> >(*this);
-            hpx::serialization::base_object_type<
-              manage_object_action<boost::uint8_t>, manage_object_action_base> base(*this);
-            ar & base;
+            ar & hpx::serialization::base_object<manage_object_action_base>(*this);
         }
 
         HPX_SERIALIZATION_POLYMORPHIC(manage_object_action);
@@ -308,10 +303,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            //ar & util::base_object_nonvirt<manage_object_action<T> >(*this);
-            hpx::serialization::base_object_type<
-              manage_object_action<T, Config>, manage_object_action<T> > base(*this);
-            ar & base;
+            ar & hpx::serialization::base_object<manage_object_action<T> >(*this);
         }
 
         HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(manage_object_action);

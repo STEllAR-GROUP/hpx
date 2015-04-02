@@ -8,7 +8,6 @@
 #define HPX_SERIALIZATION_SERIALIZE_HPP
 
 #include <hpx/runtime/serialization/access.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 

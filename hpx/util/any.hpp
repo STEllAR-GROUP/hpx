@@ -326,9 +326,7 @@ namespace hpx { namespace util
             template <typename Archive>
             void serialize(Archive & ar, unsigned)
             {
-                hpx::serialization::base_object_type<fxn_ptr, base_type> base =
-                    hpx::serialization::base_object<base_type>(*this);
-                ar & base;
+                ar & hpx::serialization::base_object<base_type>(*this);
             }
             HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(fxn_ptr);
         };
