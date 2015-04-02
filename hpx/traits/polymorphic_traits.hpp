@@ -15,51 +15,51 @@
 
 namespace hpx { namespace traits {
 
-  namespace detail {
+    namespace is_intrusive_detail {
 
-    struct intrusive_helper
-    {
-      boost::uint64_t hpx_serialization_get_name() const;
-    };
+        struct helper
+        {
+            boost::uint64_t hpx_serialization_get_name() const;
+        };
+
+        template <class T>
+        struct helper_composed: T, helper {};
+
+        template <boost::uint64_t (helper::*) () const>
+        struct member_function_holder {};
+
+        template <class T, class Ambiguous =
+            member_function_holder<
+                &helper::hpx_serialization_get_name> >
+        struct impl: boost::mpl::true_ {};
+
+        template <class T>
+        struct impl<T,
+            member_function_holder<
+                &helper_composed<T>::hpx_serialization_get_name> >
+        : boost::mpl::false_ {};
+
+    } // namespace detail
+
+    template <class T, class Enable = void>
+    struct is_intrusive_polymorphic: boost::mpl::false_ {};
 
     template <class T>
-    struct intrusive_helper_composed: T, intrusive_helper {};
-
-    template <boost::uint64_t (intrusive_helper::*) () const>
-    struct member_function_holder {};
-
-    template <class T, class Ambiguous =
-      detail::member_function_holder<
-        &detail::intrusive_helper::hpx_serialization_get_name> >
-    struct is_intrusive_polymorphic_imp: boost::mpl::true_ {};
+    struct is_intrusive_polymorphic<T,
+        typename boost::enable_if<boost::is_class<T> >::type>:
+            is_intrusive_detail::impl<T> {};
 
     template <class T>
-    struct is_intrusive_polymorphic_imp<T, 
-      detail::member_function_holder<
-        &detail::intrusive_helper_composed<T>::hpx_serialization_get_name> >
-    : boost::mpl::false_ {};
-
-  } // namespace detail
-
-  template <class T, class Enable = void>
-  struct is_intrusive_polymorphic: boost::mpl::false_ {};
-
-  template <class T>
-  struct is_intrusive_polymorphic<T,
-    typename boost::enable_if<boost::is_class<T> >::type>:
-      detail::is_intrusive_polymorphic_imp<T> {};
-
-  template <class T>
-  struct is_nonintrusive_polymorphic:
-    boost::mpl::false_ {};
+    struct is_nonintrusive_polymorphic:
+        boost::mpl::false_ {};
 
 }}
 
 #define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class)                            \
   namespace hpx { namespace traits {                                          \
-    template <>                                                               \
-    struct is_nonintrusive_polymorphic<Class>:                                \
-      boost::mpl::true_ {};                                                   \
+      template <>                                                             \
+      struct is_nonintrusive_polymorphic<Class>:                              \
+          boost::mpl::true_ {};                                               \
   }}                                                                          \
 /**/
 

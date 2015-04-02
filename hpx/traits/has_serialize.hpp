@@ -34,7 +34,7 @@ namespace hpx { namespace traits {
    
         template <class T>
         struct impl<T, 
-          member_function_holder<&helper_composed<T>::serialize> >
+            member_function_holder<&helper_composed<T>::serialize> >
         : boost::mpl::false_ {};
    
     } // namespace detail
@@ -44,8 +44,8 @@ namespace hpx { namespace traits {
    
     template <class T>
     struct has_serialize<T,
-      typename boost::enable_if<boost::is_class<T> >::type>:
-        has_serialize_detail::impl<T> {};
+        typename boost::enable_if<boost::is_class<T> >::type>:
+            has_serialize_detail::impl<T> {};
 
 }}
 
