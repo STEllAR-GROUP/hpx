@@ -62,14 +62,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         return util::safe_bool<locality>()(ip_ != boost::uint32_t(0xFFFF));
       }
 
-      void save(util::portable_binary_oarchive & ar) const {
+      void save(serialization::output_archive & ar) const {
         // save the state
         FUNC_START_DEBUG_MSG;
         ar.save(ip_);
         FUNC_END_DEBUG_MSG;
       }
 
-      void load(util::portable_binary_iarchive & ar) {
+      void load(serialization::input_archive & ar) {
         // load the state
         FUNC_START_DEBUG_MSG;
         ar.load(ip_);
@@ -142,7 +142,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
       parcelport(util::runtime_configuration const& ini,
           util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
           util::function_nonser<void()> const& on_stop_thread) :
-            parcelset::parcelport(ini, here(ini), "verbs"), archive_flags_(boost::archive::no_header)
+            parcelset::parcelport(ini, here(ini), "verbs"), archive_flags_(0) // boost::archive::no_header)
       , stopped_(false)
 //      , parcels_sent_(0)
       {
@@ -154,20 +154,20 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
     #endif
         if (endian_out == "little")
-          archive_flags_ |= util::endian_little;
+          archive_flags_ |= serialization::endian_little;
         else if (endian_out == "big")
-          archive_flags_ |= util::endian_big;
+          archive_flags_ |= serialization::endian_big;
         else {
           HPX_ASSERT(endian_out == "little" || endian_out == "big");
         }
 
         if (!this->allow_array_optimizations()) {
-          archive_flags_ |= util::disable_array_optimization;
-          archive_flags_ |= util::disable_data_chunking;
+          archive_flags_ |= serialization::disable_array_optimization;
+          archive_flags_ |= serialization::disable_data_chunking;
           LOG_DEBUG_MSG("Disabling array optimization and data chunking");
         } else {
           if (!this->allow_zero_copy_optimizations()) {
-            archive_flags_ |= util::disable_data_chunking;
+            archive_flags_ |= serialization::disable_data_chunking;
             LOG_DEBUG_MSG("Disabling data chunking");
           }
         }
