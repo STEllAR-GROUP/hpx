@@ -5,8 +5,6 @@
 
 if(HPX_WITH_CXX11_LAMBDAS)
 
-  add_definitions(-DHPX_LIMIT=8)
-
   add_subdirectory(jacobi_component)
 
   set(jacobi_sources
