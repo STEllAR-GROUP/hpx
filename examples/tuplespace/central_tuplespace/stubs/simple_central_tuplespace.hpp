@@ -96,6 +96,112 @@ namespace examples { namespace stubs
             // The following get yields control while the action is executed.
             return take_async(gid, tp, timeout).get();
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        /// store tuple space into disk.
+        ///
+        /// \returns This function returns an \a hpx::lcos::future. When the
+        ///          value of this computation is needed, the get() method of
+        ///          the future should be called. If the value is available,
+        ///          get() will return immediately; otherwise, it will block
+        ///          until the value is ready.
+        //[simple_central_tuplespace_stubs_store_async
+        static hpx::lcos::future<int>
+        store_async(hpx::naming::id_type const& gid, const std::string& file_name)
+        {
+            typedef server::simple_central_tuplespace::store_action action_type;
+            return hpx::async<action_type>(gid, file_name);
+        }
+        //]
+
+        /// store tuple space into disk.
+        ///
+        /// \note This function is fully synchronous.
+        static int store_sync(hpx::naming::id_type const& gid
+                , const std::string& file_name)
+        {
+            // The following get yields control while the action is executed.
+            return store_async(gid, file_name).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        /// load tuple space from disk.
+        ///
+        /// \returns This function returns an \a hpx::lcos::future. When the
+        ///          value of this computation is needed, the get() method of
+        ///          the future should be called. If the value is available,
+        ///          get() will return immediately; otherwise, it will block
+        ///          until the value is ready.
+        //[simple_central_tuplespace_stubs_load_async
+        static hpx::lcos::future<int>
+        load_async(hpx::naming::id_type const& gid, const std::string& file_name)
+        {
+            typedef server::simple_central_tuplespace::load_action action_type;
+            return hpx::async<action_type>(gid, file_name);
+        }
+        //]
+
+        /// load tuple space from disk.
+        ///
+        /// \note This function is fully synchronous.
+        static int load_sync(hpx::naming::id_type const& gid
+                , const std::string& file_name)
+        {
+            // The following get yields control while the action is executed.
+            return load_async(gid, file_name).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        /// print tuple space contents.
+        ///
+        /// \returns This function returns an \a hpx::lcos::future. When the
+        ///          value of this computation is needed, the get() method of
+        ///          the future should be called. If the value is available,
+        ///          get() will return immediately; otherwise, it will block
+        ///          until the value is ready.
+        //[simple_central_tuplespace_stubs_print_async
+        static hpx::lcos::future<std::string>
+        print_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::simple_central_tuplespace::print_action action_type;
+            return hpx::async<action_type>(gid);
+        }
+        //]
+
+        /// print tuple space contents.
+        ///
+        /// \note This function is fully synchronous.
+        static std::string print_sync(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action is executed.
+            return print_async(gid).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        /// clear tuple space contents.
+        ///
+        /// \returns This function returns an \a hpx::lcos::future. When the
+        ///          value of this computation is needed, the get() method of
+        ///          the future should be called. If the value is available,
+        ///          get() will return immediately; otherwise, it will block
+        ///          until the value is ready.
+        //[simple_central_tuplespace_stubs_clear_async
+        static hpx::lcos::future<void>
+        clear_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::simple_central_tuplespace::clear_action action_type;
+            return hpx::async<action_type>(gid);
+        }
+        //]
+
+        /// clear tuple space contents.
+        ///
+        /// \note This function is fully synchronous.
+        static void clear_sync(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action is executed.
+            return clear_async(gid).get();
+        }
     };
 }}
 

@@ -39,9 +39,51 @@ void print_tuple(const tuple_type& tuple)
     hpx::cout<<")";
 }
 
+void simple_central_tuplespace_store_load_test(
+        const std::vector<tuple_type>& tuples) {
+    // Find the localities connected to this application.
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
+    const std::string tuplespace_symbol_name = "/tuplespace_load_store_test_" +
+        boost::lexical_cast<std::string>(hpx::get_locality_id());
+    examples::simple_central_tuplespace central_tuplespace;
 
-void simple_central_tuplespace_test(const std::string& tuplespace_symbol_name, const tuple_type tuple)
+    if(!central_tuplespace.create(tuplespace_symbol_name, localities.back()))
+    {
+        hpx::cerr << "locality " << hpx::get_locality_id() << ": "
+            << "FAIL to create " << tuplespace_symbol_name << hpx::endl;
+
+        return;
+    }
+
+   // insert tuples
+   for (std::vector<tuple_type>::const_iterator it = tuples.begin();
+           it != tuples.end(); ++it) {
+       central_tuplespace.write_sync(*it);
+   }
+
+   boost::posix_time::ptime now =
+       boost::posix_time::second_clock::local_time();
+   std::string file_name = std::string("TupleSpace") +
+       std::string("_") + boost::posix_time::to_iso_string(now);
+
+   central_tuplespace.store_sync(file_name);
+
+   hpx::cout<<"Original Tuple Space Content:\n"<<central_tuplespace.print()<<"\n";
+   central_tuplespace.clear_sync();
+
+   examples::simple_central_tuplespace copy_central_tuplespace;
+   copy_central_tuplespace.create(tuplespace_symbol_name + "_copy", localities.back());
+
+   copy_central_tuplespace.load_sync(file_name);
+
+   hpx::cout<<"Copy Tuple Space Content:\n"<<copy_central_tuplespace.print()<<"\n";
+}
+
+HPX_PLAIN_ACTION(simple_central_tuplespace_store_load_test, simple_central_tuplespace_store_load_test_action);
+
+void simple_central_tuplespace_test(
+    const std::string& tuplespace_symbol_name, const tuple_type tuple)
 {
    examples::simple_central_tuplespace central_tuplespace;
 
@@ -100,17 +142,7 @@ int hpx_main()
         // Find the localities connected to this application.
         std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-        const std::string tuplespace_symbol_name = "/tuplespace";
-        examples::simple_central_tuplespace central_tuplespace;
-
-        if(!central_tuplespace.create(tuplespace_symbol_name, localities.back()))
-        {
-            hpx::cerr << "locality " << hpx::get_locality_id() << ": " 
-                << "FAIL to create " << tuplespace_symbol_name << hpx::endl;
-
-            return hpx::finalize();
-        }
-
+        hpx::cout << "Total " << localities.size() << " localities." << hpx::endl;
 
         tuple_type tuple1;
         tuple1.push_back(std::string("first"))
@@ -122,7 +154,6 @@ int hpx_main()
         print_tuple(tuple1);
         hpx::cout<< hpx::endl;
 
-
         tuple_type tuple2;
         tuple2.push_back(std::string("second"))
             .push_back(std::string("string")) // first elem: string
@@ -133,20 +164,56 @@ int hpx_main()
         print_tuple(tuple2);
         hpx::cout<< hpx::endl;
 
-        std::vector<hpx::lcos::future<void> > futures;
-
-        BOOST_FOREACH(hpx::naming::id_type const& node, localities)
         {
-            // Asynchronously start a new task. The task is encapsulated in a
-            // future, which we can query to determine if the task has
-            // completed.
-            typedef simple_central_tuplespace_test_action action_type;
-            futures.push_back(hpx::async<action_type>
-                    (node, tuplespace_symbol_name, tuple1));
-            futures.push_back(hpx::async<action_type>
-                    (node, tuplespace_symbol_name, tuple2));
+            // store and load tests
+
+            std::vector<hpx::lcos::future<void> > futures;
+            std::vector<tuple_type> tuples;
+            tuples.push_back(tuple1);
+            tuples.push_back(tuple2);
+
+            BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+            {
+                // Asynchronously start a new task. The task is encapsulated in a
+                // future, which we can query to determine if the task has
+                // completed.
+                typedef simple_central_tuplespace_store_load_test_action action_type1;
+                futures.push_back(hpx::async<action_type1>
+                        (node, tuples));
+            }
+            hpx::wait_all(futures);
         }
-        hpx::wait_all(futures);
+
+        {
+            // basic operations test
+
+            std::vector<hpx::lcos::future<void> > futures;
+            int id = 0;
+            BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+            {
+                const std::string tuplespace_symbol_name = "/tuplespace_test_" +
+                    boost::lexical_cast<std::string>(id++);
+                examples::simple_central_tuplespace central_tuplespace;
+
+                if(!central_tuplespace.create(tuplespace_symbol_name, localities.back()))
+                {
+                    hpx::cerr << "locality " << hpx::get_locality_id() << ": "
+                        << "FAIL to create " << tuplespace_symbol_name << hpx::endl;
+
+                    return hpx::finalize();
+                }
+
+                // Asynchronously start a new task. The task is encapsulated in a
+                // future, which we can query to determine if the task has
+                // completed.
+                typedef simple_central_tuplespace_test_action action_type;
+                futures.push_back(hpx::async<action_type>
+                        (node, tuplespace_symbol_name, tuple1));
+                futures.push_back(hpx::async<action_type>
+                        (node, tuplespace_symbol_name, tuple2));
+            }
+            hpx::wait_all(futures);
+        }
     }
 
     // Initiate shutdown of the runtime systems on all localities.

@@ -14,6 +14,7 @@ foreach(component ${components})
     AUTOGLOB
     HEADER_GLOB "${component}.h*"
     SOURCE_GLOB "${component}.c*"
+    DEPENDENCIES iostreams_component
     FOLDER "Examples/TupleSpace/${component}")
 
 endforeach()
