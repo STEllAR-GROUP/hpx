@@ -8,9 +8,117 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <hpx/util/transform_iterator.hpp>
-#include <hpx/util/stencil3_iterator.hpp>
 
 #include <strstream>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace test
+{
+    template <typename Iterator>
+    BOOST_FORCEINLINE
+    Iterator previous(Iterator it)
+    {
+        return --it;
+    }
+
+    template <typename Iterator>
+    BOOST_FORCEINLINE
+    Iterator next(Iterator it)
+    {
+        return ++it;
+    }
+
+    namespace detail
+    {
+        struct stencil_transformer
+        {
+            template <typename T>
+            struct result;
+
+            template <typename This, typename Iterator>
+            struct result<This(Iterator)>
+            {
+                typedef typename std::iterator_traits<Iterator>::reference
+                    element_type;
+                typedef hpx::util::tuple<
+                        element_type, element_type, element_type
+                    > type;
+            };
+
+            // it will dereference tuple(it-1, it, it+1)
+            template <typename Iterator>
+            typename result<stencil_transformer(Iterator)>::type
+            operator()(Iterator const& it) const
+            {
+                typedef typename result<
+                        stencil_transformer(Iterator)
+                    >::type type;
+                return type(*test::previous(it), *it, *test::next(it));
+            }
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator,
+        typename Transformer = detail::stencil_transformer>
+    class stencil3_iterator
+      : public hpx::util::transform_iterator<Iterator, Transformer>
+    {
+    private:
+        typedef hpx::util::transform_iterator<Iterator, Transformer> base_type;
+
+    public:
+        stencil3_iterator() {}
+
+        explicit stencil3_iterator(Iterator const& it)
+          : base_type(it, Transformer())
+        {}
+
+        stencil3_iterator(Iterator const& it, Transformer const& t)
+          : base_type(it, t)
+        {}
+    };
+
+    template <typename Iterator, typename Transformer>
+    inline stencil3_iterator<Iterator, Transformer>
+    make_stencil3_iterator(Iterator const& it, Transformer const& t)
+    {
+        return stencil3_iterator<Iterator, Transformer>(it, t);
+    }
+
+    template <typename Iterator, typename Transformer>
+    inline std::pair<
+        stencil3_iterator<Iterator, Transformer>,
+        stencil3_iterator<Iterator, Transformer>
+    >
+    make_stencil3_range(Iterator const& begin, Iterator const& end,
+        Transformer const& t)
+    {
+        return std::make_pair(
+            make_stencil3_iterator(begin, t),
+            make_stencil3_iterator(end, t));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator>
+    inline stencil3_iterator<Iterator>
+    make_stencil3_iterator(Iterator const& it)
+    {
+        return stencil3_iterator<Iterator>(it);
+    }
+
+    template <typename Iterator>
+    inline std::pair<
+        stencil3_iterator<Iterator>,
+        stencil3_iterator<Iterator>
+    >
+    make_stencil3_range(Iterator const& begin, Iterator const& end)
+    {
+        return std::make_pair(
+            make_stencil3_iterator(begin),
+            make_stencil3_iterator(end));
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_stencil3_iterator()
@@ -18,7 +126,7 @@ void test_stencil3_iterator()
     std::vector<int> values(10);
     std::iota(std::begin(values), std::end(values), 0);
 
-    auto r = hpx::util::make_stencil3_range(values.begin()+1, values.end()-1);
+    auto r = test::make_stencil3_range(values.begin()+1, values.end()-1);
 
     typedef std::iterator_traits<decltype(r.first)>::reference reference;
 
@@ -65,8 +173,7 @@ namespace test
         operator()(Iterator const& it) const
         {
             typedef typename result<custom_stencil_transformer(Iterator)>::type type;
-            return type(f_(*hpx::util::detail::previous(it)), *it,
-                f_(*hpx::util::detail::next(it)));
+            return type(f_(*test::previous(it)), *it, f_(*test::next(it)));
         }
 
         F f_;
@@ -89,7 +196,7 @@ void test_stencil3_iterator_custom()
     std::iota(std::begin(values), std::end(values), 0);
 
     auto t = test::make_custom_stencil_transformer([](int i) { return 2*i; });
-    auto r = hpx::util::make_stencil3_range(values.begin()+1, values.end()-1, t);
+    auto r = test::make_stencil3_range(values.begin()+1, values.end()-1, t);
 
     typedef std::iterator_traits<decltype(r.first)>::reference reference;
 

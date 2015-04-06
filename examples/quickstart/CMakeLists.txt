@@ -67,7 +67,6 @@ if(HPX_WITH_CXX11_LAMBDAS)
       fibonacci_dataflow
       pipeline1
       vector_counting_dotproduct
-      vector_stencil_operations
       vector_zip_dotproduct
      )
 
@@ -78,8 +77,6 @@ if(HPX_WITH_CXX11_LAMBDAS)
     set(hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
   endif()
   set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
-  set(vector_stencil_operations_FLAGS
-      COMPONENT_DEPENDENCIES iostreams vector_component)
   set(vector_zip_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
 
