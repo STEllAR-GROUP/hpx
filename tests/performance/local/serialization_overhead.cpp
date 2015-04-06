@@ -101,7 +101,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        std::size_t arg_size = hpx::traits::get_type_size(outp);
+        std::size_t arg_size = hpx::traits::get_type_size(outp, out_archive_flags);
         std::vector<char> out_buffer;
 
         out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);

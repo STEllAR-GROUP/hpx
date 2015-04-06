@@ -548,9 +548,15 @@ namespace hpx { namespace traits
     template <typename T, typename Allocator>
     struct type_size<util::serialize_buffer<T, Allocator> >
     {
-        static std::size_t call(util::serialize_buffer<T, Allocator> const& b)
+        static std::size_t call(util::serialize_buffer<T, Allocator> const& b, int flags)
         {
-            return b.size() * sizeof(T) + sizeof(std::size_t) + sizeof(Allocator); //-V119
+            if (flags & hpx::util::disable_data_chunking) {
+                return b.size() * sizeof(T) + sizeof(std::size_t) + sizeof(Allocator); //-V119
+            }
+            else {
+                // size required to specify a new pointer chunk is coming (needs checking)
+                return 8;
+            }
         }
     };
 }}
