@@ -669,6 +669,9 @@ response symbol_namespace::statistics_counter(
         case symbol_ns_iterate_names:
             get_data_func = boost::bind(&cd::get_iterate_names_count, &counter_data_, ::_1);
             break;
+        case symbol_ns_on_event:
+            get_data_func = boost::bind(&cd::get_on_event_count, &counter_data_, ::_1);
+            break;
         case symbol_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
             break;
@@ -693,6 +696,9 @@ response symbol_namespace::statistics_counter(
             break;
         case symbol_ns_iterate_names:
             get_data_func = boost::bind(&cd::get_iterate_names_time, &counter_data_, ::_1);
+            break;
+        case symbol_ns_on_event:
+            get_data_func = boost::bind(&cd::get_on_event_time, &counter_data_, ::_1);
             break;
         case symbol_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);

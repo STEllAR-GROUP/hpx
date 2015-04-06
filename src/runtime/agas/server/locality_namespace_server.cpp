@@ -667,7 +667,7 @@ response locality_namespace::statistics_counter(
         case locality_ns_num_threads:
             get_data_func = boost::bind(&cd::get_num_threads_count, &counter_data_, ::_1);
             break;
-        case primary_ns_statistics_counter:
+        case locality_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
             break;
         default:
@@ -701,7 +701,7 @@ response locality_namespace::statistics_counter(
         case locality_ns_num_threads:
             get_data_func = boost::bind(&cd::get_num_threads_time, &counter_data_, ::_1);
             break;
-        case primary_ns_statistics_counter:
+        case locality_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);
             break;
         default:
