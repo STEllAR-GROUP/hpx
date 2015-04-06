@@ -5,9 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/components/remote_object/object.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
-#include <hpx/components/remote_object/distributed_new.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/include/iostreams.hpp>
 
@@ -27,7 +25,7 @@ namespace jacobi
             type = hpx::components::get_component_type<
                 server::row
             >();
- 
+
         hpx::components::distributing_factory::result_type rows_allocated =
             factory.create_components(type, ny);
 

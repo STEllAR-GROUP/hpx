@@ -15,7 +15,6 @@ set(tests
     inheritance_3_classes_concrete
     migrate_component
     migrate_component_to_storage
-    remote_object
     unordered_map
     vector_copy
     vector_for_each
@@ -41,12 +40,6 @@ set(get_ptr_PARAMETERS
     THREADS_PER_LOCALITY 2)
 
 set(migrate_component_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
-
-set(remote_object_FLAGS
-    DEPENDENCIES iostreams_component remote_object_component)
-set(remote_object_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
 
