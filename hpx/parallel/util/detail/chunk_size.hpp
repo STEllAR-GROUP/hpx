@@ -85,7 +85,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             desired_chunktime_ns = boost::chrono::nanoseconds(1000000);
         
         // make sure we have enough work left to actually run the benchmark
-        if(count < test_chunk_size + startup_size) return 0;
+        if(count < test_chunk_size * cores + startup_size) return 0;
         
         // add startup iteration(s), as in some cases the first iteration(s)
         // are slower. (cache effects and stuff)
@@ -96,8 +96,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             count -= startup_size;
         }
         
+        // run the benchmark iterations
         std::vector<Future> bench_futures(32);
-        // run the benchmark iteration
         boost::uint64_t t = hpx::util::high_resolution_clock::now();
         for(int i = 0; i < cores; i++){
             bench_futures[i] = std::move(hpx::async(f1, first, test_chunk_size));
