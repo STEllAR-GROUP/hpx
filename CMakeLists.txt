@@ -639,24 +639,126 @@ hpx_add_compile_flag(-DBOOST_DISABLE_ASSERTS
 
 # Make sure we compile in C++11 mode (MSVC uses it automatically)
 if(NOT MSVC)
-  #set(_cxx11_support FALSE)
-  # Try -std=c++11 first
-  check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
-  # ... If it failed try -std=c++0x
-  if(NOT HPX_WITH_CXX11)
-    check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
-    if(HPX_WITH_CXX0X)
-      set(CXX11_FLAG -std=c++0x)
-      set(HPX_WITH_CXX11 TRUE)
-    endif()
+  # Try -std=c++14 first
+  check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
+  if(HPX_WITH_CXX14)
+    set(CXX_FLAG -std=c++14)
   else()
-    set(CXX11_FLAG -std=c++11)
+    # ... otherwise try -std=c++0y
+    check_cxx_compiler_flag(-std=c++0y HPX_WITH_CXX0Y)
+    if(HPX_WITH_CXX0Y)
+      set(CXX_FLAG -std=c++0y)
+    else()
+      # ... otherwise try -std=c++11
+      check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
+      if(HPX_WITH_CXX11)
+        set(CXX_FLAG -std=c++11)
+      else()
+        # ... otherwise try -std=c++0x
+        check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
+        if(HPX_WITH_CXX0X)
+          set(CXX_FLAG -std=c++0x)
+        endif()
+      endif()
+    endif()
   endif()
-  if(NOT HPX_WITH_CXX11)
-    hpx_error("Unable to compile HPX without C++11 support in your compiler. HPX needs at the very least rvalue references with proper move semantics")
-  endif()
-  hpx_add_compile_flag(${CXX11_FLAG})
 
+  hpx_add_compile_flag(${CXX_FLAG})
+endif()
+
+################################################################################
+# C++ feature tests
+################################################################################
+
+# Check the availability of certain C++11 language features
+hpx_check_for_cxx11_alias_templates(
+  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
+
+hpx_check_for_cxx11_auto(
+  DEFINITIONS HPX_HAVE_CXX11_AUTO)
+
+hpx_check_for_cxx11_constexpr(
+  DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
+
+hpx_check_for_cxx11_decltype(
+  DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
+
+hpx_check_for_cxx11_defaulted_functions(
+  DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+
+hpx_check_for_cxx11_deleted_functions(
+  DEFINITIONS HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+
+hpx_check_for_cxx11_explicit_cvt_ops(
+  DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS)
+
+hpx_check_for_cxx11_function_template_default_args(
+  REQUIRED "HPX needs support for C++11 defaulted function template arguments")
+
+hpx_check_for_cxx11_inline_namespaces(
+  DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
+
+hpx_check_for_cxx11_lambdas(
+  DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
+
+hpx_check_for_cxx11_noexcept(
+  DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
+
+hpx_check_for_cxx11_nullptr(
+  DEFINITIONS HPX_HAVE_CXX11_NULLPTR)
+
+hpx_check_for_cxx11_range_based_for(
+  DEFINITIONS HPX_HAVE_CXX11_RANGE_BASED_FOR)
+
+hpx_check_for_cxx11_rvalue_references(
+  REQUIRED "HPX needs support for C++11 rvalue references")
+
+hpx_check_for_cxx11_scoped_enums(
+  DEFINITIONS HPX_HAVE_CXX11_SCOPED_ENUMS)
+
+hpx_check_for_cxx11_static_assert(
+  DEFINITIONS HPX_HAVE_CXX11_STATIC_ASSERT)
+
+hpx_check_for_cxx11_variadic_macros(
+  REQUIRED "HPX needs support for C++11 variadic macros")
+
+hpx_check_for_cxx11_variadic_templates(
+  REQUIRED "HPX needs support for C++11 variadic templates")
+
+# Check the availability of certain C++11 library features
+hpx_check_for_cxx11_std_chrono(
+  DEFINITIONS HPX_HAVE_CXX11_STD_CHRONO)
+
+hpx_check_for_cxx11_std_initializer_list(
+  DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
+
+hpx_check_for_cxx11_std_is_final(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_FINAL)
+
+hpx_check_for_cxx11_std_is_null_pointer(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_NULL_POINTER)
+
+hpx_check_for_cxx11_std_unique_ptr(
+  REQUIRED "HPX needs support for C++11 std::unique_ptr")
+
+hpx_check_for_cxx11_std_type_traits(
+  DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
+
+# Check the availability of certain C++14 language features
+hpx_check_for_cxx14_constexpr(
+  DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
+
+hpx_check_for_cxx14_lambdas(
+  DEFINITIONS HPX_HAVE_CXX14_LAMBDAS)
+
+# Check the availability of certain C++14 library features
+hpx_check_for_cxx14_std_integer_sequence(
+  DEFINITIONS HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
+
+hpx_check_for_cxx14_std_result_of_sfinae(
+  DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
+
+if(NOT MSVC)
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
@@ -904,101 +1006,6 @@ else()
     hpx_warn("Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
   endif()
 endif()
-
-##############################################################################
-
-##############################################################################
-# Check the availability of certain C++11 language features
-
-hpx_check_for_cxx11_alias_templates(
-  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
-
-hpx_check_for_cxx11_auto(
-  DEFINITIONS HPX_HAVE_CXX11_AUTO)
-
-hpx_check_for_cxx11_constexpr(
-  DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
-
-hpx_check_for_cxx11_decltype(
-  DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
-
-hpx_check_for_cxx11_defaulted_functions(
-  DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
-
-hpx_check_for_cxx11_deleted_functions(
-  DEFINITIONS HPX_HAVE_CXX11_DELETED_FUNCTIONS)
-
-hpx_check_for_cxx11_explicit_cvt_ops(
-  DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS)
-
-hpx_check_for_cxx11_function_template_default_args(
-  REQUIRED "HPX needs support for C++11 defaulted function template arguments")
-
-hpx_check_for_cxx11_inline_namespaces(
-  DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
-
-hpx_check_for_cxx11_lambdas(
-  DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
-
-hpx_check_for_cxx11_noexcept(
-  DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
-
-hpx_check_for_cxx11_nullptr(
-  DEFINITIONS HPX_HAVE_CXX11_NULLPTR)
-
-hpx_check_for_cxx11_range_based_for(
-  DEFINITIONS HPX_HAVE_CXX11_RANGE_BASED_FOR)
-
-hpx_check_for_cxx11_rvalue_references(
-  REQUIRED "HPX needs support for C++11 rvalue references")
-
-hpx_check_for_cxx11_scoped_enums(
-  DEFINITIONS HPX_HAVE_CXX11_SCOPED_ENUMS)
-
-hpx_check_for_cxx11_static_assert(
-  DEFINITIONS HPX_HAVE_CXX11_STATIC_ASSERT)
-
-hpx_check_for_cxx11_variadic_macros(
-  REQUIRED "HPX needs support for C++11 variadic macros")
-
-hpx_check_for_cxx11_variadic_templates(
-  REQUIRED "HPX needs support for C++11 variadic templates")
-
-# Check the availability of certain C++11 library features
-
-hpx_check_for_cxx11_std_chrono(
-  DEFINITIONS HPX_HAVE_CXX11_STD_CHRONO)
-
-hpx_check_for_cxx11_std_initializer_list(
-  DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
-
-hpx_check_for_cxx11_std_is_final(
-  DEFINITIONS HPX_HAVE_CXX11_STD_IS_FINAL)
-
-hpx_check_for_cxx11_std_is_null_pointer(
-  DEFINITIONS HPX_HAVE_CXX11_STD_IS_NULL_POINTER)
-
-hpx_check_for_cxx11_std_unique_ptr(
-  REQUIRED "HPX needs support for C++11 std::unique_ptr")
-
-hpx_check_for_cxx11_std_type_traits(
-  DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
-
-# Check the availability of certain C++14 language features
-
-hpx_check_for_cxx14_constexpr(
-  DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
-
-hpx_check_for_cxx14_lambdas(
-  DEFINITIONS HPX_HAVE_CXX14_LAMBDAS)
-
-# Check the availability of certain C++14 library features
-
-hpx_check_for_cxx14_std_integer_sequence(
-  DEFINITIONS HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
-
-hpx_check_for_cxx14_std_result_of_sfinae(
-  DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
 
 ##############################################################################
 
