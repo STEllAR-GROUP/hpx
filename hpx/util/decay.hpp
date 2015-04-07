@@ -57,6 +57,24 @@ namespace hpx { namespace util
     struct decay_unwrap
       : detail::decay_unwrap_impl<typename decay<T>::type>
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct decay_if_lvalue
+    {
+        typedef T type;
+    };
+
+    template <typename T>
+    struct decay_if_lvalue<T const&>
+    {
+        typedef T const& type;
+    };
+
+    template <typename T>
+    struct decay_if_lvalue<T&>
+      : util::decay<T>
+    {};
 }}
 
 #endif

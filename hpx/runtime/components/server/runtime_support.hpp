@@ -46,25 +46,6 @@
 
 namespace hpx { namespace components { namespace server
 {
-    namespace detail
-    {
-        template <typename T>
-        struct decay_if_lvalue
-        {
-            typedef T type;
-        };
-
-        template <typename T>
-        struct decay_if_lvalue<T const&>
-        {
-            typedef T const& type;
-        };
-
-        template <typename T>
-        struct decay_if_lvalue<T&> : util::decay<T>
-        {};
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     class runtime_support
     {
@@ -871,12 +852,12 @@ namespace hpx { namespace components { namespace server
     struct create_component_action
       : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(
-                typename detail::decay_if_lvalue<Ts>::type...)
+                typename util::decay_if_lvalue<Ts>::type...)
           , &runtime_support::create_component<
-                Component, typename detail::decay_if_lvalue<Ts>::type...
+                Component, typename util::decay_if_lvalue<Ts>::type...
             >
           , create_component_action<
-                Component, typename detail::decay_if_lvalue<Ts>::type...
+                Component, typename util::decay_if_lvalue<Ts>::type...
             >
         >
     {};
@@ -893,12 +874,12 @@ namespace hpx { namespace components { namespace server
     struct create_component_direct_action
       : ::hpx::actions::direct_action<
             naming::gid_type (runtime_support::*)(
-                typename detail::decay_if_lvalue<Ts>::type...)
+                typename util::decay_if_lvalue<Ts>::type...)
           , &runtime_support::create_component<
-                Component, typename detail::decay_if_lvalue<Ts>::type...
+                Component, typename util::decay_if_lvalue<Ts>::type...
             >
           , create_component_direct_action<
-                Component, typename detail::decay_if_lvalue<Ts>::type...
+                Component, typename util::decay_if_lvalue<Ts>::type...
             >
         >
     {};
