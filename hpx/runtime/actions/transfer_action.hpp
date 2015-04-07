@@ -253,9 +253,10 @@ namespace hpx { namespace actions
         }
 
         /// Return the size of action arguments in bytes
-        std::size_t get_type_size() const
+        /// flags should contain serialization options which affect the space required
+        std::size_t get_type_size(int flags) const
         {
-            return traits::type_size<arguments_type>::call(arguments_);
+            return traits::type_size<arguments_type>::call(arguments_, flags);
         }
 
         /// Return whether the embedded action may require id-splitting

@@ -100,7 +100,7 @@ namespace hpx { namespace parcelset
             virtual naming::gid_type get_parcel_id() const = 0;
             virtual void set_parcel_id(naming::gid_type const& id) = 0;
 
-            virtual std::size_t get_type_size() const = 0;
+            virtual std::size_t get_type_size(int flags) const = 0;
 
             virtual bool may_require_id_splitting() const = 0;
 
@@ -322,9 +322,9 @@ namespace hpx { namespace parcelset
                 data_.parcel_id_ = id;
             }
 
-            std::size_t get_type_size() const
+            std::size_t get_type_size(int flags) const
             {
-                return sizeof(parcel_buffer) + this->get_action()->get_type_size();
+                return sizeof(parcel_buffer) + this->get_action()->get_type_size(flags);
             }
 
             bool may_require_id_splitting() const
@@ -509,12 +509,12 @@ namespace hpx { namespace parcelset
                 data_.parcel_id_ = id;
             }
 
-            std::size_t get_type_size() const
+            std::size_t get_type_size(int flags) const
             {
                 return sizeof(parcel_buffer) +
-                    traits::type_size<std::vector<naming::id_type> >::call(dests_) +
-                    traits::type_size<std::vector<naming::address> >::call(addrs_) +
-                    this->get_action()->get_type_size();      // action
+                    traits::type_size<std::vector<naming::id_type> >::call(dests_, flags) +
+                    traits::type_size<std::vector<naming::address> >::call(addrs_, flags) +
+                    this->get_action()->get_type_size(flags);      // action
             }
 
             void save(util::portable_binary_oarchive& ar) const;
@@ -717,9 +717,9 @@ namespace hpx { namespace parcelset
             return data_->get_message_handler(ph, loc, *this);
         }
 
-        std::size_t get_type_size() const
+        std::size_t get_type_size(int flags) const
         {
-            return data_->get_type_size();
+            return data_->get_type_size(flags);
         }
 
         bool may_require_id_splitting() const
@@ -766,9 +766,9 @@ namespace hpx { namespace traits
     template <>
     struct type_size<hpx::parcelset::parcel>
     {
-        static std::size_t call(hpx::parcelset::parcel const& p)
+        static std::size_t call(hpx::parcelset::parcel const& p, int flags)
         {
-            return sizeof(hpx::parcelset::parcel) + p.get_type_size();
+            return sizeof(hpx::parcelset::parcel) + p.get_type_size(flags);
         }
     };
 

@@ -77,7 +77,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     int in_archive_flags, int out_archive_flags, bool zero_copy)
 {
     // serialize data
-    std::size_t arg_size = hpx::traits::get_type_size(outp);
+    std::size_t arg_size = hpx::traits::get_type_size(outp, out_archive_flags);
     std::vector<char> out_buffer;
     std::vector<hpx::util::serialization_chunk> out_chunks;
     boost::uint32_t dest_locality_id = outp.get_destination_locality_id();
