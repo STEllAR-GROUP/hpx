@@ -1,15 +1,25 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2009 Andrey Semashev
 //  Copyright (c) 2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-void check_f(int&) {}
+#include <functional>
+#include <type_traits>
+
+struct callable
+{
+    int operator()(){ return 0; }
+};
+
+template <typename T>
+void test_result_of_sfinae(T&&, ...) {}
+
+template <typename T>
+void test_result_of_sfinae(T&&, typename std::result_of<T(int)>::type) {}
 
 int main()
 {
-    auto x = 10;
-    check_f(x);
+    test_result_of_sfinae(callable(), 0);
 }

@@ -1,12 +1,23 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2007 Douglas Gregor
-//  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename... Elements>
-struct tuple {};
+#include <type_traits>
 
-int main() {}
+struct callable
+{
+    int operator()(){ return 0; }
+};
+
+int main()
+{
+    using namespace std;
+
+    int x = 0;
+    add_const<int>::type* rc = &x;
+    decay<int const&>::type* d = &x;
+    result_of<callable()>::type* ro = &x;
+}
