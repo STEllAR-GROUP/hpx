@@ -4,37 +4,37 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_VECTOR_DISTRIBUTION_POLICY_HPP
-#define HPX_VECTOR_DISTRIBUTION_POLICY_HPP
+#if !defined(HPX_TRAITS_IS_DISTRIBUTION_POLICY_APR_07_2015_0412PM)
+#define HPX_TRAITS_IS_DISTRIBUTION_POLICY_APR_07_2015_0412PM
 
 #include <hpx/include/util.hpp>
-#include <hpx/components/containers/distribution_policy.hpp>
+#include <hpx/runtime/components/distribution_policy.hpp>
 
 #include <type_traits>
 
-namespace hpx
+namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         /// \cond NOINTERNAL
         template <typename T>
-        struct is_vector_distribution_policy
+        struct is_distribution_policy
           : std::false_type
         {};
 
         template <>
-        struct is_vector_distribution_policy<distribution_policy>
+        struct is_distribution_policy<components::distribution_policy>
           : std::true_type
         {};
         // \endcond
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct is_vector_distribution_policy
-      : detail::is_vector_distribution_policy<typename hpx::util::decay<T>::type>
+    template <typename T, typename Enable>
+    struct is_distribution_policy
+      : detail::is_distribution_policy<typename hpx::util::decay<T>::type>
     {};
-}
+}}
 
 #endif

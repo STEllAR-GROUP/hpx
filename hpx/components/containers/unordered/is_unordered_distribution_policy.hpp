@@ -7,7 +7,7 @@
 #define HPX_UNORDERED_DISTRIBUTION_POLICY_HPP
 
 #include <hpx/include/util.hpp>
-#include <hpx/components/containers/distribution_policy.hpp>
+#include <hpx/components/containers/container_distribution_policy.hpp>
 
 #include <type_traits>
 
@@ -23,7 +23,7 @@ namespace hpx
         {};
 
         template <>
-        struct is_unordered_distribution_policy<distribution_policy>
+        struct is_unordered_distribution_policy<container_distribution_policy>
           : std::true_type
         {};
         // \endcond

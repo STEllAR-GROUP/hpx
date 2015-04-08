@@ -39,6 +39,7 @@
 #include <hpx/runtime/components/server/migration_support.hpp>
 
 #include <hpx/runtime/components/new.hpp>
+#include <hpx/runtime/components/new_colocated.hpp>
 #include <hpx/runtime/components/copy_component.hpp>
 #include <hpx/runtime/components/migrate_component.hpp>
 

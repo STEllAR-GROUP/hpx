@@ -219,9 +219,12 @@ parallel::uninitialized_fill            "uninitialized_fill" "hpx\.parallel\.v1\
 parallel::uninitialized_fill_n          "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
 
 
+# hpx/runtime/components/distribution_policy.hpp
+distribution_policy                   "" "hpx\.components\.distribution_policy.*"
+
 # hpx/runtime/components/new.hpp
-new_                                  "" "hpx\.components\.new_.*"
-new_colocated                         "" "hpx\.components\.new_colocated.*"
+new_                                  "" "hpx\.new_id.*"
+new_colocated                         "" "hpx\.new_colocated.*"
 
 # hpx/runtime/components/copy_component.hpp
 copy                                  "" "hpx\.components\.copy.*"
