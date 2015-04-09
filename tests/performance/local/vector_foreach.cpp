@@ -11,12 +11,13 @@
 #include <hpx/include/vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 
+#include <boost/cstdint.hpp>
+#include <boost/format.hpp>
+#include <boost/range/functions.hpp>
+
 #include "worker_timed.hpp"
 
 #include <stdexcept>
-
-#include <boost/format.hpp>
-#include <boost/cstdint.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.

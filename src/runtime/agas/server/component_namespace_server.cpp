@@ -14,8 +14,6 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
-#include <boost/foreach.hpp>
-
 // TODO: Remove the use of the name "prefix"
 
 namespace hpx { namespace agas
@@ -285,7 +283,7 @@ std::vector<response> component_namespace::bulk_service(
     std::vector<response> r;
     r.reserve(reqs.size());
 
-    BOOST_FOREACH(request const& req, reqs)
+    for (request const& req : reqs)
     {
         error_code ign;
         r.push_back(service(req, ign));

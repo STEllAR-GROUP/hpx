@@ -17,7 +17,6 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/serialization/version.hpp>
@@ -904,7 +903,7 @@ namespace hpx { namespace traits
         {
             std::vector<naming::id_type> result;
             result.reserve(rhs.size());
-            BOOST_FOREACH(naming::gid_type const& r, rhs)
+            for (naming::gid_type const& r : rhs)
             {
                 bool has_credits = naming::detail::has_credits(r);
                 result.push_back(naming::id_type(r,

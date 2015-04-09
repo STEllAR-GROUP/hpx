@@ -9,7 +9,6 @@
 #include <hpx/util/serialize_buffer.hpp>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::util::serialize_buffer<char> buffer_plain_type;
@@ -58,7 +57,7 @@ void test(hpx::id_type dest, char* send_buffer, std::size_t size)
     }
     hpx::wait_all(recv_buffers);
 
-    BOOST_FOREACH(hpx::future<buffer_type>& f, recv_buffers)
+    for (hpx::future<buffer_type>& f : recv_buffers)
     {
         buffer_type b = f.get();
         HPX_TEST_EQ(b.size(), size);
@@ -84,7 +83,7 @@ void test_stateful_allocator(hpx::id_type dest, char* send_buffer,
     }
     hpx::wait_all(recv_buffers);
 
-    BOOST_FOREACH(hpx::future<buffer_type>& f, recv_buffers)
+    for (hpx::future<buffer_type>& f : recv_buffers)
     {
         buffer_type b = f.get();
         HPX_TEST_EQ(b.size(), size);
@@ -98,7 +97,7 @@ int hpx_main(int argc, char* argv[])
     std::size_t const max_size = 1 << 22;
     std::unique_ptr<char[]> send_buffer(new char[max_size]);
 
-    BOOST_FOREACH(hpx::id_type loc, hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         for (std::size_t size = 1; size <= max_size; size *= 2)
         {

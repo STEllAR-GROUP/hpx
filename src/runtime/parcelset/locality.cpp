@@ -9,8 +9,6 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 
-#include <boost/foreach.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
@@ -37,7 +35,7 @@ namespace hpx { namespace parcelset
     {
         boost::io::ios_flags_saver ifs(os);
         os << "[ ";
-        BOOST_FOREACH(endpoints_type::value_type const & loc, endpoints)
+        for (endpoints_type::value_type const& loc : endpoints)
         {
             os << "(" << loc.first << ":" << loc.second << ") ";
         }

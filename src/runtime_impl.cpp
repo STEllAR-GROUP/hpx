@@ -8,7 +8,6 @@
 #include <boost/config.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
-#include <boost/foreach.hpp>
 
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
@@ -174,25 +173,25 @@ namespace hpx {
 #endif
 
         // copy over all startup functions registered so far
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_pre_startup_functions)
+        for (util::function_nonser<void()> const& f : global_pre_startup_functions)
         {
             add_pre_startup_function(f);
         }
         global_pre_startup_functions.clear();
 
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_startup_functions)
+        for (util::function_nonser<void()> const& f : global_startup_functions)
         {
             add_startup_function(f);
         }
         global_startup_functions.clear();
 
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_pre_shutdown_functions)
+        for (util::function_nonser<void()> const& f : global_pre_shutdown_functions)
         {
             add_pre_shutdown_function(f);
         }
         global_pre_shutdown_functions.clear();
 
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_shutdown_functions)
+        for (util::function_nonser<void()> const& f : global_shutdown_functions)
         {
             add_shutdown_function(f);
         }

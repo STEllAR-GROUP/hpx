@@ -118,7 +118,7 @@ namespace hpx { namespace util
             {
                 HPX_ASSERT(data_.get() <= current_);
                 HPX_ASSERT(current_ <= data_.get() + chunk_size_);
-                BOOST_FOREACH(free_list_type::value_type const & v, free_list_)
+                for (free_list_type::value_type const & v : free_list_)
                 {
                     HPX_ASSERT(v.first <= chunk_size_);
                     HPX_ASSERT(v.second != current_);

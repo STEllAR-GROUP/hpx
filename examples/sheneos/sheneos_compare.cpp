@@ -386,7 +386,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
         std::vector<hpx::lcos::future<void> > tests;
-        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
+        for (hpx::naming::id_type const& id : locality_ids)
         {
             using hpx::async;
             for (std::size_t i = 0; i < num_workers; ++i)
@@ -408,7 +408,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
         std::vector<hpx::lcos::future<void> > bulk_one_tests;
-        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
+        for (hpx::naming::id_type const& id : locality_ids)
         {
             using hpx::async;
             for (std::size_t i = 0; i < num_workers; ++i)
@@ -431,7 +431,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
         std::vector<hpx::lcos::future<void> > bulk_tests;
-        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
+        for (hpx::naming::id_type const& id : locality_ids)
         {
             using hpx::async;
             for (std::size_t i = 0; i < num_workers; ++i)

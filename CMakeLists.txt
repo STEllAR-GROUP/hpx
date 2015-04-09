@@ -708,7 +708,7 @@ hpx_check_for_cxx11_nullptr(
   DEFINITIONS HPX_HAVE_CXX11_NULLPTR)
 
 hpx_check_for_cxx11_range_based_for(
-  DEFINITIONS HPX_HAVE_CXX11_RANGE_BASED_FOR)
+  REQUIRED "HPX needs support for C++11 range-based for-loop")
 
 hpx_check_for_cxx11_rvalue_references(
   REQUIRED "HPX needs support for C++11 rvalue references")

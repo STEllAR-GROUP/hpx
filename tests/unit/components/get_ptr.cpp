@@ -82,7 +82,7 @@ int main()
 
 
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         HPX_TEST(!hpx::expect_exception());
 

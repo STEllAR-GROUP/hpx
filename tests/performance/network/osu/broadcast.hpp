@@ -59,7 +59,7 @@ namespace hpx { namespace lcos
             {
                 std::vector<hpx::id_type> bcast_ids;
                 bcast_ids.reserve(ids.size()-1);
-                BOOST_FOREACH(hpx::id_type const & id, ids)
+                for (hpx::id_type const& id : ids)
                 {
                     if(id == this_id) continue;
                     bcast_ids.push_back(id);

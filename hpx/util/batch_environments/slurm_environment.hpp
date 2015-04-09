@@ -201,14 +201,14 @@ namespace hpx { namespace util { namespace batch_environments {
 
                 std::vector<std::string> tmp_nodes;
 
-                BOOST_FOREACH(value_type const & value, p)
+                for (value_type const& value : p)
                 {
                     std::string const & prefix = boost::fusion::at_c<0>(value);
                     optional_type const & ranges = boost::fusion::at_c<1>(value);
                     bool push_now = tmp_nodes.empty();
                     if(ranges)
                     {
-                        BOOST_FOREACH(vector_type const & range, *ranges)
+                        for (vector_type const& range : *ranges)
                         {
                             if(range.size() == 1)
                             {
@@ -220,7 +220,7 @@ namespace hpx { namespace util { namespace batch_environments {
                                 }
                                 else
                                 {
-                                    BOOST_FOREACH(std::string & node, tmp_nodes)
+                                    for (std::string& node : tmp_nodes)
                                     {
                                         node += s;
                                     }
@@ -256,9 +256,9 @@ namespace hpx { namespace util { namespace batch_environments {
                                 {
                                     std::vector<std::string> tmp;
                                     std::swap(tmp, tmp_nodes);
-                                    BOOST_FOREACH(std::string s, tmp)
+                                    for (std::string s : tmp)
                                     {
-                                        BOOST_FOREACH(std::string const & s2, vs)
+                                        for (std::string const& s2 : vs)
                                         {
                                             s += s2;
                                             tmp_nodes.push_back(s);
@@ -276,7 +276,7 @@ namespace hpx { namespace util { namespace batch_environments {
                         }
                         else
                         {
-                            BOOST_FOREACH(std::string & node, tmp_nodes)
+                            for (std::string& node : tmp_nodes)
                             {
                                 node += prefix;
                             }

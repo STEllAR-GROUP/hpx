@@ -10,10 +10,11 @@
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
-#include <stdexcept>
-
-#include <boost/format.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/format.hpp>
+#include <boost/range/functions.hpp>
+
+#include <stdexcept>
 
 ///////////////////////////////////////////////////////////////////////////////
 int delay = 1000;

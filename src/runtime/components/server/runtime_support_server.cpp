@@ -46,7 +46,6 @@
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/path.hpp>
@@ -478,7 +477,7 @@ namespace hpx { namespace components { namespace server
 
 #if defined(HPX_DEBUG)
             bool found = false;
-            BOOST_FOREACH(naming::address const & a, freed_components)
+            for (naming::address const& a : freed_components)
             {
                 if(a == addr)
                 {
@@ -853,7 +852,7 @@ namespace hpx { namespace components { namespace server
         boost::uint32_t locality_id = get_locality_id();
         std::vector<lcos::future<void> > lazy_actions;
 
-        BOOST_FOREACH(naming::id_type id, locality_ids)
+        for (naming::id_type const& id : locality_ids)
         {
             if (locality_id != naming::get_locality_id_from_id(id))
             {
@@ -890,7 +889,7 @@ namespace hpx { namespace components { namespace server
             boost::uint32_t locality_id = get_locality_id();
             std::vector<lcos::future<void> > lazy_actions;
 
-            BOOST_FOREACH(naming::gid_type gid, locality_ids)
+            for (naming::gid_type gid : locality_ids)
             {
                 if (locality_id != naming::get_locality_id_from_gid(gid))
                 {
@@ -1167,14 +1166,14 @@ namespace hpx { namespace components { namespace server
     {
         if (pre_startup) {
             get_runtime().set_state(runtime::state_pre_startup);
-            BOOST_FOREACH(util::function_nonser<void()> const& f, pre_startup_functions_)
+            for (util::function_nonser<void()> const& f : pre_startup_functions_)
             {
                 f();
             }
         }
         else {
             get_runtime().set_state(runtime::state_startup);
-            BOOST_FOREACH(util::function_nonser<void()> const& f, startup_functions_)
+            for (util::function_nonser<void()> const& f : startup_functions_)
             {
                 f();
             }
@@ -1186,7 +1185,7 @@ namespace hpx { namespace components { namespace server
         runtime& rt = get_runtime();
         if (pre_shutdown) {
             rt.set_state(runtime::state_pre_shutdown);
-            BOOST_FOREACH(util::function_nonser<void()> const& f, pre_shutdown_functions_)
+            for (util::function_nonser<void()> const& f : pre_shutdown_functions_)
             {
                 try {
                     f();
@@ -1198,7 +1197,7 @@ namespace hpx { namespace components { namespace server
         }
         else {
             rt.set_state(runtime::state_shutdown);
-            BOOST_FOREACH(util::function_nonser<void()> const& f, shutdown_functions_)
+            for (util::function_nonser<void()> const& f : shutdown_functions_)
             {
                 try {
                     f();
@@ -1235,7 +1234,7 @@ namespace hpx { namespace components { namespace server
 
         typedef server::runtime_support::remove_from_connection_cache_action action_type;
         action_type act;
-        BOOST_FOREACH(naming::id_type const& id, locality_ids)
+        for (naming::id_type const& id : locality_ids)
         {
             apply(act, id, rt->endpoints());
         }

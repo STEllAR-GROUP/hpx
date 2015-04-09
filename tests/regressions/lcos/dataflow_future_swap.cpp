@@ -13,7 +13,6 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/thread/thread.hpp>
 
 #include <iostream>

@@ -8,8 +8,6 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/foreach.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 bool on_shutdown_executed = false;
 boost::uint32_t locality_id = boost::uint32_t(-1);
@@ -38,7 +36,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::string expected;
 
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    BOOST_FOREACH(hpx::id_type l, localities)
+    for (hpx::id_type const& l : localities)
     {
         futures.push_back(hpx::async(worker_action(), l));
         expected += "hello!\n";

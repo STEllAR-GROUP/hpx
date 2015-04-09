@@ -9,7 +9,6 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/config/compiler_specific.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/assign/std/vector.hpp>
 
 #include <tests/regressions/actions/components/action_move_semantics.hpp>
@@ -77,7 +76,7 @@ void test_actions()
     using hpx::test::server::action_move_semantics;
 
     std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
-    BOOST_FOREACH(hpx::naming::id_type id, localities)
+    for (hpx::naming::id_type const& id : localities)
     {
         bool is_local = id == hpx::find_here();
 
@@ -180,7 +179,7 @@ void test_direct_actions()
     using hpx::test::server::action_move_semantics;
 
     std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
-    BOOST_FOREACH(hpx::naming::id_type id, localities)
+    for (hpx::naming::id_type const& id : localities)
     {
         bool is_local = id == hpx::find_here();
 

@@ -32,7 +32,7 @@ namespace jacobi
         rows.reserve(ny);
         std::vector<hpx::lcos::future<void> > init_futures;
         init_futures.reserve(ny);
-        BOOST_FOREACH(hpx::naming::id_type id, hpx::util::locality_results(rows_allocated))
+        for (hpx::naming::id_type const& id : hpx::util::locality_results(rows_allocated))
         {
             row r; r.id = id;
             init_futures.push_back(r.init(nx, value));

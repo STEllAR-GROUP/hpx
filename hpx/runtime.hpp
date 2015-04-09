@@ -26,7 +26,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
 #include <memory>
@@ -124,7 +123,7 @@ namespace hpx
             typedef util::function_nonser<void()> value_type;
 
             boost::mutex::scoped_lock l(mtx_);
-            BOOST_FOREACH(value_type f, on_exit_functions_)
+            for (value_type const& f : on_exit_functions_)
                 f();
         }
 

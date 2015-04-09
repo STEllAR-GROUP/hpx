@@ -51,7 +51,7 @@ boost::atomic<boost::uint32_t> int_f_vector_count;
 int int_f_vector(std::vector<int> const & vf)
 {
     int sum = 0;
-    BOOST_FOREACH(int f, vf)
+    for (int f : vf)
     {
         sum += f;
     }
@@ -143,7 +143,7 @@ boost::atomic<boost::uint32_t> future_int_f_vector_count;
 int future_int_f_vector(std::vector<future<int> >& vf)
 {
     int sum = 0;
-    BOOST_FOREACH(future<int>& f, vf)
+    for (future<int>& f : vf)
     {
         HPX_TEST(f.is_ready());
         sum += f.get();

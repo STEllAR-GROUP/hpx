@@ -22,7 +22,6 @@
 #endif
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/atomic.hpp>
 
 #include <stdexcept>
@@ -102,7 +101,7 @@ namespace hpx { namespace detail
         std::sort(env.begin(), env.end());
 
         std::string retval = boost::str(boost::format("%d entries:\n") % env.size());
-        BOOST_FOREACH(std::string const& s, env)
+        for (std::string const& s : env)
         {
             retval += "  " + s + "\n";
         }

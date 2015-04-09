@@ -46,7 +46,7 @@ namespace hpx
             chunks.reserve(buffer.chunks_.size());
 
             std::size_t index = 0;
-            BOOST_FOREACH(util::serialization_chunk& c, buffer.chunks_)
+            for (util::serialization_chunk& c : buffer.chunks_)
             {
                 if (c.type_ == util::chunk_type_pointer)
                     chunks.push_back(transmission_chunk_type(index, c.size_));
@@ -60,7 +60,7 @@ namespace hpx
 
             if (!chunks.empty()) {
                 // the remaining number of chunks are non-zero-copy
-                BOOST_FOREACH(util::serialization_chunk& c, buffer.chunks_)
+                for (util::serialization_chunk& c : buffer.chunks_)
                 {
                     if (c.type_ == util::chunk_type_index) {
                         chunks.push_back(
