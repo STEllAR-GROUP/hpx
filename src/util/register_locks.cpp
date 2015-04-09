@@ -205,7 +205,7 @@ namespace hpx { namespace util
             if (!held_locks.empty())
             {
                 if (detail::some_locks_are_not_ignored(held_locks))
-
+                {
                     // temporarily cleaning held locks to avoid endless recursions
                     // when acquiring the back-trace
                     detail::reset_on_exit e(enabled, false);
