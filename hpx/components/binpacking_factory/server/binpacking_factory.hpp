@@ -12,6 +12,8 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/locality_result.hpp>
 
+#include <boost/range/iterator_range.hpp>
+
 #include <vector>
 #include <algorithm>
 
@@ -31,9 +33,8 @@ namespace hpx { namespace components { namespace server
         typedef std::vector<util::locality_result> result_type;
 
         typedef util::locality_result_iterator iterator_type;
-        typedef
-            std::pair<util::locality_result_iterator, util::locality_result_iterator>
-        iterator_range_type;
+        typedef boost::iterator_range<util::locality_result_iterator>
+            iterator_range_type;
 
         /// \brief Action to create new components
         remote_result_type create_components(components::component_type type,

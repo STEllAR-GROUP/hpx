@@ -18,6 +18,7 @@
 
 #include <boost/make_shared.hpp>
 #include <boost/iterator_adaptors.hpp>
+#include <boost/range/iterator_range.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -159,7 +160,7 @@ namespace hpx { namespace util
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT std::pair<locality_result_iterator, locality_result_iterator>
+    HPX_EXPORT boost::iterator_range<locality_result_iterator>
         locality_results(std::vector<util::locality_result> const& v);
 }}
 
