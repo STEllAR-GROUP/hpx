@@ -4,11 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_DISTRIBUTION_POLICY_HPP
-#define HPX_DISTRIBUTION_POLICY_HPP
+#ifndef HPX_CONTAINER_DISTRIBUTION_POLICY_HPP
+#define HPX_CONTAINER_DISTRIBUTION_POLICY_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/distribution_policy.hpp>
+#include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -22,7 +22,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // This class specifies the block chunking policy parameters to use for the
     // partitioning of the data in a hpx::vector
-    struct container_distribution_policy : components::distribution_policy
+    struct container_distribution_policy : components::default_distribution_policy
     {
     public:
         container_distribution_policy()
@@ -67,7 +67,7 @@ namespace hpx
 
         container_distribution_policy(std::size_t num_partitions,
                 std::vector<id_type> const& localities)
-          : components::distribution_policy(localities),
+          : components::default_distribution_policy(localities),
             num_partitions_(num_partitions)
         {}
 

@@ -29,20 +29,21 @@ namespace hpx { namespace components
     /// This class specifies the parameters for a simple distribution policy
     /// to use for creating (and evenly distributing) a given number of items
     /// on a given set of localities.
-    struct distribution_policy
+    struct default_distribution_policy
     {
     public:
-        /// Default-construct a new instance of a \a distribution_policy. This
-        /// policy will represent one locality (the local locality).
-        distribution_policy()
+        /// Default-construct a new instance of a \a default_distribution_policy.
+        /// This policy will represent one locality (the local locality).
+        default_distribution_policy()
         {}
 
-        /// Create a new \a distribution policy representing the given set of
-        /// localities.
+        /// Create a new \a default_distribution policy representing the given
+        /// set of localities.
         ///
         /// \param locs     [in] The list of localities the new instance should
         ///                 represent
-        distribution_policy operator()(std::vector<id_type> const& locs) const
+        default_distribution_policy operator()(
+            std::vector<id_type> const& locs) const
         {
 #if defined(HPX_DEBUG)
             for (id_type const& loc: locs)
@@ -50,17 +51,18 @@ namespace hpx { namespace components
                 HPX_ASSERT(naming::is_locality(loc));
             }
 #endif
-            return distribution_policy(locs);
+            return default_distribution_policy(locs);
         }
 
-        /// Create a new \a distribution policy representing the given locality
+        /// Create a new \a default_distribution policy representing the given
+        /// locality
         ///
         /// \param loc     [in] The locality the new instance should
         ///                 represent
-        distribution_policy operator()(id_type const& loc) const
+        default_distribution_policy operator()(id_type const& loc) const
         {
             HPX_ASSERT(naming::is_locality(loc));
-            return distribution_policy(loc);
+            return default_distribution_policy(loc);
         }
 
         /// Return the list of localities represented by this
@@ -119,11 +121,11 @@ namespace hpx { namespace components
 
     protected:
         /// \cond NOINTERNAL
-        distribution_policy(std::vector<id_type> const& localities)
+        default_distribution_policy(std::vector<id_type> const& localities)
           : localities_(localities)
         {}
 
-        distribution_policy(id_type const& locality)
+        default_distribution_policy(id_type const& locality)
         {
             localities_.push_back(locality);
         }
@@ -134,13 +136,13 @@ namespace hpx { namespace components
 
     /// A predefined instance of the default \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.
-    static distribution_policy const default_layout;
+    static default_distribution_policy const default_layout;
 }}
 
 /// \cond NOINTERNAL
 namespace hpx
 {
-    using hpx::components::distribution_policy;
+    using hpx::components::default_distribution_policy;
     using hpx::components::default_layout;
 }
 /// \endcond

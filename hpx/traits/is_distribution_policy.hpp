@@ -7,10 +7,12 @@
 #if !defined(HPX_TRAITS_IS_DISTRIBUTION_POLICY_APR_07_2015_0412PM)
 #define HPX_TRAITS_IS_DISTRIBUTION_POLICY_APR_07_2015_0412PM
 
-#include <hpx/include/util.hpp>
-#include <hpx/runtime/components/distribution_policy.hpp>
-
 #include <type_traits>
+
+namespace hpx { namespace component
+{
+    struct default_distribution_policy;
+}}
 
 namespace hpx { namespace traits
 {
@@ -24,7 +26,7 @@ namespace hpx { namespace traits
         {};
 
         template <>
-        struct is_distribution_policy<components::distribution_policy>
+        struct is_distribution_policy<components::default_distribution_policy>
           : std::true_type
         {};
         // \endcond

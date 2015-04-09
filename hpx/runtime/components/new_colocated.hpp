@@ -44,13 +44,13 @@ namespace hpx
     ///          \endcode
     ///
     /// \returns The function returns different types depending on its use:\n
-    ///          If the explicit template argument \a Component represents a
-    ///          component type (traits::is_component<Component>::value
+    ///          * If the explicit template argument \a Component represents a
+    ///          component type (<code>traits::is_component<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which can be used to retrieve the global
     ///          address of the newly created component.\n
-    ///          If the explicit template argument \a Component represents a
-    ///          client side object (traits::is_client<Component>::value
+    ///          * If the explicit template argument \a Component represents a
+    ///          client side object (<code>traits::is_client<Component>::value</code>
     ///          evaluates to true), the function will return a new instance
     ///          of that type which can be used to refer to the newly created
     ///          component instance.
@@ -84,13 +84,13 @@ namespace hpx
     ///          \endcode
     ///
     /// \returns The function returns different types depending on its use:\n
-    ///          If the explicit template argument \a Component represents a
-    ///          component type (traits::is_component<Component>::value
+    ///          * If the explicit template argument \a Component represents a
+    ///          component type (<code>traits::is_component<Component>::value</code>
     ///          evaluates to true), the function will return an \a hpx::future
     ///          object instance which can be used to retrieve the global
     ///          address of the newly created component.\n
-    ///          If the explicit template argument \a Component represents a
-    ///          client side object (traits::is_client<Component>::value
+    ///          * If the explicit template argument \a Component represents a
+    ///          client side object (<code>traits::is_client<Component>::value</code>
     ///          evaluates to true), the function will return a new instance
     ///          of that type which can be used to refer to the newly created
     ///          component instance.

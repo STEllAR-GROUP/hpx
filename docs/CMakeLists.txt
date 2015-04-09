@@ -99,7 +99,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/runtime/components/new.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/new_colocated.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/copy_component.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/components/distribution_policy.hpp"
+    "${hpx_SOURCE_DIR}/hpx/runtime/components/default_distribution_policy.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
     "${hpx_SOURCE_DIR}/hpx/lcos/broadcast.hpp"

@@ -22,6 +22,8 @@
 #include <hpx/runtime/agas/interface.hpp>
 
 #include <utility>
+#include <vector>
+
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_base_of.hpp>
@@ -395,6 +397,80 @@ namespace hpx { namespace components
     protected:
         future_type gid_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, Client
+    >::type
+    make_client(hpx::id_type const& id)
+    {
+        return Client(id);
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, Client
+    >::type
+    make_client(hpx::future<hpx::id_type> const& id)
+    {
+        return Client(id);
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, Client
+    >::type
+    make_client(hpx::future<hpx::id_type> && id)
+    {
+        return Client(std::move(id));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_client(std::vector<hpx::id_type> const& ids)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::id_type const& id: ids)
+        {
+            result.push_back(Client(id));
+        }
+        return result;
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_client(std::vector<hpx::future<hpx::id_type> > const& ids)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::future<hpx::id_type> const& id: ids)
+        {
+            result.push_back(Client(id));
+        }
+        return result;
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_client(std::vector<hpx::future<hpx::id_type> > && id)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::future<hpx::id_type> && id: ids)
+        {
+            result.push_back(Client(std::move(id)));
+        }
+        return result;
+    }
 }}
 
 #endif
