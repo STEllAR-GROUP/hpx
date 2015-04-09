@@ -50,13 +50,6 @@ namespace hpx
     ///                 hpx::new_<some_component>(hpx::find_here(), ...);
     ///              hpx::id_type id = f.get();
     ///          \endcode
-    ///          Specify the component type as an array type to create more than
-    ///          one instance:
-    ///          \code
-    ///              hpx::future<std::vector<hpx::id_type> > f =
-    ///                 hpx::new_<some_component[10]>(hpx::default_layout, ...);
-    ///              hpx::id_type id = f.get();
-    ///          \endcode
     ///
     /// \returns The function returns different types depending on its use:\n
     ///          * If the explicit template argument \a Component represents a
@@ -69,23 +62,6 @@ namespace hpx
     ///          evaluates to true), the function will return a new instance
     ///          of that type which can be used to refer to the newly created
     ///          component instance.
-    ///          * If the explicit template argument \a Component represents an
-    ///          array of a component type (i.e. \a Component[N],
-    ///          where <code>traits::is_component<Component>::value</code>
-    ///          evaluates to true), the function will return an \a hpx::future
-    ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a global address of one
-    ///          of the newly created components.
-    ///          The function will create \a N instances of the component.
-    ///          * If the explicit template argument \a Component represents an
-    ///          array of a client side object type (i.e. \a Component[N],
-    ///          where <code>traits::is_client<Component>::value</code>
-    ///          evaluates to true), the function will return an \a hpx::future
-    ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a client side instance of
-    ///          the given type, each representing one of the newly created
-    ///          components. The function will create \a N instances of the
-    ///          component.
     ///
     template <typename Component, typename ...Ts>
     <unspecified>
@@ -160,13 +136,6 @@ namespace hpx
     ///                 hpx::new_<some_component>(hpx::default_layout, ...);
     ///              hpx::id_type id = f.get();
     ///          \endcode
-    ///          Specify the component type as an array type to create more than
-    ///          one instance:
-    ///          \code
-    ///              hpx::future<std::vector<hpx::id_type> > f =
-    ///                 hpx::new_<some_component[10]>(hpx::default_layout, ...);
-    ///              hpx::id_type id = f.get();
-    ///          \endcode
     ///
     /// \returns The function returns different types depending on its use:\n
     ///          * If the explicit template argument \a Component represents a
@@ -179,23 +148,6 @@ namespace hpx
     ///          evaluates to true), the function will return a new instance
     ///          of that type which can be used to refer to the newly created
     ///          component instance.
-    ///          * If the explicit template argument \a Component represents an
-    ///          array of a component type (i.e. \a Component[N],
-    ///          where <code>traits::is_component<Component>::value</code>
-    ///          evaluates to true), the function will return an \a hpx::future
-    ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a global address of one
-    ///          of the newly created components.
-    ///          The function will create \a N instances of the component.
-    ///          * If the explicit template argument \a Component represents an
-    ///          array of a client side object type (i.e. \a Component[N],
-    ///          where <code>traits::is_client<Component>::value</code>
-    ///          evaluates to true), the function will return an \a hpx::future
-    ///          object instance which holds a std::vector<hpx::id_type>, where
-    ///          eahc of the items in this vector is a client side instance of
-    ///          the given type, each representing one of the newly created
-    ///          components. The function will create \a N instances of the
-    ///          component.
     ///
     template <typename Component, typename DistPolicy, typename ...Ts>
     <unspecified>
@@ -350,27 +302,6 @@ namespace hpx { namespace components
                     std::move(objs));
             }
         };
-
-        // create a given number of component instances
-        template <typename Component, std::size_t N>
-        struct new_component<Component[N]>
-        {
-            typedef hpx::future<std::vector<hpx::id_type> > type;
-
-            template <typename ...Ts>
-            static type call(hpx::id_type const& locality, Ts&&... vs)
-            {
-                return new_component<Component[]>::call(
-                    locality, N, std::forward<Ts>(vs)...);
-            }
-
-            template <typename DistPolicy, typename ...Ts>
-            static type call(DistPolicy const& policy, Ts&&... vs)
-            {
-                return new_component<Component[]>::call(
-                    policy, N, std::forward<Ts>(vs)...);
-            }
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -455,28 +386,6 @@ namespace hpx { namespace components
                             return make_client<Client>(v.get());
                         }
                     );
-            }
-        };
-
-        // create a given number of client instances
-        template <typename Client, std::size_t N>
-        struct new_client<Client[N]>
-        {
-            typedef hpx::future<std::vector<Client> > type;
-            typedef typename Client::server_component_type component_type;
-
-            template <typename ...Ts>
-            static type call(hpx::id_type const& locality, Ts&&... vs)
-            {
-                return new_client<Client[]>::call(
-                    locality, N, std::forward<Ts>(vs)...);
-            }
-
-            template <typename DistPolicy, typename ...Ts>
-            static type call(DistPolicy const& policy, Ts&&... vs)
-            {
-                return new_client<Client[]>::call(
-                    policy, N, std::forward<Ts>(vs)...);
             }
         };
     }
