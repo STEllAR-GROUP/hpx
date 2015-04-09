@@ -11,6 +11,8 @@ set(tests
     function
     parse_slurm_nodelist
     serialize_buffer
+    stencil3_iterator
+    transform_iterator
     tuple
     zero_copy_serialization
    )
