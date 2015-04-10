@@ -24,14 +24,14 @@
 
 namespace hpx { namespace components
 {
-    /// This class specifies the parameters for a simple distribution policy
-    /// to use for creating (and evenly distributing) a given number of items
-    /// on a given set of localities.
+    /// This class specifies the parameters for a distribution policy to use
+    /// for creating a given number of items on the locality where a given
+    /// object is currently placed.
     struct colocated_distribution_policy
     {
     public:
         /// Default-construct a new instance of a \a colocated_distribution_policy.
-        /// This policy will represent one locality (the local locality).
+        /// This policy will represent the local locality.
         colocated_distribution_policy()
         {}
 
@@ -59,8 +59,8 @@ namespace hpx { namespace components
             return colocated_distribution_policy(client.get_gid());
         }
 
-        /// Create one object on one of the localities associated by
-        /// this policy instance
+        /// Create one object on the locality of the object this distribution
+        /// policy instance is associated with
         ///
         /// \params vs  [in] The arguments which will be forwarded to the
         ///             constructor of the new object.
@@ -114,8 +114,7 @@ namespace hpx { namespace components
         /// \cond NOINTERNAL
         colocated_distribution_policy(id_type const& id)
           : id_(id)
-        {
-        }
+        {}
 
         hpx::id_type id_;   // the global address of the object with which the
                             // new objects will be colocated
