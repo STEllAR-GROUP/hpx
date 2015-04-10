@@ -211,16 +211,25 @@ parallel::transform_inclusive_scan    "transform_inclusive_scan" "hpx\.parallel\
 parallel::transform_reduce            "transform_reduce" "hpx\.parallel\.v1\.transform_reduce.*"
 
 # hpx/parallel/algorithms/uninitialized_copy.hpp
-parallel::uninitialized_copy            "uninitialized_copy" "hpx\.parallel\.v1\.uninitialized_copy$"
-parallel::uninitialized_copy_n          "uninitialized_copy_n" "hpx\.parallel\.v1\.uninitialized_copy_n.*"
+parallel::uninitialized_copy          "uninitialized_copy" "hpx\.parallel\.v1\.uninitialized_copy$"
+parallel::uninitialized_copy_n        "uninitialized_copy_n" "hpx\.parallel\.v1\.uninitialized_copy_n.*"
 
 # hpx/parallel/algorithms/uninitialized_fill.hpp
-parallel::uninitialized_fill            "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
-parallel::uninitialized_fill_n          "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
+parallel::uninitialized_fill          "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
+parallel::uninitialized_fill_n        "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
 
 
-# hpx/runtime/components/distribution_policy.hpp
-distribution_policy                   "" "hpx\.components\.distribution_policy.*"
+# hpx/runtime/components/colocating_distribution_policy.hpp
+colocating_distribution_policy        "" "hpx\.components\.colocating_distribution_policy.*"
+colocated                             "" "hpx\.components\.colocated.*"
+
+# hpx/runtime/components/default_distribution_policy.hpp
+default_distribution_policy           "" "hpx\.components\.default_distribution_policy.*"
+default_layout                        "" "hpx\.components\.default_layout.*"
+
+# hpx/runtime/components/binpacking_distribution_policy.hpp
+binpacking_distribution_policy        "" "hpx\.components\.binpacking_distribution_policy.*"
+binpacked                             '' "hpx\.components\.binpacked.*"
 
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.new_id.*"

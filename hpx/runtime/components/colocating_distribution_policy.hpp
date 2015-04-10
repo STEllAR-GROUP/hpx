@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file colocated_distribution_policy.hpp
+/// \file colocating_distribution_policy.hpp
 
-#if !defined(HPX_COMPONENTS_COLOCATED_DISTRIBUTION_POLICY_APR_10_2015_0227PM)
-#define HPX_COMPONENTS_COLOCATED_DISTRIBUTION_POLICY_APR_10_2015_0227PM
+#if !defined(HPX_COMPONENTS_colocating_distribution_policy_APR_10_2015_0227PM)
+#define HPX_COMPONENTS_colocating_distribution_policy_APR_10_2015_0227PM
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
@@ -27,36 +27,36 @@ namespace hpx { namespace components
     /// This class specifies the parameters for a distribution policy to use
     /// for creating a given number of items on the locality where a given
     /// object is currently placed.
-    struct colocated_distribution_policy
+    struct colocating_distribution_policy
     {
     public:
-        /// Default-construct a new instance of a \a colocated_distribution_policy.
+        /// Default-construct a new instance of a \a colocating_distribution_policy.
         /// This policy will represent the local locality.
-        colocated_distribution_policy()
+        colocating_distribution_policy()
         {}
 
-        /// Create a new \a colocated_distribution_policy representing the
+        /// Create a new \a colocating_distribution_policy representing the
         /// locality where the given object os current located
         ///
         /// \param id     [in] The global address of the object with which
         ///                the new instances should be colocated on
         ///
-        colocated_distribution_policy operator()(id_type const& id) const
+        colocating_distribution_policy operator()(id_type const& id) const
         {
-            return colocated_distribution_policy(id);
+            return colocating_distribution_policy(id);
         }
 
-        /// Create a new \a colocated_distribution_policy representing the
+        /// Create a new \a colocating_distribution_policy representing the
         /// locality where the given object os current located
         ///
         /// \param client  [in] The client side representation of the object with
         ///                which the new instances should be colocated on
         ///
         template <typename Client, typename Stub>
-        colocated_distribution_policy operator()(
+        colocating_distribution_policy operator()(
             client_base<Client, Stub> const& client) const
         {
-            return colocated_distribution_policy(client.get_gid());
+            return colocating_distribution_policy(client.get_gid());
         }
 
         /// Create one object on the locality of the object this distribution
@@ -112,7 +112,7 @@ namespace hpx { namespace components
 
     protected:
         /// \cond NOINTERNAL
-        colocated_distribution_policy(id_type const& id)
+        colocating_distribution_policy(id_type const& id)
           : id_(id)
         {}
 
@@ -123,19 +123,19 @@ namespace hpx { namespace components
 
     /// A predefined instance of the default \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.
-    static colocated_distribution_policy const colocated;
+    static colocating_distribution_policy const colocated;
 }}
 
 /// \cond NOINTERNAL
 namespace hpx
 {
-    using hpx::components::colocated_distribution_policy;
+    using hpx::components::colocating_distribution_policy;
     using hpx::components::colocated;
 
     namespace traits { namespace detail
     {
         template <>
-        struct is_distribution_policy<components::colocated_distribution_policy>
+        struct is_distribution_policy<components::colocating_distribution_policy>
           : std::true_type
         {};
     }}

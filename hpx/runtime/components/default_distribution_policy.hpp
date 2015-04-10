@@ -73,13 +73,6 @@ namespace hpx { namespace components
             return default_distribution_policy(loc);
         }
 
-        /// Return the list of localities represented by this
-        /// \a distribution_policy
-        std::vector<id_type> const& get_localities() const
-        {
-            return localities_;
-        }
-
         /// Create one object on one of the localities associated by
         /// this policy instance
         ///
