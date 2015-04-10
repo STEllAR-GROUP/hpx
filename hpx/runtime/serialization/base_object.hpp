@@ -17,8 +17,8 @@
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/decay.hpp>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     template <typename Derived, typename Base, typename Enable =
         typename hpx::traits::is_intrusive_polymorphic<Derived>::type>
     struct base_object_type
@@ -93,7 +93,6 @@ namespace hpx { namespace serialization {
         ar.invoke(t);
         return ar;
     }
-
 }}
 
 #endif

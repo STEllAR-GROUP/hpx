@@ -18,9 +18,6 @@
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#define HPX_SINGLE_ARG(...) __VA_ARGS__
-#define HPX_COMMA ,
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {

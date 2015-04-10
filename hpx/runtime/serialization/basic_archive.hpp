@@ -4,25 +4,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_SERIALIZATION_ARCHIVE_HPP
-#define HPX_SERIALIZATION_ARCHIVE_HPP
+#ifndef HPX_SERIALIZATION_BASIC_ARCHIVE_HPP
+#define HPX_SERIALIZATION_BASIC_ARCHIVE_HPP
 
-#include <hpx/config.hpp>
-#include <hpx/runtime/serialization/container.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/static_assert.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/type_traits/is_pointer.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
-#include <boost/type_traits/is_unsigned.hpp>
-#include <boost/type_traits/is_abstract.hpp>
 
 #include <algorithm>
 #include <map>
 #include <iostream>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     namespace detail
     {
         struct ptr_helper
@@ -47,21 +43,17 @@ namespace hpx { namespace serialization {
         std::reverse(address, address + size);
     }
 
-    template <typename Helper>
-    Helper & tracked_pointer(input_archive & ar, std::size_t pos);
-
     template <typename Archive>
-    struct archive
+    struct basic_archive
     {
         static const std::size_t npos = -1;
 
-        archive(std::unique_ptr<container> buffer, boost::uint32_t flags)
+        basic_archive(boost::uint32_t flags)
           : flags_(flags)
-          , buffer_(std::move(buffer))
           , size_(0)
         {}
 
-        virtual ~archive()
+        virtual ~basic_archive()
         {}
 
         template <typename T>
@@ -108,13 +100,7 @@ namespace hpx { namespace serialization {
             return flags_;
         }
 
-        void set_filter(binary_filter* filter)
-        {
-            buffer_->set_filter(filter);
-        }
-
         boost::uint32_t flags_;
-        std::unique_ptr<container> buffer_;
         std::size_t size_;
     };
 

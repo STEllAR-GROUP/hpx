@@ -11,8 +11,8 @@
 
 #include <memory>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     namespace detail
     {
         struct ptr_helper;
@@ -23,6 +23,9 @@ namespace hpx { namespace serialization {
 
     BOOST_FORCEINLINE
     void register_pointer(input_archive & ar, std::size_t pos, std::unique_ptr<detail::ptr_helper> helper);
+
+    template <typename Helper>
+    Helper & tracked_pointer(input_archive & ar, std::size_t pos);
 
     template <typename Archive, typename T>
     void serialize(Archive & ar, T & t, unsigned);
@@ -60,7 +63,7 @@ namespace hpx { namespace serialization {
     BOOST_FORCEINLINE                                                               \
     void serialize(hpx::serialization::output_archive & ar, T & t, unsigned)        \
     {                                                                               \
-        save(ar, const_cast<typename boost::add_const<T>::type &>(t), 0);           \
+        save(ar, const_cast<boost::add_const<T>::type &>(t), 0);                    \
     }                                                                               \
 /**/
 

@@ -8,9 +8,10 @@
 #define HPX_SERIALIZATION_SHARED_PTR_HPP
 
 #include <hpx/runtime/serialization/detail/pointer.hpp>
+#include <boost/shared_ptr.hpp>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     template <typename T>
     void serialize(input_archive & ar, boost::shared_ptr<T> & ptr, unsigned n)
     {

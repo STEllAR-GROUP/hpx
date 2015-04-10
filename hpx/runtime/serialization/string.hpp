@@ -6,13 +6,12 @@
 #ifndef HPX_SERIALIZATION_STRING_HPP
 #define HPX_SERIALIZATION_STRING_HPP
 
-#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <string>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     // load string
     template <typename Char, typename CharTraits, typename Allocator>
     void serialize(input_archive & ar, std::basic_string<Char, CharTraits, Allocator> & s, unsigned)

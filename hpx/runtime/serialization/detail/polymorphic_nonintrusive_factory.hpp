@@ -47,7 +47,7 @@ namespace hpx { namespace serialization { namespace detail
         void register_class(const std::string& class_name,
             const function_bunch_type& bunch)
         {
-             map_[class_name] = bunch;
+             map_.emplace(class_name, bunch);
         }
 
         // the following templates are defined in *.ipp file

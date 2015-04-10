@@ -71,14 +71,17 @@ int main()
     hpx::serialization::output_archive oarchive(buffer);
     oarchive << A();
 
-    B const * b1 = new D;
+    B * const b1 = new D;
+    B * cb1 = new D;
     oarchive << hpx::serialization::raw_ptr(b1);
+    oarchive << hpx::serialization::raw_ptr(cb1);
 
     hpx::serialization::input_archive iarchive(buffer);
     A a;
     iarchive >> a;
-    B * b2 = 0;
+    B *b2 = nullptr, *b3 = nullptr;
     iarchive >> hpx::serialization::raw_ptr(b2);
+    iarchive >> hpx::serialization::raw_ptr(b3);
 
     HPX_TEST_EQ(a.a, 8);
     HPX_TEST_NEQ(b2, b1);

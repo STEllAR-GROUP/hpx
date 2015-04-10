@@ -17,17 +17,16 @@
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/identity.hpp>
 
-namespace hpx { namespace serialization {
-
-    namespace detail {
-
+namespace hpx { namespace serialization
+{
+    namespace detail
+    {
         template <class Archive, class T>
         BOOST_FORCEINLINE void serialize_force_adl(Archive& ar, T& t, unsigned)
         {
             serialize(ar, t, 0);
         }
-
-    } // namespace detail
+    }
 
     class access
     {

@@ -120,7 +120,7 @@ namespace hpx { namespace components { namespace security
 #endif
 }}}
 
-namespace hpx { namespace traits {
+namespace hpx { namespace traits
 {
     template <>
     struct is_bitwise_serializable<

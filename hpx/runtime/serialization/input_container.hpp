@@ -9,19 +9,19 @@
 
 #include <hpx/util/assert.hpp>
 #include <hpx/exception.hpp>
-
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 
 #include <cstddef> // for size_t
 #include <cstring> // for memcpy
 #include <vector>
 #include <memory>
 
-namespace hpx { namespace serialization {
+namespace hpx { namespace serialization
+{
     template <typename Container>
-    struct input_container
-      : container
+    struct input_container: erased_input_container
     {
     private:
         std::size_t get_chunk_size(std::size_t chunk) const
@@ -64,8 +64,6 @@ namespace hpx { namespace serialization {
                 current_chunk_ = 0;
             }
         }
-
-        ~input_container() {}
 
         void set_filter(binary_filter* filter) // override
         {

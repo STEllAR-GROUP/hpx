@@ -7,44 +7,36 @@
 #ifndef HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 
-#include <hpx/runtime/serialization/archive.hpp>
+#include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/input_container.hpp>
 #include <hpx/runtime/serialization/raw_ptr.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
 #include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/or.hpp>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     struct HPX_ALWAYS_EXPORT input_archive
-      : archive<input_archive>
+      : basic_archive<input_archive>
     {
-        typedef archive<input_archive> base_type;
+        typedef basic_archive<input_archive> base_type;
 
         typedef
             std::map<std::size_t, std::unique_ptr<detail::ptr_helper> >
             pointer_tracker;
 
         template <typename Container>
-        static std::unique_ptr<container> make_container(
-            Container & buffer,
-            const std::vector<serialization_chunk>* chunks,
-            std::size_t inbound_data_size)
-        {
-            return std::unique_ptr<container>(
-                new input_container<Container>(buffer, chunks, inbound_data_size));
-        }
-
-        template <typename Container>
         input_archive(Container & buffer,
             boost::uint32_t flags = 0U,
             std::size_t inbound_data_size = 0,
             const std::vector<serialization_chunk>* chunks = 0)
-          : base_type(make_container(buffer, chunks, inbound_data_size), flags)
+          : base_type(flags)
+          , buffer_(new input_container<Container>(buffer, chunks, inbound_data_size))
         {
             bool has_filter = false;
             load(has_filter);
@@ -53,7 +45,7 @@ namespace hpx { namespace serialization {
             if (has_filter && enable_compression())
             {
                 *this >> raw_ptr(filter);
-                set_filter(filter);
+                buffer_->set_filter(filter);
             }
         }
 
@@ -232,6 +224,8 @@ namespace hpx { namespace serialization {
             return static_cast<Helper &>(*it->second);
         }
 
+    private:
+        std::unique_ptr<erased_input_container> buffer_;
         pointer_tracker pointer_tracker_;
     };
 
@@ -246,7 +240,6 @@ namespace hpx { namespace serialization {
     {
         return ar.tracked_pointer<Helper>(pos);
     }
-
 }}
 
 #endif

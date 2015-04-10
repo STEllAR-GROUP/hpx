@@ -8,9 +8,10 @@
 #define HPX_SERIALIZATION_INTRUSIVE_PTR_HPP
 
 #include <hpx/runtime/serialization/detail/pointer.hpp>
+#include <boost/intrusive_ptr.hpp>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     template <typename T>
     void serialize(input_archive & ar, boost::intrusive_ptr<T> & ptr, unsigned n)
     {

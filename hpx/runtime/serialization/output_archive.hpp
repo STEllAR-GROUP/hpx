@@ -7,33 +7,24 @@
 #ifndef HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 
-#include <hpx/runtime/serialization/archive.hpp>
+#include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/raw_ptr.hpp>
 
 #include <boost/mpl/or.hpp>
 #include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
 #include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     struct HPX_ALWAYS_EXPORT output_archive
-      : archive<output_archive>
+      : basic_archive<output_archive>
     {
-        typedef archive<output_archive> base_type;
+        typedef basic_archive<output_archive> base_type;
         typedef std::map<const void *, std::size_t> pointer_tracker;
-
-        template <typename Container>
-        static std::unique_ptr<container> make_container(
-            Container & buffer,
-            std::vector<serialization_chunk>* chunks,
-            binary_filter* filter)
-        {
-            return std::unique_ptr<container>(
-                new output_container<Container>(buffer, chunks, filter));
-        }
 
         template <typename Container>
         output_archive(Container & buffer,
@@ -41,8 +32,9 @@ namespace hpx { namespace serialization {
             boost::uint32_t dest_locality_id = ~0U,
             std::vector<serialization_chunk>* chunks = 0,
             binary_filter* filter = 0)
-            : base_type(make_container(buffer, chunks, filter), flags),
-              dest_locality_id_(dest_locality_id)
+            : base_type(flags)
+            , buffer_(new output_container<Container>(buffer, chunks, filter))
+            , dest_locality_id_(dest_locality_id)
         {
             bool has_filter = filter != 0;
             save(has_filter);
@@ -50,7 +42,7 @@ namespace hpx { namespace serialization {
             if (has_filter && enable_compression())
             {
                 *this << raw_ptr(filter);
-                set_filter(filter);
+                buffer_->set_filter(filter);
             }
         }
 
@@ -222,6 +214,8 @@ namespace hpx { namespace serialization {
             return size_;
         }
 
+    private:
+        std::unique_ptr<erased_output_container> buffer_;
         pointer_tracker pointer_tracker_;
         boost::uint32_t dest_locality_id_;
     };
@@ -231,7 +225,6 @@ namespace hpx { namespace serialization {
     {
         return ar.track_pointer(pos);
     }
-
 }}
 
 #endif

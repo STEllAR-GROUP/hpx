@@ -17,8 +17,8 @@
 #include <array>
 #endif
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     template <class T>
     class array
     {
@@ -29,19 +29,6 @@ namespace hpx { namespace serialization {
             m_t(t),
             m_element_count(s)
         {}
-
-        array(const array& rhs):
-            m_t(rhs.m_t),
-            m_element_count(rhs.m_element_count)
-        {}
-
-        array& operator=(const array& rhs)
-        {
-            if (this == &rhs) return *this;
-
-            m_t = rhs.m_t;
-            m_element_count = rhs.m_element_count;
-        }
 
         value_type* address() const
         {
@@ -104,48 +91,6 @@ namespace hpx { namespace serialization {
         value_type* m_t;
         std::size_t m_element_count;
     };
-
-    template <>
-    template <class Archive>
-    void array<float>::serialize(Archive& ar, unsigned int v)
-    {
-        serialize_optimized(ar, v, boost::mpl::true_());
-    }
-
-    template <>
-    template <class Archive>
-    void array<double>::serialize(Archive& ar, unsigned int v)
-    {
-        serialize_optimized(ar, v, boost::mpl::true_());
-    }
-
-    template <>
-    template <class Archive>
-    void array<char>::serialize(Archive& ar, unsigned int v)
-    {
-        serialize_optimized(ar, v, boost::mpl::true_());
-    }
-
-    template <>
-    template <class Archive>
-    void array<signed char>::serialize(Archive& ar, unsigned int v)
-    {
-        serialize_optimized(ar, v, boost::mpl::true_());
-    }
-
-    template <>
-    template <class Archive>
-    void array<unsigned char>::serialize(Archive& ar, unsigned int v)
-    {
-        serialize_optimized(ar, v, boost::mpl::true_());
-    }
-
-    template <>
-    template <class Archive>
-    void array<bool>::serialize(Archive& ar, unsigned int v)
-    {
-        serialize_optimized(ar, v, boost::mpl::true_());
-    }
 
     // make_array function
     template <class T> BOOST_FORCEINLINE

@@ -8,8 +8,8 @@
 
 #include <hpx/runtime/serialization/detail/pointer.hpp>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     namespace detail
     {
         template <class T>
@@ -20,13 +20,6 @@ namespace hpx { namespace serialization {
             raw_ptr_type(T* t)
                 : t(t)
             {}
-
-            raw_ptr_type operator=(const raw_ptr_type& rhs)
-            {
-                if (this == &rhs) return *this;
-                t = rhs.t;
-                return *this;
-            }
 
             T* get() const
             {
@@ -89,7 +82,7 @@ namespace hpx { namespace serialization {
 
     // allow raw_ptr_type to be serialized as prvalue
     template <class T> BOOST_FORCEINLINE
-    output_archive & operator<<(output_archive & ar, const detail::raw_ptr_proxy<T>& t)
+    output_archive & operator<<(output_archive & ar, detail::raw_ptr_proxy<T> t)
     {
         t.serialize(ar, 0);
         return ar;
@@ -103,7 +96,7 @@ namespace hpx { namespace serialization {
     }
 
     template <class T> BOOST_FORCEINLINE
-    output_archive & operator&(output_archive & ar, const detail::raw_ptr_proxy<T>& t)
+    output_archive & operator&(output_archive & ar, detail::raw_ptr_proxy<T> t)
     {
         t.serialize(ar, 0);
         return ar;

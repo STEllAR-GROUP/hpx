@@ -17,7 +17,7 @@
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/unordered_map.hpp>
-#include <boost/atomic/atomic.hpp>
+#include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace serialization { namespace detail
@@ -37,7 +37,7 @@ namespace hpx { namespace serialization { namespace detail
 
         void register_class(const std::string& name, ctor_type fun)
         {
-            map_[name] = fun;
+            map_.emplace(name, fun);
         }
 
         template <class T>

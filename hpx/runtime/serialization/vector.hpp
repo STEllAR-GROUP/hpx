@@ -13,8 +13,8 @@
 
 #include <vector>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     // load vector<T>
     template <typename T, typename Allocator>
     void load_impl(input_archive & ar, std::vector<T, Allocator> & vs, boost::mpl::false_)

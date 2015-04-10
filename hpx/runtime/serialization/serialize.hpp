@@ -11,8 +11,8 @@
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     template <typename Archive, typename T>
     void serialize(Archive & ar, T & t, unsigned)
     {

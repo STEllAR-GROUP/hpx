@@ -19,7 +19,8 @@
 #  define HPX_ZERO_COPY_SERIALIZATION_THRESHOLD     256
 #endif
 
-namespace hpx { namespace serialization {
+namespace hpx { namespace serialization
+{
     ///////////////////////////////////////////////////////////////////////
     union chunk_data
     {
