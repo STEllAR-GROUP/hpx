@@ -3,14 +3,22 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file distribution_policy.hpp
+/// \file default_distribution_policy.hpp
 
 #if !defined(HPX_COMPONENTS_DISTRIBUTION_POLICY_APR_07_2015_1246PM)
 #define HPX_COMPONENTS_DISTRIBUTION_POLICY_APR_07_2015_1246PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/util/move.hpp>
 
 #include <algorithm>
+#include <vector>
 
 namespace hpx { namespace components
 {
@@ -72,22 +80,105 @@ namespace hpx { namespace components
             return localities_;
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        /// Return the number of items to place on the given locality.
+        /// Create one object on one of the localities associated by
+        /// this policy instance
         ///
-        /// \param items    [in] The overall number of items to create based on
-        ///                 the given \a distribution_policy.
-        /// \param loc      [in] The locality for which the function will
-        ///                 return how many items to create.
+        /// \params vs  [in] The arguments which will be forwarded to the
+        ///             constructor of the new object.
         ///
-        /// \note This function will calculate the number of items to be
-        ///       created on the given locality. A \a distribution_policy will
-        ///       evenly distribute the overall number of items over the given
-        ///       localities it represents.
+        /// \returns A future holding the global address which represents
+        ///          the newly created object
         ///
-        /// \returns The number of items to be created on the given locality
-        ///          \a loc.
+        template <typename Component, typename ...Ts>
+        hpx::future<hpx::id_type> create(Ts&&... vs) const
+        {
+            using components::stub_base;
+
+            for (hpx::id_type const& loc: localities_)
+            {
+                if (get_num_items(1, loc) != 0)
+                {
+                    return stub_base<Component>::create_async(
+                        loc, std::forward<Ts>(vs)...);
+                }
+            }
+
+            // by default the object will be created on the current
+            // locality
+            return stub_base<Component>::create_async(
+                hpx::find_here(), std::forward<Ts>(vs)...);
+        }
+
+        /// Create multiple objects on the localities associated by
+        /// this policy instance
         ///
+        /// \param count [in] The number of objects to create
+        /// \params vs   [in] The arguments which will be forwarded to the
+        ///              constructors of the new objects.
+        ///
+        /// \returns A future holding the list of global addresses which
+        ///          represent the newly created objects
+        ///
+        template <typename Component, typename ...Ts>
+        hpx::future<std::vector<hpx::id_type> >
+        bulk_create(std::size_t count, Ts&&... vs) const
+        {
+            using components::stub_base;
+
+            // handle special cases
+            if (localities_.size() == 0)
+            {
+                return stub_base<Component>::bulk_create_async(
+                    hpx::find_here(), count, std::forward<Ts>(vs)...);
+            }
+            else if (localities_.size() == 1)
+            {
+                return stub_base<Component>::bulk_create_async(
+                    localities_.front(), count, std::forward<Ts>(vs)...);
+            }
+
+            // schedule creation of all objects across given localities
+            std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
+            objs.reserve(localities_.size());
+            for (hpx::id_type const& loc: localities_)
+            {
+                objs.push_back(stub_base<Component>::bulk_create_async(
+                    loc, get_num_items(count, loc), vs...));
+            }
+
+            // consolidate all results into single array
+            return hpx::lcos::local::dataflow(
+                [](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
+                    -> std::vector<hpx::id_type>
+                {
+                    std::vector<hpx::id_type> result = v.front().get();
+                    for (auto it = v.begin()+1; it != v.end(); ++it)
+                    {
+                        std::vector<id_type> r = it->get();
+                        std::copy(r.begin(), r.end(),
+                            std::back_inserter(result));
+                    }
+                    return result;
+                },
+                std::move(objs));
+        }
+
+    protected:
+        // Return the number of items to place on the given locality.
+        //
+        // \param items    [in] The overall number of items to create based on
+        //                 the given \a distribution_policy.
+        // \param loc      [in] The locality for which the function will
+        //                 return how many items to create.
+        //
+        // \note This function will calculate the number of items to be
+        //       created on the given locality. A \a distribution_policy will
+        //       evenly distribute the overall number of items over the given
+        //       localities it represents.
+        //
+        // \returns The number of items to be created on the given locality
+        //          \a loc.
+        //
         std::size_t
         get_num_items(std::size_t items, hpx::id_type const& loc) const
         {
@@ -144,6 +235,14 @@ namespace hpx
 {
     using hpx::components::default_distribution_policy;
     using hpx::components::default_layout;
+
+    namespace traits { namespace detail
+    {
+        template <>
+        struct is_distribution_policy<components::default_distribution_policy>
+          : std::true_type
+        {};
+    }}
 }
 /// \endcond
 

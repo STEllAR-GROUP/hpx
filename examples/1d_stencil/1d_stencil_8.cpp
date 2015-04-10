@@ -287,7 +287,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
     // Create a new component on the locality co-located to the id 'where'. The
     // new instance will be initialized from the given partition_data.
     partition(hpx::id_type where, partition_data const& data)
-      : base_type(hpx::new_colocated<partition_server>(where, data))
+      : base_type(hpx::new_<partition_server>(hpx::colocated(where), data))
     {}
 
     // Attach a future representing a (possibly remote) partition.

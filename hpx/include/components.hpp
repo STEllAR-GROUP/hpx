@@ -39,9 +39,11 @@
 #include <hpx/runtime/components/server/migration_support.hpp>
 
 #include <hpx/runtime/components/new.hpp>
-#include <hpx/runtime/components/new_colocated.hpp>
 #include <hpx/runtime/components/copy_component.hpp>
 #include <hpx/runtime/components/migrate_component.hpp>
+
+#include <hpx/runtime/components/default_distribution_policy.hpp>
+#include <hpx/runtime/components/colocated_distribution_policy.hpp>
 
 #include <hpx/runtime/get_ptr.hpp>
 

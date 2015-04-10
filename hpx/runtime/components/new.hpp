@@ -13,9 +13,8 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/components/distribution_policy.hpp>
+#include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/move.hpp>
 
 #include <type_traits>
@@ -224,19 +223,7 @@ namespace hpx { namespace components
             template <typename DistPolicy, typename ...Ts>
             static type call(DistPolicy const& policy, Ts&&... vs)
             {
-                using components::stub_base;
-
-                for (hpx::id_type const& loc: policy.get_localities())
-                {
-                    if (policy.get_num_items(1, loc) != 0)
-                    {
-                        return stub_base<Component>::create_async(
-                            loc, std::forward<Ts>(vs)...);
-                    }
-                }
-
-                return stub_base<Component>::create_async(
-                    hpx::find_here(), std::forward<Ts>(vs)...);
+                return policy.create<Component>(std::forward<Ts>(vs)...);
             }
         };
 
@@ -259,47 +246,8 @@ namespace hpx { namespace components
             static type call(DistPolicy const& policy, std::size_t count,
                 Ts&&... vs)
             {
-                using components::stub_base;
-
-                std::vector<hpx::id_type> const& localities =
-                    policy.get_localities();
-
-                // handle special cases
-                if (localities.size() == 0)
-                {
-                    return stub_base<Component>::bulk_create_async(
-                        hpx::find_here(), count, std::forward<Ts>(vs)...);
-                }
-                else if (localities.size() == 1)
-                {
-                    return stub_base<Component>::bulk_create_async(
-                        localities.front(), count, std::forward<Ts>(vs)...);
-                }
-
-                // schedule creation of all objects accross given localities
-                std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
-                objs.reserve(policy.get_localities().size());
-                for (hpx::id_type const& loc: policy.get_localities())
-                {
-                    objs.push_back(stub_base<Component>::bulk_create_async(
-                        loc, policy.get_num_items(count, loc), vs...));
-                }
-
-                // consolidate all results into single array
-                return hpx::lcos::local::dataflow(
-                    [](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
-                        -> std::vector<hpx::id_type>
-                    {
-                        std::vector<hpx::id_type> result = v.front().get();
-                        for (auto it = v.begin()+1; it != v.end(); ++it)
-                        {
-                            std::vector<id_type> r = it->get();
-                            std::copy(r.begin(), r.end(),
-                                std::back_inserter(result));
-                        }
-                        return result;
-                    },
-                    std::move(objs));
+                return policy.bulk_create<Component>(count,
+                    std::forward<Ts>(vs)...);
             }
         };
     }
@@ -350,21 +298,8 @@ namespace hpx { namespace components
             template <typename DistPolicy, typename ...Ts>
             static type call(DistPolicy const& policy, Ts&&... vs)
             {
-                using components::stub_base;
-
-                for (hpx::id_type const& loc: policy.get_localities())
-                {
-                    if (policy.get_num_items(1, loc) != 0)
-                    {
-                        return make_client<Client>(
-                            stub_base<component_type>::create_async(
-                                loc, std::forward<Ts>(vs)...));
-                    }
-                }
-
-                return make_client<Client>(
-                    stub_base<component_type>::create_async(
-                        hpx::find_here(), std::forward<Ts>(vs)...));
+                return make_client<Client>(policy.create<component_type>(
+                    std::forward<Ts>(vs)...));
             }
         };
 

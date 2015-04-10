@@ -9,11 +9,6 @@
 
 #include <type_traits>
 
-namespace hpx { namespace component
-{
-    struct default_distribution_policy;
-}}
-
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -23,11 +18,6 @@ namespace hpx { namespace traits
         template <typename T>
         struct is_distribution_policy
           : std::false_type
-        {};
-
-        template <>
-        struct is_distribution_policy<components::default_distribution_policy>
-          : std::true_type
         {};
         // \endcond
     }

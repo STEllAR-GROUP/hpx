@@ -224,7 +224,6 @@ distribution_policy                   "" "hpx\.components\.distribution_policy.*
 
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.new_id.*"
-new_colocated                         "" "hpx\.new_colocated.*"
 
 # hpx/runtime/components/copy_component.hpp
 copy                                  "" "hpx\.components\.copy.*"

@@ -73,8 +73,35 @@ namespace hpx { namespace components { namespace stubs
                 std::forward<Ts>(vs)...).get();
         }
 
-        /// Create a new component \a type using the runtime_support with the
-        /// given \a targetgid. This is a non-blocking call.
+        /// Create multiple new components \a type using the runtime_support
+        /// colocated with the with the given \a targetgid. This is a
+        /// non-blocking call.
+        template <typename Component, typename ...Ts>
+        static lcos::future<std::vector<naming::id_type> >
+        bulk_create_component_colocated_async(naming::id_type const& gid,
+            std::size_t count, Ts&&... vs)
+        {
+            typedef server::bulk_create_component_action<
+                Component, typename hpx::util::decay<Ts>::type...
+            > action_type;
+
+            return hpx::async_colocated<action_type>(gid, count,
+                std::forward<Ts>(vs)...);
+        }
+
+        /// Create multiple new components \a type using the runtime_support
+        /// colocated with the with the given \a targetgid. Block for the
+        /// creation to finish.
+        template <typename Component, typename ...Ts>
+        static std::vector<naming::id_type> bulk_create_component_colocated(
+            naming::id_type const& gid, std::size_t count, Ts&&... vs)
+        {
+            return bulk_create_component_colocated_async<Component>(gid,
+                count, std::forward<Ts>(vs)...).get();
+        }
+
+        /// Create multiple new components \a type using the runtime_support
+        /// on the given locality. This is a  non-blocking call.
         template <typename Component, typename ...Ts>
         static lcos::future<std::vector<naming::id_type> >
         bulk_create_component_async(naming::id_type const& gid,
@@ -96,8 +123,8 @@ namespace hpx { namespace components { namespace stubs
                 std::forward<Ts>(vs)...);
         }
 
-        /// Create a new component \a type using the runtime_support with the
-        /// given \a targetgid. Block for the creation to finish.
+        /// Create multiple new components \a type using the runtime_support
+        /// on the given locality. Block for the creation to finish.
         template <typename Component, typename ...Ts>
         static std::vector<naming::id_type> bulk_create_component(
             naming::id_type const& gid, std::size_t count, Ts&&... vs)
