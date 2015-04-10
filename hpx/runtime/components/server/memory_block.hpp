@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -644,20 +644,6 @@ namespace hpx { namespace components { namespace server
 
             // free memory itself
             get_heap().free(p);
-        }
-
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        static factory_property get_factory_properties()
-        {
-            // this component can be allocated one at a time only, but the
-            // meaning of the count parameter passed to create is different.
-            // In this case it specifies the number of bytes to allocate for a
-            // new memory block.
-            return factory_instance_count_is_size;
         }
 
     public:

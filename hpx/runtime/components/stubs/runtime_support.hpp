@@ -28,18 +28,6 @@ namespace hpx { namespace components { namespace stubs
     struct HPX_EXPORT runtime_support
     {
         ///////////////////////////////////////////////////////////////////////
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        static lcos::future<int> get_factory_properties_async(
-            naming::id_type const& targetgid, components::component_type type);
-
-        static int get_factory_properties(naming::id_type const& targetgid,
-            components::component_type type);
-
-        ///////////////////////////////////////////////////////////////////////
         /// Create a new component \a type using the runtime_support with the
         /// given \a targetgid. This is a non-blocking call. The caller needs
         /// to call \a future#get on the result of this function

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -136,16 +136,6 @@ namespace hpx { namespace components
         std::string get_component_name() const
         {
             return unique_component_name<derived_component_factory>::call();
-        }
-
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        factory_property get_factory_properties() const
-        {
-            return Component::get_factory_properties();
         }
 
         /// \brief Create one or more new component instances.
