@@ -20,21 +20,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     struct header
     {
         typedef int value_type;
+        typedef char flag_type;
         enum data_pos
         {
-            pos_tag              = 0 * sizeof(value_type),
-            pos_size             = 1 * sizeof(value_type),
-            pos_numbytes         = 2 * sizeof(value_type),
-            pos_numchunks_first  = 3 * sizeof(value_type),
-            pos_numchunks_second = 4 * sizeof(value_type),
-            pos_piggy_back_flag  = 5 * sizeof(value_type),
-            pos_piggy_back_data  = 5 * sizeof(value_type) + 1
+            pos_tag               = 0 * sizeof(value_type),
+            pos_size              = 1 * sizeof(value_type),
+            pos_numbytes          = 2 * sizeof(value_type),
+            pos_numchunks_first   = 3 * sizeof(value_type),
+            pos_numchunks_second  = 4 * sizeof(value_type),
+            pos_chunk_flag        = 5 * sizeof(value_type),
+            pos_piggy_back_flag   = 6 * sizeof(value_type),// + (1 * sizeof(flag_type)),
+            pos_chunk_offset      = 7 * sizeof(value_type),// + (2 * sizeof(flag_type)),
+            pos_piggy_back_offset = 8 * sizeof(value_type),// + (2 * sizeof(flag_type)) + 1,
+            pos_data_zone         = 8 * sizeof(value_type) + 1,// + (2 * sizeof(flag_type)) + 1
         };
 
         static int const data_size_ = SIZE;
 
         template <typename Buffer>
-        header(Buffer const & buffer, int tag, bool disable_piggyback_copy=false)
+        header(Buffer const & buffer, int tag, bool enable_piggyback_copy=true)
         {
             boost::int64_t size = static_cast<boost::int64_t>(buffer.size_);
             boost::int64_t numbytes = static_cast<boost::int64_t>(buffer.data_size_);
@@ -42,29 +46,44 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             HPX_ASSERT(size <= (std::numeric_limits<value_type>::max)());
             HPX_ASSERT(numbytes <= (std::numeric_limits<value_type>::max)());
 
-            set<pos_tag>(tag);
+            // chunk data is not stored by default
+            set<pos_chunk_flag>(static_cast<value_type>(0));
+            set<pos_piggy_back_flag>(static_cast<value_type>(0));
+            set<pos_chunk_offset>(static_cast<value_type>(0));
+            set<pos_piggy_back_offset>(static_cast<value_type>(0));
+
+            set<pos_tag>(static_cast<value_type>(tag));
             set<pos_size>(static_cast<value_type>(size));
             set<pos_numbytes>(static_cast<value_type>(numbytes));
             set<pos_numchunks_first>(static_cast<value_type>(buffer.num_chunks_.first));
             set<pos_numchunks_second>(static_cast<value_type>
                 (buffer.num_chunks_.second));
 
-LOG_DEBUG_MSG("Buffer data size is " << buffer.data_.size() << " (data_size_ - pos_piggy_back_data) is " << (data_size_ - pos_piggy_back_data));
+            LOG_DEBUG_MSG("Buffer data size is " << buffer.data_.size());
 
-            if(buffer.data_.size() <= (data_size_ - pos_piggy_back_data))
-            {
-                data_[pos_piggy_back_flag] = 1;
-                if (!disable_piggyback_copy) {
-                  std::memcpy(&data_[pos_piggy_back_data], &buffer.data_[0],
-                       buffer.data_.size());
-                  LOG_DEBUG_MSG("Copying piggy_back data_[pos_piggy_back_flag] = " << decnumber((int)(data_[pos_piggy_back_flag])));
-                }
-                else {
-                  LOG_DEBUG_MSG("Setting (no copy) piggy_back data_[pos_piggy_back_flag] = " << decnumber((int)(data_[pos_piggy_back_flag])));
-                }
+            // find out how much space is needed for chunk information
+            const std::vector<serialization::serialization_chunk>& chunks = buffer.chunks_;
+            size_t chunkbytes = chunks.size() * sizeof(serialization::serialization_chunk);
+            // can we send the chunk info inside the header
+            if (chunkbytes <= (data_size_ - pos_data_zone)) {
+              set<pos_chunk_flag>(static_cast<value_type>(1));
+              set<pos_chunk_offset>(static_cast<value_type>(pos_data_zone));
+              std::memcpy(&data_[data_[pos_chunk_offset]], chunks.data(), chunkbytes);
+              LOG_DEBUG_MSG("Copied chunk data into header : size " << decnumber(chunkbytes) << " at offset " << decnumber(*(int*)&data_[pos_chunk_offset]));
             }
             else {
-                data_[pos_piggy_back_flag] = 0;
+              chunkbytes = 0;
+            }
+
+            // can we send main chunk as well as other information
+            if(buffer.data_.size() <= (data_size_ - chunkbytes - pos_data_zone)) {
+                set<pos_piggy_back_flag>(static_cast<value_type>(1));
+                set<pos_piggy_back_offset>(static_cast<value_type>(pos_data_zone + chunkbytes));
+                LOG_DEBUG_MSG("Piggy back data in header : size "<< buffer.data_.size() << " at offset " << decnumber(*(int*)&data_[pos_piggy_back_offset]));
+                if (enable_piggyback_copy) {
+                  std::memcpy(&data_[data_[pos_piggy_back_offset]], &buffer.data_[0], buffer.data_.size());
+                  LOG_DEBUG_MSG("Copying piggy_back data_[pos_piggy_back_flag] = " << decnumber((int)(data_[pos_piggy_back_flag])));
+                }
             }
         }
 
@@ -122,8 +141,23 @@ LOG_DEBUG_MSG("Buffer data size is " << buffer.data_.size() << " (data_size_ - p
         char * piggy_back()
         {
             if(data_[pos_piggy_back_flag])
-                return &data_[pos_piggy_back_data];
+                return &data_[data_[pos_piggy_back_offset]];
             return 0;
+        }
+
+        char * chunk_data()
+        {
+            if(data_[pos_chunk_flag])
+                return &data_[data_[pos_chunk_offset]];
+            return 0;
+        }
+
+        std::size_t header_length()
+        {
+            if(data_[pos_chunk_flag])
+                return *reinterpret_cast<value_type*>(&data_[pos_piggy_back_offset]);
+            else
+                return *reinterpret_cast<value_type*>(&data_[pos_chunk_offset]);
         }
 
     private:
