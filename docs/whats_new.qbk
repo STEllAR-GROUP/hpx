@@ -11,11 +11,27 @@
 
 [heading General Changes]
 
- * Added integration with the [@https://circleci.com/gh/STEllAR-GROUP/hpx CircleCI]
-   hosted continuous integration service. This gives us constant and immediate
-   feedback on the health of our master branch.
+* Added integration with the [@https://circleci.com/gh/STEllAR-GROUP/hpx CircleCI]
+  hosted continuous integration service. This gives us constant and immediate
+  feedback on the health of our master branch.
+* The compiler configuration subsystem has been reimplemented. Instead of using
+  Boost.Config we now use our own lightweight set of cmake scripts to determine
+  the available language and library features supported by the used compiler.
+* The API for creating instance of components has been consolidated. All
+  component instances should be created using the [funcref hpx::new_ `hpx::new_`]
+  only. It allows to instantiate both, single component instances and multiple
+  component instances. The placement of the created components can be controlled
+  by special distribution policies.
 
 [heading Breaking Changes]
+
+* The macro `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY` has been deprecated. Please
+  use [macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`] instead.
+  The old macro will be removed in the next release.
+* The API function `hpx::new_colocated` has been removed. Please use the
+  consolidated API [funcref hpx::new_ `hpx::new_`] in conjunction with the new
+  [classref hpx::components::colocating_distribution_policy `hpx::colocating_distribution_policy`]
+  instead.
 
 [heading Bug Fixes (Closed Tickets)]
 

@@ -98,6 +98,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/binpacking_distribution_policy.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/colocating_distribution_policy.hpp"
+    "${hpx_SOURCE_DIR}/hpx/runtime/components/component_factory.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/copy_component.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/default_distribution_policy.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"

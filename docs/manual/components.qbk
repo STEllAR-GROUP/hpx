@@ -8,15 +8,20 @@
 [section:components Writing Components]
 
 A component in __hpx__ is a C++ class which can be created remotely and for which
-its member function can be invoked remotely as well. The following sections
+its member functions can be invoked remotely as well. The following sections
 highlight how components can be defined, created, and used.
 
 [//////////////////////////////////////////////////////////////////////////////]
 [section:components_server Defining Components]
 
-In order for a C++ class type to be managed remotely, the type must be derived
-from the `hpx::components::simple_component_base` template type. Note that the
-component type itself has to passed as a template argument to the base class.
+In order for a C++ class type to be managed remotely in __hpx__, the type must
+be derived from the `hpx::components::simple_component_base` template type. We
+call such C++ class types 'components'.
+
+Note that the component type itself is passed as a template argument to the
+base class.
+
+    // header file some_component.hpp
 
     #include <hpx/include/components.hpp>
 
@@ -26,7 +31,7 @@ component type itself has to passed as a template argument to the base class.
         struct some_component
           : hpx::components::simple_component_base<some_component>
         {
-            // This member function should be invoked remotely
+            // This member function is has to be invoked remotely
             int some_member_function(std::string s)
             {
                 return boost::lexical_cast<int>(s);
@@ -45,7 +50,39 @@ component type itself has to passed as a template argument to the base class.
     //
     // Note: The second arguments to the macro below have to be systemwide-unique
     //       C++ identifiers
+    //
     ``[macroref HPX_REGISTER_ACTION_DECLARATION `HPX_REGISTER_ACTION_DECLARATION`]``(app::some_component::some_member_action, some_component_some_action);
+
+There is more boiler plate code which has to be placed into a
+source file in order for the component to be usable. Every component type
+requires to have macros placed into its source file, one for each component type
+and one macro for each of the actions defined by the component type.
+
+For instance:
+
+    // source file some_component.cpp
+
+    #include "some_component.hpp"
+
+    // The following code generates all necessary boiler plate to enable the
+    // remote creation of 'app::some_component' instances with 'hpx::new_<>()'
+    //
+    using some_component = app::some_component;
+    using component_type = hpx::components::simple_component<some_component>;
+
+    // Please note that the second argument to this macro must be a
+    // (system-wide) unique C++-style identifier (without any namespaces)
+    //
+    ``[macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`]``(component_type, some_component);
+
+    // The parameters for this macro have to be the same as used in the corresponding
+    // HPX_REGISTER_ACTION_DECLARATION() macro invocation in the corresponding
+    // header file.
+    //
+    // Please note that the second argument to this macro must be a
+    // (system-wide) unique C++-style identifier (without any namespaces)
+    //
+    ``[macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`]``(app::some_component::some_member_action, some_component_some_action);
 
 [endsect]
 

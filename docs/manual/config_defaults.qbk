@@ -199,7 +199,7 @@ of the components will contain at least the following properties:
     [[`hpx.components.<component_instance_name>.name`]
      [This is the name of a component, usually the same as the second argument
       to the macro used while registering the component with
-      [macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`].
+      [macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`].
       Set by the component factory.]]
     [[`hpx.components.<component_instance_name>.path`]
      [This is either the full path file name of the component module or the
