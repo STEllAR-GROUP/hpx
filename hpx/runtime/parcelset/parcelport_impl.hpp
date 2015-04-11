@@ -582,7 +582,7 @@ namespace hpx { namespace parcelset
                         return true;
 
                     destinations.reserve(parcel_destinations_.size());
-                    BOOST_FOREACH(locality const& loc, parcel_destinations_)
+                    for (locality const& loc : parcel_destinations_)
                     {
                         destinations.push_back(loc);
                     }
@@ -591,7 +591,7 @@ namespace hpx { namespace parcelset
 
             // Create new HPX threads which send the parcels that are still
             // pending.
-            BOOST_FOREACH(locality const& loc, destinations)
+            for (locality const& loc : destinations)
             {
                 if (!trigger_sending_parcels(loc, true))
                     return false;
@@ -629,7 +629,7 @@ namespace hpx { namespace parcelset
                             std::back_inserter(threads));
                         l.unlock();
 
-                        BOOST_FOREACH(threads::thread_id_type const& t, threads)
+                        for (threads::thread_id_type const& t : threads)
                         {
                             if(threads::get_thread_state(t) != threads::suspended)
                             {

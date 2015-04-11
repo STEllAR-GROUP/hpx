@@ -11,8 +11,6 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/foreach.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::simple_component_base<test_server>
@@ -71,7 +69,7 @@ int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         // repeating this a couple of times forces the issue ...
         for (int i = 0; i != 100; ++i)

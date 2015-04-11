@@ -13,8 +13,6 @@
 #include <iostream>
 #include <functional>
 
-#include <boost/foreach.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_VECTOR(double);
@@ -134,7 +132,7 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
 
     // test iteration over localities
     count = 0;
-    BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         iterator end = v.end(locality_id);
@@ -153,7 +151,7 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
     HPX_TEST_EQ(count, size);
 
     count = 0;
-    BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         const_iterator end = v.cend(locality_id);
@@ -173,7 +171,7 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
     // test segmented iteration over localities
     count = 0;
     seg_count = 0;
-    BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         local_segment_iterator seg_end = v.segment_end(locality_id);
@@ -192,7 +190,7 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
 
     count = 0;
     seg_count = 0;
-    BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         boost::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         const_local_segment_iterator seg_cend = v.segment_cend(locality_id);

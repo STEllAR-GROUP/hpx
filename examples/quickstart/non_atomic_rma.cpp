@@ -24,7 +24,6 @@
 #include <boost/serialization/export.hpp>
 
 #include <boost/thread/locks.hpp>
-#include <boost/foreach.hpp>
 #include <boost/ref.hpp>
 
 #include <algorithm>

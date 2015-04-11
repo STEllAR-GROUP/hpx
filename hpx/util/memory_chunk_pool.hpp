@@ -64,7 +64,7 @@ namespace hpx { namespace util
 
         ~memory_chunk_pool()
         {
-            BOOST_FOREACH(typename backup_chunks_type::value_type &v, backup_chunks_)
+            for (typename backup_chunks_type::value_type& v : backup_chunks_)
             {
                 char *ptr = v.second - offset_;
 #if _POSIX_SOURCE
@@ -158,7 +158,7 @@ namespace hpx { namespace util
             {
 #if defined(HPX_DEBUG)
                 bool valid_chunk = false;
-                BOOST_FOREACH(memory_chunk_type & c, memory_chunks_)
+                for (memory_chunk_type& c : memory_chunks_)
                 {
                     if(&c == chunk)
                     {

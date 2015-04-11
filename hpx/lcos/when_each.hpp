@@ -112,6 +112,7 @@ namespace hpx
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/and.hpp>
+#include <boost/range/functions.hpp>
 #include <boost/utility/enable_if.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

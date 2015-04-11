@@ -8,6 +8,8 @@
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/range/functions.hpp>
+
 #include "test_utils.hpp"
 
 // FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408

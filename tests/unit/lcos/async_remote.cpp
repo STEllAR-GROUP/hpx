@@ -156,7 +156,7 @@ void test_remote_async(hpx::id_type const& target)
 int hpx_main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         test_remote_async(id);
     }

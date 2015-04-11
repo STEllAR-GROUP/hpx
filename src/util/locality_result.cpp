@@ -9,6 +9,7 @@
 #include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/include/serialization.hpp>
 
+#include <boost/range/iterator_range.hpp>
 #include <boost/serialization/vector.hpp>
 
 namespace hpx { namespace util
@@ -59,11 +60,10 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     /// return an iterator range for the given locality_result's
-    std::pair<locality_result_iterator, locality_result_iterator>
+    boost::iterator_range<locality_result_iterator>
     locality_results(std::vector<util::locality_result> const& v)
     {
-        typedef std::pair<locality_result_iterator, locality_result_iterator>
-            result_type;
+        typedef boost::iterator_range<locality_result_iterator> result_type;
         return result_type(locality_result_iterator(v), locality_result_iterator());
     }
 

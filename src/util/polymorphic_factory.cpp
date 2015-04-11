@@ -11,8 +11,6 @@
 #include <hpx/util/static.hpp>
 #include <hpx/util/jenkins_hash.hpp>
 
-#include <boost/foreach.hpp>
-
 namespace hpx { namespace actions
 {
     class HPX_EXPORT continuation;

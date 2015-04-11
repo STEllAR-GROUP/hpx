@@ -21,7 +21,7 @@ int hpx_main(boost::program_options::variables_map&)
 {
     std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
 
-    BOOST_FOREACH(hpx::naming::id_type const & id, localities)
+    for (hpx::naming::id_type const& id : localities)
     {
         {
             hpx::naming::id_type a = id;

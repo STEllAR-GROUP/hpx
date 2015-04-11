@@ -9,7 +9,6 @@
 #include <set>
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/program_options.hpp>
 
 #include <hpx/hpx.hpp>

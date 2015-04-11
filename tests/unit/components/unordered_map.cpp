@@ -14,7 +14,6 @@
 #include <functional>
 #include <string>
 
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

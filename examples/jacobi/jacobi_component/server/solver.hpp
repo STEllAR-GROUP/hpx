@@ -75,7 +75,7 @@ namespace jacobi
                 std::vector<hpx::lcos::shared_future<void> > init_futures;
                 init_futures.reserve(ny);
                 std::size_t y = 0;
-                BOOST_FOREACH(hpx::naming::id_type id, hpx::util::locality_results(si_allocated))
+                for (hpx::naming::id_type const& id : hpx::util::locality_results(si_allocated))
                 {
                     //std::cout << y << " " << id << "\n";
                     jacobi::stencil_iterator r; r.id = id;

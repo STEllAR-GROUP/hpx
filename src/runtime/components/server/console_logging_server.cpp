@@ -19,7 +19,6 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
@@ -62,7 +61,7 @@ namespace hpx { namespace components { namespace server
 
         using boost::fusion::at_c;
 
-        BOOST_FOREACH(message_type const& msg, msgs)
+        for (message_type const& msg : msgs)
         {
             const logging_destination dest = at_c<0>(msg);
             const std::size_t level = at_c<1>(msg);

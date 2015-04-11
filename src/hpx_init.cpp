@@ -44,7 +44,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
-#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -608,7 +607,7 @@ namespace hpx
 
                 std::vector<std::string> bind_affinity =
                     cfg.vm_["hpx:bind"].as<std::vector<std::string> >();
-                BOOST_FOREACH(std::string const& s, bind_affinity)
+                for (std::string const& s : bind_affinity)
                 {
                     if (!affinity_desc.empty())
                         affinity_desc += ";";
@@ -719,7 +718,7 @@ namespace hpx
 
                 std::vector<std::string> bind_affinity =
                     cfg.vm_["hpx:bind"].as<std::vector<std::string> >();
-                BOOST_FOREACH(std::string const& s, bind_affinity)
+                for (std::string const& s : bind_affinity)
                 {
                     if (!affinity_desc.empty())
                         affinity_desc += ";";
@@ -829,7 +828,7 @@ namespace hpx
 
                 std::vector<std::string> bind_affinity =
                     cfg.vm_["hpx:bind"].as<std::vector<std::string> >();
-                BOOST_FOREACH(std::string const& s, bind_affinity)
+                for (std::string const& s : bind_affinity)
                 {
                     if (!affinity_desc.empty())
                         affinity_desc += ";";

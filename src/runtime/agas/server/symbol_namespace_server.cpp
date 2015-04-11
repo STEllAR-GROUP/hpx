@@ -277,7 +277,7 @@ std::vector<response> symbol_namespace::bulk_service(
     std::vector<response> r;
     r.reserve(reqs.size());
 
-    BOOST_FOREACH(request const& req, reqs)
+    for (request const& req : reqs)
     {
         error_code ign;
         r.push_back(service(req, ign));
@@ -371,7 +371,7 @@ response symbol_namespace::bind(
         on_event_data_.erase(p.first, p.second);
 
         // notify all LCOS which were registered with this name
-        BOOST_FOREACH(hpx::id_type const& id, lcos)
+        for (hpx::id_type const& id : lcos)
         {
             // re-locate the entry in the GID table for each LCO anew, as we
             // need to unlock the mutex protecting the table for each iteration

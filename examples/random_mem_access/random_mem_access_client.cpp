@@ -10,7 +10,6 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <boost/foreach.hpp>
 #include <time.h>
 
 #include "random_mem_access/random_mem_access.hpp"
@@ -19,7 +18,7 @@ inline void
 init(hpx::components::server::distributing_factory::iterator_range_type r,
     std::vector<hpx::components::random_mem_access>& accu)
 {
-    BOOST_FOREACH(hpx::naming::id_type const& id, r)
+    for (hpx::naming::id_type const& id : r)
     {
         accu.push_back(hpx::components::random_mem_access(id));
     }

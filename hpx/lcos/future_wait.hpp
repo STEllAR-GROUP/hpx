@@ -12,7 +12,6 @@
 #include <hpx/lcos/wait_all.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/foreach.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/is_void.hpp>

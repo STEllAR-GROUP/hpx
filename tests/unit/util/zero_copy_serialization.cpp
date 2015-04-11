@@ -9,8 +9,6 @@
 #include <hpx/util/serialize_buffer.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/foreach.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 struct data_buffer

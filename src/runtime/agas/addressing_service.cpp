@@ -2210,7 +2210,7 @@ namespace hpx { namespace agas
         std::vector<hpx::id_type> find_all_symbol_namespace_services()
         {
             std::vector<hpx::id_type> ids;
-            BOOST_FOREACH(hpx::id_type const& id, hpx::find_all_localities())
+            for (hpx::id_type const& id : hpx::find_all_localities())
             {
                 ids.push_back(hpx::id_type(
                     agas::stubs::symbol_namespace::get_service_instance(id),
@@ -2880,7 +2880,7 @@ void addressing_service::send_refcnt_requests(
         typedef addressing_service::refcnt_requests_type::const_reference
             const_reference;
 
-        BOOST_FOREACH(const_reference e, requests)
+        for (const_reference e : requests)
         {
             // The [client] tag is in there to make it easier to filter
             // through the logs.
@@ -2928,7 +2928,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
         typedef std::map<naming::id_type, std::vector<request> > requests_type;
         requests_type requests;
 
-        BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
+        for (refcnt_requests_type::const_reference e : *p)
         {
             HPX_ASSERT(e.second < 0);
 
@@ -2993,7 +2993,7 @@ addressing_service::send_refcnt_requests_async(
     requests_type requests;
 
     std::vector<hpx::future<std::vector<response> > > lazy_results;
-    BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
+    for (refcnt_requests_type::const_reference e : *p)
     {
         HPX_ASSERT(e.second < 0);
 
@@ -3029,10 +3029,10 @@ void addressing_service::send_refcnt_requests_sync(
 
     wait_all(lazy_results);
 
-    BOOST_FOREACH(hpx::future<std::vector<response> > & f, lazy_results)
+    for (hpx::future<std::vector<response> >& f : lazy_results)
     {
         std::vector<response> const& reps = f.get();
-        BOOST_FOREACH(response const& rep, reps)
+        for (response const& rep : reps)
         {
             if (success != rep.get_status())
             {
@@ -3187,7 +3187,7 @@ namespace hpx
         }
 
         std::vector<hpx::future<hpx::id_type> > results;
-        BOOST_FOREACH(std::size_t i, ids)
+        for (std::size_t i : ids)
         {
             std::string name = detail::name_from_basename(basename, i);
             results.push_back(agas::on_symbol_namespace_event(

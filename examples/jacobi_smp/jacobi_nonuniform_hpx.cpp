@@ -82,7 +82,7 @@ namespace jacobi_smp {
                 std::vector<std::size_t> const & deps(dependencies[block]);
                 std::vector<hpx::shared_future<void> > trigger;
                 trigger.reserve(deps.size());
-                BOOST_FOREACH(std::size_t dep, deps)
+                for (std::size_t dep : deps)
                 {
                     trigger.push_back((*deps_src)[dep]);
                 }                                                                                                                           

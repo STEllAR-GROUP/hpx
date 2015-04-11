@@ -472,7 +472,7 @@ int hpx_main(variables_map& vm)
         {
             ofs_test_info.rfiles = rfiles;
 
-            BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+            for (hpx::naming::id_type const& node : localities)
             {
                 // Initiate an asynchronous IO operation wait for it to complete without
                 // blocking any of the HPX thread-manager threads.
@@ -488,7 +488,7 @@ int hpx_main(variables_map& vm)
         {
             ofs_test_info.wfiles = wfiles;
 
-            BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+            for (hpx::naming::id_type const& node : localities)
             {
                 for(int proc=0; proc < procs; proc++)
                 {

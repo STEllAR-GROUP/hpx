@@ -736,7 +736,7 @@ namespace hpx { namespace threads
                 detail::mappings_spec_type mappings_specs(
                     boost::get<detail::mappings_spec_type>(mappings));
 
-                BOOST_FOREACH(detail::full_mapping_type& m, mappings_specs)
+                for (detail::full_mapping_type& m : mappings_specs)
                 {
                     if (m.first.type_ != detail::spec_type::thread)
                     {

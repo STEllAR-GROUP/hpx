@@ -137,7 +137,7 @@ int main()
     HPX_TEST(test_copy_component_there(hpx::find_here()));
 
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         HPX_TEST(test_copy_component(id));
         HPX_TEST(test_copy_component_here(id));

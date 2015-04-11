@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    BOOST_FOREACH(hpx::id_type id, localities)
+    for (hpx::id_type const& id : localities)
     {
         zerocopy zc = hpx::new_<zerocopy_server>(id, ZEROCOPY_DATASIZE);
 

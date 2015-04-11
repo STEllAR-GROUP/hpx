@@ -92,7 +92,7 @@ bool test_migrate_component(hpx::id_type source, hpx::id_type target)
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         HPX_TEST(test_migrate_component(hpx::find_here(), id));
         HPX_TEST(test_migrate_component(id, hpx::find_here()));

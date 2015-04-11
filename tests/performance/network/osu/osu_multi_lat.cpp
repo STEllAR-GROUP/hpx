@@ -132,7 +132,7 @@ void run_benchmark(boost::program_options::variables_map & vm)
         double total_latency = 0;
 
         hpx::wait_all(benchmarks);
-        BOOST_FOREACH(hpx::future<double> & f, benchmarks)
+        for (hpx::future<double>& f : benchmarks)
         {
             total_latency += f.get();
         }

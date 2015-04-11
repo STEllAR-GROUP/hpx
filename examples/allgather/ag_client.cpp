@@ -23,7 +23,7 @@ inline void
 init(hpx::components::server::distributing_factory::iterator_range_type const& r,
     std::vector<hpx::naming::id_type>& p)
 {
-    BOOST_FOREACH(hpx::naming::id_type const& id, r)
+    for (hpx::naming::id_type const& id : r)
     {
         p.push_back(id);
     }
