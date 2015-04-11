@@ -19,7 +19,7 @@ typedef hpx::components::managed_component<
     examples::server::template_function_accumulator
 > accumulator_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(accumulator_type, template_function_accumulator);
+HPX_REGISTER_COMPONENT(accumulator_type, template_function_accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for managed_accumulator actions.

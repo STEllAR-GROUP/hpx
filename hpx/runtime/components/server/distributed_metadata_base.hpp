@@ -97,7 +97,7 @@ namespace hpx { namespace components { namespace server
     typedef ::hpx::components::simple_component<                              \
         ::hpx::components::server::distributed_metadata_base<config>          \
     > BOOST_PP_CAT(__distributed_metadata_, name);                            \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(                                   \
+    HPX_REGISTER_COMPONENT(                                                   \
         BOOST_PP_CAT(__distributed_metadata_, name))                          \
     /**/
 

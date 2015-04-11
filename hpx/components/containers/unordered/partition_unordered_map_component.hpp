@@ -405,7 +405,7 @@ namespace hpx { namespace server
     typedef ::hpx::components::simple_component<                              \
         BOOST_PP_CAT(partition_unordered_map, __LINE__)                       \
     > BOOST_PP_CAT(__unordered_map_, name);                                   \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(BOOST_PP_CAT(__unordered_map_, name)) \
+    HPX_REGISTER_COMPONENT(BOOST_PP_CAT(__unordered_map_, name))              \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////

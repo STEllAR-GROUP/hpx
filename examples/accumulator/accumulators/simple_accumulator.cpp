@@ -18,7 +18,7 @@ typedef hpx::components::simple_component<
     examples::server::simple_accumulator
 > accumulator_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(accumulator_type, simple_accumulator);
+HPX_REGISTER_COMPONENT(accumulator_type, simple_accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for simple_accumulator actions.

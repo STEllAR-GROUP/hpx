@@ -16,7 +16,7 @@ typedef hpx::components::managed_component<
         > board_type;
 
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(board_type, board);
+HPX_REGISTER_COMPONENT(board_type, board);
 
 // Serialization support for the board actions
 

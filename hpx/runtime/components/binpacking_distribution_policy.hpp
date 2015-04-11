@@ -310,12 +310,10 @@ namespace hpx { namespace components
         /// \endcond
     };
 
-    /// \cond NOINTERNAL
     /// By default the binpacking policy uses the overall number of objects
     /// on the used localities.
     char const* const binpacking_distribution_policy::default_counter_name =
         "/runtime/count/component";
-    /// \endcond
 
     /// A predefined instance of the binpacking \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.

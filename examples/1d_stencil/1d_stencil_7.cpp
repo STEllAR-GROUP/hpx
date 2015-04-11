@@ -183,10 +183,10 @@ private:
 // The macros below are necessary to generate the code required for exposing
 // our partition type remotely.
 //
-// HPX_REGISTER_MINIMAL_COMPONENT_FACTORY() exposes the component creation
+// HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::simple_component<partition_server> partition_server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(partition_server_type, partition_server);
+HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.

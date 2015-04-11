@@ -105,7 +105,7 @@ typedef hpx::components::managed_component<
     jacobi::server::stencil_iterator
 > stencil_iterator_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_iterator_type, stencil_iterator);
+HPX_REGISTER_COMPONENT(stencil_iterator_type, stencil_iterator);
 
 
 HPX_REGISTER_ACTION(
