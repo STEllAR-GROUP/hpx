@@ -220,15 +220,15 @@ parallel::uninitialized_fill_n        "uninitialized_fill_n" "hpx\.parallel\.v1\
 
 
 # hpx/runtime/components/colocating_distribution_policy.hpp
-colocating_distribution_policy        "" "hpx\.components\.colocating_distribution_policy.*"
+colocating_distribution_policy        "" "hpx\.components\.colocating_distri_id.*"
 colocated                             "" "hpx\.components\.colocated.*"
 
 # hpx/runtime/components/default_distribution_policy.hpp
-default_distribution_policy           "" "hpx\.components\.default_distribution_policy.*"
+default_distribution_policy           "" "hpx\.components\.default_distribut_id.*"
 default_layout                        "" "hpx\.components\.default_layout.*"
 
 # hpx/runtime/components/binpacking_distribution_policy.hpp
-binpacking_distribution_policy        "" "hpx\.components\.binpacking_distribution_policy.*"
+binpacking_distribution_policy        "" "hpx\.components\.binpacking_distri_id.*"
 binpacked                             '' "hpx\.components\.binpacked.*"
 
 # hpx/runtime/components/new.hpp

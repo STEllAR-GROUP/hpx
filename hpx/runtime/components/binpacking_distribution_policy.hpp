@@ -82,8 +82,8 @@ namespace hpx { namespace components
         /// Create one object on one of the localities associated by
         /// this policy instance
         ///
-        /// \params vs  [in] The arguments which will be forwarded to the
-        ///             constructor of the new object.
+        /// \param vs  [in] The arguments which will be forwarded to the
+        ///            constructor of the new object.
         ///
         /// \returns A future holding the global address which represents
         ///          the newly created object
@@ -112,8 +112,8 @@ namespace hpx { namespace components
         /// this policy instance
         ///
         /// \param count [in] The number of objects to create
-        /// \params vs   [in] The arguments which will be forwarded to the
-        ///              constructors of the new objects.
+        /// \param vs   [in] The arguments which will be forwarded to the
+        ///             constructors of the new objects.
         ///
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
@@ -317,7 +317,7 @@ namespace hpx { namespace components
         "/runtime/count/component";
     /// \endcond
 
-    /// A predefined instance of the default \a distribution_policy. It will
+    /// A predefined instance of the binpacking \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.
     static binpacking_distribution_policy const binpacked;
 }}
