@@ -223,7 +223,7 @@ namespace hpx { namespace components
             template <typename DistPolicy, typename ...Ts>
             static type call(DistPolicy const& policy, Ts&&... vs)
             {
-                return policy.create<Component>(std::forward<Ts>(vs)...);
+                return policy.template create<Component>(std::forward<Ts>(vs)...);
             }
         };
 
@@ -246,7 +246,7 @@ namespace hpx { namespace components
             static type call(DistPolicy const& policy, std::size_t count,
                 Ts&&... vs)
             {
-                return policy.bulk_create<Component>(count,
+                return policy.template bulk_create<Component>(count,
                     std::forward<Ts>(vs)...);
             }
         };

@@ -461,7 +461,7 @@ namespace hpx { namespace components
     inline typename boost::enable_if_c<
         traits::is_client<Client>::value, std::vector<Client>
     >::type
-    make_client(std::vector<hpx::future<hpx::id_type> > && id)
+    make_client(std::vector<hpx::future<hpx::id_type> > && ids)
     {
         std::vector<Client> result;
         result.reserve(ids.size());

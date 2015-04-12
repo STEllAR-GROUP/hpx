@@ -222,13 +222,10 @@ namespace hpx { namespace components
         {
             using components::stub_base;
 
-            for (hpx::id_type const& loc: localities_)
+            if (!localities_.empty())
             {
-                if (get_num_items(1, loc) != 0)
-                {
-                    return stub_base<Component>::create_async(
-                        loc, std::forward<Ts>(vs)...);
-                }
+                return stub_base<Component>::create_async(
+                    localities_.front(), std::forward<Ts>(vs)...);
             }
 
             // by default the object will be created on the current
