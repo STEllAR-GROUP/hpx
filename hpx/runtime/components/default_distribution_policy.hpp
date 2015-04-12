@@ -156,7 +156,6 @@ namespace hpx { namespace components
                 std::move(objs));
         }
 
-    protected:
         /// \cond NOINTERNAL
         // Return the number of items to place on the given locality.
         //
