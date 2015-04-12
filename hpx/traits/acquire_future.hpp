@@ -147,7 +147,7 @@ namespace hpx { namespace traits
             std::transform(boost::begin(futures), boost::end(futures),
                 std::back_inserter(values), acquire_future_disp());
 
-            return std::move(values);
+            return values;
         }
     };
 }}

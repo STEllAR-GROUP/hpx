@@ -2073,7 +2073,7 @@ lcos::future<bool> addressing_service::register_name_async(
         );
     }
 
-    return std::move(f);
+    return f;
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////

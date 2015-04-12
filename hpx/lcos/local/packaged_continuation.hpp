@@ -397,7 +397,7 @@ namespace hpx { namespace lcos { namespace detail
         typename shared_state_ptr<result_type>::type p(
             new shared_state(std::forward<F>(f)));
         static_cast<shared_state*>(p.get())->attach(future, policy);
-        return std::move(p);
+        return p;
     }
 
     template <typename ContResult, typename Future, typename F>
@@ -414,7 +414,7 @@ namespace hpx { namespace lcos { namespace detail
         typename shared_state_ptr<result_type>::type p(
             new shared_state(std::forward<F>(f)));
         static_cast<shared_state*>(p.get())->attach(future, sched);
-        return std::move(p);
+        return p;
     }
 }}}
 
@@ -512,7 +512,7 @@ namespace hpx { namespace lcos { namespace detail
         // create a continuation
         typename shared_state_ptr<result_type>::type p(new shared_state());
         static_cast<shared_state*>(p.get())->attach(future);
-        return std::move(p);
+        return p;
     }
 }}}
 
@@ -565,7 +565,7 @@ namespace hpx { namespace lcos { namespace detail
         // create a continuation
         typename shared_state_ptr<void>::type p(new void_shared_state());
         static_cast<void_shared_state*>(p.get())->attach(future);
-        return std::move(p);
+        return p;
     }
 }}}
 

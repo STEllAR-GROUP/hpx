@@ -517,7 +517,7 @@ namespace hpx { namespace lcos
                 std::move(t.begin(), t.end(), std::back_inserter(res));
             }
 
-            return std::move(res);
+            return res;
         }
 
         ///////////////////////////////////////////////////////////////////////
