@@ -83,13 +83,13 @@ namespace hpx
     static container_distribution_policy const layout;
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace traits { namespace detail
+    namespace traits
     {
         template <>
         struct is_distribution_policy<container_distribution_policy>
           : std::true_type
         {};
-    }}
+    }
 }
 
 #endif

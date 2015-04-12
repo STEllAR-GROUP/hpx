@@ -22,46 +22,18 @@
 
 #include <algorithm>
 #include <vector>
+#include <iterator>
 
 namespace hpx { namespace components
 {
     static char const* const default_binpacking_counter_name =
         "/runtime/count/component@";
 
-    /// This class specifies the parameters for a binpacking distribution policy
-    /// to use for creating a given number of items on a given set of localities.
-    /// The binpacking policy will distribute the new objects in a way such that
-    /// each of the localities will equalize the number of overall objects of
-    /// this type based on a given criteria (by default this criteria is the
-    /// overall number of objects of this type).
-    struct binpacking_distribution_policy
+    namespace detail
     {
-    private:
         /// \cond NOINTERNAL
-        static hpx::future<std::vector<hpx::id_type> >
-        consolidate_result(
-            std::vector<hpx::future<std::vector<hpx::id_type> > > && objs)
-        {
-            // consolidate all results into single array
-            return hpx::lcos::local::dataflow(
-                [](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
-                    -> std::vector<hpx::id_type>
-                {
-                    std::vector<hpx::id_type> result = v.front().get();
-                    for (auto it = v.begin()+1; it != v.end(); ++it)
-                    {
-                        std::vector<id_type> r = it->get();
-                        std::copy(r.begin(), r.end(),
-                            std::back_inserter(result));
-                    }
-                    return result;
-                },
-                std::move(objs));
-        }
-
-        std::vector<std::size_t>
-        static get_items_count(std::size_t count,
-            std::vector<boost::uint64_t> && values)
+        inline std::vector<std::size_t>
+        get_items_count(std::size_t count, std::vector<boost::uint64_t> && values)
         {
             std::size_t maxcount = 0;
             std::size_t existing = 0;
@@ -128,37 +100,115 @@ namespace hpx { namespace components
             return to_create;
         }
 
+        inline hpx::future<std::vector<hpx::id_type> >
+        consolidate_result(
+            std::vector<hpx::future<std::vector<hpx::id_type> > > && objs)
+        {
+            // consolidate all results into single array
+            return hpx::lcos::local::dataflow(
+                [](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
+                    -> std::vector<hpx::id_type>
+                {
+                    std::vector<hpx::id_type> result = v.front().get();
+                    for (auto it = v.begin()+1; it != v.end(); ++it)
+                    {
+                        std::vector<id_type> r = it->get();
+                        std::copy(r.begin(), r.end(),
+                            std::back_inserter(result));
+                    }
+                    return result;
+                },
+                std::move(objs));
+        }
+
+        inline hpx::future<std::vector<boost::uint64_t> >
+        retrieve_counter_values(
+            std::vector<performance_counters::performance_counter> && counters)
+        {
+            using namespace hpx::performance_counters;
+
+            std::vector<hpx::future<boost::uint64_t> > values;
+            values.reserve(counters.size());
+
+            for (performance_counter const& counter: counters)
+                values.push_back(counter.get_value<boost::uint64_t>());
+
+            return hpx::lcos::local::dataflow(
+                hpx::util::unwrapped(
+                    [](std::vector<boost::uint64_t> && values)
+                    {
+                        return values;
+                    }),
+                std::move(values));
+        }
+
+        template <typename String>
+        hpx::future<std::vector<boost::uint64_t> > get_counter_values(
+            String component_name, std::string const& counter_name,
+            std::vector<hpx::id_type> const& localities)
+        {
+            using namespace hpx::performance_counters;
+
+            // create performance counters on all localities
+            std::vector<performance_counter> counters;
+            counters.reserve(localities.size());
+
+            if (counter_name.back() == '@')
+            {
+                std::string name(counter_name + component_name);
+                for (hpx::id_type const& id: localities)
+                    counters.push_back(performance_counter(name, id));
+            }
+            else
+            {
+                for (hpx::id_type const& id: localities)
+                    counters.push_back(performance_counter(counter_name, id));
+            }
+
+            return hpx::lcos::local::dataflow(&retrieve_counter_values,
+                std::move(counters));
+        }
+
         template <typename Component>
         struct create_helper
         {
-            create_helper(binpacking_distribution_policy const& policy)
-              : policy_(policy)
+            create_helper(std::vector<hpx::id_type> const& localities)
+              : localities_(localities)
             {}
 
             template <typename ...Ts>
             hpx::future<std::vector<hpx::id_type> > operator()(
                 hpx::future<std::vector<boost::uint64_t> > && values,
-                std::size_t count, Ts... vs) const
+                std::size_t count, Ts&&... vs) const
             {
                 std::vector<std::size_t> to_create =
-                    policy_.get_items_count(count, values.get());
+                    detail::get_items_count(count, values.get());
 
                 std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
-                objs.reserve(policy_.localities_.size());
+                objs.reserve(localities_.size());
 
                 for (std::size_t i = 0; i != to_create.size(); ++i)
                 {
                     objs.push_back(stub_base<Component>::bulk_create_async(
-                        policy_.localities_[i], to_create[i], vs...));
+                        localities_[i], to_create[i], vs...));
                 }
 
-                return policy_.consolidate_result(std::move(objs));
+                return detail::consolidate_result(std::move(objs));
             }
 
-            binpacking_distribution_policy const& policy_;
+            std::vector<hpx::id_type> const& localities_;
         };
         /// \endcond
+    }
 
+    /// This class specifies the parameters for a binpacking distribution policy
+    /// to use for creating a given number of items on a given set of localities.
+    /// The binpacking policy will distribute the new objects in a way such that
+    /// each of the localities will equalize the number of overall objects of
+    /// this type based on a given criteria (by default this criteria is the
+    /// overall number of objects of this type).
+    struct binpacking_distribution_policy
+    {
     public:
         /// Default-construct a new instance of a \a binpacking_distribution_policy.
         /// This policy will represent one locality (the local locality).
@@ -264,16 +314,16 @@ namespace hpx { namespace components
 
             // schedule creation of all objects across given localities
             hpx::future<std::vector<boost::uint64_t> > values =
-                get_counter_values(
+                detail::get_counter_values(
                     hpx::components::unique_component_name<
                         hpx::components::component_factory<
                             typename Component::wrapping_type
                         >
-                    >::call());
+                    >::call(), counter_name_, localities_);
 
             using hpx::util::placeholders::_1;
             return values.then(
-                hpx::util::bind(create_helper<Component>(*this),
+                hpx::util::bind(detail::create_helper<Component>(localities_),
                     _1, count, std::forward<Ts>(vs)...));
         }
 
@@ -283,56 +333,6 @@ namespace hpx { namespace components
         {
             return counter_name_;
         }
-
-    protected:
-        /// \cond NOINTERNAL
-        static hpx::future<std::vector<boost::uint64_t> >
-        get_counter_values_helper(
-            std::vector<performance_counters::performance_counter> && counters)
-        {
-            using namespace hpx::performance_counters;
-
-            std::vector<hpx::future<boost::uint64_t> > values;
-            values.reserve(counters.size());
-
-            for (performance_counter const& counter: counters)
-                values.push_back(counter.get_value<boost::uint64_t>());
-
-            return hpx::lcos::local::dataflow(
-                hpx::util::unwrapped(
-                    [](std::vector<boost::uint64_t> && values)
-                    {
-                        return values;
-                    }),
-                std::move(values));
-        }
-
-        hpx::future<std::vector<boost::uint64_t> > get_counter_values(
-            std::string const& component_name) const
-        {
-            using namespace hpx::performance_counters;
-
-            // create performance counters on all localities
-            std::vector<performance_counter> counters;
-            counters.reserve(localities_.size());
-
-            if (counter_name_[sizeof(counter_name_)-2] == '@')
-            {
-                std::string counter_name(counter_name_ + component_name);
-                for (hpx::id_type const& id: localities_)
-                    counters.push_back(performance_counter(counter_name, id));
-            }
-            else
-            {
-                for (hpx::id_type const& id: localities_)
-                    counters.push_back(performance_counter(counter_name_, id));
-            }
-
-            return hpx::lcos::local::dataflow(
-                &binpacking_distribution_policy::get_counter_values_helper,
-                std::move(counters));
-        }
-        /// \endcond
 
     protected:
         /// \cond NOINTERNAL
@@ -365,13 +365,13 @@ namespace hpx
     using hpx::components::binpacking_distribution_policy;
     using hpx::components::binpacked;
 
-    namespace traits { namespace detail
+    namespace traits
     {
         template <>
         struct is_distribution_policy<components::binpacking_distribution_policy>
           : std::true_type
         {};
-    }}
+    }
 }
 /// \endcond
 

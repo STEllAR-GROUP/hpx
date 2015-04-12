@@ -49,8 +49,8 @@ namespace hpx { namespace components
         /// Create a new \a colocating_distribution_policy representing the
         /// locality where the given object os current located
         ///
-        /// \param client  [in] The client side representation of the object with
-        ///                which the new instances should be colocated on
+        /// \param client  [in] The client side representation of the object
+        ///                with which the new instances should be colocated on
         ///
         template <typename Client, typename Stub>
         colocating_distribution_policy operator()(
@@ -121,8 +121,9 @@ namespace hpx { namespace components
         /// \endcond
     };
 
-    /// A predefined instance of the colocating \a distribution_policy. It will
-    /// represent the local locality and will place all items to create here.
+    /// A predefined instance of the co-locating \a distribution_policy. It
+    /// will represent the local locality and will place all items to create
+    /// here.
     static colocating_distribution_policy const colocated;
 }}
 
@@ -132,13 +133,13 @@ namespace hpx
     using hpx::components::colocating_distribution_policy;
     using hpx::components::colocated;
 
-    namespace traits { namespace detail
+    namespace traits
     {
         template <>
         struct is_distribution_policy<components::colocating_distribution_policy>
           : std::true_type
         {};
-    }}
+    }
 }
 /// \endcond
 

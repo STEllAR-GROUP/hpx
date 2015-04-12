@@ -11,21 +11,9 @@
 
 namespace hpx { namespace traits
 {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <typename T>
-        struct is_distribution_policy
-          : std::false_type
-        {};
-        // \endcond
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable>
     struct is_distribution_policy
-      : detail::is_distribution_policy<typename hpx::util::decay<T>::type>
+      : std::false_type
     {};
 }}
 

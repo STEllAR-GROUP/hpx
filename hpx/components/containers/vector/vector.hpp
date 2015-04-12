@@ -691,15 +691,15 @@ namespace hpx
         /// \a size using the given distribution policy.
         ///
         /// \param size             The overall size of the vector
-        /// \param policy           The distribution policy to use (default: block)
+        /// \param policy           The distribution policy to use
         /// \param symbolic_name    The (optional) name to register the newly
         ///                         created vector
         ///
         template <typename DistPolicy>
         vector(size_type size, DistPolicy const& policy,
                 typename std::enable_if<
-                        is_vector_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
+                    traits::is_vector_distribution_policy<DistPolicy>::value
+                >::type* = 0)
           : size_(size),
             partition_size_(std::size_t(-1))
         {
@@ -713,15 +713,15 @@ namespace hpx
         ///
         /// \param size             The overall size of the vector
         /// \param val              Default value for the elements in vector
-        /// \param policy           The distribution policy to use (default: block)
+        /// \param policy           The distribution policy to use
         /// \param symbolic_name    The (optional) name to register the newly
         ///                         created vector
         ///
         template <typename DistPolicy>
         vector(size_type size, T const& val, DistPolicy const& policy,
                 typename std::enable_if<
-                        is_vector_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
+                    traits::is_vector_distribution_policy<DistPolicy>::value
+                >::type* = 0)
           : size_(size),
             partition_size_(std::size_t(-1))
         {

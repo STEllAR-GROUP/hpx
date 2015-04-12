@@ -231,13 +231,13 @@ namespace hpx
     using hpx::components::default_distribution_policy;
     using hpx::components::default_layout;
 
-    namespace traits { namespace detail
+    namespace traits
     {
         template <>
         struct is_distribution_policy<components::default_distribution_policy>
           : std::true_type
         {};
-    }}
+    }
 }
 /// \endcond
 

@@ -12,29 +12,18 @@
 
 #include <type_traits>
 
-namespace hpx
+namespace hpx { namespace traits
 {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <typename T>
-        struct is_vector_distribution_policy
-          : std::false_type
-        {};
-
-        template <>
-        struct is_vector_distribution_policy<container_distribution_policy>
-          : std::true_type
-        {};
-        // \endcond
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct is_vector_distribution_policy
-      : detail::is_vector_distribution_policy<typename hpx::util::decay<T>::type>
+        : std::false_type
     {};
-}
+
+    template <>
+    struct is_vector_distribution_policy<container_distribution_policy>
+        : std::true_type
+    {};
+}}
 
 #endif
