@@ -298,8 +298,9 @@ namespace hpx { namespace components
             template <typename DistPolicy, typename ...Ts>
             static type call(DistPolicy const& policy, Ts&&... vs)
             {
-                return make_client<Client>(policy.create<component_type>(
-                    std::forward<Ts>(vs)...));
+                return make_client<Client>(
+                    policy.template create<component_type>(
+                        std::forward<Ts>(vs)...));
             }
         };
 
