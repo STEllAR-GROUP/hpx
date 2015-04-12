@@ -11,17 +11,23 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/unwrapped.hpp>
 
 #include <algorithm>
 #include <vector>
 
 namespace hpx { namespace components
 {
+    static char const* const default_binpacking_counter_name =
+        "/runtime/count/component@";
+
     /// This class specifies the parameters for a binpacking distribution policy
     /// to use for creating a given number of items on a given set of localities.
     /// The binpacking policy will distribute the new objects in a way such that
@@ -30,11 +36,134 @@ namespace hpx { namespace components
     /// overall number of objects of this type).
     struct binpacking_distribution_policy
     {
+    private:
+        /// \cond NOINTERNAL
+        static hpx::future<std::vector<hpx::id_type> >
+        consolidate_result(
+            std::vector<hpx::future<std::vector<hpx::id_type> > > && objs)
+        {
+            // consolidate all results into single array
+            return hpx::lcos::local::dataflow(
+                [](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
+                    -> std::vector<hpx::id_type>
+                {
+                    std::vector<hpx::id_type> result = v.front().get();
+                    for (auto it = v.begin()+1; it != v.end(); ++it)
+                    {
+                        std::vector<id_type> r = it->get();
+                        std::copy(r.begin(), r.end(),
+                            std::back_inserter(result));
+                    }
+                    return result;
+                },
+                std::move(objs));
+        }
+
+        std::vector<std::size_t>
+        static get_items_count(std::size_t count,
+            std::vector<boost::uint64_t> && values)
+        {
+            std::size_t maxcount = 0;
+            std::size_t existing = 0;
+
+            for (boost::uint64_t value: values)
+            {
+                maxcount = (std::max)(maxcount, std::size_t(value));
+                existing += value;
+            }
+
+            // distribute the number of components to create in a way, so that
+            // the overall number of component instances on all localities is
+            // approximately the same
+            std::size_t num_localities = values.size();
+
+            HPX_ASSERT(maxcount * num_localities >= std::size_t(existing));
+            std::size_t missing = maxcount * num_localities - existing;
+            if (missing == 0) missing = 1;
+
+            double hole_ratio = (std::min)(count, missing) / double(missing);
+            HPX_ASSERT(hole_ratio <= 1.);
+
+            std::size_t overflow_count =
+                (count > missing) ? (count - missing) / num_localities : 0;
+            std::size_t excess = count - overflow_count * num_localities;
+
+            // calculate the number of new instances to create on each of the
+            // localities
+            std::vector<std::size_t> to_create;
+            to_create.reserve(num_localities);
+
+            std::size_t created_count = 0;
+            for (std::size_t i = 0; i != num_localities; ++i)
+            {
+                boost::uint64_t value = values[i];
+                std::size_t numcreate = overflow_count +
+                    std::size_t((maxcount - value) * hole_ratio);
+
+                if (excess != 0) {
+                    --excess;
+                    ++numcreate;
+                }
+
+                if (i == num_localities-1) {
+                    // last bin gets all the rest
+                    if (created_count + numcreate < count)
+                        numcreate = count - created_count;
+                }
+
+                if (created_count + numcreate > count)
+                    numcreate = count - created_count;
+
+                if (numcreate == 0)
+                    break;
+
+                // create all components  for each locality at a time
+                to_create.push_back(numcreate);
+
+                created_count += numcreate;
+                if (created_count >= count)
+                    break;
+            }
+
+            return to_create;
+        }
+
+        template <typename Component>
+        struct create_helper
+        {
+            create_helper(binpacking_distribution_policy const& policy)
+              : policy_(policy)
+            {}
+
+            template <typename ...Ts>
+            hpx::future<std::vector<hpx::id_type> > operator()(
+                hpx::future<std::vector<boost::uint64_t> > && values,
+                std::size_t count, Ts... vs) const
+            {
+                std::vector<std::size_t> to_create =
+                    policy_.get_items_count(count, values.get());
+
+                std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
+                objs.reserve(policy_.localities_.size());
+
+                for (std::size_t i = 0; i != to_create.size(); ++i)
+                {
+                    objs.push_back(stub_base<Component>::bulk_create_async(
+                        policy_.localities_[i], to_create[i], vs...));
+                }
+
+                return policy_.consolidate_result(std::move(objs));
+            }
+
+            binpacking_distribution_policy const& policy_;
+        };
+        /// \endcond
+
     public:
         /// Default-construct a new instance of a \a binpacking_distribution_policy.
         /// This policy will represent one locality (the local locality).
         binpacking_distribution_policy()
-          : counter_name_(default_counter_name)
+          : counter_name_(default_binpacking_counter_name)
         {}
 
         /// Create a new \a default_distribution policy representing the given
@@ -50,7 +179,7 @@ namespace hpx { namespace components
         ///
         binpacking_distribution_policy operator()(
             std::vector<id_type> const& locs,
-            char const* counter_name = default_counter_name) const
+            char const* counter_name = default_binpacking_counter_name) const
         {
 #if defined(HPX_DEBUG)
             for (id_type const& loc: locs)
@@ -73,7 +202,7 @@ namespace hpx { namespace components
         ///                      used).
         ///
         binpacking_distribution_policy operator()(id_type const& loc,
-            char const* counter_name = default_counter_name) const
+            char const* counter_name = default_binpacking_counter_name) const
         {
             HPX_ASSERT(naming::is_locality(loc));
             return binpacking_distribution_policy(loc, counter_name);
@@ -137,156 +266,76 @@ namespace hpx { namespace components
             }
 
             // schedule creation of all objects across given localities
-            std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
-            objs.reserve(localities_.size());
-            for (hpx::id_type const& loc: localities_)
-            {
-                objs.push_back(stub_base<Component>::bulk_create_async(
-                    loc, get_num_items(count, loc), vs...));
-            }
+            hpx::future<std::vector<boost::uint64_t> > values =
+                get_counter_values(
+                    hpx::components::unique_component_name<
+                        hpx::components::component_factory<
+                            typename Component::wrapping_type
+                        >
+                    >::call());
 
-            // consolidate all results into single array
-            return hpx::lcos::local::dataflow(
-                [](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
-                    -> std::vector<hpx::id_type>
-                {
-                    std::vector<hpx::id_type> result = v.front().get();
-                    for (auto it = v.begin()+1; it != v.end(); ++it)
-                    {
-                        std::vector<id_type> r = it->get();
-                        std::copy(r.begin(), r.end(),
-                            std::back_inserter(result));
-                    }
-                    return result;
-                },
-                std::move(objs));
+            using hpx::util::placeholders::_1;
+            return values.then(
+                hpx::util::bind(create_helper<Component>(*this),
+                    _1, count, std::forward<Ts>(vs)...));
+        }
+
+        /// Returns the name of the performance counter associated with this
+        /// policy instance.
+        std::string const& get_counter_name() const
+        {
+            return counter_name_;
         }
 
     protected:
-//     binpacking_factory::remote_result_type
-//     binpacking_factory::create_components_counterbased(
-//         components::component_type type, std::size_t count,
-//         std::string const& countername) const
-//     {
-//         // make sure we get localities for derived component type, if any
-//         components::component_type prefix_type = type;
-//         if (type != components::get_base_type(type))
-//             prefix_type = components::get_derived_type(type);
-//
-//         // get list of locality prefixes
-//         std::vector<naming::id_type> localities =
-//             hpx::find_all_localities(prefix_type);
-//
-//         if (localities.empty())
-//         {
-//             HPX_THROW_EXCEPTION(bad_component_type,
-//                 "binpacking_factory::create_components_binpacked",
-//                 "attempt to create component instance of unknown type: " +
-//                 components::get_component_type_name(type));
-//         }
-//
-//         if (count == std::size_t(-1))
-//             count = localities.size();
-//
-//         // create performance counters on all localities
-//         performance_counters::counter_path_elements p;
-//         performance_counters::get_counter_type_path_elements(countername, p);
-//
-//         // FIXME: make loop asynchronous
-//         typedef lcos::future<naming::id_type> future_type;
-//
-//         std::vector<future_type> lazy_counts;
-//         BOOST_FOREACH(naming::id_type const& id, localities)
-//         {
-//             std::string name;
-//             p.parentinstanceindex_ = naming::get_locality_id_from_id(id);
-//             performance_counters::get_counter_name(p, name);
-//             lazy_counts.push_back(performance_counters::get_counter_async(name));
-//         }
-//
-//         // wait for counts to get back, collect statistics
-//         long maxcount = 0;
-//         long existing = 0;
-//
-//         // FIXME: make loop asynchronous
-//         std::vector<long> counts;
-//         counts.reserve(lazy_counts.size());
-//         BOOST_FOREACH(future_type & f, lazy_counts)
-//         {
-//             performance_counters::counter_value value =
-//                 performance_counters::stubs::performance_counter::get_value(f.get());
-//             counts.push_back(value.get_value<long>());
-//             maxcount = (std::max)(maxcount, counts.back());
-//             existing += counts.back();
-//         }
-//
-//         // distribute the number of components to create in a way, so that the
-//         // overall number of component instances on all localities is
-//         // approximately the same
-//         HPX_ASSERT(std::size_t(maxcount) * counts.size() >= std::size_t(existing));
-//         std::size_t missing = std::size_t(maxcount) * counts.size() -
-//             std::size_t(existing);
-//         if (missing == 0) missing = 1;
-//
-//         double hole_ratio = (std::min)(count, missing) / double(missing);
-//         HPX_ASSERT(hole_ratio <= 1.);
-//
-//         std::size_t overflow_count =
-//             (count > missing) ? (count - missing) / counts.size() : 0;
-//         std::size_t excess = count - overflow_count * counts.size();
-//
-//         typedef std::vector<lazy_result> future_values_type;
-//         typedef server::runtime_support::bulk_create_components_action
-//             action_type;
-//
-//         std::size_t created_count = 0;
-//         future_values_type v;
-//
-//         // start an asynchronous operation for each of the localities
-//         for (std::size_t i = 0; i < counts.size(); ++i)
-//         {
-//             std::size_t numcreate =
-//                 std::size_t((maxcount - counts[i]) * hole_ratio) + overflow_count;
-//
-//             if (excess != 0) {
-//                 --excess;
-//                 ++numcreate;
-//             }
-//
-//             if (i == counts.size()-1) {
-//                 // last bin gets all the rest
-//                 if (created_count + numcreate < count)
-//                     numcreate = count - created_count;
-//             }
-//
-//             if (created_count + numcreate > count)
-//                 numcreate = count - created_count;
-//
-//             if (numcreate == 0)
-//                 break;
-//
-//             // create all components  for each locality at a time
-//             v.push_back(future_values_type::value_type(localities[i].get_gid()));
-//             lcos::packaged_action<action_type, std::vector<naming::gid_type> > p;
-//             p.apply(launch::async, localities[i], type, numcreate);
-//             v.back().gids_ = p.get_future();
-//
-//             created_count += numcreate;
-//             if (created_count >= count)
-//                 break;
-//         }
-//
-//         // now wait for the results
-//         remote_result_type results;
-//
-//         BOOST_FOREACH(lazy_result& lr, v)
-//         {
-//             results.push_back(remote_result_type::value_type(lr.locality_, type));
-//             results.back().gids_ = std::move(lr.gids_.get());
-//         }
-//
-//         return results;
-//     }
+        /// \cond NOINTERNAL
+        static hpx::future<std::vector<boost::uint64_t> >
+        get_counter_values_helper(
+            std::vector<performance_counters::performance_counter> && counters)
+        {
+            using namespace hpx::performance_counters;
+
+            std::vector<hpx::future<boost::uint64_t> > values;
+            values.reserve(counters.size());
+
+            for (performance_counter const& counter: counters)
+                values.push_back(counter.get_value<boost::uint64_t>());
+
+            return hpx::lcos::local::dataflow(
+                hpx::util::unwrapped(
+                    [](std::vector<boost::uint64_t> && values)
+                    {
+                        return values;
+                    }),
+                std::move(values));
+        }
+
+        hpx::future<std::vector<boost::uint64_t> > get_counter_values(
+            std::string const& component_name) const
+        {
+            using namespace hpx::performance_counters;
+
+            // create performance counters on all localities
+            std::vector<performance_counter> counters;
+            counters.reserve(localities_.size());
+
+            if (counter_name_[sizeof(counter_name_)-2] == '@')
+            {
+                std::string counter_name(counter_name_ + component_name);
+                for (hpx::id_type const& id: localities_)
+                    counters.push_back(performance_counter(counter_name, id));
+            }
+            else
+            {
+                for (hpx::id_type const& id: localities_)
+                    counters.push_back(performance_counter(counter_name_, id));
+            }
+
+            return hpx::lcos::local::dataflow(
+                &binpacking_distribution_policy::get_counter_values_helper,
+                std::move(counters));
+        }
+        /// \endcond
 
     protected:
         /// \cond NOINTERNAL
@@ -303,17 +352,10 @@ namespace hpx { namespace components
             localities_.push_back(locality);
         }
 
-        static char const* const default_counter_name;
-
         std::vector<id_type> localities_;   // localities to create things on
         std::string counter_name_;          // name of counter to use as criteria
         /// \endcond
     };
-
-    /// By default the binpacking policy uses the overall number of objects
-    /// on the used localities.
-    char const* const binpacking_distribution_policy::default_counter_name =
-        "/runtime/count/component";
 
     /// A predefined instance of the binpacking \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.

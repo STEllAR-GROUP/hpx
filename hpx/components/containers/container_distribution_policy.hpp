@@ -31,7 +31,7 @@ namespace hpx
 
         container_distribution_policy operator()(std::size_t num_partitions) const
         {
-            return container_distribution_policy(num_partitions, get_localities());
+            return container_distribution_policy(num_partitions, localities_);
         }
 
         container_distribution_policy operator()(
@@ -52,8 +52,13 @@ namespace hpx
         std::size_t get_num_partitions() const
         {
             std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
-                get_localities().size() : num_partitions_;
+                localities_.size() : num_partitions_;
             return (std::max)(num_parts, std::size_t(1));
+        }
+
+        std::vector<hpx::id_type> const& get_localities() const
+        {
+            return localities_;
         }
 
     private:

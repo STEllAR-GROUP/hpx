@@ -951,7 +951,7 @@ namespace hpx { namespace components { namespace server
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::get_instance_count",
                 strm.str());
-            return factory_invalid;
+            return boost::int32_t(-1);
         }
 
         // ask for the factory's capabilities

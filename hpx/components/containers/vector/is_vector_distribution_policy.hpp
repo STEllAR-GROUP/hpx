@@ -8,7 +8,6 @@
 #define HPX_VECTOR_DISTRIBUTION_POLICY_HPP
 
 #include <hpx/include/util.hpp>
-#include <hpx/runtime/components/distribution_policy.hpp>
 #include <hpx/components/containers/container_distribution_policy.hpp>
 
 #include <type_traits>

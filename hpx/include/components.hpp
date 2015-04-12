@@ -43,7 +43,8 @@
 #include <hpx/runtime/components/migrate_component.hpp>
 
 #include <hpx/runtime/components/default_distribution_policy.hpp>
-#include <hpx/runtime/components/colocated_distribution_policy.hpp>
+#include <hpx/runtime/components/colocating_distribution_policy.hpp>
+#include <hpx/runtime/components/binpacking_distribution_policy.hpp>
 
 #include <hpx/runtime/get_ptr.hpp>
 
