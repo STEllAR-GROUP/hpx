@@ -123,7 +123,7 @@ namespace hpx
             state->set_on_completed(detail::keep_id_alive(gid));
         }
 
-        return std::move(f);
+        return f;
     }
 
     template <typename Action, typename ...Ts>

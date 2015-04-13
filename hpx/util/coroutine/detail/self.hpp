@@ -136,14 +136,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     {
         yield_decorator_type tmp(std::forward<F>(f));
         std::swap(tmp, yield_decorator_);
-        return std::move(tmp);
+        return tmp;
     }
 
     yield_decorator_type decorate_yield(yield_decorator_type const& f)
     {
         yield_decorator_type tmp(f);
         std::swap(tmp, yield_decorator_);
-        return std::move(tmp);
+        return tmp;
     }
 
     yield_decorator_type decorate_yield(yield_decorator_type && f)
@@ -156,7 +156,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     {
         yield_decorator_type tmp;
         std::swap(tmp, yield_decorator_);
-        return std::move(tmp);
+        return tmp;
     }
 
     HPX_ATTRIBUTE_NORETURN void exit() {

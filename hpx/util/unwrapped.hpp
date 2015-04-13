@@ -410,7 +410,7 @@ namespace hpx { namespace util
         detail::unwrapped_impl<typename util::decay<F>::type >
             res(std::forward<F>(f));
 
-        return std::move(res);
+        return res;
     }
 
     template <typename ...Ts>
