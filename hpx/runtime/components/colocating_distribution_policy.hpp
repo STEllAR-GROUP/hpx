@@ -5,17 +5,22 @@
 
 /// \file colocating_distribution_policy.hpp
 
-#if !defined(HPX_COMPONENTS_colocating_distribution_policy_APR_10_2015_0227PM)
-#define HPX_COMPONENTS_colocating_distribution_policy_APR_10_2015_0227PM
+#if !defined(HPX_COMPONENTS_COLOCATING_DISTRIBUTION_POLICY_APR_10_2015_0227PM)
+#define HPX_COMPONENTS_COLOCATING_DISTRIBUTION_POLICY_APR_10_2015_0227PM
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/runtime/agas/request.hpp>
+#include <hpx/runtime/agas/stubs/primary_namespace.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/lcos/async_fwd.hpp>
+#include <hpx/lcos/async_colocated_fwd.hpp>
+#include <hpx/lcos/async_callback_fwd.hpp>
+#include <hpx/lcos/async_colocated_callback_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/move.hpp>
 
 #include <algorithm>
@@ -65,21 +70,21 @@ namespace hpx { namespace components
         /// \param vs  [in] The arguments which will be forwarded to the
         ///            constructor of the new object.
         ///
+        /// \note This function is part of the placement policy implemented by
+        ///       this class
+        ///
         /// \returns A future holding the global address which represents
         ///          the newly created object
         ///
         template <typename Component, typename ...Ts>
         hpx::future<hpx::id_type> create(Ts&&... vs) const
         {
-            using components::stub_base;
-
             if (!id_)
             {
-                return stub_base<Component>::create_async(
+                return components::stub_base<Component>::create_async(
                     hpx::find_here(), std::forward<Ts>(vs)...);
             }
-
-            return stub_base<Component>::create_colocated_async(
+            return components::stub_base<Component>::create_colocated_async(
                 id_, std::forward<Ts>(vs)...);
         }
 
@@ -90,6 +95,9 @@ namespace hpx { namespace components
         /// \param vs   [in] The arguments which will be forwarded to the
         ///             constructors of the new objects.
         ///
+        /// \note This function is part of the placement policy implemented by
+        ///       this class
+        ///
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
@@ -97,18 +105,63 @@ namespace hpx { namespace components
         hpx::future<std::vector<hpx::id_type> >
         bulk_create(std::size_t count, Ts&&... vs) const
         {
-            using components::stub_base;
-
             // handle special cases
             if (!id_)
             {
-                return stub_base<Component>::bulk_create_async(
+                return components::stub_base<Component>::bulk_create_async(
                     hpx::find_here(), count, std::forward<Ts>(vs)...);
             }
-
-            return stub_base<Component>::bulk_create_colocated_async(
+            return components::stub_base<Component>::bulk_create_colocated_async(
                 id_, count, std::forward<Ts>(vs)...);
         }
+
+        /// \note This function is part of the invocation policy implemented by
+        ///       this class
+        ///
+        template <typename Action, typename ...Ts>
+        hpx::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::remote_result_type
+            >::type>
+        async(BOOST_SCOPED_ENUM(launch), Ts&&... vs) const
+        {
+            if (!id_)
+                return async<Action>(hpx::find_here(), std::forward<Ts>(vs)...);
+            return hpx::detail::async_colocated<Action>(id_, std::forward<Ts>(vs)...);
+        }
+
+        /// \note This function is part of the invocation policy implemented by
+        ///       this class
+        ///
+        template <typename Action, typename Callback, typename ...Ts>
+        hpx::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::remote_result_type
+            >::type>
+        async_cb(BOOST_SCOPED_ENUM(launch), Callback&& cb, Ts&&... vs) const
+        {
+            if (!id_)
+            {
+                return async_cb<Action>(hpx::find_here(),
+                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            }
+            return hpx::detail::async_colocated_cb<Action>(id_,
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        }
+
+        /// \cond NOINTERNAL
+        // FIXME: this can be removed once the vector<>::create() functions
+        //        have been adapted
+        std::size_t
+        get_num_items(std::size_t items, hpx::id_type const& loc) const
+        {
+            // make sure the given id is known to this distribution policy
+            HPX_ASSERT(!id_ || loc == hpx::find_here());
+
+            // this distribution policy places all items onto the given locality
+            return items;
+        }
+        /// \endcond
 
     protected:
         /// \cond NOINTERNAL

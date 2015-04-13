@@ -345,7 +345,7 @@ namespace hpx { namespace lcos
 
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
+                        hpx::detail::async_colocated<reduce_impl_action>(
                             id
                           , act
                           , std::move(ids_next)
@@ -397,7 +397,7 @@ namespace hpx { namespace lcos
         }
 
         return
-            hpx::async_colocated<reduce_impl_action>(
+            hpx::detail::async_colocated<reduce_impl_action>(
                 ids[0]
               , Action()
               , ids

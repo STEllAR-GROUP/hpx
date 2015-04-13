@@ -316,8 +316,10 @@ namespace hpx { namespace components
             {
                 return new_component<component_type[]>::call(
                         std::forward<Ts>(vs)...
-                    ).then(
+                    )
+                    .then(
                         [](hpx::future<std::vector<hpx::id_type> > && v)
+                            -> Client
                         {
                             return make_client<Client>(v.get());
                         }

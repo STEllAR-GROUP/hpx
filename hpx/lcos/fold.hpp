@@ -416,7 +416,7 @@ namespace hpx { namespace lcos
                 if(!ids.empty())
                 {
                     fold_futures.push_back(
-                        hpx::async_colocated<fold_impl_action>(
+                        hpx::detail::async_colocated<fold_impl_action>(
                             ids_next.front()
                           , act
                           , std::move(ids_next)
@@ -477,7 +477,7 @@ namespace hpx { namespace lcos
             fold_impl_action;
 
         return
-            hpx::async_colocated<fold_impl_action>(
+            hpx::detail::async_colocated<fold_impl_action>(
                 ids[0]
               , Action()
               , ids
@@ -602,7 +602,7 @@ namespace hpx { namespace lcos
         }
 
         return
-            hpx::async_colocated<fold_impl_action>(
+            hpx::detail::async_colocated<fold_impl_action>(
                 inverted_ids[0]
               , Action()
               , inverted_ids

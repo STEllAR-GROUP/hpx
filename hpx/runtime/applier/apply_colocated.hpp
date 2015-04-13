@@ -18,7 +18,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 
-namespace hpx
+namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename ...Ts>
@@ -51,6 +51,6 @@ namespace hpx
     {
         return apply_colocated<Derived>(gid, std::forward<Ts>(vs)...);
     }
-}
+}}
 
 #endif

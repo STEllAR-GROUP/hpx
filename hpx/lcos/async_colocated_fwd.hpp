@@ -1,9 +1,7 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-///////////////////////////////////////////////////////////////////////////////
 
 #if !defined(HPX_LCOS_ASYNC_COLOCATED_FWD_FEB_01_2014_0107PM)
 #define HPX_LCOS_ASYNC_COLOCATED_FWD_FEB_01_2014_0107PM
@@ -12,7 +10,7 @@
 #include <hpx/traits.hpp>
 #include <hpx/util/move.hpp>
 
-namespace hpx
+namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename ...Ts>
@@ -33,6 +31,6 @@ namespace hpx
     async_colocated(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid, Ts&&... vs);
-}
+}}
 
 #endif

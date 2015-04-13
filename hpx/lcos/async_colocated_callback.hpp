@@ -8,7 +8,7 @@
 
 #include <hpx/lcos/async_colocated.hpp>
 
-namespace hpx
+namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename ...Ts>
@@ -55,6 +55,6 @@ namespace hpx
         return async_colocated_cb<Derived>(gid, std::forward<Callback>(cb),
             std::forward<Ts>(vs)...);
     }
-}
+}}
 
 #endif

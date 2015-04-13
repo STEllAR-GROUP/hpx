@@ -725,7 +725,7 @@ namespace hpx { namespace lcos
                     std::vector<hpx::id_type> ids_next(it, it + next_fan);
 
                     hpx::id_type id(ids_next[0]);
-                    hpx::apply_colocated<broadcast_impl_action>(
+                    hpx::detail::apply_colocated<broadcast_impl_action>(
                         id
                       , act
                       , std::move(ids_next)
@@ -822,7 +822,7 @@ namespace hpx { namespace lcos
             return;
         }
 
-        hpx::apply_colocated<broadcast_impl_action>(
+        hpx::detail::apply_colocated<broadcast_impl_action>(
                 ids[0]
               , Action()
               , ids

@@ -8,7 +8,7 @@
 
 #include <hpx/lcos/async_colocated_fwd.hpp>
 
-namespace hpx
+namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename ...Ts>
@@ -29,6 +29,6 @@ namespace hpx
     async_colocated_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid, Callback&& cb, Ts&&... vs);
-}
+}}
 
 #endif

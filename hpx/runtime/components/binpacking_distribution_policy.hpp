@@ -264,6 +264,9 @@ namespace hpx { namespace components
         /// \param vs  [in] The arguments which will be forwarded to the
         ///            constructor of the new object.
         ///
+        /// \note This function is part of the placement policy implemented by
+        ///       this class
+        ///
         /// \returns A future holding the global address which represents
         ///          the newly created object
         ///
@@ -290,6 +293,9 @@ namespace hpx { namespace components
         /// \param count [in] The number of objects to create
         /// \param vs   [in] The arguments which will be forwarded to the
         ///             constructors of the new objects.
+        ///
+        /// \note This function is part of the placement policy implemented by
+        ///       this class
         ///
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
