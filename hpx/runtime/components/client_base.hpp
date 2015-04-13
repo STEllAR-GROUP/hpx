@@ -465,9 +465,9 @@ namespace hpx { namespace components
     {
         std::vector<Client> result;
         result.reserve(ids.size());
-        for (hpx::future<hpx::id_type> && id: ids)
+        for (hpx::future<hpx::id_type>& id: ids)
         {
-            result.push_back(Client(std::move(id)));
+            result.push_back(Client(id));
         }
         return result;
     }
