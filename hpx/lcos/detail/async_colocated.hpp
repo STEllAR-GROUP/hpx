@@ -15,7 +15,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/async_continue_fwd.hpp>
-#include <hpx/lcos/async_colocated_fwd.hpp>
+#include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>

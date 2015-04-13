@@ -47,8 +47,8 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         Callback && cb, Ts&&... vs)
     {
-        return hpx::target(gid).template apply_cb<Action>(
-            static_cast<actions::continuation*>(0), priority,
+        return hpx::detail::apply_cb_impl<Action>(
+            static_cast<actions::continuation*>(0), gid, priority,
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
@@ -173,8 +173,8 @@ namespace hpx
     apply_p_cb(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, Callback && cb, Ts&&... vs)
     {
-        return hpx::target(gid).template apply_cb(
-            c, priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        return hpx::detail::apply_cb_impl<Action>(c, gid, priority,
+            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename Callback, typename ...Ts>
@@ -205,7 +205,7 @@ namespace hpx
     apply_p_cb(actions::continuation* c, DistPolicy const& policy,
         threads::thread_priority priority, Callback && cb, Ts&&... vs)
     {
-        return policy.template apply_cb(
+        return policy.template apply_cb<Action>(
             c, priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 

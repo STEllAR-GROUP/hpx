@@ -273,18 +273,11 @@ namespace hpx { namespace components
         template <typename Component, typename ...Ts>
         hpx::future<hpx::id_type> create(Ts&&... vs) const
         {
-            using components::stub_base;
-
-            if (!localities_.empty())
-            {
-                return stub_base<Component>::create_async(
-                    localities_.front(), std::forward<Ts>(vs)...);
-            }
-
             // by default the object will be created on the current
             // locality
-            return stub_base<Component>::create_async(
-                hpx::find_here(), std::forward<Ts>(vs)...);
+            return components::stub_base<Component>::create_async(
+                localities_.empty() ? hpx::find_here() : localities_.front(),
+                std::forward<Ts>(vs)...);
         }
 
         /// Create multiple objects on the localities associated by

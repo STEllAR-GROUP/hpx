@@ -137,8 +137,8 @@ namespace hpx { namespace lcos
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/lcos/async_colocated.hpp>
-#include <hpx/runtime/applier/apply_colocated.hpp>
+#include <hpx/lcos/detail/async_colocated.hpp>
+#include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/calculate_fanout.hpp>
@@ -575,7 +575,7 @@ namespace hpx { namespace lcos
 
                     hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
+                        hpx::detail::async_colocated<broadcast_impl_action>(
                             id
                           , act
                           , std::move(ids_next)
@@ -657,7 +657,7 @@ namespace hpx { namespace lcos
 
                     hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
+                        hpx::detail::async_colocated<broadcast_impl_action>(
                             id
                           , act
                           , std::move(ids_next)
@@ -772,7 +772,7 @@ namespace hpx { namespace lcos
         }
 
         return
-            hpx::async_colocated<broadcast_impl_action>(
+            hpx::detail::async_colocated<broadcast_impl_action>(
                 ids[0]
               , Action()
               , ids

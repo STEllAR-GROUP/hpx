@@ -14,7 +14,6 @@
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/components/targeting_distribution_policy.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/lcos/packaged_action.hpp>
@@ -170,14 +169,9 @@ namespace hpx { namespace components
             >::type>
         async(BOOST_SCOPED_ENUM(launch) policy, Ts&&... vs) const
         {
-            // handle special cases
-            if (localities_.size() == 0)
-            {
-                return hpx::target.
-                    template async<Action>(policy, std::forward<Ts>(vs)...);
-            }
-            return hpx::target(localities_.front()).
-                template async<Action>(policy, std::forward<Ts>(vs)...);
+            return hpx::detail::async_impl<Action>(policy,
+                localities_.empty() ? hpx::find_here() : localities_.front(),
+                std::forward<Ts>(vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -190,47 +184,33 @@ namespace hpx { namespace components
             >::type>
         async_cb(BOOST_SCOPED_ENUM(launch) policy, Callback&& cb, Ts&&... vs) const
         {
-            // handle special cases
-            if (localities_.size() == 0)
-            {
-                return hpx::target.template async_cb<Action>(policy,
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
-            }
-            return hpx::target(localities_.front()).
-                template async_cb<Action>(policy, std::forward<Callback>(cb),
-                    std::forward<Ts>(vs)...);
+            return hpx::detail::async_cb_impl<Action>(policy,
+                localities_.empty() ? hpx::find_here() : localities_.front(),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
         template <typename Action, typename ...Ts>
-        bool apply(threads::thread_priority priority, Ts&&... vs) const
+        bool apply(actions::continuation* c, threads::thread_priority priority,
+            Ts&&... vs) const
         {
-            if (localities_.size() == 0)
-            {
-                return hpx::target.template apply<Action>(priority,
-                    std::forward<Ts>(vs)...);
-            }
-            return hpx::target(localities_.front()).
-                template apply<Action>(priority, std::forward<Ts>(vs)...);
+            return hpx::detail::apply_impl<Action>(c,
+                localities_.empty() ? hpx::find_here() : localities_.front(),
+                priority, std::forward<Ts>(vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
         template <typename Action, typename Callback, typename ...Ts>
-        bool apply_cb(threads::thread_priority priority, Callback&& cb,
-            Ts&&... vs) const
+        bool apply_cb(actions::continuation* c,
+            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
-            if (localities_.size() == 0)
-            {
-                return hpx::target.template apply_cb<Action>(priority,
-                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
-            }
-            return hpx::target(localities_.front()).
-                template apply_cb<Action>(priority, std::forward<Callback>(cb),
-                    std::forward<Ts>(vs)...);
+            return hpx::detail::apply_cb_impl<Action>(c,
+                localities_.empty() ? hpx::find_here() : localities_.front(),
+                priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         /// \cond NOINTERNAL

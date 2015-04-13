@@ -16,9 +16,9 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
+#include <hpx/runtime/applier/detail/apply_implementations.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/components/targeting_distribution_policy.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
@@ -262,8 +262,8 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         Ts&&... vs)
     {
-        return hpx::target(gid).template apply(
-            static_cast<actions::continuation*>(0), priority,
+        return hpx::detail::apply_impl<Action>(
+            static_cast<actions::continuation*>(0), gid, priority,
             std::forward<Ts>(vs)...);
     }
 
@@ -293,7 +293,7 @@ namespace hpx
     apply_p(DistPolicy const& policy, threads::thread_priority priority,
         Ts&&... vs)
     {
-        return policy.template apply(
+        return policy.template apply<Action>(
             static_cast<actions::continuation*>(0), priority,
             std::forward<Ts>(vs)...);
     }
@@ -396,7 +396,7 @@ namespace hpx
         {
             if (0 == c)
             {
-                return apply_r_p(std::move(addr), id, priority,
+                return apply_r_p<Action>(std::move(addr), id, priority,
                     std::forward<Ts>(vs)...);
             }
 
@@ -453,7 +453,7 @@ namespace hpx
         {
             if (0 == c)
             {
-                return apply_l_p(target, std::move(addr), priority,
+                return apply_l_p<Action>(target, std::move(addr), priority,
                     std::forward<Ts>(vs)...);
             }
 
@@ -488,8 +488,8 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, Ts&&... vs)
     {
-        return hpx::target(gid).template apply(
-            c, priority, std::forward<Ts>(vs)...);
+        return hpx::detail::apply_impl<Action>(
+            c, gid, priority, std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename ...Ts>
@@ -518,7 +518,7 @@ namespace hpx
     apply_p(actions::continuation* c, DistPolicy const& policy,
         threads::thread_priority priority, Ts&&... vs)
     {
-        return policy.template apply(
+        return policy.template apply<Action>(
             c, priority, std::forward<Ts>(vs)...);
     }
 

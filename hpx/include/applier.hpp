@@ -10,8 +10,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/applier/apply_colocated.hpp>
-#include <hpx/runtime/applier/apply_colocated_callback.hpp>
+#include <hpx/runtime/applier/detail/apply_colocated.hpp>
+#include <hpx/runtime/applier/detail/apply_colocated_callback.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
 

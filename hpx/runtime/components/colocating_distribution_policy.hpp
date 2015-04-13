@@ -12,14 +12,15 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
+#include <hpx/runtime/applier/detail/apply_colocated_callback.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/lcos/async_fwd.hpp>
-#include <hpx/lcos/async_colocated_fwd.hpp>
+#include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/lcos/async_callback_fwd.hpp>
-#include <hpx/lcos/async_colocated_callback_fwd.hpp>
+#include <hpx/lcos/detail/async_colocated_callback_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/move.hpp>
 
@@ -123,11 +124,15 @@ namespace hpx { namespace components
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
-        async(BOOST_SCOPED_ENUM(launch), Ts&&... vs) const
+        async(BOOST_SCOPED_ENUM(launch) policy, Ts&&... vs) const
         {
             if (!id_)
-                return async<Action>(hpx::find_here(), std::forward<Ts>(vs)...);
-            return hpx::detail::async_colocated<Action>(id_, std::forward<Ts>(vs)...);
+            {
+                return async<Action>(policy, hpx::find_here(),
+                    std::forward<Ts>(vs)...);
+            }
+            return hpx::detail::async_colocated<Action>(
+                id_, std::forward<Ts>(vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -138,15 +143,49 @@ namespace hpx { namespace components
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
-        async_cb(BOOST_SCOPED_ENUM(launch), Callback&& cb, Ts&&... vs) const
+        async_cb(BOOST_SCOPED_ENUM(launch) policy, Callback&& cb, Ts&&... vs) const
         {
             if (!id_)
             {
-                return async_cb<Action>(hpx::find_here(),
+                return async_cb<Action>(policy, hpx::find_here(),
                     std::forward<Callback>(cb), std::forward<Ts>(vs)...);
             }
             return hpx::detail::async_colocated_cb<Action>(id_,
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        }
+
+        /// \note This function is part of the invocation policy implemented by
+        ///       this class
+        ///
+        template <typename Action, typename ...Ts>
+        bool apply(actions::continuation* c, threads::thread_priority priority,
+            Ts&&... vs) const
+        {
+            if (!id_)
+            {
+                return apply_p<Action>(c, hpx::find_here(), priority,
+                    std::forward<Ts>(vs)...);
+            }
+            HPX_ASSERT(0 == c);
+            return hpx::detail::apply_colocated<Action>(
+                id_, std::forward<Ts>(vs)...);
+        }
+
+        /// \note This function is part of the invocation policy implemented by
+        ///       this class
+        ///
+        template <typename Action, typename Callback, typename ...Ts>
+        bool apply_cb(actions::continuation* c,
+            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
+        {
+            if (!id_)
+            {
+                return apply_p_cb<Action>(c, hpx::find_here(), priority,
+                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            }
+            HPX_ASSERT(0 == c);
+            return hpx::detail::apply_colocated_cb<Action>(
+                id_, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         /// \cond NOINTERNAL

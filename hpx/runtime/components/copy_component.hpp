@@ -49,7 +49,7 @@ namespace hpx { namespace components
     copy(naming::id_type const& to_copy)
     {
         typedef server::copy_component_action_here<Component> action_type;
-        return async<action_type>(hpx::colocated(to_copy), to_copy);
+        return hpx::detail::async_colocated<action_type>(to_copy, to_copy);
     }
 
     /// \brief Copy given component to the specified target locality
@@ -80,7 +80,8 @@ namespace hpx { namespace components
     copy(naming::id_type const& to_copy, naming::id_type const& target_locality)
     {
         typedef server::copy_component_action<Component> action_type;
-        return async<action_type>(hpx::colocated(to_copy), to_copy, target_locality);
+        return hpx::detail::async_colocated<action_type>(
+            to_copy, to_copy, target_locality);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -117,8 +118,8 @@ namespace hpx { namespace components
         typedef server::copy_component_action<component_type> action_type;
 
         id_type id = to_copy.get_gid();
-        return Derived(async<action_type>(
-            hpx::colocated(to_copy), to_copy, target_locality));
+        return Derived(hpx::detail::async_colocated<action_type>(
+            to_copy, to_copy, target_locality));
     }
 }}
 
