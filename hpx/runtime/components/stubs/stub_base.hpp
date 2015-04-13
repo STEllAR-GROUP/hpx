@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
+#include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/move.hpp>
 
