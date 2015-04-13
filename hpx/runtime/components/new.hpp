@@ -319,7 +319,7 @@ namespace hpx { namespace components
                     )
                     .then(
                         [](hpx::future<std::vector<hpx::id_type> > && v)
-                            -> Client
+                            -> std::vector<Client>
                         {
                             return make_client<Client>(v.get());
                         }
