@@ -8,7 +8,6 @@
 
 #include <map>
 
-#include <boost/foreach.hpp>
 #include <boost/mpl/and.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/add_reference.hpp>
@@ -110,7 +109,7 @@ namespace hpx
             typedef typename std::map<Key, Value, Comp, Alloc>::value_type value_type;
 
             ar << t.size();
-            BOOST_FOREACH(value_type& val, t)
+            for(value_type& val : t)
             {
                 ar << val;
             }

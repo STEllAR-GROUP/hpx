@@ -79,7 +79,7 @@ int main()
     hpx::serialization::input_archive iarchive(buffer);
     A a;
     iarchive >> a;
-    B *b2 = nullptr, *b3 = nullptr;
+    B *b2 = 0, *b3 = 0;
     iarchive >> hpx::serialization::raw_ptr(b2);
     iarchive >> hpx::serialization::raw_ptr(b3);
 
