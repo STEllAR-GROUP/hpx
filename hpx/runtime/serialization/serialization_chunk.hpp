@@ -59,7 +59,7 @@ namespace hpx { namespace serialization
     inline serialization_chunk create_pointer_chunk(void const* pos, std::size_t size)
     {
         serialization_chunk retval = {
-            { 0 }, size, static_cast<std::uint8_t>(chunk_type_pointer)
+            { 0 }, size, static_cast<std::uint8_t>(chunk_type_pointer), 0
         };
         retval.data_.cpos_ = pos;
         return retval;
