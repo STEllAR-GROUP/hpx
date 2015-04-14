@@ -72,27 +72,30 @@ namespace hpx { namespace serialization
 
         bool enable_compression() const
         {
-            return flags_ & hpx::serialization::enable_compression;
+            return (flags_ & hpx::serialization::enable_compression) ?
+                true : false;
         }
 
         bool endian_big() const
         {
-            return flags_ & hpx::serialization::endian_big;
+            return (flags_ & hpx::serialization::endian_big) ? true : false;
         }
 
         bool endian_little() const
         {
-            return flags_ & hpx::serialization::endian_little;
+            return (flags_ & hpx::serialization::endian_little) ? true : false;
         }
 
         bool disable_array_optimization() const
         {
-            return flags_ & hpx::serialization::disable_array_optimization;
+            return (flags_ & hpx::serialization::disable_array_optimization) ?
+                true : false;
         }
 
         bool disable_data_chunking() const
         {
-            return flags_ & hpx::serialization::disable_data_chunking;
+            return (flags_ & hpx::serialization::disable_data_chunking) ?
+                true : false;
         }
 
         boost::uint32_t flags() const

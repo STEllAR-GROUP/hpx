@@ -19,6 +19,8 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/or.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace serialization
 {
     struct HPX_ALWAYS_EXPORT input_archive
@@ -241,5 +243,7 @@ namespace hpx { namespace serialization
         return ar.tracked_pointer<Helper>(pos);
     }
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

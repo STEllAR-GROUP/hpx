@@ -20,6 +20,8 @@
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace serialization { namespace detail
 {
     class HPX_EXPORT polymorphic_intrusive_factory: boost::noncopyable
@@ -189,6 +191,8 @@ namespace hpx { namespace serialization { namespace detail {
     }
 
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_WITH_NAME(Class, Name)             \
   HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(Class, (Name +                          \

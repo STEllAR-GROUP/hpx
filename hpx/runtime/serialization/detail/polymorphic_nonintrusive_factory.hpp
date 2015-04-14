@@ -19,6 +19,8 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_abstract.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace serialization { namespace detail
 {
     struct function_bunch_type
@@ -156,6 +158,8 @@ namespace hpx { namespace serialization { namespace detail
             instance;
 
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #define HPX_SERIALIZATION_REGISTER_CLASS(Class)                               \
     HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class);                               \
