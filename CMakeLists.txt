@@ -912,7 +912,6 @@ if(HPX_COMPILER_WARNINGS)
       hpx_add_compile_flag_if_available(-Werror=uninitialized)
     endif()
 
-    hpx_add_compile_flag_if_available(-Werror=missing-field-initializers)
     hpx_add_compile_flag_if_available(-Werror=format)
     hpx_add_compile_flag_if_available(-Werror=missing-braces)
     hpx_add_compile_flag_if_available(-Werror=sign-compare)
