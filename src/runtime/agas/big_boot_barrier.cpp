@@ -423,7 +423,7 @@ void register_worker(registration_header const& header)
 
     parcelset::locality dest;
     parcelset::locality here = bbb.here();
-    BOOST_FOREACH(parcelset::endpoints_type::value_type const & loc, header.endpoints)
+    for (parcelset::endpoints_type::value_type const & loc : header.endpoints)
     {
         if(loc.second.type() == here.type())
         {
@@ -614,7 +614,7 @@ void register_worker_security(registration_header_security const& header)
 
     parcelset::locality dest;
     parcelset::locality here = bbb.here();
-    BOOST_FOREACH(parcelset::locality const & loc, header.endpoints)
+    for (parcelset::locality const& loc : header.endpoints)
     {
         if(loc.get_type() == here.get_type())
         {

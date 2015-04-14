@@ -9,8 +9,6 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/foreach.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 hpx::id_type test_colocation()
 {
@@ -77,7 +75,7 @@ void test(hpx::id_type there)
 
 int hpx_main()
 {
-    BOOST_FOREACH(hpx::id_type const& id, hpx::find_all_localities())
+    for (hpx::id_type const& id : hpx::find_all_localities())
     {
         test(id);
     }

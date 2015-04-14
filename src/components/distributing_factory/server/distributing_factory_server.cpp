@@ -80,7 +80,7 @@ namespace hpx { namespace components { namespace server
         // start an asynchronous operation for each of the localities
         future_values_type v;
 
-        BOOST_FOREACH(naming::id_type const& fact, localities)
+        for (naming::id_type const& fact : localities)
         {
             std::size_t numcreate = count_on_locality;
             if (excess != 0) {
@@ -108,7 +108,7 @@ namespace hpx { namespace components { namespace server
         // now wait for the results
         remote_result_type results;
 
-        BOOST_FOREACH(lazy_result& lr, v)
+        for (lazy_result& lr : v)
         {
             results.push_back(remote_result_type::value_type(lr.locality_, type));
             results.back().gids_ = std::move(lr.gids_.get());
@@ -178,7 +178,7 @@ namespace hpx { namespace components { namespace server
         // now wait for the results
         remote_result_type results;
 
-        BOOST_FOREACH(lazy_result& lr, v)
+        for (lazy_result& lr : v)
         {
             results.push_back(remote_result_type::value_type(lr.locality_, type));
             results.back().gids_ = std::move(lr.gids_.get());

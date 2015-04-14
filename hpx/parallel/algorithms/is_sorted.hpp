@@ -16,14 +16,15 @@
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
+#include <boost/range/functions.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/type_traits/is_base_of.hpp>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/utility/enable_if.hpp>
+
 #include <algorithm>
 #include <iterator>
 #include <functional>
-
-#include <boost/static_assert.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
-#include <boost/type_traits/is_same.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {

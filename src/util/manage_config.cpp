@@ -6,8 +6,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/manage_config.hpp>
 
-#include <boost/foreach.hpp>
-
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -32,7 +30,7 @@ namespace hpx { namespace util
 
     void manage_config::add(std::vector<std::string> const& cfg)
     {
-        BOOST_FOREACH(std::string const& s, cfg)
+        for (std::string const& s : cfg)
         {
             std::string::size_type p = s.find_last_of("=");
             std::string key(trim_whitespace(s.substr(0, p)));

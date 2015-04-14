@@ -730,7 +730,7 @@ namespace hpx { namespace performance_counters
                 return false;
 
             counter_info i = info;
-            BOOST_FOREACH(counter_info& basei, counter_infos)
+            for (counter_info& basei : counter_infos)
             {
                 p.parentinstancename_ = basei.fullname_;
                 counter_status status = get_counter_name(p, i.fullname_, ec);

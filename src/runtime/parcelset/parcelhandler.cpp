@@ -29,7 +29,6 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 #include <algorithm>
 #include <sstream>
@@ -106,8 +105,7 @@ namespace hpx { namespace parcelset
         count_routed_(0),
         write_handler_(&parcelhandler::default_write_handler)
     {
-        BOOST_FOREACH(plugins::parcelport_factory_base *factory,
-            get_parcelport_factories())
+        for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
         {
             boost::shared_ptr<parcelport> pp;
             pp.reset(
@@ -130,7 +128,7 @@ namespace hpx { namespace parcelset
                 pports_.find(get_priority(get_config_entry(cfgkey, "tcp")));
             if(it != pports_.end() && it->first > 0) return it->second;
         }
-        BOOST_FOREACH(pports_type::value_type const & pp, pports_)
+        for (pports_type::value_type const& pp : pports_)
         {
             if(pp.first > 0 && pp.second->can_bootstrap())
                 return pp.second;
@@ -145,7 +143,7 @@ namespace hpx { namespace parcelset
         HPX_ASSERT(parcels_);
 
         parcels_->set_parcelhandler(this);
-        BOOST_FOREACH(pports_type::value_type & pp, pports_)
+        for (pports_type::value_type& pp : pports_)
         {
             if(pp.second != get_bootstrap_parcelport())
             {
@@ -183,7 +181,7 @@ namespace hpx { namespace parcelset
     // list available parcel ports
     void parcelhandler::list_parcelports(std::ostringstream& strm) const
     {
-        BOOST_FOREACH(pports_type::value_type const & pp, pports_)
+        for (pports_type::value_type const& pp : pports_)
         {
             list_parcelport(
                 strm
@@ -226,9 +224,9 @@ namespace hpx { namespace parcelset
     void parcelhandler::remove_from_connection_cache(
         endpoints_type const& endpoints)
     {
-        BOOST_FOREACH(endpoints_type::value_type const & loc, endpoints)
+        for (endpoints_type::value_type const& loc : endpoints)
         {
-            BOOST_FOREACH(pports_type::value_type & pp, pports_)
+            for (pports_type::value_type& pp : pports_)
             {
                 if(std::string(pp.second->type()) == loc.second.type())
                 {
@@ -266,7 +264,7 @@ namespace hpx { namespace parcelset
         }
 
         // make sure all pending parcels are being handled
-        BOOST_FOREACH(pports_type::value_type & pp, pports_)
+        for (pports_type::value_type& pp : pports_)
         {
             if(pp.first > 0)
             {
@@ -281,7 +279,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::stop(bool blocking)
     {
         // now stop all parcel ports
-        BOOST_FOREACH(pports_type::value_type & pp, pports_)
+        for (pports_type::value_type& pp : pports_)
         {
             if(pp.first > 0)
             {
@@ -329,7 +327,7 @@ namespace hpx { namespace parcelset
         HPX_ASSERT(resolver_);
         endpoints_type const & dest_endpoints = resolver_->resolve_locality(dest_gid);
 
-        BOOST_FOREACH(pports_type::value_type & pp, pports_)
+        for (pports_type::value_type& pp : pports_)
         {
             if(pp.first > 0)
             {
@@ -358,7 +356,7 @@ namespace hpx { namespace parcelset
     util::io_service_pool* parcelhandler::get_thread_pool(char const* name)
     {
         util::io_service_pool* result = 0;
-        BOOST_FOREACH(pports_type::value_type & pp, pports_)
+        for (pports_type::value_type& pp : pports_)
         {
             result = pp.second->get_thread_pool(name);
             if (result) return result;
@@ -458,7 +456,7 @@ namespace hpx { namespace parcelset
     boost::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const
     {
         boost::int64_t parcel_count = 0;
-        BOOST_FOREACH(pports_type::value_type const& pp, pports_)
+        for (pports_type::value_type const& pp : pports_)
         {
             parcel_count += pp.second->get_pending_parcels_count(reset);
         }
@@ -570,7 +568,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     std::string parcelhandler::get_locality_name() const
     {
-        BOOST_FOREACH(pports_type::value_type const & pp, pports_)
+        for (pports_type::value_type const& pp : pports_)
         {
             if(pp.first > 0)
             {
@@ -588,7 +586,7 @@ namespace hpx { namespace parcelset
         new_state = enable_parcel_handling_.exchange(
             new_state, boost::memory_order_acquire);
 
-        BOOST_FOREACH(pports_type::value_type & pp, pports_)
+        for (pports_type::value_type& pp : pports_)
         {
             if(pp.first > 0)
                 pp.second->enable(enable_parcel_handling_);
@@ -769,7 +767,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::register_counter_types()
     {
         // register connection specific counters
-        BOOST_FOREACH(pports_type::value_type const & pp, pports_)
+        for (pports_type::value_type const & pp : pports_)
         {
             register_counter_types(pp.second->type());
         }
@@ -1149,7 +1147,7 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::init(int *argc, char ***argv, util::command_line_handling &cfg)
     {
-        BOOST_FOREACH(plugins::parcelport_factory_base *factory, get_parcelport_factories())
+        for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
         {
             factory->init(argc, argv, cfg);
         }
@@ -1187,7 +1185,7 @@ namespace hpx { namespace parcelset
             "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}"
             ;
 
-        BOOST_FOREACH(plugins::parcelport_factory_base *factory, get_parcelport_factories())
+        for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
         {
             factory->get_plugin_info(ini_defs);
         }

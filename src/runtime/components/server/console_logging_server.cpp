@@ -16,7 +16,6 @@
 #include <hpx/runtime/serialization/serialize_sequence.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <hpx/util/logging/format/named_write_fwd.hpp>
@@ -56,7 +55,7 @@ namespace hpx { namespace components { namespace server
 
         using boost::fusion::at_c;
 
-        BOOST_FOREACH(message_type const& msg, msgs)
+        for (message_type const& msg : msgs)
         {
             const logging_destination dest = at_c<0>(msg);
             const std::size_t level = at_c<1>(msg);

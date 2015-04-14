@@ -11,7 +11,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/foreach.hpp>
+
 #include <algorithm>
 #include <memory>
 
@@ -89,7 +89,7 @@ int hpx_main(int argc, char* argv[])
     // alloc buffer to send
     boost::shared_array<char> send_buffer(new char[MEMORY_BLOCK_SIZE]);
 
-    BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         receive(loc, send_buffer.get(), MEMORY_BLOCK_SIZE, 1);
     }

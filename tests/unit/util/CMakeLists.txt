@@ -10,6 +10,8 @@ set(tests
     bind_action
     function
     parse_slurm_nodelist
+    stencil3_iterator
+    transform_iterator
     tuple
    )
 

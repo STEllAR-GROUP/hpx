@@ -153,7 +153,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::cout << (boost::format(fmt) % n % r % (d / max_runs) % next_locality.load());
 
         get_serial_execution_count_action serial_count;
-        BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
+        for (hpx::id_type const& loc : hpx::find_all_localities())
         {
             std::size_t count = serial_count(loc);
             std::cout << (boost::format("  serial-count,%1%,%2%\n") %

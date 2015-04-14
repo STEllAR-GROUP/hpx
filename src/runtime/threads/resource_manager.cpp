@@ -9,8 +9,6 @@
 #include <hpx/lcos/local/once.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#include <boost/foreach.hpp>
-
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -154,7 +152,7 @@ namespace hpx { namespace threads
 
         // inform executor to give up virtual cores
         proxy_data& p = (*it).second;
-        BOOST_FOREACH(coreids_type coreids, p.core_ids_)
+        for (coreids_type coreids : p.core_ids_)
         {
             p.proxy_->remove_processing_unit(coreids.second, ec);
         }
@@ -173,7 +171,7 @@ namespace hpx { namespace threads
 
         // adjust resource usage count
         proxy_data& p = (*it).second;
-        BOOST_FOREACH(coreids_type coreids, p.core_ids_)
+        for (coreids_type coreids : p.core_ids_)
         {
             HPX_ASSERT(punits_[coreids.first].use_count_ != 0);
             --punits_[coreids.first].use_count_;

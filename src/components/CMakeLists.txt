@@ -13,7 +13,6 @@ set(subdirs
     iostreams
     memory
     papi_counters
-    remote_object
     security
    )
 

@@ -18,7 +18,6 @@
 
 #include <list>
 
-#include <boost/foreach.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
 namespace hpx { namespace agas
@@ -289,7 +288,7 @@ std::vector<response> locality_namespace::bulk_service(
     std::vector<response> r;
     r.reserve(reqs.size());
 
-    BOOST_FOREACH(request const& req, reqs)
+    for (request const& req : reqs)
     {
         error_code ign;
         r.push_back(service(req, ign));
@@ -314,7 +313,7 @@ response locality_namespace::allocate(
     mutex_type::scoped_lock l(mutex_);
 
 #if defined(HPX_DEBUG)
-    BOOST_FOREACH(partition_table_type::value_type const & partition, partitions_)
+    for (partition_table_type::value_type const& partition : partitions_)
     {
         HPX_ASSERT(at_c<0>(partition.second) != endpoints);
     }
@@ -667,7 +666,7 @@ response locality_namespace::statistics_counter(
         case locality_ns_num_threads:
             get_data_func = boost::bind(&cd::get_num_threads_count, &counter_data_, ::_1);
             break;
-        case primary_ns_statistics_counter:
+        case locality_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
             break;
         default:
@@ -701,7 +700,7 @@ response locality_namespace::statistics_counter(
         case locality_ns_num_threads:
             get_data_func = boost::bind(&cd::get_num_threads_time, &counter_data_, ::_1);
             break;
-        case primary_ns_statistics_counter:
+        case locality_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);
             break;
         default:

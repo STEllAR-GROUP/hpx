@@ -90,7 +90,7 @@ void run_benchmark(params const & p)
     {
         std::vector<hpx::future<void> > init_futures;
         init_futures.reserve(ids.size());
-        BOOST_FOREACH(hpx::id_type const & id, ids)
+        for (hpx::id_type const& id : ids)
         {
             init_futures.push_back(
                 hpx::async<broadcast_component::init_action>(id, ids, p.max_msg_size, p.fan_out)
@@ -109,7 +109,7 @@ void run_benchmark(params const & p)
 
         std::vector<hpx::future<double> > run_futures;
         run_futures.reserve(ids.size());
-        BOOST_FOREACH(hpx::id_type const & id, ids)
+        for (hpx::id_type const& id : ids)
         {
             run_futures.push_back(
                 hpx::async<broadcast_component::run_action>(id, size, iterations, skip)
@@ -119,7 +119,7 @@ void run_benchmark(params const & p)
 
         std::vector<double> times; times.reserve(ids.size());
         hpx::wait_all(run_futures);
-        BOOST_FOREACH(hpx::future<double> & f, run_futures)
+        for (hpx::future<double>& f : run_futures)
         {
             times.push_back(f.get());
         }

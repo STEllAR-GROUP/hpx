@@ -1115,10 +1115,10 @@ namespace hpx
 //                                     );
 //
 //             std::vector<future<void>> assign_lazy_sync;
-//             BOOST_FOREACH(partition_description_type const& p,
-//                           std::make_pair(partitions_.begin(),
-//                                          partitions_.end() - 1)
-//                           )
+//             for (partition_description_type const& p,
+//                 boost::make_iterator_range(partitions_.begin(),
+//                                            partitions_.end() - 1)
+//                 )
 //             {
 //                 assign_lazy_sync.push_back(
 //                     partition_vector_stub::assign_async((p.first).get(), n, val)

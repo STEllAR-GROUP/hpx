@@ -6,7 +6,6 @@
 #define BOOST_TEST_MODULE lockfree_tests
 #include <boost/test/included/unit_test.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/static_assert.hpp>
 
 #include <boost/type_traits/is_same.hpp>
@@ -29,14 +28,14 @@ void run_test(void)
     for (int i = 0; i != 128; ++i)
         nodes.push_back(fl.allocate());
 
-    BOOST_FOREACH(dummy * d, nodes)
+    for (dummy* d  :nodes)
         fl.deallocate(d);
 
     nodes.clear();
     for (int i = 0; i != 128; ++i)
         nodes.push_back(fl.allocate());
 
-    BOOST_FOREACH(dummy * d, nodes)
+    for (dummy* d : nodes)
         fl.deallocate(d);
 
     for (int i = 0; i != 128; ++i)

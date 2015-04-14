@@ -16,8 +16,6 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/config/compiler_specific.hpp>
 
-#include <boost/foreach.hpp>
-
 #include <tests/regressions/actions/components/movable_objects.hpp>
 
 using boost::program_options::variables_map;
@@ -358,7 +356,7 @@ void test_object_actions()
 {
     std::vector<id_type> localities = hpx::find_all_localities();
 
-    BOOST_FOREACH(id_type id, localities)
+    for (id_type const& id : localities)
     {
         bool is_local = id == find_here();
 
@@ -484,7 +482,7 @@ void test_object_direct_actions()
 {
     std::vector<id_type> localities = hpx::find_all_localities();
 
-    BOOST_FOREACH(id_type id, localities)
+    for (id_type const& id : localities)
     {
         bool is_local = id == find_here();
 

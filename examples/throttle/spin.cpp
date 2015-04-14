@@ -6,7 +6,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
 
@@ -46,7 +45,7 @@ int hpx_main(variables_map& vm)
             {
                 std::vector<id_type> localities = hpx::find_all_localities();
 
-                BOOST_FOREACH(id_type const& locality_, localities)
+                for (id_type const& locality_ : localities)
                 {
                     address addr = hpx::agas::resolve(locality_).get();
 

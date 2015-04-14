@@ -177,7 +177,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
             }
 
-            BOOST_FOREACH(serialization::serialization_chunk & c, buffer.chunks_)
+            for (serialization::serialization_chunk& c : buffer.chunks_)
             {
                 if(c.type_ == serialization::chunk_type_pointer)
                 {

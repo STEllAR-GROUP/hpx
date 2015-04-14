@@ -281,7 +281,7 @@ namespace hpx { namespace lcos
                 for (std::size_t i = 2; i != fres.size(); ++i)
                     res = reduce_op_(res, fres[i].get());
 
-                return std::move(res);
+                return res;
             }
 
             ReduceOp const& reduce_op_;

@@ -206,8 +206,6 @@ namespace hpx { namespace util
             {
                 if (detail::some_locks_are_not_ignored(held_locks))
                 {
-                    register_locks::held_locks_map tmp_held_locks;
-
                     // temporarily cleaning held locks to avoid endless recursions
                     // when acquiring the back-trace
                     detail::reset_on_exit e(enabled, false);

@@ -8,7 +8,6 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/components/binpacking_factory/server/binpacking_factory.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/move/move.hpp>
 
 #include <vector>
@@ -70,7 +69,7 @@ namespace hpx { namespace components { namespace server
 
         // retrieve the current number of instances of the given component
         std::vector<lcos::future<boost::int32_t> > lazy_counts;
-        BOOST_FOREACH(naming::id_type const& id, localities)
+        for (naming::id_type const& id : localities)
         {
             lazy_counts.push_back(
                 stubs::runtime_support::get_instance_count_async(id, type));
@@ -82,7 +81,7 @@ namespace hpx { namespace components { namespace server
 
         std::vector<long> counts;
         counts.reserve(lazy_counts.size());
-        BOOST_FOREACH(lcos::future<boost::int32_t> & f, lazy_counts)
+        for (lcos::future<boost::int32_t>& f : lazy_counts)
         {
             counts.push_back(f.get());
             maxcount = (std::max)(maxcount, counts.back());
@@ -148,7 +147,7 @@ namespace hpx { namespace components { namespace server
         // now wait for the results
         remote_result_type results;
 
-        BOOST_FOREACH(lazy_result& lr, v)
+        for (lazy_result& lr : v)
         {
             results.push_back(remote_result_type::value_type(lr.locality_, type));
             results.back().gids_ = std::move(lr.gids_.get());
@@ -191,7 +190,7 @@ namespace hpx { namespace components { namespace server
         typedef lcos::future<naming::id_type> future_type;
 
         std::vector<future_type> lazy_counts;
-        BOOST_FOREACH(naming::id_type const& id, localities)
+        for (naming::id_type const& id : localities)
         {
             std::string name;
             p.parentinstanceindex_ = naming::get_locality_id_from_id(id);
@@ -206,7 +205,7 @@ namespace hpx { namespace components { namespace server
         // FIXME: make loop asynchronous
         std::vector<long> counts;
         counts.reserve(lazy_counts.size());
-        BOOST_FOREACH(future_type & f, lazy_counts)
+        for (future_type& f : lazy_counts)
         {
             performance_counters::counter_value value =
                 performance_counters::stubs::performance_counter::get_value(f.get());
@@ -274,7 +273,7 @@ namespace hpx { namespace components { namespace server
         // now wait for the results
         remote_result_type results;
 
-        BOOST_FOREACH(lazy_result& lr, v)
+        for (lazy_result& lr : v)
         {
             results.push_back(remote_result_type::value_type(lr.locality_, type));
             results.back().gids_ = std::move(lr.gids_.get());

@@ -11,8 +11,6 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <boost/foreach.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Define a base component which exposes the required interface
 struct A : hpx::components::abstract_simple_component_base<A>
@@ -94,7 +92,7 @@ int main()
     // Use the client class to invoke the print functionality of the compound
     // component 'B'.
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    BOOST_FOREACH(hpx::id_type id, localities)
+    for (hpx::id_type const& id : localities)
     {
         client hw1(hpx::components::new_<B>(id));
         hw1.print();

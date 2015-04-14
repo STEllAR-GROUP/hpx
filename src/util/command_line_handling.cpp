@@ -20,7 +20,6 @@
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/program_options.hpp>
 
@@ -662,7 +661,7 @@ namespace hpx { namespace util
         if (debug_clp) {
             std::cerr << "Configuration before runtime start:\n";
             std::cerr << "-----------------------------------\n";
-            BOOST_FOREACH(std::string const& s, ini_config) {
+            for (std::string const& s : ini_config) {
                 std::cerr << s << std::endl;
             }
             std::cerr << "-----------------------------------\n";
@@ -915,8 +914,7 @@ namespace hpx { namespace util
         // will be considered now.
 
         parcelset::parcelhandler::init(&argc, &argv, *this);
-        BOOST_FOREACH(boost::shared_ptr<plugins::plugin_registry_base> & reg,
-            plugin_registries)
+        for (boost::shared_ptr<plugins::plugin_registry_base>& reg : plugin_registries)
         {
             reg->init(&argc, &argv, *this);
         }

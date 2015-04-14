@@ -21,7 +21,6 @@
 
 #include <list>
 
-#include <boost/foreach.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
@@ -360,7 +359,7 @@ std::vector<response> primary_namespace::bulk_service(
     std::vector<response> r;
     r.reserve(reqs.size());
 
-    BOOST_FOREACH(request const& req, reqs)
+    for (request const& req : reqs)
     {
         r.push_back(service(req, ec));
         if (ec)
@@ -992,7 +991,7 @@ void primary_namespace::resolve_free_list(
 
     typedef refcnt_table_type::iterator iterator;
 
-    BOOST_FOREACH(iterator const& it, free_list)
+    for (iterator const& it : free_list)
     {
         typedef refcnt_table_type::key_type key_type;
 
@@ -1190,7 +1189,7 @@ void primary_namespace::free_components_sync(
     // Delete the objects on the free list.
     components::server::runtime_support::free_component_action act;
 
-    BOOST_FOREACH(free_entry const& e, free_list)
+    for (free_entry const& e : free_list)
     {
         // Bail if we're in late shutdown and non-local.
         if (HPX_UNLIKELY(!threads::threadmanager_is(running)) &&

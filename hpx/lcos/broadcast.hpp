@@ -510,14 +510,14 @@ namespace hpx { namespace lcos
             std::vector<Result> res;
             std::vector<hpx::future<std::vector<Result> > > fres = std::move(r.get());
 
-            BOOST_FOREACH(hpx::future<std::vector<Result> >& f, fres)
+            for (hpx::future<std::vector<Result> >& f : fres)
             {
                 std::vector<Result> t = std::move(f.get());
                 res.reserve(res.capacity() + t.size());
                 std::move(t.begin(), t.end(), std::back_inserter(res));
             }
 
-            return std::move(res);
+            return res;
         }
 
         ///////////////////////////////////////////////////////////////////////

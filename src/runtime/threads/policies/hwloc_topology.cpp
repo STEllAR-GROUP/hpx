@@ -19,7 +19,6 @@
 #include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/io/ios_state.hpp>
-#include <boost/foreach.hpp>
 
 namespace hpx { namespace threads
 {
@@ -45,7 +44,7 @@ namespace hpx { namespace threads
                         << values.size();
 
             std::size_t i = 0;
-            BOOST_FOREACH(std::size_t value, values)
+            for (std::size_t value : values)
             {
                 LTM_(debug) << "hwloc_topology: " << valuename //-V128
                             << "(" << i++ << "): " << value;
@@ -59,7 +58,7 @@ namespace hpx { namespace threads
                         << values.size();
 
             std::size_t i = 0;
-            BOOST_FOREACH(mask_cref_type value, values)
+            for (mask_cref_type value : values)
             {
                 LTM_(debug) << "hwloc_topology: " << valuename //-V128
                             << "(" << i++ << "): " HPX_CPU_MASK_PREFIX

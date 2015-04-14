@@ -29,8 +29,8 @@ namespace hpx { namespace traits
     struct type_size
     {
         typedef void uses_sizeof;
-
-        static BOOST_FORCEINLINE std::size_t call(T const&)
+        // flags are used for serialization options which may affect final encoded size
+        static BOOST_FORCEINLINE std::size_t call(T const&, int)
         {
             return sizeof(T);
         }
@@ -74,28 +74,30 @@ namespace hpx { namespace traits
         typename boost::enable_if<traits::detail::is_container<T> >::type>
     {
         template <typename T_>
-        static BOOST_FORCEINLINE std::size_t call(T_ const& v, boost::mpl::false_)
+        static BOOST_FORCEINLINE
+        std::size_t call(T_ const& v, int flags, boost::mpl::false_)
         {
             std::size_t sum = sizeof(T_);
             typename T_::const_iterator end = v.end();
             for (typename T_::const_iterator it = v.begin(); it != end; ++it)
-                sum += type_size<typename T_::value_type>::call(*it);
+                sum += type_size<typename T_::value_type>::call(*it, flags);
             return sum;
         }
 
         template <typename T_>
-        static BOOST_FORCEINLINE std::size_t call(T_ const& v, boost::mpl::true_)
+        static BOOST_FORCEINLINE
+        std::size_t call(T_ const& v, int, boost::mpl::true_)
         {
             return sizeof(T_) + v.size() * sizeof(typename T_::value_type); //-V119
         }
 
-        static BOOST_FORCEINLINE std::size_t call(T const& v)
+        static BOOST_FORCEINLINE std::size_t call(T const& v, int flags)
         {
             typedef boost::mpl::bool_<
                 traits::detail::has_uses_sizeof<
                     traits::type_size<typename T::value_type>
                 >::value> predicate;
-            return call(v, predicate());
+            return call(v, flags, predicate());
         }
     };
 
@@ -108,9 +110,10 @@ namespace hpx { namespace traits
             typedef std::size_t result_type;
 
             template <typename T>
-            BOOST_FORCEINLINE std::size_t operator()(std::size_t size, T const& t) const
+            BOOST_FORCEINLINE std::size_t
+            operator()(std::size_t size, T const& t, int flags) const
             {
-                return size + type_size<T>::call(t);
+                return size + type_size<T>::call(t, flags);
             }
         };
     }
@@ -119,10 +122,12 @@ namespace hpx { namespace traits
     struct type_size<T,
         typename boost::enable_if<boost::fusion::traits::is_sequence<T> >::type>
     {
-        static BOOST_FORCEINLINE std::size_t call(T const& v)
+        static BOOST_FORCEINLINE std::size_t call(T const& v, int flags)
         {
             std::size_t sum = sizeof(T);
-            return boost::fusion::accumulate(v, sum, traits::detail::get_size());
+            return boost::fusion::accumulate(v, sum,
+                util::bind(traits::detail::get_size(),
+                util::placeholders::_1, util::placeholders::_2, flags));
         }
     };
 
@@ -130,9 +135,10 @@ namespace hpx { namespace traits
     template <typename T>
     struct type_size<boost::shared_ptr<T> >
     {
-        static BOOST_FORCEINLINE std::size_t call(boost::shared_ptr<T> const& p)
+        static BOOST_FORCEINLINE
+        std::size_t call(boost::shared_ptr<T> const& p, int flags)
         {
-            return type_size<T>::call(*p);
+            return type_size<T>::call(*p, flags);
         }
     };
 
@@ -140,17 +146,18 @@ namespace hpx { namespace traits
     template <typename T>
     struct type_size<boost::intrusive_ptr<T> >
     {
-        static BOOST_FORCEINLINE std::size_t call(boost::intrusive_ptr<T> const& p)
+        static BOOST_FORCEINLINE
+        std::size_t call(boost::intrusive_ptr<T> const& p, int flags)
         {
-            return type_size<T>::call(*p);
+            return type_size<T>::call(*p, flags);
         }
     };
 
     //////////////////////////////////////////////////////////////////////////
     template <typename T>
-    BOOST_FORCEINLINE std::size_t get_type_size(T const& t)
+    BOOST_FORCEINLINE std::size_t get_type_size(T const& t, int flags)
     {
-        return type_size<T>::call(t);
+        return type_size<T>::call(t, flags);
     }
 }}
 

@@ -590,7 +590,7 @@ namespace hpx { namespace components { namespace server
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
 
-        return std::move(ids);
+        return ids;
     }
 
     template <typename Component, typename T, typename ...Ts>
@@ -646,7 +646,7 @@ namespace hpx { namespace components { namespace server
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
 
-        return std::move(ids);
+        return ids;
     }
 
     template <typename Component>

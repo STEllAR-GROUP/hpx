@@ -23,7 +23,6 @@
 #include <boost/lexical_cast.hpp>
 
 #include <boost/thread/locks.hpp>
-#include <boost/foreach.hpp>
 #include <boost/ref.hpp>
 
 #include <algorithm>

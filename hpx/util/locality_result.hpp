@@ -19,7 +19,7 @@
 
 #include <boost/make_shared.hpp>
 #include <boost/iterator_adaptors.hpp>
-#include <boost/foreach.hpp>
+#include <boost/range/iterator_range.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -79,7 +79,7 @@ namespace hpx { namespace util
         locality_result(remote_locality_result const& results)
           : prefix_(results.prefix_), type_(results.type_)
         {
-            BOOST_FOREACH(naming::gid_type const& gid, results.gids_)
+            for (naming::gid_type const& gid : results.gids_)
             {
                 gids_.push_back(naming::id_type(gid, naming::id_type::managed));
             }
@@ -161,7 +161,7 @@ namespace hpx { namespace util
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT std::pair<locality_result_iterator, locality_result_iterator>
+    HPX_EXPORT boost::iterator_range<locality_result_iterator>
         locality_results(std::vector<util::locality_result> const& v);
 }}
 
@@ -182,7 +182,7 @@ namespace hpx { namespace traits
         static result_type call(remote_result_type const& rhs)
         {
             result_type result;
-            BOOST_FOREACH(remote_result_type::value_type const& r, rhs)
+            for (remote_result_type::value_type const& r : rhs)
             {
                 result.push_back(result_type::value_type(r));
             }
