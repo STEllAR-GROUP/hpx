@@ -215,25 +215,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         int acquire()
         {
             mutex_type::scoped_lock l(mtx_);
-            if(free_tags_.empty())
+//            if(free_tags_.empty())
                 return next_tag_++;
 
-            int tag = free_tags_.front();
-            free_tags_.pop_front();
-            return tag;
+//            int tag = free_tags_.front();
+//            free_tags_.pop_front();
+//            return tag;
         }
 
         void release(int tag)
         {
-            if(tag == next_tag_) return;
+//            if(tag == next_tag_) return;
 
-            mutex_type::scoped_lock l(mtx_);
-            free_tags_.push_back(tag);
+//            mutex_type::scoped_lock l(mtx_);
+//            free_tags_.push_back(tag);
         }
 
         mutex_type mtx_;
         int next_tag_;
-        std::deque<int> free_tags_;
+//        std::deque<int> free_tags_;
     };
 
 }}}
