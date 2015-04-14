@@ -120,4 +120,11 @@ namespace hpx { namespace detail
     }
 }}
 
+#if defined(HPX_COLOCATED_BACKWARDS_COMPATIBILITY)
+namespace hpx
+{
+    using hpx::detail::async_colocated;
+}
+#endif
+
 #endif

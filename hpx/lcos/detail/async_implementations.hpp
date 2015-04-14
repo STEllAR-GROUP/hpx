@@ -219,7 +219,6 @@ namespace hpx { namespace detail
 
         return f;
     }
-
     /// \endcond
 }}
 
