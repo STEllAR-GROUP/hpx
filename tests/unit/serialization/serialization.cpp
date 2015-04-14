@@ -12,7 +12,7 @@ namespace foo
 {
     class bar
     {
-        friend hpx::serialization::access;
+        friend class hpx::serialization::access;
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
@@ -62,7 +62,6 @@ namespace foo
         std::cout << "loading bap\n";
     }
     HPX_SERIALIZATION_SPLIT_FREE(bap)
-
 }
 
 HPX_IS_BITWISE_SERIALIZABLE(foo::bap);
