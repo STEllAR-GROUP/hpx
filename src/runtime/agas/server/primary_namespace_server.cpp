@@ -330,7 +330,7 @@ parcelset::policies::message_handler* primary_namespace::get_message_handler(
     return routed_p.get_message_handler(ph, loc);
 }
 
-util::binary_filter* primary_namespace::get_serialization_filter(
+serialization::binary_filter* primary_namespace::get_serialization_filter(
     parcelset::parcel const& p
     )
 {

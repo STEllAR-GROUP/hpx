@@ -11,6 +11,8 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #include <hpx/components/containers/unordered/unordered_distribution_policy.hpp>
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
@@ -60,7 +62,7 @@ namespace hpx { namespace server
             boost::uint32_t locality_id_;
 
         private:
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
@@ -79,7 +81,7 @@ namespace hpx { namespace server
         std::vector<partition_data> partitions_;
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned)

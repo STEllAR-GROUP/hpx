@@ -3,17 +3,20 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <algorithm>
+#include <iterator>
+#include <fstream>
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/serialize_buffer.hpp>
-
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/serialization.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/format.hpp>
 
 // This function will never be called
-int test_function(hpx::util::serialize_buffer<double> const& b)
+int test_function(hpx::serialization::serialize_buffer<double> const& b)
 {
     return 42;
 }
@@ -37,12 +40,12 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         hpx::get_config_entry("hpx.parcel.endian_out", "little");
 #endif
 
-    int in_archive_flags = boost::archive::no_header;
-    int out_archive_flags = boost::archive::no_header;
+    unsigned int in_archive_flags = 0U;
+    unsigned int out_archive_flags = 0U;
     if (endian_out == "little")
-        out_archive_flags |= hpx::util::endian_little;
+        out_archive_flags |= hpx::serialization::endian_little;
     else if (endian_out == "big")
-        out_archive_flags |= hpx::util::endian_big;
+        out_archive_flags |= hpx::serialization::endian_big;
     else {
         HPX_ASSERT(endian_out =="little" || endian_out == "big");
     }
@@ -52,10 +55,10 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     if (boost::lexical_cast<int>(array_optimization) == 0)
     {
-        in_archive_flags |= hpx::util::disable_array_optimization;
-        out_archive_flags |= hpx::util::disable_array_optimization;
-        in_archive_flags |= hpx::util::disable_data_chunking;
-        out_archive_flags |= hpx::util::disable_data_chunking;
+        in_archive_flags |= hpx::serialization::disable_array_optimization;
+        out_archive_flags |= hpx::serialization::disable_array_optimization;
+        in_archive_flags |= hpx::serialization::disable_data_chunking;
+        out_archive_flags |= hpx::serialization::disable_data_chunking;
     }
     else
     {
@@ -63,8 +66,8 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
             hpx::get_config_entry("hpx.parcel.zero_copy_optimization", "1");
         if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
         {
-            in_archive_flags |= hpx::util::disable_data_chunking;
-            out_archive_flags |= hpx::util::disable_data_chunking;
+            in_archive_flags |= hpx::serialization::disable_data_chunking;
+            out_archive_flags |= hpx::serialization::disable_data_chunking;
         }
     }
 
@@ -72,8 +75,8 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     std::vector<double> data;
     data.resize(data_size);
 
-    hpx::util::serialize_buffer<double> buffer(data.data(), data.size(),
-        hpx::util::serialize_buffer<double>::reference);
+    hpx::serialization::serialize_buffer<double> buffer(data.data(), data.size(),
+        hpx::serialization::serialize_buffer<double>::reference);
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp;
@@ -92,9 +95,9 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here);
 
-    std::vector<hpx::util::serialization_chunk>* chunks = 0;
+    std::vector<hpx::serialization::serialization_chunk>* chunks = 0;
     if (zerocopy)
-        chunks = new std::vector<hpx::util::serialization_chunk>();
+        chunks = new std::vector<hpx::serialization::serialization_chunk>();
 
     boost::uint32_t dest_locality_id = outp.get_destination_locality_id();
     hpx::util::high_resolution_timer t;
@@ -108,10 +111,9 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
         {
             // create an output archive and serialize the parcel
-            hpx::util::portable_binary_oarchive archive(
-                out_buffer, chunks, dest_locality_id, 0, out_archive_flags);
+            hpx::serialization::output_archive archive(
+                out_buffer, out_archive_flags, dest_locality_id, chunks);
             archive << outp;
-
             arg_size = archive.bytes_written();
         }
 
@@ -119,8 +121,8 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
         {
             // create an input archive and deserialize the parcel
-            hpx::util::portable_binary_iarchive archive(
-                out_buffer, chunks, arg_size, in_archive_flags);
+            hpx::serialization::input_archive archive(
+                out_buffer, in_archive_flags, arg_size, chunks);
 
             archive >> inp;
         }
@@ -156,7 +158,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         overall_time += timings[i].get();
 
     if (print_header)
-        hpx::cout << "datasize,testcount,time/test[ns]\n" << hpx::flush;
+        hpx::cout << "datasize,testcount,average_time[ns]\n" << hpx::flush;
 
     hpx::cout << (boost::format("%d,%d,%f\n") %
         data_size % iterations % (overall_time / concurrency)) << hpx::flush;

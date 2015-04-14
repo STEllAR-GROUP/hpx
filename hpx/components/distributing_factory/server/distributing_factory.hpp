@@ -12,9 +12,8 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/locality_result.hpp>
 
-#include <boost/range/iterator_range.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/vector.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #include <vector>
 #include <numeric>
@@ -95,12 +94,12 @@ namespace hpx { namespace components { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization of partition_info
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
-    HPX_COMPONENT_EXPORT void serialize(hpx::util::portable_binary_iarchive& ar,
+    HPX_COMPONENT_EXPORT void serialize(input_archive& ar,
         hpx::components::server::partition_info& info, unsigned int const);
 
-    HPX_COMPONENT_EXPORT void serialize(hpx::util::portable_binary_oarchive& ar,
+    HPX_COMPONENT_EXPORT void serialize(output_archive& ar,
         hpx::components::server::partition_info& info, unsigned int const);
 }}
 

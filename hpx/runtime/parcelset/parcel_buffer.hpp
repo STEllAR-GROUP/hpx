@@ -8,7 +8,7 @@
 #define HPX_PARCELSET_PARCEL_BUFFER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/portable_binary_archive.hpp>
+#include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 
 #include <boost/integer/endian.hpp>
@@ -18,7 +18,7 @@
 
 namespace hpx { namespace parcelset
 {
-    template <typename BufferType, typename ChunkType = util::serialization_chunk>
+    template <typename BufferType, typename ChunkType = serialization::serialization_chunk>
     struct parcel_buffer
     {
         typedef std::pair<

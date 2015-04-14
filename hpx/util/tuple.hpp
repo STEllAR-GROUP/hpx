@@ -9,9 +9,11 @@
 #define HPX_UTIL_TUPLE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize_sequence.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
 
@@ -19,7 +21,6 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/size_t.hpp>
-#include <boost/serialization/is_bitwise_serializable.hpp>
 #include <boost/type_traits/add_const.hpp>
 #include <boost/type_traits/add_cv.hpp>
 #include <boost/type_traits/add_volatile.hpp>
@@ -926,16 +927,20 @@ namespace hpx { namespace util
 
 #include <hpx/util/detail/fusion_adapt_tuple.hpp>
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ...Ts>
     struct is_bitwise_serializable<
         ::hpx::util::tuple<Ts...>
     > : ::hpx::util::detail::all_of<
-            boost::serialization::is_bitwise_serializable<Ts>...
+            hpx::traits::is_bitwise_serializable<Ts>...
         >
     {};
+
+}}
+
+namespace hpx { namespace serialization {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive, typename ...Ts>
@@ -946,13 +951,13 @@ namespace boost { namespace serialization
       , unsigned int const version
     )
     {
-        ::hpx::util::serialize_sequence(ar, t);
+        ::hpx::serialization::serialize_sequence(ar, t);
     }
 
     // These are needed to avoid conflicts with serialize_empty_type
     BOOST_FORCEINLINE
     void serialize(
-        hpx::util::portable_binary_oarchive&
+        serialization::output_archive&
       , ::hpx::util::tuple<>&
       , unsigned int const
     )
@@ -960,7 +965,7 @@ namespace boost { namespace serialization
 
     BOOST_FORCEINLINE
     void serialize(
-        hpx::util::portable_binary_iarchive&
+        serialization::input_archive&
       , ::hpx::util::tuple<>&
       , unsigned int const
     )

@@ -13,19 +13,17 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/is_bitwise_serializable.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -36,34 +34,41 @@ namespace hpx { namespace actions { namespace detail
     struct action_serialization_data
     {
         action_serialization_data()
-          : parent_id_(0)
+          : parent_locality_(naming::invalid_locality_id)
+          , parent_id_(static_cast<boost::uint64_t>(-1))
           , parent_phase_(0)
-          , parent_locality_(0)
-          , priority_(0)
-          , stacksize_(0)
+          , priority_(static_cast<threads::thread_priority>(0))
+          , stacksize_(static_cast<threads::thread_stacksize>(0))
         {}
 
-        action_serialization_data(boost::uint64_t parent_id,
+        action_serialization_data(boost::uint32_t parent_locality,
+                boost::uint64_t parent_id,
                 boost::uint64_t parent_phase,
-                boost::uint32_t parent_locality,
-                boost::uint16_t priority,
-                boost::uint16_t stacksize)
-          : parent_id_(parent_id)
+                threads::thread_priority priority,
+                threads::thread_stacksize stacksize)
+          : parent_locality_(parent_locality)
+          , parent_id_(parent_id)
           , parent_phase_(parent_phase)
-          , parent_locality_(parent_locality)
           , priority_(priority)
           , stacksize_(stacksize)
         {}
 
+        boost::uint32_t parent_locality_;
         boost::uint64_t parent_id_;
         boost::uint64_t parent_phase_;
-        boost::uint32_t parent_locality_;
-        boost::uint16_t priority_;
-        boost::uint16_t stacksize_;
+        threads::thread_priority priority_;
+        threads::thread_stacksize stacksize_;
+
+        template <class Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            ar & parent_id_ & parent_phase_ & parent_locality_
+               & priority_ & stacksize_;
+        }
     };
 }}}
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits
 {
     template <>
     struct is_bitwise_serializable<
@@ -278,8 +283,8 @@ namespace hpx { namespace actions
         /// Return whether the embedded action is part of termination detection
         virtual bool does_termination_detection() const = 0;
 
-        virtual void load(hpx::util::portable_binary_iarchive & ar) = 0;
-        virtual void save(hpx::util::portable_binary_oarchive & ar) const = 0;
+        virtual void load(serialization::input_archive & ar) = 0;
+        virtual void save(serialization::output_archive & ar) const = 0;
 
         /// Wait for embedded futures to become ready
         virtual void wait_for_futures() = 0;
@@ -305,7 +310,7 @@ namespace hpx { namespace actions
 
         /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.
-        virtual util::binary_filter* get_serialization_filter(
+        virtual serialization::binary_filter* get_serialization_filter(
             parcelset::parcel const& p) const = 0;
 
         /// Return a pointer to the message handler to be used for this action.

@@ -598,9 +598,9 @@ namespace hpx
             action, pp, num_messages, interval, ec);
     }
 
-    util::binary_filter* runtime::create_binary_filter(
+    serialization::binary_filter* runtime::create_binary_filter(
         char const* binary_filter_type, bool compress,
-        util::binary_filter* next_filter, error_code& ec)
+        serialization::binary_filter* next_filter, error_code& ec)
     {
         return runtime_support_->create_binary_filter(binary_filter_type,
             compress, next_filter, ec);
@@ -1405,8 +1405,8 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Create an instance of a binary filter plugin
-    util::binary_filter* create_binary_filter(char const* binary_filter_type,
-        bool compress, util::binary_filter* next_filter, error_code& ec)
+    serialization::binary_filter* create_binary_filter(char const* binary_filter_type,
+        bool compress, serialization::binary_filter* next_filter, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)

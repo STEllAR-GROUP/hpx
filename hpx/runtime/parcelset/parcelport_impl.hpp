@@ -92,7 +92,7 @@ namespace hpx { namespace parcelset
           , io_service_pool_(thread_pool_size(ini),
                 on_start_thread, on_stop_thread, pool_name(), pool_name_postfix())
           , connection_cache_(max_connections(ini), max_connections_per_loc(ini))
-          , archive_flags_(boost::archive::no_header)
+          , archive_flags_(0)
           , operations_in_flight_(0)
         {
 #ifdef BOOST_BIG_ENDIAN
@@ -101,20 +101,20 @@ namespace hpx { namespace parcelset
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
 #endif
             if (endian_out == "little")
-                archive_flags_ |= util::endian_little;
+                archive_flags_ |= serialization::endian_little;
             else if (endian_out == "big")
-                archive_flags_ |= util::endian_big;
+                archive_flags_ |= serialization::endian_big;
             else {
                 HPX_ASSERT(endian_out =="little" || endian_out == "big");
             }
 
             if (!this->allow_array_optimizations()) {
-                archive_flags_ |= util::disable_array_optimization;
-                archive_flags_ |= util::disable_data_chunking;
+                archive_flags_ |= serialization::disable_array_optimization;
+                archive_flags_ |= serialization::disable_data_chunking;
             }
             else {
                 if (!this->allow_zero_copy_optimizations())
-                    archive_flags_ |= util::disable_data_chunking;
+                    archive_flags_ |= serialization::disable_data_chunking;
             }
         }
 

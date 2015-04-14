@@ -22,8 +22,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/map.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -775,23 +775,19 @@ std::string section::expand_only(std::string value,
 template <typename Archive>
 void section::save(Archive& ar, const unsigned int version) const
 {
-    using namespace boost::serialization;
-
-    ar << make_nvp("name", name_);
-    ar << make_nvp("parent_name", parent_name_);
-    ar << make_nvp("entries", entries_);
-    ar << make_nvp("sections", sections_);
+    ar << name_;
+    ar << parent_name_;
+    ar << entries_;
+    ar << sections_;
 }
 
 template <typename Archive>
 void section::load(Archive& ar, const unsigned int version)
 {
-    using namespace boost::serialization;
-
-    ar >> make_nvp("name", name_);
-    ar >> make_nvp("parent_name", parent_name_);
-    ar >> make_nvp("entries", entries_);
-    ar >> make_nvp("sections", sections_);
+    ar >> name_;
+    ar >> parent_name_;
+    ar >> entries_;
+    ar >> sections_;
 
     set_root(this, true);     // make this the current root
 }
@@ -799,10 +795,10 @@ void section::load(Archive& ar, const unsigned int version)
 ///////////////////////////////////////////////////////////////////////////////
 // explicit instantiation for the correct archive types
 template HPX_EXPORT void
-section::save(util::portable_binary_oarchive&, const unsigned int version) const;
+section::save(serialization::output_archive&, const unsigned int version) const;
 
 template HPX_EXPORT void
-section::load(util::portable_binary_iarchive&, const unsigned int version);
+section::load(serialization::input_archive&, const unsigned int version);
 
 }}  // namespace hpx::util
 

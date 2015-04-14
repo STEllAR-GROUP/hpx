@@ -8,11 +8,10 @@
 
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
 
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -101,7 +100,7 @@ namespace hpx { namespace naming
         friend std::ostream& operator<< (std::ostream&, address const&);
 
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void save(Archive& ar, const unsigned int version) const;
@@ -109,7 +108,7 @@ namespace hpx { namespace naming
         template <typename Archive>
         void load(Archive& ar, const unsigned int version);
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER();
     };
 
     inline std::ostream& operator<< (std::ostream& os, address const& addr)
@@ -123,23 +122,6 @@ namespace hpx { namespace naming
 
 ///////////////////////////////////////////////////////////////////////////////
 }}
-
-///////////////////////////////////////////////////////////////////////////////
-// this is the current version of the address serialization format
-// this definition needs to be in the global namespace
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-BOOST_CLASS_VERSION(hpx::naming::address, HPX_ADDRESS_VERSION)
-BOOST_CLASS_TRACKING(hpx::naming::address, boost::serialization::track_never)
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

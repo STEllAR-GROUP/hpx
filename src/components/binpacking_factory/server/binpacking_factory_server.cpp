@@ -8,10 +8,6 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/components/binpacking_factory/server/binpacking_factory.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/vector.hpp>
 #include <boost/move/move.hpp>
 
 #include <vector>

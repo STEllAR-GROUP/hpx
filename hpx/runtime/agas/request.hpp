@@ -19,11 +19,8 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/serialize_as_future.hpp>
-
-#include <boost/serialization/split_member.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/tracking.hpp>
 
 // The number of types that the request's variant can represent.
 #define HPX_AGAS_REQUEST_SUBTYPES 14
@@ -238,20 +235,20 @@ struct HPX_EXPORT request
         ) const;
 
   private:
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
 
     void save(
-        hpx::util::portable_binary_oarchive& ar
+        serialization::output_archive& ar
       , const unsigned int
         ) const;
 
     void load(
-        hpx::util::portable_binary_iarchive& ar
+        serialization::input_archive& ar
       , const unsigned int
         );
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    HPX_SERIALIZATION_SPLIT_MEMBER()
 
     namespace_action_code mc; //-V707
     boost::shared_ptr<request_data> data;
@@ -287,20 +284,6 @@ HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
   , hpx::util::function<void(std::string const&, hpx::components::component_type)>
   , request_iterate_types_function_type
 )
-
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-BOOST_CLASS_VERSION(hpx::agas::request, HPX_AGAS_VERSION)
-BOOST_CLASS_TRACKING(hpx::agas::request, boost::serialization::track_never)
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
 
 #endif // HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 

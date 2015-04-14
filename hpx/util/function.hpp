@@ -9,7 +9,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/error.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/function_template.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/decay.hpp>
@@ -41,7 +40,8 @@
             std::pair<                                                        \
                 function_vtable_ptr<                                          \
                     Sig                                                       \
-                  , portable_binary_iarchive, portable_binary_oarchive        \
+                  , ::hpx::serialization::input_archive                       \
+                  , ::hpx::serialization::output_archive                      \
                 >                                                             \
               , util::decay<HPX_UTIL_STRIP(Functor)>::type                    \
             >                                                                 \
@@ -93,7 +93,7 @@ namespace hpx { namespace util { namespace detail
         std::pair<
             hpx::util::detail::function_vtable_ptr<
                 Sig
-              , hpx::util::portable_binary_iarchive, hpx::util::portable_binary_oarchive
+              , hpx::serialization::input_archive, hpx::serialization::output_archive
             >
           , hpx::util::detail::empty_function<Sig>
         >
@@ -115,7 +115,7 @@ namespace hpx { namespace traits {
         std::pair<
             hpx::util::detail::function_vtable_ptr<
                 Sig
-              , hpx::util::portable_binary_iarchive, hpx::util::portable_binary_oarchive
+              , hpx::serialization::input_archive, hpx::serialization::output_archive
             >
           , hpx::util::detail::empty_function<Sig>
         >

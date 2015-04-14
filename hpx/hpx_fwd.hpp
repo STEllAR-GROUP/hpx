@@ -1634,9 +1634,9 @@ namespace hpx
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
-    HPX_API_EXPORT util::binary_filter* create_binary_filter(
+    HPX_API_EXPORT serialization::binary_filter* create_binary_filter(
         char const* binary_filter_type, bool compress,
-        util::binary_filter* next_filter = 0, error_code& ec = throws);
+        serialization::binary_filter* next_filter = 0, error_code& ec = throws);
 
 #if defined(HPX_HAVE_SODIUM)
     namespace components { namespace security

@@ -14,7 +14,6 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/void_cast.hpp>
 
 #include <boost/fusion/include/vector.hpp>
 

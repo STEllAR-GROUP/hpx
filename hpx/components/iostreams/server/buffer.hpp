@@ -13,10 +13,7 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/split_member.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/vector.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 namespace hpx { namespace iostreams { namespace detail
 {
@@ -100,14 +97,14 @@ namespace hpx { namespace iostreams { namespace detail
         boost::shared_ptr<std::vector<char> > data_;
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         HPX_COMPONENT_EXPORT void save(
-            hpx::util::portable_binary_oarchive& ar, unsigned) const;
+            serialization::output_archive& ar, unsigned) const;
         HPX_COMPONENT_EXPORT void load(
-            hpx::util::portable_binary_iarchive& ar, unsigned);
+            serialization::input_archive& ar, unsigned);
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER();
+        HPX_SERIALIZATION_SPLIT_MEMBER();
 
         mutable mutex_type mtx_;
     };

@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/unique_function_template.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/decay.hpp>
@@ -42,7 +41,8 @@
             std::pair<                                                        \
                 unique_function_vtable_ptr<                                   \
                     Sig                                                       \
-                  , portable_binary_iarchive, portable_binary_oarchive        \
+                  , serialization::input_archive                              \
+                  , serialization::output_archive                             \
                 >                                                             \
               , util::decay<HPX_UTIL_STRIP(Functor)>::type                    \
             >                                                                 \

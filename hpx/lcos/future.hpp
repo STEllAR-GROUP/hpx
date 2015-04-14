@@ -275,18 +275,14 @@ namespace hpx { namespace lcos { namespace detail
         }
     }
 
-    template <typename Archive, typename Future>
-    typename boost::disable_if<
-        typename Archive::is_saving
-    >::type serialize_future(Archive& ar, Future& f, unsigned)
+    template <typename Future>
+    void serialize_future(serialization::input_archive& ar, Future& f, unsigned)
     {
         serialize_future_load(ar, f);
     }
 
-    template <typename Archive, typename Future>
-    typename boost::enable_if<
-        typename Archive::is_saving
-    >::type serialize_future(Archive& ar, Future& f, unsigned)
+    template <typename Future>
+    void serialize_future(serialization::output_archive& ar, Future& f, unsigned)
     {
         serialize_future_save(ar, f);
     }
@@ -1342,7 +1338,7 @@ namespace hpx { namespace actions
         }
 
         /// serialization support
-        void load(hpx::util::portable_binary_iarchive& ar)
+        void load(serialization::input_archive& ar)
         {
             // serialize base class
             typedef continuation base_type;
@@ -1354,7 +1350,7 @@ namespace hpx { namespace actions
             if (have_function)
                 ar >> f_;
         }
-        void save(hpx::util::portable_binary_oarchive& ar) const
+        void save(serialization::output_archive& ar) const
         {
             // serialize base class
             typedef continuation base_type;
@@ -1450,7 +1446,7 @@ namespace hpx { namespace actions
         }
 
         /// serialization support
-        void load(hpx::util::portable_binary_iarchive& ar)
+        void load(serialization::input_archive& ar)
         {
             // serialize base class
             typedef continuation base_type;
@@ -1462,7 +1458,7 @@ namespace hpx { namespace actions
             if (have_function)
                 ar >> f_;
         }
-        void save(hpx::util::portable_binary_oarchive& ar) const
+        void save(serialization::output_archive& ar) const
         {
             // serialize base class
             typedef continuation base_type;
@@ -1556,7 +1552,7 @@ namespace hpx { namespace actions
         }
 
         /// serialization support
-        void load(hpx::util::portable_binary_iarchive& ar)
+        void load(serialization::input_archive& ar)
         {
             // serialize base class
             typedef continuation base_type;
@@ -1568,7 +1564,7 @@ namespace hpx { namespace actions
             if (have_function)
                 ar >> f_;
         }
-        void save(hpx::util::portable_binary_oarchive& ar) const
+        void save(serialization::output_archive& ar) const
         {
             // serialize base class
             typedef continuation base_type;
@@ -1664,7 +1660,7 @@ namespace hpx { namespace actions
         }
 
         /// serialization support
-        void load(hpx::util::portable_binary_iarchive& ar)
+        void load(serialization::input_archive& ar)
         {
             // serialize base class
             typedef continuation base_type;
@@ -1676,7 +1672,7 @@ namespace hpx { namespace actions
             if (have_function)
                 ar >> f_;
         }
-        void save(hpx::util::portable_binary_oarchive& ar) const
+        void save(serialization::output_archive& ar) const
         {
             // serialize base class
             typedef continuation base_type;
@@ -1693,7 +1689,7 @@ namespace hpx { namespace actions
     };
 }}
 
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     template <typename Archive, typename T>
     BOOST_FORCEINLINE

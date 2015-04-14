@@ -14,7 +14,6 @@
 #include <hpx/util/detail/count_num_args.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/serialization/serialization.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
 

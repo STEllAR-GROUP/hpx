@@ -9,6 +9,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/naming.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/include/util.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
@@ -95,8 +96,7 @@ namespace hpx { namespace components { namespace server
             std::vector<char> data;
 
             {
-                util::portable_binary_oarchive archive(
-                    data, (util::binary_filter*)0, boost::archive::no_header);
+                serialization::output_archive archive(data);
                 archive << ptr;
             }
 

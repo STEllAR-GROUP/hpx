@@ -11,9 +11,6 @@
 
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/serialization/split_member.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/tracking.hpp>
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -138,7 +135,7 @@ struct gva
     boost::uint64_t offset;
 
   private:
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template<class Archive>
     void save(Archive& ar, const unsigned int version) const
@@ -154,7 +151,7 @@ struct gva
         ar >> prefix >> type >> count >> lva_ >> offset;
     }
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    HPX_SERIALIZATION_SPLIT_MEMBER()
 };
 
 template <typename Char, typename Traits>
@@ -171,20 +168,6 @@ operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 }
 
 }}
-
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#   if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#       pragma GCC diagnostic push
-#   endif
-#   pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-BOOST_CLASS_VERSION(hpx::agas::gva, HPX_AGAS_VERSION)
-BOOST_CLASS_TRACKING(hpx::agas::gva, boost::serialization::track_never)
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
 
 #endif // HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4
 

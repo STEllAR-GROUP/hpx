@@ -8,7 +8,8 @@
 #define HPX_PARCELSET_DECODE_PARCELS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/portable_binary_archive.hpp>
+
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/shared_ptr.hpp>
 
@@ -17,11 +18,11 @@
 namespace hpx { namespace parcelset
 {
     template <typename Buffer>
-    std::vector<util::serialization_chunk> decode_chunks(Buffer & buffer)
+    std::vector<serialization::serialization_chunk> decode_chunks(Buffer & buffer)
     {
         typedef typename Buffer::transmission_chunk_type transmission_chunk_type;
 
-        std::vector<util::serialization_chunk> chunks;
+        std::vector<serialization::serialization_chunk> chunks;
 
         std::size_t num_zero_copy_chunks =
             static_cast<std::size_t>(
@@ -44,7 +45,7 @@ namespace hpx { namespace parcelset
 
                 HPX_ASSERT(buffer.chunks_[i].size() == second);
 
-                chunks[first] = util::create_pointer_chunk(
+                chunks[first] = serialization::create_pointer_chunk(
                         buffer.chunks_[i].data(), second);
             }
 
@@ -61,7 +62,7 @@ namespace hpx { namespace parcelset
                     ++index;
 
                 // place the index based chunk at the right spot
-                chunks[index] = util::create_index_chunk(first, second);
+                chunks[index] = serialization::create_index_chunk(first, second);
                 ++index;
             }
 #if defined(HPX_DEBUG)
@@ -86,15 +87,15 @@ namespace hpx { namespace parcelset
       , std::size_t parcel_count
     )
     {
-        std::vector<util::serialization_chunk> chunks(decode_chunks(buffer));
+        std::vector<serialization::serialization_chunk> chunks(decode_chunks(buffer));
 
-        unsigned archive_flags = boost::archive::no_header;
+        unsigned archive_flags = 0U;
         if (!pp.allow_array_optimizations()) {
-            archive_flags |= util::disable_array_optimization;
-            archive_flags |= util::disable_data_chunking;
+            archive_flags |= serialization::disable_array_optimization;
+            archive_flags |= serialization::disable_data_chunking;
         }
         else if (!pp.allow_zero_copy_optimizations()) {
-            archive_flags |= util::disable_data_chunking;
+            archive_flags |= serialization::disable_data_chunking;
         }
         boost::uint64_t inbound_data_size = buffer.data_size_;
 
@@ -109,8 +110,8 @@ namespace hpx { namespace parcelset
 
                 {
                     // De-serialize the parcel data
-                    util::portable_binary_iarchive archive(buffer.data_,
-                        &chunks, inbound_data_size, archive_flags);
+                    serialization::input_archive archive(buffer.data_,
+                        archive_flags, inbound_data_size, &chunks);
 
                     if(parcel_count == 0)
                         archive >> parcel_count; //-V128a

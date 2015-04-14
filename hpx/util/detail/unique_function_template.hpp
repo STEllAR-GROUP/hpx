@@ -9,19 +9,14 @@
 #define HPX_UTIL_DETAIL_UNIQUE_FUNCTION_TEMPLATE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/tracking.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -108,22 +103,13 @@ namespace hpx { namespace util { namespace detail
             >();
 }}}
 
-namespace boost { namespace serialization
-{
-    template <typename Sig, typename IArchive, typename OArchive>
-    struct tracking_level< ::hpx::util::detail::unique_function_vtable_ptr<
-        Sig, IArchive, OArchive
-    > > : boost::mpl::int_<boost::serialization::track_never>
-    {};
-}}
-
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Sig
-      , typename IArchive = portable_binary_iarchive
-      , typename OArchive = portable_binary_oarchive
+      , typename IArchive = serialization::input_archive
+      , typename OArchive = serialization::output_archive
     >
     class unique_function
       : public detail::basic_function<
@@ -191,7 +177,7 @@ namespace hpx { namespace util
         using base_type::target;
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         void load(IArchive& ar, const unsigned version)
         {
@@ -222,7 +208,7 @@ namespace hpx { namespace util
             }
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
     };
 
     template <typename Sig>

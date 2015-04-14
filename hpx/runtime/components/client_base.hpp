@@ -12,6 +12,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/safe_bool.hpp>
@@ -368,7 +369,7 @@ namespace hpx { namespace components
 //         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)

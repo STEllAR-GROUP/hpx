@@ -7,9 +7,9 @@
 #define HPX_UTIL_STORAGE_TUPLE_HPP_APR_11_2013_1010AM
 
 #include <vector>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/access.hpp>
 
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/any.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -34,7 +34,7 @@ namespace hpx { namespace util { namespace storage
 
             ~tuple() {}
 
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned const)

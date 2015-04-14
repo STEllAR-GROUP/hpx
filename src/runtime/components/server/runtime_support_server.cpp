@@ -29,6 +29,8 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
 #include <hpx/lcos/broadcast.hpp>
@@ -37,8 +39,6 @@
 #endif
 
 #include <hpx/util/assert.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
@@ -51,11 +51,6 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
 
 #include <algorithm>
 #include <set>
@@ -1291,9 +1286,9 @@ namespace hpx { namespace components { namespace server
         return mh;
     }
 
-    util::binary_filter* runtime_support::create_binary_filter(
+    serialization::binary_filter* runtime_support::create_binary_filter(
         char const* binary_filter_type, bool compress,
-        util::binary_filter* next_filter, error_code& ec)
+        serialization::binary_filter* next_filter, error_code& ec)
     {
         // locate the factory for the requested plugin type
         plugin_map_mutex_type::scoped_lock l(p_mtx_);
@@ -1317,7 +1312,7 @@ namespace hpx { namespace components { namespace server
             boost::static_pointer_cast<plugins::binary_filter_factory_base>(
                 (*it).second.first));
 
-        util::binary_filter* bf = factory->create(compress, next_filter);
+        serialization::binary_filter* bf = factory->create(compress, next_filter);
         if (0 == bf) {
             std::ostringstream strm;
             strm << "couldn't to create binary filter plugin of type: "

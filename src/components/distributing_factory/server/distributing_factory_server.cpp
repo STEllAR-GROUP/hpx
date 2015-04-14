@@ -8,7 +8,6 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
-#include <boost/serialization/vector.hpp>
 #include <boost/move/move.hpp>
 #include <vector>
 
@@ -190,17 +189,17 @@ namespace hpx { namespace components { namespace server
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // implement the serialization functions
-    void serialize(hpx::util::portable_binary_iarchive& ar,
+    void serialize(input_archive& ar,
         hpx::components::server::partition_info& info, unsigned int const)
     {
         ar & info.dims_ & info.dim_sizes_;
     }
 
-    void serialize(hpx::util::portable_binary_oarchive& ar,
+    void serialize(output_archive& ar,
         hpx::components::server::partition_info& info, unsigned int const)
     {
         ar & info.dims_ & info.dim_sizes_;

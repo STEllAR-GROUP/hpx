@@ -9,11 +9,9 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/serialization.hpp>
 
 #include <vector>
-
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/vector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 const std::size_t vsize_default = 1024*1024;

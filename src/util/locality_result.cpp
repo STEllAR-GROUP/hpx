@@ -8,9 +8,9 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/include/serialization.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #include <boost/range/iterator_range.hpp>
-#include <boost/serialization/vector.hpp>
 
 namespace hpx { namespace util
 {
@@ -68,13 +68,13 @@ namespace hpx { namespace util
     }
 
     void remote_locality_result::serialize(
-        hpx::util::portable_binary_oarchive & ar, const unsigned int)
+        hpx::serialization::output_archive & ar, const unsigned int)
     {
         ar & prefix_ & gids_ & type_;
     }
 
     void remote_locality_result::serialize(
-        hpx::util::portable_binary_iarchive & ar, const unsigned int)
+        hpx::serialization::input_archive & ar, const unsigned int)
     {
         ar & prefix_ & gids_ & type_;
     }

@@ -14,12 +14,11 @@
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/runtime/serialization/raw_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/noncopyable.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/array.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -272,7 +271,7 @@ namespace hpx { namespace components
         /// \note Serializing memory_blocks is not platform independent as
         ///       such things as endianess, alignment, and data type sizes are
         ///       not considered.
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         ///////////////////////////////////////////////////////////////////////
         template <class Archive>
@@ -288,7 +287,7 @@ namespace hpx { namespace components
             HPX_ASSERT(act);
 
             ar << size; //-V128
-            ar << act;
+            ar << hpx::serialization::raw_ptr(act);
 
             HPX_ASSERT(act->save());
             if (config) {
@@ -320,7 +319,7 @@ namespace hpx { namespace components
             actions::manage_object_action_base* act = 0;
 
             ar >> size; //-V128
-            ar >> act;
+            ar >> hpx::serialization::raw_ptr(act);
 
             typedef server::detail::memory_block_header alloc_type;
             alloc_type* p =
@@ -350,7 +349,7 @@ namespace hpx { namespace components
                 config_.reset(load_(ar, version));
             data_.reset(load_(ar, version, config_.get()));
         }
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER();
 
     private:
         boost::intrusive_ptr<server::detail::memory_block_header> data_;

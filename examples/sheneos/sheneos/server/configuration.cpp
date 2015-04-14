@@ -5,9 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <hpx/util/assert.hpp>
 
@@ -31,17 +29,17 @@ namespace sheneos { namespace server
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // Implement the serialization functions.
-    void serialize(hpx::util::portable_binary_iarchive& ar,
+    void serialize(input_archive& ar,
         sheneos::config_data& cfg, unsigned int const)
     {
         ar & cfg.datafile_name_ & cfg.symbolic_name_& cfg.num_instances_;
     }
 
-    void serialize(hpx::util::portable_binary_oarchive& ar,
+    void serialize(output_archive& ar,
         sheneos::config_data& cfg, unsigned int const)
     {
         ar & cfg.datafile_name_ & cfg.symbolic_name_& cfg.num_instances_;

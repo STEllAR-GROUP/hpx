@@ -16,6 +16,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/traits/action_capability_provider.hpp>
 #endif
@@ -30,10 +31,8 @@
 #include <hpx/traits/type_size.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/serialize_exception.hpp>
-#include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
 
 #include <boost/cstdint.hpp>
 
@@ -356,7 +355,7 @@ namespace hpx { namespace actions
 
         /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.
-        util::binary_filter* get_serialization_filter(
+        serialization::binary_filter* get_serialization_filter(
             parcelset::parcel const& p) const
         {
             return traits::action_serialization_filter<derived_type>::call(p);
@@ -389,48 +388,28 @@ namespace hpx { namespace actions
         }
 
         // serialization support
-        void load(hpx::util::portable_binary_iarchive & ar)
+        void load(hpx::serialization::input_archive & ar)
         {
-            util::serialize_sequence(ar, arguments_);
+            serialization::serialize_sequence(ar, arguments_);
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
 
-            if (ar.flags() & util::disable_array_optimization) {
-#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
-                boost::uint32_t parent_locality_ = naming::invalid_locality_id;
-                boost::uint64_t parent_id_ = boost::uint64_t(-1);
-                boost::uint64_t parent_phase_ = 0;
-#endif
-                ar >> parent_locality_;
-                ar >> parent_id_;
-                ar >> parent_phase_;
-
-                boost::uint16_t priority = 0;
-                boost::uint16_t stacksize = 0;
-                ar >> priority;
-                ar >> stacksize;
-
-                priority_ = static_cast<threads::thread_priority>(priority);
-                stacksize_ = static_cast<threads::thread_stacksize>(stacksize);
-            }
-            else {
-                detail::action_serialization_data data;
-                ar.load(data);
+            detail::action_serialization_data data;
+            ar >> data;
 
 #if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
-                parent_id_ = data.parent_id_;
-                parent_phase_ = data.parent_phase_;
-                parent_locality_ = data.parent_locality_;
+            parent_locality_ = data.parent_locality_;
+            parent_id_ = data.parent_id_;
+            parent_phase_ = data.parent_phase_;
 #endif
-                priority_ = static_cast<threads::thread_priority>(data.priority_);
-                stacksize_ = static_cast<threads::thread_stacksize>(data.stacksize_);
-            }
+            priority_ = data.priority_;
+            stacksize_ = data.stacksize_;
         }
 
-        void save(hpx::util::portable_binary_oarchive & ar) const
+        void save(hpx::serialization::output_archive & ar) const
         {
-            util::serialize_sequence(ar, arguments_);
+            serialization::serialize_sequence(ar, arguments_);
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
@@ -440,21 +419,9 @@ namespace hpx { namespace actions
             boost::uint64_t parent_id_ = boost::uint64_t(-1);
             boost::uint64_t parent_phase_ = 0;
 #endif
-            if (ar.flags() & util::disable_array_optimization) {
-                ar << parent_locality_;
-                ar << parent_id_;
-                ar << parent_phase_;
-
-                boost::uint16_t priority = priority_;
-                boost::uint16_t stacksize = stacksize_;
-                ar << priority;
-                ar << stacksize;
-            }
-            else {
-                detail::action_serialization_data data(parent_id_,
-                    parent_phase_, parent_locality_, priority_, stacksize_);
-                ar.save(data);
-            }
+            detail::action_serialization_data data(parent_locality_,
+                parent_id_, parent_phase_, priority_, stacksize_);
+            ar << data;
         }
 
     private:

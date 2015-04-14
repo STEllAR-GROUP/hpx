@@ -11,16 +11,14 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
-#include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/util/register_locks_globally.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
 
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/serialization.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -337,12 +335,15 @@ namespace hpx { namespace naming
     private:
         friend std::ostream& operator<< (std::ostream& os, gid_type const& id);
 
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
-        void save(util::portable_binary_oarchive& ar, const unsigned int version) const;
-        void load(util::portable_binary_iarchive& ar, const unsigned int version);
+        template <class T>
+        void save(T& ar, const unsigned int version) const;
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        template <class T>
+        void load(T& ar, const unsigned int version);
+
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
         // lock implementation
         typedef lcos::local::spinlock_pool<tag> internal_mutex_type;
@@ -383,7 +384,7 @@ namespace hpx { namespace naming
     };
 }}
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // we know that we can serialize a gid as a byte sequence
@@ -799,8 +800,8 @@ namespace hpx { namespace naming
             }
 
             // serialization
-            void save(util::portable_binary_oarchive& ar) const;
-            void load(util::portable_binary_iarchive& ar);
+            void save(serialization::output_archive& ar) const;
+            void load(serialization::input_archive& ar);
 
         private:
             // credit management (called during serialization), this function
@@ -946,27 +947,6 @@ namespace std
         }
     };
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// this is the current version of the id_type serialization format
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-
-BOOST_CLASS_VERSION(hpx::naming::gid_type, HPX_GIDTYPE_VERSION)
-BOOST_CLASS_TRACKING(hpx::naming::gid_type, boost::serialization::track_never)
-BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
-BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
-BOOST_SERIALIZATION_INTRUSIVE_PTR(hpx::naming::detail::id_type_impl)
-
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

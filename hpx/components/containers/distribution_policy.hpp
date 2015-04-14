@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/vector.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #include <algorithm>
 
@@ -59,7 +59,7 @@ namespace hpx
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int version)

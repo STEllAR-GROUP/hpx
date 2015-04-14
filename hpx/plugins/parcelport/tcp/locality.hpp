@@ -12,6 +12,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
@@ -54,13 +55,13 @@ namespace hpx { namespace parcelset
                 return util::safe_bool<locality>()(port_ != boost::uint16_t(-1));
             }
 
-            void save(util::portable_binary_oarchive & ar) const
+            void save(serialization::output_archive & ar) const
             {
                 ar.save(address_);
                 ar.save(port_);
             }
 
-            void load(util::portable_binary_iarchive & ar)
+            void load(serialization::input_archive & ar)
             {
                 ar.load(address_);
                 ar.load(port_);

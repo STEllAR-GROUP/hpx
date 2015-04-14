@@ -177,9 +177,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
             }
 
-            for (util::serialization_chunk& c : buffer.chunks_)
+            for (serialization::serialization_chunk& c : buffer.chunks_)
             {
-                if(c.type_ == util::chunk_type_pointer)
+                if(c.type_ == serialization::chunk_type_pointer)
                 {
                     wait_done(wait_request, background);
                     {
