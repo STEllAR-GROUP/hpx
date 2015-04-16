@@ -169,10 +169,54 @@ namespace hpx { namespace components
                 std::move(counters));
         }
 
+        inline hpx::id_type const& get_best_locality(
+            hpx::future<std::vector<boost::uint64_t> > && f,
+            std::vector<hpx::id_type> const& localities)
+        {
+            std::vector<boost::uint64_t> values = f.get();
+
+            std::size_t best_locality = 0;
+            boost::uint64_t min_value =
+                (std::numeric_limits<boost::uint64_t>::max)();
+
+            for (std::size_t i = 0; i != values.size(); ++i)
+            {
+                if (min_value > values[i])
+                {
+                    min_value = values[i];
+                    best_locality = i;
+                }
+            }
+
+            return localities[best_locality];
+        }
+
         template <typename Component>
         struct create_helper
         {
             create_helper(std::vector<hpx::id_type> const& localities)
+              : localities_(localities)
+            {}
+
+            template <typename ...Ts>
+            hpx::future<hpx::id_type> operator()(
+                hpx::future<std::vector<boost::uint64_t> > && values,
+                Ts&&... vs) const
+            {
+                hpx::id_type const& best_locality =
+                    get_best_locality(std::move(values), localities_);
+
+                return stub_base<Component>::create_async(
+                    best_locality, std::forward<Ts>(vs)...);
+            }
+
+            std::vector<hpx::id_type> const& localities_;
+        };
+
+        template <typename Component>
+        struct create_bulk_helper
+        {
+            create_bulk_helper(std::vector<hpx::id_type> const& localities)
               : localities_(localities)
             {}
 
@@ -272,16 +316,31 @@ namespace hpx { namespace components
         {
             using components::stub_base;
 
-            if (!localities_.empty())
+            // handle special cases
+            if (localities_.size() == 0)
+            {
+                return stub_base<Component>::create_async(
+                    hpx::find_here(), std::forward<Ts>(vs)...);
+            }
+            else if (localities_.size() == 1)
             {
                 return stub_base<Component>::create_async(
                     localities_.front(), std::forward<Ts>(vs)...);
             }
 
-            // by default the object will be created on the current
-            // locality
-            return stub_base<Component>::create_async(
-                hpx::find_here(), std::forward<Ts>(vs)...);
+            // schedule creation of all objects across given localities
+            hpx::future<std::vector<boost::uint64_t> > values =
+                detail::get_counter_values(
+                    hpx::components::unique_component_name<
+                        hpx::components::component_factory<
+                            typename Component::wrapping_type
+                        >
+                    >::call(), counter_name_, localities_);
+
+            using hpx::util::placeholders::_1;
+            return values.then(hpx::util::bind(
+                detail::create_helper<Component>(localities_),
+                _1, std::forward<Ts>(vs)...));
         }
 
         /// Create multiple objects on the localities associated by
@@ -323,7 +382,8 @@ namespace hpx { namespace components
 
             using hpx::util::placeholders::_1;
             return values.then(
-                hpx::util::bind(detail::create_helper<Component>(localities_),
+                hpx::util::bind(
+                    detail::create_bulk_helper<Component>(localities_),
                     _1, count, std::forward<Ts>(vs)...));
         }
 
