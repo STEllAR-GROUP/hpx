@@ -13,11 +13,11 @@ if(NOT HPX_MALLOC)
     "The default allocator for your system is ${DEFAULT_MALLOC}, but ${DEFAULT_MALLOC} could not be found. "
       "The system allocator has poor performance. As such ${DEFAULT_MALLOC} is a strong optional requirement. "
       "Being aware of the performance hit, you can override this default and get rid of this dependency by setting -DHPX_MALLOC=system. "
-      "Other valid options for HPX_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc")
+      "Valid options for HPX_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc, and custom")
 else()
   set(allocator_error
     "HPX_MALLOC was set to ${HPX_MALLOC}, but ${HPX_MALLOC} could not be found. "
-      "Other valid options for HPX_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc")
+      "Valid options for HPX_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc, and custom")
 endif()
 
 string(TOUPPER "${HPX_MALLOC}" HPX_MALLOC_UPPER)
@@ -94,4 +94,5 @@ if(_use_custom_allocator)
   hpx_add_compile_flag_if_available(-fno-builtin-posix_memalign LANGUAGES CXX C)
 endif()
 
+hpx_add_config_define(HPX_MALLOC "\"${HPX_MALLOC}\"")
 hpx_info("Using ${HPX_MALLOC} allocator.")
