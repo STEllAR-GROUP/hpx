@@ -7,9 +7,8 @@
 #define HPX_LCOS_ASYNC_CALLBACK_MAR_30_2015_1119AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/traits/component_type_is_compatible.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/lcos/packaged_action.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/lcos/detail/async_implementations_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async.hpp>
 

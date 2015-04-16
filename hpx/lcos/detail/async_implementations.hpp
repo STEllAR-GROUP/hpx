@@ -11,6 +11,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/util/move.hpp>
 

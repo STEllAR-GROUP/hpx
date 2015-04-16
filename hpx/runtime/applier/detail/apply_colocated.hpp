@@ -11,6 +11,7 @@
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
+#include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
 #include <hpx/runtime/applier/register_apply_colocated.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
@@ -41,7 +42,6 @@ namespace hpx { namespace detail
             service_target, req);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Signature, typename Derived,
         typename ...Ts>
     bool apply_colocated(
@@ -50,13 +50,39 @@ namespace hpx { namespace detail
     {
         return apply_colocated<Derived>(gid, std::forward<Ts>(vs)...);
     }
-}}
 
-#if defined(HPX_COLOCATED_BACKWARDS_COMPATIBILITY)
-namespace hpx
-{
-    using hpx::detail::apply_colocated;
-}
-#endif
+    template <typename Action, typename ...Ts>
+    bool apply_colocated(hpx::actions::continuation_type const& cont,
+        naming::id_type const& gid, Ts&&... vs)
+    {
+        // Attach the requested action as a continuation to a resolve_async
+        // call on the locality responsible for the target gid.
+        agas::request req(agas::primary_ns_resolve_gid, gid.get_gid());
+        naming::id_type service_target(
+            agas::stubs::primary_namespace::get_service_instance(gid.get_gid()),
+            naming::id_type::unmanaged);
+
+        typedef agas::server::primary_namespace::service_action action_type;
+
+        using util::placeholders::_2;
+        return apply_continue<action_type>(
+            util::functional::apply_continuation(
+                util::bind<Action>(
+                    util::bind(util::functional::extract_locality(), _2, gid),
+                    std::forward<Ts>(vs)...),
+                cont),
+            service_target, req);
+    }
+
+    template <typename Component, typename Signature, typename Derived,
+        typename ...Ts>
+    bool apply_colocated(
+        hpx::actions::continuation_type const& cont,
+        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
+        naming::id_type const& gid, Ts&&... vs)
+    {
+        return apply_colocated<Derived>(cont, gid, std::forward<Ts>(vs)...);
+    }
+}}
 
 #endif

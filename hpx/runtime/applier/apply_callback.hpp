@@ -11,6 +11,8 @@
 
 #include <hpx/runtime/applier/apply.hpp>
 
+#include <boost/make_shared.hpp>
+
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -48,7 +50,7 @@ namespace hpx
         Callback && cb, Ts&&... vs)
     {
         return hpx::detail::apply_cb_impl<Action>(
-            static_cast<actions::continuation*>(0), gid, priority,
+            actions::continuation_type(), gid, priority,
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
@@ -80,7 +82,7 @@ namespace hpx
         Callback && cb, Ts&&... vs)
     {
         return policy.template apply_cb<Action>(
-            static_cast<actions::continuation*>(0), priority,
+            actions::continuation_type(), priority,
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
@@ -113,22 +115,22 @@ namespace hpx
     {
         template <typename Action, typename Callback, typename ...Ts>
         inline bool
-        apply_r_p_cb(naming::address&& addr, actions::continuation* c,
-            naming::id_type const& id, threads::thread_priority priority,
-            Callback && cb, Ts&&... vs)
+        apply_r_p_cb(naming::address&& addr,
+            actions::continuation_type const& c, naming::id_type const& id,
+            threads::thread_priority priority, Callback && cb, Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             lcos::local::detail::invoke_when_ready(
-                detail::put_parcel<Action>(id, std::move(addr), priority,
-                    actions::continuation_type(c), std::forward<Callback>(cb)),
+                detail::put_parcel<Action>(id, std::move(addr), priority, c,
+                    std::forward<Callback>(cb)),
                 std::forward<Ts>(vs)...);
             return false;     // destination is remote
         }
 
         template <typename Action, typename Callback, typename ...Ts>
         inline bool
-        apply_r_cb(naming::address&& addr, actions::continuation* c,
+        apply_r_cb(naming::address&& addr, actions::continuation_type const& c,
             naming::id_type const& gid, Callback && cb, Ts&&... vs)
         {
             return apply_r_p_cb<Action>(std::move(addr), c, gid,
@@ -140,7 +142,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename ...Ts>
     inline bool
-    apply_p_cb(actions::continuation* c, naming::address&& addr,
+    apply_p_cb(actions::continuation_type const& c, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
         Callback && cb, Ts&&... vs)
     {
@@ -156,21 +158,21 @@ namespace hpx
         if (addr.locality_ == hpx::get_locality()) {
             // apply locally
             bool result = applier::detail::apply_l_p<Action>(c, gid,
-                std::move(addr), priority,
-                std::forward<Ts>(vs)...);
-            cb(boost::system::error_code(), parcelset::parcel());     // invoke callback
+                std::move(addr), priority, std::forward<Ts>(vs)...);
+
+            // invoke callback
+            cb(boost::system::error_code(), parcelset::parcel());
             return result;
         }
 
         // apply remotely
         return applier::detail::apply_r_p_cb<Action>(std::move(addr), c, gid,
-            priority, std::forward<Callback>(cb),
-            std::forward<Ts>(vs)...);
+            priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename Callback, typename ...Ts>
     inline bool
-    apply_p_cb(actions::continuation* c, naming::id_type const& gid,
+    apply_p_cb(actions::continuation_type const& c, naming::id_type const& gid,
         threads::thread_priority priority, Callback && cb, Ts&&... vs)
     {
         return hpx::detail::apply_cb_impl<Action>(c, gid, priority,
@@ -179,7 +181,7 @@ namespace hpx
 
     template <typename Action, typename Callback, typename ...Ts>
     inline bool
-    apply_cb(actions::continuation* c, naming::id_type const& gid,
+    apply_cb(actions::continuation_type const& c, naming::id_type const& gid,
         Callback && cb, Ts&&... vs)
     {
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
@@ -189,7 +191,7 @@ namespace hpx
     template <typename Component, typename Signature, typename Derived,
         typename Callback, typename ...Ts>
     inline bool
-    apply_cb(actions::continuation* c,
+    apply_cb(actions::continuation_type const& c,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Callback && cb, Ts&&... vs)
     {
@@ -202,7 +204,7 @@ namespace hpx
     inline typename boost::enable_if_c<
         traits::is_distribution_policy<DistPolicy>::value, bool
     >::type
-    apply_p_cb(actions::continuation* c, DistPolicy const& policy,
+    apply_p_cb(actions::continuation_type const& c, DistPolicy const& policy,
         threads::thread_priority priority, Callback && cb, Ts&&... vs)
     {
         return policy.template apply_cb<Action>(
@@ -214,7 +216,7 @@ namespace hpx
     inline typename boost::enable_if_c<
         traits::is_distribution_policy<DistPolicy>::value, bool
     >::type
-    apply_cb(actions::continuation* c, DistPolicy const& policy,
+    apply_cb(actions::continuation_type const& c, DistPolicy const& policy,
         Callback && cb, Ts&&... vs)
     {
         return apply_p_cb<Action>(c, policy, actions::action_priority<Action>(),
@@ -226,7 +228,7 @@ namespace hpx
     inline typename boost::enable_if_c<
         traits::is_distribution_policy<DistPolicy>::value, bool
     >::type
-    apply_cb(actions::continuation* c,
+    apply_cb(actions::continuation_type const& c,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         DistPolicy const& policy, Callback && cb, Ts&&... vs)
     {
@@ -248,7 +250,9 @@ namespace hpx
                 result_type;
 
             return apply_r_p_cb<Action>(std::move(addr),
-                new actions::typed_continuation<result_type>(contgid),
+                boost::make_shared<
+                    actions::typed_continuation<result_type>
+                >(contgid),
                 gid, priority, std::forward<Callback>(cb),
                 std::forward<Ts>(vs)...);
         }
@@ -263,7 +267,9 @@ namespace hpx
                 result_type;
 
             return apply_r_p_cb<Action>(std::move(addr),
-                new actions::typed_continuation<result_type>(contgid),
+                boost::make_shared<
+                    actions::typed_continuation<result_type>
+                >(contgid),
                 gid, actions::action_priority<Action>(),
                 std::forward<Callback>(cb),
                 std::forward<Ts>(vs)...);
@@ -281,7 +287,9 @@ namespace hpx
             result_type;
 
         return apply_p_cb<Action>(
-            new actions::typed_continuation<result_type>(contgid),
+            boost::make_shared<
+                actions::typed_continuation<result_type>
+            >(contgid),
             gid, priority, std::forward<Callback>(cb),
             std::forward<Ts>(vs)...);
     }
@@ -296,7 +304,9 @@ namespace hpx
             result_type;
 
         return apply_p_cb<Action>(
-            new actions::typed_continuation<result_type>(contgid),
+            boost::make_shared<
+                actions::typed_continuation<result_type>
+            >(contgid),
             gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
@@ -312,7 +322,9 @@ namespace hpx
             result_type;
 
         return apply_p_cb<Action>(
-            new actions::typed_continuation<result_type>(contgid),
+            boost::make_shared<
+                actions::typed_continuation<result_type>
+            >(contgid),
             std::move(addr), gid, priority, std::forward<Callback>(cb),
             std::forward<Ts>(vs)...);
     }
@@ -327,7 +339,9 @@ namespace hpx
             result_type;
 
         return apply_p_cb<Action>(
-            new actions::typed_continuation<result_type>(contgid),
+            boost::make_shared<
+                actions::typed_continuation<result_type>
+            >(contgid),
             std::move(addr), gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }

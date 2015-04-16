@@ -12,7 +12,6 @@
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

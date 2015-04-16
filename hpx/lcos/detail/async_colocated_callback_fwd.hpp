@@ -18,7 +18,6 @@ namespace hpx { namespace detail
         >::type>
     async_colocated_cb(naming::id_type const& gid, Callback&& cb, Ts&&... vs);
 
-    ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Signature, typename Derived,
         typename Callback, typename ...Ts>
@@ -29,6 +28,34 @@ namespace hpx { namespace detail
     async_colocated_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid, Callback&& cb, Ts&&... vs);
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename Callback, typename ...Ts>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async_colocated_cb(hpx::actions::continuation_type const& cont,
+        naming::id_type const& gid, Callback&& cb, Ts&&... vs);
+
+    template <
+        typename Component, typename Signature, typename Derived,
+        typename Callback, typename ...Ts>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
+    async_colocated_cb(
+        hpx::actions::continuation_type const& cont
+      , hpx::actions::basic_action<Component, Signature, Derived> /*act*/
+      , naming::id_type const& gid, Callback&& cb, Ts&&... vs);
 }}
+
+#if defined(HPX_COLOCATED_BACKWARDS_COMPATIBILITY)
+namespace hpx
+{
+    using hpx::detail::async_colocated_cb;
+}
+#endif
 
 #endif

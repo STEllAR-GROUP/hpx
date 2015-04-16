@@ -17,7 +17,7 @@
 namespace hpx { namespace detail
 {
     template <typename Action, typename ...Ts>
-    bool apply_impl(actions::continuation* c, hpx::id_type const& id,
+    bool apply_impl(actions::continuation_type const& c, hpx::id_type const& id,
         threads::thread_priority priority, Ts&&... vs)
     {
         if (!traits::action_is_target_valid<Action>::call(id)) {
@@ -41,7 +41,7 @@ namespace hpx { namespace detail
     }
 
     template <typename Action, typename Callback, typename ...Ts>
-    bool apply_cb_impl(actions::continuation* c, hpx::id_type const& id,
+    bool apply_cb_impl(actions::continuation_type const& c, hpx::id_type const& id,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
         if (!traits::action_is_target_valid<Action>::call(id)) {
