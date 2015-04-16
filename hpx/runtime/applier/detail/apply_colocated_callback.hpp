@@ -85,7 +85,7 @@ namespace hpx { namespace detail
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
-        return apply_colocated_cb<Derived>(const, gid,
+        return apply_colocated_cb<Derived>(cont, gid,
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 }}

@@ -218,7 +218,7 @@ namespace hpx { namespace actions { namespace detail
         static bool call(Continuation& c, boost::mpl::true_)
         {
             Continuation cont(
-                boost::make_shared<wrapped_continuation<Action, N>(c)
+                boost::make_shared<wrapped_continuation<Action, N> >(c)
             );
             c = cont;
             return true;
