@@ -83,7 +83,7 @@ namespace hpx { namespace agas { namespace server
             rt.get_parcel_handler().put_parcel(p);
         }
 
-        if (rt.get_state() < runtime::state_pre_shutdown)
+        if (rt.get_state() < pre_shutdown)
         {
             // asynchronously update cache on source locality
             naming::id_type source = p.get_source();
