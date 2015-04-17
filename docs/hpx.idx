@@ -211,17 +211,28 @@ parallel::transform_inclusive_scan    "transform_inclusive_scan" "hpx\.parallel\
 parallel::transform_reduce            "transform_reduce" "hpx\.parallel\.v1\.transform_reduce.*"
 
 # hpx/parallel/algorithms/uninitialized_copy.hpp
-parallel::uninitialized_copy            "uninitialized_copy" "hpx\.parallel\.v1\.uninitialized_copy$"
-parallel::uninitialized_copy_n          "uninitialized_copy_n" "hpx\.parallel\.v1\.uninitialized_copy_n.*"
+parallel::uninitialized_copy          "uninitialized_copy" "hpx\.parallel\.v1\.uninitialized_copy$"
+parallel::uninitialized_copy_n        "uninitialized_copy_n" "hpx\.parallel\.v1\.uninitialized_copy_n.*"
 
 # hpx/parallel/algorithms/uninitialized_fill.hpp
-parallel::uninitialized_fill            "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
-parallel::uninitialized_fill_n          "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
+parallel::uninitialized_fill          "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
+parallel::uninitialized_fill_n        "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
 
+
+# hpx/runtime/components/colocating_distribution_policy.hpp
+colocating_distribution_policy        "" "hpx\.components\.colocating_distri_id.*"
+colocated                             "" "hpx\.components\.colocated.*"
+
+# hpx/runtime/components/default_distribution_policy.hpp
+default_distribution_policy           "" "hpx\.components\.default_distribut_id.*"
+default_layout                        "" "hpx\.components\.default_layout.*"
+
+# hpx/runtime/components/binpacking_distribution_policy.hpp
+binpacking_distribution_policy        "" "hpx\.components\.binpacking_distri_id.*"
+binpacked                             '' "hpx\.components\.binpacked.*"
 
 # hpx/runtime/components/new.hpp
-new_                                  "" "hpx\.components\.new_.*"
-new_colocated                         "" "hpx\.components\.new_colocated.*"
+new_                                  "" "hpx\.new_id.*"
 
 # hpx/runtime/components/copy_component.hpp
 copy                                  "" "hpx\.components\.copy.*"
@@ -404,3 +415,6 @@ HPX_DEFINE_COMPONENT_CONST_ACTION         "" "HPX_DEFINE_COMPONENT_CONST_ACTION"
 HPX_REGISTER_PLAIN_ACTION                 "" "HPX_REGISTER_PLAIN_ACTION"
 HPX_DEFINE_PLAIN_ACTION                   "" "HPX_DEFINE_PLAIN_ACTION"
 HPX_PLAIN_ACTION                          "" "HPX_PLAIN_ACTION"
+
+# hpx/runtime/components/component_factory.hpp
+HPX_REGISTER_COMPONENT                    "" "HPX_REGISTER_COMPONENT"

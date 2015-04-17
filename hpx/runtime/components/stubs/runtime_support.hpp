@@ -28,18 +28,6 @@ namespace hpx { namespace components { namespace stubs
     struct HPX_EXPORT runtime_support
     {
         ///////////////////////////////////////////////////////////////////////
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        static lcos::future<int> get_factory_properties_async(
-            naming::id_type const& targetgid, components::component_type type);
-
-        static int get_factory_properties(naming::id_type const& targetgid,
-            components::component_type type);
-
-        ///////////////////////////////////////////////////////////////////////
         /// Create a new component \a type using the runtime_support with the
         /// given \a targetgid. This is a non-blocking call. The caller needs
         /// to call \a future#get on the result of this function
@@ -73,8 +61,35 @@ namespace hpx { namespace components { namespace stubs
                 std::forward<Ts>(vs)...).get();
         }
 
-        /// Create a new component \a type using the runtime_support with the
-        /// given \a targetgid. This is a non-blocking call.
+        /// Create multiple new components \a type using the runtime_support
+        /// colocated with the with the given \a targetgid. This is a
+        /// non-blocking call.
+        template <typename Component, typename ...Ts>
+        static lcos::future<std::vector<naming::id_type> >
+        bulk_create_component_colocated_async(naming::id_type const& gid,
+            std::size_t count, Ts&&... vs)
+        {
+            typedef server::bulk_create_component_action<
+                Component, typename hpx::util::decay<Ts>::type...
+            > action_type;
+
+            return hpx::async_colocated<action_type>(gid, count,
+                std::forward<Ts>(vs)...);
+        }
+
+        /// Create multiple new components \a type using the runtime_support
+        /// colocated with the with the given \a targetgid. Block for the
+        /// creation to finish.
+        template <typename Component, typename ...Ts>
+        static std::vector<naming::id_type> bulk_create_component_colocated(
+            naming::id_type const& gid, std::size_t count, Ts&&... vs)
+        {
+            return bulk_create_component_colocated_async<Component>(gid,
+                count, std::forward<Ts>(vs)...).get();
+        }
+
+        /// Create multiple new components \a type using the runtime_support
+        /// on the given locality. This is a  non-blocking call.
         template <typename Component, typename ...Ts>
         static lcos::future<std::vector<naming::id_type> >
         bulk_create_component_async(naming::id_type const& gid,
@@ -96,8 +111,8 @@ namespace hpx { namespace components { namespace stubs
                 std::forward<Ts>(vs)...);
         }
 
-        /// Create a new component \a type using the runtime_support with the
-        /// given \a targetgid. Block for the creation to finish.
+        /// Create multiple new components \a type using the runtime_support
+        /// on the given locality. Block for the creation to finish.
         template <typename Component, typename ...Ts>
         static std::vector<naming::id_type> bulk_create_component(
             naming::id_type const& gid, std::size_t count, Ts&&... vs)

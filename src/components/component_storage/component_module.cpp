@@ -12,7 +12,7 @@ HPX_REGISTER_COMPONENT_MODULE()
 
 typedef hpx::components::server::component_storage component_storage_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::simple_component<component_storage_type>,
     component_storage_factory, hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(component_storage_type)

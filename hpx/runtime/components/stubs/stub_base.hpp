@@ -85,6 +85,26 @@ namespace hpx { namespace components
                 ServerComponent>(gid, std::forward<Ts>(vs)...);
         }
 
+        template <typename ...Ts>
+        static lcos::future<std::vector<naming::id_type> >
+        bulk_create_colocated_async(naming::id_type const& id, std::size_t count,
+            Ts&&... vs)
+        {
+            using stubs::runtime_support;
+            return runtime_support::bulk_create_component_colocated_async<
+                ServerComponent>(id, count, std::forward<Ts>(vs)...);
+        }
+
+        template <typename ...Ts>
+        static std::vector<naming::id_type>
+        bulk_create_colocated(naming::id_type const& id, std::size_t count,
+            Ts&&... vs)
+        {
+            using stubs::runtime_support;
+            return runtime_support::bulk_create_component_colocated<
+                ServerComponent>(id, count, std::forward<Ts>(vs)...);
+        }
+
         /// Delete an existing component
         static void
         free(component_type type, naming::id_type& gid)

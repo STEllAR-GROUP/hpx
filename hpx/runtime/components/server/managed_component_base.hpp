@@ -576,16 +576,6 @@ namespace hpx { namespace components
             heap_type::free(p, count);
         }
 
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        static factory_property get_factory_properties()
-        {
-            return factory_none;
-        }
-
 #if defined(HPX_HAVE_SECURITY)
         static components::security::capability get_required_capabilities(
             components::security::traits::capability<>::capabilities caps)

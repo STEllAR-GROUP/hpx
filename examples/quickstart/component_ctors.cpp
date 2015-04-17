@@ -36,7 +36,7 @@ struct message_server : managed_component_base<message_server>
 };
 
 typedef managed_component<message_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, message_server);
+HPX_REGISTER_COMPONENT(server_type, message_server);
 
 typedef message_server::print_action print_action;
 HPX_REGISTER_ACTION_DECLARATION(print_action);

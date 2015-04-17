@@ -12,7 +12,7 @@ if(HPX_WITH_CXX11_LAMBDAS)
 
   set(jacobi_FLAGS
       COMPONENT_DEPENDENCIES
-      iostreams jacobi_component distributing_factory)
+      iostreams jacobi_component)
 
   # add jacobi executable
   add_hpx_executable(jacobi
