@@ -35,7 +35,7 @@ namespace hpx { namespace detail
         naming::id_type const& gid, Ts&&... vs);
 }}
 
-#if defined(HPX_COLOCATED_BACKWARDS_COMPATIBILITY)
+#if defined(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
 namespace hpx
 {
     using hpx::detail::apply_colocated;

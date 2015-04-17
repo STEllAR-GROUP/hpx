@@ -474,10 +474,13 @@ hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel da
 
 ################################################################################
 # Backwards compatibility options (edit for each release)
-# HPX_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
-hpx_option(HPX_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
+# HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
+hpx_option(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
     "Enable backwards compatibility for apply_colocated, async_colocated and friends"
     ON ADVANCED)
+if(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
+endif()
 
 ################################################################################
 # Set basic search paths for HPX
