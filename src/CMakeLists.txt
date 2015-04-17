@@ -210,7 +210,7 @@ set_property(TARGET hpx APPEND
 # Emulation of SwapContext on Windows
 ################################################################################
 if(MSVC)
-  if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
+  if(HPX_WITH_SWAP_CONTEXT_EMULATION)
     set_property(TARGET hpx APPEND
       PROPERTY LINK_FLAGS
       "/EXPORT:switch_to_fiber")
