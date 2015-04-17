@@ -13,6 +13,7 @@
 #include <hpx/util/static.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
+#include <hpx/traits/needs_automatic_registration.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/unordered_map.hpp>
@@ -23,6 +24,25 @@
 
 namespace hpx { namespace serialization { namespace detail
 {
+        template <typename T>
+        char const* get_serialization_name()
+#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
+        ;
+#else
+        {
+            /// If you encounter this assert while compiling code, that means that
+            /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
+            /// but the header in which the action is defined misses a
+            /// HPX_REGISTER_ACTION_DECLARATION
+            BOOST_MPL_ASSERT_MSG(
+                traits::needs_automatic_registration<T>::value
+              , HPX_REGISTER_ACTION_DECLARATION_MISSING
+              , (T)
+            );
+            return util::type_id<T>::typeid_.type_id();
+        }
+#endif
+
     struct function_bunch_type
     {
         typedef void (*save_function_type) (output_archive& , const void* base);
@@ -49,7 +69,15 @@ namespace hpx { namespace serialization { namespace detail
         void register_class(const std::string& class_name,
             const function_bunch_type& bunch)
         {
-             map_.emplace(class_name, bunch);
+            if(class_name.empty())
+            {
+                HPX_THROW_EXCEPTION(serialization_error
+                  , "polymorphic_nonintrusive_factory::register_class"
+                  , "Cannot register a factory with an empty name");
+            }
+            auto it = map_.find(class_name);
+            if(it == map_.end())
+                map_.emplace(class_name, bunch);
         }
 
         // the following templates are defined in *.ipp file
@@ -107,8 +135,8 @@ namespace hpx { namespace serialization { namespace detail
 
             polymorphic_nonintrusive_factory::instance().
                 register_class(
-                   typeid(Derived).name(),
-                   bunch
+                    get_serialization_name<Derived>(),
+                    bunch
                 );
         }
 
@@ -139,7 +167,7 @@ namespace hpx { namespace serialization { namespace detail
 
             polymorphic_nonintrusive_factory::instance().
                 register_class(
-                    typeid(Derived).name(),
+                    get_serialization_name<Derived>(),
                     bunch
                 );
         }
@@ -161,10 +189,31 @@ namespace hpx { namespace serialization { namespace detail
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#define HPX_SERIALIZATION_REGISTER_CLASS(Class)                               \
+#define HPX_SERIALIZATION_REGISTER_CLASS_DECLARATION(Class)                   \
+    namespace hpx { namespace serialization { namespace detail {              \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        char const* get_serialization_name<Class>();                          \
+    }}}                                                                       \
+    namespace hpx { namespace traits {                                        \
+        template <>                                                           \
+        struct needs_automatic_registration<action>                           \
+          : boost::mpl::false_                                                \
+        {};                                                                   \
+    }}                                                                        \
     HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class);                               \
+
+#define HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, Name)                    \
+    namespace hpx { namespace serialization { namespace detail {              \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        char const* get_serialization_name<Class>()                           \
+        {                                                                     \
+            return BOOST_PP_STRINGIZE(Name);                                  \
+        }                                                                     \
+    }}}                                                                       \
     template hpx::serialization::detail::register_class<Class>                \
         hpx::serialization::detail::register_class<Class>::instance;          \
 /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS(Class)                               \
+    HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, Class)                       \
 
 #endif
