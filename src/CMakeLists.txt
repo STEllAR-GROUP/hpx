@@ -51,7 +51,7 @@ add_hpx_library_sources(hpx_init
 set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
 
 if(MSVC)
-  if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
+  if(HPX_WITH_SWAP_CONTEXT_EMULATION)
     set(switch_to_fiber_source "${hpx_SOURCE_DIR}/src/util/coroutine/switch_to_fiber.asm")
     add_hpx_library_sources(hpx_external_objects
       GLOB GLOBS "${switch_to_fiber_source}")

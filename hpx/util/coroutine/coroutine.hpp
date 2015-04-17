@@ -181,14 +181,14 @@ namespace hpx { namespace util { namespace coroutines
         return m_pimpl->get_thread_id();
     }
 
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
     std::size_t get_thread_phase() const
     {
         return m_pimpl->get_thread_phase();
     }
 #endif
 
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
     std::size_t get_thread_data() const
     {
         return m_pimpl.get() ? m_pimpl->get_thread_data() : 0;

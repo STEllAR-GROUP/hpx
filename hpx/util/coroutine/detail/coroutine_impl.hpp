@@ -181,7 +181,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       this->wake_up();
     }
 
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
     std::size_t get_thread_phase() const
     {
         return this->phase();

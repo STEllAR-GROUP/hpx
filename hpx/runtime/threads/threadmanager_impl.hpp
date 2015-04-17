@@ -427,7 +427,7 @@ namespace hpx { namespace threads
         ///                   back trace of the thread referenced by the \a id
         ///                   parameter. If the thread is not known to the
         ///                   thread-manager the return value will be the zero.
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         char const* get_backtrace(thread_id_type const& id) const;
         char const* set_backtrace(thread_id_type const& id, char const* bt = 0);
 #else
@@ -435,7 +435,7 @@ namespace hpx { namespace threads
         util::backtrace const* set_backtrace(thread_id_type const& id, util::backtrace const* bt = 0);
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         /// The get_thread_data function is part of the thread related
         /// API. It queries the currently stored thread specific data pointer.
         ///
@@ -459,12 +459,12 @@ namespace hpx { namespace threads
             std::size_t data, error_code& ec = throws);
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_idle_rate(bool reset);
         boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 #endif
-#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         boost::int64_t avg_creation_idle_rate(bool reset);
         boost::int64_t avg_cleanup_idle_rate(bool reset);
 #endif
@@ -492,13 +492,13 @@ namespace hpx { namespace threads
             scheduler_.on_error(num_thread, e);
         }
 
-#ifdef HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
+#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
         boost::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_executed_thread_phases(
             std::size_t num = std::size_t(-1), bool reset = false);
 
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
         boost::int64_t get_thread_phase_duration(
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_thread_duration(
@@ -560,11 +560,11 @@ namespace hpx { namespace threads
             performance_counters::counter_info const& info, error_code& ec);
         naming::gid_type thread_counts_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
         naming::gid_type idle_rate_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 #endif
-#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         naming::gid_type thread_wait_time_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
         naming::gid_type task_wait_time_counter_creator(
@@ -584,7 +584,7 @@ namespace hpx { namespace threads
         std::vector<boost::int64_t> executed_thread_phases_;
         boost::atomic<long> thread_count_;
 
-#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS) && defined(HPX_THREAD_MAINTAIN_IDLE_RATES)
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
         double timestamp_scale_;            ///< scale timestamps to nanoseconds
 #endif
 

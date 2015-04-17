@@ -8,7 +8,7 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_PARCELPORT_MPI)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <mpi.h>
 #endif
 
@@ -61,7 +61,7 @@ namespace hpx
         return HPX_VERSION_TAG;
     }
 
-#if defined(HPX_PARCELPORT_MPI)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
     std::string mpi_version()
     {
         std::ostringstream strm;
@@ -114,13 +114,13 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     //
-    //  HPX_THREAD_MAINTAIN_PARENT_REFERENCE=1
-    //  HPX_THREAD_MAINTAIN_PHASE_INFORMATION=1
-    //  HPX_THREAD_MAINTAIN_DESCRIPTION=1
-    //  HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION=1
+    //  HPX_HAVE_THREAD_PARENT_REFERENCE=1
+    //  HPX_HAVE_THREAD_PHASE_INFORMATION=1
+    //  HPX_HAVE_THREAD_DESCRIPTION=1
+    //  HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION=1
     //  HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH=5
-    //  HPX_THREAD_MAINTAIN_TARGET_ADDRESS=1
-    //  HPX_THREAD_MAINTAIN_QUEUE_WAITTIME=0
+    //  HPX_HAVE_THREAD_TARGET_ADDRESS=1
+    //  HPX_HAVE_THREAD_QUEUE_WAITTIME=0
 
     std::string configuration_string()
     {
@@ -156,25 +156,25 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_PARCEL_COALESCING=OFF\n";
 #endif
-#if defined(HPX_PARCELPORT_TCP)
-        strm << "  HPX_PARCELPORT_TCP=ON\n";
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+        strm << "  HPX_HAVE_PARCELPORT_TCP=ON\n";
 #else
-        strm << "  HPX_PARCELPORT_TCP=OFF\n";
+        strm << "  HPX_HAVE_PARCELPORT_TCP=OFF\n";
 #endif
-#if defined(HPX_PARCELPORT_MPI)
-        strm << "  HPX_PARCELPORT_MPI=ON (" << mpi_version() << ")\n";
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        strm << "  HPX_HAVE_PARCELPORT_MPI=ON (" << mpi_version() << ")\n";
 #else
-        strm << "  HPX_PARCELPORT_MPI=OFF\n";
+        strm << "  HPX_HAVE_PARCELPORT_MPI=OFF\n";
 #endif
-#if defined(HPX_PARCELPORT_IPC)
-        strm << "  HPX_PARCELPORT_IPC=ON\n";
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+        strm << "  HPX_HAVE_PARCELPORT_IPC=ON\n";
 #else
-        strm << "  HPX_PARCELPORT_IPC=OFF\n";
+        strm << "  HPX_HAVE_PARCELPORT_IPC=OFF\n";
 #endif
-#if defined(HPX_PARCELPORT_IBVERBS)
-        strm << "  HPX_PARCELPORT_IBVERBS=ON\n";
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        strm << "  HPX_HAVE_PARCELPORT_IBVERBS=ON\n";
 #else
-        strm << "  HPX_PARCELPORT_IBVERBS=OFF\n";
+        strm << "  HPX_HAVE_PARCELPORT_IBVERBS=OFF\n";
 #endif
 #if defined(HPX_HAVE_VERIFY_LOCKS)
         strm << "  HPX_HAVE_VERIFY_LOCKS=ON\n";
@@ -203,10 +203,10 @@ namespace hpx
         strm << "  HPX_HAVE_SWAP_CONTEXT_EMULATION=OFF\n";
 #endif
 #endif
-#if defined(HPX_RUN_MAIN_EVERYWHERE)
-        strm << "  HPX_RUN_MAIN_EVERYWHERE=ON\n";
+#if defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
+        strm << "  HPX_HAVE_RUN_MAIN_EVERYWHERE=ON\n";
 #else
-        strm << "  HPX_RUN_MAIN_EVERYWHERE=OFF\n";
+        strm << "  HPX_HAVE_RUN_MAIN_EVERYWHERE=OFF\n";
 #endif
 
 #if defined(HPX_LIMIT)
@@ -228,7 +228,7 @@ namespace hpx
         strm << "  HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD="
              << HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD << "\n";
 #endif
-#if defined(HPX_PARCELPORT_IPC) && defined(HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE)
+#if defined(HPX_HAVE_PARCELPORT_IPC) && defined(HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE)
         strm << "  HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE="
              << HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE << "\n";
 #endif
@@ -303,7 +303,7 @@ namespace hpx
 #if defined(HPX_HAVE_HWLOC)
             "  Hwloc: %s\n"
 #endif
-#if defined(HPX_PARCELPORT_MPI)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
             "  MPI: %s\n"
 #endif
             "\n"
@@ -320,7 +320,7 @@ namespace hpx
 #if defined(HPX_HAVE_HWLOC)
             hwloc_version() %
 #endif
-#if defined(HPX_PARCELPORT_MPI)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
             mpi_version() %
 #endif
             build_type() %

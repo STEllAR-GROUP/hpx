@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#if defined(HPX_PARCELPORT_IBVERBS)
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
 #include <hpx/exception_list.hpp>
 #include <hpx/plugins/parcelport/ibverbs/connection_handler.hpp>

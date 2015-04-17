@@ -87,7 +87,7 @@ namespace hpx
 
         lcos::future<void> get_future(error_code& ec = throws);
 
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t get_thread_data() const;
         std::size_t set_thread_data(std::size_t);
 #endif

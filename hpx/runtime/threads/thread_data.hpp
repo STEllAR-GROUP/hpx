@@ -125,14 +125,14 @@ namespace hpx { namespace threads
         thread_data_base(thread_init_data& init_data, thread_state_enum newstate)
           : current_state_(thread_state(newstate)),
             current_state_ex_(thread_state_ex(wait_signaled)),
-#ifdef HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
             component_id_(init_data.lva),
 #endif
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
             description_(init_data.description ? init_data.description : ""),
             lco_description_(""),
 #endif
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             parent_locality_id_(init_data.parent_locality_id),
             parent_thread_id_(init_data.parent_id),
             parent_thread_phase_(init_data.parent_phase),
@@ -140,7 +140,7 @@ namespace hpx { namespace threads
 #ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             marked_state_(unknown),
 #endif
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             backtrace_(0),
 #endif
             priority_(init_data.priority),
@@ -154,7 +154,7 @@ namespace hpx { namespace threads
             LTM_(debug) << "thread::thread(" << this << "), description("
                         << get_description() << ")";
 
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             // store the thread id of the parent thread, mainly for debugging
             // purposes
             if (0 == parent_thread_id_) {
@@ -176,14 +176,14 @@ namespace hpx { namespace threads
 
             current_state_.store(thread_state(newstate));
             current_state_ex_.store(thread_state_ex(wait_signaled));
-#ifdef HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
             component_id_ = init_data.lva;
 #endif
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
             description_ = (init_data.description ? init_data.description : "");
             lco_description_ = "";
 #endif
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             parent_locality_id_ = init_data.parent_locality_id;
             parent_thread_id_ = init_data.parent_id;
             parent_thread_phase_ = init_data.parent_phase;
@@ -191,7 +191,7 @@ namespace hpx { namespace threads
 #ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             set_marked_state(thread_state(unknown));
 #endif
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             backtrace_ = 0;
 #endif
             priority_ = init_data.priority;
@@ -206,7 +206,7 @@ namespace hpx { namespace threads
             LTM_(debug) << "thread::thread(" << this << "), description("
                         << get_description() << "), rebind";
 
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
             // store the thread id of the parent thread, mainly for debugging
             // purposes
             if (0 == parent_thread_id_) {
@@ -355,14 +355,14 @@ namespace hpx { namespace threads
         /// Return the id of the component this thread is running in
         naming::address::address_type get_component_id() const
         {
-#ifndef HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
             return 0;
 #else
             return component_id_;
 #endif
         }
 
-#ifndef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifndef HPX_HAVE_THREAD_DESCRIPTION
         char const* get_description() const
         {
             return "<unknown>";
@@ -406,7 +406,7 @@ namespace hpx { namespace threads
         }
 #endif
 
-#ifndef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
         /// Return the locality of the parent thread
         boost::uint32_t get_parent_locality_id() const
         {
@@ -455,9 +455,9 @@ namespace hpx { namespace threads
         }
 #endif
 
-#ifndef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#ifndef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 
-# ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+# ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         char const* get_backtrace() const
         {
             return 0;
@@ -477,9 +477,9 @@ namespace hpx { namespace threads
         }
 # endif
 
-#else  // defined(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#else  // defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 
-# ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+# ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         char const* get_backtrace() const
         {
             mutex_type::scoped_lock l(this);
@@ -516,7 +516,7 @@ namespace hpx { namespace threads
             std::string bt;
             if (0 != backtrace_)
             {
-# ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+# ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
                 bt = *backtrace_;
 #else
                 bt = backtrace_->trace();
@@ -587,7 +587,7 @@ namespace hpx { namespace threads
         virtual thread_state_enum operator()() = 0;
         virtual thread_id_type get_thread_id() const = 0;
         virtual std::size_t get_thread_phase() const = 0;
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 #endif
@@ -607,16 +607,16 @@ namespace hpx { namespace threads
 
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information
-#ifdef HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
         naming::address::address_type component_id_;
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
         char const* description_;
         char const* lco_description_;
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         boost::uint32_t parent_locality_id_;
         thread_id_repr_type parent_thread_id_;
         std::size_t parent_thread_phase_;
@@ -626,8 +626,8 @@ namespace hpx { namespace threads
         mutable thread_state marked_state_;
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
-# ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
+# ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         char const* backtrace_;
 # else
         util::backtrace const* backtrace_;
@@ -740,14 +740,14 @@ namespace hpx { namespace threads
 
         std::size_t get_thread_phase() const
         {
-#ifndef HPX_THREAD_MAINTAIN_PHASE_INFORMATION
+#ifndef HPX_HAVE_THREAD_PHASE_INFORMATION
             return 0;
 #else
             return coroutine_.get_thread_phase();
 #endif
         }
 
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         std::size_t get_thread_data() const
         {
             return coroutine_.get_thread_data();
@@ -840,14 +840,14 @@ namespace hpx { namespace threads
 
         std::size_t get_thread_phase() const
         {
-#ifndef HPX_THREAD_MAINTAIN_PHASE_INFORMATION
+#ifndef HPX_HAVE_THREAD_PHASE_INFORMATION
             return 0;
 #else
             return coroutine_.get_thread_phase();
 #endif
         }
 
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         std::size_t get_thread_data() const
         {
             return coroutine_.get_thread_data();

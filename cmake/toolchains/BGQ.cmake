@@ -48,13 +48,13 @@ set(CMAKE_CROSSCOMPILING ON)
 set(HPX_PLATFORM "BlueGeneQ")
 
 # Always disable the ibverbs parcelport as it is nonfunctional on the BGQ.
-set(HPX_IBVERBS_PARCELPORT OFF)
+set(HPX_WITH_IBVERBS_PARCELPORT OFF)
 
 # Always disable the tcp parcelport as it is nonfunctional on the BGQ.
-set(HPX_TCP_PARCELPORT OFF)
+set(HPX_WITH_TCP_PARCELPORT OFF)
 
 # Always enable the tcp parcelport as it is currently the only way to communicate on the BGQ.
-set(HPX_MPI_PARCELPORT ON)
+set(HPX_WITH_MPI_PARCELPORT ON)
 
 # We have a bunch of cores on the BGQ ...
 set(HPX_MAX_CPU_COUNT "64")

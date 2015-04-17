@@ -192,7 +192,7 @@ required libraries via MacPorts:
   with the following command:
 
 ``
-   cmake -DHPX_PARCELPORT_MPI=ON \
+   cmake -DHPX_WITH_PARCELPORT_MPI=ON \
         -DCMAKE_C_COMPILER=gcc \
         -DCMAKE_CXX_COMPILER=g++ \
         -DCMAKE_FORTRAN_COMPILER=gfortran \

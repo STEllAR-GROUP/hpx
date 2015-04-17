@@ -544,7 +544,7 @@ namespace hpx
             return rt.start();
         }
 
-#if defined(HPX_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // local scheduler (one queue for each OS threads)
         int run_local(startup_function_type const& startup,
@@ -645,7 +645,7 @@ namespace hpx
         }
 #endif
 
-#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // local static scheduler with priority queue (one queue for each OS
         // threads plus one separate queue for high priority HPX-threads). Doesn't
@@ -865,7 +865,7 @@ namespace hpx
             return 0;
         }
 
-#if defined(HPX_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // priority abp scheduler: local priority deques for each OS thread,
         // with work stealing from the "bottom" of each.
@@ -918,7 +918,7 @@ namespace hpx
         }
 #endif
 
-#if defined(HPX_HIERARCHY_SCHEDULER)
+#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // hierarchical scheduler: The thread queues are built up hierarchically
         // this avoids contention during work stealing
@@ -956,7 +956,7 @@ namespace hpx
         }
 #endif
 
-#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // hierarchical scheduler: The thread queues are built up hierarchically
         // this avoids contention during work stealing
@@ -1053,7 +1053,7 @@ namespace hpx
 
                 // Initialize and start the HPX runtime.
                 if (0 == std::string("local").find(cfg.queuing_)) {
-#if defined(HPX_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
                     cfg.queuing_ = "local";
                     result = detail::run_local(startup, shutdown, cfg, blocking);
 #else
@@ -1064,7 +1064,7 @@ namespace hpx
 #endif
                 }
                 else if (0 == std::string("static").find(cfg.queuing_)) {
-#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
                     cfg.queuing_ = "static";
                     result = detail::run_static(startup, shutdown, cfg, blocking);
 #else
@@ -1081,7 +1081,7 @@ namespace hpx
                     result = detail::run_priority_local(startup, shutdown, cfg, blocking);
                 }
                 else if (0 == std::string("abp-priority").find(cfg.queuing_)) {
-#if defined(HPX_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER)
                     // local scheduler with priority deque (one deque for each OS threads
                     // plus separate dequeues for high priority HPX-threads), uses
                     // abp-style stealing
@@ -1095,7 +1095,7 @@ namespace hpx
 #endif
                 }
                 else if (0 == std::string("hierarchy").find(cfg.queuing_)) {
-#if defined(HPX_HIERARCHY_SCHEDULER)
+#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
                     // hierarchy scheduler: tree of queues, with work
                     // stealing from the parent queue in that tree.
                     cfg.queuing_ = "hierarchy";
@@ -1108,7 +1108,7 @@ namespace hpx
 #endif
                 }
                 else if (0 == std::string("periodic-priority").find(cfg.queuing_)) {
-#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
                     cfg.queuing_ = "periodic-priority";
                     result = detail::run_periodic(startup, shutdown, cfg, blocking);
 #else

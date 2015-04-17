@@ -19,13 +19,13 @@ set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_C_COMPILER gcc)
 #set(CMAKE_Fortran_COMPILER)
 
-# Add flags we need for BGAS compilation 
-set(CMAKE_CXX_FLAGS_INIT 
+# Add flags we need for BGAS compilation
+set(CMAKE_CXX_FLAGS_INIT
   "-D__powerpc__ -D__bgion__ -I/gpfs/bbp.cscs.ch/home/biddisco/src/bgas/rdmahelper "
   CACHE STRING "Initial compiler flags used to compile for BGAS"
 )
 # the V1R2M2 includes are necessary for some hardware specific features
-#-DHPX_SMALL_STACK_SIZE=0x200000 -DHPX_MEDIUM_STACK_SIZE=0x200000 -DHPX_LARGE_STACK_SIZE=0x200000 -DHPX_HUGE_STACK_SIZE=0x200000 
+#-DHPX_SMALL_STACK_SIZE=0x200000 -DHPX_MEDIUM_STACK_SIZE=0x200000 -DHPX_LARGE_STACK_SIZE=0x200000 -DHPX_HUGE_STACK_SIZE=0x200000
 
 set(CMAKE_EXE_LINKER_FLAGS_INIT "-L/gpfs/bbp.cscs.ch/apps/bgas/tools/gcc/gcc-4.8.2/install/lib64 -latomic -lrt" CACHE STRING "BGAS flags")
 
@@ -41,13 +41,13 @@ set(HPX_PLATFORM "native")
 set(HPX_WITH_GENERIC_CONTEXT_COROUTINES OFF CACHE BOOL "diable generic coroutines")
 
 # BGAS nodes support ibverbs
-set(HPX_PARCELPORT_IBVERBS ON CACHE BOOL "")
+set(HPX_WITH_PARCELPORT_IBVERBS ON CACHE BOOL "")
 
 # Always disable the tcp parcelport as it is nonfunctional on the BGQ.
-set(HPX_PARCELPORT_TCP ON CACHE BOOL "")
+set(HPX_WITH_PARCELPORT_TCP ON CACHE BOOL "")
 
 # Always enable the tcp parcelport as it is currently the only way to communicate on the BGQ.
-set(HPX_PARCELPORT_MPI ON CACHE BOOL "")
+set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "")
 
 # We have a bunch of cores on the A2 processor ...
 set(HPX_MAX_CPU_COUNT "64" CACHE STRING "")

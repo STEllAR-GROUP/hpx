@@ -227,34 +227,34 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the parent thread information in debug builds
 /// only.
-#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#    define HPX_HAVE_THREAD_PARENT_REFERENCE
 #  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the thread phase in debug builds only.
-#if !defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if !defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_PHASE_INFORMATION
+#    define HPX_HAVE_THREAD_PHASE_INFORMATION
 #  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the thread description in debug builds only.
-#if !defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if !defined(HPX_HAVE_THREAD_DESCRIPTION)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_DESCRIPTION
+#    define HPX_HAVE_THREAD_DESCRIPTION
 #  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the target address of the data the thread is
 /// accessing in debug builds only.
-#if !defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if !defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#    define HPX_HAVE_THREAD_TARGET_ADDRESS
 #  endif
 #endif
 
@@ -262,9 +262,9 @@
 /// By default we do not maintain stack back-traces on suspension. This is a
 /// pure debugging aid to be able to see in the debugger where a suspended
 /// thread got stuck.
-#if defined(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION) && \
+#if defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION) && \
   !defined(HPX_HAVE_STACKTRACES)
-#  error HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION reqires HPX_HAVE_STACKTRACES to be defined!
+#  error HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION reqires HPX_HAVE_STACKTRACES to be defined!
 #endif
 
 /// By default we capture only 5 levels of stack back trace on suspension
