@@ -94,5 +94,4 @@ if(_use_custom_allocator)
   hpx_add_compile_flag_if_available(-fno-builtin-posix_memalign LANGUAGES CXX C)
 endif()
 
-hpx_add_config_define(HPX_MALLOC "\"${HPX_MALLOC}\"")
 hpx_info("Using ${HPX_MALLOC} allocator.")

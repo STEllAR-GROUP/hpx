@@ -496,6 +496,8 @@ include(HPX_SetupBoost)
 
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
+# Add define to which allocator has been selected.
+hpx_add_config_define(HPX_MALLOC "\"${HPX_MALLOC}\"")
 
 if(HPX_WITH_HWLOC)
   find_package(Hwloc)
