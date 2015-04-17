@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file action_support.hpp
+/// \file transfer_action.hpp
 
 #if !defined(HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_NOV_14_2008_0711PM)
 #define HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_NOV_14_2008_0711PM
@@ -17,6 +17,9 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/serialization/serialize_sequence.hpp>
+#include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/runtime/serialization/input_archive.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/traits/action_capability_provider.hpp>
 #endif
@@ -106,7 +109,6 @@ namespace hpx { namespace actions
         //
         ~transfer_action()
         {
-            init_registration<transfer_action<Action> >::g.register_action();
         }
 
     public:
@@ -388,7 +390,8 @@ namespace hpx { namespace actions
         }
 
         // serialization support
-        void load(hpx::serialization::input_archive & ar)
+        // loading ...
+        void serialize(hpx::serialization::input_archive & ar)
         {
             serialization::serialize_sequence(ar, arguments_);
 
@@ -407,7 +410,8 @@ namespace hpx { namespace actions
             stacksize_ = data.stacksize_;
         }
 
-        void save(hpx::serialization::output_archive & ar) const
+        // saving ...
+        void serialize(hpx::serialization::output_archive & ar)
         {
             serialization::serialize_sequence(ar, arguments_);
 
@@ -423,6 +427,14 @@ namespace hpx { namespace actions
                 parent_id_, parent_phase_, priority_, stacksize_);
             ar << data;
         }
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+            ar & hpx::serialization::base_object<base_action>(*this);
+            serialize(ar);
+        }
+        HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(transfer_action, detail::get_action_name<derived_type>());
 
     private:
         static boost::uint32_t get_locality_id()
@@ -455,31 +467,11 @@ namespace hpx { namespace actions
     /// \endcond
 }}
 
-namespace hpx { namespace actions
-{
+namespace hpx { namespace traits {
     template <typename Action>
-    struct init_registration<transfer_action<Action> >
-    {
-        static detail::automatic_action_registration<transfer_action<Action> > g;
-    };
-
-    template <typename Action>
-    detail::automatic_action_registration<transfer_action<Action> >
-        init_registration<transfer_action<Action> >::g =
-            detail::automatic_action_registration<transfer_action<Action> >();
-}}
-
-// Disabling the guid initialization stuff for actions
-namespace hpx { namespace traits
-{
-    /// \cond NOINTERNAL
-    template <typename Action>
-    struct needs_guid_initialization<
-            hpx::actions::transfer_action<Action>,
-            util::always_void<typename Action::needs_guid_serialization> >
-      : Action::needs_guid_serialization
+    struct needs_automatic_registration<hpx::actions::transfer_action<Action> >
+      : needs_automatic_registration<Action>
     {};
-    /// \endcond
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

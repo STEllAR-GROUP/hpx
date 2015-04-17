@@ -8,6 +8,7 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
+#include <hpx/runtime/serialization/shared_ptr.hpp>
 
 #include <sstream>
 
@@ -41,10 +42,7 @@ namespace hpx { namespace parcelset
             if (has_source_id)
                 ar << source_id_;
 
-            std::string action_name = action_->get_action_name();
-            ar << action_name;
-
-            action_->save(ar);
+            ar << action_;
 
             // If we have a continuation, serialize it.
             if (has_continuation) {
@@ -63,12 +61,7 @@ namespace hpx { namespace parcelset
             if (has_source_id)
                 ar >> source_id_;
 
-            std::string action_name;
-            ar >> action_name;
-
-            action_ = util::polymorphic_factory<
-                actions::base_action>::create(action_name);
-            action_->load(ar);
+            ar >> action_;
 
             // handle continuation.
             if (has_continuation) {

@@ -53,10 +53,6 @@ namespace hpx { namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Enable = void>
-    struct needs_guid_initialization;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Enable = void>
     struct is_action;
 
     // Customization point for action priority

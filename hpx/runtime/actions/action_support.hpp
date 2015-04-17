@@ -145,53 +145,6 @@ namespace hpx { namespace actions
         {
             typedef hpx::util::unused_type type;
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action>
-        struct action_registration
-        {
-            static boost::shared_ptr<base_action> create()
-            {
-                return boost::shared_ptr<base_action>(new Action());
-            }
-
-            action_registration()
-            {
-                util::polymorphic_factory<base_action>::get_instance().
-                    add_factory_function(
-                        detail::get_action_name<typename Action::derived_type>()
-                      , &action_registration::create
-                    );
-            }
-        };
-
-        template <typename Action, typename Enable =
-            typename traits::needs_automatic_registration<Action>::type>
-        struct automatic_action_registration
-        {
-            automatic_action_registration()
-            {
-                action_registration<Action> auto_register;
-            }
-
-            automatic_action_registration & register_action()
-            {
-                return *this;
-            }
-        };
-
-        template <typename Action>
-        struct automatic_action_registration<Action, boost::mpl::false_>
-        {
-            automatic_action_registration()
-            {
-            }
-
-            automatic_action_registration & register_action()
-            {
-                return *this;
-            }
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -283,9 +236,6 @@ namespace hpx { namespace actions
         /// Return whether the embedded action is part of termination detection
         virtual bool does_termination_detection() const = 0;
 
-        virtual void load(serialization::input_archive & ar) = 0;
-        virtual void save(serialization::output_archive & ar) const = 0;
-
         /// Wait for embedded futures to become ready
         virtual void wait_for_futures() = 0;
 
@@ -323,6 +273,11 @@ namespace hpx { namespace actions
         virtual components::security::capability get_required_capabilities(
             naming::address::address_type lva) const = 0;
 #endif
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {}
+        HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(base_action);
     };
 
     ///////////////////////////////////////////////////////////////////////////

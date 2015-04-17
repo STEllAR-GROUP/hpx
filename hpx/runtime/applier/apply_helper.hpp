@@ -16,6 +16,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
+#include <hpx/traits/action_stacksize.hpp>
 
 namespace hpx { namespace applier { namespace detail
 {

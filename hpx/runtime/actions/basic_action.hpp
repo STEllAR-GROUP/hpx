@@ -16,7 +16,6 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/is_future.hpp>
@@ -40,6 +39,10 @@
 
 namespace hpx { namespace actions
 {
+    // transfer_action forward declaration
+    template <typename Action>
+    struct transfer_action;
+
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -418,14 +421,6 @@ namespace hpx { namespace actions
 /// \cond NOINTERNAL
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
-    hpx::actions::detail::register_base_helper<action>                        \
-            BOOST_PP_CAT(                                                     \
-                BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
-                _##actionname);                                               \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
@@ -440,12 +435,13 @@ namespace hpx { namespace actions
         }                                                                     \
     }}}                                                                       \
 /**/
-
-#define HPX_ACTION_REGISTER_ACTION_FACTORY(Action, Name)                      \
-    static ::hpx::actions::detail::action_registration<Action>                \
-        const BOOST_PP_CAT(Name, _action_factory_registration) =              \
-        ::hpx::actions::detail::action_registration<Action>();                \
-/**/
+#define HPX_DEFINE_ACTION_REGISTRATION(action, actionname)                    \
+    static ::hpx::serialization::detail::register_class_name<                 \
+        hpx::actions::transfer_action<action>                                 \
+    > const BOOST_PP_CAT(actionname, _action_factory_registration) =          \
+            ::hpx::serialization::detail::register_class_name<                \
+                hpx::actions::transfer_action<action>                         \
+            >();                                                              \
 
 #define HPX_REGISTER_ACTION_(...)                                             \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
@@ -456,19 +452,16 @@ namespace hpx { namespace actions
     HPX_REGISTER_ACTION_2(action, action)                                     \
 /**/
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
-    HPX_ACTION_REGISTER_ACTION_FACTORY(hpx::actions::transfer_action<action>, \
-        actionname)                                                           \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1(action)              \
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \
         char const* get_action_name<action>();                                \
     }}}                                                                       \
-/**/
-#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2(action)              \
+                                                                              \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
         struct needs_automatic_registration<action>                           \
@@ -486,9 +479,7 @@ namespace hpx { namespace actions
     HPX_REGISTER_ACTION_DECLARATION_2(action, action)                         \
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION_2(action, actionname)                 \
-    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1(action)                  \
-    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2(                         \
-        hpx::actions::transfer_action<action>)                                \
+    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)                   \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////

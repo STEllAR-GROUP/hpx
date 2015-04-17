@@ -47,8 +47,6 @@ namespace hpx { namespace actions
             R(Ps...), Derived>
     {
     public:
-        typedef boost::mpl::false_ needs_guid_initialization;
-
         static std::string get_action_name(naming::address::address_type /*lva*/)
         {
             std::stringstream name;
