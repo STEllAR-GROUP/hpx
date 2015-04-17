@@ -501,6 +501,8 @@ include(HPX_SetupBoost)
 
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
+# Add define to which allocator has been selected.
+hpx_add_config_define(HPX_MALLOC "\"${HPX_MALLOC}\"")
 
 if(HPX_WITH_HWLOC)
   find_package(Hwloc)
@@ -917,7 +919,6 @@ if(HPX_COMPILER_WARNINGS)
       hpx_add_compile_flag_if_available(-Werror=uninitialized)
     endif()
 
-    hpx_add_compile_flag_if_available(-Werror=missing-field-initializers)
     hpx_add_compile_flag_if_available(-Werror=format)
     hpx_add_compile_flag_if_available(-Werror=missing-braces)
     hpx_add_compile_flag_if_available(-Werror=sign-compare)

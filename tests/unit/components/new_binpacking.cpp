@@ -37,8 +37,10 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_binpacking()
+std::vector<hpx::id_type> test_binpacking_multiple()
 {
+    std::vector<hpx::id_type> keep_alive;
+
     // create an increasing number of instances on all available localities
     std::vector<std::vector<hpx::id_type> > targets;
 
@@ -51,6 +53,7 @@ void test_binpacking()
         for (hpx::id_type const& id: targets.back())
         {
             HPX_TEST(hpx::async<call_action>(id).get() == loc);
+            keep_alive.push_back(id);
         }
     }
 
@@ -84,11 +87,53 @@ void test_binpacking()
     }
 
     HPX_TEST_EQ(2*count, new_count);
+
+    for (hpx::id_type const& id: filled_targets)
+        keep_alive.push_back(id);
+
+    return keep_alive;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void test_binpacking_single()
+{
+    // create an increasing number of instances on all available localities
+    std::vector<std::vector<hpx::id_type> > targets;
+
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    for (std::size_t i = 0; i != localities.size(); ++i)
+    {
+        hpx::id_type const& loc = localities[i];
+
+        targets.push_back(hpx::new_<test_server[]>(loc, i+1).get());
+        for (hpx::id_type const& id: targets.back())
+        {
+            HPX_TEST(hpx::async<call_action>(id).get() == loc);
+        }
+    }
+
+    std::string counter_name(hpx::components::default_binpacking_counter_name);
+    counter_name += "test_server";
+
+    hpx::performance_counters::performance_counter instances(
+        counter_name, localities[0]);
+    boost::uint64_t before = instances.get_value_sync<boost::uint64_t>();
+
+    // now use bin-packing policy to create one more instance
+    hpx::id_type filled_target = hpx::new_<test_server>(
+        hpx::binpacked(localities)).get();
+
+    // now, the first locality should have one more instance
+    boost::uint64_t after = instances.get_value_sync<boost::uint64_t>();
+
+    HPX_TEST_EQ(before+1, after);
 }
 
 int main()
 {
-    test_binpacking();
+    std::vector<hpx::id_type> ids = test_binpacking_multiple();
+    test_binpacking_single();
+
     return 0;
 }
 
