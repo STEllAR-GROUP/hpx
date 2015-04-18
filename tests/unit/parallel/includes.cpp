@@ -50,17 +50,20 @@ void test_includes1(ExPolicy const& policy, IteratorTag)
         std::vector<std::size_t> c2;
         std::copy(start_it, end_it, std::back_inserter(c2));
 
-        ++c2[std::rand() % c2.size()]; //-V104
+        if (!c2.empty())
+        {
+            ++c2[std::rand() % c2.size()]; //-V104
 
-        bool result = hpx::parallel::includes(policy,
-            iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2), boost::end(c2));
+            bool result = hpx::parallel::includes(policy,
+                iterator(boost::begin(c1)), iterator(boost::end(c1)),
+                boost::begin(c2), boost::end(c2));
 
-        bool expected = std::includes(boost::begin(c1), boost::end(c1),
-            boost::begin(c2), boost::end(c2));
+            bool expected = std::includes(boost::begin(c1), boost::end(c1),
+                boost::begin(c2), boost::end(c2));
 
-        // verify values
-        HPX_TEST_EQ(result, expected);
+            // verify values
+            HPX_TEST_EQ(result, expected);
+        }
     }
 }
 
@@ -101,19 +104,22 @@ void test_includes1_async(ExPolicy const& p, IteratorTag)
         std::vector<std::size_t> c2;
         std::copy(start_it, end_it, std::back_inserter(c2));
 
-        ++c2[std::rand() % c2.size()]; //-V104
+        if (!c2.empty())
+        {
+            ++c2[std::rand() % c2.size()]; //-V104
 
-        hpx::future<bool> result =
-            hpx::parallel::includes(p,
-                iterator(boost::begin(c1)), iterator(boost::end(c1)),
+            hpx::future<bool> result =
+                hpx::parallel::includes(p,
+                    iterator(boost::begin(c1)), iterator(boost::end(c1)),
+                    boost::begin(c2), boost::end(c2));
+            result.wait();
+
+            bool expected = std::includes(boost::begin(c1), boost::end(c1),
                 boost::begin(c2), boost::end(c2));
-        result.wait();
 
-        bool expected = std::includes(boost::begin(c1), boost::end(c1),
-            boost::begin(c2), boost::end(c2));
-
-        // verify values
-        HPX_TEST_EQ(result.get(), expected);
+            // verify values
+            HPX_TEST_EQ(result.get(), expected);
+        }
     }
 }
 
@@ -182,17 +188,20 @@ void test_includes2(ExPolicy const& policy, IteratorTag)
         std::vector<std::size_t> c2;
         std::copy(start_it, end_it, std::back_inserter(c2));
 
-        ++c2[std::rand() % c2.size()]; //-V104
+        if (!c2.empty())
+        {
+            ++c2[std::rand() % c2.size()]; //-V104
 
-        bool result = hpx::parallel::includes(policy,
-            iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2), boost::end(c2), std::less<std::size_t>());
+            bool result = hpx::parallel::includes(policy,
+                iterator(boost::begin(c1)), iterator(boost::end(c1)),
+                boost::begin(c2), boost::end(c2), std::less<std::size_t>());
 
-        bool expected = std::includes(boost::begin(c1), boost::end(c1),
-            boost::begin(c2), boost::end(c2), std::less<std::size_t>());
+            bool expected = std::includes(boost::begin(c1), boost::end(c1),
+                boost::begin(c2), boost::end(c2), std::less<std::size_t>());
 
-        // verify values
-        HPX_TEST_EQ(result, expected);
+            // verify values
+            HPX_TEST_EQ(result, expected);
+        }
     }
 }
 
@@ -233,19 +242,22 @@ void test_includes2_async(ExPolicy const& p, IteratorTag)
         std::vector<std::size_t> c2;
         std::copy(start_it, end_it, std::back_inserter(c2));
 
-        ++c2[std::rand() % c2.size()]; //-V104
+        if (!c2.empty())
+        {
+            ++c2[std::rand() % c2.size()]; //-V104
 
-        hpx::future<bool> result =
-            hpx::parallel::includes(p,
-                iterator(boost::begin(c1)), iterator(boost::end(c1)),
+            hpx::future<bool> result =
+                hpx::parallel::includes(p,
+                    iterator(boost::begin(c1)), iterator(boost::end(c1)),
+                    boost::begin(c2), boost::end(c2), std::less<std::size_t>());
+            result.wait();
+
+            bool expected = std::includes(boost::begin(c1), boost::end(c1),
                 boost::begin(c2), boost::end(c2), std::less<std::size_t>());
-        result.wait();
 
-        bool expected = std::includes(boost::begin(c1), boost::end(c1),
-            boost::begin(c2), boost::end(c2), std::less<std::size_t>());
-
-        // verify values
-        HPX_TEST_EQ(result.get(), expected);
+            // verify values
+            HPX_TEST_EQ(result.get(), expected);
+        }
     }
 }
 
