@@ -14,7 +14,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
 
-#include <hpx/components/containers/vector/is_vector_distribution_policy.hpp>
+#include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/vector/vector_segmented_iterator.hpp>
 #include <hpx/components/containers/vector/partition_vector_component.hpp>
 
@@ -491,7 +491,8 @@ namespace hpx
         template <typename DistPolicy, typename Create>
         void create(DistPolicy const& policy, Create && creator)
         {
-            std::size_t num_parts = policy.get_num_partitions();
+            std::size_t num_parts =
+                traits::num_container_partitions<DistPolicy>::call(policy);
             std::size_t part_size = (size_ + num_parts - 1) / num_parts;
 
             // create as many partitions as required
@@ -642,7 +643,7 @@ namespace hpx
             partition_size_(std::size_t(-1))
         {
             if (size != 0)
-                create(hpx::layout);
+                create(hpx::container_layout);
         }
 
         /// Constructor which create and initialize vector with the
@@ -658,7 +659,7 @@ namespace hpx
             partition_size_(std::size_t(-1))
         {
             if (size != 0)
-                create(val, hpx::layout);
+                create(val, hpx::container_layout);
         }
 
         /// Constructor which create and initialize vector of size
@@ -672,7 +673,7 @@ namespace hpx
         template <typename DistPolicy>
         vector(size_type size, DistPolicy const& policy,
                 typename std::enable_if<
-                    traits::is_vector_distribution_policy<DistPolicy>::value
+                    traits::is_distribution_policy<DistPolicy>::value
                 >::type* = 0)
           : size_(size),
             partition_size_(std::size_t(-1))
@@ -694,7 +695,7 @@ namespace hpx
         template <typename DistPolicy>
         vector(size_type size, T const& val, DistPolicy const& policy,
                 typename std::enable_if<
-                    traits::is_vector_distribution_policy<DistPolicy>::value
+                    traits::is_distribution_policy<DistPolicy>::value
                 >::type* = 0)
           : size_(size),
             partition_size_(std::size_t(-1))

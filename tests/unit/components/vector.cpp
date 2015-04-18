@@ -355,11 +355,11 @@ void trivial_tests()
 
     trivial_test_without_policy<T>(length, "test1");
 
-    trivial_test_with_policy<T>(length, 1, hpx::layout, "test1");
-    trivial_test_with_policy<T>(length, 3, hpx::layout(3), "test2");
-    trivial_test_with_policy<T>(length, 3, hpx::layout(3, localities), "test3");
+    trivial_test_with_policy<T>(length, 1, hpx::container_layout, "test1");
+    trivial_test_with_policy<T>(length, 3, hpx::container_layout(3), "test2");
+    trivial_test_with_policy<T>(length, 3, hpx::container_layout(3, localities), "test3");
     trivial_test_with_policy<T>(length, localities.size(),
-        hpx::layout(localities), "test4");
+        hpx::container_layout(localities), "test4");
 }
 
 int main()

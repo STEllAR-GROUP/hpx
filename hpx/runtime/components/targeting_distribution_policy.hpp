@@ -167,6 +167,17 @@ namespace hpx { namespace components
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
+        /// Returns the number of associated localities for this distribution
+        /// policy
+        ///
+        /// \note This function is part of the creation policy implemented by
+        ///       this class
+        ///
+        std::size_t get_num_localities() const
+        {
+            return 1;
+        }
+
     protected:
         /// \cond NOINTERNAL
         targeting_distribution_policy(hpx::id_type const& id)

@@ -416,6 +416,17 @@ namespace hpx { namespace components
             return counter_name_;
         }
 
+        /// Returns the number of associated localities for this distribution
+        /// policy
+        ///
+        /// \note This function is part of the creation policy implemented by
+        ///       this class
+        ///
+        std::size_t get_num_localities() const
+        {
+            return localities_.size();
+        }
+
     protected:
         /// \cond NOINTERNAL
         binpacking_distribution_policy(std::vector<id_type> const& localities,

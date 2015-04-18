@@ -14,7 +14,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
-#include <hpx/components/containers/unordered/is_unordered_distribution_policy.hpp>
+#include <hpx/components/containers/container_distribution_policy.hpp>
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 
 #include <cstdint>
@@ -253,10 +253,6 @@ namespace hpx
         {
             typedef server::unordered_map_config_data::partition_data base_type;
 
-            partition_data(future<id_type> && part, boost::uint32_t locality_id)
-              : base_type(std::move(part), locality_id)
-            {}
-
             partition_data(id_type const& part, boost::uint32_t locality_id)
               : base_type(part, locality_id)
             {}
@@ -374,7 +370,8 @@ namespace hpx
         {
             typedef partition_unordered_map_server component_type;
 
-            std::size_t num_parts = policy.get_num_partitions();
+            std::size_t num_parts =
+                traits::num_container_partitions<DistPolicy>::call(policy);
 
             // create as many partitions as required
             hpx::future<std::vector<bulk_locality_result> > f =
@@ -392,7 +389,8 @@ namespace hpx
         {
             typedef partition_unordered_map_server component_type;
 
-            std::size_t num_parts = policy.get_num_partitions();
+            std::size_t num_parts =
+                traits::num_container_partitions<DistPolicy>::call(policy);
 
             // create as many partitions as required
             hpx::future<std::vector<bulk_locality_result> > f =
@@ -428,8 +426,7 @@ namespace hpx
             {
                 boost::uint32_t locality = rhs.partitions_[i].locality_id_;
 
-                partitions.push_back(partition_data(
-                    std::move(objs[i]), locality));
+                partitions.push_back(partition_data(objs[i].get(), locality));
 
                 if (locality == this_locality)
                 {
@@ -474,13 +471,13 @@ namespace hpx
         /// of the unordered_map is 0.
         unordered_map()
         {
-            create(layout);
+            create(container_layout);
         }
 
         template <typename DistPolicy>
         unordered_map(DistPolicy const& policy,
             typename std::enable_if<
-                    traits::is_unordered_distribution_policy<DistPolicy>::value
+                    traits::is_distribution_policy<DistPolicy>::value
                 >::type* = 0)
         {
             create(policy);
@@ -490,13 +487,13 @@ namespace hpx
                 Hash const& hash = Hash(), KeyEqual const& equal = KeyEqual())
           : hash_base_type(hash, equal)
         {
-            create(hpx::layout, bucket_count, hash, equal);
+            create(hpx::container_layout, bucket_count, hash, equal);
         }
 
         template <typename DistPolicy>
         unordered_map(std::size_t bucket_count, DistPolicy const& policy,
             typename std::enable_if<
-                    traits::is_unordered_distribution_policy<DistPolicy>::value
+                    traits::is_distribution_policy<DistPolicy>::value
                 >::type* = 0)
         {
             create(policy, bucket_count, Hash(), KeyEqual());
@@ -506,7 +503,7 @@ namespace hpx
         unordered_map(std::size_t bucket_count,
                 Hash const& hash, DistPolicy const& policy,
                 typename std::enable_if<
-                    traits::is_unordered_distribution_policy<DistPolicy>::value
+                    traits::is_distribution_policy<DistPolicy>::value
                 >::type* = 0)
           : hash_base_type(hash, KeyEqual())
         {
@@ -518,7 +515,7 @@ namespace hpx
                 Hash const& hash, KeyEqual const& equal,
                 DistPolicy const& policy,
                 typename std::enable_if<
-                    traits::is_unordered_distribution_policy<DistPolicy>::value
+                    traits::is_distribution_policy<DistPolicy>::value
                 >::type* = 0)
           : hash_base_type(hash, equal)
         {
