@@ -86,6 +86,11 @@ namespace hpx { namespace components
                 id_, std::forward<Ts>(vs)...);
         }
 
+        /// \cond NOINTERNAL
+        typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
+            bulk_locality_result;
+        /// \endcond
+
         /// Create multiple objects colocated with the object represented
         /// by this policy instance
         ///
@@ -100,17 +105,38 @@ namespace hpx { namespace components
         ///          represent the newly created objects
         ///
         template <typename Component, typename ...Ts>
-        hpx::future<std::vector<hpx::id_type> >
+        hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts&&... vs) const
         {
-            // handle special cases
+            using components::stub_base;
+
+            hpx::id_type id;
+            hpx::future<std::vector<hpx::id_type> > f;
             if (!id_)
             {
-                return components::stub_base<Component>::bulk_create_async(
-                    hpx::find_here(), count, std::forward<Ts>(vs)...);
+                id = hpx::find_here();
+                f = stub_base<Component>::bulk_create_async(
+                        id, count, std::forward<Ts>(vs)...);
             }
-            return components::stub_base<Component>::bulk_create_colocated_async(
-                id_, count, std::forward<Ts>(vs)...);
+            else
+            {
+                id = id_;
+                f = stub_base<Component>::bulk_create_colocated_async(
+                        id, count, std::forward<Ts>(vs)...);
+            }
+
+            return f.then(hpx::launch::sync,
+                [id](hpx::future<std::vector<hpx::id_type> > && f)
+                    -> std::vector<bulk_locality_result>
+                {
+                    std::vector<bulk_locality_result> result;
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+                    result.emplace_back(id, f.get());
+#else
+                    result.push_back(std::make_pair(id, f.get()));
+#endif
+                    return result;
+                });
         }
 
         /// \note This function is part of the invocation policy implemented by

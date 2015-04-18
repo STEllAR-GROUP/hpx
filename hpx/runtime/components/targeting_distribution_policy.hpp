@@ -71,6 +71,11 @@ namespace hpx { namespace components
                 id_ ? id_ : hpx::find_here(), std::forward<Ts>(vs)...);
         }
 
+        /// \cond NOINTERNAL
+        typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
+            bulk_locality_result;
+        /// \endcond
+
         /// Create multiple objects on the localities associated by
         /// this policy instance
         ///
@@ -85,13 +90,28 @@ namespace hpx { namespace components
         ///          represent the newly created objects
         ///
         template <typename Component, typename ...Ts>
-        hpx::future<std::vector<hpx::id_type> >
+        hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts&&... vs) const
         {
             // by default the object will be created on the current
             // locality
-            return components::stub_base<Component>::bulk_create_async(
-                id_ ? id_ : hpx::find_here(), count, std::forward<Ts>(vs)...);
+            hpx::id_type id = id_ ? id_ : hpx::find_here();
+            hpx::future<std::vector<hpx::id_type> > f =
+                components::stub_base<Component>::bulk_create_async(
+                    id, count, std::forward<Ts>(vs)...);
+
+            return f.then(hpx::launch::sync,
+                [id](hpx::future<std::vector<hpx::id_type> > && f)
+                    -> std::vector<bulk_locality_result>
+                {
+                    std::vector<bulk_locality_result> result;
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+                    result.emplace_back(id, f.get());
+#else
+                    result.push_back(std::make_pair(id, f.get()));
+#endif
+                    return result;
+                });
         }
 
         /// \note This function is part of the invocation policy implemented by
