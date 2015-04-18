@@ -167,20 +167,6 @@ namespace hpx { namespace components
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
-        /// \cond NOINTERNAL
-        // FIXME: this can be removed once the vector<>::create() functions
-        //        have been adapted
-        std::size_t
-        get_num_items(std::size_t items, hpx::id_type const& loc) const
-        {
-            // make sure the given id is known to this distribution policy
-            HPX_ASSERT(!id_ || loc == hpx::find_here());
-
-            // this distribution policy places all items onto the given locality
-            return items;
-        }
-        /// \endcond
-
     protected:
         /// \cond NOINTERNAL
         targeting_distribution_policy(hpx::id_type const& id)

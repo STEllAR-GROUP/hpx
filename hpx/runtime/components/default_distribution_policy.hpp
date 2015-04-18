@@ -238,9 +238,8 @@ namespace hpx { namespace components
                 priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
+    protected:
         /// \cond NOINTERNAL
-        // FIXME: this can be made protected once the vector<>::create()
-        //        functions have been adapted
         std::size_t
         get_num_items(std::size_t items, hpx::id_type const& loc) const
         {
