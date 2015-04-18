@@ -192,8 +192,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         ///       available. \a run might or might not return before invocation of
         ///       f completes.
         ///
-        /// \throws \a task_canceled_exception, as described in Exception
-        ///         Handling.
+        /// \throw This function may throw \a task_canceled_exception, as
+        ///        described in Exception Handling.
         ///
         template <typename F>
         void run(F && f)
@@ -225,8 +225,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         /// \note The call to \a wait is sequenced before the continuation as if
         ///       \a wait returns on the same thread.
         ///
-        /// \throws \a task_canceled_exception, as described in Exception
-        ///         Handling.
+        /// \throw This function may throw \a task_canceled_exception, as
+        ///        described in Exception Handling.
         ///
         /// \code
         /// Example:
