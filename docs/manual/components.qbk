@@ -32,7 +32,7 @@ base class.
           : hpx::components::simple_component_base<some_component>
         {
             // This member function is has to be invoked remotely
-            int some_member_function(std::string s)
+            int some_member_function(std::string const& s)
             {
                 return boost::lexical_cast<int>(s);
             }
@@ -89,12 +89,21 @@ For instance:
 [//////////////////////////////////////////////////////////////////////////////]
 [section:components_client Defining Client Side Representation Classes]
 
+Often it is very convenient to define a separate type for a component which can
+be used on the client side (from where the component is instantiated and used).
+This step might seem as unnecessary duplicating code, however it significantly
+increases the type safety of the code.
+
+A possible implementation of such a client side representation for the component
+described in the previous section could look like:
+
     #include <hpx/include/components.hpp>
 
     namespace app
     {
         // Define a client side representation type for the component type
         // 'some_component' defined in the previous section.
+        //
         struct some_component_client
           : hpx::components::client_base<some_component_client, some_component>
         {
@@ -105,13 +114,20 @@ For instance:
               : base_type(std::move(id))
             {}
 
-            hpx::future<int> some_member_function(std::string s)
+            hpx::future<int> some_member_function(std::string const& s)
             {
                 some_component::some_member_action act;
-                return hpx::async(act, get_gid());
+                return hpx::async(act, get_gid(), s);
             }
         };
     }
+
+A client side object stores the global id of the component instance it
+represents. This global id is accessible by calling the function
+`client_base<>::get_gid()`. The special constructor which is provided in the
+example allows to create this client side object directly using the API
+function [funcref hpx::new_ `hpx::new_<>()`].
+
 
 [endsect]
 
@@ -121,6 +137,62 @@ For instance:
 Instances of defined component types can be created in two different ways. If
 the component to create has a defined client side representation type, then this
 can be used, otherwise use the server type.
+
+The following examples assume that `component_type` is the type of the server
+side implementation of the component to create. All additional arguments
+(see `, ...` notation below) are passed through to the corresponding constructor
+calls of those objects.
+
+    // create one instance on the given locality
+    hpx::id_type here = hpx::find_here();
+    hpx::future<hpx::id_type> f =
+        hpx::new_<component_type>(here, ...);
+
+    // create one instance using the given distribution
+    // policy (here: hpx::colocating_distribution_policy)
+    hpx::id_type here = hpx::find_here();
+    hpx::future<hpx::id_type> f =
+        hpx::new_<component_type>(hpx::colocated(here), ...);
+
+
+    // create multiple instances on the given locality
+    hpx::id_type here = find_here();
+    hpx::future<std::vector<hpx::id_type>> f =
+        hpx::new_<component_type[]>(here, num, ...);
+
+    // create multiple instances using the given distribution
+    // policy (here: hpx::binpacking_distribution_policy)
+    hpx::future<std::vector<hpx::id_type>> f = hpx::new_<component_type[]>(
+        hpx::binpacking(hpx::find_all_localities()), num, ...);
+
+The examples below demonstrate the use of the same API functions for creating
+client side representation objects (instead of just plain ids). These examples
+assume that `client_type` is the type of the client side representation of the
+component type to create. As above, all additional arguments
+(see `, ...` notation below) are passed through to the corresponding constructor
+calls of the server side implementation objects corresponding to the
+`client_type`.
+
+    // create one instance on the given locality
+    hpx::id_type here = hpx::find_here();
+    client_type c = hpx::new_<client_type>(here, ...);
+
+    // create one instance using the given distribution
+    // policy (here: hpx::colocating_distribution_policy)
+    hpx::id_type here = hpx::find_here();
+    client_type c = hpx::new_<client_type>(hpx::colocated(here), ...);
+
+
+    // create multiple instances on the given locality
+    hpx::id_type here = hpx::find_here();
+    hpx::future<std::vector<client_type>> f =
+        hpx::new_<client_type[]>(here, num, ...);
+
+    // create multiple instances using the given distribution
+    // policy (here: hpx::binpacking_distribution_policy)
+    hpx::future<std::vector<client_type>> f = hpx::new_<client_type[]>(
+        hpx::binpacking(hpx::find_all_localities()), num, ...);
+
 
 
 [endsect]
