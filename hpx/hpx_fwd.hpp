@@ -560,29 +560,31 @@ namespace hpx
             // Base component for LCOs that do produce values.
             component_base_lco_with_value = 4,
 
-            // Synchronization barrier LCO.
-            component_barrier = ((5 << 16) | component_base_lco),
+            // Synchronization latch, barrier, and flex_barrier LCOs.
+            component_latch = ((5 << 16) | component_base_lco_with_value),
+            component_barrier = ((6 << 16) | component_base_lco),
+            component_flex_barrier = ((7 << 16) | component_base_lco),
 
             // An LCO representing a value which may not have been computed yet.
-            component_promise = ((6 << 16) | component_base_lco_with_value),
+            component_promise = ((8 << 16) | component_base_lco_with_value),
 
             // AGAS locality services.
-            component_agas_locality_namespace = 7,
+            component_agas_locality_namespace = 9,
 
             // AGAS primary address resolution services.
-            component_agas_primary_namespace = 8,
+            component_agas_primary_namespace = 10,
 
             // AGAS global type system.
-            component_agas_component_namespace = 9,
+            component_agas_component_namespace = 11,
 
             // AGAS symbolic naming services.
-            component_agas_symbol_namespace = 10,
+            component_agas_symbol_namespace = 12,
 
 #if defined(HPX_HAVE_SODIUM)
             // root CA, subordinate CA
-            signed_certificate_promise = ((11 << 16) | component_base_lco_with_value),
-            component_root_certificate_authority = 12,
-            component_subordinate_certificate_authority = 13,
+            signed_certificate_promise = ((13 << 16) | component_base_lco_with_value),
+            component_root_certificate_authority = 14,
+            component_subordinate_certificate_authority = 15,
 #endif
 
             component_last,
