@@ -40,7 +40,8 @@
 //
 #include <unordered_map>
 
-#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
+//#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
+#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD 256
 
 using namespace hpx::parcelset::policies;
 
@@ -259,8 +260,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
       send_wr_map SendCompletionMap;
       send_wr_map TagSendCompletionMap;
 
-
-
       // pointer to verbs completion member function type
       typedef int (parcelport::*parcel_member_function)(struct ibv_wc *completion, RdmaClientPtr);
 
@@ -355,7 +354,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                               << " index " << decnumber(c.data_.index_));
                   }
 
-
                   buffer.num_chunks_ = h->num_chunks();
                   buffer.data_.resize(static_cast<std::size_t>(h->size()));
                   buffer.data_size_ = h->size();
@@ -377,12 +375,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
           else if (completion->opcode==IBV_WC_RECV && completion->byte_len==0) {
               uint64_t tag = completion->imm_data;
               LOG_DEBUG_MSG("zero byte receive with tag " << decnumber(tag));
+              // let go of this region (waste really as this was a zero byte message)
+              chunk_pool_->deallocate(region);
+              // now release any zero copy regions we were holding until parcel complete
               send_wr_map::iterator it = TagSendCompletionMap.find(tag);
               parcel_send_data send_data = std::move(it->second);
               for (auto r : send_data.zero_copy_regions) {
-//                  chunk_pool_->deallocate(r);
+                  chunk_pool_->deallocate(r);
               }
               TagSendCompletionMap.erase(it);
+              // and trigger the send complete handler for hpx internal cleanup
               LOG_DEBUG_MSG("Calling write_handler for completed send");
               send_data.handler.operator()(error_code(), send_data.parcel);
           }
@@ -449,7 +451,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                                       << " with rkey " << decnumber(c.rkey_) << " size " << hexnumber(c.size_)
                                       << " for tag " << tag);
                               // put region into map before posting read in case it completes whilst this thread is suspended
-                              RdmaMemoryRegion *get_region = chunk_pool_->allocateRegion(c.size_);
+                              RdmaMemoryRegion *get_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
                               receive_data.zero_copy_regions.push_back(get_region);
                               ZeroCopyGetCompletionMap[(uint64_t)get_region] = tag;
                               // overwrite the serialization data to account for the local pointers instead of remote ones
@@ -669,32 +671,33 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                       << " pos " << hexpointer(c.data_.pos_)
                       << " index " << decnumber(c.data_.index_));
           }
+          int index = 0;
           for (serialization::serialization_chunk &c : buffer.chunks_) {
               if (c.type_ == serialization::chunk_type_pointer) {
                   // if the data chunk fits into a memory block, copy it
                   util::high_resolution_timer regtimer;
                   RdmaMemoryRegion *zero_copy_region;
-/*                  if (c.size_<=HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD) {
-                      zero_copy_region = chunk_pool_->allocateRegion(c.size_);
+                  if (c.size_<=HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD) {
+                      zero_copy_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
                       char *zero_copy_memory = (char*)(zero_copy_region->getAddress());
                       std::memcpy(zero_copy_memory, c.data_.cpos_, c.size_);
                       // the pointer in the chunk info must be changed
-                      const_cast<void*>(c.data_.cpos_) = zero_copy_memory;
-                      c.data_.pos_ = zero_copy_memory;
+                      buffer.chunks_[index] = serialization::create_pointer_chunk(zero_copy_memory, c.size_);
                       LOG_DEBUG_MSG("Time to copy memory (ns) " << decnumber(regtimer.elapsed_nanoseconds()));
                   }
                   else {
-*/                      // create a memory region from the pointer
+                      // create a memory region from the pointer
                       zero_copy_region = new RdmaMemoryRegion(
-                              _rdmaController->getProtectionDomain(), c.data_.cpos_, c.size_);
+                              _rdmaController->getProtectionDomain(), c.data_.cpos_, std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
                       LOG_DEBUG_MSG("Time to register memory (ns) " << decnumber(regtimer.elapsed_nanoseconds()));
-//                  }
+                  }
                   c.rkey_  = zero_copy_region->getRemoteKey();
                   LOG_DEBUG_MSG("Zero-copy rdma Get region created for address "
                           << hexpointer(zero_copy_region->getAddress())
                           << " and rkey " << decnumber(c.rkey_));
                   send_data.zero_copy_regions.push_back(zero_copy_region);
               }
+              index++;
           }
 
           // grab a memory block from the pinned pool to use for the header
@@ -771,7 +774,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         if (stopped_)
           return false;
         // if an event comes in, we may spend time processing/handling it and another may arrive
-        // during this handling, so keep checking until non are received
+        // during this handling, so keep checking until none are received
         bool done = false;
         do {
           done = (_rdmaController->eventMonitor(0) == 0);
