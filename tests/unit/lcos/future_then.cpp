@@ -15,6 +15,7 @@
 #include <memory>
 #include <string>
 
+#include <boost/assign.hpp>
 #include <boost/move/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

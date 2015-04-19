@@ -506,14 +506,14 @@ namespace hpx { namespace lcos
 /**/
 
 #define HPX_REGISTER_REDUCE_ACTION_2(Action, ReduceOp)                        \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
             reduce_invoker<ReduceOp>::type                                    \
       , BOOST_PP_CAT(BOOST_PP_CAT(reduce_, Action), ReduceOp)                 \
     )                                                                         \
 /**/
 #define HPX_REGISTER_REDUCE_ACTION_3(Action, ReduceOp, Name)                  \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
             reduce_invoker<ReduceOp>::type                                    \
       , BOOST_PP_CAT(reduce_, Name)                                           \
@@ -559,7 +559,7 @@ namespace hpx { namespace lcos
 /**/
 
 #define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_2(Action, ReduceOp)             \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
         >::reduce_invoker<ReduceOp>::type                                     \
@@ -567,7 +567,7 @@ namespace hpx { namespace lcos
     )                                                                         \
 /**/
 #define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_3(Action, ReduceOp, Name)       \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
         >::reduce_invoker<ReduceOp>::type                                     \

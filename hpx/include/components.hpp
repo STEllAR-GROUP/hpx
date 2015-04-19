@@ -12,7 +12,6 @@
 
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/components/component_commandline.hpp>

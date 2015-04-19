@@ -548,41 +548,44 @@ namespace hpx
             // component creation, etc). One per locality.
             component_runtime_support = 0,
 
+            // Pseudo-component to be used for plain actions
+            component_plain_function = 1,
+
             // Pseudo-component for direct access to local virtual memory.
-            component_memory = 1,
+            component_memory = 2,
 
             // Generic memory blocks.
-            component_memory_block = 2,
+            component_memory_block = 3,
 
             // Base component for LCOs that do not produce a value.
-            component_base_lco = 3,
+            component_base_lco = 4,
 
             // Base component for LCOs that do produce values.
-            component_base_lco_with_value = 4,
+            component_base_lco_with_value = 5,
 
             // Synchronization barrier LCO.
-            component_barrier = ((5 << 16) | component_base_lco),
+            component_barrier = ((6 << 16) | component_base_lco),
 
             // An LCO representing a value which may not have been computed yet.
-            component_promise = ((6 << 16) | component_base_lco_with_value),
+            component_promise = ((7 << 16) | component_base_lco_with_value),
 
             // AGAS locality services.
-            component_agas_locality_namespace = 7,
+            component_agas_locality_namespace = 8,
 
             // AGAS primary address resolution services.
-            component_agas_primary_namespace = 8,
+            component_agas_primary_namespace = 9,
 
             // AGAS global type system.
-            component_agas_component_namespace = 9,
+            component_agas_component_namespace = 10,
 
             // AGAS symbolic naming services.
-            component_agas_symbol_namespace = 10,
+            component_agas_symbol_namespace = 11,
 
 #if defined(HPX_HAVE_SODIUM)
             // root CA, subordinate CA
-            signed_certificate_promise = ((11 << 16) | component_base_lco_with_value),
-            component_root_certificate_authority = 12,
-            component_subordinate_certificate_authority = 13,
+            signed_certificate_promise = ((12 << 16) | component_base_lco_with_value),
+            component_root_certificate_authority = 13,
+            component_subordinate_certificate_authority = 14,
 #endif
 
             component_last,

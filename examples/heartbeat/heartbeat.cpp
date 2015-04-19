@@ -11,7 +11,6 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/state.hpp>

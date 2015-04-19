@@ -719,14 +719,14 @@ namespace hpx { namespace lcos
 /**/
 
 #define HPX_REGISTER_FOLD_ACTION_2(Action, FoldOp)                            \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_fold_action<Action>::                       \
             fold_invoker<FoldOp>::type                                        \
       , BOOST_PP_CAT(BOOST_PP_CAT(fold_, Action), FoldOp)                     \
     )                                                                         \
 /**/
 #define HPX_REGISTER_FOLD_ACTION_3(Action, FoldOp, Name)                      \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_fold_action<Action>::                       \
             fold_invoker<FoldOp>::type                                        \
       , BOOST_PP_CAT(fold_, Name)                                             \
@@ -772,7 +772,7 @@ namespace hpx { namespace lcos
 /**/
 
 #define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_2(Action, FoldOp)                 \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_fold_action<                                \
             ::hpx::lcos::detail::fold_with_index<Action>                      \
         >::fold_invoker<FoldOp>::type                                         \
@@ -780,7 +780,7 @@ namespace hpx { namespace lcos
     )                                                                         \
 /**/
 #define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_3(Action, FoldOp, Name)           \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_fold_action<                                \
             ::hpx::lcos::detail::fold_with_index<Action>                      \
         >::fold_invoker<FoldOp>::type                                         \

@@ -955,7 +955,7 @@ namespace hpx { namespace lcos
     HPX_REGISTER_BROADCAST_APPLY_ACTION_2(Action, Action)                     \
 /**/
 #define HPX_REGISTER_BROADCAST_APPLY_ACTION_2(Action, Name)                   \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type        \
       , BOOST_PP_CAT(broadcast_apply_, Name)                                  \
     )                                                                         \
@@ -1011,7 +1011,7 @@ namespace hpx { namespace lcos
     HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_2(Action, Action)          \
 /**/
 #define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_2(Action, Name)        \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_broadcast_apply_action<                     \
             ::hpx::lcos::detail::broadcast_with_index<Action>                 \
         >::type                                                               \
@@ -1064,7 +1064,7 @@ namespace hpx { namespace lcos
     HPX_REGISTER_BROADCAST_ACTION_2(Action, Action)                           \
 /**/
 #define HPX_REGISTER_BROADCAST_ACTION_2(Action, Name)                         \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
       , BOOST_PP_CAT(broadcast_, Name)                                        \
     )                                                                         \
@@ -1118,7 +1118,7 @@ namespace hpx { namespace lcos
     HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_2(Action, Action)                \
 /**/
 #define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_2(Action, Name)              \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_broadcast_action<                           \
             ::hpx::lcos::detail::broadcast_with_index<Action>                 \
         >::type                                                               \
