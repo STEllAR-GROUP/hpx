@@ -306,6 +306,11 @@ void test_includes_exception(ExPolicy const& policy, IteratorTag)
 
     HPX_ASSERT(start <= end);
 
+    if (start == end)
+        ++end;
+
+    HPX_ASSERT(end <= c1.size());
+
     base_iterator start_it = boost::next(boost::begin(c1), start);
     base_iterator end_it = boost::next(boost::begin(c1), end);
 
@@ -345,6 +350,11 @@ void test_includes_exception_async(ExPolicy const& p, IteratorTag)
     std::size_t end = start + (std::rand() % (c1.size() - start));
 
     HPX_ASSERT(start <= end);
+
+    if (start == end)
+        ++end;
+
+    HPX_ASSERT(end <= c1.size());
 
     base_iterator start_it = boost::next(boost::begin(c1), start);
     base_iterator end_it = boost::next(boost::begin(c1), end);
@@ -422,6 +432,11 @@ void test_includes_bad_alloc(ExPolicy const& policy, IteratorTag)
 
     HPX_ASSERT(start <= end);
 
+    if (start == end)
+        ++end;
+
+    HPX_ASSERT(end <= c1.size());
+
     base_iterator start_it = boost::next(boost::begin(c1), start);
     base_iterator end_it = boost::next(boost::begin(c1), end);
 
@@ -460,6 +475,11 @@ void test_includes_bad_alloc_async(ExPolicy const& p, IteratorTag)
     std::size_t end = start + (std::rand() % (c1.size() - start));
 
     HPX_ASSERT(start <= end);
+
+    if (start == end)
+        ++end;
+
+    HPX_ASSERT(end <= c1.size());
 
     base_iterator start_it = boost::next(boost::begin(c1), start);
     base_iterator end_it = boost::next(boost::begin(c1), end);
