@@ -97,7 +97,7 @@ namespace hpx { namespace serialization { namespace detail
         {
         }
 
-        friend class hpx::util::static_<polymorphic_nonintrusive_factory>;
+        friend struct hpx::util::static_<polymorphic_nonintrusive_factory>;
 
         serializer_map_type map_;
     };
