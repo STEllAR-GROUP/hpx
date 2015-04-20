@@ -194,8 +194,8 @@ namespace hpx { namespace components
           : gid_(rhs.gid_)
         {}
         explicit client_base(client_base && rhs)
-          : gid_(std::move(rhs.gid_)),
-            registered_name_(std::move(rhs.registered_name_))
+          : registered_name_(std::move(rhs.registered_name_)),
+            gid_(std::move(rhs.gid_))
         {}
 
         // A future to a client_base can be unwrapped to represent the
