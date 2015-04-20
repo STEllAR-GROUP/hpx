@@ -590,7 +590,7 @@ namespace hpx
                 typedef typename partition_vector_client::server_component_type
                     component_type;
                 objs.push_back(hpx::components::copy<component_type>(
-                    it->partition_.get()));
+                    it->partition_));
             }
             wait_all(objs);
 
@@ -603,16 +603,16 @@ namespace hpx
             {
                 boost::uint32_t locality = rhs.partitions_[i].locality_id_;
 
-                partitions.push_back(partition_data(std::move(objs[i]),
+                partitions.push_back(partition_data(objs[i].get(),
                     rhs.partitions_[i].size_, locality));
 
                 if (locality == this_locality)
                 {
                     using util::placeholders::_1;
                     ptrs.push_back(get_ptr<partition_vector_server>(
-                        partitions[i].partition_.get()).then(
-                            util::bind(&vector::get_ptr_helper, this, i,
-                                std::ref(partitions), _1)));
+                        partitions[i].partition_).then(
+                            util::bind(&vector::get_ptr_helper,
+                                i, std::ref(partitions), _1)));
                 }
             }
 
