@@ -97,7 +97,7 @@ namespace hpx
         {
             static std::size_t call(Policy const& policy)
             {
-                return policies.get_num_localities();
+                return policy.get_num_localities();
             }
         };
 
