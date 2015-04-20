@@ -8,6 +8,7 @@ machine:
         - docker
     environment:
         IMAGE_NAME: stellargroup/build_env:debian_clang
+        TARGET_IMAGE_NAME: stellargroup/hpx:dev
 
 general:
     branches:
@@ -26,9 +27,20 @@ dependencies:
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance
+        - docker build -t ${TARGET_IMAGE_NAME} $PWD
 
 test:
     override:
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ./bin/hello_world --hpx:bind=none
         #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.unit --output-on-failure
         #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.regressions --output-on-failure
+        - rm -rf build && mkdir build
+        - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hello_world
+        - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hpxcxx --exe=hello_world_test_build ../examples/quickstart/hello_world.cpp
+        - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} ./hello_world_test_build
+
+deployment:
+    hub:
+        commands:
+            - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+            - docker push ${TARGET_IMAGE_NAME}
