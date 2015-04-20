@@ -36,7 +36,7 @@ test:
         #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.regressions --output-on-failure
         - rm -rf build && mkdir build
         - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hello_world
-        - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hpxcxx --exe=hello_world_test_build ../examples/quickstart/hello_world.cpp
+        - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hpxcxx --exe=hello_world_test_build ../examples/quickstart/hello_world.cpp -liostreams
         - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} ./hello_world_test_build
 
 deployment:
