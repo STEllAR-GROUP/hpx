@@ -10,7 +10,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::simple_component<
         startup_shutdown::server::startup_shutdown_component>,
     startup_shutdown_component);

@@ -101,7 +101,7 @@ boilerplate code needed for __hpx__ to function properly:
     ``[macroref HPX_REGISTER_COMPONENT_MODULE `HPX_REGISTER_COMPONENT_MODULE`]``();
 
     // Define factory object associated with our component of type 'app::server'.
-    ``[macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`]``(app::server, app_server);
+    ``[macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`]``(app::server, app_server);
 
     // Define boilerplate code required for each of the component actions. Use the
     // same argument as used for HPX_REGISTER_ACTION_DECLARATION above.
@@ -162,7 +162,7 @@ library from there. The section name `hpx.components.app_server`
 reflects the instance name of the component (`app_server` is an arbitrary,
 but unique name) . The property value for `hpx.components.app_server.name`
 should be the same as used for the second argument to the macro
-[macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`]
+[macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`]
 above.
 
 Additionally a file `.hpx.ini` which could be located in the current working

@@ -69,7 +69,7 @@ struct broadcast_component
     buffer_type recv_buffer;
 };
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::simple_component<broadcast_component>
   , osu_broadcast_component);
 

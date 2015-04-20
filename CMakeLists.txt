@@ -473,6 +473,14 @@ hpx_option(HPX_WITH_COMPRESSION_SNAPPY BOOL "Enable snappy compression for parce
 hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
 
 ################################################################################
+# Backwards compatibility options (edit for each release)
+# HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
+hpx_option(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
+    "Enable backwards compatibility for apply_colocated, async_colocated and friends"
+    ON ADVANCED)
+if(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
+endif()
 
 ################################################################################
 # Set basic search paths for HPX
@@ -496,6 +504,8 @@ include(HPX_SetupBoost)
 
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
+# Add define to which allocator has been selected.
+hpx_add_config_define(HPX_MALLOC "\"${HPX_MALLOC}\"")
 
 if(HPX_WITH_HWLOC)
   find_package(Hwloc)

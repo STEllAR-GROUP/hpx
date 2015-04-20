@@ -203,8 +203,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             result_type(typename hpx::util::decay<Args>::type const&...)
         > act;
 
-        return hpx::async_colocated(act, id, std::forward<Algo>(algo), policy,
-            std::forward<Args>(args)...);
+        return hpx::async(act, hpx::colocated(id), std::forward<Algo>(algo),
+            policy, std::forward<Args>(args)...);
     }
 
     template <typename Algo, typename ExPolicy, typename IsSeq, typename... Args>

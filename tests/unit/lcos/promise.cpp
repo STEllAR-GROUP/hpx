@@ -48,6 +48,7 @@ int future_callback(
     HPX_TEST(f.has_exception());
 
     std::string what_msg;
+    bool caught_exception = false;
 
     try {
         f.get();          // should rethrow
@@ -55,9 +56,13 @@ int future_callback(
     }
     catch (std::exception const& e) {
         what_msg = e.what();
-        HPX_TEST(true);
+        caught_exception = true;
+    }
+    catch (...) {
+        HPX_TEST(false);
     }
 
+    HPX_TEST(caught_exception);
     HPX_TEST_EQ(what_msg, error_msg);
     return -1;
 }
@@ -107,19 +112,25 @@ int hpx_main(boost::program_options::variables_map&)
     }
 
     {
-        hpx::lcos::future<int> p = hpx::async<test_error_action>(hpx::find_here());
+        hpx::lcos::future<int> p =
+            hpx::async<test_error_action>(hpx::find_here());
 
         std::string what_msg;
+        bool caught_exception = false;
 
         try {
             p.get();      // throws
             HPX_TEST(false);
         }
         catch (std::exception const& e) {
-            HPX_TEST(true);
             what_msg = e.what();
+            caught_exception = true;
+        }
+        catch (...) {
+            HPX_TEST(false);
         }
 
+        HPX_TEST(caught_exception);
         HPX_TEST_EQ(what_msg, error_msg);
     }
 
@@ -128,16 +139,18 @@ int hpx_main(boost::program_options::variables_map&)
         hpx::lcos::future<int> p = hpx::async(do_error, hpx::find_here());
 
         std::string what_msg;
+        bool caught_exception = false;
 
         try {
             p.get();      // throws
             HPX_TEST(false);
         }
         catch (std::exception const& e) {
-            HPX_TEST(true);
             what_msg = e.what();
+            caught_exception = true;
         }
 
+        HPX_TEST(caught_exception);
         HPX_TEST_EQ(what_msg, error_msg);
     }
 
@@ -145,23 +158,29 @@ int hpx_main(boost::program_options::variables_map&)
         bool data_cb_called = false;
         bool error_cb_called = false;
 
-        hpx::lcos::shared_future<int> f = hpx::async<test_error_action>(hpx::find_here());
+        hpx::lcos::shared_future<int> f =
+            hpx::async<test_error_action>(hpx::find_here());
         hpx::lcos::future<int> p = f.then(hpx::util::bind(future_callback,
             boost::ref(data_cb_called), boost::ref(error_cb_called),
             hpx::util::placeholders::_1));
 
         std::string what_msg;
+        bool caught_exception = false;
 
         try {
+            p.get();      // guarantee for callback to have finished executing
             f.get();      // throws
-            p.get();
             HPX_TEST(false);
         }
         catch (std::exception const& e) {
-            HPX_TEST(true);
             what_msg = e.what();
+            caught_exception = true;
+        }
+        catch (...) {
+            HPX_TEST(false);
         }
 
+        HPX_TEST(caught_exception);
         HPX_TEST_EQ(what_msg, error_msg);
         HPX_TEST(!data_cb_called);
         HPX_TEST(error_cb_called);
@@ -179,6 +198,7 @@ int hpx_main(boost::program_options::variables_map&)
                     boost::ref(error_cb_called), hpx::util::placeholders::_1));
 
         std::string what_msg;
+        bool caught_exception = false;
 
         try {
             f.get();      // throws
@@ -186,10 +206,14 @@ int hpx_main(boost::program_options::variables_map&)
             HPX_TEST(false);
         }
         catch (std::exception const& e) {
-            HPX_TEST(true);
             what_msg = e.what();
+            caught_exception = true;
+        }
+        catch (...) {
+            HPX_TEST(false);
         }
 
+        HPX_TEST(caught_exception);
         HPX_TEST_EQ(what_msg, error_msg);
         HPX_TEST(!data_cb_called);
         HPX_TEST(error_cb_called);

@@ -70,11 +70,11 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 detail::pack_c<std::size_t, Is...>
-              , naming::id_type const& contgid
+              , naming::id_type const& cont
               , BoundArgs& bound_args, UnboundArgs&& unbound_args
             )
             {
-                return hpx::apply_c<Action>(contgid, bind_eval<Action>(
+                return hpx::apply_c<Action>(cont, bind_eval<Action>(
                     util::get<Is>(bound_args),
                     std::forward<UnboundArgs>(unbound_args))...);
             }
@@ -83,15 +83,52 @@ namespace hpx { namespace util
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         BOOST_FORCEINLINE
         bool
-        bind_action_apply_cont(naming::id_type const& contgid,
+        bind_action_apply_cont(naming::id_type const& cont,
             BoundArgs& bound_args, UnboundArgs&& unbound_args
         )
         {
-            return bind_action_apply_cont_impl<Action, BoundArgs, UnboundArgs>::call(
-                typename detail::make_index_pack<
-                    util::tuple_size<BoundArgs>::value
-                >::type(), contgid,
-                bound_args, std::forward<UnboundArgs>(unbound_args));
+            return bind_action_apply_cont_impl<
+                    Action, BoundArgs, UnboundArgs
+                >::call(
+                    typename detail::make_index_pack<
+                        util::tuple_size<BoundArgs>::value
+                    >::type(), cont,
+                    bound_args, std::forward<UnboundArgs>(unbound_args));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl2
+        {
+            typedef bool type;
+
+            template <std::size_t ...Is>
+            static BOOST_FORCEINLINE
+            type call(
+                detail::pack_c<std::size_t, Is...>
+              , hpx::actions::continuation_type const& cont
+              , BoundArgs& bound_args, UnboundArgs&& unbound_args
+            )
+            {
+                return hpx::apply<Action>(cont, bind_eval<Action>(
+                    util::get<Is>(bound_args),
+                    std::forward<UnboundArgs>(unbound_args))...);
+            }
+        };
+
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        BOOST_FORCEINLINE
+        bool
+        bind_action_apply_cont2(hpx::actions::continuation_type const& cont,
+            BoundArgs& bound_args, UnboundArgs&& unbound_args)
+        {
+            return bind_action_apply_cont_impl2<
+                    Action, BoundArgs, UnboundArgs
+                >::call(
+                    typename detail::make_index_pack<
+                        util::tuple_size<BoundArgs>::value
+                    >::type(), cont,
+                    bound_args, std::forward<UnboundArgs>(unbound_args));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -188,6 +225,15 @@ namespace hpx { namespace util
             apply_c(naming::id_type const& contgid, Us&&... us) const
             {
                 return detail::bind_action_apply_cont<Action>(contgid,
+                    _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
+            }
+
+            template <typename ...Us>
+            BOOST_FORCEINLINE
+            bool
+            apply_c(actions::continuation_type const& cont, Us&&... us) const
+            {
+                return detail::bind_action_apply_cont2<Action>(cont,
                     _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
             }
 

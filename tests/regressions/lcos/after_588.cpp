@@ -50,7 +50,7 @@ struct test
 };
 
 typedef hpx::components::managed_component<test> test_component;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(test_component);
+HPX_REGISTER_COMPONENT(test_component);
 
 HPX_REGISTER_ACTION(test::pong_action, test_pong_action);
 HPX_REGISTER_ACTION(test::ping_action, test_ping_action);

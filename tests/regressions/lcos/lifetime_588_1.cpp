@@ -33,10 +33,9 @@ struct foo
     HPX_DEFINE_COMPONENT_ACTION(foo, bar, bar_action);
 };
 
-HPX_REGISTER_ACTION_DECLARATION(foo::bar_action, foo_bar_action);
 HPX_REGISTER_ACTION(foo::bar_action, foo_bar_action);
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(hpx::components::simple_component<foo>, foo);
+HPX_REGISTER_COMPONENT(hpx::components::simple_component<foo>, foo);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

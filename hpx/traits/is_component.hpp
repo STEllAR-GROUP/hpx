@@ -17,7 +17,8 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable>
-    struct is_component : boost::mpl::false_
+    struct is_component
+      : boost::mpl::false_
     {};
 
     template <typename Component>
@@ -71,6 +72,22 @@ namespace hpx { namespace traits
     template <>
     struct is_component<components::server::memory_block>
       : boost::mpl::true_
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable>
+    struct is_component_or_component_array
+      : is_component<T>
+    {};
+
+    template <typename T>
+    struct is_component_or_component_array<T[]>
+      : is_component<T>
+    {};
+
+    template <typename T, std::size_t N>
+    struct is_component_or_component_array<T[N]>
+      : is_component<T>
     {};
 }}
 

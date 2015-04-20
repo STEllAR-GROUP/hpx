@@ -1085,7 +1085,7 @@ system and application performance.
         [The type of the component. This is the string which has been used
          while registering the component with __hpx__, e.g. which has been
          passed as the second parameter to the macro
-         [macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`].
+         [macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`].
         ]
         [Returns the overall number of currently active components of the
          specified type on the given locality.]

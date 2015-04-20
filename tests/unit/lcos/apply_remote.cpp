@@ -53,7 +53,7 @@ struct increment_server
 };
 
 typedef hpx::components::managed_component<increment_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, increment_server);
+HPX_REGISTER_COMPONENT(server_type, increment_server);
 
 typedef increment_server::call_action call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action);

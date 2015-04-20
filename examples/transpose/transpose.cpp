@@ -161,10 +161,10 @@ struct block
 // The macros below are necessary to generate the code required for exposing
 // our partition type remotely.
 //
-// HPX_REGISTER_MINIMAL_COMPONENT_FACTORY() exposes the component creation
+// HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::simple_component<block_component> block_component_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(block_component_type, block_component);
+HPX_REGISTER_COMPONENT(block_component_type, block_component);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.

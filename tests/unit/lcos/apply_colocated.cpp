@@ -50,7 +50,7 @@ struct increment_server
 };
 
 typedef hpx::components::managed_component<increment_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, increment_server);
+HPX_REGISTER_COMPONENT(server_type, increment_server);
 
 typedef increment_server::call_action call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action);
@@ -80,7 +80,7 @@ int hpx_main()
 
     {
         increment_action inc;
-        hpx::apply_colocated(inc, there, here, 1);
+        hpx::apply(inc, hpx::colocated(there), here, 1);
     }
 
     {
@@ -89,7 +89,7 @@ int hpx_main()
         hpx::id_type where = inc_f.get();
 
         increment_action inc;
-        hpx::apply_colocated(inc, where, here, 1);
+        hpx::apply(inc, hpx::colocated(where), here, 1);
     }
 
     {
@@ -97,7 +97,7 @@ int hpx_main()
             hpx::components::new_<increment_server>(there);
         hpx::id_type where = inc_f.get();
 
-        hpx::apply_colocated<increment_action>(where, here, 1);
+        hpx::apply<increment_action>(hpx::colocated(where), here, 1);
     }
 
     // register function which will verify final result

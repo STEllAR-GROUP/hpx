@@ -89,8 +89,8 @@ namespace hpx
             "HPX - High Performance ParalleX\n"
             "A general purpose parallel C++ runtime system for distributed applications\n"
             "of any scale.\n\n"
-            "Copyright (c) 2007-2014 The STE||AR Group, Louisiana State University,\n"
-            "http://stellar.cct.lsu.edu, email:hpx-users@stellar.cct.lsu.edu\n\n"
+            "Copyright (c) 2007-2015, The STE||AR Group,\n"
+            "http://stellar-group.org, email:hpx-users@stellar.cct.lsu.edu\n\n"
             "Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
             "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n";
         return copyright;
@@ -232,6 +232,9 @@ namespace hpx
         strm << "  HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE="
              << HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE << "\n";
 #endif
+#if defined(HPX_MALLOC)
+        strm << "  HPX_MALLOC=" << HPX_MALLOC << "\n";
+#endif
 
         strm << "  HPX_PREFIX (configured)=" << util::hpx_prefix() << "\n";
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__) && !defined(__MIC)
@@ -244,7 +247,7 @@ namespace hpx
     std::string build_string()
     {
         return boost::str(
-            boost::format("V%d.%d.%d%s (AGAS: V%d.%d), Git: %s") % //-V609
+            boost::format("V%d.%d.%d%s (AGAS: V%d.%d), Git: %.10s") % //-V609
                 HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
                 HPX_VERSION_SUBMINOR % HPX_VERSION_TAG %
                 (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10) %
@@ -266,6 +269,13 @@ namespace hpx
         return boost::str(boost::format("V%d.%d.%d") %
             (HWLOC_API_VERSION / 0x10000) % (HWLOC_API_VERSION / 0x100 % 0x100) %
             (HWLOC_API_VERSION % 0x100));
+    }
+#endif
+
+#if defined(HPX_MALLOC)
+    std::string malloc_version()
+    {
+        return HPX_MALLOC;
     }
 #endif
 
@@ -302,9 +312,9 @@ namespace hpx
             "  Date: %s\n"
             "  Platform: %s\n"
             "  Compiler: %s\n"
-            "  Standard Library: %s");
+            "  Standard Library: %s\n");
 
-        return boost::str(logo %
+        std::string version = boost::str(logo %
             build_string() %
             boost_version() %
 #if defined(HPX_HAVE_HWLOC)
@@ -318,6 +328,12 @@ namespace hpx
             boost_platform() %
             boost_compiler() %
             boost_stdlib());
+
+#if defined(HPX_MALLOC)
+            version += "  Allocator: " + malloc_version() + "\n";
+#endif
+
+            return version;
     }
 
     std::string build_type()

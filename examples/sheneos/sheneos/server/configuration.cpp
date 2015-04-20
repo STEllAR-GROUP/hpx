@@ -56,7 +56,7 @@ HPX_REGISTER_ACTION(configuration_type::init_action,
 HPX_REGISTER_ACTION(configuration_type::get_action,
     sheneos_configuration_get_action);
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::simple_component<configuration_type>,
     sheneos_configuration_type);
 
