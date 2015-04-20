@@ -6,7 +6,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 

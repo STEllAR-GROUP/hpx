@@ -113,53 +113,6 @@ namespace hpx { namespace actions
             return util::type_id<Continuation>::typeid_.type_id();
         }
 #endif
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Continuation>
-        struct continuation_registration
-        {
-            static boost::shared_ptr<continuation> create()
-            {
-                return boost::shared_ptr<continuation>(new Continuation());
-            }
-
-            continuation_registration()
-            {
-                util::polymorphic_factory<continuation>::get_instance().
-                    add_factory_function(
-                        detail::get_continuation_name<Continuation>()
-                      , &continuation_registration::create
-                    );
-            }
-        };
-
-        template <typename Continuation, typename Enable =
-            typename traits::needs_automatic_registration<Continuation>::type>
-        struct automatic_continuation_registration
-        {
-            automatic_continuation_registration()
-            {
-                continuation_registration<Continuation> auto_register;
-            }
-
-            automatic_continuation_registration & register_continuation()
-            {
-                return *this;
-            }
-        };
-
-        template <typename Continuation>
-        struct automatic_continuation_registration<Continuation, boost::mpl::false_>
-        {
-            automatic_continuation_registration()
-            {
-            }
-
-            automatic_continuation_registration & register_continuation()
-            {
-                return *this;
-            }
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
