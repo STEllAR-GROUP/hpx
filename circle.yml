@@ -27,6 +27,13 @@ dependencies:
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance
+        # TODO replace this line with "docker build" once docker managed to
+        # introduce temporal file copies that don't show in the resulting image
+        # size.
+        # The problem is the "ADD/COPY" and "RUN rm" in Dockerfile. Those count
+        # as seperate steps and keep the temporal files stored as part of the
+        # image, expanding it by about 500 MB.
+        # docker-compile.pl is a dirty workaround, and shall be removed ASAP.
         - ./tools/docker/docker-compile.pl ${TARGET_IMAGE_NAME}
 
 test:
