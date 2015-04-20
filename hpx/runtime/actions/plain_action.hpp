@@ -34,7 +34,21 @@ namespace hpx { namespace actions
     namespace detail
     {
         struct plain_function
-        {};
+        {
+            template <typename F>
+            static threads::thread_function_type
+            decorate_action(naming::address_type, F && f)
+            {
+                return std::forward<F>(f);
+            }
+
+            static void schedule_thread(naming::address_type,
+                threads::thread_init_data& data,
+                threads::thread_state_enum initial_state)
+            {
+                hpx::threads::register_work_plain(data, initial_state); //-V106
+            }
+        };
     }
     /// \cond NOINTERNAL
 
@@ -78,29 +92,6 @@ namespace hpx { namespace actions
 }}
 
 namespace hpx { namespace traits {
-
-    template <typename Action>
-    struct action_schedule_thread<Action, typename Action::is_plain_action>
-    {
-        static void
-        call(naming::address::address_type /*lva*/, threads::thread_init_data& data,
-            threads::thread_state_enum initial_state)
-        {
-            hpx::threads::register_work_plain(data, initial_state); //-V106
-        }
-    };
-
-    template <typename Action>
-    struct action_decorate_function<Action, typename Action::is_plain_action>
-    {
-        template <typename F>
-        static threads::thread_function_type
-        call(naming::address_type /*lva*/, F && f)
-        {
-            // by default we forward this to the component type
-            return std::forward<F>(f);
-        }
-    };
 
     template <> HPX_ALWAYS_EXPORT
     inline components::component_type

@@ -435,13 +435,6 @@ namespace hpx { namespace actions
         }                                                                     \
     }}}                                                                       \
 /**/
-#define HPX_DEFINE_ACTION_REGISTRATION(action, actionname)                    \
-    static ::hpx::serialization::detail::register_class_name<                 \
-        hpx::actions::transfer_action<action>                                 \
-    > const BOOST_PP_CAT(actionname, _action_factory_registration) =          \
-            ::hpx::serialization::detail::register_class_name<                \
-                hpx::actions::transfer_action<action>                         \
-            >();                                                              \
 
 #define HPX_REGISTER_ACTION_(...)                                             \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
