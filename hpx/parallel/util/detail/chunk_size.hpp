@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         // run the benchmark iterations
         std::vector<Future> bench_futures(cores);
         boost::uint64_t t = hpx::util::high_resolution_clock::now();
-        for(int i = 0; i < cores; i++){
+        for(std::size_t i = 0; i < cores; i++){
             bench_futures[i] = std::move(hpx::async(f1, first, test_chunk_size));
             // mark benchmarked items as processed
             std::advance(first, test_chunk_size);
@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         hpx::wait_any(bench_futures); 
         t = (hpx::util::high_resolution_clock::now() - t);
         
-        for(int i = 0; i < cores; i++){
+        for(std::size_t i = 0; i < cores; i++){
             workitems.push_back(std::move(bench_futures[i]));
         }
 
@@ -164,7 +164,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         // run the benchmark iterations
         std::vector<Future> bench_futures(cores);
         boost::uint64_t t = hpx::util::high_resolution_clock::now();
-        for(int i = 0; i < cores; i++){
+        for(std::size_t i = 0; i < cores; i++){
             bench_futures[i] = std::move(hpx::async(f1, base_idx,
                                                     first, test_chunk_size));
             // mark benchmarked items as processed
@@ -175,7 +175,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         hpx::wait_any(bench_futures); 
         t = (hpx::util::high_resolution_clock::now() - t);
         
-        for(int i = 0; i < cores; i++){
+        for(std::size_t i = 0; i < cores; i++){
             workitems.push_back(std::move(bench_futures[i]));
         }
 
