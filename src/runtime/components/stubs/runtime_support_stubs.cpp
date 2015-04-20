@@ -7,7 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/applier/apply_colocated.hpp>
+#include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -255,7 +255,8 @@ namespace hpx { namespace components { namespace stubs
     {
         typedef server::runtime_support::update_agas_cache_entry_action
             action_type;
-        hpx::apply_colocated<action_type>(targetgid, gid, g, count, offset);
+        hpx::detail::apply_colocated<action_type>(
+            targetgid, gid, g, count, offset);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -342,8 +343,8 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(targetgid, type);
     }
 
-    boost::int32_t runtime_support::get_instance_count(naming::id_type const& targetgid,
-        components::component_type type)
+    boost::int32_t runtime_support::get_instance_count(
+        naming::id_type const& targetgid, components::component_type type)
     {
         // The following get yields control while the action above
         // is executed and the result is returned to the future

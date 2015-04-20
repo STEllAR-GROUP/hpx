@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
-#include <hpx/lcos/async_colocated.hpp>
+#include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -113,7 +113,7 @@ namespace hpx
         }
         lcos::local::futures_factory<result_type()> p(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...));
-        if (detail::has_async_policy(policy))
+        if (hpx::detail::has_async_policy(policy))
         {
             p.apply(policy);
             if (policy == launch::fork)

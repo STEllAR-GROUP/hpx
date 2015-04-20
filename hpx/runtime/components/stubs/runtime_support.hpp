@@ -11,9 +11,10 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
-#include <hpx/runtime/applier/apply_colocated.hpp>
+#include <hpx/runtime/applier/register_apply_colocated.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
@@ -73,7 +74,7 @@ namespace hpx { namespace components { namespace stubs
                 Component, typename hpx::util::decay<Ts>::type...
             > action_type;
 
-            return hpx::async_colocated<action_type>(gid, count,
+            return hpx::detail::async_colocated<action_type>(gid, count,
                 std::forward<Ts>(vs)...);
         }
 
@@ -133,7 +134,7 @@ namespace hpx { namespace components { namespace stubs
             typedef server::create_component_action<
                 Component, typename hpx::util::decay<Ts>::type...
             > action_type;
-            return hpx::async_colocated<action_type>(gid,
+            return hpx::detail::async_colocated<action_type>(gid,
                 std::forward<Ts>(vs)...);
         }
 

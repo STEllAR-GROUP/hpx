@@ -80,6 +80,7 @@ namespace hpx { namespace lcos
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/assert.hpp>
@@ -345,7 +346,7 @@ namespace hpx { namespace lcos
 
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
+                        hpx::detail::async_colocated<reduce_impl_action>(
                             id
                           , act
                           , std::move(ids_next)
@@ -397,7 +398,7 @@ namespace hpx { namespace lcos
         }
 
         return
-            hpx::async_colocated<reduce_impl_action>(
+            hpx::detail::async_colocated<reduce_impl_action>(
                 ids[0]
               , Action()
               , ids

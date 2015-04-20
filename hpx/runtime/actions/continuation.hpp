@@ -20,6 +20,9 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#ifndef BOOST_MSVC
+#include <boost/utility/enable_if.hpp>
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -34,6 +37,14 @@ namespace hpx
     apply(hpx::actions::basic_action<Component, Signature, Derived>,
         naming::id_type const&, Ts&&... vs);
 
+    template <typename Component, typename Signature, typename Derived,
+        typename ...Ts>
+    inline bool
+    apply(hpx::actions::continuation_type const& c,
+        hpx::actions::basic_action<Component, Signature, Derived>,
+        naming::id_type const& contgid, naming::id_type const& gid,
+        Ts&&... vs);
+
     // MSVC complains about ambiguities if it sees this forward declaration
 #ifndef BOOST_MSVC
     template <typename F, typename ...Ts>
@@ -45,6 +56,7 @@ namespace hpx
       , bool
     >::type
     apply(F&& f, Ts&&... vs);
+#endif
 
     template <
         typename Component, typename Signature, typename Derived,
@@ -52,7 +64,6 @@ namespace hpx
     bool apply_continue(
         hpx::actions::basic_action<Component, Signature, Derived>,
         Cont&& cont, naming::id_type const& gid, Ts&&... vs);
-#endif
 
     template <typename Component, typename Signature, typename Derived,
         typename ...Ts>
@@ -377,7 +388,6 @@ namespace hpx { namespace actions
     template <typename Result>
     struct typed_continuation : continuation
     {
-
         typed_continuation()
         {}
 
@@ -390,14 +400,12 @@ namespace hpx { namespace actions
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type const& gid,
-                F && f)
+        explicit typed_continuation(naming::id_type const& gid, F && f)
           : continuation(gid), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type && gid,
-                F && f)
+        explicit typed_continuation(naming::id_type && gid, F && f)
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
@@ -416,6 +424,7 @@ namespace hpx { namespace actions
             LLCO_(info)
                 << "typed_continuation<Result>::trigger_value("
                 << this->get_gid() << ")";
+
             if (f_.empty()) {
                 if (!this->get_gid()) {
                     HPX_THROW_EXCEPTION(invalid_status,
@@ -470,7 +479,9 @@ namespace hpx { namespace actions
     template <typename Result>
     struct init_registration<typed_continuation<Result> >
     {
-        static detail::automatic_continuation_registration<typed_continuation<Result> > g;
+        static detail::automatic_continuation_registration<
+                typed_continuation<Result>
+            > g;
     };
 }}
 
@@ -479,7 +490,7 @@ namespace hpx { namespace traits
     template <>
     struct needs_automatic_registration<
             hpx::actions::typed_continuation<void> >
-        : boost::mpl::false_
+      : boost::mpl::false_
     {};
 }}
 
@@ -501,14 +512,12 @@ namespace hpx { namespace actions
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type const& gid,
-                F && f)
+        explicit typed_continuation(naming::id_type const& gid, F && f)
           : continuation(gid), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type && gid,
-                F && f)
+        explicit typed_continuation(naming::id_type && gid, F && f)
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
@@ -527,6 +536,7 @@ namespace hpx { namespace actions
             LLCO_(info)
                 << "typed_continuation<void>::trigger("
                 << this->get_gid() << ")";
+
             if (f_.empty()) {
                 if (!this->get_gid()) {
                     HPX_THROW_EXCEPTION(invalid_status,

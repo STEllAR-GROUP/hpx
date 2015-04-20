@@ -10,9 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/traits/component_type_is_compatible.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/move.hpp>
@@ -53,12 +57,6 @@ namespace hpx { namespace components
         default_distribution_policy operator()(
             std::vector<id_type> const& locs) const
         {
-#if defined(HPX_DEBUG)
-            for (id_type const& loc: locs)
-            {
-                HPX_ASSERT(naming::is_locality(loc));
-            }
-#endif
             return default_distribution_policy(locs);
         }
 
@@ -69,7 +67,6 @@ namespace hpx { namespace components
         ///                 represent
         default_distribution_policy operator()(id_type const& loc) const
         {
-            HPX_ASSERT(naming::is_locality(loc));
             return default_distribution_policy(loc);
         }
 
@@ -78,6 +75,9 @@ namespace hpx { namespace components
         ///
         /// \param vs  [in] The arguments which will be forwarded to the
         ///            constructor of the new object.
+        ///
+        /// \note This function is part of the placement policy implemented by
+        ///       this class
         ///
         /// \returns A future holding the global address which represents
         ///          the newly created object
@@ -108,6 +108,9 @@ namespace hpx { namespace components
         /// \param count [in] The number of objects to create
         /// \param vs   [in] The arguments which will be forwarded to the
         ///             constructors of the new objects.
+        ///
+        /// \note This function is part of the placement policy implemented by
+        ///       this class
         ///
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
@@ -156,22 +159,63 @@ namespace hpx { namespace components
                 std::move(objs));
         }
 
+        /// \note This function is part of the invocation policy implemented by
+        ///       this class
+        ///
+        template <typename Action, typename ...Ts>
+        hpx::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::remote_result_type
+            >::type>
+        async(BOOST_SCOPED_ENUM(launch) policy, Ts&&... vs) const
+        {
+            return hpx::detail::async_impl<Action>(policy,
+                localities_.empty() ? hpx::find_here() : localities_.front(),
+                std::forward<Ts>(vs)...);
+        }
+
+        /// \note This function is part of the invocation policy implemented by
+        ///       this class
+        ///
+        template <typename Action, typename Callback, typename ...Ts>
+        hpx::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::remote_result_type
+            >::type>
+        async_cb(BOOST_SCOPED_ENUM(launch) policy, Callback&& cb, Ts&&... vs) const
+        {
+            return hpx::detail::async_cb_impl<Action>(policy,
+                localities_.empty() ? hpx::find_here() : localities_.front(),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        }
+
+        /// \note This function is part of the invocation policy implemented by
+        ///       this class
+        ///
+        template <typename Action, typename ...Ts>
+        bool apply(actions::continuation_type const& c,
+            threads::thread_priority priority, Ts&&... vs) const
+        {
+            return hpx::detail::apply_impl<Action>(c,
+                localities_.empty() ? hpx::find_here() : localities_.front(),
+                priority, std::forward<Ts>(vs)...);
+        }
+
+        /// \note This function is part of the invocation policy implemented by
+        ///       this class
+        ///
+        template <typename Action, typename Callback, typename ...Ts>
+        bool apply_cb(actions::continuation_type const& c,
+            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
+        {
+            return hpx::detail::apply_cb_impl<Action>(c,
+                localities_.empty() ? hpx::find_here() : localities_.front(),
+                priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        }
+
         /// \cond NOINTERNAL
-        // Return the number of items to place on the given locality.
-        //
-        // \param items    [in] The overall number of items to create based on
-        //                 the given \a distribution_policy.
-        // \param loc      [in] The locality for which the function will
-        //                 return how many items to create.
-        //
-        // \note This function will calculate the number of items to be
-        //       created on the given locality. A \a distribution_policy will
-        //       evenly distribute the overall number of items over the given
-        //       localities it represents.
-        //
-        // \returns The number of items to be created on the given locality
-        //          \a loc.
-        //
+        // FIXME: this can be made protected once the vector<>::create()
+        //        functions have been adapted
         std::size_t
         get_num_items(std::size_t items, hpx::id_type const& loc) const
         {

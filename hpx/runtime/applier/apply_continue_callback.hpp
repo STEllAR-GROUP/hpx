@@ -24,8 +24,9 @@ namespace hpx
         typedef typename action_type::result_type result_type;
 
         return apply_cb<Action>(
-            new hpx::actions::typed_continuation<result_type>(
-                std::forward<Cont>(cont)),
+            boost::make_shared<
+                hpx::actions::typed_continuation<result_type>
+            >(std::forward<Cont>(cont)),
             gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
@@ -48,8 +49,9 @@ namespace hpx
         typedef typename action_type::result_type result_type;
 
         return apply_cb<Action>(
-            new hpx::actions::typed_continuation<result_type>(
-                cont, make_continuation()),
+            boost::make_shared<
+                hpx::actions::typed_continuation<result_type>
+            >(cont, make_continuation()),
             gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
