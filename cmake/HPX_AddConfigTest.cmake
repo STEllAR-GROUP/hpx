@@ -254,6 +254,13 @@ macro(hpx_check_for_cxx11_std_chrono)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_std_is_bind_expression)
+  add_hpx_config_test(HPX_WITH_CXX11_IS_BIND_EXPRESSION
+    SOURCE cmake/tests/cxx11_std_is_bind_expression.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_is_final)
   add_hpx_config_test(HPX_WITH_CXX11_IS_FINAL
     SOURCE cmake/tests/cxx11_std_is_final.cpp
@@ -264,6 +271,13 @@ endmacro()
 macro(hpx_check_for_cxx11_std_is_null_pointer)
   add_hpx_config_test(HPX_WITH_CXX11_IS_NULL_POINTER
     SOURCE cmake/tests/cxx11_std_is_null_pointer.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_is_placeholder)
+  add_hpx_config_test(HPX_WITH_CXX11_IS_PLACEHOLDER
+    SOURCE cmake/tests/cxx11_std_is_placeholder.cpp
     FILE ${ARGN})
 endmacro()
 

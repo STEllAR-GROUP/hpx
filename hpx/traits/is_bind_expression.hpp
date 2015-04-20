@@ -1,28 +1,28 @@
-//  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_IS_BIND_EXPRESSION_AUG_28_2013_0603PM)
-#define HPX_TRAITS_IS_BIND_EXPRESSION_AUG_28_2013_0603PM
+#ifndef HPX_TRAITS_IS_BIND_EXPRESSION_HPP
+#define HPX_TRAITS_IS_BIND_EXPRESSION_HPP
 
 #include <hpx/config.hpp>
 
-#include <boost/mpl/bool.hpp>
+#include <boost/type_traits/integral_constant.hpp>
 
-#ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
-#   include <functional>
+#ifdef HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION
+#include <functional>
 #endif
 
 namespace hpx { namespace traits
 {
     template <typename T>
     struct is_bind_expression
-#   ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
+#ifdef HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION
       : std::is_bind_expression<T>
-#   else
-      : boost::mpl::false_
-#   endif
+#else
+      : boost::false_type
+#endif
     {};
 }}
 
