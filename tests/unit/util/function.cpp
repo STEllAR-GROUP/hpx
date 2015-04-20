@@ -8,7 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/serialization/access.hpp>
+#include <hpx/runtime/serialization/access.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -24,7 +24,7 @@ struct small_object
   private:
     boost::uint64_t x_;
 
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template <
         typename Archive
@@ -91,7 +91,7 @@ struct big_object
     boost::uint64_t x_;
     boost::uint64_t y_;
 
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template <
         typename Archive

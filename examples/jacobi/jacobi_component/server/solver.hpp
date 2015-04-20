@@ -12,7 +12,6 @@
 #include "stencil_iterator.hpp"
 
 #include <hpx/include/components.hpp>
-#include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
@@ -60,22 +59,14 @@ namespace jacobi
             {
                 stencil_iterators.reserve(ny);
 
-                hpx::components::distributing_factory factory =
-                    hpx::components::distributing_factory::create(hpx::find_here());
-
-                // make get the type of the solver component
-                hpx::components::component_type
-                    type = hpx::components::get_component_type<
-                        server::stencil_iterator
-                    >();
-
-                hpx::components::distributing_factory::result_type si_allocated =
-                    factory.create_components(type, ny);
+                std::vector<hpx::id_type> ids =
+                    hpx::new_<server::stencil_iterator[]>(
+                        hpx::default_layout(hpx::find_all_localities()), ny).get();
 
                 std::vector<hpx::lcos::shared_future<void> > init_futures;
                 init_futures.reserve(ny);
                 std::size_t y = 0;
-                BOOST_FOREACH(hpx::naming::id_type id, hpx::util::locality_results(si_allocated))
+                for (hpx::naming::id_type const& id : ids)
                 {
                     //std::cout << y << " " << id << "\n";
                     jacobi::stencil_iterator r; r.id = id;

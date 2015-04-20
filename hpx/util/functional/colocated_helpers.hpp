@@ -9,6 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -62,6 +64,12 @@ namespace hpx { namespace util { namespace functional
               : bound_(std::move(bound))
             {}
 
+            explicit apply_continuation_impl(
+                    Bound && bound, actions::continuation_type const& c)
+              : bound_(std::move(bound)),
+                cont_(c)
+            {}
+
             template <typename T>
             typename util::result_of<bound_type(naming::id_type, T)>::type
             operator()(naming::id_type lco, T && t) const
@@ -70,21 +78,52 @@ namespace hpx { namespace util { namespace functional
                     bound_type(naming::id_type, T)
                 >::type result_type;
 
-                bound_.apply(lco, std::forward<T>(t));
+                if (cont_)
+                    bound_.apply_c(cont_, lco, std::forward<T>(t));
+                else
+                    bound_.apply(lco, std::forward<T>(t));
                 return result_type();
             }
 
         private:
             // serialization support
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
-            BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
+            BOOST_FORCEINLINE void save(Archive& ar, unsigned int const) const
             {
-                ar & bound_;
+                bool has_continuation = cont_ ? true : false;
+                ar & bound_ & has_continuation;
+                if (has_continuation)
+                {
+                    std::string continuation_name =
+                        cont_->get_continuation_name();
+                    ar << continuation_name;
+
+                    cont_->save(ar);
+                }
             }
 
+            template <typename Archive>
+            BOOST_FORCEINLINE void load(Archive& ar, unsigned int const)
+            {
+                bool has_continuation = cont_ ? true : false;
+                ar & bound_ & has_continuation;
+                if (has_continuation)
+                {
+                    std::string continuation_name;
+                    ar >> continuation_name;
+
+                    cont_ = util::polymorphic_factory<
+                        actions::continuation>::create(continuation_name);
+                    cont_->load(ar);
+                }
+            }
+
+            HPX_SERIALIZATION_SPLIT_MEMBER();
+
             bound_type bound_;
+            actions::continuation_type cont_;
         };
     }
 
@@ -94,6 +133,14 @@ namespace hpx { namespace util { namespace functional
     {
         return functional::detail::apply_continuation_impl<
             typename util::decay<Bound>::type>(std::forward<Bound>(bound));
+    }
+
+    template <typename Bound>
+    functional::detail::apply_continuation_impl<typename util::decay<Bound>::type>
+    apply_continuation(Bound && bound, actions::continuation_type const& c)
+    {
+        return functional::detail::apply_continuation_impl<
+            typename util::decay<Bound>::type>(std::forward<Bound>(bound), c);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -118,6 +165,12 @@ namespace hpx { namespace util { namespace functional
               : bound_(std::move(bound))
             {}
 
+            explicit async_continuation_impl(
+                    Bound && bound, actions::continuation_type const& c)
+              : bound_(std::move(bound)),
+                cont_(c)
+            {}
+
             template <typename T>
             typename util::result_of<bound_type(naming::id_type, T)>::type
             operator()(naming::id_type lco, T && t) const
@@ -126,21 +179,52 @@ namespace hpx { namespace util { namespace functional
                     bound_type(naming::id_type, T)
                 >::type result_type;
 
-                bound_.apply_c(lco, lco, std::forward<T>(t));
+                if (cont_)
+                    bound_.apply_c(cont_, lco, std::forward<T>(t));
+                else
+                    bound_.apply_c(lco, lco, std::forward<T>(t));
                 return result_type();
             }
 
         private:
             // serialization support
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
-            BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
+            BOOST_FORCEINLINE void save(Archive& ar, unsigned int const) const
             {
-                ar & bound_;
+                bool has_continuation = cont_ ? true : false;
+                ar & bound_ & has_continuation;
+                if (has_continuation)
+                {
+                    std::string continuation_name =
+                        cont_->get_continuation_name();
+                    ar << continuation_name;
+
+                    cont_->save(ar);
+                }
             }
 
+            template <typename Archive>
+            BOOST_FORCEINLINE void load(Archive& ar, unsigned int const)
+            {
+                bool has_continuation = cont_ ? true : false;
+                ar & bound_ & has_continuation;
+                if (has_continuation)
+                {
+                    std::string continuation_name;
+                    ar >> continuation_name;
+
+                    cont_ = util::polymorphic_factory<
+                        actions::continuation>::create(continuation_name);
+                    cont_->load(ar);
+                }
+            }
+
+            HPX_SERIALIZATION_SPLIT_MEMBER();
+
             bound_type bound_;
+            actions::continuation_type cont_;
         };
     }
 
@@ -150,6 +234,14 @@ namespace hpx { namespace util { namespace functional
     {
         return functional::detail::async_continuation_impl<
             typename util::decay<Bound>::type>(std::forward<Bound>(bound));
+    }
+
+    template <typename Bound>
+    functional::detail::async_continuation_impl<typename util::decay<Bound>::type>
+    async_continuation(Bound && bound, actions::continuation_type const& c)
+    {
+        return functional::detail::async_continuation_impl<
+            typename util::decay<Bound>::type>(std::forward<Bound>(bound), c);
     }
 }}}
 

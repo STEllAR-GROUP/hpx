@@ -7,12 +7,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-
 #include "server/simple_accumulator.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,7 +18,7 @@ typedef hpx::components::simple_component<
     examples::server::simple_accumulator
 > accumulator_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(accumulator_type, simple_accumulator);
+HPX_REGISTER_COMPONENT(accumulator_type, simple_accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for simple_accumulator actions.

@@ -8,7 +8,6 @@
 #include <boost/config.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
-#include <boost/foreach.hpp>
 
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
@@ -174,25 +173,25 @@ namespace hpx {
 #endif
 
         // copy over all startup functions registered so far
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_pre_startup_functions)
+        for (util::function_nonser<void()> const& f : global_pre_startup_functions)
         {
             add_pre_startup_function(f);
         }
         global_pre_startup_functions.clear();
 
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_startup_functions)
+        for (util::function_nonser<void()> const& f : global_startup_functions)
         {
             add_startup_function(f);
         }
         global_startup_functions.clear();
 
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_pre_shutdown_functions)
+        for (util::function_nonser<void()> const& f : global_pre_shutdown_functions)
         {
             add_pre_shutdown_function(f);
         }
         global_pre_shutdown_functions.clear();
 
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_shutdown_functions)
+        for (util::function_nonser<void()> const& f : global_shutdown_functions)
         {
             add_shutdown_function(f);
         }
@@ -602,9 +601,13 @@ namespace hpx {
             threads::mask_cref_type used_processing_units =
                 thread_manager_->get_used_processing_units();
 
-            this->topology_.set_thread_affinity_mask(
-                this->topology_.get_service_affinity_mask(
-                    used_processing_units));
+            // --hpx:bind=none  should disable all affinity definitions
+            if (threads::any(used_processing_units))
+            {
+                this->topology_.set_thread_affinity_mask(
+                    this->topology_.get_service_affinity_mask(
+                        used_processing_units));
+            }
 #endif
         }
     }

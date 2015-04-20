@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -99,19 +99,6 @@ namespace hpx { namespace components
     {
         traits::component_type_database<Component>::set(type);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    enum factory_property
-    {
-        factory_invalid = -1,
-        factory_none = 0,                   ///< The factory has no special properties
-        factory_is_multi_instance = 1,      ///< The factory can be used to
-                                            ///< create more than one component
-                                            ///< at the same time
-        factory_instance_count_is_size = 2  ///< The component count will be
-                                            ///< interpreted as the component
-                                            ///< size instead
-    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

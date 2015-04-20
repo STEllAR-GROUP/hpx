@@ -34,6 +34,7 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
@@ -215,7 +216,7 @@ namespace hpx
             util::security::subordinate_certificate_authority subordinate_certificate_authority_;
 
             // certificate store
-            HPX_STD_UNIQUE_PTR<components::security::certificate_store> cert_store_;
+            std::unique_ptr<components::security::certificate_store> cert_store_;
             components::security::signed_certificate locality_certificate_;
         };
     }
@@ -597,9 +598,9 @@ namespace hpx
             action, pp, num_messages, interval, ec);
     }
 
-    util::binary_filter* runtime::create_binary_filter(
+    serialization::binary_filter* runtime::create_binary_filter(
         char const* binary_filter_type, bool compress,
-        util::binary_filter* next_filter, error_code& ec)
+        serialization::binary_filter* next_filter, error_code& ec)
     {
         return runtime_support_->create_binary_filter(binary_filter_type,
             compress, next_filter, ec);
@@ -1404,8 +1405,8 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Create an instance of a binary filter plugin
-    util::binary_filter* create_binary_filter(char const* binary_filter_type,
-        bool compress, util::binary_filter* next_filter, error_code& ec)
+    serialization::binary_filter* create_binary_filter(char const* binary_filter_type,
+        bool compress, serialization::binary_filter* next_filter, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)

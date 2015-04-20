@@ -437,14 +437,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Enable usage of std::unique_ptr instead of std::auto_ptr
-#if !defined(HPX_HAVE_CXX11_STD_UNIQUE_PTR)
-#  define HPX_STD_UNIQUE_PTR ::std::auto_ptr
-#else
-#  define HPX_STD_UNIQUE_PTR ::std::unique_ptr
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Older Boost versions do not have BOOST_NOEXCEPT defined
 #if !defined(BOOST_NOEXCEPT)
 #  define BOOST_NOEXCEPT

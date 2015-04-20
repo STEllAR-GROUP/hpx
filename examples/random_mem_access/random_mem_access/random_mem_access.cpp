@@ -6,18 +6,12 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-
 #include "server/random_mem_access.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
 HPX_REGISTER_COMPONENT_MODULE();
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::simple_component<hpx::components::server::random_mem_access>,
     random_mem_access);
 

@@ -9,9 +9,4 @@
 template <typename... Elements>
 struct tuple {};
 
-int main()
-{
-   tuple<int, int, int, long, float, tuple<bool> > t;
-   return 0;
-}
-
+int main() {}

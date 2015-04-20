@@ -10,20 +10,13 @@
 #include <hpx/util/static.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
-
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/runtime/serialization/serialize_sequence.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
 
 #include <hpx/util/logging/format/named_write_fwd.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
@@ -62,7 +55,7 @@ namespace hpx { namespace components { namespace server
 
         using boost::fusion::at_c;
 
-        BOOST_FOREACH(message_type const& msg, msgs)
+        for (message_type const& msg : msgs)
         {
             const logging_destination dest = at_c<0>(msg);
             const std::size_t level = at_c<1>(msg);

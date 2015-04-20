@@ -29,7 +29,7 @@ struct hello_world_server : managed_component_base<hello_world_server>
 };
 
 typedef managed_component<hello_world_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, hello_world_server);
+HPX_REGISTER_COMPONENT(server_type, hello_world_server);
 
 typedef hello_world_server::print_action print_action;
 HPX_REGISTER_ACTION_DECLARATION(print_action);

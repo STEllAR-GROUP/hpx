@@ -7,13 +7,6 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-
-#include <boost/serialization/vector.hpp>
 #include "server/allgather.hpp"
 #include "server/allgather_and_gate.hpp"
 
@@ -26,7 +19,7 @@ typedef hpx::components::managed_component<
     ag::server::allgather
 > allgather_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(allgather_type, ag_allgather);
+HPX_REGISTER_COMPONENT(allgather_type, ag_allgather);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(
@@ -50,7 +43,7 @@ typedef hpx::components::managed_component<
     ag::server::allgather_and_gate
 > allgather_and_gate_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(allgather_and_gate_type, ag_allgather_and_gate);
+HPX_REGISTER_COMPONENT(allgather_and_gate_type, ag_allgather_and_gate);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(

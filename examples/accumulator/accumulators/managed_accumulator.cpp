@@ -7,12 +7,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-
 #include "server/managed_accumulator.hpp"
 
 //[managed_accumulator_registration_definitions
@@ -25,7 +19,7 @@ typedef hpx::components::managed_component<
     examples::server::managed_accumulator
 > accumulator_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(accumulator_type, managed_accumulator);
+HPX_REGISTER_COMPONENT(accumulator_type, managed_accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for managed_accumulator actions.

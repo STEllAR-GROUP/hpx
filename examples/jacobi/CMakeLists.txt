@@ -5,8 +5,6 @@
 
 if(HPX_WITH_CXX11_LAMBDAS)
 
-  add_definitions(-DHPX_LIMIT=8)
-
   add_subdirectory(jacobi_component)
 
   set(jacobi_sources
@@ -14,7 +12,7 @@ if(HPX_WITH_CXX11_LAMBDAS)
 
   set(jacobi_FLAGS
       COMPONENT_DEPENDENCIES
-      iostreams jacobi_component distributing_factory)
+      iostreams jacobi_component)
 
   # add jacobi executable
   add_hpx_executable(jacobi

@@ -14,15 +14,6 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
-
-
 namespace hpx { namespace lcos
 {
 }}
@@ -36,3 +27,5 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(std::vector<hpx::naming::gid_type>,
 HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::naming::id_type, id_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE(std::vector<hpx::naming::id_type>,
     vector_id_type)
+
+HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::util::unused_type, unused_type)

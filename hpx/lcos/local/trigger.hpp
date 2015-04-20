@@ -59,7 +59,7 @@ namespace hpx { namespace lcos { namespace local
         {
             bool triggered = false;
             error_code rc(lightweight);
-            BOOST_FOREACH(conditional_trigger* c, conditions_)
+            for (conditional_trigger* c : conditions_)
             {
                 triggered |= c->set(rc);
                 if (rc && (&ec != &throws))

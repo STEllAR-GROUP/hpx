@@ -9,8 +9,6 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/foreach.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 hpx::id_type test_colocation()
 {
@@ -30,10 +28,9 @@ struct test_server
 };
 
 typedef hpx::components::managed_component<test_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
 HPX_REGISTER_ACTION(call_action);
 
 struct test_client
@@ -60,24 +57,24 @@ void test(hpx::id_type there)
     // verify for remote component
     HPX_TEST_EQ(hpx::get_colocation_id_sync(t1.get_gid()), there);
 
-    HPX_TEST_EQ(hpx::async_colocated<test_colocation_action>(
-        t1.get_gid()).get(), there);
+    HPX_TEST_EQ(hpx::async<test_colocation_action>(
+        hpx::colocated(t1.get_gid())).get(), there);
 
     test_colocation_action act;
-    HPX_TEST_EQ(hpx::async_colocated(act, t1.get_gid()).get(), there);
+    HPX_TEST_EQ(hpx::async(act, hpx::colocated(t1.get_gid())).get(), there);
 
     // verify for remote locality
     HPX_TEST_EQ(hpx::get_colocation_id_sync(there), there);
 
-    HPX_TEST_EQ(hpx::async_colocated<test_colocation_action>(
-        there).get(), there);
+    HPX_TEST_EQ(hpx::async<test_colocation_action>(
+        hpx::colocated(there)).get(), there);
 
-    HPX_TEST_EQ(hpx::async_colocated(act, there).get(), there);
+    HPX_TEST_EQ(hpx::async(act, hpx::colocated(there)).get(), there);
 }
 
 int hpx_main()
 {
-    BOOST_FOREACH(hpx::id_type const& id, hpx::find_all_localities())
+    for (hpx::id_type const& id : hpx::find_all_localities())
     {
         test(id);
     }

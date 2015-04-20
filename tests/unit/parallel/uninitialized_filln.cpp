@@ -8,6 +8,8 @@
 #include <hpx/include/parallel_uninitialized_fill.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/range/functions.hpp>
+
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////

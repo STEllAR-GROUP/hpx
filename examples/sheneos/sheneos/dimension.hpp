@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <boost/serialization/serialization.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace sheneos
@@ -33,14 +33,14 @@ namespace sheneos
 
 ///////////////////////////////////////////////////////////////////////////////
 // Non-intrusive serialization support.
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive& ar, sheneos::dimension& dim,
+    serialize(input_archive& ar, sheneos::dimension& dim,
         unsigned int const);
 
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive& ar, sheneos::dimension& dim,
+    serialize(output_archive& ar, sheneos::dimension& dim,
         unsigned int const);
 }}
 

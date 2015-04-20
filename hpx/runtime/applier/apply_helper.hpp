@@ -74,11 +74,12 @@ namespace hpx { namespace applier { namespace detail
 
         template <typename ...Ts>
         static void
-        call (actions::continuation_type& c, naming::id_type const& target,
+        call (actions::continuation_type const& cont, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_priority priority,
             Ts&&... vs)
         {
             // first decorate the continuation
+            actions::continuation_type c(cont);
             traits::action_decorate_continuation<Action>::call(c);
 
             // now, schedule the thread
@@ -116,7 +117,7 @@ namespace hpx { namespace applier { namespace detail
 
         template <typename ...Ts>
         static void
-        call (actions::continuation_type& c, naming::id_type const& target,
+        call (actions::continuation_type const& c, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_priority,
             Ts&&... vs)
         {

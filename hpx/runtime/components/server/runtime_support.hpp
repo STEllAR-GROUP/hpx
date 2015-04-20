@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Thomas Heller
 //
@@ -135,10 +135,6 @@ namespace hpx { namespace components { namespace server
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// \brief Action to figure out, whether we can create more than one
-        ///        instance at once
-        int factory_properties(components::component_type type);
-
         /// \brief Action to create N new default constructed components
         std::vector<naming::gid_type> bulk_create_components(
             components::component_type type, std::size_t count);
@@ -233,7 +229,6 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, factory_properties);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, bulk_create_components);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_memory_block);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components);
@@ -339,9 +334,9 @@ namespace hpx { namespace components { namespace server
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,
             std::size_t interval, error_code& ec);
-        util::binary_filter* create_binary_filter(
+        serialization::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
-            util::binary_filter* next_filter, error_code& ec);
+            serialization::binary_filter* next_filter, error_code& ec);
 
         // notify of message being sent
         void dijkstra_make_black();
@@ -590,7 +585,7 @@ namespace hpx { namespace components { namespace server
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
 
-        return std::move(ids);
+        return ids;
     }
 
     template <typename Component, typename T, typename ...Ts>
@@ -646,7 +641,7 @@ namespace hpx { namespace components { namespace server
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
 
-        return std::move(ids);
+        return ids;
     }
 
     template <typename Component>
@@ -783,9 +778,6 @@ namespace hpx { namespace components { namespace server
 
 #include <hpx/config/warnings_suffix.hpp>
 
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::runtime_support::factory_properties_action,
-    factory_properties_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::bulk_create_components_action,
     bulk_create_components_action)

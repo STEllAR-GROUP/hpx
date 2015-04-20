@@ -10,9 +10,9 @@ set(tests
     bind_action
     function
     parse_slurm_nodelist
-    serialize_buffer
+    stencil3_iterator
+    transform_iterator
     tuple
-    zero_copy_serialization
    )
 
 if(HPX_WITH_CXX11_STD_INITIALIZER_LIST)

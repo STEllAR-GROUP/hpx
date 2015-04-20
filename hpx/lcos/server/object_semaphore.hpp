@@ -18,6 +18,8 @@
 #include <hpx/runtime/applier/trigger.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
+#include <memory>
+
 namespace hpx { namespace lcos { namespace server
 {
 
@@ -128,7 +130,7 @@ struct object_semaphore
     void signal(ValueType const& val, boost::uint64_t count)
     { // {{{
         // push back the new value onto the queue
-        HPX_STD_UNIQUE_PTR<queue_value_entry> node
+        std::unique_ptr<queue_value_entry> node
             (new queue_value_entry(val, count));
 
         mutex_type::scoped_lock l(mtx_);
@@ -142,7 +144,7 @@ struct object_semaphore
     void get(naming::id_type const& lco)
     { // {{{
         // push the LCO's GID onto the queue
-        HPX_STD_UNIQUE_PTR<queue_thread_entry> node(new queue_thread_entry(lco));
+        std::unique_ptr<queue_thread_entry> node(new queue_thread_entry(lco));
 
         mutex_type::scoped_lock l(mtx_);
 

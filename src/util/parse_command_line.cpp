@@ -17,7 +17,6 @@
 #include <vector>
 
 #include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
 #include <boost/scoped_array.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -291,7 +290,7 @@ namespace hpx { namespace util
                 std::vector<std::string> const &cfg_files =
                     vm["hpx:options-file"].as<std::vector<std::string> >();
 
-                BOOST_FOREACH(std::string const& cfg_file, cfg_files)
+                for (std::string const& cfg_file : cfg_files)
                 {
                     // parse a single config file and store the results
                     read_config_file_options(cfg_file, desc_cfgfile, vm, ini,
@@ -426,7 +425,8 @@ namespace hpx { namespace util
                   "the detailed affinity description for the OS threads, see "
                   "the documentation for a detailed description of possible "
                   "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
-                  "--hpx:affinity options. Implies --hpx:numa-sensitive.")
+                  "--hpx:affinity options. Implies --hpx:numa-sensitive "
+                  "(--hpx:bind=none disables defining thread affinities).")
                 ("hpx:print-bind",
                   "print to the console the bit masks calculated from the "
                   "arguments specified to all --hpx:bind options.")
@@ -714,7 +714,7 @@ namespace hpx { namespace util
             value_type;
 
         std::string command_line;
-        BOOST_FOREACH(value_type const& v, vm)
+        for (value_type const& v : vm)
         {
             boost::any const& value = v.second.value();
             if (boost::any_cast<std::string>(&value)) {
@@ -738,7 +738,7 @@ namespace hpx { namespace util
             else if (boost::any_cast<std::vector<std::string> >(&value)) {
                 std::vector<std::string> const& vec =
                     v.second.as<std::vector<std::string> >();
-                BOOST_FOREACH(std::string const& e, vec)
+                for (std::string const& e : vec)
                 {
                     add_as_option(command_line, v.first, embed_in_quotes(e));
                     if (!command_line.empty())

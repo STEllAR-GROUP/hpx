@@ -82,8 +82,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         boost::shared_array<buffer_type> buffer(
             new buffer_type[combiner(len1, len2)]);
 
-        std::size_t const cores = hpx::get_os_thread_count(policy.get_executor());
-        std::size_t const step = (len1 + cores - 1) / cores;
+        std::size_t cores = hpx::get_os_thread_count(policy.get_executor());
+        std::size_t step = (len1 + cores - 1) / cores;
         boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
 
         // fill the buffer piecewise

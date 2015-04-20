@@ -8,8 +8,6 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/foreach.hpp>
-
 #include "read_values.hpp"
 #include "partition.hpp"
 #include "interpolate1d.hpp"
@@ -62,7 +60,7 @@ namespace interpolate1d
         distributing_factory::iterator_range_type parts =
             hpx::util::locality_results(results);
 
-        BOOST_FOREACH(hpx::naming::id_type id, parts)
+        for (hpx::naming::id_type const& id : parts)
             partitions_.push_back(id);
 
         std::size_t num_localities = partitions_.size();

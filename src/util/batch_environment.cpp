@@ -19,7 +19,6 @@
 #include <iostream>
 #include <fstream>
 
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/tokenizer.hpp>
@@ -81,7 +80,7 @@ namespace hpx { namespace util
         bool found_agas_host = false;
         std::size_t agas_node_num = 0;
         std::string nodes_list;
-        BOOST_FOREACH(std::string s, nodes)
+        for (std::string s : nodes)
         {
             if (!s.empty()) {
                 if (debug_)
@@ -116,8 +115,7 @@ namespace hpx { namespace util
         // if an AGAS host is specified, it needs to be in the list
         // of nodes participating in this run
         if (!agas_host.empty() && !found_agas_host) {
-            throw hpx::detail::command_line_error(
-                "Requested AGAS host (" + agas_host +
+            throw hpx::detail::command_line_error("Requested AGAS host (" + agas_host +
                 ") not found in node list");
         }
 

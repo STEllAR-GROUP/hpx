@@ -11,8 +11,10 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
-#include <hpx/components/containers/unordered/unordered_distribution_policy.hpp>
+#include <hpx/components/containers/unordered/is_unordered_distribution_policy.hpp>
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 
 #include <cstdint>
@@ -60,7 +62,7 @@ namespace hpx { namespace server
             boost::uint32_t locality_id_;
 
         private:
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
@@ -79,7 +81,7 @@ namespace hpx { namespace server
         std::vector<partition_data> partitions_;
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
@@ -525,9 +527,9 @@ namespace hpx
 
         template <typename DistPolicy>
         unordered_map(DistPolicy const& policy,
-                typename std::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
+            typename std::enable_if<
+                    traits::is_unordered_distribution_policy<DistPolicy>::value
+                >::type* = 0)
         {
             create(policy);
         }
@@ -541,9 +543,9 @@ namespace hpx
 
         template <typename DistPolicy>
         unordered_map(std::size_t bucket_count, DistPolicy const& policy,
-                typename std::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
+            typename std::enable_if<
+                    traits::is_unordered_distribution_policy<DistPolicy>::value
+                >::type* = 0)
         {
             create(bucket_count, policy);
         }
@@ -552,8 +554,8 @@ namespace hpx
         unordered_map(std::size_t bucket_count,
                 Hash const& hash, DistPolicy const& policy,
                 typename std::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
+                    traits::is_unordered_distribution_policy<DistPolicy>::value
+                >::type* = 0)
           : hash_base_type(hash, KeyEqual())
         {
             create(bucket_count, policy, hash);
@@ -564,8 +566,8 @@ namespace hpx
                 Hash const& hash, KeyEqual const& equal,
                 DistPolicy const& policy,
                 typename std::enable_if<
-                        is_unordered_distribution_policy<DistPolicy>::value
-                    >::type* = 0)
+                    traits::is_unordered_distribution_policy<DistPolicy>::value
+                >::type* = 0)
           : hash_base_type(hash, equal)
         {
             create(bucket_count, policy, hash, equal);

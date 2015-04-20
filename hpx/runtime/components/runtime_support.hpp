@@ -34,14 +34,6 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        int get_factory_properties(components::component_type type);
-        lcos::future<int> get_factory_properties_async(components::component_type);
-
         /// Create a new component type using the runtime_support
         template <typename Component, typename ...Ts>
         naming::id_type create_component(Ts&&... vs)

@@ -5,8 +5,6 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <boost/foreach.hpp>
-
 #include "cancelable_action/cancelable_action.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,7 +62,7 @@ void handle_interruption_using_error_code(hpx::id_type const& id)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    BOOST_FOREACH(hpx::id_type const& id, hpx::find_all_localities())
+    for (hpx::id_type const& id : hpx::find_all_localities())
     {
         handle_interruption_using_exception(id);
         handle_interruption_using_error_code(id);

@@ -104,16 +104,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     examples::server::template_function_accumulator::query_action,
     managed_accumulator_query_action);
 
-// Actions with template arguments do not need to be declared in the same way
-// as all other actions. The reason is that it is impossible to declare the
-// action with all possible template argument type combinations. Thus, we let
-// the compiler generate the necessary serialization code. The same technique
-// could be employed for non-template action-types as well, however this
-// increases compilation time considerably.
-HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(
-    (template <typename T>),
-    (examples::server::template_function_accumulator::add_action<T>)
-)
-
 #endif
-

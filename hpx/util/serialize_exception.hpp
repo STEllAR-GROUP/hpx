@@ -8,11 +8,11 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/config.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/split_free.hpp>
 
 namespace hpx { namespace util
 {
@@ -47,17 +47,17 @@ namespace hpx { namespace util
 }}  // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive>
-    void save(Archive& ar, boost::exception_ptr const& ep, unsigned int);
+    void save(Archive& ar, boost::exception_ptr const& e, unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive>
     void load(Archive& ar, boost::exception_ptr& e, unsigned int);
-}}
 
-BOOST_SERIALIZATION_SPLIT_FREE(boost::exception_ptr)
+    HPX_SERIALIZATION_SPLIT_FREE(boost::exception_ptr);
+}}
 
 #endif

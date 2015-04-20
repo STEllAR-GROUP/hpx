@@ -9,7 +9,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/error.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/function_template.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/decay.hpp>
@@ -41,7 +40,8 @@
             std::pair<                                                        \
                 function_vtable_ptr<                                          \
                     Sig                                                       \
-                  , portable_binary_iarchive, portable_binary_oarchive        \
+                  , ::hpx::serialization::input_archive                       \
+                  , ::hpx::serialization::output_archive                      \
                 >                                                             \
               , util::decay<HPX_UTIL_STRIP(Functor)>::type                    \
             >                                                                 \
@@ -82,5 +82,46 @@
             BOOST_PP_CAT(hpx_function_serialization_, Name)), _type)          \
       , Name)                                                                 \
 /**/
+
+
+// Pseudo registration for empty functions.
+// We don't want to serialize empty functions.
+namespace hpx { namespace util { namespace detail
+{
+    template <typename Sig>
+    struct get_function_name_impl<
+        std::pair<
+            hpx::util::detail::function_vtable_ptr<
+                Sig
+              , hpx::serialization::input_archive, hpx::serialization::output_archive
+            >
+          , hpx::util::detail::empty_function<Sig>
+        >
+    >
+    {
+        static char const * call()
+        {
+            hpx::throw_exception(bad_function_call,
+                "empty function object should not be used",
+                "get_function_name<empty_function>");
+            return "";
+        }
+    };
+}}}
+
+namespace hpx { namespace traits {
+    template <typename Sig>
+    struct needs_automatic_registration<
+        std::pair<
+            hpx::util::detail::function_vtable_ptr<
+                Sig
+              , hpx::serialization::input_archive, hpx::serialization::output_archive
+            >
+          , hpx::util::detail::empty_function<Sig>
+        >
+    >
+      : boost::mpl::false_
+    {};
+}}
 
 #endif

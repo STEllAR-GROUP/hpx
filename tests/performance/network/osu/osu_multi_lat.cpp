@@ -9,7 +9,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
@@ -45,8 +45,8 @@ unsigned long getpagesize()
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::serialize_buffer<char>
-isend(hpx::util::serialize_buffer<char> const& receive_buffer)
+hpx::serialization::serialize_buffer<char>
+isend(hpx::serialization::serialize_buffer<char> const& receive_buffer)
 {
     return receive_buffer;
 }
@@ -78,7 +78,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
         if (i == skip)
             t.restart();
 
-        typedef hpx::util::serialize_buffer<char> buffer_type;
+        typedef hpx::serialization::serialize_buffer<char> buffer_type;
         std::vector<hpx::future<buffer_type> > send_futures;
         send_futures.reserve(window_size);
         for(std::size_t j = 0; j < window_size; ++j)
@@ -132,7 +132,7 @@ void run_benchmark(boost::program_options::variables_map & vm)
         double total_latency = 0;
 
         hpx::wait_all(benchmarks);
-        BOOST_FOREACH(hpx::future<double> & f, benchmarks)
+        for (hpx::future<double>& f : benchmarks)
         {
             total_latency += f.get();
         }

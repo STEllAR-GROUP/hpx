@@ -11,6 +11,7 @@ set(tests
     thread_rescheduling
     thread_suspend_pending
     thread_suspend_duration
+    threads_all_1422
    )
 
 if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
@@ -29,6 +30,7 @@ set(thread_pool_executor_1112_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_suspend_pending_PARAMETERS THREADS_PER_LOCALITY 1)
 set(thread_suspend_duration_PARAMETERS THREADS_PER_LOCALITY 1)
+set(threads_all_1422_PARAMETERS THREADS_PER_LOCALITY -1)        # -1 means 'all'
 
 foreach(test ${tests})
   set(sources

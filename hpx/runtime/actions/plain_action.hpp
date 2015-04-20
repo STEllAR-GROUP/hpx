@@ -19,7 +19,6 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/plain_function.hpp>
 #include <hpx/util/unused.hpp>
-#include <hpx/util/void_cast.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
 
@@ -154,7 +153,6 @@ namespace hpx { namespace actions
 /// \endcode
 ///
 #define HPX_REGISTER_PLAIN_ACTION_TEMPLATE(template_, action_type)            \
-    HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(template_, action_type);         \
     HPX_DEFINE_GET_COMPONENT_TYPE_TEMPLATE(template_,                         \
         (hpx::components::server::plain_function<HPX_UTIL_STRIP(action_type)>)) \
 /**/

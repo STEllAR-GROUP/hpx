@@ -10,6 +10,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/range/functions.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_VECTOR(double);

@@ -20,7 +20,6 @@
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/program_options.hpp>
 
@@ -385,7 +384,7 @@ namespace hpx { namespace util
                     std::cerr << "failed opening: " << node_file << std::endl;
 
                 // raise hard error if nodefile could not be opened
-                throw std::logic_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Could not open nodefile: '%s'") % node_file));
             }
         }
@@ -662,7 +661,7 @@ namespace hpx { namespace util
         if (debug_clp) {
             std::cerr << "Configuration before runtime start:\n";
             std::cerr << "-----------------------------------\n";
-            BOOST_FOREACH(std::string const& s, ini_config) {
+            for (std::string const& s : ini_config) {
                 std::cerr << s << std::endl;
             }
             std::cerr << "-----------------------------------\n";
@@ -808,7 +807,15 @@ namespace hpx { namespace util
                 threads::mask_cref_type pu_mask =
                     rt.get_thread_manager().get_pu_mask(top, i);
 
-                top.print_affinity_mask(strm, i, pu_mask);
+                if (!threads::any(pu_mask))
+                {
+                    strm << std::setw(4) << i << ": thread binding disabled"
+                         << std::endl;
+                }
+                else
+                {
+                    top.print_affinity_mask(strm, i, pu_mask);
+                }
 
                 // Make sure the mask does not contradict the CPU bindings
                 // returned by the system (see #973: Would like option to
@@ -907,8 +914,7 @@ namespace hpx { namespace util
         // will be considered now.
 
         parcelset::parcelhandler::init(&argc, &argv, *this);
-        BOOST_FOREACH(boost::shared_ptr<plugins::plugin_registry_base> & reg,
-            plugin_registries)
+        for (boost::shared_ptr<plugins::plugin_registry_base>& reg : plugin_registries)
         {
             reg->init(&argc, &argv, *this);
         }

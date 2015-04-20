@@ -6,9 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_SIGNING_REQUEST_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_SIGNING_REQUEST_HPP
 
-#include <boost/serialization/serialization.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/array.hpp>
 
 #include <hpx/components/security/capability.hpp>
 #include <hpx/components/security/public_key.hpp>
@@ -79,12 +80,12 @@ namespace hpx { namespace components { namespace security
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int)
         {
-            ar & boost::serialization::make_array(begin(), size());
+            ar & hpx::serialization::make_array(begin(), size());
         }
 
         naming::gid_type subject_;
@@ -98,7 +99,7 @@ namespace hpx { namespace components { namespace security
 #endif
 }}}
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits
 {
     template <>
     struct is_bitwise_serializable<

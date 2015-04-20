@@ -8,11 +8,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/tracking.hpp>
-
 #include <vector>
 
 #include <hpx/hpx.hpp>
@@ -22,10 +17,9 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/serialize_sequence.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/value_at.hpp>
@@ -578,10 +572,10 @@ namespace hpx { namespace agas
     struct save_visitor : boost::static_visitor<void>
     {
       private:
-        hpx::util::portable_binary_oarchive& ar;
+        hpx::serialization::output_archive& ar;
 
       public:
-        save_visitor(hpx::util::portable_binary_oarchive& ar_)
+        save_visitor(hpx::serialization::output_archive& ar_)
           : ar(ar_)
         {}
 
@@ -591,11 +585,11 @@ namespace hpx { namespace agas
         void operator()(Sequence const& seq) const
         {
             // TODO: verification?
-            util::serialize_sequence(ar, seq);
+            serialization::serialize_sequence(ar, seq);
         }
     };
 
-    void response::save(hpx::util::portable_binary_oarchive& ar, const unsigned int) const
+    void response::save(serialization::output_archive& ar, const unsigned int) const
     { // {{{
         // TODO: versioning?
         int which = data->which();
@@ -612,13 +606,13 @@ namespace hpx { namespace agas
             boost::mpl::at_c<                                               \
                 response_data::data_type::types, n                          \
             >::type d;                                                      \
-            util::serialize_sequence(ar, d);                                \
+            serialization::serialize_sequence(ar, d);                       \
             data->data = d;                                                 \
             return;                                                         \
         }                                                                   \
     /**/
 
-    void response::load(hpx::util::portable_binary_iarchive& ar, const unsigned int)
+    void response::load(serialization::input_archive& ar, const unsigned int)
     { // {{{
         // TODO: versioning
         int which = -1;

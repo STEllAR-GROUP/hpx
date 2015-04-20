@@ -91,7 +91,7 @@ namespace hpx { namespace lcos
             {
                 gate_.synchronize(1, l);
                 data_[which] = std::move(t);
-                gate_.set(which);
+                gate_.set(which, l);
             }
 
         private:
@@ -237,7 +237,7 @@ namespace hpx { namespace lcos
     typedef hpx::components::simple_component<                                \
         hpx::lcos::detail::gather_server<type>                                \
     > BOOST_PP_CAT(gather_, name);                                            \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(BOOST_PP_CAT(gather_, name))       \
+    HPX_REGISTER_COMPONENT(BOOST_PP_CAT(gather_, name))                       \
     /**/
 
 #endif // DOXYGEN

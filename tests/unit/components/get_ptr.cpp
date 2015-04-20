@@ -21,7 +21,7 @@ struct test_server
 };
 
 typedef hpx::components::simple_component<test_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::check_ptr_action check_ptr_action;
 HPX_REGISTER_ACTION_DECLARATION(check_ptr_action);
@@ -82,7 +82,7 @@ int main()
 
 
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         HPX_TEST(!hpx::expect_exception());
 

@@ -6,6 +6,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,10 +41,9 @@ private:
 };
 
 typedef hpx::components::simple_component<test_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
 HPX_REGISTER_ACTION(call_action);
 
 struct test_client
@@ -137,7 +137,7 @@ int main()
     HPX_TEST(test_copy_component_there(hpx::find_here()));
 
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         HPX_TEST(test_copy_component(id));
         HPX_TEST(test_copy_component_here(id));

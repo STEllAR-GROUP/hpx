@@ -363,7 +363,7 @@ namespace hpx { namespace applier
         if (!parcel_handler_.get_raw_remote_localities(raw_prefixes, type, ec))
             return false;
 
-        BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
+        for (naming::gid_type& gid : raw_prefixes)
             prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
 
         return true;
@@ -382,7 +382,7 @@ namespace hpx { namespace applier
         if (!parcel_handler_.get_raw_localities(raw_prefixes, components::component_invalid, ec))
             return false;
 
-        BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
+        for (naming::gid_type& gid : raw_prefixes)
             prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
 
         return true;
@@ -395,7 +395,7 @@ namespace hpx { namespace applier
         if (!parcel_handler_.get_raw_localities(raw_prefixes, type, ec))
             return false;
 
-        BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
+        for (naming::gid_type& gid : raw_prefixes)
             prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
 
         return true;

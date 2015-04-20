@@ -6,6 +6,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 
+#include <hpx/runtime/serialization/serialize.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 #define ZEROCOPY_DATASIZE   1024*1024
 
@@ -52,7 +54,7 @@ public:
 
 private:
     // serialization support
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template <typename Archive>
     void load(Archive& ar, unsigned int const version)
@@ -69,7 +71,7 @@ private:
         ar << size_ << t;
     }
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    HPX_SERIALIZATION_SPLIT_MEMBER()
 
 private:
     pointer pointer_;
@@ -79,10 +81,10 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 // Buffer object used on the client side to specify where to place the received
 // data
-typedef hpx::util::serialize_buffer<double> general_buffer_type;
+typedef hpx::serialization::serialize_buffer<double> general_buffer_type;
 
 // Buffer object used for sending the data back to the receiver.
-typedef hpx::util::serialize_buffer<double, pointer_allocator<double> >
+typedef hpx::serialization::serialize_buffer<double, pointer_allocator<double> >
     transfer_buffer_type;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -140,7 +142,7 @@ private:
 };
 
 typedef hpx::components::managed_component<zerocopy_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, zerocopy_server);
+HPX_REGISTER_COMPONENT(server_type, zerocopy_server);
 
 typedef zerocopy_server::get_here_action zerocopy_get_here_action;
 HPX_REGISTER_ACTION_DECLARATION(zerocopy_get_here_action);
@@ -209,7 +211,7 @@ int main(int argc, char* argv[])
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    BOOST_FOREACH(hpx::id_type id, localities)
+    for (hpx::id_type const& id : localities)
     {
         zerocopy zc = hpx::new_<zerocopy_server>(id, ZEROCOPY_DATASIZE);
 

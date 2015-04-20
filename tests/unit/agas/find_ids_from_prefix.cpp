@@ -9,8 +9,6 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/foreach.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::simple_component_base<test_server>
@@ -26,10 +24,9 @@ struct test_server
 };
 
 typedef hpx::components::simple_component<test_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
 HPX_REGISTER_ACTION(call_action);
 
 struct test_client
@@ -67,7 +64,7 @@ void test_find_all_ids_from_basename()
 
     // retrieve all component ids
     std::set<hpx::id_type> component_localities;
-    BOOST_FOREACH(hpx::future<hpx::id_type>& f, all_ids)
+    for (hpx::future<hpx::id_type>& f : all_ids)
     {
         hpx::id_type id = f.get();
         hpx::id_type locality = test_client(id).call();
@@ -79,7 +76,7 @@ void test_find_all_ids_from_basename()
     HPX_TEST_EQ(component_localities.size(), localities.size());
 
     // make sure that components are on all localities
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         HPX_TEST(component_localities.find(id) != component_localities.end());
     }
@@ -102,7 +99,7 @@ void test_find_ids_from_basename()
 
     std::vector<std::size_t> sequence_nrs;
     sequence_nrs.reserve(localities.size());
-    BOOST_FOREACH(hpx::id_type locality, localities)
+    for (hpx::id_type const& locality : localities)
     {
         sequence_nrs.push_back(hpx::naming::get_locality_id_from_id(locality));
     }
@@ -113,7 +110,7 @@ void test_find_ids_from_basename()
 
     // retrieve all component ids
     std::set<hpx::id_type> component_localities;
-    BOOST_FOREACH(hpx::future<hpx::id_type>& f, ids)
+    for (hpx::future<hpx::id_type>& f : ids)
     {
         hpx::id_type id = f.get();
 
@@ -126,7 +123,7 @@ void test_find_ids_from_basename()
     HPX_TEST_EQ(component_localities.size(), localities.size());
 
     // make sure that components are on all localities
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         HPX_TEST(component_localities.find(id) != component_localities.end());
     }
@@ -152,7 +149,7 @@ void test_find_id_from_basename()
     sequence_nrs.reserve(localities.size());
     ids.reserve(localities.size());
 
-    BOOST_FOREACH(hpx::id_type locality, localities)
+    for (hpx::id_type const& locality : localities)
     {
         std::size_t nr = hpx::naming::get_locality_id_from_id(locality);
         sequence_nrs.push_back(nr);
@@ -163,7 +160,7 @@ void test_find_id_from_basename()
 
     // retrieve all component ids
     std::set<hpx::id_type> component_localities;
-    BOOST_FOREACH(hpx::future<hpx::id_type>& f, ids)
+    for (hpx::future<hpx::id_type>& f : ids)
     {
         hpx::id_type id = f.get();
 
@@ -176,7 +173,7 @@ void test_find_id_from_basename()
     HPX_TEST_EQ(component_localities.size(), localities.size());
 
     // make sure that components are on all localities
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         HPX_TEST(component_localities.find(id) != component_localities.end());
     }

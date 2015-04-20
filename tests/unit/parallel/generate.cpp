@@ -8,7 +8,12 @@
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/range/functions.hpp>
+
 #include "test_utils.hpp"
+
+// FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408
+#if !(defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1500)
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -297,6 +302,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     generate_bad_alloc_test();
     return hpx::finalize();
 }
+#else
+int hpx_main(boost::program_options::variables_map& vm)
+{
+    return hpx::finalize();
+}
+#endif
 
 int main(int argc, char* argv[])
 {

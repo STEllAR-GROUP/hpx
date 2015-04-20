@@ -12,6 +12,6 @@ includedir=${exec_prefix}/include
 Name: hpx_application
 Description: High Performance ParalleX (application configuration) - debug build
 Version: @HPX_VERSION@
-Libs: @CXX11_FLAG@ -L${libdir} -lhpxd -lhpx_initd -lhpx_serializationd @HPX_PKG_DEBUG_LIBRARIES@
-Cflags: @CXX11_FLAG@ -DHPX_DEBUG @HPX_CONF_INCLUDE_DIRS@ -DHPX_APPLICATION_EXPORTS -DHPX_ENABLE_ASSERT_HANDLER
+Libs: @CXX_FLAG@ -L${libdir} -lhpxd -lhpx_initd @HPX_PKG_DEBUG_LIBRARIES@
+Cflags: @CXX_FLAG@ -DHPX_DEBUG @HPX_CONF_INCLUDE_DIRS@ -DHPX_APPLICATION_EXPORTS -DHPX_ENABLE_ASSERT_HANDLER
 

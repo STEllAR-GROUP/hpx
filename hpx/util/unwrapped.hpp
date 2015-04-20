@@ -78,7 +78,7 @@ namespace hpx { namespace util
             static type call(Range& range, /*is_void=*/boost::mpl::false_)
             {
                 type result;
-                BOOST_FOREACH(typename Range::value_type & f, range)
+                for (typename Range::value_type& f : range)
                 {
                     result.push_back(unwrap_impl<future_type>::call(f));
                 }
@@ -89,7 +89,7 @@ namespace hpx { namespace util
             template <typename Range>
             static type call(Range& range, /*is_void=*/boost::mpl::true_)
             {
-                BOOST_FOREACH(typename Range::value_type & f, range)
+                for (typename Range::value_type& f : range)
                 {
                     unwrap_impl<future_type>::call(f);
                 }
@@ -410,7 +410,7 @@ namespace hpx { namespace util
         detail::unwrapped_impl<typename util::decay<F>::type >
             res(std::forward<F>(f));
 
-        return std::move(res);
+        return res;
     }
 
     template <typename ...Ts>

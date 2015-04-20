@@ -9,13 +9,13 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/base_object.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
@@ -189,7 +189,7 @@ namespace hpx { namespace performance_counters
 
     protected:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
@@ -236,14 +236,16 @@ namespace hpx { namespace performance_counters
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
             typedef counter_type_path_elements base_type;
-            ar & boost::serialization::base_object<base_type>(*this);
-            ar & parentinstancename_ & instancename_ &
+            hpx::serialization::base_object_type<
+              counter_path_elements, base_type> base =
+                hpx::serialization::base_object<base_type>(*this);
+            ar & base & parentinstancename_ & instancename_ &
                  parentinstanceindex_ & instanceindex_ &
                  parentinstance_is_basename_;
         }
@@ -334,7 +336,7 @@ namespace hpx { namespace performance_counters
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
@@ -435,7 +437,7 @@ namespace hpx { namespace performance_counters
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)

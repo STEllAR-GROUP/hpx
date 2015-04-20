@@ -18,7 +18,6 @@
 
 #include <list>
 
-#include <boost/foreach.hpp>
 #include <boost/fusion/include/at_c.hpp>
 
 namespace hpx { namespace agas
@@ -183,27 +182,59 @@ void locality_namespace::register_counter_types(
           i != detail::num_locality_namespace_services;
           ++i)
     {
+        // global counters are handled elsewhere
+        if (detail::locality_namespace_services[i].code_ == locality_ns_statistics_counter)
+            continue;
+
         std::string name(detail::locality_namespace_services[i].name_);
         std::string help;
         std::string::size_type p = name.find_last_of('/');
-        if (p != std::string::npos) {
-            if (detail::locality_namespace_services[i].target_ == detail::counter_target_count)
-                help = boost::str(help_count % name.substr(p+1));
-            else
-                help = boost::str(help_time % name.substr(p+1));
-        }
-        else {
-            HPX_ASSERT(detail::locality_namespace_services[i].code_ ==
-                locality_ns_statistics_counter);
-            name = locality_namespace_service_name + name;
-            if (detail::locality_namespace_services[i].target_ == detail::counter_target_count)
-                help = "returns the overall number of invocations of all locality AGAS services";
-            else
-                help = "returns the overall execution time of all locality AGAS services";
-        }
+        HPX_ASSERT(p != std::string::npos);
+
+        if (detail::locality_namespace_services[i].target_ == detail::counter_target_count)
+            help = boost::str(help_count % name.substr(p+1));
+        else
+            help = boost::str(help_time % name.substr(p+1));
 
         performance_counters::install_counter_type(
             agas::performance_counter_basename + name
+          , performance_counters::counter_raw
+          , help
+          , creator
+          , &performance_counters::locality0_counter_discoverer
+          , HPX_PERFORMANCE_COUNTER_V1
+          , detail::locality_namespace_services[i].uom_
+          , ec
+          );
+        if (ec) return;
+    }
+}
+
+void locality_namespace::register_global_counter_types(
+    error_code& ec
+    )
+{
+    performance_counters::create_counter_func creator(
+        boost::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+      , agas::server::locality_namespace_service_name));
+
+    for (std::size_t i = 0;
+          i != detail::num_locality_namespace_services;
+          ++i)
+    {
+        // local counters are handled elsewhere
+        if (detail::locality_namespace_services[i].code_ != locality_ns_statistics_counter)
+            continue;
+
+        std::string help;
+        if (detail::locality_namespace_services[i].target_ == detail::counter_target_count)
+            help = "returns the overall number of invocations of all locality AGAS services";
+        else
+            help = "returns the overall execution time of all locality AGAS services";
+
+        performance_counters::install_counter_type(
+            std::string(agas::performance_counter_basename) +
+                detail::locality_namespace_services[i].name_
           , performance_counters::counter_raw
           , help
           , creator
@@ -257,7 +288,7 @@ std::vector<response> locality_namespace::bulk_service(
     std::vector<response> r;
     r.reserve(reqs.size());
 
-    BOOST_FOREACH(request const& req, reqs)
+    for (request const& req : reqs)
     {
         error_code ign;
         r.push_back(service(req, ign));
@@ -282,7 +313,7 @@ response locality_namespace::allocate(
     mutex_type::scoped_lock l(mutex_);
 
 #if defined(HPX_DEBUG)
-    BOOST_FOREACH(partition_table_type::value_type const & partition, partitions_)
+    for (partition_table_type::value_type const& partition : partitions_)
     {
         HPX_ASSERT(at_c<0>(partition.second) != endpoints);
     }
@@ -635,7 +666,7 @@ response locality_namespace::statistics_counter(
         case locality_ns_num_threads:
             get_data_func = boost::bind(&cd::get_num_threads_count, &counter_data_, ::_1);
             break;
-        case primary_ns_statistics_counter:
+        case locality_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
             break;
         default:
@@ -669,7 +700,7 @@ response locality_namespace::statistics_counter(
         case locality_ns_num_threads:
             get_data_func = boost::bind(&cd::get_num_threads_time, &counter_data_, ::_1);
             break;
-        case primary_ns_statistics_counter:
+        case locality_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);
             break;
         default:

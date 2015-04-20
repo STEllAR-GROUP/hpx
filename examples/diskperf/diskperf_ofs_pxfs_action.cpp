@@ -15,6 +15,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/include/serialization.hpp>
 
 #include <fstream>
 #include <cstdlib>
@@ -66,7 +67,7 @@ struct RESULT {
     double	user;
     double	sys;
 
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -86,7 +87,7 @@ struct ofs_test_info_type
     std::string pvfs2tab_file;
 
 
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -472,7 +473,7 @@ int hpx_main(variables_map& vm)
         {
             ofs_test_info.rfiles = rfiles;
 
-            BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+            for (hpx::naming::id_type const& node : localities)
             {
                 // Initiate an asynchronous IO operation wait for it to complete without
                 // blocking any of the HPX thread-manager threads.
@@ -488,7 +489,7 @@ int hpx_main(variables_map& vm)
         {
             ofs_test_info.wfiles = wfiles;
 
-            BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+            for (hpx::naming::id_type const& node : localities)
             {
                 for(int proc=0; proc < procs; proc++)
                 {

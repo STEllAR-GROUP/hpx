@@ -29,9 +29,16 @@ double k = 0.5;     // heat transfer coefficient
 double dt = 1.;     // time step
 double dx = 1.;     // grid spacing
 
-inline std::size_t idx(std::size_t i, std::size_t size)
+inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
+    if(i == 0 && dir == -1)
+        return size-1;
+    if(i == size-1 && dir == +1)
+        return 0;
+
+    HPX_ASSERT((i + dir) < size);
+
+    return i + dir;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,7 +73,7 @@ private:
     // Serialization support: even if all of the code below runs on one
     // locality only, we need to provide an (empty) implementation for the
     // serialization as all arguments passed to actions have to support this.
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int version) const {}
@@ -126,10 +133,10 @@ private:
 // The macros below are necessary to generate the code required for exposing
 // our partition type remotely.
 //
-// HPX_REGISTER_MINIMAL_COMPONENT_FACTORY() exposes the component creation
+// HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::simple_component<partition_server> partition_server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(partition_server_type, partition_server);
+HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
@@ -153,7 +160,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
     // Create a new component on the locality co-located to the id 'where'. The
     // new instance will be initialized from the given partition_data.
     partition(hpx::id_type where, partition_data && data)
-      : base_type(hpx::new_colocated<partition_server>(where, std::move(data)))
+      : base_type(hpx::new_<partition_server>(hpx::colocated(where), std::move(data)))
     {}
 
     // Attach a future representing a (possibly remote) partition.
@@ -268,7 +275,7 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
         {
             next[i] = dataflow(
                     hpx::launch::async, Op,
-                    current[idx(i-1, np)], current[i], current[idx(i+1, np)]
+                    current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]
                 );
         }
     }

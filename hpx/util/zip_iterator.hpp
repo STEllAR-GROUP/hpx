@@ -10,7 +10,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/serialize_sequence.hpp>
+#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
@@ -285,10 +285,10 @@ namespace hpx { namespace util
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename IteratorTuple>
+        template <typename IteratorTuple, typename Derived>
         class zip_iterator_base
           : public boost::iterator_facade<
-                zip_iterator_base<IteratorTuple>
+                Derived
               , typename zip_iterator_value<IteratorTuple>::type
               , typename zip_iterator_category<IteratorTuple>::type
               , typename zip_iterator_reference<IteratorTuple>::type
@@ -296,7 +296,7 @@ namespace hpx { namespace util
         {
             typedef
                 boost::iterator_facade<
-                    zip_iterator_base<IteratorTuple>
+                    zip_iterator_base<IteratorTuple, Derived>
                   , typename zip_iterator_value<IteratorTuple>::type
                   , typename zip_iterator_category<IteratorTuple>::type
                   , typename zip_iterator_reference<IteratorTuple>::type
@@ -356,12 +356,12 @@ namespace hpx { namespace util
             }
 
         private:
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
             {
-                util::serialize_sequence(ar, iterators_);
+                serialization::serialize_sequence(ar, iterators_);
             }
 
         private:
@@ -371,9 +371,11 @@ namespace hpx { namespace util
 
     template<typename ...Ts>
     class zip_iterator
-      : public detail::zip_iterator_base<tuple<Ts...> >
+      : public detail::zip_iterator_base<
+            tuple<Ts...>, zip_iterator<Ts...> >
     {
-        typedef detail::zip_iterator_base<tuple<Ts...> > base_type;
+        typedef detail::zip_iterator_base<tuple<Ts...>, zip_iterator<Ts...> >
+            base_type;
 
     public:
         zip_iterator() : base_type() {}
@@ -401,156 +403,6 @@ namespace hpx { namespace traits
 {
     namespace functional
     {
-        struct get_segment_iterator
-        {
-            template <typename Iterator>
-            struct apply
-            {
-                template <typename T>
-                struct result;
-
-                template <typename This, typename Iter>
-                struct result<This(Iter)>
-                {
-                    typedef typename segmented_iterator_traits<
-                            Iterator
-                        >::segment_iterator type;
-                };
-
-                template <typename Iter>
-                typename result<get_segment_iterator(Iter)>::type
-                operator()(Iter iter) const
-                {
-                    return segmented_iterator_traits<Iterator>::segment(iter);
-                };
-            };
-        };
-
-        struct get_local_iterator
-        {
-            template <typename Iterator>
-            struct apply
-            {
-                template <typename T>
-                struct result;
-
-                template <typename This, typename Iter>
-                struct result<This(Iter)>
-                {
-                    typedef typename segmented_iterator_traits<
-                            Iterator
-                        >::local_iterator type;
-                };
-
-                template <typename Iter>
-                typename result<get_local_iterator(Iter)>::type
-                operator()(Iter iter) const
-                {
-                    return segmented_iterator_traits<Iterator>::local(iter);
-                };
-            };
-        };
-
-        struct get_begin
-        {
-            template <typename Iterator>
-            struct apply
-            {
-                template <typename T>
-                struct result;
-
-                template <typename This, typename SegIter>
-                struct result<This(SegIter)>
-                {
-                    typedef typename segmented_iterator_traits<
-                            Iterator
-                        >::local_iterator type;
-                };
-
-                template <typename SegIter>
-                typename result<get_begin(SegIter)>::type
-                operator()(SegIter iter) const
-                {
-                    return segmented_iterator_traits<Iterator>::begin(iter);
-                };
-            };
-        };
-
-        struct get_end
-        {
-            template <typename Iterator>
-            struct apply
-            {
-                template <typename T>
-                struct result;
-
-                template <typename This, typename SegIter>
-                struct result<This(SegIter)>
-                {
-                    typedef typename segmented_iterator_traits<
-                            Iterator
-                        >::local_iterator type;
-                };
-
-                template <typename SegIter>
-                typename result<get_end(SegIter)>::type
-                operator()(SegIter iter) const
-                {
-                    return segmented_iterator_traits<Iterator>::end(iter);
-                };
-            };
-        };
-
-        struct get_local_begin
-        {
-            template <typename Iterator>
-            struct apply
-            {
-                template <typename T>
-                struct result;
-
-                template <typename This, typename LocalSegIter>
-                struct result<This(LocalSegIter)>
-                {
-                    typedef typename segmented_iterator_traits<
-                            Iterator
-                        >::local_raw_iterator type;
-                };
-
-                template <typename LocalSegIter>
-                typename result<get_local_begin(LocalSegIter)>::type
-                operator()(LocalSegIter iter) const
-                {
-                    return segmented_iterator_traits<Iterator>::begin(iter);
-                };
-            };
-        };
-
-        struct get_local_end
-        {
-            template <typename Iterator>
-            struct apply
-            {
-                template <typename T>
-                struct result;
-
-                template <typename This, typename LocalSegIter>
-                struct result<This(LocalSegIter)>
-                {
-                    typedef typename segmented_iterator_traits<
-                            Iterator
-                        >::local_raw_iterator type;
-                };
-
-                template <typename LocalSegIter>
-                typename result<get_local_end(LocalSegIter)>::type
-                operator()(LocalSegIter iter) const
-                {
-                    return segmented_iterator_traits<Iterator>::end(iter);
-                };
-            };
-        };
-
         ///////////////////////////////////////////////////////////////////////
         struct get_raw_iterator
         {
@@ -676,7 +528,7 @@ namespace hpx { namespace traits
         {
             return segment_iterator(
                 functional::lift_zipped_iterators<
-                        functional::get_segment_iterator, iterator
+                        functional::segmented_iterator_segment, iterator
                     >::call(iter));
         }
 
@@ -686,7 +538,7 @@ namespace hpx { namespace traits
         {
             return local_iterator(
                 functional::lift_zipped_iterators<
-                        functional::get_local_iterator, iterator
+                        functional::segmented_iterator_local, iterator
                     >::call(iter));
         }
 
@@ -696,7 +548,7 @@ namespace hpx { namespace traits
         {
             return local_iterator(
                 functional::lift_zipped_iterators<
-                        functional::get_begin, iterator
+                        functional::segmented_iterator_begin, iterator
                     >::call(iter));
         }
 
@@ -706,7 +558,7 @@ namespace hpx { namespace traits
         {
             return local_iterator(
                 functional::lift_zipped_iterators<
-                        functional::get_end, iterator
+                        functional::segmented_iterator_end, iterator
                     >::call(iter));
         }
 
@@ -716,7 +568,7 @@ namespace hpx { namespace traits
         {
             return local_raw_iterator(
                 functional::lift_zipped_iterators<
-                        functional::get_local_begin, iterator
+                        functional::segmented_iterator_local_begin, iterator
                     >::call(seg_iter));
         }
 
@@ -726,7 +578,7 @@ namespace hpx { namespace traits
         {
             return local_raw_iterator(
                 functional::lift_zipped_iterators<
-                        functional::get_local_end, iterator
+                        functional::segmented_iterator_local_end, iterator
                     >::call(seg_iter));
         }
 

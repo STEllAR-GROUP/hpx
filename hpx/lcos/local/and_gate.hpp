@@ -14,7 +14,6 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <utility>
-#include <boost/foreach.hpp>
 
 #include <list>
 
@@ -68,7 +67,7 @@ namespace hpx { namespace lcos { namespace local
         {
             bool triggered = false;
             error_code rc(lightweight);
-            BOOST_FOREACH(conditional_trigger* c, conditions_)
+            for (conditional_trigger* c : conditions_)
             {
                 triggered |= c->set(rc);
                 if (rc && (&ec != &throws))
@@ -105,7 +104,8 @@ namespace hpx { namespace lcos { namespace local
         }
 
         /// \brief Set the data which has to go into the segment \a which.
-        bool set(std::size_t which, error_code& ec = throws)
+        template <typename OuterLock>
+        bool set(std::size_t which, OuterLock & outer_lock, error_code& ec = throws)
         {
             typename mutex_type::scoped_lock l(mtx_);
             if (which >= received_segments_.size())
@@ -139,12 +139,20 @@ namespace hpx { namespace lcos { namespace local
                     // Unlock the lock to avoid locking problems
                     // when triggering the promise
                     l.unlock();
+                    outer_lock.unlock();
                     p.set_value();              // fire event
                     return true;
                 }
             }
 
             return false;
+        }
+
+        bool set(std::size_t which, error_code& ec = throws)
+        {
+            no_mutex mtx;
+            no_mutex::scoped_lock lk(mtx);
+            return set(which, lk, ec);
         }
 
     protected:

@@ -9,6 +9,8 @@
 #include <hpx/include/parallel_remove_copy.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+// FIXME: Intel 15 currently can not compile this code. This needs to be fixed. See #1408
+#if !(defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1500)
 void test_zero()
 {
     using namespace hpx::parallel;
@@ -35,6 +37,7 @@ void test_zero()
     HPX_TEST(i_remove_copy_if == ans_remove_copy_if);
     HPX_TEST(i_remove_copy == ans_remove_copy);
 }
+
 void test_async_zero()
 {
     using namespace hpx::parallel;
@@ -62,6 +65,7 @@ void test_async_zero()
     HPX_TEST(f_remove_copy_if.get() == ans_remove_copy_if);
     HPX_TEST(f_remove_copy.get() == ans_remove_copy);
 }
+
 void test_one(std::vector<int> a)
 {
     using namespace hpx::parallel;
@@ -91,7 +95,14 @@ void test_one(std::vector<int> a)
 
 }
 
-void test_async_one(std::vector<int> a)
+void print(std::vector<int> const& result, std::vector<int> const& correct)
+{
+    HPX_TEST_EQ(result.size(), correct.size());
+    for (std::size_t i = 0; i != result.size(); ++i)
+        std::cout << i << ": " << result[i] << " == " << correct[i] << std::endl;
+}
+
+void test_async_one(std::vector<int> const& a)
 {
     using namespace hpx::parallel;
     typedef std::vector<int>::iterator Iter;
@@ -119,11 +130,21 @@ void test_async_one(std::vector<int> a)
     f_remove_copy_if.wait();
     f_remove_copy.wait();
 
-    HPX_TEST(std::equal(b.begin(), b.end(), b_ans.begin()));
-    HPX_TEST(std::equal(c.begin(), c.end(), c_ans.begin()));
-    HPX_TEST(std::equal(d.begin(), d.end(), d_ans.begin()));
-}
+    bool copy_if_eq = std::equal(b.begin(), b.end(), b_ans.begin());
+    HPX_TEST(copy_if_eq);
+    if (!copy_if_eq)
+        print(b, b_ans);
 
+    bool remove_copy_if_eq = std::equal(c.begin(), c.end(), c_ans.begin());
+    HPX_TEST(remove_copy_if_eq);
+    if (!remove_copy_if_eq)
+        print(c, c_ans);
+
+    bool remove_copy_eq = std::equal(d.begin(), d.end(), d_ans.begin());
+    HPX_TEST(remove_copy_eq);
+    if (!remove_copy_eq)
+        print(d, d_ans);
+}
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -154,6 +175,12 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     return hpx::finalize();
 }
+#else
+int hpx_main(boost::program_options::variables_map& vm)
+{
+    return hpx::finalize();
+}
+#endif
 
 int main(int argc, char* argv[])
 {

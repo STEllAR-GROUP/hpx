@@ -174,11 +174,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     {
         boost::system::error_code ec;
         acceptor_.close(ec);
-        BOOST_FOREACH(pd_map_type::value_type & pd_pair, pd_map_)
+        for (pd_map_type::value_type& pd_pair : pd_map_)
         {
             ibv_dealloc_pd(pd_pair.second);
         }
-        BOOST_FOREACH(ibv_context * ctx, context_list_)
+        for (ibv_context* ctx : context_list_)
         {
             ibv_close_device(ctx);
         }

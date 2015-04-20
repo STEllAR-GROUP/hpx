@@ -112,6 +112,7 @@ namespace hpx
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/and.hpp>
+#include <boost/range/functions.hpp>
 #include <boost/utility/enable_if.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -295,7 +296,6 @@ namespace hpx { namespace lcos
         BOOST_STATIC_ASSERT_MSG(
             traits::is_future<Future>::value, "invalid use of when_each");
 
-        typedef void result_type;
         typedef hpx::util::tuple<std::vector<Future> > argument_type;
         typedef typename util::decay<F>::type func_type;
         typedef detail::when_each_frame<argument_type, func_type> frame_type;
@@ -393,7 +393,6 @@ namespace hpx { namespace lcos
                 typename traits::acquire_future<Ts>::type...
             > argument_type;
 
-        typedef void result_type;
         typedef typename util::decay<F>::type func_type;
         typedef detail::when_each_frame<argument_type, func_type> frame_type;
 

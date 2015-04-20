@@ -34,6 +34,8 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
+#include <boost/archive/basic_archive.hpp>
+
 namespace hpx
 {
     bool is_starting();
@@ -70,8 +72,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , bootstrapping_(true)
           , max_connections_(max_connections(ini))
           , chunk_pool_(4096, max_connections_)
-          , sender_(stopped_, max_connections_)
-          , receiver_(*this, chunk_pool_, stopped_, max_connections_)
+          , sender_(max_connections_)
+          , receiver_(*this, chunk_pool_, max_connections_)
           , enable_parcel_handling_(true)
           , handles_parcels_(0)
         {
@@ -81,20 +83,20 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
 #endif
             if (endian_out == "little")
-                archive_flags_ |= util::endian_little;
+                archive_flags_ |= serialization::endian_little;
             else if (endian_out == "big")
-                archive_flags_ |= util::endian_big;
+                archive_flags_ |= serialization::endian_big;
             else {
                 HPX_ASSERT(endian_out =="little" || endian_out == "big");
             }
 
             if (!this->allow_array_optimizations()) {
-                archive_flags_ |= util::disable_array_optimization;
-                archive_flags_ |= util::disable_data_chunking;
+                archive_flags_ |= serialization::disable_array_optimization;
+                archive_flags_ |= serialization::disable_data_chunking;
             }
             else {
                 if (!this->allow_zero_copy_optimizations())
-                    archive_flags_ |= util::disable_data_chunking;
+                    archive_flags_ |= serialization::disable_data_chunking;
             }
         }
 
@@ -183,8 +185,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         void stop(bool blocking = true)
         {
             stopped_ = true;
-            sender_.stop();
-            receiver_.stop();
+            while(handles_parcels_ != 0)
+            {
+                if(threads::get_self_ptr())
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "mpi::parcelport::enable");
+            }
             if(blocking)
             {
                 MPI_Barrier(util::mpi_environment::communicator());
@@ -221,7 +227,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         void put_parcel(parcelset::locality const & dest, parcel p,
             write_handler_type f)
         {
-            if(stopped_) return;
             handles_parcels h(this);
 
             if(!enable_parcel_handling_)
@@ -236,7 +241,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             allocator_type alloc(chunk_pool_);
             snd_buffer_type buffer(alloc);
-            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, this->get_max_outbound_message_size());
+            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_,
+                this->get_max_outbound_message_size());
 
             buffer.data_point_.time_ = timer.elapsed_nanoseconds();
 
@@ -272,7 +278,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
     private:
         typedef util::memory_chunk_pool<> memory_pool_type;
-        typedef util::detail::memory_chunk_pool_allocator<char> allocator_type;
+        typedef util::detail::memory_chunk_pool_allocator<char, util::memory_chunk_pool<>> allocator_type;
         typedef
             std::vector<char, allocator_type>
             data_type;
@@ -379,7 +385,9 @@ namespace hpx { namespace traits
 #if defined(HPX_PARCELPORT_MPI_ENV)
                 "env = ${HPX_PARCELPORT_MPI_ENV:" HPX_PARCELPORT_MPI_ENV "}\n"
 #else
-                "env = ${HPX_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE}\n"
+                "env = ${HPX_PARCELPORT_MPI_ENV:"
+                        "MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE"
+                    "}\n"
 #endif
                 "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:1}\n"
                 "max_connections = ${HPX_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"

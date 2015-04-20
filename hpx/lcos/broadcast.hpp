@@ -137,8 +137,8 @@ namespace hpx { namespace lcos
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/lcos/async_colocated.hpp>
-#include <hpx/runtime/applier/apply_colocated.hpp>
+#include <hpx/lcos/detail/async_colocated.hpp>
+#include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/calculate_fanout.hpp>
@@ -147,7 +147,7 @@ namespace hpx { namespace lcos
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-#include <boost/serialization/vector.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #include <vector>
 
@@ -510,14 +510,14 @@ namespace hpx { namespace lcos
             std::vector<Result> res;
             std::vector<hpx::future<std::vector<Result> > > fres = std::move(r.get());
 
-            BOOST_FOREACH(hpx::future<std::vector<Result> >& f, fres)
+            for (hpx::future<std::vector<Result> >& f : fres)
             {
                 std::vector<Result> t = std::move(f.get());
                 res.reserve(res.capacity() + t.size());
                 std::move(t.begin(), t.end(), std::back_inserter(res));
             }
 
-            return std::move(res);
+            return res;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -575,7 +575,7 @@ namespace hpx { namespace lcos
 
                     hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
+                        hpx::detail::async_colocated<broadcast_impl_action>(
                             id
                           , act
                           , std::move(ids_next)
@@ -657,7 +657,7 @@ namespace hpx { namespace lcos
 
                     hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
+                        hpx::detail::async_colocated<broadcast_impl_action>(
                             id
                           , act
                           , std::move(ids_next)
@@ -725,7 +725,7 @@ namespace hpx { namespace lcos
                     std::vector<hpx::id_type> ids_next(it, it + next_fan);
 
                     hpx::id_type id(ids_next[0]);
-                    hpx::apply_colocated<broadcast_impl_action>(
+                    hpx::detail::apply_colocated<broadcast_impl_action>(
                         id
                       , act
                       , std::move(ids_next)
@@ -772,11 +772,11 @@ namespace hpx { namespace lcos
         }
 
         return
-            hpx::async_colocated<broadcast_impl_action>(
+            hpx::detail::async_colocated<broadcast_impl_action>(
                 ids[0]
               , Action()
               , ids
-              , 0
+              , std::size_t(0)
               , typename boost::is_same<void, action_result>::type()
               , vs...
             );
@@ -822,7 +822,7 @@ namespace hpx { namespace lcos
             return;
         }
 
-        hpx::apply_colocated<broadcast_impl_action>(
+        hpx::detail::apply_colocated<broadcast_impl_action>(
                 ids[0]
               , Action()
               , ids

@@ -15,7 +15,9 @@ set(tests
     inheritance_3_classes_concrete
     migrate_component
     migrate_component_to_storage
-    remote_object
+    new_
+    new_binpacking
+    new_colocated
     unordered_map
     vector_copy
     vector_for_each
@@ -44,12 +46,6 @@ set(migrate_component_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
 
-set(remote_object_FLAGS
-    DEPENDENCIES iostreams_component remote_object_component)
-set(remote_object_PARAMETERS
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 2)
-
 set(inheritance_2_classes_abstract_FLAGS
     DEPENDENCIES iostreams_component)
 
@@ -73,6 +69,10 @@ set(unordered_map_PARAMETERS
 
 set(migrate_component_to_storage_FLAGS
     DEPENDENCIES unordered_component component_storage_component)
+
+set(new__PARAMETERS LOCALITIES 2)
+set(new_binpacking_PARAMETERS LOCALITIES 2)
+set(new_colocated_PARAMETERS LOCALITIES 2)
 
 set(vector_FLAGS DEPENDENCIES vector_component)
 set(vector_algorithms_FLAGS DEPENDENCIES vector_component)

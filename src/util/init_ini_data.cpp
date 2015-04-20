@@ -24,7 +24,6 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/tokenizer.hpp>
 #include <hpx/util/plugin.hpp>
-#include <boost/foreach.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/range/iterator_range.hpp>
 
@@ -239,7 +238,7 @@ namespace hpx { namespace util
         }
         else {
             // ask all registries
-            BOOST_FOREACH(std::string const& s, names)
+            for (std::string const& s : names)
             {
                 // create the component registry object
                 boost::shared_ptr<components::component_registry_base>
@@ -285,7 +284,7 @@ namespace hpx { namespace util
         }
         else {
             // ask all registries
-            BOOST_FOREACH(std::string const& s, names)
+            for (std::string const& s : names)
             {
                 // create the component registry object
                 boost::shared_ptr<components::component_registry_base>
@@ -321,7 +320,7 @@ namespace hpx { namespace util
         std::vector<std::string> ini_data;
         if (!names.empty()) {
             // ask all registries
-            BOOST_FOREACH(std::string const& s, names)
+            for (std::string const& s : names)
             {
                 // create the plugin registry object
                 boost::shared_ptr<plugins::plugin_registry_base>
@@ -441,7 +440,7 @@ namespace hpx { namespace util
         std::random_shuffle(libdata.begin(), libdata.end());
 
         typedef std::pair<fs::path, std::string> libdata_type;
-        BOOST_FOREACH(libdata_type const& p,
+        for (libdata_type const& p :
             boost::iterator_range<iterator_type>(libdata.begin(), libdata.end()))
         {
             // get the handle of the library

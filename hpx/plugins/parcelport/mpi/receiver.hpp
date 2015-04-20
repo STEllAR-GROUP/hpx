@@ -12,6 +12,7 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 
 #include <hpx/util/memory_chunk_pool.hpp>
+#include <hpx/util/memory_chunk_pool_allocator.hpp>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
@@ -22,8 +23,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef hpx::lcos::local::spinlock mutex_type;
         typedef std::list<std::pair<int, header> > header_list;
         typedef std::set<std::pair<int, int> > handles_header_type;
-        typedef util::memory_chunk_pool<> memory_pool_type;
-        typedef util::detail::memory_chunk_pool_allocator<char> allocator_type;
+        typedef util::memory_chunk_pool<mutex_type> memory_pool_type;
+        typedef util::detail::memory_chunk_pool_allocator<
+                char, memory_pool_type
+            > allocator_type;
         typedef
             std::vector<char, allocator_type>
             data_type;
@@ -31,10 +34,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         struct handle_header
         {
-            handle_header(header_list::iterator it, receiver &receiver)
+            handle_header(header_list::iterator it, receiver &receiver, mutex_type::scoped_lock * l)
               : receiver_(receiver)
               , handles_(false)
+              , l_(l)
             {
+                // as handle_header tries to acquire a mutex as well, we need to
+                // ignore the headers_mtx_ here
+                util::ignore_while_checking<mutex_type::scoped_lock> il(l_);
+                mutex_type::scoped_lock lk(receiver_.handles_header_mtx_);
                 std::pair<int, int> p(it->first, it->second.tag());
                 header_handle_ = receiver_.handles_header_.find(p);
 
@@ -48,8 +56,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
             }
 
+            handle_header(handle_header && other)
+              : receiver_(other.receiver_)
+              , handles_(other.handles_)
+              , l_(other.l_)
+              , header_handle_(other.header_handle_)
+            {
+                other.handles_ = false;
+            }
+
             ~handle_header()
             {
+                // as handle_header tries to acquire a mutex as well, we need to
+                // ignore the headers_mtx_ here
+                util::ignore_while_checking<mutex_type::scoped_lock> il(l_);
+                mutex_type::scoped_lock lk(receiver_.handles_header_mtx_);
                 if(handles_)
                 {
                     HPX_ASSERT(header_handle_ != receiver_.handles_header_.end());
@@ -66,16 +87,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             receiver &receiver_;
             bool handles_;
-            header h_;
+            mutex_type::scoped_lock * l_;
             handles_header_type::iterator header_handle_;
+            HPX_MOVABLE_BUT_NOT_COPYABLE(handle_header);
         };
 
-        receiver(parcelport & pp, memory_pool_type & chunk_pool,
-                boost::atomic<bool> & stopped
+        receiver(parcelport & pp, memory_pool_type & chunk_pool
               , std::size_t max_connections)
           : pp_(pp)
           , chunk_pool_(chunk_pool)
-          , stopped_(stopped)
           , max_connections_(max_connections)
           , num_connections_(0)
         {}
@@ -83,10 +103,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         void run()
         {
             new_header();
-        }
-
-        void stop()
-        {
         }
 
         struct check_num_connections
@@ -100,7 +116,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 decrement_ = true;
                 ++this_->num_connections_;
             }
-            
+
             ~check_num_connections()
             {
                 if(decrement_)
@@ -129,7 +145,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 iterator it = headers_.begin();
                 while(it != headers_.end())
                 {
-                    handle_header handle(it, *this);
+                    handle_header handle(it, *this, &l);
                     if(handle.handles_)
                     {
 
@@ -139,7 +155,26 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
                         {
                             hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-                            receive_message(source, h);
+
+                            std::size_t num_thread(-1);
+                            if(threads::get_self_ptr())
+                                num_thread = hpx::get_worker_thread_num();
+
+                            error_code ec(lightweight);
+                            if(hpx::is_starting())
+                            {
+                                receive_message(source, h, std::move(handle));
+                            }
+                            else
+                            {
+                                hpx::applier::register_thread_nullary(
+                                    util::bind(
+                                        util::one_shot(&receiver::receive_message),
+                                        this, source, h, std::move(handle)),
+                                    "mpi::receiver::receive_message",
+                                    threads::pending, true, threads::thread_priority_boost,
+                                    num_thread, threads::thread_stacksize_default, ec);
+                            }
                             h.reset();
                         }
 
@@ -160,7 +195,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return did_some_work;
         }
 
-        void receive_message(int source, header h)
+        void receive_message(int source, header h, handle_header)
         {
             util::high_resolution_timer timer;
             MPI_Request request;
@@ -175,7 +210,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             performance_counters::parcels::data_point& data = buffer.data_point_;
             data.time_ = timer.elapsed_nanoseconds();
-            data.bytes_ = static_cast<std::size_t>(buffer.size_);
+            data.bytes_ = static_cast<std::size_t>(h.numbytes());
 
             buffer.data_.resize(static_cast<std::size_t>(h.size()));
             buffer.num_chunks_ = h.num_chunks();
@@ -220,7 +255,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             else
             {
                 wait_done(wait_request);
-                if(stopped_) return;
                 {
                     util::mpi_environment::scoped_lock l;
                     MPI_Irecv(
@@ -240,7 +274,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             for(data_type & c: buffer.chunks_)
             {
                 wait_done(wait_request);
-                if(stopped_) return;
                 std::size_t chunk_size = buffer.transmission_chunks_[chunk_idx++].second;
 
                 c.resize(chunk_size);
@@ -260,7 +293,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
 
             wait_done(wait_request);
-            if(stopped_) return;
 
             data.time_ = timer.elapsed_nanoseconds() - data.time_;
 
@@ -292,8 +324,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         header new_header()
         {
-            if(stopped_) return header();
-
             header h = rcv_header_;
             rcv_header_.reset();
             MPI_Irecv(
@@ -319,8 +349,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         mutex_type handles_header_mtx_;
         handles_header_type handles_header_;
-
-        boost::atomic<bool> & stopped_;
 
         mutex_type connections_mtx_;
         std::size_t const max_connections_;
@@ -354,8 +382,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     accept();
                 }
                 ++k;
-
-                if(stopped_) return;
             }
             request = NULL;
         }
@@ -368,11 +394,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool request_done_locked(MPI_Request & r, MPI_Status *status)
         {
-            if(stopped_)
-            {
-                MPI_Cancel(&r);
-                return false;
-            }
             int completed = 0;
             int ret = 0;
             ret = MPI_Test(&r, &completed, status);

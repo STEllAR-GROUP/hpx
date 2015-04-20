@@ -12,18 +12,13 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
-
 #include <hpx/util/function.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
+
 #include <hpx/util/bind.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 
 #include <boost/format.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/lexical_cast.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
@@ -735,7 +730,7 @@ namespace hpx { namespace performance_counters
                 return false;
 
             counter_info i = info;
-            BOOST_FOREACH(counter_info& basei, counter_infos)
+            for (counter_info& basei : counter_infos)
             {
                 p.parentinstancename_ = basei.fullname_;
                 counter_status status = get_counter_name(p, i.fullname_, ec);

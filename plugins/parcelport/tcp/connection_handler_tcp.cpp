@@ -114,15 +114,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         {
             // cancel all pending read operations, close those sockets
             lcos::local::spinlock::scoped_lock l(connections_mtx_);
-            BOOST_FOREACH(boost::shared_ptr<receiver> c,
-                accepted_connections_)
+            for (boost::shared_ptr<receiver> const& c : accepted_connections_)
             {
-                boost::system::error_code ec;
-                boost::asio::ip::tcp::socket& s = c->socket();
-                if (s.is_open()) {
-                    s.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-                    s.close(ec);    // close the socket to give it back to the OS
-                }
+                c->shutdown();
             }
 
             accepted_connections_.clear();

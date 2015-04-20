@@ -14,7 +14,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/noncopyable.hpp>
 
 #include <sstream>

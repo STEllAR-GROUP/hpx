@@ -6,22 +6,17 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <hpx/components/iostreams/server/output_stream.hpp>
 #include <hpx/components/iostreams/ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_COMPONENT_MODULE()
 
 typedef hpx::iostreams::server::output_stream ostream_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::managed_component<ostream_type>,
     output_stream_factory, hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(ostream_type)

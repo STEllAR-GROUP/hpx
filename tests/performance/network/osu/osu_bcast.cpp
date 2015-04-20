@@ -9,8 +9,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
-#include <hpx/util/serialize_buffer.hpp>
 #include <hpx/util/any.hpp>
 
 #include <boost/assert.hpp>
@@ -38,7 +38,7 @@ struct broadcast_component
 
     HPX_DEFINE_COMPONENT_ACTION(broadcast_component, init);
 
-    typedef hpx::util::serialize_buffer<char> buffer_type;
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
     double run(std::size_t size, std::size_t iterations, std::size_t skip)
     {
@@ -69,7 +69,7 @@ struct broadcast_component
     buffer_type recv_buffer;
 };
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::simple_component<broadcast_component>
   , osu_broadcast_component);
 
@@ -90,7 +90,7 @@ void run_benchmark(params const & p)
     {
         std::vector<hpx::future<void> > init_futures;
         init_futures.reserve(ids.size());
-        BOOST_FOREACH(hpx::id_type const & id, ids)
+        for (hpx::id_type const& id : ids)
         {
             init_futures.push_back(
                 hpx::async<broadcast_component::init_action>(id, ids, p.max_msg_size, p.fan_out)
@@ -109,7 +109,7 @@ void run_benchmark(params const & p)
 
         std::vector<hpx::future<double> > run_futures;
         run_futures.reserve(ids.size());
-        BOOST_FOREACH(hpx::id_type const & id, ids)
+        for (hpx::id_type const& id : ids)
         {
             run_futures.push_back(
                 hpx::async<broadcast_component::run_action>(id, size, iterations, skip)
@@ -119,7 +119,7 @@ void run_benchmark(params const & p)
 
         std::vector<double> times; times.reserve(ids.size());
         hpx::wait_all(run_futures);
-        BOOST_FOREACH(hpx::future<double> & f, run_futures)
+        for (hpx::future<double>& f : run_futures)
         {
             times.push_back(f.get());
         }

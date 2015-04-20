@@ -12,6 +12,6 @@ includedir=${exec_prefix}/include
 Name: hpx_component
 Description: High Performance ParalleX (application configuration)
 Version: @HPX_VERSION@
-Libs: @CXX11_FLAG@ -shared -L${libdir} -lhpx -lhpx_serialization @HPX_PKG_LIBRARIES@
-Cflags: @CXX11_FLAG@ @HPX_CONF_INCLUDE_DIRS@ -DHPX_COMPONENT_EXPORTS -DHPX_ENABLE_ASSERT_HANDLER
+Libs: @CXX_FLAG@ -shared -L${libdir} -lhpx @HPX_PKG_LIBRARIES@
+Cflags: @CXX_FLAG@ @HPX_CONF_INCLUDE_DIRS@ -DHPX_COMPONENT_EXPORTS -DHPX_ENABLE_ASSERT_HANDLER
 

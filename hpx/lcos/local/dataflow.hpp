@@ -27,10 +27,11 @@
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
+#include <boost/range/functions.hpp>
 #include <boost/ref.hpp>
+#include <boost/static_assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/static_assert.hpp>
 
 #include <algorithm>
 

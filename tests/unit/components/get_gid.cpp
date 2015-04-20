@@ -8,6 +8,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 using hpx::components::stub_base;
@@ -30,7 +31,7 @@ struct test_server : managed_component_base<test_server>
 };
 
 typedef managed_component<test_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::check_gid_action check_gid_action;
 HPX_REGISTER_ACTION_DECLARATION(check_gid_action);

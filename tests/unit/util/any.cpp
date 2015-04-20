@@ -12,7 +12,6 @@
 #include <boost/unordered_map.hpp>
 #include <hpx/util/storage/tuple.hpp>
 
-#include <boost/serialization/access.hpp>
 #include <boost/any.hpp>
 
 #include "small_big_object.hpp"

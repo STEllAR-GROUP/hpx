@@ -93,7 +93,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     inline bool starting_up(boost::ptr_vector<boost::atomic<hpx::state> >& states)
     {
         typedef boost::atomic<hpx::state> state_type;
-        BOOST_FOREACH(state_type& state, states)
+        for (state_type& state : states)
         {
             if (state.load() < running)
                 return true;

@@ -122,9 +122,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 buffers.push_back(boost::asio::buffer(buffer_.data_));
 
                 // now add chunks themselves, those hold zero-copy serialized chunks
-                BOOST_FOREACH(util::serialization_chunk& c, buffer_.chunks_)
+                for (serialization::serialization_chunk& c : buffer_.chunks_)
                 {
-                    if (c.type_ == util::chunk_type_pointer)
+                    if (c.type_ == serialization::chunk_type_pointer)
                         buffers.push_back(boost::asio::buffer(c.data_.cpos_, c.size_));
                 }
             }

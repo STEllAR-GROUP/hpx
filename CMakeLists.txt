@@ -170,7 +170,6 @@ if(APPLE)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" OFF ADVANCED)
-hpx_option(HPX_BUILD_WITH_INSTALL_PREFIX BOOL "Always set the HPX_PREFIX default to the install directory (default: OFF)" OFF ADVANCED)
 
 ################################################################################
 # Native TLS configuration
@@ -217,10 +216,6 @@ hpx_option(HPX_AUTOMATIC_SERIALIZATION_REGISTRATION BOOL
 if(NOT HPX_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_config_define(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
-
-hpx_option(HPX_UNIQUE_FUTURE_ALIAS BOOL
-  "HPX will defined unique_future<R> as a template alias to future<R>. (default OFF)."
-  OFF ADVANCED)
 
 ## Thread Manager related build options
 
@@ -399,8 +394,8 @@ hpx_option(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of ch
 
 ## mpi parcelport settings
 hpx_option(HPX_PARCELPORT_MPI_ENV STRING
-  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE)."
-  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
+  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE)."
+  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
 hpx_option(HPX_PARCELPORT_MPI_MULTITHREADED BOOL
   "Turn on MPI multithreading support (default: ON)."
   ON CATEGORY "Parcelport" ADVANCED)
@@ -478,6 +473,14 @@ hpx_option(HPX_WITH_COMPRESSION_SNAPPY BOOL "Enable snappy compression for parce
 hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
 
 ################################################################################
+# Backwards compatibility options (edit for each release)
+# HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
+hpx_option(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
+    "Enable backwards compatibility for apply_colocated, async_colocated and friends"
+    ON ADVANCED)
+if(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
+endif()
 
 ################################################################################
 # Set basic search paths for HPX
@@ -501,6 +504,8 @@ include(HPX_SetupBoost)
 
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
+# Add define to which allocator has been selected.
+hpx_add_config_define(HPX_MALLOC "\"${HPX_MALLOC}\"")
 
 if(HPX_WITH_HWLOC)
   find_package(Hwloc)
@@ -644,24 +649,126 @@ hpx_add_compile_flag(-DBOOST_DISABLE_ASSERTS
 
 # Make sure we compile in C++11 mode (MSVC uses it automatically)
 if(NOT MSVC)
-  #set(_cxx11_support FALSE)
-  # Try -std=c++11 first
-  check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
-  # ... If it failed try -std=c++0x
-  if(NOT HPX_WITH_CXX11)
-    check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
-    if(HPX_WITH_CXX0X)
-      set(CXX11_FLAG -std=c++0x)
-      set(HPX_WITH_CXX11 TRUE)
-    endif()
+  # Try -std=c++14 first
+  check_cxx_compiler_flag(-std=c++14 HPX_WITH_CXX14)
+  if(HPX_WITH_CXX14)
+    set(CXX_FLAG -std=c++14)
   else()
-    set(CXX11_FLAG -std=c++11)
+    # ... otherwise try -std=c++0y
+    check_cxx_compiler_flag(-std=c++0y HPX_WITH_CXX0Y)
+    if(HPX_WITH_CXX0Y)
+      set(CXX_FLAG -std=c++0y)
+    else()
+      # ... otherwise try -std=c++11
+      check_cxx_compiler_flag(-std=c++11 HPX_WITH_CXX11)
+      if(HPX_WITH_CXX11)
+        set(CXX_FLAG -std=c++11)
+      else()
+        # ... otherwise try -std=c++0x
+        check_cxx_compiler_flag(-std=c++0x HPX_WITH_CXX0X)
+        if(HPX_WITH_CXX0X)
+          set(CXX_FLAG -std=c++0x)
+        endif()
+      endif()
+    endif()
   endif()
-  if(NOT HPX_WITH_CXX11)
-    hpx_error("Unable to compile HPX without C++11 support in your compiler. HPX needs at the very least rvalue references with proper move semantics")
-  endif()
-  hpx_add_compile_flag(${CXX11_FLAG})
 
+  hpx_add_compile_flag(${CXX_FLAG})
+endif()
+
+################################################################################
+# C++ feature tests
+################################################################################
+
+# Check the availability of certain C++11 language features
+hpx_check_for_cxx11_alias_templates(
+  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
+
+hpx_check_for_cxx11_auto(
+  DEFINITIONS HPX_HAVE_CXX11_AUTO)
+
+hpx_check_for_cxx11_constexpr(
+  DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
+
+hpx_check_for_cxx11_decltype(
+  DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
+
+hpx_check_for_cxx11_defaulted_functions(
+  DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+
+hpx_check_for_cxx11_deleted_functions(
+  DEFINITIONS HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+
+hpx_check_for_cxx11_explicit_cvt_ops(
+  DEFINITIONS HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS)
+
+hpx_check_for_cxx11_function_template_default_args(
+  REQUIRED "HPX needs support for C++11 defaulted function template arguments")
+
+hpx_check_for_cxx11_inline_namespaces(
+  DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
+
+hpx_check_for_cxx11_lambdas(
+  DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
+
+hpx_check_for_cxx11_noexcept(
+  DEFINITIONS HPX_HAVE_CXX11_NOEXCEPT)
+
+hpx_check_for_cxx11_nullptr(
+  DEFINITIONS HPX_HAVE_CXX11_NULLPTR)
+
+hpx_check_for_cxx11_range_based_for(
+  REQUIRED "HPX needs support for C++11 range-based for-loop")
+
+hpx_check_for_cxx11_rvalue_references(
+  REQUIRED "HPX needs support for C++11 rvalue references")
+
+hpx_check_for_cxx11_scoped_enums(
+  DEFINITIONS HPX_HAVE_CXX11_SCOPED_ENUMS)
+
+hpx_check_for_cxx11_static_assert(
+  DEFINITIONS HPX_HAVE_CXX11_STATIC_ASSERT)
+
+hpx_check_for_cxx11_variadic_macros(
+  REQUIRED "HPX needs support for C++11 variadic macros")
+
+hpx_check_for_cxx11_variadic_templates(
+  REQUIRED "HPX needs support for C++11 variadic templates")
+
+# Check the availability of certain C++11 library features
+hpx_check_for_cxx11_std_chrono(
+  DEFINITIONS HPX_HAVE_CXX11_STD_CHRONO)
+
+hpx_check_for_cxx11_std_initializer_list(
+  DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
+
+hpx_check_for_cxx11_std_is_final(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_FINAL)
+
+hpx_check_for_cxx11_std_is_null_pointer(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_NULL_POINTER)
+
+hpx_check_for_cxx11_std_unique_ptr(
+  REQUIRED "HPX needs support for C++11 std::unique_ptr")
+
+hpx_check_for_cxx11_std_type_traits(
+  DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
+
+# Check the availability of certain C++14 language features
+hpx_check_for_cxx14_constexpr(
+  DEFINITIONS HPX_HAVE_CXX14_CONSTEXPR)
+
+hpx_check_for_cxx14_lambdas(
+  DEFINITIONS HPX_HAVE_CXX14_LAMBDAS)
+
+# Check the availability of certain C++14 library features
+hpx_check_for_cxx14_std_integer_sequence(
+  DEFINITIONS HPX_HAVE_CXX14_STD_INTEGER_SEQUENCE)
+
+hpx_check_for_cxx14_std_result_of_sfinae(
+  DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
+
+if(NOT MSVC)
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
@@ -815,7 +922,6 @@ if(HPX_COMPILER_WARNINGS)
       hpx_add_compile_flag_if_available(-Werror=uninitialized)
     endif()
 
-    #hpx_add_compile_flag_if_available(-Werror=missing-field-initializers)
     hpx_add_compile_flag_if_available(-Werror=format)
     hpx_add_compile_flag_if_available(-Werror=missing-braces)
     hpx_add_compile_flag_if_available(-Werror=sign-compare)
@@ -912,45 +1018,6 @@ endif()
 
 ##############################################################################
 
-##############################################################################
-# Check the availability of certain C++11 language features
-
-hpx_check_for_cxx11_rvalue_references()
-
-if(NOT HPX_WITH_CXX11_RVALUE_REFERENCES)
-  hpx_error("HPX needs support for C++11 rvalue references")
-endif()
-
-hpx_check_for_cxx11_variadic_templates(
-  DEFINITIONS HPX_HAVE_CXX11_VARIADIC_TEMPLATES)
-
-hpx_check_for_cxx11_lambdas(
-  DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
-
-hpx_check_for_cxx11_auto(
-  DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
-
-hpx_check_for_cxx11_decltype(
-  DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
-
-hpx_check_for_cxx11_alias_templates(
-  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
-
-hpx_check_for_cxx11_defaulted_deleted_functions(
-  DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS)
-
-hpx_check_for_cxx11_std_unique_ptr(
-  DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
-              BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
-
-hpx_check_for_cxx11_std_initializer_list(
-  DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
-
-hpx_check_for_cxx11_std_chrono(
-  DEFINITIONS HPX_HAVE_CXX11_STD_CHRONO)
-
-##############################################################################
-
 ################################################################################
 # Check Build Options based on the found dependencies. We also check for errors
 # with incompatible options with the currently selected platform.
@@ -981,13 +1048,6 @@ if(MSVC)
       hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     endif()
   endif()
-endif()
-
-if(HPX_UNIQUE_FUTURE_ALIAS)
-  if(NOT HPX_WITH_CXX11_ALIAS_TEMPLATES)
-    hpx_error("template aliases are not available for this compiler. Can't create a unique_future<R> alias. Please set HPX_UNIQUE_FUTURE_ALIAS to OFF or use a modern compiler")
-  endif()
-  hpx_add_config_define(HPX_UNIQUE_FUTURE_ALIAS)
 endif()
 
 ################################################################################
@@ -1129,18 +1189,13 @@ foreach(def ${HPX_CONFIG_DEFINITIONS_VAR})
 endforeach()
 
 # Generate a defines.hpp to be used in the build directory ...
-if(HPX_BUILD_WITH_INSTALL_PREFIX)
-  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-else()
-  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-endif()
+set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
                @ONLY)
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
-
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp"
                @ONLY)
@@ -1154,13 +1209,12 @@ configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
 # installation instructions
 ################################################################################
 install(
-  DIRECTORY ${CMAKE_BINARY_DIR}/bin/
-  DESTINATION hpx/bin/
+  FILES "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+  DESTINATION bin
   COMPONENT core
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                   GROUP_READ GROUP_EXECUTE
-                   WORLD_READ WORLD_EXECUTE
-  FILES_MATCHING PATTERN "hpxcxx" EXCLUDE)
+  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+  GROUP_READ GROUP_EXECUTE
+  WORLD_READ WORLD_EXECUTE)
 
 install( # install all hpx header files
   DIRECTORY hpx/

@@ -13,7 +13,6 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -40,7 +39,6 @@
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/vector.hpp>
 
 #include <sstream>
 
@@ -425,7 +423,7 @@ void register_worker(registration_header const& header)
 
     parcelset::locality dest;
     parcelset::locality here = bbb.here();
-    BOOST_FOREACH(parcelset::endpoints_type::value_type const & loc, header.endpoints)
+    for (parcelset::endpoints_type::value_type const & loc : header.endpoints)
     {
         if(loc.second.type() == here.type())
         {
@@ -616,7 +614,7 @@ void register_worker_security(registration_header_security const& header)
 
     parcelset::locality dest;
     parcelset::locality here = bbb.here();
-    BOOST_FOREACH(parcelset::locality const & loc, header.endpoints)
+    for (parcelset::locality const& loc : header.endpoints)
     {
         if(loc.get_type() == here.get_type())
         {

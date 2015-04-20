@@ -10,13 +10,13 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/util/serialize_buffer.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::serialize_buffer<int> test(hpx::util::serialize_buffer<int> const& b)
+hpx::serialization::serialize_buffer<int> test(hpx::serialization::serialize_buffer<int> const& b)
 {
     return b;
 }
@@ -55,10 +55,10 @@ int hpx_main()
 
             std::generate(data.begin(), data.end(), inc());
 
-            hpx::util::serialize_buffer<int> buffer(data.data(), data.size(),
-                hpx::util::serialize_buffer<int>::reference);
+            hpx::serialization::serialize_buffer<int> buffer(data.data(), data.size(),
+                hpx::serialization::serialize_buffer<int>::reference);
 
-            hpx::util::serialize_buffer<int> result = act(localities[0], buffer);
+            hpx::serialization::serialize_buffer<int> result = act(localities[0], buffer);
 
             HPX_TEST(std::equal(data.begin(), data.end(), result.data()));
         }

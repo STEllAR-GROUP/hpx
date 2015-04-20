@@ -6,12 +6,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-
 #include "server/simple_central_tuplespace.hpp"
 
 //[simple_central_tuplespace_registration_definitions
@@ -24,7 +18,7 @@ typedef hpx::components::simple_component<
     examples::server::simple_central_tuplespace
 > central_tuplespace_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(central_tuplespace_type, simple_central_tuplespace);
+HPX_REGISTER_COMPONENT(central_tuplespace_type, simple_central_tuplespace);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for simple_central_tuplespace actions.

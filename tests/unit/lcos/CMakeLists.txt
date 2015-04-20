@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2014 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,11 @@ set(tests
     apply_colocated
     apply_local
     apply_remote
+    async_cb_colocated
+    async_cb_remote
     async_continue
+    async_continue_cb
+    async_continue_cb_colocated
     async_local
     async_remote
     broadcast
@@ -34,9 +38,13 @@ set(tests
 
 set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(apply_remote_PARAMETERS LOCALITIES 2)
+set(async_cb_colocated_PARAMETERS LOCALITIES 2)
 
 set(async_continue_PARAMETERS LOCALITIES 2)
+set(async_continue_cb_PARAMETERS LOCALITIES 2)
+set(async_continue_cb_colocated_PARAMETERS LOCALITIES 2)
 set(async_remote_PARAMETERS LOCALITIES 2)
+set(async_cb_remote_PARAMETERS LOCALITIES 2)
 
 set(broadcast_PARAMETERS LOCALITIES 2)
 set(broadcast_apply_PARAMETERS LOCALITIES 2)

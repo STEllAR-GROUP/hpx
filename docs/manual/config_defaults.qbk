@@ -199,7 +199,7 @@ of the components will contain at least the following properties:
     [[`hpx.components.<component_instance_name>.name`]
      [This is the name of a component, usually the same as the second argument
       to the macro used while registering the component with
-      [macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`].
+      [macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`].
       Set by the component factory.]]
     [[`hpx.components.<component_instance_name>.path`]
      [This is either the full path file name of the component module or the
@@ -501,7 +501,7 @@ to `ON`).
 ``
     [hpx.parcel.mpi]
     enable = ${HPX_PARCELPORT_MPI:1}
-    env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}
+    env = ${HPX_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE}
     multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}
     rank = <MPI_rank>
     processor_name = <MPI_processor_name>

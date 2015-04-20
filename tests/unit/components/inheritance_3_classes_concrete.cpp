@@ -31,7 +31,7 @@ struct A : hpx::components::managed_component_base<A>
 };
 
 typedef hpx::components::managed_component<A> serverA_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(serverA_type, A);
+HPX_REGISTER_COMPONENT(serverA_type, A);
 
 typedef A::test0_action test0_action;
 HPX_REGISTER_ACTION_DECLARATION(test0_action);
@@ -189,10 +189,10 @@ int main()
 
     { // Client to A, instance of A
         clientA obj(hpx::components::new_<A>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "A");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(!b_ctor); HPX_TEST(!b_dtor);
     HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
@@ -203,10 +203,10 @@ int main()
 
     { // Client to A, instance of B
         clientA obj(hpx::components::new_<B>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "B");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
@@ -217,11 +217,11 @@ int main()
 
     { // Client to B, instance of B
         clientB obj(hpx::components::new_<B>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "B");
         HPX_TEST_EQ(obj.test1(), "B");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
@@ -232,10 +232,10 @@ int main()
 
     { // Client to A, instance of C
         clientA obj(hpx::components::new_<C>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "C");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(c_ctor); HPX_TEST(c_dtor);
@@ -246,11 +246,11 @@ int main()
 
     { // Client to B, instance of C
         clientB obj(hpx::components::new_<C>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "C");
         HPX_TEST_EQ(obj.test1(), "C");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(c_ctor); HPX_TEST(c_dtor);
@@ -261,12 +261,12 @@ int main()
 
     { // Client to C, instance of C
         clientC obj(hpx::components::new_<C>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "C");
         HPX_TEST_EQ(obj.test1(), "C");
         HPX_TEST_EQ(obj.test2(), "C");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(c_ctor); HPX_TEST(c_dtor);

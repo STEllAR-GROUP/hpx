@@ -14,7 +14,6 @@
 #include <hpx/util/detail/count_num_args.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/serialization/serialization.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
 
@@ -98,7 +97,7 @@ namespace hpx { namespace components { namespace server
     typedef ::hpx::components::simple_component<                              \
         ::hpx::components::server::distributed_metadata_base<config>          \
     > BOOST_PP_CAT(__distributed_metadata_, name);                            \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(                                   \
+    HPX_REGISTER_COMPONENT(                                                   \
         BOOST_PP_CAT(__distributed_metadata_, name))                          \
     /**/
 

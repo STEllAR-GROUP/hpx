@@ -13,14 +13,12 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/compression_snappy.hpp>
 
 #include <vector>
 #include <list>
 #include <set>
 
 #include <boost/ref.hpp>
-#include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,7 +90,7 @@ void hello_world_foreman()
         std::vector<hpx::lcos::future<std::size_t> > futures;
         futures.reserve(attendance.size());
 
-        BOOST_FOREACH(std::size_t worker, attendance)
+        for (std::size_t worker : attendance)
         {
             // Asynchronously start a new task. The task is encapsulated in a
             // future, which we can query to determine if the task has
@@ -141,7 +139,7 @@ int main()
     std::vector<hpx::lcos::future<void> > futures;
     futures.reserve(localities.size());
 
-    BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+    for (hpx::naming::id_type const& node : localities)
     {
         // Asynchronously start a new task. The task is encapsulated in a
         // future, which we can query to determine if the task has

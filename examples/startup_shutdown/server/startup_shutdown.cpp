@@ -6,17 +6,11 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-
 #include "startup_shutdown.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::simple_component<
         startup_shutdown::server::startup_shutdown_component>,
     startup_shutdown_component);
