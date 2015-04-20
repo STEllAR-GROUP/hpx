@@ -98,6 +98,6 @@ namespace hpx { namespace util
     }
 
 //     template class polymorphic_factory<actions::base_action>;
-    template class polymorphic_factory<actions::continuation>;
+//     template class polymorphic_factory<actions::continuation>;
     template class polymorphic_factory<detail::function_registration_info_base>;
 }}

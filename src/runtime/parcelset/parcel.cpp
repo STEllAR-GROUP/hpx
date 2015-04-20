@@ -46,11 +46,7 @@ namespace hpx { namespace parcelset
 
             // If we have a continuation, serialize it.
             if (has_continuation) {
-                std::string continuation_name =
-                    continuation_->get_continuation_name();
-                ar << continuation_name;
-
-                continuation_->save(ar);
+                ar << continuation_;
             }
         }
 
@@ -65,12 +61,7 @@ namespace hpx { namespace parcelset
 
             // handle continuation.
             if (has_continuation) {
-                std::string continuation_name;
-                ar >> continuation_name;
-
-                continuation_ = util::polymorphic_factory<
-                    actions::continuation>::create(continuation_name);
-                continuation_->load(ar);
+                ar >> continuation_;
             }
         }
 
