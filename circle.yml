@@ -41,6 +41,7 @@ test:
 
 deployment:
     hub:
+        branch: docker_image_generation
         commands:
             - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
             - docker push ${TARGET_IMAGE_NAME}
