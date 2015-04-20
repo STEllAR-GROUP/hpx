@@ -10,7 +10,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/util/polymorphic_factory.hpp>
+#include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -96,11 +96,7 @@ namespace hpx { namespace util { namespace functional
                 ar & bound_ & has_continuation;
                 if (has_continuation)
                 {
-                    std::string continuation_name =
-                        cont_->get_continuation_name();
-                    ar << continuation_name;
-
-                    cont_->save(ar);
+                    ar << cont_;
                 }
             }
 
@@ -111,12 +107,7 @@ namespace hpx { namespace util { namespace functional
                 ar & bound_ & has_continuation;
                 if (has_continuation)
                 {
-                    std::string continuation_name;
-                    ar >> continuation_name;
-
-                    cont_ = util::polymorphic_factory<
-                        actions::continuation>::create(continuation_name);
-                    cont_->load(ar);
+                    ar >> cont_;
                 }
             }
 
@@ -197,11 +188,7 @@ namespace hpx { namespace util { namespace functional
                 ar & bound_ & has_continuation;
                 if (has_continuation)
                 {
-                    std::string continuation_name =
-                        cont_->get_continuation_name();
-                    ar << continuation_name;
-
-                    cont_->save(ar);
+                    ar << cont_;
                 }
             }
 
@@ -212,12 +199,7 @@ namespace hpx { namespace util { namespace functional
                 ar & bound_ & has_continuation;
                 if (has_continuation)
                 {
-                    std::string continuation_name;
-                    ar >> continuation_name;
-
-                    cont_ = util::polymorphic_factory<
-                        actions::continuation>::create(continuation_name);
-                    cont_->load(ar);
+                    ar >> cont_;
                 }
             }
 
