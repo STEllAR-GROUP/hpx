@@ -205,7 +205,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             if (id_ != threads::get_self_id())
             {
                 HPX_THROW_EXCEPTION(task_block_not_active,
-                    "define_task_block_handle::run",
+                    "task_block::run",
                     "the task_block is not active");
             }
 
@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             if (id_ != threads::get_self_id())
             {
                 HPX_THROW_EXCEPTION(task_block_not_active,
-                    "define_task_block_handle::run",
+                    "task_block::run",
                     "the task_block is not active");
             }
 
