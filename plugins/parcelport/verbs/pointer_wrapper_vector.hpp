@@ -9,7 +9,8 @@
 #include <hpx/config.hpp>
 //
 #include <vector>
-
+#include <functional>
+//
 namespace hpx { namespace util { namespace detail
 {
 // this class looks like a vector, but can be initialized from a pointer and size,
@@ -20,8 +21,10 @@ template<class T>
 class pointer_wrapper_vector
 {
   public:
+    typedef std::function<void(void)> deleter_callback;
     T  *m_array_;
     int m_size_;
+    deleter_callback cb_;
 
     typedef T                                           value_type;
     typedef value_type &                                reference;
@@ -33,11 +36,26 @@ class pointer_wrapper_vector
     typedef typename std::vector<T>::allocator_type     allocator_type;
 
     pointer_wrapper_vector() : m_array_(0), m_size_(0) {}
-    pointer_wrapper_vector(T* p, std::size_t s) : m_array_(p), m_size_(s) {}
+    pointer_wrapper_vector(T* p, std::size_t s, deleter_callback cb) :
+        m_array_(p), m_size_(s), cb_(cb) {}
 
-    pointer_wrapper_vector(pointer_wrapper_vector<T> const & other, allocator_type allocator = allocator_type()) :
-      m_array_(other.m_array_), m_size_(other.m_size_) {}
+    pointer_wrapper_vector(pointer_wrapper_vector<T>&& other, allocator_type allocator = allocator_type()) :
+        m_array_(other.m_array_), m_size_(other.m_size_), cb_(other.cb_)
+    {
+        other.m_size_  = 0;
+        other.m_array_ = 0;
+        other.cb_      = NULL;
+    }
 
+    ~pointer_wrapper_vector() {
+        if (m_array_ && cb_) {
+            LOG_DEBUG_MSG("Deleting pointer wrapper, should trigger callback to parcelport memory free");
+            cb_();
+        }
+        else {
+            LOG_DEBUG_MSG("============ %%%%%%%%%%%%%");
+        }
+    }
     size_type size() const { return m_size_; }
 
     size_type max_size() const { return m_size_; }
@@ -63,6 +81,10 @@ class pointer_wrapper_vector
 
     void resize(std::size_t s) {}
     void reserve(std::size_t s) {}
+
+  private:
+    pointer_wrapper_vector(pointer_wrapper_vector<T> const & other, allocator_type allocator = allocator_type());
+
   };
 }}}
 
