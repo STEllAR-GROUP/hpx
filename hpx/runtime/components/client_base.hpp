@@ -110,6 +110,18 @@ namespace hpx { namespace traits
             return std::forward<T_>(value);
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Derived>
+    struct serialize_as_future<Derived,
+            typename boost::enable_if<is_client<Derived> >::type>
+      : boost::mpl::true_
+    {
+        static void call(Derived& c)
+        {
+            c.wait();
+        }
+    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -319,6 +331,11 @@ namespace hpx { namespace components
         bool is_ready() const
         {
             return gid_.is_ready();
+        }
+
+        void wait() const
+        {
+            return gid_.wait();
         }
 
         ///////////////////////////////////////////////////////////////////////

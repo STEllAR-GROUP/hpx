@@ -1,4 +1,4 @@
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2015 Hartmut Kaiser
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2013 Agustin Berge
 //
@@ -13,6 +13,7 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_placeholder.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -304,16 +305,27 @@ namespace hpx { namespace util
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
 {
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename BoundArgs>
     struct is_bind_expression<util::detail::bound_action<Action, BoundArgs> >
       : boost::mpl::true_
     {};
 
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename BoundArgs>
     struct is_bound_action<util::detail::bound_action<Action, BoundArgs> >
       : boost::mpl::true_
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename BoundArgs>
+    struct serialize_as_future<util::detail::bound_action<Action, BoundArgs> >
+      : serialize_as_future<BoundArgs>
+    {
+        static void call(util::detail::bound_action<Action, BoundArgs> & b)
+        {
+            traits::serialize_as_future<BoundArgs>::call(b._bound_args);
+        }
+    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

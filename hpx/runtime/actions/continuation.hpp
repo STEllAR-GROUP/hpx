@@ -17,6 +17,7 @@
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/type_traits/remove_reference.hpp>
@@ -223,6 +224,8 @@ namespace hpx { namespace actions
             return gid_;
         }
 
+        virtual void wait_for_futures() = 0;
+
     protected:
         naming::id_type gid_;
     };
@@ -286,6 +289,10 @@ namespace hpx { namespace actions
     template <typename Cont>
     struct continuation_impl
     {
+    private:
+        typedef typename util::decay<Cont>::type cont_type;
+
+    public:
         template <typename T>
         struct result;
 
@@ -312,6 +319,11 @@ namespace hpx { namespace actions
             return std::move(t);
         }
 
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<cont_type>::call(cont_);
+        }
+
     private:
         // serialization support
         friend class hpx::serialization::access;
@@ -322,7 +334,6 @@ namespace hpx { namespace actions
             ar & cont_ & target_;
         }
 
-        typedef typename util::decay<Cont>::type cont_type;
         cont_type cont_;
         hpx::id_type target_;
     };
@@ -331,6 +342,11 @@ namespace hpx { namespace actions
     template <typename Cont, typename F>
     struct continuation2_impl
     {
+    private:
+        typedef typename boost::remove_reference<Cont>::type cont_type;
+        typedef typename boost::remove_reference<F>::type function_type;
+
+    public:
         template <typename T>
         struct result;
 
@@ -362,6 +378,12 @@ namespace hpx { namespace actions
             return std::move(t);
         }
 
+        void wait_for_futures()
+        {
+            traits::serialize_as_future<cont_type>::call(cont_);
+            traits::serialize_as_future<function_type>::call(f_);
+        }
+
     private:
         // serialization support
         friend class hpx::serialization::access;
@@ -371,9 +393,6 @@ namespace hpx { namespace actions
         {
             ar & cont_ & target_ & f_;
         }
-
-        typedef typename boost::remove_reference<Cont>::type cont_type;
-        typedef typename boost::remove_reference<F>::type function_type;
 
         cont_type cont_;        // continuation type
         hpx::id_type target_;
@@ -388,6 +407,10 @@ namespace hpx { namespace actions
     template <typename Result>
     struct typed_continuation : continuation
     {
+    private:
+        typedef util::function<void(naming::id_type, Result)> function_type;
+
+    public:
         typed_continuation()
         {}
 
@@ -439,6 +462,11 @@ namespace hpx { namespace actions
             }
         }
 
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<function_type>::call(f_);
+        }
+
     private:
         char const* get_continuation_name() const
         {
@@ -471,7 +499,7 @@ namespace hpx { namespace actions
                 ar << f_;
         }
 
-        util::function<void(naming::id_type, Result)> f_;
+        function_type f_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -500,6 +528,10 @@ namespace hpx { namespace actions
     template <>
     struct typed_continuation<void> : continuation
     {
+    private:
+        typedef util::function<void(naming::id_type)> function_type;
+
+    public:
         typed_continuation()
         {}
 
@@ -556,6 +588,11 @@ namespace hpx { namespace actions
             this->trigger();
         }
 
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<function_type>::call(f_);
+        }
+
     private:
         char const* get_continuation_name() const
         {
@@ -588,7 +625,7 @@ namespace hpx { namespace actions
                 ar << f_;
         }
 
-        util::function<void(naming::id_type)> f_;
+        function_type f_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

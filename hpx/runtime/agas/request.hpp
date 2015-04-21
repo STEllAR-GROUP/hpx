@@ -264,6 +264,7 @@ namespace hpx { namespace traits
     {
         static void call(hpx::agas::request& r)
         {
+            // routed parcels need to be checked for embedded future objects
             if (r.get_action_code() == hpx::agas::primary_ns_route)
             {
                 hpx::parcelset::parcel p = r.get_parcel();

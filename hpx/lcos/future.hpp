@@ -1263,6 +1263,10 @@ namespace hpx { namespace actions
     template <typename R>
     struct typed_continuation<lcos::future<R> > : continuation
     {
+    private:
+        typedef util::function<void(naming::id_type, R)> function_type;
+
+    public:
         typed_continuation()
         {}
 
@@ -1331,6 +1335,11 @@ namespace hpx { namespace actions
                     util::placeholders::_1));
         }
 
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<function_type>::call(f_);
+        }
+
     private:
         char const* get_continuation_name() const
         {
@@ -1363,12 +1372,16 @@ namespace hpx { namespace actions
                 ar << f_;
         }
 
-        util::function<void(naming::id_type, R)> f_;
+        function_type f_;
     };
 
     template <>
     struct typed_continuation<lcos::future<void> > : continuation
     {
+    private:
+        typedef util::function<void(naming::id_type)> function_type;
+
+    public:
         typed_continuation()
         {}
 
@@ -1439,6 +1452,11 @@ namespace hpx { namespace actions
                     util::placeholders::_1));
         }
 
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<function_type>::call(f_);
+        }
+
     private:
         char const* get_continuation_name() const
         {
@@ -1471,12 +1489,16 @@ namespace hpx { namespace actions
                 ar << f_;
         }
 
-        util::function<void(naming::id_type)> f_;
+        function_type f_;
     };
 
     template <typename R>
     struct typed_continuation<lcos::shared_future<R> > : continuation
     {
+    private:
+        typedef util::function<void(naming::id_type, R)> function_type;
+
+    public:
         typed_continuation()
         {}
 
@@ -1524,7 +1546,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(lcos::shared_future<R> && result) const
+        virtual void trigger_value(lcos::shared_future<R> && result) const
         {
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
@@ -1543,6 +1565,11 @@ namespace hpx { namespace actions
                     boost::static_pointer_cast<typed_continuation const>(
                         shared_from_this()),
                     util::placeholders::_1));
+        }
+
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -1577,12 +1604,16 @@ namespace hpx { namespace actions
                 ar << f_;
         }
 
-        util::function<void(naming::id_type, R)> f_;
+        function_type f_;
     };
 
     template <>
     struct typed_continuation<lcos::shared_future<void> > : continuation
     {
+    private:
+        typedef util::function<void(naming::id_type)> function_type;
+
+    public:
         typed_continuation()
         {}
 
@@ -1632,7 +1663,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(lcos::shared_future<void> && result) const
+        virtual void trigger_value(lcos::shared_future<void> && result) const
         {
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
@@ -1651,6 +1682,11 @@ namespace hpx { namespace actions
                     boost::static_pointer_cast<typed_continuation const>(
                         shared_from_this()),
                     util::placeholders::_1));
+        }
+
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -1685,7 +1721,7 @@ namespace hpx { namespace actions
                 ar << f_;
         }
 
-        util::function<void(naming::id_type)> f_;
+        function_type f_;
     };
 }}
 
@@ -1704,6 +1740,30 @@ namespace hpx { namespace serialization
     {
         hpx::lcos::detail::serialize_future(ar, f, version);
     }
+}}
+
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename R>
+    struct serialize_as_future<lcos::future<R> >
+      : boost::mpl::true_
+    {
+        static void call(lcos::future<R>& f)
+        {
+            f.wait();
+        }
+    };
+
+    template <typename R>
+    struct serialize_as_future<lcos::shared_future<R> >
+      : boost::mpl::true_
+    {
+        static void call(lcos::shared_future<R>& f)
+        {
+            f.wait();
+        }
+    };
 }}
 
 #include <hpx/lcos/local/packaged_continuation.hpp>

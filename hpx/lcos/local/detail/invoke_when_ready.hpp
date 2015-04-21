@@ -95,6 +95,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         void apply()
         {
             // wait for all futures to become ready
+            traits::serialize_as_future<F>::call(f_);
             traits::serialize_as_future<Args>::call(args_);
 
             // invoke the function
@@ -145,6 +146,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     template <typename F, typename ...Ts>
     typename boost::disable_if<
         util::detail::any_of<
+            traits::serialize_as_future<typename util::decay<F>::type>,
             traits::serialize_as_future<typename util::decay<Ts>::type>...>
       , future<typename util::result_of<
             typename util::decay<F>::type(typename util::decay<Ts>::type...)
@@ -163,6 +165,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     template <typename F, typename ...Ts>
     typename boost::enable_if<
         util::detail::any_of<
+            traits::serialize_as_future<typename util::decay<F>::type>,
             traits::serialize_as_future<typename util::decay<Ts>::type>...>
       , future<typename util::result_of<
             typename util::decay<F>::type(typename util::decay<Ts>::type...)
