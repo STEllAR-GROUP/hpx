@@ -123,7 +123,7 @@ namespace hpx { namespace util { namespace functional
 
             HPX_SERIALIZATION_SPLIT_MEMBER();
 
-            friend traits::serialize_as_future<apply_continuation_impl>;
+            friend struct traits::serialize_as_future<apply_continuation_impl>;
 
             bound_type bound_;
             actions::continuation_type cont_;
@@ -158,7 +158,7 @@ namespace hpx { namespace traits
         static void
         call(util::functional::detail::apply_continuation_impl<Bound>& b)
         {
-            typedef util::functional::detail::apply_continuation_impl<
+            typedef typename util::functional::detail::apply_continuation_impl<
                     Bound
                 >::bound_type bound_type;
             traits::serialize_as_future<bound_type>::call(b.bound_);
@@ -250,7 +250,7 @@ namespace hpx { namespace util { namespace functional
 
             HPX_SERIALIZATION_SPLIT_MEMBER();
 
-            friend traits::serialize_as_future<async_continuation_impl>;
+            friend struct traits::serialize_as_future<async_continuation_impl>;
 
             bound_type bound_;
             actions::continuation_type cont_;
@@ -285,7 +285,7 @@ namespace hpx { namespace traits
         static void
         call(util::functional::detail::async_continuation_impl<Bound>& b)
         {
-            typedef util::functional::detail::async_continuation_impl<
+            typedef typename util::functional::detail::async_continuation_impl<
                     Bound
                 >::bound_type bound_type;
             traits::serialize_as_future<bound_type>::call(b.bound_);
