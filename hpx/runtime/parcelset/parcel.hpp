@@ -775,6 +775,11 @@ namespace hpx { namespace traits
     struct serialize_as_future<hpx::parcelset::parcel>
       : boost::mpl::true_
     {
+        static bool call_if(hpx::parcelset::parcel& r)
+        {
+            return true;
+        }
+
         static void call(hpx::parcelset::parcel& p)
         {
             p.wait_for_futures();

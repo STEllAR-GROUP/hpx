@@ -70,6 +70,8 @@ namespace hpx { namespace util { namespace detail
         typename serializable_vtable<IAr, OAr>::load_object_t load_object;
         typename serializable_vtable<IAr, OAr>::wait_for_future_t
             wait_for_future;
+        typename serializable_vtable<IAr, OAr>::has_to_wait_for_futures_t
+            has_to_wait_for_futures;
 
         template <typename T>
         unique_function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
@@ -79,6 +81,8 @@ namespace hpx { namespace util { namespace detail
           , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
           , wait_for_future(
                 &serializable_vtable<IAr, OAr>::template wait_for_future<T>)
+          , has_to_wait_for_futures(
+                &serializable_vtable<IAr, OAr>::template has_to_wait_for_futures<T>)
         {
             init_registration<
                 std::pair<unique_function_vtable_ptr, T>
@@ -364,11 +368,19 @@ namespace hpx { namespace traits
 {
     template <typename Sig, typename IArchive, typename OArchive>
     struct serialize_as_future<util::unique_function<Sig, IArchive, OArchive> >
-      : boost::mpl::true_
+      : boost::mpl::false_
     {
+        // call_if will be invoked when the trait is false
+        static bool
+        call_if(util::unique_function<Sig, IArchive, OArchive>& f)
+        {
+            return !f.vptr->empty && f.vptr->has_to_wait_for_futures(&f.object);
+        }
+
         static void call(util::unique_function<Sig, IArchive, OArchive>& f)
         {
-            f.vptr->wait_for_future(&f.object);
+            if (!f.vptr->empty)
+                f.vptr->wait_for_future(&f.object);
         }
     };
 
@@ -376,7 +388,13 @@ namespace hpx { namespace traits
     struct serialize_as_future<util::unique_function<Sig, void, void> >
       : boost::mpl::false_
     {
-        static void call(util::unique_function<Sig, void, void>&) {}
+        static BOOST_FORCEINLINE
+        bool call_if(util::unique_function<Sig, void, void>&)
+            { return false; }
+
+        static BOOST_FORCEINLINE
+        void call(util::unique_function<Sig, void, void>&)
+            {}
     };
 
 #ifdef BOOST_NO_CXX11_TEMPLATE_ALIASES
@@ -384,7 +402,13 @@ namespace hpx { namespace traits
     struct serialize_as_future<util::unique_function_nonser<Sig> >
       : boost::mpl::false_
     {
-        static void call(util::unique_function_nonser<Sig>&) {}
+        static BOOST_FORCEINLINE
+        bool call_if(util::unique_function_nonser<Sig>&)
+            { return false; }
+
+        static BOOST_FORCEINLINE
+        void call(util::unique_function_nonser<Sig>&)
+            {}
     };
 #endif
 }}

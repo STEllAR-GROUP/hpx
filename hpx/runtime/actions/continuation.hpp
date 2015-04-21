@@ -224,6 +224,7 @@ namespace hpx { namespace actions
             return gid_;
         }
 
+        virtual bool has_to_wait_for_futures() = 0;
         virtual void wait_for_futures() = 0;
 
     protected:
@@ -319,6 +320,11 @@ namespace hpx { namespace actions
             return std::move(t);
         }
 
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<cont_type>::call_if(cont_);
+        }
+
         virtual void wait_for_futures()
         {
             traits::serialize_as_future<cont_type>::call(cont_);
@@ -378,7 +384,13 @@ namespace hpx { namespace actions
             return std::move(t);
         }
 
-        void wait_for_futures()
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<cont_type>::call_if(cont_) ||
+                traits::serialize_as_future<function_type>::call_if(f_);
+        }
+
+        virtual void wait_for_futures()
         {
             traits::serialize_as_future<cont_type>::call(cont_);
             traits::serialize_as_future<function_type>::call(f_);
@@ -460,6 +472,11 @@ namespace hpx { namespace actions
             else {
                 f_(this->get_gid(), std::move(result));
             }
+        }
+
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<function_type>::call_if(f_);
         }
 
         virtual void wait_for_futures()
@@ -586,6 +603,11 @@ namespace hpx { namespace actions
         virtual void trigger_value(util::unused_type &&) const
         {
             this->trigger();
+        }
+
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<function_type>::call_if(f_);
         }
 
         virtual void wait_for_futures()

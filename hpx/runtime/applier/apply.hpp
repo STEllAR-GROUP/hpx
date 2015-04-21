@@ -136,12 +136,16 @@ namespace hpx
     {
         template <typename Action>
         struct serialize_as_future<applier::detail::put_parcel<Action> >
-          : boost::mpl::true_
+          : boost::mpl::false_
         {
+            static bool call_if(applier::detail::put_parcel<Action>& pp)
+            {
+                return pp.cont_ && pp.cont_->has_to_wait_for_futures();
+            }
+
             static void call(applier::detail::put_parcel<Action>& pp)
             {
-                if (pp.cont_)
-                    pp.cont_->wait_for_futures();
+                if (pp.cont_) pp.cont_->wait_for_futures();
             }
         };
     }

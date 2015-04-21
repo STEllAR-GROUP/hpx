@@ -1335,6 +1335,11 @@ namespace hpx { namespace actions
                     util::placeholders::_1));
         }
 
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<function_type>::call_if(f_);
+        }
+
         virtual void wait_for_futures()
         {
             traits::serialize_as_future<function_type>::call(f_);
@@ -1452,6 +1457,11 @@ namespace hpx { namespace actions
                     util::placeholders::_1));
         }
 
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<function_type>::call_if(f_);
+        }
+
         virtual void wait_for_futures()
         {
             traits::serialize_as_future<function_type>::call(f_);
@@ -1565,6 +1575,11 @@ namespace hpx { namespace actions
                     boost::static_pointer_cast<typed_continuation const>(
                         shared_from_this()),
                     util::placeholders::_1));
+        }
+
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<function_type>::call_if(f_);
         }
 
         virtual void wait_for_futures()
@@ -1684,6 +1699,11 @@ namespace hpx { namespace actions
                     util::placeholders::_1));
         }
 
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<function_type>::call_if(f_);
+        }
+
         virtual void wait_for_futures()
         {
             traits::serialize_as_future<function_type>::call(f_);
@@ -1747,8 +1767,13 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename R>
     struct serialize_as_future<lcos::future<R> >
-      : boost::mpl::true_
+      : boost::mpl::false_
     {
+        static bool call_if(lcos::future<R>& f)
+        {
+            return f.valid() && !f.is_ready();
+        }
+
         static void call(lcos::future<R>& f)
         {
             f.wait();
@@ -1759,6 +1784,11 @@ namespace hpx { namespace traits
     struct serialize_as_future<lcos::shared_future<R> >
       : boost::mpl::true_
     {
+        static bool call_if(lcos::future<R>& f)
+        {
+            return f.valid() && !f.is_ready();
+        }
+
         static void call(lcos::shared_future<R>& f)
         {
             f.wait();

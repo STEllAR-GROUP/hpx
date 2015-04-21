@@ -75,6 +75,8 @@ namespace hpx { namespace util { namespace detail
         typename serializable_vtable<IAr, OAr>::load_object_t load_object;
         typename serializable_vtable<IAr, OAr>::wait_for_future_t
             wait_for_future;
+        typename serializable_vtable<IAr, OAr>::has_to_wait_for_futures_t
+            has_to_wait_for_futures;
 
         template <typename T>
         function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
@@ -84,6 +86,8 @@ namespace hpx { namespace util { namespace detail
           , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
           , wait_for_future(
                 &serializable_vtable<IAr, OAr>::template wait_for_future<T>)
+          , has_to_wait_for_futures(
+                &serializable_vtable<IAr, OAr>::template has_to_wait_for_futures<T>)
         {
             if(!this->empty)
                 name = get_function_name<std::pair<function_vtable_ptr, T> >();

@@ -130,11 +130,18 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Sig, typename IArchive, typename OArchive>
     struct serialize_as_future<util::function<Sig, IArchive, OArchive> >
-      : boost::mpl::true_
+      : boost::mpl::false_
     {
+        static bool
+        call_if(util::function<Sig, IArchive, OArchive>& f)
+        {
+            return !f.vptr->empty && f.vptr->has_to_wait_for_futures(&f.object);
+        }
+
         static void call(util::function<Sig, IArchive, OArchive>& f)
         {
-            f.vptr->wait_for_future(&f.object);
+            if (!f.vptr->empty)
+                f.vptr->wait_for_future(&f.object);
         }
     };
 
@@ -142,6 +149,7 @@ namespace hpx { namespace traits
     struct serialize_as_future<util::function<Sig, void, void> >
       : boost::mpl::false_
     {
+        static bool call_if(util::function<Sig, void, void>&) { return false; }
         static void call(util::function<Sig, void, void>&) {}
     };
 
@@ -150,6 +158,7 @@ namespace hpx { namespace traits
     struct serialize_as_future<util::function_nonser<Sig> >
       : boost::mpl::false_
     {
+        static bool call_if(util::function_nonser<Sig>&) { return false; }
         static void call(util::function_nonser<Sig>&) {}
     };
 #endif

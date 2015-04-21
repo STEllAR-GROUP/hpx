@@ -110,18 +110,6 @@ namespace hpx { namespace traits
             return std::forward<T_>(value);
         }
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived>
-    struct serialize_as_future<Derived,
-            typename boost::enable_if<is_client<Derived> >::type>
-      : boost::mpl::true_
-    {
-        static void call(Derived& c)
-        {
-            c.wait();
-        }
-    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -487,6 +475,26 @@ namespace hpx { namespace components
         }
         return result;
     }
+}}
+
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Derived>
+    struct serialize_as_future<Derived,
+            typename boost::enable_if<is_client<Derived> >::type>
+      : boost::mpl::false_
+    {
+        static bool call_if(Derived& c)
+        {
+            return c.valid() && !c.is_ready();
+        }
+
+        static void call(Derived& c)
+        {
+            c.wait();
+        }
+    };
 }}
 
 #endif

@@ -32,6 +32,7 @@
 
 #include <cstddef> // for size_t
 #include <utility>
+#include <algorithm>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
@@ -950,6 +951,17 @@ namespace hpx { namespace traits
                 util::detail::pack_c<std::size_t, Is...>, Ts...
             >
         {
+            static bool call_if(util::tuple<Ts...>& t)
+            {
+                bool const _sequencer[] = {
+                    serialize_as_future<Ts>::call_if(util::get<Is>(t))...
+                };
+
+                return std::any_of(_sequencer,
+                    _sequencer+sizeof(_sequencer)/sizeof(_sequencer[0]),
+                    [](bool b) { return b; });
+            }
+
             static void call(util::tuple<Ts...>& t)
             {
                 int const _sequencer[] = {
@@ -964,13 +976,23 @@ namespace hpx { namespace traits
     struct serialize_as_future<util::tuple<> >
       : boost::mpl::false_
     {
-        static void call(util::tuple<>&) {}
+        static BOOST_FORCEINLINE bool call_if(util::tuple<>&) { return false; }
+        static BOOST_FORCEINLINE void call(util::tuple<>&) {}
     };
 
     template <typename ...Ts>
     struct serialize_as_future<util::tuple<Ts...> >
       : util::detail::any_of<serialize_as_future<Ts>...>
     {
+        static bool call_if(util::tuple<Ts...>& t)
+        {
+            return util::detail::any_of<serialize_as_future<Ts>...>::value ||
+                traits::detail::serialize_as_future_helper<
+                    typename util::detail::make_index_pack<sizeof...(Ts)>::type,
+                    Ts...
+                >::call_if(t);
+        }
+
         static void call(util::tuple<Ts...>& t)
         {
             traits::detail::serialize_as_future_helper<

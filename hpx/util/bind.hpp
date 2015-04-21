@@ -492,6 +492,13 @@ namespace hpx { namespace traits
             serialize_as_future<BoundArgs>::value
         >
     {
+        static BOOST_FORCEINLINE
+        bool call_if(util::detail::bound<F, BoundArgs>& b)
+        {
+            return serialize_as_future<F>::call_if(b._f) ||
+                serialize_as_future<BoundArgs>::call_if(b._bound_args);
+        }
+
         static void call(util::detail::bound<F, BoundArgs> & b)
         {
             traits::serialize_as_future<F>::call(b._f);
