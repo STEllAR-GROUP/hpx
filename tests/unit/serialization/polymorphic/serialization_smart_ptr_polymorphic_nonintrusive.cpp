@@ -26,7 +26,8 @@ struct A
   virtual const char* foo() = 0;
 
 };
-HPX_SERIALIZATION_REGISTER_CLASS(A);
+
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(A);
 
 template <class Archive>
 void serialize(Archive& ar, A& a, unsigned)
@@ -60,7 +61,7 @@ void save(Archive& ar, const B& b, unsigned)
   ar & b.b;
 }
 HPX_SERIALIZATION_SPLIT_FREE(B);
-HPX_SERIALIZATION_REGISTER_CLASS(B);
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(B);
 
 struct C: public B
 {
@@ -105,8 +106,8 @@ void test_shared()
     HPX_TEST_NEQ(op1.get(), ip.get());
     HPX_TEST_NEQ(op2.get(), ip.get());
     HPX_TEST_EQ(op1.get(), op2.get());
-    HPX_TEST_EQ(op1->foo(), "C::foo");
-    HPX_TEST_EQ(op2->foo(), "C::foo");
+    HPX_TEST_EQ(op1->foo(), std::string("C::foo"));
+    HPX_TEST_EQ(op2->foo(), std::string("C::foo"));
     HPX_TEST_EQ(static_cast<C*>(op1.get())->a, 1);
     HPX_TEST_EQ(static_cast<C*>(op1.get())->b, 2);
     HPX_TEST_EQ(static_cast<C*>(op1.get())->get_c(), 3);
@@ -127,7 +128,7 @@ struct D
 
   virtual const char* foo() = 0;
 };
-HPX_SERIALIZATION_REGISTER_CLASS(D);
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(D);
 
 template <class Archive>
 void load(Archive& ar, D& d, unsigned)
@@ -167,7 +168,6 @@ struct E: D
   }
 
 };
-HPX_SERIALIZATION_REGISTER_CLASS(E);
 
 template <class Archive>
 void load(Archive& ar, E& e, unsigned)
@@ -182,6 +182,8 @@ void save(Archive& ar, const E& e, unsigned)
   ar & e.b;
 }
 HPX_SERIALIZATION_SPLIT_FREE(E);
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(E);
+
 
 struct F: public E
 {
@@ -199,7 +201,6 @@ struct F: public E
     return c;
   }
 };
-HPX_SERIALIZATION_REGISTER_CLASS(F);
 
 template <class Archive>
 void serialize(Archive& ar, F& f, unsigned)
@@ -207,6 +208,7 @@ void serialize(Archive& ar, F& f, unsigned)
   ar & hpx::serialization::base_object<E>(f);
   ar & f.c;
 }
+HPX_SERIALIZATION_REGISTER_CLASS(F);
 
 void test_intrusive()
 {
@@ -225,8 +227,8 @@ void test_intrusive()
     HPX_TEST_NEQ(op1.get(), ip.get());
     HPX_TEST_NEQ(op2.get(), ip.get());
     HPX_TEST_EQ(op1.get(), op2.get());
-    HPX_TEST_EQ(op1->foo(), "F::foo");
-    HPX_TEST_EQ(op2->foo(), "F::foo");
+    HPX_TEST_EQ(op1->foo(), std::string("F::foo"));
+    HPX_TEST_EQ(op2->foo(), std::string("F::foo"));
     HPX_TEST_EQ(static_cast<F*>(op1.get())->a, 1);
     HPX_TEST_EQ(static_cast<F*>(op1.get())->b, 2);
     HPX_TEST_EQ(static_cast<F*>(op1.get())->get_c(), 3);
