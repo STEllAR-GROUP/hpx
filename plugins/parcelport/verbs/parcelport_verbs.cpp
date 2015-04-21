@@ -39,6 +39,9 @@
 #include "RdmaDevice.h"
 //
 #include <unordered_map>
+//
+#include <mutex>
+#include <condition_variable>
 
 //#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
 #define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD 256
@@ -193,6 +196,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         FUNC_END_DEBUG_MSG;
       }
 
+//      ~parcelport() {
+//          LOG_DEBUG_MSG("Parcelport destructor being called");
+          //_rdmaController->
+//      }
+
       static RdmaControllerPtr _rdmaController;
       static std::string       _ibverbs_ifname;
       static std::string       _ibverbs_device;
@@ -209,6 +217,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
       // reuse of classes/types
       typedef header<DEFAULT_MEMORY_POOL_CHUNK_SIZE>                    header_type;
       typedef hpx::lcos::local::spinlock                                mutex_type;
+      typedef hpx::lcos::local::spinlock::scoped_lock lock_type;
+      typedef hpx::lcos::local::condition_variable    condition_type;
+//      mutex_type     stop_mutex;
+//      condition_type stop_cond;
+
+      std::mutex stop_mutex;
+      std::condition_variable stop_cond;
+
       typedef char                                                      memory_type;
       typedef RdmaMemoryPool                                            memory_pool_type;
       typedef std::shared_ptr<memory_pool_type>                         memory_pool_ptr_type;
@@ -300,6 +316,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
           ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
           if (ip_it==ip_qp_map.end()) {
               ip_qp_map.insert(std::make_pair(dest_ip, qpinfo.first));
+              client->setInitiatedConnection(false);
               LOG_DEBUG_MSG("handle_verbs_connection OK adding " << ipaddress(dest_ip));
           }
           else {
@@ -679,7 +696,37 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
       void stop(bool blocking = true) {
         FUNC_START_DEBUG_MSG;
-            stopped_ = true;
+        if (!stopped_) {
+            bool finished = false;
+            do {
+                finished =
+                    ZeroCopyGetCompletionMap.empty() &&
+                    TagReceiveCompletionMap.empty() &&
+                    SendCompletionMap.empty() &&
+                    TagSendCompletionMap.empty();
+                if (!finished) {
+                    LOG_ERROR_MSG("Entering STOP when not all parcels have completed");
+                    do_background_work(1);
+                }
+            } while (!finished);
+
+            typedef std::unique_lock<std::mutex>  lock_type2;
+            lock_type2 lock(stop_mutex);
+            _rdmaController->for_each_client(
+                [](std::pair<const uint32_t, RdmaClientPtr> &mappair) {
+                    if (mappair.second->getInitiatedConnection()) {
+                        _rdmaController->removeServerToServerConnection(mappair.second);
+                    }
+                }
+            );
+            // wait for all clients initiated elswhere to be disconnected
+            while (_rdmaController->num_clients()!=0) {
+                LOG_DEBUG_MSG("waiting in the lambda 1");
+                _rdmaController->eventMonitor(0);
+            }
+            LOG_DEBUG_MSG("wait done");
+        }
+        stopped_ = true;
         FUNC_END_DEBUG_MSG;
         // Stop receiving and sending of parcels
       }
@@ -704,6 +751,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         else {
           LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
           client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
+          client->setInitiatedConnection(true);
           ip_qp_map[dest_ip] = client->getQpNum();
         }
 
