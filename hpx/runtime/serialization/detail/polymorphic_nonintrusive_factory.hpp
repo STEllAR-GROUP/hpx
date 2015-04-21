@@ -59,6 +59,8 @@ namespace hpx { namespace serialization { namespace detail
     public:
         typedef boost::unordered_map<std::string,
                   function_bunch_type, hpx::util::jenkins_hash> serializer_map_type;
+        typedef boost::unordered_map<std::string,
+                  std::string, hpx::util::jenkins_hash> serializer_name_map_type;
 
         static polymorphic_nonintrusive_factory& instance()
         {
@@ -66,9 +68,15 @@ namespace hpx { namespace serialization { namespace detail
             return factory.get();
         }
 
-        void register_class(const std::string& class_name,
+        void register_class(const std::string& type_name, const std::string& class_name,
             const function_bunch_type& bunch)
         {
+            if(type_name.empty())
+            {
+                HPX_THROW_EXCEPTION(serialization_error
+                  , "polymorphic_nonintrusive_factory::register_class"
+                  , "Cannot register a factory with an empty type name");
+            }
             if(class_name.empty())
             {
                 HPX_THROW_EXCEPTION(serialization_error
@@ -78,6 +86,9 @@ namespace hpx { namespace serialization { namespace detail
             auto it = map_.find(class_name);
             if(it == map_.end())
                 map_.emplace(class_name, bunch);
+            auto jt = name_map_.find(type_name);
+            if(jt == name_map_.end())
+                name_map_.emplace(type_name, class_name);
         }
 
         // the following templates are defined in *.ipp file
@@ -100,6 +111,7 @@ namespace hpx { namespace serialization { namespace detail
         friend struct hpx::util::static_<polymorphic_nonintrusive_factory>;
 
         serializer_map_type map_;
+        serializer_name_map_type name_map_;
     };
 
     template <class Derived, class Enable = void>
@@ -135,6 +147,7 @@ namespace hpx { namespace serialization { namespace detail
 
             polymorphic_nonintrusive_factory::instance().
                 register_class(
+                    typeid(Derived).name(),
                     get_serialization_name<Derived>(),
                     bunch
                 );
@@ -159,7 +172,11 @@ namespace hpx { namespace serialization { namespace detail
 
         register_class()
         {
+           // It's safe to call typeid here. The typeid(t).name() return value is
+           // only used for local lookup to the portable string that goes over the
+           // wire
             function_bunch_type bunch = {
+                typeid(Derived).name(),
                 &register_class<Derived>::save,
                 &register_class<Derived>::load,
                 static_cast<void* (*)()>(0)
@@ -207,13 +224,13 @@ namespace hpx { namespace serialization { namespace detail
         template <> HPX_ALWAYS_EXPORT                                         \
         char const* get_serialization_name<Class>()                           \
         {                                                                     \
-            return BOOST_PP_STRINGIZE(Name);                                  \
+            return Name;                                                      \
         }                                                                     \
     }}}                                                                       \
     template hpx::serialization::detail::register_class<Class>                \
         hpx::serialization::detail::register_class<Class>::instance;          \
 /**/
 #define HPX_SERIALIZATION_REGISTER_CLASS(Class)                               \
-    HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, Class)                       \
+    HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, BOOST_PP_STRINGIZE(Class))   \
 
 #endif

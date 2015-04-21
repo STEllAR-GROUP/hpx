@@ -18,7 +18,10 @@ namespace hpx { namespace serialization { namespace detail
    template <class T>
    void polymorphic_nonintrusive_factory::save(output_archive& ar, const T& t)
    {
-       const std::string class_name = typeid(t).name();
+       // It's safe to call typeid here. The typeid(t).name() return value is
+       // only used for local lookup to the portable string that goes over the
+       // wire
+       const std::string class_name = name_map_.at(typeid(t).name());
        ar << class_name;
 
        map_.at(class_name).save_function(ar, &t);
