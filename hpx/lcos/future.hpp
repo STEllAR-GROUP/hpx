@@ -1784,7 +1784,7 @@ namespace hpx { namespace traits
     struct serialize_as_future<lcos::shared_future<R> >
       : boost::mpl::true_
     {
-        static bool call_if(lcos::future<R>& f)
+        static bool call_if(lcos::shared_future<R>& f)
         {
             return f.valid() && !f.is_ready();
         }
