@@ -43,8 +43,8 @@
 #include <mutex>
 #include <condition_variable>
 
-//#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
-#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD 256
+#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
+//#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD 256
 
 using namespace hpx::parcelset::policies;
 
@@ -224,6 +224,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
       std::mutex stop_mutex;
       std::condition_variable stop_cond;
+      hpx::lcos::local::spinlock connection_mutex;
+      hpx::lcos::local::spinlock TagReceiveCompletionMap_mutex;
 
       typedef char                                                      memory_type;
       typedef RdmaMemoryPool                                            memory_pool_type;
@@ -296,12 +298,26 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
           chunk_pool_->deallocate(r_data.header_region);
           for (auto r : r_data.zero_copy_regions) {
-              LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
-              chunk_pool_->deallocate(r);
+              // if this region was registered on the fly, then don't return it to the pool
+              if (r->isTempRegion()) {
+                  LOG_DEBUG_MSG("Deleting " << hexpointer(r));
+                  delete r;
+              }
+              else if (r->isUserRegion()) {
+                  LOG_DEBUG_MSG("Deleting " << hexpointer(r));
+                  delete r;
+              }
+              else {
+                  LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
+                  chunk_pool_->deallocate(r);
+              }
           }
-          LOG_DEBUG_MSG("Erasing iterator ");
-          TagReceiveCompletionMap.erase(it_zt);
-          LOG_DEBUG_MSG("release_memory_buffers done ");
+          {
+              hpx::lcos::local::spinlock::scoped_lock(TagReceiveCompletionMap_mutex);
+              LOG_DEBUG_MSG("Erasing iterator ");
+              TagReceiveCompletionMap.erase(it_zt);
+              LOG_DEBUG_MSG("release_memory_buffers done ");
+          }
       }
 
 
@@ -381,6 +397,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
           //
           if ((it_z = ZeroCopyGetCompletionMap.find(wr_id)) != ZeroCopyGetCompletionMap.end()) {
               uint32_t tag = it_z->second;
+              hpx::lcos::local::spinlock::scoped_lock(TagReceiveCompletionMap_mutex);
               tag_receive_map::iterator it_zt = TagReceiveCompletionMap.find(tag);
               if (it_zt==TagReceiveCompletionMap.end()) {
                   LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(tag) << " was not found in completion tag map");
@@ -457,7 +474,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
               send_wr_map::iterator it = TagSendCompletionMap.find(tag);
               parcel_send_data send_data = std::move(it->second);
               for (auto r : send_data.zero_copy_regions) {
-                  chunk_pool_->deallocate(r);
+                  // if this region was registered on the fly, then don't return it to the pool
+                  if (!r->isUserRegion()) {
+                      LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
+                      chunk_pool_->deallocate(r);
+                  }
+                  else {
+                      LOG_DEBUG_MSG("Deleting " << hexpointer(r));
+                      delete r;
+                  }
               }
               TagSendCompletionMap.erase(it);
               // and trigger the send complete handler for hpx internal cleanup
@@ -500,7 +525,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
               // when it destroys the container. Place everything in a struct and put it into a map
               // with a key which is the tag of the parcel
               // Note create entries in map before posting any RDMA reads so that completions don't cause races
+              hpx::lcos::local::spinlock::scoped_lock(TagReceiveCompletionMap_mutex);
               LOG_DEBUG_MSG("Moving receive data into TagReceiveCompletionMap with tag " << hexuint32(tag));
+              tag_receive_map::iterator it_zt = TagReceiveCompletionMap.find(tag);
               auto ret = TagReceiveCompletionMap.insert(std::make_pair(tag, std::move(r_data)));
               if (!ret.second) {
                   throw std::runtime_error("Failed to insert tag in TagReceiveCompletionMap");
@@ -533,7 +560,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                       }
                       for (serialization::serialization_chunk &c : receive_data.chunks) {
                           if (c.type_ == serialization::chunk_type_pointer) {
-                              RdmaMemoryRegion *get_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
+                              RdmaMemoryRegion *get_region;
+                              if (c.size_<=DEFAULT_MEMORY_POOL_CHUNK_SIZE) {
+                                  get_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
+                              }
+                              else {
+                                  get_region = chunk_pool_->AllocateTemporaryBlock(c.size_);
+                              }
                               LOG_DEBUG_MSG("RDMA Get from address " << hexpointer(c.data_.cpos_)
                                       << " with rkey " << decnumber(c.rkey_) << " size " << hexnumber(c.size_)
                                       << " for tag " << hexuint32(tag)
@@ -743,18 +776,20 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " put_parcel to " << ipaddress(dest_ip) );
         //
         RdmaClientPtr client;
-        ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
-        if (ip_it!=ip_qp_map.end()) {
-          LOG_DEBUG_MSG("Connection found with qp " << ip_it->second);
-          client = _rdmaController->getClient(ip_it->second);
+        {
+            boost::lock_guard<hpx::lcos::local::spinlock> lock(connection_mutex);
+            ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
+            if (ip_it!=ip_qp_map.end()) {
+              LOG_DEBUG_MSG("Connection found with qp " << ip_it->second);
+              client = _rdmaController->getClient(ip_it->second);
+            }
+            else {
+              LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
+              client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
+              client->setInitiatedConnection(true);
+              ip_qp_map[dest_ip] = client->getQpNum();
+            }
         }
-        else {
-          LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
-          client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
-          client->setInitiatedConnection(true);
-          ip_qp_map[dest_ip] = client->getQpNum();
-        }
-
         // connection ok, we can now send required info to the remote peer
         {
           util::high_resolution_timer timer;
@@ -844,7 +879,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
           // (our allocator was used, so we can find it)
           // @TODO : find a nicer way of handling this block retrieval
           send_data.message_region = chunk_pool_->RegionFromAddress((char*)buffer.data_.data());
-          LOG_DEBUG_MSG("Finding region allocated during encode_parcel " << hexpointer(send_data.message_region));
+          LOG_DEBUG_MSG("Finding region allocated during encode_parcel : address " << hexpointer(buffer.data_.data()) << " region "<< hexpointer(send_data.message_region));
           send_data.message_region->setMessageLength(h->size());
 
           RdmaMemoryRegion *region_list[] = { send_data.header_region, send_data.message_region };
@@ -891,10 +926,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         FUNC_END_DEBUG_MSG;
       }
 
+      mutable mutex_type background_mtx;
+
       // This is called whenever a HPX OS thread is idling, can be used to poll for incoming messages
       bool do_background_work(std::size_t num_thread) {
         if (stopped_)
           return false;
+//        mutex_type::scoped_lock mtx(background_mtx);
         // if an event comes in, we may spend time processing/handling it and another may arrive
         // during this handling, so keep checking until none are received
         bool done = false;
