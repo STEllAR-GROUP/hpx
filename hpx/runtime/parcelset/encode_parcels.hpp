@@ -96,31 +96,29 @@ namespace hpx
                 chunks.clear();
                 chunks.reserve(buffer.chunks_.size());
 
-                std::size_t index = 0;
-                for (serialization::serialization_chunk& c : buffer.chunks_)
-                {
-                    if (c.type_ == serialization::chunk_type_pointer)
-                        chunks.push_back(transmission_chunk_type(index, c.size_));
-                    ++index;
-                }
-                LOG_DEBUG_MSG("Encode finalize : zero-copy chunks " << decnumber(chunks.size()));
+            std::size_t index = 0;
+            for (serialization::serialization_chunk& c : buffer.chunks_)
+            {
+                if (c.type_ == serialization::chunk_type_pointer)
+                    chunks.push_back(transmission_chunk_type(index, c.size_));
+                ++index;
+            }
+            LOG_DEBUG_MSG("Encode finalize : zero-copy chunks " << decnumber(chunks.size()));
 
                 buffer.num_chunks_ = count_chunks_type(
                     static_cast<std::uint32_t>(chunks.size()),
                     static_cast<std::uint32_t>(buffer.chunks_.size() - chunks.size())
                 );
 
-                if (!chunks.empty()) {
-                    // the remaining number of chunks are non-zero-copy
-                    for (serialization::serialization_chunk& c : buffer.chunks_)
-                    {
-                        if (c.type_ == serialization::chunk_type_index) {
-                            chunks.push_back(
-                                transmission_chunk_type(c.data_.index_, c.size_));
-                        }
+            if (!chunks.empty()) {
+                // the remaining number of chunks are non-zero-copy
+                for (serialization::serialization_chunk& c : buffer.chunks_)
+                {
+                    if (c.type_ == serialization::chunk_type_index) {
+                        chunks.push_back(
+                            transmission_chunk_type(c.data_.index_, c.size_));
                     }
                 }
-                LOG_DEBUG_MSG("Encode finalize : total chunks " << decnumber(chunks.size()));
             }
         }
 
@@ -130,7 +128,6 @@ namespace hpx
             parcel const * ps, std::size_t num_parcels, Buffer & buffer,
             int archive_flags_, std::uint64_t max_outbound_size)
         {
-          FUNC_START_DEBUG_MSG;
             HPX_ASSERT(buffer.data_.empty());
             // collect argument sizes from parcels
             std::size_t num_chunks = 0;
@@ -210,11 +207,6 @@ namespace hpx
                         }
                         archive.flush();
                         arg_size = archive.bytes_written();
-
-            LOG_DEBUG_MSG(
-                   "Inside encode parcels with bytes_written " << decnumber(archive.bytes_written())
-                << " actual containter data size " << decnumber(buffer.data_.size())
-                << " parcels_sent " << decnumber(parcels_sent));
                     }
 
                     // store the time required for serialization
@@ -265,7 +257,6 @@ namespace hpx
             LOG_DEBUG_MSG("Inside encode parcels with num_parcels_sent " << decnumber(buffer.data_point_.num_parcels_));
             detail::encode_finalize(buffer, arg_size);
 
-            FUNC_END_DEBUG_MSG;
             return parcels_sent;
         }
     }

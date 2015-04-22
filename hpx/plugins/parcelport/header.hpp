@@ -12,7 +12,6 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/array.hpp>
-#include "plugins/parcelport/verbs/rdmahelper/include/RdmaLogging.h"
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
@@ -59,8 +58,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             set<pos_numchunks_second>(static_cast<value_type>
                 (buffer.num_chunks_.second));
 
-            LOG_DEBUG_MSG("Buffer data size is " << buffer.data_.size());
-
             // find out how much space is needed for chunk information
             const std::vector<serialization::serialization_chunk>& chunks = buffer.chunks_;
             size_t chunkbytes = chunks.size() * sizeof(serialization::serialization_chunk);
@@ -69,7 +66,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
               set<pos_chunk_flag>(static_cast<value_type>(1));
               set<pos_chunk_offset>(static_cast<value_type>(pos_data_zone));
               std::memcpy(&data_[data_[pos_chunk_offset]], chunks.data(), chunkbytes);
-              LOG_DEBUG_MSG("Copied chunk data into header : size " << decnumber(chunkbytes) << " at offset " << decnumber(*(int*)&data_[pos_chunk_offset]));
             }
             else {
               chunkbytes = 0;
@@ -79,10 +75,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(buffer.data_.size() <= (data_size_ - chunkbytes - pos_data_zone)) {
                 set<pos_piggy_back_flag>(static_cast<value_type>(1));
                 set<pos_piggy_back_offset>(static_cast<value_type>(pos_data_zone + chunkbytes));
-                LOG_DEBUG_MSG("Piggy back data in header : size "<< buffer.data_.size() << " at offset " << decnumber(*(int*)&data_[pos_piggy_back_offset]));
                 if (enable_piggyback_copy) {
                   std::memcpy(&data_[data_[pos_piggy_back_offset]], &buffer.data_[0], buffer.data_.size());
-                  LOG_DEBUG_MSG("Copying piggy_back data_[pos_piggy_back_flag] = " << decnumber((int)(data_[pos_piggy_back_flag])));
                 }
             }
         }
