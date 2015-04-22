@@ -321,7 +321,13 @@ namespace hpx { namespace traits
     struct serialize_as_future<util::detail::bound_action<Action, BoundArgs> >
       : serialize_as_future<BoundArgs>
     {
-        static void call(util::detail::bound_action<Action, BoundArgs> & b)
+        static bool
+        call_if(util::detail::bound_action<Action, BoundArgs>& b)
+        {
+            return serialize_as_future<BoundArgs>::call_if(b._bound_args);
+        }
+
+        static void call(util::detail::bound_action<Action, BoundArgs>& b)
         {
             traits::serialize_as_future<BoundArgs>::call(b._bound_args);
         }

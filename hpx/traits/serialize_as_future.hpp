@@ -6,6 +6,7 @@
 #if !defined(HPX_TRAITS_SERIALIZE_AS_FUTURE_AUG_08_2014_0853PM)
 #define HPX_TRAITS_SERIALIZE_AS_FUTURE_AUG_08_2014_0853PM
 
+#include <hpx/config/forceinline.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
@@ -31,11 +32,26 @@ namespace hpx { namespace lcos
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
+    // This trait is used by invoke_when_ready to decide whether a parcel can
+    // be sent directly (no futures are being wrapped by the continuation or
+    // argument data structures), or if the parcel has to be delayed until all
+    // futures have become ready.
+    //
+    // If the trait statically evaluates to true_, the parcel will be delayed
+    // in any case and call() will be invoked on this trait to wait for all
+    // (embedded) futures to become ready.
+    // If it statically evaluates to false_, the decision whether the parcel
+    // will be delayed is done at runtime. The function call_if() will be
+    // invoked in this case to decide whether the parcel has to be delayed or
+    // not. If call_if() returns true the parcel will be delayed and call()
+    // will be invoked to wait for the (embedded) futures to become ready.
+    //
     template <typename Future, typename Enable>
     struct serialize_as_future
       : boost::mpl::false_
     {
-        static void call(Future& f) {}
+        static BOOST_FORCEINLINE bool call_if(Future&) { return false; }
+        static BOOST_FORCEINLINE void call(Future&) {}
     };
 
     template <typename T>
@@ -59,6 +75,8 @@ namespace hpx { namespace traits
         , typename boost::enable_if<is_future_range<Range> >::type>
       : boost::mpl::true_
     {
+        static BOOST_FORCEINLINE bool call_if(Range& r) { return true; }
+
         static void call(Range& r)
         {
             hpx::lcos::wait_all(r);

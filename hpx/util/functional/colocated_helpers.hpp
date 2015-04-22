@@ -153,8 +153,22 @@ namespace hpx { namespace traits
     struct serialize_as_future<
             util::functional::detail::apply_continuation_impl<Bound>
         >
-      : boost::mpl::true_
+      : traits::serialize_as_future<
+            typename util::functional::detail::apply_continuation_impl<
+                Bound
+            >::bound_type>
     {
+        static bool
+        call_if(util::functional::detail::apply_continuation_impl<Bound>& b)
+        {
+            return (b.cont_ && b.cont_->has_to_wait_for_futures()) ||
+                traits::serialize_as_future<
+                    typename util::functional::detail::apply_continuation_impl<
+                        Bound
+                    >::bound_type
+                >::call_if(b.bound_);
+        }
+
         static void
         call(util::functional::detail::apply_continuation_impl<Bound>& b)
         {
@@ -280,8 +294,22 @@ namespace hpx { namespace traits
     struct serialize_as_future<
             util::functional::detail::async_continuation_impl<Bound>
         >
-      : boost::mpl::true_
+      : traits::serialize_as_future<
+            typename util::functional::detail::async_continuation_impl<
+                Bound
+            >::bound_type>
     {
+        static bool
+        call_if(util::functional::detail::async_continuation_impl<Bound>& b)
+        {
+            return (b.cont_ && b.cont_->has_to_wait_for_futures()) ||
+                traits::serialize_as_future<
+                    typename util::functional::detail::async_continuation_impl<
+                        Bound
+                    >::bound_type
+                >::call_if(b.bound_);
+        }
+
         static void
         call(util::functional::detail::async_continuation_impl<Bound>& b)
         {

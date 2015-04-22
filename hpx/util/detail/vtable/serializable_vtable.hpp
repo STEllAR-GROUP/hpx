@@ -38,6 +38,14 @@ namespace hpx { namespace util { namespace detail
             traits::serialize_as_future<T>::call(vtable::get<T>(v));
         }
         typedef void (*wait_for_future_t)(void**);
+
+        template <typename T>
+        static bool has_to_wait_for_futures(void** v)
+        {
+            return traits::serialize_as_future<T>::value ||
+                traits::serialize_as_future<T>::call_if(vtable::get<T>(v));
+        }
+        typedef bool (*has_to_wait_for_futures_t)(void**);
     };
 }}}
 
