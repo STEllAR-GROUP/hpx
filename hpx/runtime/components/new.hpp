@@ -254,9 +254,11 @@ namespace hpx { namespace components
                         std::forward<Ts>(vs)...);
 
                 return f.then(launch::sync,
-                    [](hpx::future<std::vector<bulk_locality_result> > && f)
+                    [count](hpx::future<std::vector<bulk_locality_result> > && f)
                     {
                         std::vector<hpx::id_type> result;
+                        result.reserve(count);
+
                         for (bulk_locality_result& r: f.get())
                         {
                             std::move(r.second.begin(), r.second.end(),

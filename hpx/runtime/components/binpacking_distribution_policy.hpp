@@ -228,6 +228,8 @@ namespace hpx { namespace components
                         HPX_ASSERT(localities_.size() == v.size());
 
                         std::vector<bulk_locality_result> result;
+                        result.reserve(v.size());
+
                         for (std::size_t i = 0; i != v.size(); ++i)
                         {
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
