@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,15 +6,15 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/parallel_task_region.hpp>
+#include <hpx/include/parallel_task_block.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-using hpx::parallel::task_region;
-using hpx::parallel::async_task_region;
-using hpx::parallel::task_region_handle;
+using hpx::parallel::define_task_block;
+using hpx::parallel::define_async_task_block;
+using hpx::parallel::task_block;
 
 ///////////////////////////////////////////////////////////////////////////////
-void task_region_test1()
+void define_task_block_test1()
 {
     std::string s("test");
 
@@ -24,7 +24,7 @@ void task_region_test1()
     bool task21_flag = false;
     bool task3_flag = false;
 
-    task_region([&](task_region_handle& trh)
+    define_task_block([&](task_block& trh)
     {
         parent_flag = true;
 
@@ -37,7 +37,7 @@ void task_region_test1()
             task2_flag = true;
             hpx::cout << "task2" << hpx::endl;
 
-            task_region([&](task_region_handle& trh) {
+            define_task_block([&](task_block& trh) {
                 trh.run([&]() {
                     task21_flag = true;
                     hpx::cout << "task2.1" << hpx::endl;
@@ -62,7 +62,7 @@ void task_region_test1()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void task_region_test2()
+void define_task_block_test2()
 {
     std::string s("test");
 
@@ -72,7 +72,7 @@ void task_region_test2()
     bool task21_flag = false;
     bool task3_flag = false;
 
-    hpx::future<void> f = async_task_region([&](task_region_handle& trh)
+    hpx::future<void> f = define_async_task_block([&](task_block& trh)
     {
         parent_flag = true;
 
@@ -85,7 +85,7 @@ void task_region_test2()
             task2_flag = true;
             hpx::cout << "task2" << hpx::endl;
 
-            task_region([&](task_region_handle& trh) {
+            define_task_block([&](task_block& trh) {
                 trh.run([&]() {
                     task21_flag = true;
                     hpx::cout << "task2.1" << hpx::endl;
@@ -111,10 +111,116 @@ void task_region_test2()
     HPX_TEST(task3_flag);
 }
 
-void task_region_exceptions_test1()
+///////////////////////////////////////////////////////////////////////////////
+void define_task_block_test3()
+{
+    std::string s("test");
+
+    bool parent_flag = false;
+    bool task1_flag = false;
+    bool task2_flag = false;
+    bool task21_flag = false;
+    bool task3_flag = false;
+
+    int result = define_task_block([&](task_block& trh) -> int
+    {
+        parent_flag = true;
+
+        trh.run([=, &task1_flag]{
+            task1_flag = true;
+            hpx::cout << "task1: " << s << hpx::endl;
+        });
+
+        trh.run([&]{
+            task2_flag = true;
+            hpx::cout << "task2" << hpx::endl;
+
+            define_task_block([&](task_block& trh)
+            {
+                trh.run([&]{
+                    task21_flag = true;
+                    hpx::cout << "task2.1" << hpx::endl;
+                });
+            });
+        });
+
+        int i = 0, j = 10, k = 20;
+        trh.run([=, &task3_flag]{
+            task3_flag = true;
+            hpx::cout << "task3: " << i << " " << j << " " << k << hpx::endl;
+        });
+
+        hpx::cout << "parent" << hpx::endl;
+
+        return 42;
+    });
+
+    HPX_TEST_EQ(result, 42);
+    HPX_TEST(parent_flag);
+    HPX_TEST(task1_flag);
+    HPX_TEST(task2_flag);
+    HPX_TEST(task21_flag);
+    HPX_TEST(task3_flag);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void define_task_block_test4()
+{
+    std::string s("test");
+
+    bool parent_flag = false;
+    bool task1_flag = false;
+    bool task2_flag = false;
+    bool task21_flag = false;
+    bool task3_flag = false;
+
+    hpx::future<int> f = define_async_task_block([&](task_block& trh) -> int
+    {
+        parent_flag = true;
+
+        trh.run([=, &task1_flag]{
+            task1_flag = true;
+            hpx::cout << "task1: " << s << hpx::endl;
+        });
+
+        trh.run([&]{
+            task2_flag = true;
+            hpx::cout << "task2" << hpx::endl;
+
+            define_task_block([&](task_block& trh)
+            {
+                trh.run([&]{
+                    task21_flag = true;
+                    hpx::cout << "task2.1" << hpx::endl;
+                });
+            });
+        });
+
+        int i = 0, j = 10, k = 20;
+        trh.run([=, &task3_flag]{
+            task3_flag = true;
+            hpx::cout << "task3: " << i << " " << j << " " << k << hpx::endl;
+        });
+
+        hpx::cout << "parent" << hpx::endl;
+
+        return 42;
+    });
+
+    f.wait();
+
+    HPX_TEST_EQ(f.get(), 42);
+    HPX_TEST(parent_flag);
+    HPX_TEST(task1_flag);
+    HPX_TEST(task2_flag);
+    HPX_TEST(task21_flag);
+    HPX_TEST(task3_flag);
+}
+
+void define_task_block_exceptions_test1()
 {
     try {
-        task_region([](task_region_handle& trh) {
+        define_task_block([](task_block& trh) {
             trh.run([]() {
                 hpx::cout << "task1" << hpx::endl;
                 throw 1;
@@ -139,9 +245,9 @@ void task_region_exceptions_test1()
     }
 }
 
-void task_region_exceptions_test2()
+void define_task_block_exceptions_test2()
 {
-    hpx::future<void> f = async_task_region([](task_region_handle& trh)
+    hpx::future<void> f = define_async_task_block([](task_block& trh)
     {
         trh.run([]() {
             hpx::cout << "task1" << hpx::endl;
@@ -170,10 +276,10 @@ void task_region_exceptions_test2()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void task_region_exceptions_test3()
+void define_task_block_exceptions_test3()
 {
     try {
-        task_region([&](task_region_handle& trh)
+        define_task_block([&](task_block& trh)
         {
             trh.run([&]()
             {
@@ -194,16 +300,16 @@ void task_region_exceptions_test3()
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
-        HPX_TEST_EQ(int(e.get_error()), int(hpx::task_region_not_active));
+        HPX_TEST_EQ(int(e.get_error()), int(hpx::task_block_not_active));
     }
     catch (...) {
         HPX_TEST(false);
     }
 }
 
-void task_region_exceptions_test4()
+void define_task_block_exceptions_test4()
 {
-    hpx::future<void> f = async_task_region([&](task_region_handle& trh)
+    hpx::future<void> f = define_async_task_block([&](task_block& trh)
     {
         trh.run([&]()
         {
@@ -222,7 +328,7 @@ void task_region_exceptions_test4()
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
-        HPX_TEST_EQ(int(e.get_error()), int(hpx::task_region_not_active));
+        HPX_TEST_EQ(int(e.get_error()), int(hpx::task_block_not_active));
     }
     catch (...) {
         HPX_TEST(false);
@@ -239,14 +345,16 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    task_region_test1();
-    task_region_test2();
+    define_task_block_test1();
+    define_task_block_test2();
+    define_task_block_test3();
+    define_task_block_test4();
 
-    task_region_exceptions_test1();
-    task_region_exceptions_test2();
+    define_task_block_exceptions_test1();
+    define_task_block_exceptions_test2();
 
-    task_region_exceptions_test3();
-    task_region_exceptions_test4();
+    define_task_block_exceptions_test3();
+    define_task_block_exceptions_test4();
 
     return hpx::finalize();
 }

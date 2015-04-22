@@ -59,7 +59,7 @@ set(tests
     set_symmetric_difference
     set_union
     swapranges
-    task_region
+    task_block
     transform
     transform_binary
     transform_exclusive_scan
@@ -71,7 +71,7 @@ set(tests
     uninitialized_filln
    )
 
-set(task_region_FLAGS DEPENDENCIES iostreams_component)
+set(task_block_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(test ${tests})
   set(sources
