@@ -232,8 +232,8 @@ namespace hpx
         strm << "  HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE="
              << HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE << "\n";
 #endif
-#if defined(HPX_MALLOC)
-        strm << "  HPX_MALLOC=" << HPX_MALLOC << "\n";
+#if defined(HPX_HAVE_MALLOC)
+        strm << "  HPX_HAVE_MALLOC=" << HPX_HAVE_MALLOC << "\n";
 #endif
 
         strm << "  HPX_PREFIX (configured)=" << util::hpx_prefix() << "\n";
@@ -251,7 +251,7 @@ namespace hpx
                 HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
                 HPX_VERSION_SUBMINOR % HPX_VERSION_TAG %
                 (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10) %
-                HPX_GIT_COMMIT);
+                HPX_HAVE_GIT_COMMIT);
     }
 
     std::string boost_version()
@@ -272,10 +272,10 @@ namespace hpx
     }
 #endif
 
-#if defined(HPX_MALLOC)
+#if defined(HPX_HAVE_MALLOC)
     std::string malloc_version()
     {
-        return HPX_MALLOC;
+        return HPX_HAVE_MALLOC;
     }
 #endif
 
@@ -329,7 +329,7 @@ namespace hpx
             boost_compiler() %
             boost_stdlib());
 
-#if defined(HPX_MALLOC)
+#if defined(HPX_HAVE_MALLOC)
             version += "  Allocator: " + malloc_version() + "\n";
 #endif
 

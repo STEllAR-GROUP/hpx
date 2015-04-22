@@ -35,7 +35,7 @@
 # pragma once
 #endif
 
-#if !defined(HPX_LOG_NO_TS)
+#if !defined(HPX_HAVE_LOG_NO_TS)
 
 #include <errno.h>
 #include <pthread.h>

@@ -92,7 +92,7 @@ namespace hpx { namespace util
         // The bottom line is that we use the MPI parcelport either when the
         // application was executed using mpirun or if the tcp/ip parcelport
         // was disabled.
-        if (!detail::detect_mpi_environment(cfg.rtcfg_, HPX_PARCELPORT_MPI_ENV) &&
+        if (!detail::detect_mpi_environment(cfg.rtcfg_, HPX_HAVE_PARCELPORT_MPI_ENV) &&
             detail::get_cfg_entry(cfg, "hpx.parcel.tcp.enable", 1))
         {
             cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
@@ -104,7 +104,7 @@ namespace hpx { namespace util
 
         cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
 
-#if defined(PARCELPORT_MPI_MULTITHREADED)
+#if defined(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
         int flag = (detail::get_cfg_entry(
             cfg, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
                 MPI_THREAD_MULTIPLE : MPI_THREAD_SINGLE;

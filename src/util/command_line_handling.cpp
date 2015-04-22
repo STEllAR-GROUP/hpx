@@ -230,12 +230,12 @@ namespace hpx { namespace util
                         "must be greater than 0");
                 }
 
-#if defined(HPX_MAX_CPU_COUNT)
-                if (threads > HPX_MAX_CPU_COUNT) {
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
+                if (threads > HPX_HAVE_MAX_CPU_COUNT) {
                     throw hpx::detail::command_line_error("Requested more than "
-                        BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" --hpx:threads "
+                        BOOST_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
-                        "-DHPX_MAX_CPU_COUNT=<N> when configuring HPX.");
+                        "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
                 }
 #endif
             }

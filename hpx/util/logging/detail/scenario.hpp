@@ -149,7 +149,7 @@ namespace usage {
             */
             struct single_thread {};
 
-#ifndef HPX_LOG_NO_TS
+#ifndef HPX_HAVE_LOG_NO_TS
             typedef often<> default_;
 #else
             typedef single_thread default_;
@@ -204,7 +204,7 @@ namespace usage {
             */
             struct single_thread {};
 
-#ifndef HPX_LOG_NO_TS
+#ifndef HPX_HAVE_LOG_NO_TS
             typedef often<> default_;
 #else
             typedef single_thread default_;
@@ -229,7 +229,7 @@ namespace usage {
             */
             struct single_thread {};
 
-#ifndef HPX_LOG_NO_TS
+#ifndef HPX_HAVE_LOG_NO_TS
             typedef correctness default_;
 #else
             typedef single_thread default_;

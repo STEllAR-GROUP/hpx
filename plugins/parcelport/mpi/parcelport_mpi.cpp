@@ -382,15 +382,15 @@ namespace hpx { namespace traits
         static char const* call()
         {
             return
-#if defined(HPX_PARCELPORT_MPI_ENV)
-                "env = ${HPX_PARCELPORT_MPI_ENV:" HPX_PARCELPORT_MPI_ENV "}\n"
+#if defined(HPX_HAVE_PARCELPORT_MPI_ENV)
+                "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:" HPX_HAVE_PARCELPORT_MPI_ENV "}\n"
 #else
-                "env = ${HPX_PARCELPORT_MPI_ENV:"
+                "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:"
                         "MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE"
                     "}\n"
 #endif
-                "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:1}\n"
-                "max_connections = ${HPX_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"
+                "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:1}\n"
+                "max_connections = ${HPX_HAVE_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"
                 ;
         }
     };

@@ -1546,7 +1546,7 @@ namespace hpx { namespace components { namespace server
                         isenabled, options, startup_handled);
                 }
                 else {
-#if defined(HPX_STATIC_LINKING)
+#if defined(HPX_HAVE_STATIC_LINKING)
                     HPX_THROW_EXCEPTION(service_unavailable,
                         "runtime_support::load_components",
                         "static linking configuration does not support dynamic "
@@ -1744,7 +1744,7 @@ namespace hpx { namespace components { namespace server
         return true;    // startup/shutdown functions got registered
     }
 
-#if !defined(HPX_STATIC_LINKING)
+#if !defined(HPX_HAVE_STATIC_LINKING)
     bool runtime_support::load_component_dynamic(
         util::section& ini, std::string const& instance,
         std::string const& component, boost::filesystem::path lib,
@@ -2054,7 +2054,7 @@ namespace hpx { namespace components { namespace server
                     // FIXME: implement statically linked plugins
                 }
                 else {
-#if defined(HPX_STATIC_LINKING)
+#if defined(HPX_HAVE_STATIC_LINKING)
                     HPX_THROW_EXCEPTION(service_unavailable,
                         "runtime_support::load_plugins",
                         "static linking configuration does not support dynamic "
@@ -2083,7 +2083,7 @@ namespace hpx { namespace components { namespace server
         return true;
     }
 
-#if !defined(HPX_STATIC_LINKING)
+#if !defined(HPX_HAVE_STATIC_LINKING)
     bool runtime_support::load_plugin(util::section& ini,
         std::string const& instance, std::string const& plugin,
         boost::filesystem::path const& lib, bool isenabled)

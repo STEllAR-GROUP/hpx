@@ -9,7 +9,7 @@
 #include <string>
 #include <hpx/config.hpp>
 
-#if defined(HPX_WITH_LOGGING)
+#if defined(HPX_HAVE_LOGGING)
 
 #include <hpx/util/logging/format/named_write.hpp>
 #include <hpx/util/logging/format_fwd.hpp>

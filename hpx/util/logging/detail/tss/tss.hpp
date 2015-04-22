@@ -21,7 +21,7 @@
 # pragma once
 #endif
 
-#if !defined(HPX_LOG_NO_TSS)
+#if !defined(HPX_HAVE_LOG_NO_TSS)
 
 #include <hpx/util/logging/detail/fwd.hpp>
 
@@ -95,7 +95,7 @@ private:
 
 }}}
 
-#endif // !HPX_LOG_NO_TSS
+#endif // !HPX_HAVE_LOG_NO_TSS
 
 #endif
 

@@ -108,7 +108,7 @@ add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/parallel/*.hpp"
   APPEND)
 
-if(HPX_STATIC_LINKING)
+if(HPX_WITH_STATIC_LINKING)
   add_hpx_library_headers(hpx
     GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/components/*.hpp"
     APPEND)
@@ -148,7 +148,7 @@ add_hpx_source_group(
   ROOT "${hpx_SOURCE_DIR}/hpx"
   TARGETS ${hpx_init_HEADERS})
 
-if(NOT HPX_STATIC_LINKING)
+if(NOT HPX_WITH_STATIC_LINKING)
   if(MSVC)
     # The MSVC linker can't handle a static library as large as we get when
     # statically linking the main HPX library
@@ -165,10 +165,10 @@ set(hpx_SOURCES ${hpx_SOURCES} ${HPX_STATIC_PARCELPORT_PLUGINS_SOURCES})
 
 ################################################################################
 # libhpx
-if(HPX_STATIC_LINKING)
+if(HPX_WITH_STATIC_LINKING)
   set(hpx_SOURCES ${hpx_SOURCES} {hpx_init_SOURCES})
 endif()
-if(HPX_BUILD_DEFAULT_TARGETS)
+if(HPX_WITH_DEFAULT_TARGETS)
   add_library(hpx ${hpx_library_link_mode_core}
     ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 else()
@@ -176,7 +176,7 @@ else()
     ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 endif()
 
-#if(HPX_STATIC_LINKING)
+#if(HPX_WITH_STATIC_LINKING)
 #  add_dependencies(hpx static_component_data_hpp)
 #endif()
 
@@ -222,8 +222,8 @@ set(hpx_targets ${hpx_targets} hpx)
 ################################################################################
 # libhpx_init
 
-if(NOT HPX_STATIC_LINKING)
-  if(HPX_BUILD_DEFAULT_TARGETS)
+if(NOT HPX_WITH_STATIC_LINKING)
+  if(HPX_WITH_DEFAULT_TARGETS)
     add_library(hpx_init STATIC
       ${hpx_init_SOURCES} ${hpx_init_HEADERS})
   else()
@@ -242,7 +242,7 @@ if(NOT HPX_STATIC_LINKING)
 endif()
 
 set(_optional)
-if(HPX_BUILD_DEFAULT_TARGETS)
+if(HPX_WITH_DEFAULT_TARGETS)
   set(_optional OPTIONAL)
 endif()
 

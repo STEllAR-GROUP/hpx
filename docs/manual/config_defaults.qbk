@@ -501,20 +501,20 @@ to `ON`).
 ``
     [hpx.parcel.mpi]
     enable = ${HPX_HAVE_PARCELPORT_MPI:1}
-    env = ${HPX_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE}
-    multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}
+    env = ${HPX_HAVE_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE}
+    multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}
     rank = <MPI_rank>
     processor_name = <MPI_processor_name>
-    array_optimization = ${HPX_PARCEL_MPI_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
-    zero_copy_optimization = ${HPX_PARCEL_MPI_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
-    use_io_pool = ${HPX_PARCEL_MPI_USE_IO_POOL:$1}
-    async_serialization = ${HPX_PARCEL_MPI_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
-    enable_security = ${HPX_PARCEL_MPI_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
-    parcel_pool_size = ${HPX_PARCEL_MPI_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
-    max_connections =  ${HPX_PARCEL_MPI_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
-    max_connections_per_locality = ${HPX_PARCEL_MPI_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
-    max_message_size =  ${HPX_PARCEL_MPI_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
-    max_outbound_message_size =  ${HPX_PARCEL_MPI_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
+    array_optimization = ${HPX_HAVE_PARCEL_MPI_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+    zero_copy_optimization = ${HPX_HAVE_PARCEL_MPI_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
+    use_io_pool = ${HPX_HAVE_PARCEL_MPI_USE_IO_POOL:$1}
+    async_serialization = ${HPX_HAVE_PARCEL_MPI_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
+    enable_security = ${HPX_HAVE_PARCEL_MPI_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
+    parcel_pool_size = ${HPX_HAVE_PARCEL_MPI_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
+    max_connections =  ${HPX_HAVE_PARCEL_MPI_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
+    max_connections_per_locality = ${HPX_HAVE_PARCEL_MPI_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
+    max_message_size =  ${HPX_HAVE_PARCEL_MPI_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
+    max_outbound_message_size =  ${HPX_HAVE_PARCEL_MPI_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
 ``
 [c++]
 

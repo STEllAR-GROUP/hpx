@@ -41,8 +41,8 @@
 
 #define HPX_VERSION_TAG          "-trunk"
 
-#if !defined(HPX_GIT_COMMIT)
-    #define HPX_GIT_COMMIT       "unknown"
+#if !defined(HPX_HAVE_GIT_COMMIT)
+    #define HPX_HAVE_GIT_COMMIT  "unknown"
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

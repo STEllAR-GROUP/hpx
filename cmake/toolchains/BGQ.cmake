@@ -57,9 +57,9 @@ set(HPX_WITH_TCP_PARCELPORT OFF)
 set(HPX_WITH_MPI_PARCELPORT ON)
 
 # We have a bunch of cores on the BGQ ...
-set(HPX_MAX_CPU_COUNT "64")
+set(HPX_WITH_MAX_CPU_COUNT "64")
 
 # We default to tbbmalloc as our allocator on the MIC
-if(NOT DEFINED HPX_MALLOC)
-  set(HPX_MALLOC "system")
+if(NOT DEFINED HPX_WITH_MALLOC)
+  set(HPX_WITH_MALLOC "system" CACHE STRING "")
 endif()

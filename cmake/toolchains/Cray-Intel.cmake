@@ -55,8 +55,8 @@ set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "")
 set(HPX_WITH_PARCELPORT_MPI_MULTITHREADED OFF CACHE BOOL "")
 
 # We default to system as our allocator on the BGQ
-if(NOT DEFINED HPX_MALLOC)
-  set(HPX_MALLOC "system" CACHE STRING "")
+if(NOT DEFINED HPX_WITH_MALLOC)
+  set(HPX_WITH_MALLOC "system" CACHE STRING "")
 endif()
 
 # We do a cross compilation here ...

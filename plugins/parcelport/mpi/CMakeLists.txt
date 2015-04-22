@@ -32,12 +32,12 @@ if(HPX_WITH_PARCELPORT_MPI)
   # is enabled by default.
   # PMI_RANK: Intel MPI and MVAPICH2
   # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
-  if(HPX_PARCELPORT_MPI_ENV)
-    string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_PARCELPORT_MPI_ENV}")
-    hpx_add_config_define(HPX_PARCELPORT_MPI_ENV "\"${hpx_parcelport_mpi_env_}\"")
+  if(HPX_WITH_PARCELPORT_MPI_ENV)
+    string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_WITH_PARCELPORT_MPI_ENV}")
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_ENV "\"${hpx_parcelport_mpi_env_}\"")
   endif()
-  if(HPX_PARCELPORT_MPI_MULTITHREADED)
-    hpx_add_config_define(HPX_PARCELPORT_MPI_MULTITHREADED)
+  if(HPX_WITH_PARCELPORT_MPI_MULTITHREADED)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
   endif()
 
   macro(add_parcelport_mpi_module)

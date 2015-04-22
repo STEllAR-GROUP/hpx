@@ -51,7 +51,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 {
 #if (defined(__linux) || defined(linux) || defined(__linux__))
                     std::string ibverbs_ifname(
-                        sec->get_entry("ifname", HPX_PARCELPORT_IBVERBS_IFNAME));
+                        sec->get_entry("ifname", HPX_HAVE_PARCELPORT_IBVERBS_IFNAME));
 
                     ifaddrs *ifap;
                     getifaddrs(&ifap);
@@ -125,13 +125,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     std::size_t connection_handler::memory_chunk_size(util::runtime_configuration const& ini)
     {
         return hpx::util::get_entry_as<std::size_t>(
-            ini, "hpx.parcel.ibverbs.memory_chunk_size", HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE);
+            ini, "hpx.parcel.ibverbs.memory_chunk_size", HPX_HAVE_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE);
     }
 
     std::size_t connection_handler::max_memory_chunks(util::runtime_configuration const& ini)
     {
         return hpx::util::get_entry_as<std::size_t>(
-            ini, "hpx.parcel.ibverbs.max_memory_chunks", HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS);
+            ini, "hpx.parcel.ibverbs.max_memory_chunks", HPX_HAVE_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS);
     }
 
     connection_handler::connection_handler(util::runtime_configuration const& ini,

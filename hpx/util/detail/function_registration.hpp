@@ -24,7 +24,7 @@ namespace hpx { namespace util { namespace detail
     struct get_function_name_impl
     {
         static char const* call()
-#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
+#ifndef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
         ;
 #else
         {

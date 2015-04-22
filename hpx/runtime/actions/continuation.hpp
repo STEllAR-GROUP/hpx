@@ -95,7 +95,7 @@ namespace hpx { namespace actions
     {
         template <typename Continuation>
         char const* get_continuation_name()
-#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
+#ifndef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
         ;
 #else
         {

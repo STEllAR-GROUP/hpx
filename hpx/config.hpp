@@ -297,7 +297,7 @@
 #  define HPX_PATH_DELIMITERS               "/"
 #  ifdef __APPLE__    // apple
 #    define HPX_SHARED_LIB_EXTENSION        ".dylib"
-#  elif defined(HPX_STATIC_LINKING)
+#  elif defined(HPX_HAVE_STATIC_LINKING)
 #    define HPX_SHARED_LIB_EXTENSION        ".a"
 #  else  // linux & co
 #    define HPX_SHARED_LIB_EXTENSION        ".so"
@@ -477,8 +477,8 @@
 #if defined(__MIC__) && !defined(HPX_WITH_MORE_THAN_64_THREADS)
 #  define HPX_WITH_MORE_THAN_64_THREADS
 #endif
-#if defined(__MIC__) && !defined(HPX_MAX_CPU_COUNT)
-#  define HPX_MAX_CPU_COUNT 256
+#if defined(__MIC__) && !defined(HPX_HAVE_MAX_CPU_COUNT)
+#  define HPX_HAVE_MAX_CPU_COUNT 256
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

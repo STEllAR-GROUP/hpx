@@ -50,11 +50,11 @@ set(HPX_WITH_PARCELPORT_TCP ON CACHE BOOL "")
 set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "")
 
 # We have a bunch of cores on the A2 processor ...
-set(HPX_MAX_CPU_COUNT "64" CACHE STRING "")
+set(HPX_WITH_MAX_CPU_COUNT "64" CACHE STRING "")
 
 # We have no custom malloc yet
-if(NOT DEFINED HPX_MALLOC)
-  set(HPX_MALLOC "system" CACHE STRING "")
+if(NOT DEFINED HPX_WITH_MALLOC)
+  set(HPX_WITH_MALLOC "system" CACHE STRING "")
 endif()
 
 set(HPX_HIDDEN_VISIBILITY OFF CACHE BOOL "")
@@ -72,11 +72,11 @@ set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Default build")
 # Testing flags
 #
 set(BUILD_TESTING                  ON  CACHE BOOL "Testing enabled by default")
-set(HPX_BUILD_TESTS                ON  CACHE BOOL "Testing enabled by default")
-set(HPX_BUILD_TESTS_BENCHMARKS     ON  CACHE BOOL "Testing enabled by default")
-set(HPX_BUILD_TESTS_REGRESSIONS    ON  CACHE BOOL "Testing enabled by default")
-set(HPX_BUILD_TESTS_UNIT           ON  CACHE BOOL "Testing enabled by default")
-set(HPX_BUILD_TESTS_EXTERNAL_BUILD OFF CACHE BOOL "Turn off build of cmake build tests")
+set(HPX_WITH_TESTS                ON  CACHE BOOL "Testing enabled by default")
+set(HPX_WITH_TESTS_BENCHMARKS     ON  CACHE BOOL "Testing enabled by default")
+set(HPX_WITH_TESTS_REGRESSIONS    ON  CACHE BOOL "Testing enabled by default")
+set(HPX_WITH_TESTS_UNIT           ON  CACHE BOOL "Testing enabled by default")
+set(HPX_WITH_TESTS_EXTERNAL_BUILD OFF CACHE BOOL "Turn off build of cmake build tests")
 set(DART_TESTING_TIMEOUT           45  CACHE STRING "Life is too short")
 
-#HPX_STATIC_LINKING
+# HPX_WITH_STATIC_LINKING

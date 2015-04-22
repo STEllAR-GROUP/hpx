@@ -7,7 +7,7 @@
 ###############################################################################
 set(root "${hpx_SOURCE_DIR}/hpx/components/binpacking_factory")
 
-if(HPX_BUILD_DEFAULT_TARGETS)
+if(HPX_WITH_DEFAULT_TARGETS)
   add_hpx_component(binpacking_factory
     FOLDER "Core/Components"
     HEADER_ROOT ${root}

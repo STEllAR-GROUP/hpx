@@ -21,7 +21,7 @@
 # pragma once
 #endif
 
-#if !defined(HPX_LOG_TSS_USE_INTERNAL) && !defined(HPX_LOG_TSS_USE_BOOST) && !defined(HPX_LOG_TSS_USE_CUSTOM) && !defined(HPX_LOG_NO_TSS)
+#if !defined(HPX_LOG_TSS_USE_INTERNAL) && !defined(HPX_LOG_TSS_USE_BOOST) && !defined(HPX_LOG_TSS_USE_CUSTOM) && !defined(HPX_HAVE_LOG_NO_TSS)
 // use has not specified what TSS strategy to use
 #define HPX_LOG_TSS_USE_INTERNAL
 
@@ -65,7 +65,7 @@ namespace hpx { namespace util { namespace logging {
         - @ref HPX_LOG_TSS_USE_INTERNAL
         - @ref HPX_LOG_TSS_USE_BOOST
         - @ref HPX_LOG_TSS_USE_CUSTOM
-        - @ref HPX_LOG_NO_TSS
+        - @ref HPX_HAVE_LOG_NO_TSS
 
 
 
@@ -480,7 +480,7 @@ The possibilities are:
 - @ref HPX_LOG_TSS_USE_INTERNAL : use our internal implementation (no dependency on boost::thread)
 - @ref HPX_LOG_TSS_USE_BOOST : use the implementation from boost::thread (dependency on boost::thread, of course).
 - @ref HPX_LOG_TSS_USE_CUSTOM : uses a custom implementation. The interface of this implementation should match boost::thread's interface of @c thread_specific_ptr class
-- @ref HPX_LOG_NO_TSS : don't use TSS
+- @ref HPX_HAVE_LOG_NO_TSS : don't use TSS
 
 
 @subsubsection HPX_LOG_TSS_USE_INTERNAL HPX_LOG_TSS_USE_INTERNAL
@@ -508,7 +508,7 @@ When #defining HPX_LOG_TSS_USE_CUSTOM, do it like this:
 @endcode
 
 
-@subsubsection HPX_LOG_NO_TSS HPX_LOG_NO_TSS
+@subsubsection HPX_HAVE_LOG_NO_TSS HPX_HAVE_LOG_NO_TSS
 
 If defined, we don't use @ref macros_tss "TSS" as all.
 

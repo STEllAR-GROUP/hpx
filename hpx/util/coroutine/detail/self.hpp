@@ -90,22 +90,22 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
                 BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()           \
 /**/
 
-    yield_result_type yield(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX,
+    yield_result_type yield(BOOST_PP_ENUM(HPX_HAVE_COROUTINE_ARG_MAX,
         HPX_COROUTINE_PARAM_WITH_DEFAULT, typename yield_traits::arg))
     {
         return !yield_decorator_.empty() ? yield_decorator_(arg0)
           : yield_impl(typename coroutine_type::result_slot_type(
-            BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
+            BOOST_PP_ENUM_PARAMS(HPX_HAVE_COROUTINE_ARG_MAX, arg)));
     }
 
     template <typename Target>
     yield_result_type yield_to(Target& target
-        BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX,
+        BOOST_PP_ENUM_TRAILING(HPX_HAVE_COROUTINE_ARG_MAX,
             HPX_COROUTINE_PARAM_WITH_DEFAULT, typename Target::arg))
     {
         typedef typename Target::arg_slot_type slot_type;
         return yield_to_impl(target, slot_type(
-            BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
+            BOOST_PP_ENUM_PARAMS(HPX_HAVE_COROUTINE_ARG_MAX, arg)));
     }
 
 #undef  HPX_COROUTINE_PARAM_WITH_DEFAULT
