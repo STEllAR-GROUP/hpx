@@ -463,7 +463,7 @@ namespace hpx { namespace threads
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_idle_rate(bool reset);
         boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
-#endif
+
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         boost::int64_t avg_creation_idle_rate(bool reset);
         boost::int64_t avg_cleanup_idle_rate(bool reset);
@@ -507,7 +507,6 @@ namespace hpx { namespace threads
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_thread_overhead(
             std::size_t num = std::size_t(-1), bool reset = false);
-#endif
 #endif
 
     protected:
@@ -563,7 +562,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
         naming::gid_type idle_rate_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-#endif
+
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         naming::gid_type thread_wait_time_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
@@ -584,7 +583,7 @@ namespace hpx { namespace threads
         std::vector<boost::int64_t> executed_thread_phases_;
         boost::atomic<long> thread_count_;
 
-#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
         double timestamp_scale_;            ///< scale timestamps to nanoseconds
 #endif
 

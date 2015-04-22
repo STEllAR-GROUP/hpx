@@ -318,11 +318,8 @@ hpx_option(HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES BOOL
   "Enable measuring thread creation and cleanup times (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
-if(HPX_WITH_THREAD_IDLE_RATES)
-  hpx_add_config_define(HPX_HAVE_THREAD_IDLE_RATES)
-  if(HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES)
-    hpx_add_config_define(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
-  endif()
+if(HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES)
+  hpx_add_config_define(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
 endif()
 
 hpx_option(HPX_WITH_THREAD_CUMULATIVE_COUNTS BOOL
