@@ -31,22 +31,19 @@ namespace hpx { namespace lcos { namespace local
             promise_base()
               : shared_state_(new shared_state_type())
               , future_retrieved_(false)
-              , has_result_(false)
             {}
 
             promise_base(promise_base&& other) BOOST_NOEXCEPT
               : shared_state_(std::move(other.shared_state_))
               , future_retrieved_(other.future_retrieved_)
-              , has_result_(other.has_result_)
             {
                 other.shared_state_ = 0;
                 other.future_retrieved_ = false;
-                other.has_result_ = false;
             }
 
             ~promise_base()
             {
-                if (shared_state_ != 0 && future_retrieved_ && !has_result_)
+                if (shared_state_ != 0 && future_retrieved_ && !shared_state_->is_ready())
                 {
                     shared_state_->set_error(broken_promise,
                         "promise_base<R>::~promise_base",
@@ -58,7 +55,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 if (this != &other)
                 {
-                    if (shared_state_ != 0 && future_retrieved_ && !has_result_)
+                    if (shared_state_ != 0 && future_retrieved_ && !shared_state_->is_ready())
                     {
                         shared_state_->set_error(broken_promise,
                             "promise_base<R>::operator=",
@@ -67,11 +64,9 @@ namespace hpx { namespace lcos { namespace local
 
                     shared_state_ = std::move(other.shared_state_);
                     future_retrieved_ = other.future_retrieved_;
-                    has_result_ = other.has_result_;
 
                     other.shared_state_ = 0;
                     other.future_retrieved_ = false;
-                    other.has_result_ = false;
                 }
                 return *this;
             }
@@ -80,7 +75,6 @@ namespace hpx { namespace lcos { namespace local
             {
                 boost::swap(shared_state_, other.shared_state_);
                 boost::swap(future_retrieved_, other.future_retrieved_);
-                boost::swap(has_result_, other.has_result_);
             }
 
             bool valid() const BOOST_NOEXCEPT
@@ -113,14 +107,6 @@ namespace hpx { namespace lcos { namespace local
             template <typename T>
             void set_result(T&& value, error_code& ec = throws)
             {
-                if (has_result_)
-                {
-                    HPX_THROWS_IF(ec, promise_already_satisfied,
-                        "promise_base<R>::set_result",
-                        "result has already been stored for this promise");
-                    return;
-                }
-
                 if (shared_state_ == 0)
                 {
                     HPX_THROWS_IF(ec, no_state,
@@ -129,10 +115,16 @@ namespace hpx { namespace lcos { namespace local
                     return;
                 }
 
+                if (shared_state_->is_ready())
+                {
+                    HPX_THROWS_IF(ec, promise_already_satisfied,
+                        "promise_base<R>::set_result",
+                        "result has already been stored for this promise");
+                    return;
+                }
+
                 shared_state_->set_result(std::forward<T>(value), ec);
                 if (ec) return;
-
-                has_result_ = true;
             }
 
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
@@ -151,7 +143,6 @@ namespace hpx { namespace lcos { namespace local
         private:
             boost::intrusive_ptr<shared_state_type> shared_state_;
             bool future_retrieved_;
-            bool has_result_;
         };
     }
 
