@@ -538,8 +538,6 @@ include(HPX_SetupBoost)
 
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
-# Add define to which allocator has been selected.
-hpx_add_config_define(HPX_MALLOC "\"${HPX_MALLOC}\"")
 
 # convey selected allocator type to the build configuration
 hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
