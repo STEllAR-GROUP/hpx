@@ -28,14 +28,12 @@ struct test_server
 };
 
 typedef hpx::components::simple_component<test_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::call_future_void_action call_future_void_action;
-HPX_REGISTER_ACTION_DECLARATION(call_future_void_action);
 HPX_REGISTER_ACTION(call_future_void_action);
 
 typedef test_server::call_future_int_action call_future_int_action;
-HPX_REGISTER_ACTION_DECLARATION(call_future_int_action);
 HPX_REGISTER_ACTION(call_future_int_action);
 
 ///////////////////////////////////////////////////////////////////////////////

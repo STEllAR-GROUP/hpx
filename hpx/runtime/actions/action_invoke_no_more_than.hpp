@@ -18,6 +18,7 @@
 #include <hpx/traits/action_decorate_continuation.hpp>
 
 #include <boost/static_assert.hpp>
+#include <boost/make_shared.hpp>
 
 namespace hpx { namespace actions { namespace detail
 {
@@ -216,7 +217,9 @@ namespace hpx { namespace actions { namespace detail
         template <typename Continuation>
         static bool call(Continuation& c, boost::mpl::true_)
         {
-            Continuation cont(new wrapped_continuation<Action, N>(c));
+            Continuation cont(
+                boost::make_shared<wrapped_continuation<Action, N> >(c)
+            );
             c = cont;
             return true;
         }

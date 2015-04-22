@@ -14,12 +14,24 @@ macro(create_cmake_test name hpx_dir)
   add_custom_target(${name}.make_build_dir
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${build_dir}" VERBATIM
   )
+  set(ADDITIONAL_CMAKE_OPTIONS)
+  if(CMAKE_TOOLCHAIN_FILE)
+    set(ADDITIONAL_CMAKE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
+  endif()
+  if(CMAKE_MAKE_COMMAND)
+    set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_MAKE_COMMAND=${CMAKE_MAKE_COMMAND})
+  endif()
+  if(CMAKE_SYSROOT)
+    set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_SYSROOT=${CMAKE_SYSROOT})
+  endif()
   add_custom_target(${name}.make_configure
     COMMAND
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}"
       "${hpx_SOURCE_DIR}/tests/unit/build/src"
       -DHPX_DIR=${hpx_dir}
+      ${ADDITIONAL_CMAKE_OPTIONS}
       -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+      -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
       -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=$<CONFIGURATION> VERBATIM)
   add_dependencies(${name}.make_configure ${name}.make_build_dir hpx iostreams_component)
@@ -99,7 +111,12 @@ set(tests
   build_dir
   install_dir)
 
-foreach(system cmake pkgconfig)
+set(build_systems cmake)
+if(NOT CMAKE_TOOLCHAIN_FILE)
+  set(build_systems ${build_sytems} pkgconfig)
+endif()
+
+foreach(system ${build_systems})
   add_hpx_pseudo_target(tests.unit.build.${system})
   foreach(test ${tests})
     add_hpx_pseudo_target(tests.unit.build.${system}.${test})

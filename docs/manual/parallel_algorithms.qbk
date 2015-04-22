@@ -332,10 +332,10 @@ __hpx__ provides implementations of the following parallel algorithms:
 
 [endsect]
 
-[section:task_region Using Task Regions]
+[section:task_block Using Task Regions]
 
-The `task_region`, `run` and the `wait` functions implemented based on
-__cpp11_n4088__ are based on the task_group concept that is a part of the
+The `define_task_block`, `run` and the `wait` functions implemented based on
+__cpp11_n4088__ are based on the task_block concept that is a part of the
 common subset of the __ppl__ and the __tbb__ libraries.
 
 This implementations adopts a simpler syntax than exposed by those libraries -
@@ -357,8 +357,8 @@ results:
     int traverse(node& n, Func && compute)
     {
         int left = 0, right = 0;
-        task_region(
-            [&](task_region_handle& tr) {
+        define_task_block(
+            [&](task_block& tr) {
                 if (n.left)
                     tr.run([&] { left = traverse(*n.left, compute); });
                 if (n.right)
@@ -369,43 +369,43 @@ results:
     }
 
 The example above demonstrates the use of two of the functions,
-[funcref hpx::parallel::v2::task_region task_region] and the
-[memberref hpx::parallel::v2::task_region_handle::run run] member
-function of a [classref hpx::parallel::v2::task_region_handle task_region_handle].
+[funcref hpx::parallel::v2::define_task_block define_task_block] and the
+[memberref hpx::parallel::v2::task_block::run run] member
+function of a [classref hpx::parallel::v2::task_block task_block].
 
-The `task_region` function delineates a region in a program code potentially
+The `task_block` function delineates a region in a program code potentially
 containing invocations of threads spawned by the `run` member function of the
-`task_region_handle` class.
+`task_block` class.
 The `run` function spawns an __hpx__ thread, a unit of work that is allowed to
 execute in parallel with respect to the caller. Any parallel tasks spawned by
-`run` within the `task_region` are joined back to a single thread of execution
-at the end of the `task_region`.
+`run` within the task block are joined back to a single thread of execution
+at the end of the `define_task_block`.
 `run` takes a user-provided function object `f` and starts it asynchronously -
 i.e. it may return before the execution of `f` completes. The __hpx__
 scheduler may choose to run `f` immediately or delay running `f` until compute
 resources become available.
 
-A `task_region_handle` can be constructed only by `task_region` because it has
+A `task_block` can be constructed only by `define_task_block` because it has
 no public constructors.
 Thus, `run` can be invoked (directly or indirectly) only from a user-provided
-function passed to task_region:
+function passed to `define_task_block`:
 
     void g();
 
-    void f(task_region_handle& tr)
+    void f(task_block& tr)
     {
-        tr.run(g);              // OK, invoked from within task_region in h
+        tr.run(g);          // OK, invoked from within task_block in h
     }
 
     void h()
     {
-        task_region(f);
+        define_task_block(f);
     }
 
     int main()
     {
-        task_region_handle tr;  // Error: no public constructor
-        tr.run(g);              // No way to call run outside of a task_region
+        task_block tr;      // Error: no public constructor
+        tr.run(g);          // No way to call run outside of a define_task_block
         return 0;
     }
 

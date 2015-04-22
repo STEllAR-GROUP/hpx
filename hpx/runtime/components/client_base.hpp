@@ -8,7 +8,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
@@ -22,6 +21,8 @@
 #include <hpx/runtime/agas/interface.hpp>
 
 #include <utility>
+#include <vector>
+
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_base_of.hpp>
@@ -50,6 +51,21 @@ namespace hpx { namespace traits
                 Derived, typename Derived::stub_argument_type
             >,
             Derived>
+    {};
+
+    template <typename T, typename Enable = void>
+    struct is_client_or_client_array
+      : is_client<T>
+    {};
+
+    template <typename T>
+    struct is_client_or_client_array<T[]>
+      : is_client<T>
+    {};
+
+    template <typename T, std::size_t N>
+    struct is_client_or_client_array<T[N]>
+      : is_client<T>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -305,6 +321,11 @@ namespace hpx { namespace components
             return gid_.is_ready();
         }
 
+        void wait() const
+        {
+            return gid_.wait();
+        }
+
         ///////////////////////////////////////////////////////////////////////
     protected:
         static void register_as_helper(shared_future<naming::id_type> f,
@@ -379,6 +400,100 @@ namespace hpx { namespace components
 
     protected:
         future_type gid_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, Client
+    >::type
+    make_client(hpx::id_type const& id)
+    {
+        return Client(id);
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, Client
+    >::type
+    make_client(hpx::future<hpx::id_type> const& id)
+    {
+        return Client(id);
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, Client
+    >::type
+    make_client(hpx::future<hpx::id_type> && id)
+    {
+        return Client(std::move(id));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_client(std::vector<hpx::id_type> const& ids)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::id_type const& id: ids)
+        {
+            result.push_back(Client(id));
+        }
+        return result;
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_client(std::vector<hpx::future<hpx::id_type> > const& ids)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::future<hpx::id_type> const& id: ids)
+        {
+            result.push_back(Client(id));
+        }
+        return result;
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_client(std::vector<hpx::future<hpx::id_type> > && ids)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::future<hpx::id_type>& id: ids)
+        {
+            result.push_back(Client(id));
+        }
+        return result;
+    }
+}}
+
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Derived>
+    struct serialize_as_future<Derived,
+            typename boost::enable_if<is_client<Derived> >::type>
+      : boost::mpl::false_
+    {
+        static bool call_if(Derived& c)
+        {
+            return c.valid() && !c.is_ready();
+        }
+
+        static void call(Derived& c)
+        {
+            c.wait();
+        }
     };
 }}
 

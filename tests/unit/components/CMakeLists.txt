@@ -15,6 +15,9 @@ set(tests
     inheritance_3_classes_concrete
     migrate_component
     migrate_component_to_storage
+    new_
+    new_binpacking
+    new_colocated
     unordered_map
     vector_copy
     vector_for_each
@@ -66,6 +69,10 @@ set(unordered_map_PARAMETERS
 
 set(migrate_component_to_storage_FLAGS
     DEPENDENCIES unordered_component component_storage_component)
+
+set(new__PARAMETERS LOCALITIES 2)
+set(new_binpacking_PARAMETERS LOCALITIES 2)
+set(new_colocated_PARAMETERS LOCALITIES 2)
 
 set(vector_FLAGS DEPENDENCIES vector_component)
 set(vector_algorithms_FLAGS DEPENDENCIES vector_component)

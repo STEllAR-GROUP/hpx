@@ -136,7 +136,7 @@ namespace throttle { namespace server
 ///////////////////////////////////////////////////////////////////////////////
 typedef throttle::server::throttle throttle_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::simple_component<throttle_type>, throttle_throttle_type);
 
 ///////////////////////////////////////////////////////////////////////////////

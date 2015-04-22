@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -58,9 +58,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
-HPX_REGISTER_ACTION(
-    hpx::components::server::runtime_support::factory_properties_action,
-    factory_properties_action)
 HPX_REGISTER_ACTION(
     hpx::components::server::runtime_support::bulk_create_components_action,
     bulk_create_components_action)
@@ -247,33 +244,6 @@ namespace hpx { namespace components { namespace server
         shutdown_all_invoked_(false),
         modules_(cfg.modules())
     {}
-
-    ///////////////////////////////////////////////////////////////////////////
-    // return, whether more than one instance of the given component can be
-    // created at the same time
-    int runtime_support::factory_properties(components::component_type type)
-    {
-        // locate the factory for the requested component type
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
-
-        component_map_type::const_iterator it = components_.find(type);
-        if (it == components_.end() || !(*it).second.first) {
-            // we don't know anything about this component
-            std::ostringstream strm;
-            strm << "attempt to query factory properties for components "
-                    "invalid/unknown type: "
-                 << components::get_component_type_name(type);
-
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::factory_properties",
-                strm.str());
-            return factory_invalid;
-        }
-
-    // ask for the factory's capabilities
-        return (*it).second.first->get_factory_properties();
-    }
 
     /// \brief Action to create N new default constructed components
     std::vector<naming::gid_type> runtime_support::bulk_create_components(
@@ -979,9 +949,9 @@ namespace hpx { namespace components { namespace server
 
             l.unlock();
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::factory_properties",
+                "runtime_support::get_instance_count",
                 strm.str());
-            return factory_invalid;
+            return boost::int32_t(-1);
         }
 
         // ask for the factory's capabilities

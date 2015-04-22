@@ -19,7 +19,7 @@ typedef hpx::components::managed_component<
     ag::server::allgather
 > allgather_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(allgather_type, ag_allgather);
+HPX_REGISTER_COMPONENT(allgather_type, ag_allgather);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(
@@ -43,7 +43,7 @@ typedef hpx::components::managed_component<
     ag::server::allgather_and_gate
 > allgather_and_gate_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(allgather_and_gate_type, ag_allgather_and_gate);
+HPX_REGISTER_COMPONENT(allgather_and_gate_type, ag_allgather_and_gate);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(

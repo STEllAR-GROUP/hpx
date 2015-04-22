@@ -11,19 +11,95 @@
 
 [heading General Changes]
 
- * Added integration with the [@https://circleci.com/gh/STEllAR-GROUP/hpx CircleCI]
-   hosted continuous integration service. This gives us constant and immediate
-   feedback on the health of our master branch.
+* Added integration with the [@https://circleci.com/gh/STEllAR-GROUP/hpx CircleCI]
+  hosted continuous integration service. This gives us constant and immediate
+  feedback on the health of our master branch.
+* The compiler configuration subsystem has been reimplemented. Instead of using
+  Boost.Config we now use our own lightweight set of cmake scripts to determine
+  the available language and library features supported by the used compiler.
+* The API for creating instance of components has been consolidated. All
+  component instances should be created using the [funcref hpx::new_ `hpx::new_<>()`]
+  only. It allows to instantiate both, single component instances and multiple
+  component instances. The placement of the created components can be controlled
+  by special distribution policies. Please see the corresponding documentation
+  outlining the use of [funcref hpx::new_ `hpx::new_<>()`].
+* Introduced four new distribution policies which can be used with many API
+  functions which traditionally expected to be used with a locality id. The
+  new distribution policies are:
+
+  * [classref hpx::components::default_distribution_policy `hpx::default_distribution_policy`]
+    which tries to place multiple component instances as evenly as possible.
+  * [classref hpx::components::colocating_distribution_policy `hpx::colocating_distribution_policy`]
+    which will refer to the locality where a given component instance is
+    currently placed.
+  * [classref hpx::components::binpacking_distribution_policy `hpx::binpacking_distribution_policy`]
+    which will place multiple component instances as evenly as possible based
+    on any performance counter.
+  * [classref hpx::components::target_distribution_policy `hpx::target_distribution_policy`]
+    which allows to represent a given locality in the context of a distribution
+    policy.
 
 [heading Breaking Changes]
+
+* The macro `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY` has been deprecated. Please
+  use [macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`] instead.
+  The old macro will be removed in the next release.
+* The obsolete distributing_factory and binpacking_factory components have been
+  removed. The corresponding functionality is now provided by the
+  [funcref hpx::new_ `hpx::new_<>()`] API function.
+* The API function `hpx::new_colocated` has been deprecated. Please use the
+  consolidated API [funcref hpx::new_ `hpx::new_`] in conjunction with the new
+  [classref hpx::components::colocating_distribution_policy `hpx::colocating_distribution_policy`]
+  instead. The old API function will still be available for at least one
+  release of __hpx__ if the configuration variable
+  `HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY` is enabled.
+* The obsolete remote_object component has been removed.
+* Replaced the use of Boost.Serialization with our own solution. While the new
+  version is mostly compatible with Boost.Serialization, this change requires
+  some minor code modifications in user code. For more information, please see the
+  corresponding [@https://mail.cct.lsu.edu/mailman/private/hpx-users/2015-April/000558.html announcement]
+  on the __stellar_list__ mailing list.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1459] - Make cmake configure step fail explicitly if compiler version
+                 is not supported
+* [issue 1456] - Consolidating `new_<>()`
+* [issue 1454] - Removed harmful std::moves from return statements
+* [issue 1453] - Use range-based for-loop instead of Boost.Foreach
+* [issue 1452] - C++ feature tests
+* [issue 1451] - When serializing, pass archive flags to traits::get_type_size
+* [issue 1450] - traits:get_type_size needs archive flags to enable zero_copy
+                 optimizations
+* [issue 1449] - "couldn't create performance counter" - AGAS
+* [issue 1448] - Replace distributing factories with `new_<T[]>(...)`
+* [issue 1447] - Removing obsolete remote_object component
+* [issue 1446] - Hpx serialization
+* [issue 1445] - Replacing travis with circleci
+* [issue 1443] - Always stripping HPX command line arguments before executing
+                 start function
+* [issue 1442] - Adding --hpx:bind=none to disable thread affinities
+* [issue 1439] - Libraries get linked in multiple times, RPATH is not properly
+                 set
+* [issue 1438] - Removed superfluous typedefs
+* [issue 1437] - `hpx::init()` should strip HPX-related flags from argv
+* [issue 1436] - Add strong scaling option to htts
+* [issue 1435] - Adding async_cb, async_continue_cb, and async_colocated_cb
+* [issue 1434] - Added missing install rule, removed some dead CMake code
+* [issue 1433] - Add GitExternal and SubProject cmake scripts from
+                 eyescale/cmake repo
+* [issue 1432] - Add command line flag to disable thread pinning
+* [issue 1431] - Fix #1423
+* [issue 1429] - Configure setting `HPX_HAVE_PARCELPORT_MPI` is ignored
+* [issue 1427] - Adding stencil_iterator and transform_iterator
 * [issue 1426] - Fixes #1419
 * [issue 1425] - During serialization memory allocation should honour allocator
                  chunk size
+* [issue 1424] - chunk allocation during serialization does not use memory
+                 pool/allocator chunk size
+* [issue 1423] - Remove `HPX_STD_UNIQUE_PTR`
 * [issue 1422] - hpx:threads=all allocates too many os threads
 * [issue 1420] - added .travis.yml
 * [issue 1416] - Adding travis builder

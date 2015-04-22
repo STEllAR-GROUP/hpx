@@ -17,7 +17,7 @@ using hpx::components::component_agas_locality_namespace;
 
 using hpx::agas::server::locality_namespace;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::fixed_component<locality_namespace>,
     locality_namespace, hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(

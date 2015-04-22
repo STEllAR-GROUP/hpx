@@ -260,10 +260,16 @@ namespace hpx { namespace traits
 {
     template <>
     struct serialize_as_future<hpx::agas::request>
-      : boost::mpl::true_
+      : boost::mpl::false_
     {
+        static bool call_if(hpx::agas::request& r)
+        {
+            return r.get_action_code() == hpx::agas::primary_ns_route;
+        }
+
         static void call(hpx::agas::request& r)
         {
+            // routed parcels need to be checked for embedded future objects
             if (r.get_action_code() == hpx::agas::primary_ns_route)
             {
                 hpx::parcelset::parcel p = r.get_parcel();

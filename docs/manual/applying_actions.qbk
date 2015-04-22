@@ -111,7 +111,7 @@ file) in the most simple case:
     typedef hpx::components::simple_component<app::some_component> component_type;
     typedef app::some_component some_component;
 
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(component_type, some_component);
+    HPX_REGISTER_COMPONENT(component_type, some_component);
 
     // The parameters for this macro have to be the same as used in the corresponding
     // HPX_REGISTER_ACTION_DECLARATION() macro invocation above

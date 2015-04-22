@@ -260,10 +260,10 @@ private:
 // The macros below are necessary to generate the code required for exposing
 // our partition type remotely.
 //
-// HPX_REGISTER_MINIMAL_COMPONENT_FACTORY() exposes the component creation
+// HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::simple_component<partition_server> partition_server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(partition_server_type, partition_server);
+HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
@@ -287,7 +287,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
     // Create a new component on the locality co-located to the id 'where'. The
     // new instance will be initialized from the given partition_data.
     partition(hpx::id_type where, partition_data const& data)
-      : base_type(hpx::new_colocated<partition_server>(where, data))
+      : base_type(hpx::new_<partition_server>(hpx::colocated(where), data))
     {}
 
     // Attach a future representing a (possibly remote) partition.
@@ -392,10 +392,10 @@ private:
 // The macros below are necessary to generate the code required for exposing
 // our partition type remotely.
 //
-// HPX_REGISTER_MINIMAL_COMPONENT_FACTORY() exposes the component creation
+// HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::simple_component<stepper_server> stepper_server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stepper_server_type, stepper_server);
+HPX_REGISTER_COMPONENT(stepper_server_type, stepper_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.

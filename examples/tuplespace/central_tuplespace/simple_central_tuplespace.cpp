@@ -18,7 +18,7 @@ typedef hpx::components::simple_component<
     examples::server::simple_central_tuplespace
 > central_tuplespace_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(central_tuplespace_type, simple_central_tuplespace);
+HPX_REGISTER_COMPONENT(central_tuplespace_type, simple_central_tuplespace);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for simple_central_tuplespace actions.

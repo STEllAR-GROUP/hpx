@@ -17,9 +17,13 @@
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#ifndef BOOST_MSVC
+#include <boost/utility/enable_if.hpp>
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -34,6 +38,14 @@ namespace hpx
     apply(hpx::actions::basic_action<Component, Signature, Derived>,
         naming::id_type const&, Ts&&... vs);
 
+    template <typename Component, typename Signature, typename Derived,
+        typename ...Ts>
+    inline bool
+    apply(hpx::actions::continuation_type const& c,
+        hpx::actions::basic_action<Component, Signature, Derived>,
+        naming::id_type const& contgid, naming::id_type const& gid,
+        Ts&&... vs);
+
     // MSVC complains about ambiguities if it sees this forward declaration
 #ifndef BOOST_MSVC
     template <typename F, typename ...Ts>
@@ -45,6 +57,7 @@ namespace hpx
       , bool
     >::type
     apply(F&& f, Ts&&... vs);
+#endif
 
     template <
         typename Component, typename Signature, typename Derived,
@@ -52,7 +65,6 @@ namespace hpx
     bool apply_continue(
         hpx::actions::basic_action<Component, Signature, Derived>,
         Cont&& cont, naming::id_type const& gid, Ts&&... vs);
-#endif
 
     template <typename Component, typename Signature, typename Derived,
         typename ...Ts>
@@ -212,6 +224,9 @@ namespace hpx { namespace actions
             return gid_;
         }
 
+        virtual bool has_to_wait_for_futures() = 0;
+        virtual void wait_for_futures() = 0;
+
     protected:
         naming::id_type gid_;
     };
@@ -275,6 +290,10 @@ namespace hpx { namespace actions
     template <typename Cont>
     struct continuation_impl
     {
+    private:
+        typedef typename util::decay<Cont>::type cont_type;
+
+    public:
         template <typename T>
         struct result;
 
@@ -301,6 +320,16 @@ namespace hpx { namespace actions
             return std::move(t);
         }
 
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<cont_type>::call_if(cont_);
+        }
+
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<cont_type>::call(cont_);
+        }
+
     private:
         // serialization support
         friend class hpx::serialization::access;
@@ -311,7 +340,6 @@ namespace hpx { namespace actions
             ar & cont_ & target_;
         }
 
-        typedef typename util::decay<Cont>::type cont_type;
         cont_type cont_;
         hpx::id_type target_;
     };
@@ -320,6 +348,11 @@ namespace hpx { namespace actions
     template <typename Cont, typename F>
     struct continuation2_impl
     {
+    private:
+        typedef typename boost::remove_reference<Cont>::type cont_type;
+        typedef typename boost::remove_reference<F>::type function_type;
+
+    public:
         template <typename T>
         struct result;
 
@@ -351,6 +384,18 @@ namespace hpx { namespace actions
             return std::move(t);
         }
 
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<cont_type>::call_if(cont_) ||
+                traits::serialize_as_future<function_type>::call_if(f_);
+        }
+
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<cont_type>::call(cont_);
+            traits::serialize_as_future<function_type>::call(f_);
+        }
+
     private:
         // serialization support
         friend class hpx::serialization::access;
@@ -360,9 +405,6 @@ namespace hpx { namespace actions
         {
             ar & cont_ & target_ & f_;
         }
-
-        typedef typename boost::remove_reference<Cont>::type cont_type;
-        typedef typename boost::remove_reference<F>::type function_type;
 
         cont_type cont_;        // continuation type
         hpx::id_type target_;
@@ -377,7 +419,10 @@ namespace hpx { namespace actions
     template <typename Result>
     struct typed_continuation : continuation
     {
+    private:
+        typedef util::function<void(naming::id_type, Result)> function_type;
 
+    public:
         typed_continuation()
         {}
 
@@ -390,14 +435,12 @@ namespace hpx { namespace actions
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type const& gid,
-                F && f)
+        explicit typed_continuation(naming::id_type const& gid, F && f)
           : continuation(gid), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type && gid,
-                F && f)
+        explicit typed_continuation(naming::id_type && gid, F && f)
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
@@ -416,6 +459,7 @@ namespace hpx { namespace actions
             LLCO_(info)
                 << "typed_continuation<Result>::trigger_value("
                 << this->get_gid() << ")";
+
             if (f_.empty()) {
                 if (!this->get_gid()) {
                     HPX_THROW_EXCEPTION(invalid_status,
@@ -428,6 +472,16 @@ namespace hpx { namespace actions
             else {
                 f_(this->get_gid(), std::move(result));
             }
+        }
+
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<function_type>::call_if(f_);
+        }
+
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -462,7 +516,7 @@ namespace hpx { namespace actions
                 ar << f_;
         }
 
-        util::function<void(naming::id_type, Result)> f_;
+        function_type f_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -470,7 +524,9 @@ namespace hpx { namespace actions
     template <typename Result>
     struct init_registration<typed_continuation<Result> >
     {
-        static detail::automatic_continuation_registration<typed_continuation<Result> > g;
+        static detail::automatic_continuation_registration<
+                typed_continuation<Result>
+            > g;
     };
 }}
 
@@ -479,7 +535,7 @@ namespace hpx { namespace traits
     template <>
     struct needs_automatic_registration<
             hpx::actions::typed_continuation<void> >
-        : boost::mpl::false_
+      : boost::mpl::false_
     {};
 }}
 
@@ -489,6 +545,10 @@ namespace hpx { namespace actions
     template <>
     struct typed_continuation<void> : continuation
     {
+    private:
+        typedef util::function<void(naming::id_type)> function_type;
+
+    public:
         typed_continuation()
         {}
 
@@ -501,14 +561,12 @@ namespace hpx { namespace actions
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type const& gid,
-                F && f)
+        explicit typed_continuation(naming::id_type const& gid, F && f)
           : continuation(gid), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(naming::id_type && gid,
-                F && f)
+        explicit typed_continuation(naming::id_type && gid, F && f)
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
@@ -527,6 +585,7 @@ namespace hpx { namespace actions
             LLCO_(info)
                 << "typed_continuation<void>::trigger("
                 << this->get_gid() << ")";
+
             if (f_.empty()) {
                 if (!this->get_gid()) {
                     HPX_THROW_EXCEPTION(invalid_status,
@@ -544,6 +603,16 @@ namespace hpx { namespace actions
         virtual void trigger_value(util::unused_type &&) const
         {
             this->trigger();
+        }
+
+        virtual bool has_to_wait_for_futures()
+        {
+            return traits::serialize_as_future<function_type>::call_if(f_);
+        }
+
+        virtual void wait_for_futures()
+        {
+            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -578,7 +647,7 @@ namespace hpx { namespace actions
                 ar << f_;
         }
 
-        util::function<void(naming::id_type)> f_;
+        function_type f_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

@@ -29,6 +29,8 @@ namespace hpx { namespace performance_counters
 
         performance_counter(std::string const& name);
 
+        performance_counter(std::string const& name, hpx::id_type const& locality);
+
         performance_counter(future<id_type> && id)
           : base_type(std::move(id))
         {}
@@ -42,8 +44,11 @@ namespace hpx { namespace performance_counters
         counter_info get_info_sync(error_code& ec = throws);
 
         future<counter_value> get_counter_value(bool reset = false);
+        future<counter_value> get_counter_value() const;
+
         counter_value get_counter_value_sync(bool reset = false,
             error_code& ec = throws);
+        counter_value get_counter_value_sync(error_code& ec = throws) const;
 
         ///////////////////////////////////////////////////////////////////////
         future<bool> start();
@@ -74,6 +79,19 @@ namespace hpx { namespace performance_counters
         T get_value_sync(bool reset = false, error_code& ec = throws)
         {
             return get_counter_value_sync(reset).get_value<T>(ec);
+        }
+
+        template <typename T>
+        future<T> get_value(error_code& ec = throws) const
+        {
+            return get_counter_value().then(
+                util::bind(&performance_counter::extract_value<T>,
+                    util::placeholders::_1, boost::ref(ec)));
+        }
+        template <typename T>
+        T get_value_sync(error_code& ec = throws) const
+        {
+            return get_counter_value_sync().get_value<T>(ec);
         }
     };
 }}

@@ -41,7 +41,7 @@ namespace hpx { namespace lcos
 
         void wait()
         {
-            this->base_type::wait(get_gid());
+            this->lcos::stubs::barrier::wait(get_gid());
         }
 
         lcos::future<void> set_exception_async(boost::exception_ptr const& e)

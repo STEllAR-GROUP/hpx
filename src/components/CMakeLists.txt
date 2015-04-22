@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2010 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2013 Jeroen Habraken
 #
@@ -6,10 +6,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    binpacking_factory
     component_storage
     containers
-    distributing_factory
     iostreams
     memory
     papi_counters

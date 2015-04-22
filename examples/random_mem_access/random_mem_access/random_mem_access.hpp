@@ -70,7 +70,7 @@ namespace hpx { namespace components
         /// Query the current value of the random_mem_access
         int query()
         {
-            return this->base_type::query(get_gid());
+            return static_cast<int>(this->base_type::query(get_gid()));
         }
 
         /// Asynchronously query the current value of the random_mem_access

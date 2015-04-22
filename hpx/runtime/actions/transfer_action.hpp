@@ -345,12 +345,13 @@ namespace hpx { namespace actions
             threads::thread_state_enum initial_state)
         {
             // first decorate the continuation
-            traits::action_decorate_continuation<derived_type>::call(cont);
+            continuation_type c(cont);
+            traits::action_decorate_continuation<derived_type>::call(c);
 
             // now, schedule the thread
             threads::thread_init_data data;
             traits::action_schedule_thread<derived_type>::call(lva,
-                get_thread_init_data(cont, target, lva, data), initial_state);
+                get_thread_init_data(c, target, lva, data), initial_state);
         }
 
         /// Return a pointer to the filter to be used while serializing an

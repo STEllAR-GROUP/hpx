@@ -335,7 +335,10 @@ namespace hpx { namespace parcelset
 
             void wait_for_futures()
             {
-                return this->get_action()->wait_for_futures();
+                actions::continuation_type const& cont = this->get_continuation();
+                if (cont)
+                    cont->wait_for_futures();
+                this->get_action()->wait_for_futures();
             }
 
             void save(serialization::output_archive& ar) const;
@@ -772,6 +775,11 @@ namespace hpx { namespace traits
     struct serialize_as_future<hpx::parcelset::parcel>
       : boost::mpl::true_
     {
+        static bool call_if(hpx::parcelset::parcel& r)
+        {
+            return true;
+        }
+
         static void call(hpx::parcelset::parcel& p)
         {
             p.wait_for_futures();

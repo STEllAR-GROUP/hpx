@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/applier/apply_colocated.hpp>
+#include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -19,31 +19,6 @@
 
 namespace hpx { namespace components { namespace stubs
 {
-    /// \brief  The function \a get_factory_properties is used to
-    ///         determine, whether instances of the derived component can
-    ///         be created in blocks (i.e. more than one instance at once).
-    ///         This function is used by the \a distributing_factory to
-    ///         determine a correct allocation strategy
-    lcos::future<int> runtime_support::get_factory_properties_async(
-        naming::id_type const& targetgid, components::component_type type)
-    {
-        // Create a future, execute the required action,
-        // we simply return the initialized future, the caller needs
-        // to call get() on the return value to obtain the result
-        typedef
-            server::runtime_support::factory_properties_action
-        action_type;
-        return hpx::async<action_type>(targetgid, type);
-    }
-
-    int runtime_support::get_factory_properties(naming::id_type const& targetgid,
-        components::component_type type)
-    {
-        // The following get yields control while the action above
-        // is executed and the result is returned to the future
-        return get_factory_properties_async(targetgid, type).get();
-    }
-
     ///////////////////////////////////////////////////////////////////////
     lcos::future<std::vector<naming::id_type> >
     runtime_support::bulk_create_components_async(
@@ -280,7 +255,8 @@ namespace hpx { namespace components { namespace stubs
     {
         typedef server::runtime_support::update_agas_cache_entry_action
             action_type;
-        hpx::apply_colocated<action_type>(targetgid, gid, g, count, offset);
+        hpx::detail::apply_colocated<action_type>(
+            targetgid, gid, g, count, offset);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -367,8 +343,8 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(targetgid, type);
     }
 
-    boost::int32_t runtime_support::get_instance_count(naming::id_type const& targetgid,
-        components::component_type type)
+    boost::int32_t runtime_support::get_instance_count(
+        naming::id_type const& targetgid, components::component_type type)
     {
         // The following get yields control while the action above
         // is executed and the result is returned to the future
