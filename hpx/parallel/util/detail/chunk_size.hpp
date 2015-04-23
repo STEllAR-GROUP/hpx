@@ -59,6 +59,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         hpx::wait_any(bench_futures); 
         t = (hpx::util::high_resolution_clock::now() - t);
         
+        workitems.reserve(cores);
         for(std::size_t i = 0; i < cores; i++){
             workitems.push_back(std::move(bench_futures[i]));
         }

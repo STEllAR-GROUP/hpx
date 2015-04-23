@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { namespace util
                         first, count, chunk_size);
 
                     // schedule every chunk on a separate thread
-                    workitems.reserve(count / chunk_size + 1);
+                    workitems.reserve(workitems.size() + count / chunk_size + 1);
 
                     threads::executor exec = policy.get_executor();
                     while (count != 0)
@@ -98,7 +98,7 @@ namespace hpx { namespace parallel { namespace util
                         first, count, chunk_size);
 
                     // schedule every chunk on a separate thread
-                    workitems.reserve(count / chunk_size + 1);
+                    workitems.reserve(workitems.size() + count / chunk_size + 1);
 
                     threads::executor exec = policy.get_executor();
                     while (count != 0)
