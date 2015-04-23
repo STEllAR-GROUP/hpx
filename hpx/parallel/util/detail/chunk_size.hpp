@@ -161,7 +161,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 if (count > 100*cores)
                 {
                     chunk_size = auto_chunk_size(policy, workitems, f1,
-                                                 first, count, base_idx,
+                                                 first, count,
                         [&base_idx]
                            (std::vector<Future>& bench_futures,
                             F1 && f1, FwdIter& first, std::size_t& count,
