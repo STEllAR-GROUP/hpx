@@ -146,11 +146,11 @@ void copy_tests()
         copy_tests(v);
     }
 
-    copy_tests_with_policy<T>(length, 1, hpx::layout);
-    copy_tests_with_policy<T>(length, 3, hpx::layout(3));
-    copy_tests_with_policy<T>(length, 3, hpx::layout(3, localities));
+    copy_tests_with_policy<T>(length, 1, hpx::container_layout);
+    copy_tests_with_policy<T>(length, 3, hpx::container_layout(3));
+    copy_tests_with_policy<T>(length, 3, hpx::container_layout(3, localities));
     copy_tests_with_policy<T>(length, localities.size(),
-        hpx::layout(localities));
+        hpx::container_layout(localities));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
