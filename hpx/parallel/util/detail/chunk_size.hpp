@@ -16,44 +16,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
 
-    template <typename Future, typename F1, typename FwdIter>
-    void start_bench_thread(std::vector<Future>& bench_futures,
-                            F1 && f1, FwdIter& first, std::size_t& count,
-                            const std::size_t& test_chunk_size)
-    {
-            bench_futures.push_back(std::move(hpx::async(f1, first,
-                                                         test_chunk_size)));
-            // mark benchmarked items as processed
-            std::advance(first, test_chunk_size);
-            count -= test_chunk_size;
-    }
-
-    template <typename Future, typename F1, typename FwdIter>
-    void start_bench_thread(std::vector<Future>& bench_futures,
-                            F1 && f1, FwdIter& first, std::size_t& count,
-                            const std::size_t& test_chunk_size,
-                            std::size_t& base_idx)
-    {
-            bench_futures.push_back(std::move(hpx::async(f1, base_idx,
-                                                         first,
-                                                         test_chunk_size)));
-            // mark benchmarked items as processed
-            base_idx += test_chunk_size;
-            std::advance(first, test_chunk_size);
-            count -= test_chunk_size;
-    }
-
-
-
     // estimate a chunk size by running a quick benchmark
     template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
-              typename ... Idx>
+              typename StartBenchThread>
         // requires traits::is_future<Future>
     std::size_t auto_chunk_size(
         ExPolicy const& policy,
         std::vector<Future>& workitems,
         F1 && f1, FwdIter& first, std::size_t& count,
-        Idx & ... base_idx)
+        StartBenchThread && start_bench_thread)
     {
         // get executor
         threads::executor exec = policy.get_executor();
@@ -83,7 +54,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         boost::uint64_t t = hpx::util::high_resolution_clock::now();
         for(std::size_t i = 0; i < cores; i++){
             start_bench_thread(bench_futures, f1, first, count,
-                               test_chunk_size, base_idx...);
+                               test_chunk_size);
         }
         hpx::wait_any(bench_futures); 
         t = (hpx::util::high_resolution_clock::now() - t);
@@ -151,9 +122,20 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             {
                 std::size_t const cores = hpx::get_os_thread_count(exec) * 2;
                 if (count > 100*cores)
+                {
                     chunk_size = auto_chunk_size(policy, workitems, f1,
-                                                 first, count);
-
+                                                 first, count,
+                        [] (std::vector<Future>& bench_futures,
+                            F1 && f1, FwdIter& first, std::size_t& count,
+                            std::size_t test_chunk_size)
+                            {
+                                bench_futures.push_back(std::move(
+                                    hpx::async(f1, first, test_chunk_size)));
+                                // mark benchmarked items as processed
+                                std::advance(first, test_chunk_size);
+                                count -= test_chunk_size;
+                            });
+                }
                 if (chunk_size == 0)
                     chunk_size = (count + cores - 1) / cores;
             }
@@ -177,9 +159,23 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             {
                 std::size_t const cores = hpx::get_os_thread_count(exec);
                 if (count > 100*cores)
+                {
                     chunk_size = auto_chunk_size(policy, workitems, f1,
-                                                 first, count, base_idx);
-
+                                                 first, count, base_idx,
+                        [&base_idx]
+                           (std::vector<Future>& bench_futures,
+                            F1 && f1, FwdIter& first, std::size_t& count,
+                            std::size_t test_chunk_size)
+                            {
+                                bench_futures.push_back(std::move(
+                                    hpx::async(f1, base_idx, first,
+                                                   test_chunk_size)));
+                                // mark benchmarked items as processed
+                                base_idx += test_chunk_size;
+                                std::advance(first, test_chunk_size);
+                                count -= test_chunk_size;
+                            });
+                }
                 if (chunk_size == 0)
                     chunk_size = (count + cores - 1) / cores;
             }
