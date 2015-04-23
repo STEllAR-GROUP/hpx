@@ -12,6 +12,7 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/date_time_chrono.hpp>
@@ -1767,11 +1768,11 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename R>
     struct serialize_as_future<lcos::future<R> >
-      : boost::mpl::false_
+      : boost::mpl::true_
     {
         static bool call_if(lcos::future<R>& f)
         {
-            return f.valid() && !f.is_ready();
+            return true;
         }
 
         static void call(lcos::future<R>& f)
@@ -1786,7 +1787,7 @@ namespace hpx { namespace traits
     {
         static bool call_if(lcos::shared_future<R>& f)
         {
-            return f.valid() && !f.is_ready();
+            return true;
         }
 
         static void call(lcos::shared_future<R>& f)

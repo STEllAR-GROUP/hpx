@@ -18,6 +18,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/acquire_future.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
 #include <utility>
@@ -483,11 +484,11 @@ namespace hpx { namespace traits
     template <typename Derived>
     struct serialize_as_future<Derived,
             typename boost::enable_if<is_client<Derived> >::type>
-      : boost::mpl::false_
+      : boost::mpl::true_
     {
         static bool call_if(Derived& c)
         {
-            return c.valid() && !c.is_ready();
+            return true;
         }
 
         static void call(Derived& c)
