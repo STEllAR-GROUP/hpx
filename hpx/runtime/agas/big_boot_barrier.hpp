@@ -17,6 +17,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <boost/lockfree/queue.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
@@ -39,7 +40,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     boost::mutex mtx;
     std::size_t connected;
 
-    boost::lockfree::queue<util::function_nonser<void()>* > thunks;
+    boost::lockfree::queue<util::unique_function_nonser<void()>* > thunks;
 
     void spin();
 
@@ -86,14 +87,14 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
         boost::uint32_t source_prefix
       , boost::uint32_t prefix
       , parcelset::locality const& dest
-      , actions::base_action* act
+      , std::unique_ptr<actions::base_action> act
         );
 
     void apply_late(
         boost::uint32_t source_prefix
       , boost::uint32_t prefix
       , parcelset::locality const& dest
-      , actions::base_action* act
+      , std::unique_ptr<actions::base_action> act
         );
 
     void wait_bootstrap();
@@ -103,7 +104,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     // no-op on non-bootstrap localities
     void trigger();
 
-    void add_thunk(util::function_nonser<void()>* f)
+    void add_thunk(util::unique_function_nonser<void()>* f)
     {
         thunks.push(f);
     }

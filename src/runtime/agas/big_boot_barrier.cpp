@@ -13,6 +13,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -559,8 +560,9 @@ void register_worker(registration_header const& header)
         }
     }
 
-    actions::base_action* p =
-        new actions::transfer_action<notify_worker_action>(hdr);
+    std::unique_ptr<actions::base_action> p(
+            new actions::transfer_action<notify_worker_action>(hdr)
+        );
 
     // TODO: Handle cases where localities try to connect to AGAS while it's
     // shutting down.
@@ -571,7 +573,7 @@ void register_worker(registration_header const& header)
         get_big_boot_barrier().apply_late(
             0
           , naming::get_locality_id_from_gid(prefix)
-          , dest, p);
+          , dest, std::move(p));
     }
 
     else
@@ -583,17 +585,17 @@ void register_worker(registration_header const& header)
         get_big_boot_barrier().apply(
             0
           , naming::get_locality_id_from_gid(prefix)
-          , dest, p);
+          , dest, std::move(p));
 #else
         // delay the final response until the runtime system is up and running
-        util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
-            boost::bind(
-                &big_boot_barrier::apply
+        util::unique_function_nonser<void()>* thunk = new util::unique_function_nonser<void()>(
+            util::bind(
+                util::one_shot(&big_boot_barrier::apply)
               , boost::ref(get_big_boot_barrier())
               , 0
               , naming::get_locality_id_from_gid(prefix)
               , dest
-              , p));
+              , std::move(p)));
         get_big_boot_barrier().add_thunk(thunk);
 #endif
     }
@@ -698,11 +700,14 @@ void notify_worker(notification_header const& header)
       , rt.here()
       , rt.get_certificate_signing_request());
 
+    std::unique_ptr<actions::base_action> act(
+            new actions::transfer_action<register_worker_security_action>(hdr)
+        );
     get_big_boot_barrier().apply(
         naming::get_locality_id_from_gid(header.prefix)
       , 0
       , header.agas_locality
-      , new actions::transfer_action<register_worker_security_action>(hdr));
+      , std::move(act));
 #endif
 }
 // }}}
@@ -738,8 +743,9 @@ void register_worker_security(registration_header_security const& header)
         rt.get_certificate()
       , rt.sign_certificate_signing_request(header.csr));
 
-    actions::base_action* p =
-        new actions::transfer_action<notify_worker_security_action>(hdr);
+    std::unique_ptr<actions::base_action> p(
+            new actions::transfer_action<notify_worker_security_action>(hdr)
+        );
 
 
     parcelset::locality dest;
@@ -762,7 +768,7 @@ void register_worker_security(registration_header_security const& header)
         get_big_boot_barrier().apply(
             0
           , naming::get_locality_id_from_gid(header.prefix)
-          , dest, p);
+          , dest, std::move(p));
     }
 
     else
@@ -770,13 +776,13 @@ void register_worker_security(registration_header_security const& header)
         // AGAS is starting up; this locality is participating in startup
         // synchronization.
         util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
-            boost::bind(
-                &big_boot_barrier::apply
+            util::bind(
+                util::one_shot(&big_boot_barrier::apply)
               , boost::ref(get_big_boot_barrier())
               , 0
               , naming::get_locality_id_from_gid(header.prefix)
               , dest
-              , p));
+              , std::move(p)));
         get_big_boot_barrier().add_thunk(thunk);
     }
 }
@@ -862,11 +868,11 @@ void big_boot_barrier::apply(
     boost::uint32_t source_locality_id
   , boost::uint32_t target_locality_id
   , parcelset::locality const & dest
-  , actions::base_action* act
+  , std::unique_ptr<actions::base_action> act
 ) { // {{{
     HPX_ASSERT(pp);
     naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
-    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
+    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, std::move(act));
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
     pp->send_early_parcel(dest, p);
@@ -876,10 +882,10 @@ void big_boot_barrier::apply_late(
     boost::uint32_t source_locality_id
   , boost::uint32_t target_locality_id
   , parcelset::locality const & dest
-  , actions::base_action* act
+  , std::unique_ptr<actions::base_action> act
 ) { // {{{
     naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
-    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
+    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, std::move(act));
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
     get_runtime().get_parcel_handler().put_parcel(p);
@@ -955,11 +961,14 @@ void big_boot_barrier::wait_hosted(
         , unassigned
         , suggested_prefix);
 
+    std::unique_ptr<actions::base_action> act(
+            new actions::transfer_action<register_worker_action>(hdr)
+        );
     apply(
         naming::invalid_locality_id
         , 0
         , bootstrap_agas
-        , new actions::transfer_action<register_worker_action>(hdr));
+        , std::move(act));
 
     // wait for registration to be complete
     spin();

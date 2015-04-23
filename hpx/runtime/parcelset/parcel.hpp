@@ -19,7 +19,6 @@
 #include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -47,20 +46,20 @@ namespace hpx { namespace parcelset
               : count_(0)
             {}
 
-            parcel_data(actions::base_action* act)
-              : count_(0), action_(act)
+            parcel_data(std::unique_ptr<actions::base_action> act)
+              : count_(0), action_(std::move(act))
             {}
 
-            parcel_data(actions::base_action* act,
+            parcel_data(std::unique_ptr<actions::base_action> act,
                    actions::continuation* do_after)
               : count_(0),
-                action_(act), continuation_(do_after)
+                action_(std::move(act)), continuation_(do_after)
             {}
 
-            parcel_data(actions::base_action* act,
+            parcel_data(std::unique_ptr<actions::base_action> act,
                     actions::continuation_type do_after)
               : count_(0),
-                action_(act), continuation_(do_after)
+                action_(std::move(act)), continuation_(do_after)
             {}
 
             virtual ~parcel_data() {}
@@ -94,8 +93,6 @@ namespace hpx { namespace parcelset
             virtual void set_parcel_id(naming::gid_type const& id) = 0;
 
             virtual bool does_termination_detection() const = 0;
-
-            virtual void wait_for_futures() = 0;
 
             // default copy constructor is ok
             // default assignment operator is ok
@@ -188,8 +185,8 @@ namespace hpx { namespace parcelset
             }
 
             single_destination_parcel_data(naming::id_type const& apply_to,
-                    naming::address const& addr, actions::base_action* act)
-              : parcel_data(act)
+                    naming::address const& addr, std::unique_ptr<actions::base_action> act)
+              : parcel_data(std::move(act))
               , dest_(apply_to)
               , addr_(addr)
             {
@@ -199,13 +196,13 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ = 0;
 
                 HPX_ASSERT(components::types_are_compatible(
-                    act->get_component_type(), addr.type_));
+                    action_->get_component_type(), addr.type_));
             }
 
             single_destination_parcel_data(naming::id_type const& apply_to,
-                    naming::address const& addr, actions::base_action* act,
+                    naming::address const& addr, std::unique_ptr<actions::base_action> act,
                    actions::continuation* do_after)
-              : parcel_data(act, do_after)
+              : parcel_data(std::move(act), do_after)
               , dest_(apply_to)
               , addr_(addr)
             {
@@ -215,13 +212,13 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ = do_after ? 1 : 0;
 
                 HPX_ASSERT(components::types_are_compatible(
-                    act->get_component_type(), addr.type_));
+                    action_->get_component_type(), addr.type_));
             }
 
             single_destination_parcel_data(naming::id_type const& apply_to,
-                    naming::address const& addr, actions::base_action* act,
+                    naming::address const& addr, std::unique_ptr<actions::base_action> act,
                     actions::continuation_type do_after)
-              : parcel_data(act, do_after)
+              : parcel_data(std::move(act), do_after)
               , dest_(apply_to)
               , addr_(addr)
             {
@@ -231,7 +228,7 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ = do_after ? 1 : 0;
 
                 HPX_ASSERT(components::types_are_compatible(
-                    act->get_component_type(), addr.type_));
+                    action_->get_component_type(), addr.type_));
             }
 
             bool is_multi_destination() const { return false; }
@@ -316,14 +313,6 @@ namespace hpx { namespace parcelset
                 return this->get_action()->does_termination_detection();
             }
 
-            void wait_for_futures()
-            {
-                actions::continuation_type const& cont = this->get_continuation();
-                if (cont)
-                    cont->wait_for_futures();
-                this->get_action()->wait_for_futures();
-            }
-
             void save(serialization::output_archive& ar) const;
 
             void load(serialization::input_archive& ar);
@@ -380,8 +369,8 @@ namespace hpx { namespace parcelset
             multi_destination_parcel_data(
                     std::vector<naming::id_type> const& apply_to,
                     std::vector<naming::address> const& addrs,
-                    actions::base_action * act)
-              : parcel_data(act)
+                    std::unique_ptr<actions::base_action> act)
+              : parcel_data(std::move(act))
               , dests_(apply_to)
               , addrs_(addrs)
             {
@@ -403,7 +392,7 @@ namespace hpx { namespace parcelset
                     }
 
                     // all destination component types are properly matched
-                    int comptype = act->get_component_type();
+                    int comptype = action_->get_component_type();
                     for (std::size_t i = 0; i != addrs.size(); ++i)
                     {
                         HPX_ASSERT(components::types_are_compatible(
@@ -537,31 +526,36 @@ namespace hpx { namespace parcelset
         parcel() {}
 
         parcel(naming::id_type const& apply_to,
-                naming::address const& addrs, actions::base_action* act)
-          : data_(new detail::single_destination_parcel_data(apply_to, addrs, act))
+                naming::address const& addrs,
+                std::unique_ptr<actions::base_action> act)
+          : data_(new detail::single_destination_parcel_data(apply_to, addrs,
+                      std::move(act)))
         {
         }
 
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         parcel(std::vector<naming::id_type> const& apply_to,
                 std::vector<naming::address> const& addrs,
-                actions::base_action * act)
-          : data_(new detail::multi_destination_parcel_data(apply_to, addrs, act))
+                std::unique_ptr<actions::base_action> act)
+          : data_(new detail::multi_destination_parcel_data(apply_to, addrs,
+                      std::move(act)))
         {
         }
 #endif
 
         parcel(naming::id_type const& apply_to,
-                naming::address const& addrs, actions::base_action* act,
+                naming::address const& addrs, std::unique_ptr<actions::base_action> act,
                 actions::continuation* do_after)
-          : data_(new detail::single_destination_parcel_data(apply_to, addrs, act, do_after))
+          : data_(new detail::single_destination_parcel_data(apply_to, addrs,
+                      std::move(act), do_after))
         {
         }
 
         parcel(naming::id_type const& apply_to,
-                naming::address const& addrs, actions::base_action* act,
+                naming::address const& addrs, std::unique_ptr<actions::base_action> act,
                 actions::continuation_type do_after)
-          : data_(new detail::single_destination_parcel_data(apply_to, addrs, act, do_after))
+          : data_(new detail::single_destination_parcel_data(apply_to, addrs,
+                      std::move(act), do_after))
         {
         }
 
@@ -696,11 +690,6 @@ namespace hpx { namespace parcelset
             return data_->does_termination_detection();
         }
 
-        void wait_for_futures()
-        {
-            return data_->wait_for_futures();
-        }
-
         // generate unique parcel id
         static naming::gid_type generate_unique_id(
             boost::uint32_t locality_id = naming::invalid_locality_id);
@@ -723,24 +712,6 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT std::string dump_parcel(parcel const& p);
-}}
-
-namespace hpx { namespace traits
-{
-    template <>
-    struct serialize_as_future<hpx::parcelset::parcel>
-      : boost::mpl::true_
-    {
-        static bool call_if(hpx::parcelset::parcel& r)
-        {
-            return true;
-        }
-
-        static void call(hpx::parcelset::parcel& p)
-        {
-            p.wait_for_futures();
-        }
-    };
 }}
 
 namespace hpx { namespace traits

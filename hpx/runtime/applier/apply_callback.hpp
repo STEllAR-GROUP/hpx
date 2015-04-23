@@ -25,11 +25,8 @@ namespace hpx
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            lcos::local::detail::invoke_when_ready(
-                detail::put_parcel<Action>(id, std::move(addr), priority,
-                    actions::continuation_type(), std::forward<Callback>(cb)),
-                std::forward<Ts>(vs)...);
-            return false;     // destinations are remote
+            return detail::put_parcel_cb<Action>(id, std::move(addr), priority,
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         template <typename Action, typename Callback, typename ...Ts>
@@ -121,11 +118,9 @@ namespace hpx
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            lcos::local::detail::invoke_when_ready(
-                detail::put_parcel<Action>(id, std::move(addr), priority, c,
-                    std::forward<Callback>(cb)),
+            return detail::put_parcel_cont_cb<Action>(id, std::move(addr),
+                priority, c, std::forward<Callback>(cb),
                 std::forward<Ts>(vs)...);
-            return false;     // destination is remote
         }
 
         template <typename Action, typename Callback, typename ...Ts>

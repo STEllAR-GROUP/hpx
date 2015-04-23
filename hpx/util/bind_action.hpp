@@ -13,7 +13,6 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_placeholder.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -315,23 +314,6 @@ namespace hpx { namespace traits
     struct is_bound_action<util::detail::bound_action<Action, BoundArgs> >
       : boost::mpl::true_
     {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename BoundArgs>
-    struct serialize_as_future<util::detail::bound_action<Action, BoundArgs> >
-      : serialize_as_future<BoundArgs>
-    {
-        static bool
-        call_if(util::detail::bound_action<Action, BoundArgs>& b)
-        {
-            return serialize_as_future<BoundArgs>::call_if(b._bound_args);
-        }
-
-        static void call(util::detail::bound_action<Action, BoundArgs>& b)
-        {
-            traits::serialize_as_future<BoundArgs>::call(b._bound_args);
-        }
-    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

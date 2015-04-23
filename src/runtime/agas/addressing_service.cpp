@@ -1800,10 +1800,13 @@ void addressing_service::route(
             naming::id_type const route_target(
                 bootstrap_primary_namespace_gid(), naming::id_type::unmanaged);
 
+            std::unique_ptr<actions::base_action> act(
+                new actions::transfer_action<action_type>(action_priority_,
+                    req));
+
             parcelset::parcel route_p(
                 route_target, primary_ns_addr_
-              , new hpx::actions::transfer_action<action_type>(action_priority_,
-                    req));
+              , std::move(act));
 
             // send to the main AGAS instance for routing
             hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);

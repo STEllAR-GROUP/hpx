@@ -30,7 +30,6 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/tuple.hpp>
@@ -252,12 +251,6 @@ namespace hpx { namespace actions
         threads::thread_stacksize get_thread_stacksize() const
         {
             return stacksize_;
-        }
-
-        /// Wait for embedded futures to become ready
-        void wait_for_futures()
-        {
-            traits::serialize_as_future<arguments_type>::call(arguments_);
         }
 
         /// Return whether the embedded action is part of termination detection
