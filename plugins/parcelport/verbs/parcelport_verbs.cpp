@@ -259,10 +259,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // has completed : recombining of final parcel depends on which piece of the message the
         // regions belong to
         // ----------------------------------------------------------------------------------------------
-        typedef struct parcel_receive_data_ {
+        typedef struct {
             int               counter;
             std::vector<serialization::serialization_chunk>  chunks;
-            parcel_receive_data_() : counter(0), header_region(NULL), chunk_region(NULL), message_region(NULL) {}
             RdmaMemoryRegion *header_region, *chunk_region, *message_region;
             std::vector<RdmaMemoryRegion*>                   zero_copy_regions;
         } parcel_receive_data;
@@ -288,12 +287,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // map tag to receive struct
         tag_receive_map    TagReceiveCompletionMap;
 
+        typedef std::list<parcel_send_data> active_list_type;
+        typedef active_list_type::iterator  active_send_iterator;
+
         // map send parcel wr_id to all info needed on completion
-        typedef std::unordered_map<uint64_t, parcel_send_data> send_wr_map;
+        typedef std::unordered_map<uint64_t, active_send_iterator> send_wr_map;
 
         // store received objects using a map referenced by verbs work request ID
         send_wr_map SendCompletionMap;
         send_wr_map TagSendCompletionMap;
+
+        active_list_type active_sends;
+        mutex_type       active_send_mutex;
 
         // ----------------------------------------------------------------------------------------------
         // When a parcel_buffer finishes decoding a message, it will call this function
@@ -335,6 +340,48 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             FUNC_END_DEBUG_MSG;
         }
 
+        // ----------------------------------------------------------------------------------------------
+        // clean up a completed send and all its regions etc
+        // ----------------------------------------------------------------------------------------------
+        void delete_send_data(active_send_iterator send) {
+            parcel_send_data &send_data = *send;
+            // trigger the write_handler
+            LOG_DEBUG_MSG("Calling write_handler for completed send");
+            send_data.handler.operator()(error_code(), send_data.parcel);
+            //
+            LOG_DEBUG_MSG("deallocating region 1 for completed send " << hexpointer(send_data.header_region));
+            chunk_pool_->deallocate(send_data.header_region);
+            send_data.header_region  = NULL;
+            // if this message had multiple (2) SGEs then release other regions
+            if (send_data.message_region) {
+                LOG_DEBUG_MSG("deallocating region 2 for completed send " << hexpointer(send_data.message_region));
+                chunk_pool_->deallocate(send_data.message_region);
+                send_data.message_region = NULL;
+            }
+            for (auto r : send_data.zero_copy_regions) {
+                // if this region was registered on the fly, then don't return it to the pool
+                if (r->isTempRegion()) {
+                    LOG_DEBUG_MSG("Deleting " << hexpointer(r));
+                    delete r;
+                }
+                else if (r->isUserRegion()) {
+                    LOG_DEBUG_MSG("Deleting " << hexpointer(r));
+                    delete r;
+                }
+                else {
+                    LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
+                    chunk_pool_->deallocate(r);
+                }
+            }
+            // and trigger the send complete handler for hpx internal cleanup
+            LOG_DEBUG_MSG("Calling write_handler for completed send");
+            send_data.handler.operator()(error_code(), send_data.parcel);
+            {
+                hpx::lcos::local::spinlock::scoped_lock(active_send_mutex);
+                LOG_DEBUG_MSG("erasing current send from active send list");
+                active_sends.erase(send);
+            }
+        }
 
         // ----------------------------------------------------------------------------------------------
         // handler for connections, this is triggered as a callback from the rdmaController when
@@ -374,52 +421,29 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             //
             // When a send completes, release memory and trigger write_handler
             //
-            bool             found_wr_id;
-            parcel_send_data send_data;
-            RdmaMemoryRegion *region;
+            bool                 found_wr_id;
+            RdmaMemoryRegion    *region;
+            active_send_iterator current_send;
             {
                 // make sure map isn't modified whilst we are querying it
                 hpx::lcos::local::spinlock::scoped_lock lk(SendCompletionMap_mutex);
                 it_s = SendCompletionMap.find(wr_id);
                 found_wr_id = (it_s != SendCompletionMap.end());
-                // lock acquire
                 if (found_wr_id) {
                     LOG_DEBUG_MSG("Entering send (completion handler) section");
                     region = (RdmaMemoryRegion *)completion->wr_id;
-                    send_data = std::move(it_s->second);
+                    current_send = it_s->second;
                     // after the send has completed, we can release memory regions used
                     // note : release iterator before memory regions to avoid race as region is used as map key
                     // and it might be re-added to the map with new data
                     LOG_DEBUG_MSG("erasing iterator for completed send");
                     SendCompletionMap.erase(it_s);
                 }
-                // lock released
             }
             if (found_wr_id) {
-                LOG_DEBUG_MSG("deallocating region 1 for completed send " << hexpointer(region));
-                // same as region* because wr_id is header_region
-                chunk_pool_->deallocate(send_data.header_region);
-                // if this message had multiple (2) SGEs then release other regions
-                if (send_data.message_region) {
-                    LOG_DEBUG_MSG("deallocating region 2 for completed send " << hexpointer(send_data.message_region));
-                    chunk_pool_->deallocate(send_data.message_region);
-                }
                 // if the send had no zero_copy regions, then it has completed
-                if (send_data.zero_copy_regions.empty()) {
-                    // trigger the write_handler
-                    LOG_DEBUG_MSG("Calling write_handler for completed send");
-                    send_data.handler.operator()(error_code(), send_data.parcel);
-                }
-                // if there are zero copy regions, we must hold onto them until the destination tells us
-                // it has completed all rdma Get operations
-                else {
-                    hpx::lcos::local::spinlock::scoped_lock lk(TagSendCompletionMap_mutex);
-                    // put the data into a new map which is indexed by the Tag of the send
-                    // zero copy blocks will be released when we are told this has completed
-                    send_data.header_region  = NULL; // already deallocated
-                    send_data.message_region = NULL; // already deallocated
-                    send_data.chunk_region   = NULL; // not yet implemented
-                    TagSendCompletionMap[send_data.tag] = std::move(send_data);
+                if (current_send->zero_copy_regions.empty()) {
+                    delete_send_data(current_send);
                 }
                 return 0;
             }
@@ -464,9 +488,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
                 header_type *h = (header_type*)r_data.header_region->getAddress();
                 LOG_DEBUG_MSG( "get completion " <<
-                        "buffer size is " << decnumber(h->size())
-                        << "numbytes is " << decnumber(h->numbytes())
-                        << "num_chunks is zerocopy( " << decnumber(h->num_chunks().first) << ") "
+                        "buffsize " << decnumber(h->size())
+                        << "numbytes " << decnumber(h->numbytes())
+                        << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
                         << ", normal( " << decnumber(h->num_chunks().second) << ") "
                         << " chunkdata " << decnumber((h->chunk_data()!=NULL))
                         << " piggyback " << decnumber((h->piggy_back()!=NULL))
@@ -510,33 +534,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 // let go of this region (waste really as this was a zero byte message)
                 region = (RdmaMemoryRegion *)completion->wr_id;
                 chunk_pool_->deallocate(region);
+
                 // now release any zero copy regions we were holding until parcel complete
-                send_wr_map::iterator it;
-                parcel_send_data send_data;
+                active_send_iterator current_send;
                 {
                     hpx::lcos::local::spinlock::scoped_lock lk(TagSendCompletionMap_mutex);
-                    it = TagSendCompletionMap.find(tag);
+                    send_wr_map::iterator it = TagSendCompletionMap.find(tag);
                     if (it==TagSendCompletionMap.end()) {
                         LOG_ERROR_MSG("Tag not present in Send map, FATAL");
                         std::terminate();
                     }
-                    send_data = std::move(it->second);
+                    current_send = it->second;
                     TagSendCompletionMap.erase(it);
                 }
-                for (auto r : send_data.zero_copy_regions) {
-                    // if this region was registered on the fly, then don't return it to the pool
-                    if (!r->isUserRegion()) {
-                        LOG_DEBUG_MSG("Deallocating " << hexpointer(r));
-                        chunk_pool_->deallocate(r);
-                    }
-                    else {
-                        LOG_DEBUG_MSG("Deleting " << hexpointer(r));
-                        delete r;
-                    }
-                }
-                // and trigger the send complete handler for hpx internal cleanup
-                LOG_DEBUG_MSG("Calling write_handler for completed send");
-                send_data.handler.operator()(error_code(), send_data.parcel);
+                //
+                delete_send_data(current_send);
                 //
                 _rdmaController->refill_client_receives();
                 return 0;
@@ -559,9 +571,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 r_data.header_region = (RdmaMemoryRegion *)completion->wr_id;;
                 header_type *h = (header_type*)r_data.header_region->getAddress();
                 LOG_DEBUG_MSG( "received IBV_WC_RECV " <<
-                        "buffer size is " << decnumber(h->size())
-                        << "numbytes is " << decnumber(h->numbytes())
-                        << "num_chunks is zerocopy( " << decnumber(h->num_chunks().first) << ") "
+                        "buffsize " << decnumber(h->size())
+                        << "numbytes " << decnumber(h->numbytes())
+                        << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
                         << ", normal( " << decnumber(h->num_chunks().second) << ") "
                         << " chunkdata " << decnumber((h->chunk_data()!=NULL))
                         << " piggyback " << decnumber((h->piggy_back()!=NULL))
@@ -798,6 +810,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                             TagSendCompletionMap.empty();
                     if (!finished) {
                         LOG_ERROR_MSG("Entering STOP when not all parcels have completed");
+                        std::terminate();
                         do_background_work(1);
                     }
                 } while (!finished);
@@ -877,14 +890,22 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
                 // we must store details about this parcel so that all memory buffers can be kept
                 // until all send operations have completed.
-                parcel_send_data send_data;
+                active_send_iterator current_send;
+                {
+                    hpx::lcos::local::spinlock::scoped_lock(active_send_mutex);
+                    current_send = active_sends.insert(active_sends.end(), parcel_send_data());
+                }
+                parcel_send_data &send_data = *current_send;
                 send_data.tag     = tag;
                 send_data.parcel  = p;
                 send_data.handler = f;
+                send_data.header_region  = NULL;
+                send_data.message_region = NULL;
+                send_data.chunk_region   = NULL;
+
                 LOG_DEBUG_MSG("Generated unique dest " << hexnumber(dest_ip) << " coded tag " << hexuint32(send_data.tag));
 
                 // for each zerocopy chunk, we must create a memory region for the data
-                std::vector<RdmaMemoryRegion*> zero_copy_regions;
                 for (serialization::serialization_chunk &c : buffer.chunks_) {
                     LOG_DEBUG_MSG("chunk : size " << hexnumber(c.size_)
                             << " type " << decnumber((uint64_t)c.type_)
@@ -932,9 +953,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 h->assert_valid();
                 send_data.header_region->setMessageLength(h->header_length());
                 LOG_DEBUG_MSG(
-                        "sending, buffer size is " << decnumber(h->size())
-                        << "numbytes is " << decnumber(h->numbytes())
-                        << "num_chunks is zerocopy( " << decnumber(h->num_chunks().first) << ") "
+                        "sending, buffsize " << decnumber(h->size())
+                        << "numbytes " << decnumber(h->numbytes())
+                        << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
                         << ", normal( " << decnumber(h->num_chunks().second) << ") "
                         << ", chunk_flag " << decnumber(h->header_length())
                         << ", chunk_flag " << decnumber(h->header_length())
@@ -969,9 +990,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                             "@TODO : implement message rdma get from destination when size exceeds header space");
                 }
 
-                // add wr_id's to completion map
                 uint64_t wr_id = (uint64_t)(send_data.header_region);
                 {
+                    // add wr_id's to completion map
                     hpx::lcos::local::spinlock::scoped_lock(SendCompletionMap_mutex);
                     if (SendCompletionMap.find(wr_id) != SendCompletionMap.end()) {
                         LOG_ERROR_MSG("wr_id duplicated : FATAL ");
@@ -979,9 +1000,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                         throw std::runtime_error("wr_id duplicated in put_parcel : FATAL");
                     }
                     // put everything into map to be retrieved when send completes
-                    SendCompletionMap[wr_id] = std::move(send_data);
+                    SendCompletionMap[wr_id] = current_send;
                     LOG_DEBUG_MSG("wr_id for send added to WR completion map "
                             << hexpointer(wr_id) << " Entries " << SendCompletionMap.size());
+                }
+                {
+                    // if there are zero copy regions, we must hold onto them until the destination tells us
+                    // it has completed all rdma Get operations
+                    if (!send_data.zero_copy_regions.empty()) {
+                        hpx::lcos::local::spinlock::scoped_lock lk(TagSendCompletionMap_mutex);
+                        // put the data into a new map which is indexed by the Tag of the send
+                        // zero copy blocks will be released when we are told this has completed
+                        TagSendCompletionMap[send_data.tag] = current_send;
+                    }
                 }
 
                 // send the header/main_chunk to the destination, wr_id is header_region (entry 0 in region_list)
