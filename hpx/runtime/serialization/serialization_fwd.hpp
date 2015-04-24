@@ -16,7 +16,7 @@ namespace hpx { namespace serialization
     namespace detail
     {
         struct ptr_helper;
-#ifdef HPX_INTEL_VERSION && __GNUC__ == 4 && __GNUC_MINOR__ == 4
+#ifdef HPX_INTEL_VERSION && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
         typedef boost::shared_ptr<ptr_helper> ptr_helper_ptr;
 #else
         typedef std::unique_ptr<ptr_helper> ptr_helper_ptr;
