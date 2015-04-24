@@ -115,10 +115,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
         uint32_t next(uint32_t ip_addr)
         {
-            // @TODO track wrap arounds and collisions (how?)
+            // @TODO track wrap around and collisions (how?)
             return (next_tag_++ & 0x0000FFFF) + (ip_addr << 16);
         }
 
+        // using 16 bits currently.
         boost::atomic<uint32_t> next_tag_;
     };
 
@@ -300,11 +301,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // ----------------------------------------------------------------------------------------------
         void release_memory_buffers(uint32_t tag)
         {
+            FUNC_START_DEBUG_MSG;
             hpx::lcos::local::spinlock::scoped_lock lk(TagReceiveCompletionMap_mutex);
             LOG_DEBUG_MSG("Received a request to release buffers with tag " << hexuint32(tag));
             tag_receive_map::iterator it_zt = TagReceiveCompletionMap.find(tag);
             if (it_zt==TagReceiveCompletionMap.end()) {
                 LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(tag) << " was not found during release_memory_buffers");
+                std::terminate();
                 throw std::runtime_error("RDMA GET tag not found in release_memory_buffers");
             }
             parcel_receive_data &r_data = it_zt->second;
@@ -329,6 +332,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             }
             TagReceiveCompletionMap.erase(it_zt);
             LOG_DEBUG_MSG("release_memory_buffers done ");
+            FUNC_END_DEBUG_MSG;
         }
 
 
@@ -385,6 +389,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     send_data = std::move(it_s->second);
                     // after the send has completed, we can release memory regions used
                     // note : release iterator before memory regions to avoid race as region is used as map key
+                    // and it might be re-added to the map with new data
                     LOG_DEBUG_MSG("erasing iterator for completed send");
                     SendCompletionMap.erase(it_s);
                 }
@@ -436,6 +441,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     it_zt = TagReceiveCompletionMap.find(tag);
                     if (it_zt==TagReceiveCompletionMap.end()) {
                         LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(tag) << " was not found in completion tag map");
+                        std::terminate();
                         throw std::runtime_error("RDMA GET tag not found : FATAL");
                     }
                     LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(tag) << " has count of " << it_zt->second.counter);
@@ -457,7 +463,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 LOG_DEBUG_MSG("Zero copy regions size is (completion) " << r_data.zero_copy_regions.size());
 
                 header_type *h = (header_type*)r_data.header_region->getAddress();
-                LOG_DEBUG_MSG( "received " <<
+                LOG_DEBUG_MSG( "get completion " <<
                         "buffer size is " << decnumber(h->size())
                         << "numbytes is " << decnumber(h->numbytes())
                         << "num_chunks is zerocopy( " << decnumber(h->num_chunks().first) << ") "
@@ -510,6 +516,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 {
                     hpx::lcos::local::spinlock::scoped_lock lk(TagSendCompletionMap_mutex);
                     it = TagSendCompletionMap.find(tag);
+                    if (it==TagSendCompletionMap.end()) {
+                        LOG_ERROR_MSG("Tag not present in Send map, FATAL");
+                        std::terminate();
+                    }
                     send_data = std::move(it->second);
                     TagSendCompletionMap.erase(it);
                 }
@@ -548,7 +558,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 parcel_receive_data r_data;
                 r_data.header_region = (RdmaMemoryRegion *)completion->wr_id;;
                 header_type *h = (header_type*)r_data.header_region->getAddress();
-                LOG_DEBUG_MSG( "received " <<
+                LOG_DEBUG_MSG( "received IBV_WC_RECV " <<
                         "buffer size is " << decnumber(h->size())
                         << "numbytes is " << decnumber(h->numbytes())
                         << "num_chunks is zerocopy( " << decnumber(h->num_chunks().first) << ") "
@@ -568,9 +578,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 {
                     hpx::lcos::local::spinlock::scoped_lock(TagReceiveCompletionMap_mutex);
                     LOG_DEBUG_MSG("Moving receive data into TagReceiveCompletionMap with tag " << hexuint32(tag));
-                    tag_receive_map::iterator it_zt = TagReceiveCompletionMap.find(tag);
                     auto ret = TagReceiveCompletionMap.insert(std::make_pair(tag, std::move(r_data)));
                     if (!ret.second) {
+                        std::terminate();
                         throw std::runtime_error("Failed to insert tag in TagReceiveCompletionMap");
                     }
                     it = ret.first;
@@ -610,12 +620,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                                 else {
                                     get_region = chunk_pool_->AllocateTemporaryBlock(c.size_);
                                 }
-                                LOG_DEBUG_MSG("RDMA Get from address " << hexpointer(c.data_.cpos_)
-                                        << " with rkey " << decnumber(c.rkey_) << " size " << hexnumber(c.size_)
-                                        << " for tag " << hexuint32(tag)
-                                        << " local region with address " << get_region->getAddress() << " and length " << c.size_);
+                                LOG_DEBUG_MSG("RDMA Get address " << hexpointer(c.data_.cpos_)
+                                        << " rkey " << decnumber(c.rkey_) << " size " << hexnumber(c.size_)
+                                        << " tag " << hexuint32(tag)
+                                        << " local address " << get_region->getAddress() << " length " << c.size_);
                                 receive_data.zero_copy_regions.push_back(get_region);
-                                LOG_DEBUG_MSG("Zero copy regions size is (create)" << receive_data.zero_copy_regions.size());
+                                LOG_DEBUG_MSG("Zero copy regions size is (create) " << receive_data.zero_copy_regions.size());
                                 // put region into map before posting read in case it completes whilst this thread is suspended
                                 {
                                     hpx::lcos::local::spinlock::scoped_lock lk2(ZeroCopyGetCompletionMap_mutex);
@@ -632,6 +642,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     }
                 }
                 else {
+                    std::terminate();
                     throw std::runtime_error("@TODO implement RDMA GET of mass chunk information when header too small");
                 }
 
@@ -652,6 +663,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     }
                 }
                 else {
+                    std::terminate();
                     throw std::runtime_error("@TODO implement RDMA GET of message when header too small");
                 }
 
@@ -837,6 +849,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
                     client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
                     client->setInitiatedConnection(true);
+                    LOG_DEBUG_MSG("Setting qpnum in main client map");
                     ip_qp_map[dest_ip] = client->getQpNum();
                 }
             }
@@ -860,7 +873,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
                 // create a tag, needs to be unique per client
                 uint32_t tag = tag_provider_.next(dest_ip);
-                LOG_DEBUG_MSG("Generated tag " << hexuint32(tag));
+                LOG_DEBUG_MSG("Generated tag " << hexuint32(tag) << " from " << hexuint32(dest_ip));
 
                 // we must store details about this parcel so that all memory buffers can be kept
                 // until all send operations have completed.
@@ -919,7 +932,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 h->assert_valid();
                 send_data.header_region->setMessageLength(h->header_length());
                 LOG_DEBUG_MSG(
-                        "buffer size is " << decnumber(h->size())
+                        "sending, buffer size is " << decnumber(h->size())
                         << "numbytes is " << decnumber(h->numbytes())
                         << "num_chunks is zerocopy( " << decnumber(h->num_chunks().first) << ") "
                         << ", normal( " << decnumber(h->num_chunks().second) << ") "
@@ -956,8 +969,23 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                             "@TODO : implement message rdma get from destination when size exceeds header space");
                 }
 
-                // send the header/main_chunk to the destination, add wr_id's to completion map
-                uint64_t wr_id = client->postSend_xN(region_list, 2, true, false, 0);
+                // add wr_id's to completion map
+                uint64_t wr_id = (uint64_t)(send_data.header_region);
+                {
+                    hpx::lcos::local::spinlock::scoped_lock(SendCompletionMap_mutex);
+                    if (SendCompletionMap.find(wr_id) != SendCompletionMap.end()) {
+                        LOG_ERROR_MSG("wr_id duplicated : FATAL ");
+                        std::terminate();
+                        throw std::runtime_error("wr_id duplicated in put_parcel : FATAL");
+                    }
+                    // put everything into map to be retrieved when send completes
+                    SendCompletionMap[wr_id] = std::move(send_data);
+                    LOG_DEBUG_MSG("wr_id for send added to WR completion map "
+                            << hexpointer(wr_id) << " Entries " << SendCompletionMap.size());
+                }
+
+                // send the header/main_chunk to the destination, wr_id is header_region (entry 0 in region_list)
+                client->postSend_xN(region_list, 2, true, false, 0);
                 LOG_TRACE_MSG("Block header_region"
                         << " region "    << hexpointer(send_data.header_region)
                         << " buffer "    << hexpointer(send_data.header_region->getAddress()));
@@ -965,16 +993,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                         << " region "    << hexpointer(send_data.message_region)
                         << " buffer "    << hexpointer(send_data.message_region->getAddress()));
 
-                {
-                    hpx::lcos::local::spinlock::scoped_lock(SendCompletionMap_mutex);
-                    if (SendCompletionMap.find(wr_id) != SendCompletionMap.end()) {
-                        LOG_ERROR_MSG("wr_id duplicated : FATAL ");
-                    }
-                    // put everything into map to be retrieved when send completes
-                    SendCompletionMap[wr_id] = std::move(send_data);
-                    LOG_DEBUG_MSG("wr_id for send added to WR completion map "
-                            << hexpointer(wr_id) << " Entries " << SendCompletionMap.size());
-                }
 
                 // log the time spent in performance counter
                 buffer.data_point_.time_ =
@@ -1043,8 +1061,10 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
         FUNC_START_DEBUG_MSG;
         static int log_init = false;
         if (!log_init) {
+            std::cout << "init logging 1 in plugin start " << std::endl;
 #ifndef RDMAHELPER_DISABLE_LOGGING 
-            initLogging();
+            std::cout << "init logging 2 in plugin start " << std::endl;
+            initRdmaHelperLogging();
 #endif
             log_init = true;
         }
