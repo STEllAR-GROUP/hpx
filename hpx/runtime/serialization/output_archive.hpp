@@ -182,12 +182,14 @@ namespace hpx { namespace serialization
 
         void save_binary(void const * address, std::size_t count)
         {
+            if(count == 0) return;
             size_ += count;
             buffer_->save_binary(address, count);
         }
 
         void save_binary_chunk(void const * address, std::size_t count)
         {
+            if(count == 0) return;
             size_ += count;
             if(disable_data_chunking())
               buffer_->save_binary(address, count);

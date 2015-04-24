@@ -20,8 +20,10 @@ struct guard_task : DebugObject {
     util::function_nonser<void()> run;
     const bool single_guard;
 
-    guard_task() : next((guard_task *)0), run((void(*)())0), single_guard(true) {}
-    guard_task(bool sg) : next((guard_task*)0), run((void(*)())0), single_guard(sg) {}
+    guard_task()
+      : next((guard_task *)0), run((void(*)())0), single_guard(true) {}
+    guard_task(bool sg)
+      : next((guard_task*)0), run((void(*)())0), single_guard(sg) {}
 };
 
 void free(guard_task *task) {
@@ -31,7 +33,8 @@ void free(guard_task *task) {
     delete task;
 }
 
-bool sort_guard(boost::shared_ptr<guard> const& l1,boost::shared_ptr<guard> const& l2) {
+bool sort_guard(boost::shared_ptr<guard> const& l1,
+        boost::shared_ptr<guard> const& l2) {
     return boost::get_pointer(l1) < boost::get_pointer(l2);
 }
 
