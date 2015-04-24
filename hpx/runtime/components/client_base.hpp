@@ -321,6 +321,11 @@ namespace hpx { namespace components
             return gid_.is_ready();
         }
 
+        void wait() const
+        {
+            return gid_.wait();
+        }
+
         ///////////////////////////////////////////////////////////////////////
     protected:
         static void register_as_helper(shared_future<naming::id_type> f,
@@ -470,6 +475,26 @@ namespace hpx { namespace components
         }
         return result;
     }
+}}
+
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Derived>
+    struct serialize_as_future<Derived,
+            typename boost::enable_if<is_client<Derived> >::type>
+      : boost::mpl::false_
+    {
+        static bool call_if(Derived& c)
+        {
+            return c.valid() && !c.is_ready();
+        }
+
+        static void call(Derived& c)
+        {
+            c.wait();
+        }
+    };
 }}
 
 #endif

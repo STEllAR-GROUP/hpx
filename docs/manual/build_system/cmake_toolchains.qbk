@@ -14,6 +14,7 @@ In order to compile HPX for various platforms, we provide a variety of Toolchain
 take care of setting up various __cmake__ variables like compilers etc. They are located
 in the `cmake/toolchains` directory:
 
+* [link hpx.manual.build_system.building_hpx.cmake_toolchains.ARM_gcc ARM-gcc]
 * [link hpx.manual.build_system.building_hpx.cmake_toolchains.BGION_gcc BGION-gcc]
 * [link hpx.manual.build_system.building_hpx.cmake_toolchains.BGQ BGQ]
 * [link hpx.manual.build_system.building_hpx.cmake_toolchains.Cray_Intel Cray-Intel]
@@ -23,6 +24,25 @@ in the `cmake/toolchains` directory:
 [teletype]
 
 To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake invocation.
+
+[heading:ARM_gcc ARM-gcc]
+
+``
+    # Copyright (c) 2015 Thomas Heller
+    #
+    # Distributed under the Boost Software License, Version 1.0. (See accompanying
+    # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    set(CMAKE_SYSTEM_NAME Linux)
+    set(CMAKE_CROSSCOMPILING ON)
+    # Set the gcc Compiler
+    set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++-4.8)
+    set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc-4.8)
+    set(HPX_WITH_GENERIC_CONTEXT_COROUTINES ON CACHE BOOL "enable generic coroutines")
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+``
 
 [heading:BGION_gcc BGION-gcc]
 

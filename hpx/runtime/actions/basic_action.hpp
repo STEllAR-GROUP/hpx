@@ -596,11 +596,10 @@ namespace hpx { namespace actions
 /// as '<', '>', or ':'.
 ///
 /// \note This macro has to be used once for each of the component actions
-/// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION macros. It has to
-/// occur exactly once for each of the actions, thus it is recommended to
-/// place it into the source file defining the component. There is no need
-/// to use this macro for actions which have template type arguments (see
-/// \a HPX_REGISTER_ACTION_DECLARATION_TEMPLATE)
+/// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION or
+/// \a HPX_DEFINE_PLAIN_ACTION macros. It has to occur exactly once for each of
+/// the actions, thus it is recommended to place it into the source file defining
+/// the component.
 #define HPX_REGISTER_ACTION(...)                                              \
     HPX_REGISTER_ACTION_(__VA_ARGS__)                                         \
 /**/

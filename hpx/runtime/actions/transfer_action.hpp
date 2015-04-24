@@ -435,7 +435,8 @@ namespace hpx { namespace actions
             ar & hpx::serialization::base_object<base_action>(*this);
             serialize(ar);
         }
-        HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(transfer_action, detail::get_action_name<derived_type>());
+        HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
+            transfer_action, detail::get_action_name<derived_type>());
 
     private:
         static boost::uint32_t get_locality_id()

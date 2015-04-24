@@ -84,7 +84,7 @@ namespace hpx { namespace server
             partition_vector_(rhs.partition_vector_)
         {}
 
-        partition_vector operator=(partition_vector const& rhs)
+        partition_vector& operator=(partition_vector const& rhs)
         {
             if (this != &rhs)
             {
@@ -99,7 +99,7 @@ namespace hpx { namespace server
             partition_vector_(std::move(rhs.partition_vector_))
         {}
 
-        partition_vector operator=(partition_vector && rhs)
+        partition_vector& operator=(partition_vector && rhs)
         {
             if (this != &rhs)
             {

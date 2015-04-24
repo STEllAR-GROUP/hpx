@@ -64,6 +64,7 @@ namespace hpx { namespace parcelset
     void parcelhandler::sync_put_parcel(parcel& p) //-V669
     {
         lcos::local::promise<void> promise;
+        future<void> sent_future = promise.get_future();
         put_parcel(
             p
           , [&promise](boost::system::error_code const&, parcel const&)
@@ -71,7 +72,7 @@ namespace hpx { namespace parcelset
                 promise.set_value();
             }
         );  // schedule parcel send
-        promise.get_future().wait(); // wait for the parcel to be sent
+        sent_future.get(); // wait for the parcel to be sent
     }
 
     void parcelhandler::parcel_sink(parcel const& p)
