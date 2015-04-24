@@ -52,10 +52,19 @@ class pointer_wrapper_vector
             LOG_DEBUG_MSG("Deleting pointer wrapper, should trigger callback to parcelport memory free");
             cb_();
         }
-        else {
-            LOG_DEBUG_MSG("============ %%%%%%%%%%%%%");
-        }
     }
+
+    pointer_wrapper_vector & operator=(pointer_wrapper_vector && other)
+    {
+        m_array_ = other.m_array_;
+        m_size_  = other.m_size_;
+        cb_      = other.cb_;
+        other.m_size_  = 0;
+        other.m_array_ = 0;
+        other.cb_      = NULL;
+        return *this;
+    }
+
     size_type size() const { return m_size_; }
 
     size_type max_size() const { return m_size_; }
