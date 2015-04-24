@@ -26,7 +26,7 @@ namespace hpx { namespace serialization
       : basic_archive<output_archive>
     {
         typedef basic_archive<output_archive> base_type;
-        typedef std::map<const void *, std::size_t> pointer_tracker;
+        typedef std::map<const void *, boost::uint64_t> pointer_tracker;
 
         template <typename Container>
         output_archive(Container & buffer,
@@ -197,7 +197,7 @@ namespace hpx { namespace serialization
               buffer_->save_binary_chunk(address, count);
         }
 
-        std::size_t track_pointer(const void * p)
+        boost::uint64_t track_pointer(const void * p)
         {
             pointer_tracker::iterator it = pointer_tracker_.find(p);
             if(it == pointer_tracker_.end())
@@ -225,7 +225,7 @@ namespace hpx { namespace serialization
     };
 
     BOOST_FORCEINLINE
-    std::size_t track_pointer(output_archive & ar, const void * pos)
+    boost::uint64_t track_pointer(output_archive & ar, const void * pos)
     {
         return ar.track_pointer(pos);
     }

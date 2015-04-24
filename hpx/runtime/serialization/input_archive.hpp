@@ -29,7 +29,7 @@ namespace hpx { namespace serialization
         typedef basic_archive<input_archive> base_type;
 
         typedef
-            std::map<std::size_t, std::unique_ptr<detail::ptr_helper> >
+            std::map<boost::uint64_t, std::unique_ptr<detail::ptr_helper> >
             pointer_tracker;
 
         template <typename Container>
@@ -210,7 +210,7 @@ namespace hpx { namespace serialization
             return size_;
         }
 
-        void register_pointer(std::size_t pos, std::unique_ptr<detail::ptr_helper> helper)
+        void register_pointer(boost::uint64_t pos, std::unique_ptr<detail::ptr_helper> helper)
         {
             HPX_ASSERT(pointer_tracker_.find(pos) == pointer_tracker_.end());
 
@@ -218,7 +218,7 @@ namespace hpx { namespace serialization
         }
 
         template <typename Helper>
-        Helper & tracked_pointer(std::size_t pos)
+        Helper & tracked_pointer(boost::uint64_t pos)
         {
             pointer_tracker::iterator it = pointer_tracker_.find(pos);
             HPX_ASSERT(it != pointer_tracker_.end());
@@ -232,13 +232,13 @@ namespace hpx { namespace serialization
     };
 
     BOOST_FORCEINLINE
-    void register_pointer(input_archive & ar, std::size_t pos, std::unique_ptr<detail::ptr_helper> helper)
+    void register_pointer(input_archive & ar, boost::uint64_t pos, std::unique_ptr<detail::ptr_helper> helper)
     {
         ar.register_pointer(pos, std::move(helper));
     }
 
     template <typename Helper>
-    Helper & tracked_pointer(input_archive & ar, std::size_t pos)
+    Helper & tracked_pointer(input_archive & ar, boost::uint64_t pos)
     {
         return ar.tracked_pointer<Helper>(pos);
     }

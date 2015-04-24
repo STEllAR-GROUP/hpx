@@ -9,7 +9,7 @@
 
 #include <hpx/util/transform_iterator.hpp>
 
-#include <strstream>
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace test

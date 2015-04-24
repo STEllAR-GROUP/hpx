@@ -155,10 +155,10 @@ int main()
 
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    trivial_tests<std::string, double>(hpx::layout);
-    trivial_tests<std::string, double>(hpx::layout(3));
-    trivial_tests<std::string, double>(hpx::layout(3, localities));
-    trivial_tests<std::string, double>(hpx::layout(localities));
+    trivial_tests<std::string, double>(hpx::container_layout);
+    trivial_tests<std::string, double>(hpx::container_layout(3));
+    trivial_tests<std::string, double>(hpx::container_layout(3, localities));
+    trivial_tests<std::string, double>(hpx::container_layout(localities));
 
     return 0;
 }

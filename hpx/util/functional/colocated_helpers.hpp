@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,7 @@
 #define HPX_UTIL_DETAIL_COLOCATED_HELPERS_FEB_04_2014_0828PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -113,6 +114,8 @@ namespace hpx { namespace util { namespace functional
 
             HPX_SERIALIZATION_SPLIT_MEMBER();
 
+            friend struct traits::serialize_as_future<apply_continuation_impl>;
+
             bound_type bound_;
             actions::continuation_type cont_;
         };
@@ -133,7 +136,45 @@ namespace hpx { namespace util { namespace functional
         return functional::detail::apply_continuation_impl<
             typename util::decay<Bound>::type>(std::forward<Bound>(bound), c);
     }
+}}}
 
+namespace hpx { namespace traits
+{
+    template <typename Bound>
+    struct serialize_as_future<
+            util::functional::detail::apply_continuation_impl<Bound>
+        >
+      : traits::serialize_as_future<
+            typename util::functional::detail::apply_continuation_impl<
+                Bound
+            >::bound_type>
+    {
+        static bool
+        call_if(util::functional::detail::apply_continuation_impl<Bound>& b)
+        {
+            return (b.cont_ && b.cont_->has_to_wait_for_futures()) ||
+                traits::serialize_as_future<
+                    typename util::functional::detail::apply_continuation_impl<
+                        Bound
+                    >::bound_type
+                >::call_if(b.bound_);
+        }
+
+        static void
+        call(util::functional::detail::apply_continuation_impl<Bound>& b)
+        {
+            typedef typename util::functional::detail::apply_continuation_impl<
+                    Bound
+                >::bound_type bound_type;
+            traits::serialize_as_future<bound_type>::call(b.bound_);
+            if (b.cont_)
+                b.cont_->wait_for_futures();
+        }
+    };
+}}
+
+namespace hpx { namespace util { namespace functional
+{
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -205,6 +246,8 @@ namespace hpx { namespace util { namespace functional
 
             HPX_SERIALIZATION_SPLIT_MEMBER();
 
+            friend struct traits::serialize_as_future<async_continuation_impl>;
+
             bound_type bound_;
             actions::continuation_type cont_;
         };
@@ -226,5 +269,40 @@ namespace hpx { namespace util { namespace functional
             typename util::decay<Bound>::type>(std::forward<Bound>(bound), c);
     }
 }}}
+
+namespace hpx { namespace traits
+{
+    template <typename Bound>
+    struct serialize_as_future<
+            util::functional::detail::async_continuation_impl<Bound>
+        >
+      : traits::serialize_as_future<
+            typename util::functional::detail::async_continuation_impl<
+                Bound
+            >::bound_type>
+    {
+        static bool
+        call_if(util::functional::detail::async_continuation_impl<Bound>& b)
+        {
+            return (b.cont_ && b.cont_->has_to_wait_for_futures()) ||
+                traits::serialize_as_future<
+                    typename util::functional::detail::async_continuation_impl<
+                        Bound
+                    >::bound_type
+                >::call_if(b.bound_);
+        }
+
+        static void
+        call(util::functional::detail::async_continuation_impl<Bound>& b)
+        {
+            typedef typename util::functional::detail::async_continuation_impl<
+                    Bound
+                >::bound_type bound_type;
+            traits::serialize_as_future<bound_type>::call(b.bound_);
+            if (b.cont_)
+                b.cont_->wait_for_futures();
+        }
+    };
+}}
 
 #endif

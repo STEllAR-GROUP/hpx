@@ -102,6 +102,11 @@ namespace hpx { namespace components
                 hpx::find_here(), std::forward<Ts>(vs)...);
         }
 
+        /// \cond NOINTERNAL
+        typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
+            bulk_locality_result;
+        /// \endcond
+
         /// Create multiple objects on the localities associated by
         /// this policy instance
         ///
@@ -116,47 +121,69 @@ namespace hpx { namespace components
         ///          represent the newly created objects
         ///
         template <typename Component, typename ...Ts>
-        hpx::future<std::vector<hpx::id_type> >
+        hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts&&... vs) const
         {
             using components::stub_base;
 
-            // handle special cases
-            if (localities_.size() == 0)
+            if (localities_.size() > 1)
             {
-                return stub_base<Component>::bulk_create_async(
-                    hpx::find_here(), count, std::forward<Ts>(vs)...);
-            }
-            else if (localities_.size() == 1)
-            {
-                return stub_base<Component>::bulk_create_async(
-                    localities_.front(), count, std::forward<Ts>(vs)...);
-            }
-
-            // schedule creation of all objects across given localities
-            std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
-            objs.reserve(localities_.size());
-            for (hpx::id_type const& loc: localities_)
-            {
-                objs.push_back(stub_base<Component>::bulk_create_async(
-                    loc, get_num_items(count, loc), vs...));
-            }
-
-            // consolidate all results into single array
-            return hpx::lcos::local::dataflow(
-                [](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
-                    -> std::vector<hpx::id_type>
+                // schedule creation of all objects across given localities
+                std::vector<hpx::future<std::vector<hpx::id_type> > > objs;
+                objs.reserve(localities_.size());
+                for (hpx::id_type const& loc: localities_)
                 {
-                    std::vector<hpx::id_type> result = v.front().get();
-                    for (auto it = v.begin()+1; it != v.end(); ++it)
+                    objs.push_back(stub_base<Component>::bulk_create_async(
+                        loc, get_num_items(count, loc), vs...));
+                }
+
+                // consolidate all results
+                return hpx::lcos::local::dataflow(hpx::launch::sync,
+                    [=](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
+                        mutable -> std::vector<bulk_locality_result>
                     {
-                        std::vector<id_type> r = it->get();
-                        std::copy(r.begin(), r.end(),
-                            std::back_inserter(result));
-                    }
+                        HPX_ASSERT(localities_.size() == v.size());
+
+                        std::vector<bulk_locality_result> result;
+                        result.reserve(v.size());
+
+                        for (std::size_t i = 0; i != v.size(); ++i)
+                        {
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+                            result.emplace_back(
+                                    std::move(localities_[i]), v[i].get()
+                                );
+#else
+                            result.push_back(std::make_pair(
+                                    std::move(localities_[i]), v[i].get()
+                                ));
+#endif
+                        }
+                        return result;
+                    },
+                    std::move(objs));
+            }
+
+            // handle special cases
+            hpx::id_type id =
+                localities_.empty() ? hpx::find_here() : localities_.front();
+
+            hpx::future<std::vector<hpx::id_type> > f =
+                stub_base<Component>::bulk_create_async(
+                    id, count, std::forward<Ts>(vs)...);
+
+            return f.then(hpx::launch::sync,
+                [id](hpx::future<std::vector<hpx::id_type> > && f)
+                    -> std::vector<bulk_locality_result>
+                {
+                    std::vector<bulk_locality_result> result;
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+                    result.emplace_back(id, f.get());
+#else
+                    result.push_back(std::make_pair(id, f.get()));
+#endif
                     return result;
-                },
-                std::move(objs));
+                });
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -213,9 +240,19 @@ namespace hpx { namespace components
                 priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
+        /// Returns the number of associated localities for this distribution
+        /// policy
+        ///
+        /// \note This function is part of the creation policy implemented by
+        ///       this class
+        ///
+        std::size_t get_num_localities() const
+        {
+            return (std::max)(std::size_t(1), localities_.size());
+        }
+
+    protected:
         /// \cond NOINTERNAL
-        // FIXME: this can be made protected once the vector<>::create()
-        //        functions have been adapted
         std::size_t
         get_num_items(std::size_t items, hpx::id_type const& loc) const
         {
