@@ -30,11 +30,7 @@ struct Base
     std::string prefix_;
 };
 
-namespace hpx { namespace traits {
-    template <typename T>
-    struct is_nonintrusive_polymorphic<Base<T> >
-      : boost::mpl::true_ {};
-}}
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE((template <class T>), Base<T>)
 
 template <typename Archive, typename T>
 void serialize(Archive & ar, Base<T> & b, unsigned)
@@ -60,11 +56,7 @@ struct Derived1 : Base<T>
     std::size_t size_;
 };
 
-namespace hpx { namespace traits {
-    template <typename T>
-    struct is_nonintrusive_polymorphic<Derived1<T> >
-      : boost::mpl::true_ {};
-}}
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE((template <class T>), Derived1<T>)
 
 template <typename Archive, typename T>
 void serialize(Archive & ar, Derived1<T> & d1, unsigned)
