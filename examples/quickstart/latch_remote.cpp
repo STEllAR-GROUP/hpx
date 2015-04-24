@@ -19,8 +19,7 @@ int hpx_main()
     {
         // Create the latch on locality zero, let it synchronize as many
         // threads as we have localities.
-        std::size_t num_localities = hpx::get_num_localities_sync();
-        l = hpx::new_<hpx::lcos::latch>(hpx::find_here(), num_localities);
+        l = hpx::lcos::latch(hpx::get_num_localities_sync());
 
         // Register the new instance so that the other localities can connect
         // to it.
