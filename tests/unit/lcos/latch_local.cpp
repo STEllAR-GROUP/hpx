@@ -67,7 +67,7 @@ int hpx_main()
         f.get();
 
         HPX_TEST(l.is_ready());
-        HPX_TEST_EQ(num_threads.load(), 1);
+        HPX_TEST_EQ(num_threads.load(), std::size_t(1));
     }
 
     // wait
