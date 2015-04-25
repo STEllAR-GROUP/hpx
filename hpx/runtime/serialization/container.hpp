@@ -8,7 +8,6 @@
 #define HPX_SERIALIZATION_CONTAINER_HPP
 
 #include <hpx/runtime/serialization/binary_filter.hpp>
-#include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/util/assert.hpp>
 
 namespace hpx { namespace serialization
