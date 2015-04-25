@@ -100,11 +100,12 @@ namespace hpx { namespace serialization { namespace detail
   HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name);             \
   virtual void load(hpx::serialization::input_archive& ar, unsigned n)        \
   {                                                                           \
-      serialize(ar, n);                                                       \
+      serialize<hpx::serialization::input_archive>(ar, n);                    \
   }                                                                           \
   virtual void save(hpx::serialization::output_archive& ar, unsigned n) const \
   {                                                                           \
-      const_cast<Class*>(this)->serialize(ar, n);                             \
+      const_cast<Class*>(this)->                                              \
+          serialize<hpx::serialization::output_archive>(ar, n);               \
   }                                                                           \
   HPX_SERIALIZATION_SPLIT_MEMBER();                                           \
 /**/
@@ -125,12 +126,12 @@ namespace hpx { namespace serialization { namespace detail
   virtual std::string hpx_serialization_get_name() const = 0;                 \
   virtual void load(hpx::serialization::input_archive& ar, unsigned n)        \
   {                                                                           \
-      serialize(ar, n);                                                       \
+      serialize<hpx::serialization::input_archive>(ar, n);                    \
   }                                                                           \
   virtual void save(hpx::serialization::output_archive& ar, unsigned n) const \
   {                                                                           \
       const_cast<Class*>(this)->                                              \
-          serialize(ar, n);                                                   \
+          serialize<hpx::serialization::output_archive>(ar, n);               \
   }                                                                           \
   HPX_SERIALIZATION_SPLIT_MEMBER()                                            \
 /**/
