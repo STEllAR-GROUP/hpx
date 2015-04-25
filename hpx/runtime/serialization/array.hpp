@@ -9,7 +9,6 @@
 
 #include <cstddef>
 
-#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/array.hpp>
@@ -97,6 +96,13 @@ namespace hpx { namespace serialization
     array<T> make_array(T* begin, std::size_t size)
     {
         return array<T>(begin, size);
+    }
+
+    // implement serialization for arrays
+    template <class Archive, class T, std::size_t N>
+    void serialize(Archive& ar, T (&a)[N], const unsigned int /* version */)
+    {
+        ar & hpx::serialization::make_array(a, N);
     }
 
     // implement serialization for boost::array

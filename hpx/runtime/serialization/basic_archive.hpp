@@ -57,7 +57,7 @@ namespace hpx { namespace serialization
         {}
 
         template <typename T>
-        void invoke(T * t)
+        void invoke(T * (&t))
         {
             BOOST_STATIC_ASSERT_MSG(!boost::is_pointer<T *>::value,
                 "HPX does not support serialization of raw pointers. "
