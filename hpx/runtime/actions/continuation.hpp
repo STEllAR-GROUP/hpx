@@ -288,7 +288,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Cont>
-    struct continuation_impl
+    struct continuation_impl : continuation
     {
     private:
         typedef typename util::decay<Cont>::type cont_type;
@@ -309,6 +309,8 @@ namespace hpx { namespace actions
         continuation_impl(Cont_ && cont, hpx::id_type const& target)
           : cont_(std::forward<Cont_>(cont)), target_(target)
         {}
+
+        virtual ~continuation_impl() {}
 
         template <typename T>
         T operator()(hpx::id_type const& lco, T && t) const
@@ -346,7 +348,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Cont, typename F>
-    struct continuation2_impl
+    struct continuation2_impl : continuation
     {
     private:
         typedef typename boost::remove_reference<Cont>::type cont_type;
@@ -371,6 +373,8 @@ namespace hpx { namespace actions
             target_(target),
             f_(std::forward<F_>(f))
         {}
+
+        virtual ~continuation2_impl() {}
 
         template <typename T>
         T operator()(hpx::id_type const& lco, T && t) const
