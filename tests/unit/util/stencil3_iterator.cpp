@@ -162,9 +162,8 @@ namespace test
             typedef hpx::util::tuple<value_type, element_type, value_type> type;
         };
 
-        template <typename F_>
-        custom_stencil_transformer(F_ && f)
-          : f_(std::forward<F_>(f))
+        custom_stencil_transformer(F f)
+          : f_(std::move(f))
         {}
 
         // it will dereference tuple(it-1, it, it+1)
@@ -195,7 +194,7 @@ void test_stencil3_iterator_custom()
     std::vector<int> values(10);
     std::iota(std::begin(values), std::end(values), 0);
 
-    auto t = test::make_custom_stencil_transformer([](int i) { return 2*i; });
+    auto t = test::make_custom_stencil_transformer([](int i) -> int { return 2*i; };);
     auto r = test::make_stencil3_range(values.begin()+1, values.end()-1, t);
 
     typedef std::iterator_traits<decltype(r.first)>::reference reference;
