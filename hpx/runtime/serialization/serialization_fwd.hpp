@@ -9,7 +9,11 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
+#include <boost/shared_ptr.hpp>
+#else
 #include <memory>
+#endif
 
 namespace hpx { namespace serialization
 {
