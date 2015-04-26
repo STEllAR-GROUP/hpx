@@ -288,7 +288,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Cont>
-    struct continuation_impl : continuation
+    struct continuation_impl
     {
     private:
         typedef typename util::decay<Cont>::type cont_type;
@@ -348,7 +348,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Cont, typename F>
-    struct continuation2_impl : continuation
+    struct continuation2_impl
     {
     private:
         typedef typename boost::remove_reference<Cont>::type cont_type;
