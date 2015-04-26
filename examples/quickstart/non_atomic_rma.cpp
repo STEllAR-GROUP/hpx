@@ -1,6 +1,9 @@
 // Copyright (c) 2011 Matt Anderson <matt@phys.lsu.edu>
 // Copyright (c) 2011 Pedro Diniz
 //
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
 // This is the non-atomic version of the random memory access.  The array length
 // is given by the variable array_length and N is the number of random accesses
 // to this array.
@@ -10,7 +13,7 @@
 //
 // Note that this is a *non-atomic* example.
 
-//HPX includes
+// HPX includes
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>

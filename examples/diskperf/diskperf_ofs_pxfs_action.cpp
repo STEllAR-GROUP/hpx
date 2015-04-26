@@ -63,9 +63,9 @@ typedef hpx::runtime rt_type;
 typedef hpx::lcos::local::spinlock mutex_type;
 
 struct RESULT {
-    double	real;
-    double	user;
-    double	sys;
+    double real;
+    double user;
+    double sys;
 
     friend class hpx::serialization::access;
     template<class Archive>
@@ -152,10 +152,10 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
 {
     // perform the I/O operations here
    char filename[1024];
-   clock_t	start;
-   clock_t	end;
-   struct tms	t1;
-   struct tms	t2;
+   clock_t start;
+   clock_t end;
+   struct tms t1;
+   struct tms t2;
    RESULT r;
 
    uint64_t wfiles = ofs_test_info.wfiles;
@@ -186,7 +186,7 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
    for(boost::uint64_t i=0; i<wfiles; i++)
    {
        // using OrageFS syscalls
-       int	oflags;
+       int oflags;
 
        oflags = O_WRONLY|O_CREAT;
        sprintf(filename, "%s/loc_%d_file%d.%ld", ofspath.c_str(), hpx::get_locality_id(), proc, i);
@@ -278,10 +278,10 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
 {
     // perform the I/O operations here
    char filename[1024];
-   clock_t	start;
-   clock_t	end;
-   struct tms	t1;
-   struct tms	t2;
+   clock_t start;
+   clock_t end;
+   struct tms t1;
+   struct tms t2;
    RESULT r;
 
    uint64_t rfiles = ofs_test_info.rfiles;
@@ -308,7 +308,7 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
    for(boost::uint64_t i=0; i<rfiles; i++)
    {
        // using OrageFS syscalls
-       int	oflags;
+       int oflags;
 
        oflags = O_RDONLY;
        sprintf(filename, "%s/loc_%d_file%d.%ld", ofspath.c_str(), hpx::get_locality_id(), proc, i);
