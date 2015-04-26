@@ -241,7 +241,7 @@ namespace hpx { namespace threads
         /// execution by the executor at some point in the future no sooner
         /// than the time represented by abs_time.
         /// Synchronization: completion of closure on a particular thread
-        /// happens before destruction of that thread’s thread-duration
+        /// happens before destruction of that thread's thread-duration
         /// variables.
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
@@ -267,7 +267,7 @@ namespace hpx { namespace threads
         /// execution by the executor at some point in the future no sooner
         /// than time rel_time from now.
         /// Synchronization: completion of closure on a particular thread
-        /// happens before destruction of that thread’s thread-duration
+        /// happens before destruction of that thread's thread-duration
         /// variables.
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
@@ -295,7 +295,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     /// Returns: the default executor defined by the
-    /// active process. If set_default_executor hasn’t been called then the
+    /// active process. If set_default_executor hasn't been called then the
     /// return value is a pointer to an executor of unspecified type.
     HPX_EXPORT scheduled_executor default_executor();
 
