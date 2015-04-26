@@ -20,14 +20,14 @@ namespace hpx { namespace lcos { namespace server
     /// blocking all of the entering threads until all of the threads have
     /// entered the latch.
     class latch
-      : public lcos::base_lco_with_value<std::ptrdiff_t>,
+      : public lcos::base_lco_with_value<bool, std::ptrdiff_t>,
         public components::managed_component_base<latch>
     {
     private:
         typedef components::managed_component_base<latch> base_type;
 
     public:
-        typedef lcos::base_lco_with_value<std::ptrdiff_t> base_type_holder;
+        typedef lcos::base_lco_with_value<bool, std::ptrdiff_t> base_type_holder;
 
         // disambiguate base classes
         using base_type::finalize;
@@ -77,7 +77,7 @@ namespace hpx { namespace lcos { namespace server
         }
 
         /// This is invoked whenever the is_ready() function is called
-        std::ptrdiff_t get_value(hpx::error_code &)
+        bool get_value(hpx::error_code &)
         {
             return latch_.is_ready();
         }

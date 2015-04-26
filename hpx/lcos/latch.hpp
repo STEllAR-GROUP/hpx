@@ -88,7 +88,7 @@ namespace hpx { namespace lcos
         ///
         bool is_ready() const BOOST_NOEXCEPT
         {
-            return is_ready_async().get() ? true : false;
+            return is_ready_async().get();
         }
 
         /// If counter_ is 0, returns immediately. Otherwise, blocks the
@@ -116,7 +116,7 @@ namespace hpx { namespace lcos
             return hpx::async(act, get_gid(), std::move(n));
         }
 
-        hpx::future<std::ptrdiff_t> is_ready_async() const
+        hpx::future<bool> is_ready_async() const
         {
             lcos::server::latch::get_value_action act;
             return hpx::async(act, get_gid());
