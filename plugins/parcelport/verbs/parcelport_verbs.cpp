@@ -335,8 +335,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             }
             {
                 hpx::lcos::local::spinlock::scoped_lock(active_send_mutex);
-                LOG_DEBUG_MSG("erasing current send from active send list");
                 active_sends.erase(send);
+                LOG_DEBUG_MSG("Active send after erase size " << active_sends.size() );
             }
         }
 
@@ -366,9 +366,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     chunk_pool_->deallocate(r);
                 }
             }
-            active_recvs.erase(recv);
-            LOG_DEBUG_MSG("delete_recv_data done ");
-            FUNC_END_DEBUG_MSG;
+            {
+                hpx::lcos::local::spinlock::scoped_lock(active_recv_mutex);
+                active_recvs.erase(recv);
+                LOG_DEBUG_MSG("Active recv after erase size " << active_recvs.size() );
+            }
         }
 
         // ----------------------------------------------------------------------------------------------
@@ -399,7 +401,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // the rdmaController calls this callback function and we must clean up all temporary
         // memory etc and signal hpx when sends or receives finish.
         // ----------------------------------------------------------------------------------------------
-        int handle_verbs_completion(struct ibv_wc *completion, RdmaClientPtr client)
+        int handle_verbs_completion(struct ibv_wc *completion, RdmaClient *client)
         {
             uint64_t wr_id = completion->wr_id;
             //
@@ -416,6 +418,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                         current_send = it->second;
                         LOG_DEBUG_MSG("erasing iterator from SendCompletionMap : size before erase " << SendCompletionMap.size());
                         SendCompletionMap.erase(it);
+                    }
+                    else {
+                        std::terminate();
                     }
                 }
                 if (found_wr_id) {
@@ -446,7 +451,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                         LOG_DEBUG_MSG("erasing iterator from ReadCompletionMap : size before erase " << ReadCompletionMap.size());
                         ReadCompletionMap.erase(it);
                     }
-
+                    else {
+                        std::terminate();
+                    }
                 }
                 if (found_wr_id) {
                     parcel_recv_data &recv_data = *current_recv;
@@ -552,6 +559,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 {
                     hpx::lcos::local::spinlock::scoped_lock(active_recv_mutex);
                     current_recv = active_recvs.insert(active_recvs.end(), parcel_recv_data());
+                    LOG_DEBUG_MSG("Active recv after insert size " << active_recvs.size());
                 }
                 parcel_recv_data &recv_data = *current_recv;
                 // get the header of the new message/parcel
@@ -864,6 +872,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 {
                     hpx::lcos::local::spinlock::scoped_lock(active_send_mutex);
                     current_send = active_sends.insert(active_sends.end(), parcel_send_data());
+                    LOG_DEBUG_MSG("Active send after insert size " << active_sends.size());
                 }
                 parcel_send_data &send_data = *current_send;
                 send_data.tag     = tag;
