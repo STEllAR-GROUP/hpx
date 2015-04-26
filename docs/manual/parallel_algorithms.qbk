@@ -15,7 +15,7 @@ C++ Standards.
 
 At this point, __hpx__ implements several of the C++ Standardization working papers,
 most notably __cpp11_n4104__ (Working Draft, Technical Specification for C++
-Extensions for Parallelism) and __cpp11_n4088__ (Task Regions).
+Extensions for Parallelism) and __cpp11_n4088__ (Task Blocks).
 
 
 [section:parallel_algorithms Using Parallel Algorithms]
@@ -332,7 +332,7 @@ __hpx__ provides implementations of the following parallel algorithms:
 
 [endsect]
 
-[section:task_block Using Task Regions]
+[section:task_block Using Task Blocks]
 
 The `define_task_block`, `run` and the `wait` functions implemented based on
 __cpp11_n4088__ are based on the task_block concept that is a part of the

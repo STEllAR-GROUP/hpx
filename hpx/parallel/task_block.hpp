@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// address by any other means is unspecified.
     ///
     /// A \a task_block is active if it was created by the nearest
-    /// enclosing task region, where "task region" refers to an invocation of
+    /// enclosing task block, where "task block" refers to an invocation of
     /// define_task_block or define_task_block_restore_thread and "nearest
     /// enclosing" means the most
     /// recent invocation that has not yet completed. Code designated for
@@ -176,7 +176,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         /// The call to \a run synchronizes with the invocation of f. The
         /// completion of f() synchronizes with the next invocation of wait on
         /// the same task_block or completion of the nearest enclosing
-        /// task region (i.e., the \a define_task_block or
+        /// task block (i.e., the \a define_task_block or
         /// \a define_task_block_restore_thread that created this task block).
         ///
         /// Requires: F shall be MoveConstructible. The expression, (void)f(),
