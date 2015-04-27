@@ -32,7 +32,7 @@ namespace hpx { namespace components
             "component_agas_symbol_namespace",                  /* 13 */
 
 #if defined(HPX_HAVE_SODIUM)
-            "signed_certificate_promise",                       /* 14 (0x14005) */
+            "signed_certificate_promise",                       /* 14 (0xe0005) */
             "component_root_certificate_authority",             /* 15 */
             "component_subordinate_certificate_authority",      /* 16 */
 #endif
