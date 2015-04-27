@@ -20,18 +20,20 @@ namespace hpx { namespace components
             "component_memory_block",                           /*  2 */
             "component_base_lco",                               /*  3 */
             "component_base_lco_with_value",                    /*  4 */
-            "component_barrier",                                /*  5 */
-            "component_promise",                                /*  6 */
+            "component_latch",                                  /*  5 */
+            "component_barrier",                                /*  6 */
+            "component_flex_barrier",                           /*  7 */
+            "component_promise",                                /*  8 */
 
-            "component_agas_locality_namespace",                /*  7 */
-            "component_agas_primary_namespace",                 /*  8 */
-            "component_agas_component_namespace",               /*  9 */
-            "component_agas_symbol_namespace",                  /* 10 */
+            "component_agas_locality_namespace",                /*  9 */
+            "component_agas_primary_namespace",                 /* 10 */
+            "component_agas_component_namespace",               /* 11 */
+            "component_agas_symbol_namespace",                  /* 12 */
 
 #if defined(HPX_HAVE_SODIUM)
-            "signed_certificate_promise",                       /* 11 */
-            "component_root_certificate_authority",             /* 12 */
-            "component_subordinate_certificate_authority",      /* 13 */
+            "signed_certificate_promise",                       /* 13 */
+            "component_root_certificate_authority",             /* 14 */
+            "component_subordinate_certificate_authority",      /* 15 */
 #endif
         };
     }

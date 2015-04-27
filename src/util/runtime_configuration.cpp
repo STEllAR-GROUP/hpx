@@ -225,6 +225,11 @@ namespace hpx { namespace util
             "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1",
 
+            "[hpx.components.hpx_lcos_server_latch]",
+            "name = hpx",
+            "path = $[hpx.location]/bin/" HPX_DLL_STRING,
+            "enabled = 1",
+
             "[hpx.components.raw_counter]",
             "name = hpx",
             "path = $[hpx.location]/bin/" HPX_DLL_STRING,

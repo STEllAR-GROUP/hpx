@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2014 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +25,8 @@ set(example_programs
     fractals
     fractals_struct
     interest_calculator
+    latch_local
+    latch_remote
     non_atomic_rma
     pingpong
     print_to_console
