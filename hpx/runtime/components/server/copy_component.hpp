@@ -95,15 +95,5 @@ namespace hpx { namespace components { namespace server
     {};
 }}}
 
-HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
-    (template <typename Component>),
-    (hpx::components::server::copy_component_action_here<Component>)
-)
-
-HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
-    (template <typename Component>),
-    (hpx::components::server::copy_component_action<Component>)
-)
-
 #endif
 

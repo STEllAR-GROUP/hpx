@@ -306,16 +306,16 @@ namespace Storage {
 //----------------------------------------------------------------------------
 // normally these are in a header
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyToStorage, CopyToStorage_action);
-HPX_REGISTER_PLAIN_ACTION_DECLARATION(CopyToStorage_action);
+HPX_REGISTER_ACTION_DECLARATION(CopyToStorage_action);
 //HPX_ACTION_INVOKE_NO_MORE_THAN(CopyToStorage_action, 5);
 
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
-HPX_REGISTER_PLAIN_ACTION_DECLARATION(CopyFromStorage_action);
+HPX_REGISTER_ACTION_DECLARATION(CopyFromStorage_action);
 HPX_ACTION_INVOKE_NO_MORE_THAN(CopyFromStorage_action, 5);
 
 // and these in a cpp
-HPX_REGISTER_PLAIN_ACTION(CopyToStorage_action);
-HPX_REGISTER_PLAIN_ACTION(CopyFromStorage_action);
+HPX_REGISTER_ACTION(CopyToStorage_action);
+HPX_REGISTER_ACTION(CopyFromStorage_action);
 
 //----------------------------------------------------------------------------
 #ifdef USE_CLEANING_THREAD

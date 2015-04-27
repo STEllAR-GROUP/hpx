@@ -10,7 +10,6 @@
 #include <hpx/util/static.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/runtime/serialization/serialize_sequence.hpp>
@@ -29,9 +28,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // This must be in global namespace
-HPX_REGISTER_PLAIN_ACTION(
+HPX_REGISTER_ACTION(
     hpx::components::server::console_logging_action<>,
-    console_logging_action, hpx::components::factory_enabled)
+    console_logging_action)
 
 namespace hpx { namespace util { namespace detail
 {

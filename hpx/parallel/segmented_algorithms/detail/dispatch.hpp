@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             &dispatcher<Algo, ExPolicy, Args...>::sequential,
             algorithm_invoker_action<
                 Algo, ExPolicy, boost::mpl::true_, R(Args const& ...)>
-        >
+        >::type
     {};
 
     // parallel
@@ -183,7 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             &dispatcher<Algo, ExPolicy, Args...>::parallel,
             algorithm_invoker_action<
                 Algo, ExPolicy, boost::mpl::false_, R(Args const& ...)>
-        >
+        >::type
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -233,20 +233,5 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         return f.get();
     }
 }}}}
-
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40800
-
-HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
-    (template <typename Algo, typename ExPolicy, typename IsSeq, typename R,
-        typename... Args>),
-    (hpx::parallel::v1::detail::algorithm_invoker_action<
-        Algo, ExPolicy, IsSeq, R(Args const&...)>))
-
-#else
-
-// gcc 4.6 requires special handling :(
-#include <hpx/parallel/segmented_algorithms/detail/dispatch_gcc46.hpp>
-
-#endif
 
 #endif

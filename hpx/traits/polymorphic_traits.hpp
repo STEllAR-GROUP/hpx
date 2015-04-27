@@ -7,6 +7,8 @@
 #ifndef HPX_TRAITS_POLYMORPHIC_TRAITS_HPP
 #define HPX_TRAITS_POLYMORPHIC_TRAITS_HPP
 
+#include <hpx/util/detail/pp_strip_parens.hpp>
+
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_class.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -55,12 +57,20 @@ namespace hpx { namespace traits {
 
 }}
 
-#define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class)                            \
-  namespace hpx { namespace traits {                                          \
-      template <>                                                             \
-      struct is_nonintrusive_polymorphic<Class>:                              \
-          boost::mpl::true_ {};                                               \
-  }}                                                                          \
+#define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class)                          \
+    namespace hpx { namespace traits {                                      \
+        template <>                                                         \
+        struct is_nonintrusive_polymorphic<Class>:                          \
+            boost::mpl::true_ {};                                           \
+    }}                                                                      \
+/**/
+
+#define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE(TEMPLATE, ARG_LIST)    \
+    namespace hpx { namespace traits {                                      \
+        HPX_UTIL_STRIP(TEMPLATE)                                            \
+        struct is_nonintrusive_polymorphic<HPX_UTIL_STRIP(ARG_LIST)>        \
+          : boost::mpl::true_ {};                                           \
+    }}                                                                      \
 /**/
 
 #endif

@@ -17,7 +17,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
@@ -80,10 +79,8 @@ int hpx_main(po::variables_map &vm)
     int result = 0;
     double elapsed = 0.0;
 
-    components::component_type type =
-       components::get_component_type<components::server::plain_function<set_initialdata_action> >();
     std::vector<naming::id_type> localities =
-        hpx::find_remote_localities(type);
+        hpx::find_remote_localities();
 
     naming::id_type this_prefix = hpx::find_here();
 

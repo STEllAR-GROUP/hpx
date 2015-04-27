@@ -148,7 +148,8 @@ namespace hpx { namespace components { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the runtime_support actions
-HPX_REGISTER_PLAIN_ACTION_DECLARATION(hpx::components::server::allocate_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::allocate_action, allocate_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::memory::store8_action, store8_action)
