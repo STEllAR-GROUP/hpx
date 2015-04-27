@@ -62,7 +62,7 @@ struct B: A
 
 class C: public B
 {
-  friend hpx::serialization::access;
+  friend class hpx::serialization::access;
   int c;
 
   template <class Archive>
@@ -128,7 +128,7 @@ struct D
   virtual const char* foo() = 0;
 
 private:
-  friend hpx::serialization::access;
+  friend class hpx::serialization::access;
 
   template <class Archive>
   void load(Archive& ar, unsigned)
@@ -186,7 +186,7 @@ struct E: D
 
 class F: public E
 {
-  friend hpx::serialization::access;
+  friend class hpx::serialization::access;
   int c;
 
   template <class Archive>
