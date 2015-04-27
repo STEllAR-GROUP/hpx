@@ -585,9 +585,9 @@ namespace hpx
 
 #if defined(HPX_HAVE_SODIUM)
             // root CA, subordinate CA
-            signed_certificate_promise = ((15 << 16) | component_base_lco_with_value),
-            component_root_certificate_authority = 16,
-            component_subordinate_certificate_authority = 17,
+            signed_certificate_promise = ((14 << 16) | component_base_lco_with_value),
+            component_root_certificate_authority = 15,
+            component_subordinate_certificate_authority = 16,
 #endif
 
             component_last,
