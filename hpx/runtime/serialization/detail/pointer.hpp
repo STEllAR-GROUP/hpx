@@ -9,6 +9,7 @@
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_centralized_factory.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
@@ -63,6 +64,28 @@ namespace hpx { namespace serialization
                 }
             };
 
+            struct centralized_polymorphic
+            {
+                static void call(input_archive& ar,
+                    Pointer& ptr, boost::uint64_t pos)
+                {
+                    boost::uint32_t desc;
+                    ar >> desc;
+
+                    Pointer t(
+                        polymorphic_centralized_factory::create<referred_type>(desc)
+                    );
+                    ar >> *t;
+                    register_pointer(
+                          ar
+                        , pos
+                        , std::unique_ptr<detail::ptr_helper>(
+                              new detail::erase_ptr_helper<Pointer>(std::move(t), ptr)
+                          )
+                    );
+                }
+            };
+
             struct nonintrusive_polymorphic
             {
                 static void call(input_archive& ar,
@@ -101,14 +124,18 @@ namespace hpx { namespace serialization
 
         public:
             typedef typename boost::mpl::eval_if<
-                hpx::traits::is_intrusive_polymorphic<referred_type>,
-                    boost::mpl::identity<intrusive_polymorphic>,
+                hpx::traits::does_require_centralization<referred_type>,
+                    boost::mpl::identity<centralized_polymorphic>,
                     boost::mpl::eval_if<
-                        hpx::traits::is_nonintrusive_polymorphic<referred_type>,
-                            boost::mpl::identity<nonintrusive_polymorphic>,
-                            boost::mpl::identity<usual>
-                  >
-            >::type type;
+                        hpx::traits::is_intrusive_polymorphic<referred_type>,
+                            boost::mpl::identity<intrusive_polymorphic>,
+                            boost::mpl::eval_if<
+                                hpx::traits::is_nonintrusive_polymorphic<referred_type>,
+                                    boost::mpl::identity<nonintrusive_polymorphic>,
+                                    boost::mpl::identity<usual>
+                        >
+                    >
+                >::type type;
         };
 
         template <class Pointer>
@@ -127,6 +154,19 @@ namespace hpx { namespace serialization
                 }
             };
 
+            struct centralized_polymorphic
+            {
+                static void call(output_archive& ar,
+                    Pointer& ptr)
+                {
+                    const boost::uint32_t desc =
+                        polymorphic_centralized_factory::get_descriptor_by_typeid(
+                            access::get_name(ptr.get()));
+                    ar << desc;
+                    ar << *ptr;
+                }
+            };
+
             struct usual
             {
                 static void call(output_archive& ar,
@@ -138,9 +178,13 @@ namespace hpx { namespace serialization
 
         public:
             typedef typename boost::mpl::if_<
-                hpx::traits::is_intrusive_polymorphic<referred_type>,
-                    intrusive_polymorphic,
-                    usual
+                hpx::traits::does_require_centralization<referred_type>,
+                    centralized_polymorphic,
+                    typename boost::mpl::if_<
+                        hpx::traits::is_intrusive_polymorphic<referred_type>,
+                            intrusive_polymorphic,
+                            usual
+                    >::type
                 >::type type;
         };
 

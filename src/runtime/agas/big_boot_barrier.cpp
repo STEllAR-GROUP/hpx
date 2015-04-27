@@ -27,6 +27,7 @@
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_centralized_factory.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/certificate.hpp>
@@ -102,6 +103,7 @@ struct registration_header
       , boost::uint32_t cores_needed_
       , boost::uint32_t num_threads_
       , std::string const& hostname_
+      , std::vector<std::string> const& typeids_
       , naming::gid_type prefix_ = naming::gid_type()
     ) :
         endpoints(endpoints_)
@@ -110,6 +112,7 @@ struct registration_header
       , cores_needed(cores_needed_)
       , num_threads(num_threads_)
       , hostname(hostname_)
+      , typeids(typeids_)
       , prefix(prefix_)
     {}
 
@@ -119,6 +122,7 @@ struct registration_header
     boost::uint32_t cores_needed;
     boost::uint32_t num_threads;
     std::string hostname;           // hostname of locality
+    std::vector<std::string> typeids;
     naming::gid_type prefix;        // suggested prefix (optional)
 
     template <typename Archive>
@@ -130,6 +134,7 @@ struct registration_header
         ar & cores_needed;
         ar & num_threads;
         ar & hostname;
+        ar & typeids;
         ar & prefix;
     }
 };
@@ -150,6 +155,7 @@ struct notification_header
       , boost::uint32_t num_localities_
       , boost::uint32_t used_cores_
       , parcelset::endpoints_type const & agas_endpoints_
+      , std::map<std::string, boost::uint32_t> const & type_descriptors_
     ) :
         prefix(prefix_)
       , agas_locality(agas_locality_)
@@ -160,6 +166,7 @@ struct notification_header
       , num_localities(num_localities_)
       , used_cores(used_cores_)
       , agas_endpoints(agas_endpoints_)
+      , type_descriptors(type_descriptors_)
     {}
 
     naming::gid_type prefix;
@@ -171,6 +178,7 @@ struct notification_header
     boost::uint32_t num_localities;
     boost::uint32_t used_cores;
     parcelset::endpoints_type agas_endpoints;
+    std::map<std::string, boost::uint32_t> type_descriptors;
 
 #if defined(HPX_HAVE_SECURITY)
     components::security::signed_certificate root_certificate;
@@ -188,6 +196,7 @@ struct notification_header
         ar & num_localities;
         ar & used_cores;
         ar & agas_endpoints;
+        ar & type_descriptors;
 #if defined(HPX_HAVE_SECURITY)
         ar & root_certificate;
 #endif
@@ -310,6 +319,39 @@ HPX_REGISTER_ACTION(notify_worker_security_action,
 namespace hpx { namespace agas
 {
 
+template <class Base>
+struct unique_typeid_registry
+{
+    unique_typeid_registry():
+        map(), count(0)
+    {}
+
+    static boost::uint32_t get_type_descriptor(const std::string& type_id)
+    {
+        unique_typeid_registry& registry = get_instance();
+        boost::mutex::scoped_lock lock(registry.mutex);
+
+        if (registry.map.count(type_id) > 0)
+            return registry.map.at(type_id);
+
+        registry.map[type_id] = registry.count;
+        serialization::detail::polymorphic_centralized_factory::
+            register_type_descriptor(type_id, registry.count++);
+        return registry.count - 1;
+    }
+
+private:
+    static unique_typeid_registry& get_instance()
+    {
+        util::static_<unique_typeid_registry> registry;
+        return registry.get();
+    }
+
+    std::map<std::string, boost::uint32_t> map;
+    boost::uint32_t count;
+    boost::mutex mutex;
+};
+
 // remote call to AGAS
 void register_worker(registration_header const& header)
 {
@@ -389,11 +431,19 @@ void register_worker(registration_header const& header)
     boost::uint32_t first_core = rt.assign_cores(header.hostname,
         header.cores_needed);
 
+    std::map<std::string, boost::uint32_t> desc_map;
+    std::for_each(header.typeids.cbegin(), header.typeids.cend(),
+        [&](const std::string& str){
+            desc_map.insert(std::make_pair(
+                str, unique_typeid_registry<actions::base_action>::get_type_descriptor(str))
+            );
+        });
+
     big_boot_barrier & bbb = get_big_boot_barrier();
 
     notification_header hdr (prefix, bbb.here(), locality_addr, primary_addr
       , component_addr, symbol_addr, rt.get_config().get_num_localities()
-      , first_core, bbb.get_endpoints());
+      , first_core, bbb.get_endpoints(), desc_map);
 
 #if defined(HPX_HAVE_SECURITY)
     // wait for the root certificate to be available
@@ -491,6 +541,12 @@ void notify_worker(notification_header const& header)
     }
 
     util::runtime_configuration& cfg = rt.get_config();
+
+    std::for_each(header.type_descriptors.cbegin(), header.type_descriptors.cend(),
+            [&](const std::pair<const std::string, boost::uint32_t>& pair){
+                serialization::detail::polymorphic_centralized_factory
+                    ::register_type_descriptor(pair.first, pair.second);
+            });
 
     // set our prefix
     agas_client.set_local_locality(header.prefix);
@@ -719,6 +775,10 @@ big_boot_barrier::big_boot_barrier(
   , connected(get_number_of_bootstrap_connections(ini_))
   , thunks(32)
 {
+    serialization::detail::polymorphic_centralized_factory
+        ::register_type_descriptor("register_worker_action", 0u);
+    serialization::detail::polymorphic_centralized_factory
+        ::register_type_descriptor("notify_worker_action", 1u);
     if(pp_)
         pp_->register_event_handler(&early_parcel_sink);
 }
@@ -806,6 +866,9 @@ void big_boot_barrier::wait_hosted(
             util::safe_lexical_cast<boost::uint32_t>(locality_str, -1));
     }
 
+    std::vector<std::string> typenames =
+        serialization::detail::polymorphic_centralized_factory::get_registered_typenames();
+
     // contact the bootstrap AGAS node
     registration_header hdr(
           rt.endpoints()
@@ -814,6 +877,7 @@ void big_boot_barrier::wait_hosted(
         , cores_needed
         , num_threads
         , locality_name
+        , typenames
         , suggested_prefix);
 
     apply(

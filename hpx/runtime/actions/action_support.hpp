@@ -276,7 +276,7 @@ namespace hpx { namespace actions
 #endif
 
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        void serialize(Archive &, unsigned)
         {}
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(base_action);
     };
@@ -346,5 +346,7 @@ namespace hpx { namespace actions
     }
     /// \endcond
 }}
+
+HPX_TRAITS_REQUIRES_CENTRALIZATION(hpx::actions::base_action)
 
 #endif

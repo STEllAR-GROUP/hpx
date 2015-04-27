@@ -63,7 +63,7 @@ namespace hpx { namespace serialization { namespace detail
         ctor_map_type map_;
     };
 
-    template <class T>
+    template <class T, typename = void>
     struct register_class_name
     {
         register_class_name()
@@ -89,13 +89,13 @@ namespace hpx { namespace serialization { namespace detail
         static register_class_name instance;
     };
 
-    template <class T>
-    register_class_name<T> register_class_name<T>::instance;
+    template <class T, class Enable>
+    register_class_name<T, Enable> register_class_name<T, Enable>::instance;
 
 }}}
 
 #define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name)        \
-  template <class> friend                                                     \
+  template <class, class> friend                                              \
   struct ::hpx::serialization::detail::register_class_name;                   \
                                                                               \
   virtual std::string hpx_serialization_get_name() const                      \
