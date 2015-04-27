@@ -21,8 +21,8 @@ if(OPENMP_FOUND)
       jacobi_nonuniform_omp_dynamic)
 endif()
 
-set(jacobi_hpx_sources jacobi.cpp grid.cpp)
-set(jacobi_nonuniform_hpx_sources jacobi_nonuniform.cpp grid.cpp)
+set(jacobi_hpx_sources jacobi.cpp)
+set(jacobi_nonuniform_hpx_sources jacobi_nonuniform.cpp)
 
 if(OPENMP_FOUND)
     set(jacobi_omp_static_sources jacobi.cpp)

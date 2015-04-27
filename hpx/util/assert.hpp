@@ -6,6 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//  Make Boost inspect tool happy: boostinspect:naassert_macro
 //  Note: There are no include guards. This is intentional.
 
 #if defined(HPX_USE_BOOST_ASSERT)

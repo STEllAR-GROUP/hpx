@@ -36,7 +36,7 @@ std::string search(int start, int end, std::string const &word)
         //just a quick check, because the list is not perfectly symmetrical
         {
             int pos = mid/2;
-            
+
             int size;
             //if our value is lower than start, we disregard it.
             if (word.length() >= check.length())
@@ -96,7 +96,6 @@ std::string search(int start, int end, std::string const &word)
 }
 int hpx_main()
 {
-    
     {
         using namespace std;
         ifstream fin;
@@ -111,12 +110,13 @@ int hpx_main()
                 wordlist_path.push_back(path[i]);
             }
         }
-        //list of American English words in alphabetical order. Provided by Kevin at http://wordlist.sourceforge.net/
-        
+        // list of American English words in alphabetical order.
+        // Provided by Kevin at http://wordlist.sourceforge.net/
+
         string word;
         cout << "Loading file: example_text.txt\n";
         hpx::util::high_resolution_timer t;
-        
+
         int fileLines = 0;;
         std::string example_path = wordlist_path + "example_text.txt";
         fin.open(example_path);
@@ -206,7 +206,7 @@ int hpx_main()
             wordRun.reserve(strs.size());
             for (string::size_type i = 0; i < strs.size(); ++i)
             {
-                string& single = strs[i]; 
+                string& single = strs[i];
                 int start = 0;
                 hpx::naming::id_type const locality_id = hpx::find_here();
                 search_action temp;
