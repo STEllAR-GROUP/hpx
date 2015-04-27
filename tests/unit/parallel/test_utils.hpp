@@ -111,9 +111,8 @@ namespace test
     {
         static void call(ExPolicy const&, hpx::exception_list const& e)
         {
-            // The static partitioner uses the number of threads/cores for the
-            // number chunks to create.
-            HPX_TEST_LTE(e.size(), hpx::get_num_worker_threads());
+            // at least one exception should have been thrown
+            HPX_TEST_LTE(1u, e.size());
         }
     };
 
@@ -160,9 +159,8 @@ namespace test
                 HPX_TEST_EQ(e.size(), 1u);
             }
             else {
-                // The static partitioner uses the number of threads/cores for
-                // the number chunks to create.
-                HPX_TEST_LTE(e.size(), hpx::get_num_worker_threads());
+                // at least one exception should have been thrown
+                HPX_TEST_LTE(1u, e.size());
             }
         }
     };
