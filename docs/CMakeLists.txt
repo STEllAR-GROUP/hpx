@@ -54,7 +54,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/components/component_storage/migrate_to_storage.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithm.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/task_region.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/task_block.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/adjacent_find.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/all_any_none.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/copy.hpp"

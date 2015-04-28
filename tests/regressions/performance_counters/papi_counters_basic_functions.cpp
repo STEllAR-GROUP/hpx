@@ -72,12 +72,12 @@ int hpx_main(boost::program_options::variables_map&)
         std::cout << n << " counted fp instructions, result: " << cnt1 << std::endl
                   << n << " uncounted fp instructions, result: " << cnt2-cnt1 << std::endl
                   << 2*n << " fp instructions, count after reset: " << cnt3 << std::endl
-		  << n << " fp instructions, count after explicit reset: " << cnt4 << std::endl;
+          << n << " fp instructions, count after explicit reset: " << cnt4 << std::endl;
 
         pass = pass && close_enough(cnt1, n, 1.0) &&
-	       (cnt2 >= cnt1) && close_enough(cnt1, cnt2, 1.0) &&
-	       close_enough(cnt3, 2.0*cnt1, 1.0) &&
-	       close_enough(cnt4, cnt1, 1.0);
+           (cnt2 >= cnt1) && close_enough(cnt1, cnt2, 1.0) &&
+           close_enough(cnt3, 2.0*cnt1, 1.0) &&
+           close_enough(cnt4, cnt1, 1.0);
     }
     std::cout << (pass? "PASSED": "FAILED") << ".\n";
 

@@ -12,6 +12,7 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/date_time_chrono.hpp>
@@ -1293,11 +1294,6 @@ namespace hpx { namespace actions
           : f_(std::forward<F>(f))
         {}
 
-        ~typed_continuation()
-        {
-            init_registration<typed_continuation>::g.register_continuation();
-        }
-
         void deferred_trigger(lcos::future<R> result) const
         {
             if (f_.empty()) {
@@ -1352,30 +1348,35 @@ namespace hpx { namespace actions
         }
 
         /// serialization support
-        void load(serialization::input_archive& ar)
+        void serialize(serialization::input_archive& ar)
         {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::load(ar);
-
             // serialize function
             bool have_function = false;
             ar.load(have_function);
             if (have_function)
                 ar >> f_;
         }
-        void save(serialization::output_archive& ar) const
+        void serialize(serialization::output_archive& ar) const
         {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::save(ar);
-
             // serialize function
             bool have_function = !f_.empty();
             ar.save(have_function);
             if (have_function)
                 ar << f_;
         }
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+            // serialize base class
+            ar & hpx::serialization::base_object<continuation>(*this);
+
+            serialize(ar);
+        }
+        HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
+            typed_continuation
+          , detail::get_continuation_name<typed_continuation>()
+        );
 
         function_type f_;
     };
@@ -1412,11 +1413,6 @@ namespace hpx { namespace actions
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
-
-        ~typed_continuation()
-        {
-            init_registration<typed_continuation>::g.register_continuation();
-        }
 
         void deferred_trigger(lcos::future<void> result) const
         {
@@ -1470,34 +1466,39 @@ namespace hpx { namespace actions
     private:
         char const* get_continuation_name() const
         {
-            return detail::get_continuation_name<typed_continuation>();
+            return "hpx_future_void_typed_continuation";
         }
 
         /// serialization support
-        void load(serialization::input_archive& ar)
+        void serialize(serialization::input_archive& ar)
         {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::load(ar);
-
             // serialize function
             bool have_function = false;
             ar.load(have_function);
             if (have_function)
                 ar >> f_;
         }
-        void save(serialization::output_archive& ar) const
+        void serialize(serialization::output_archive& ar)
         {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::save(ar);
-
             // serialize function
             bool have_function = !f_.empty();
             ar.save(have_function);
             if (have_function)
                 ar << f_;
         }
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+            // serialize base class
+            ar & hpx::serialization::base_object<continuation>(*this);
+
+            serialize(ar);
+        }
+        HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
+            typed_continuation
+          , "hpx_future_void_typed_continuation"
+        );
 
         function_type f_;
     };
@@ -1534,11 +1535,6 @@ namespace hpx { namespace actions
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
-
-        ~typed_continuation()
-        {
-            init_registration<typed_continuation>::g.register_continuation();
-        }
 
         void deferred_trigger(lcos::shared_future<R> result) const
         {
@@ -1594,30 +1590,35 @@ namespace hpx { namespace actions
         }
 
         /// serialization support
-        void load(serialization::input_archive& ar)
+        void serialize(serialization::input_archive& ar)
         {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::load(ar);
-
             // serialize function
             bool have_function = false;
             ar.load(have_function);
             if (have_function)
                 ar >> f_;
         }
-        void save(serialization::output_archive& ar) const
+        void serialize(serialization::output_archive& ar) const
         {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::save(ar);
-
             // serialize function
             bool have_function = !f_.empty();
             ar.save(have_function);
             if (have_function)
                 ar << f_;
         }
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+            // serialize base class
+            ar & hpx::serialization::base_object<continuation>(*this);
+
+            serialize(ar);
+        }
+        HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
+            typed_continuation
+          , detail::get_continuation_name<typed_continuation>()
+        );
 
         function_type f_;
     };
@@ -1654,11 +1655,6 @@ namespace hpx { namespace actions
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
-
-        ~typed_continuation()
-        {
-            init_registration<typed_continuation>::g.register_continuation();
-        }
 
         void deferred_trigger(lcos::shared_future<void> result) const
         {
@@ -1712,34 +1708,39 @@ namespace hpx { namespace actions
     private:
         char const* get_continuation_name() const
         {
-            return detail::get_continuation_name<typed_continuation>();
+            return "hpx_shared_future_void_typed_continuation";
         }
 
         /// serialization support
-        void load(serialization::input_archive& ar)
+        void serialize(serialization::input_archive& ar)
         {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::load(ar);
-
             // serialize function
             bool have_function = false;
             ar.load(have_function);
             if (have_function)
                 ar >> f_;
         }
-        void save(serialization::output_archive& ar) const
+        void serialize(serialization::output_archive& ar) const
         {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::save(ar);
-
             // serialize function
             bool have_function = !f_.empty();
             ar.save(have_function);
             if (have_function)
                 ar << f_;
         }
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+            // serialize base class
+            ar & hpx::serialization::base_object<continuation>(*this);
+
+            serialize(ar);
+        }
+        HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
+            typed_continuation
+          , "hpx_shared_future_void_typed_continuation"
+        );
 
         function_type f_;
     };
@@ -1767,11 +1768,11 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename R>
     struct serialize_as_future<lcos::future<R> >
-      : boost::mpl::false_
+      : boost::mpl::true_
     {
         static bool call_if(lcos::future<R>& f)
         {
-            return f.valid() && !f.is_ready();
+            return true;
         }
 
         static void call(lcos::future<R>& f)
@@ -1786,7 +1787,7 @@ namespace hpx { namespace traits
     {
         static bool call_if(lcos::shared_future<R>& f)
         {
-            return f.valid() && !f.is_ready();
+            return true;
         }
 
         static void call(lcos::shared_future<R>& f)

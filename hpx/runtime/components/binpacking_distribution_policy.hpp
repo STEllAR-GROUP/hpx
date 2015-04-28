@@ -100,27 +100,6 @@ namespace hpx { namespace components
             return to_create;
         }
 
-        inline hpx::future<std::vector<hpx::id_type> >
-        consolidate_result(
-            std::vector<hpx::future<std::vector<hpx::id_type> > > && objs)
-        {
-            // consolidate all results into single array
-            return hpx::lcos::local::dataflow(
-                [](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
-                    -> std::vector<hpx::id_type>
-                {
-                    std::vector<hpx::id_type> result = v.front().get();
-                    for (auto it = v.begin()+1; it != v.end(); ++it)
-                    {
-                        std::vector<id_type> r = it->get();
-                        std::copy(r.begin(), r.end(),
-                            std::back_inserter(result));
-                    }
-                    return result;
-                },
-                std::move(objs));
-        }
-
         inline hpx::future<std::vector<boost::uint64_t> >
         retrieve_counter_values(
             std::vector<performance_counters::performance_counter> && counters)
@@ -133,7 +112,7 @@ namespace hpx { namespace components
             for (performance_counter const& counter: counters)
                 values.push_back(counter.get_value<boost::uint64_t>());
 
-            return hpx::lcos::local::dataflow(
+            return hpx::lcos::local::dataflow(hpx::launch::sync,
                 hpx::util::unwrapped(
                     [](std::vector<boost::uint64_t> && values)
                     {
@@ -165,8 +144,8 @@ namespace hpx { namespace components
                     counters.push_back(performance_counter(counter_name, id));
             }
 
-            return hpx::lcos::local::dataflow(&retrieve_counter_values,
-                std::move(counters));
+            return hpx::lcos::local::dataflow(
+                &retrieve_counter_values, std::move(counters));
         }
 
         inline hpx::id_type const& get_best_locality(
@@ -216,12 +195,16 @@ namespace hpx { namespace components
         template <typename Component>
         struct create_bulk_helper
         {
+            typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
+                bulk_locality_result;
+
             create_bulk_helper(std::vector<hpx::id_type> const& localities)
               : localities_(localities)
             {}
 
             template <typename ...Ts>
-            hpx::future<std::vector<hpx::id_type> > operator()(
+            hpx::future<std::vector<bulk_locality_result> >
+            operator()(
                 hpx::future<std::vector<boost::uint64_t> > && values,
                 std::size_t count, Ts&&... vs) const
             {
@@ -237,7 +220,31 @@ namespace hpx { namespace components
                         localities_[i], to_create[i], vs...));
                 }
 
-                return detail::consolidate_result(std::move(objs));
+                // consolidate all results
+                return hpx::lcos::local::dataflow(hpx::launch::sync,
+                    [=](std::vector<hpx::future<std::vector<hpx::id_type> > > && v)
+                        mutable -> std::vector<bulk_locality_result>
+                    {
+                        HPX_ASSERT(localities_.size() == v.size());
+
+                        std::vector<bulk_locality_result> result;
+                        result.reserve(v.size());
+
+                        for (std::size_t i = 0; i != v.size(); ++i)
+                        {
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+                            result.emplace_back(
+                                    std::move(localities_[i]), v[i].get()
+                                );
+#else
+                            result.push_back(std::make_pair(
+                                    std::move(localities_[i]), v[i].get()
+                                ));
+#endif
+                        }
+                        return result;
+                    },
+                    std::move(objs));
             }
 
             std::vector<hpx::id_type> const& localities_;
@@ -343,6 +350,11 @@ namespace hpx { namespace components
                 _1, std::forward<Ts>(vs)...));
         }
 
+        /// \cond NOINTERNAL
+        typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
+            bulk_locality_result;
+        /// \endcond
+
         /// Create multiple objects on the localities associated by
         /// this policy instance
         ///
@@ -354,37 +366,49 @@ namespace hpx { namespace components
         ///          represent the newly created objects
         ///
         template <typename Component, typename ...Ts>
-        hpx::future<std::vector<hpx::id_type> >
+        hpx::future<std::vector<bulk_locality_result> >
         bulk_create(std::size_t count, Ts&&... vs) const
         {
             using components::stub_base;
 
+            if (localities_.size() > 1)
+            {
+                // schedule creation of all objects across given localities
+                hpx::future<std::vector<boost::uint64_t> > values =
+                    detail::get_counter_values(
+                        hpx::components::unique_component_name<
+                            hpx::components::component_factory<
+                                typename Component::wrapping_type
+                            >
+                        >::call(), counter_name_, localities_);
+
+                using hpx::util::placeholders::_1;
+                return values.then(
+                    hpx::util::bind(
+                        detail::create_bulk_helper<Component>(localities_),
+                        _1, count, std::forward<Ts>(vs)...));
+            }
+
             // handle special cases
-            if (localities_.size() == 0)
-            {
-                return stub_base<Component>::bulk_create_async(
-                    hpx::find_here(), count, std::forward<Ts>(vs)...);
-            }
-            else if (localities_.size() == 1)
-            {
-                return stub_base<Component>::bulk_create_async(
-                    localities_.front(), count, std::forward<Ts>(vs)...);
-            }
+            hpx::id_type id =
+                localities_.empty() ? hpx::find_here() : localities_.front();
 
-            // schedule creation of all objects across given localities
-            hpx::future<std::vector<boost::uint64_t> > values =
-                detail::get_counter_values(
-                    hpx::components::unique_component_name<
-                        hpx::components::component_factory<
-                            typename Component::wrapping_type
-                        >
-                    >::call(), counter_name_, localities_);
+            hpx::future<std::vector<hpx::id_type> > f =
+                stub_base<Component>::bulk_create_async(
+                    id, count, std::forward<Ts>(vs)...);
 
-            using hpx::util::placeholders::_1;
-            return values.then(
-                hpx::util::bind(
-                    detail::create_bulk_helper<Component>(localities_),
-                    _1, count, std::forward<Ts>(vs)...));
+            return f.then(hpx::launch::sync,
+                [id](hpx::future<std::vector<hpx::id_type> > && f)
+                    -> std::vector<bulk_locality_result>
+                {
+                    std::vector<bulk_locality_result> result;
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+                    result.emplace_back(id, f.get());
+#else
+                    result.push_back(std::make_pair(id, f.get()));
+#endif
+                    return result;
+                });
         }
 
         /// Returns the name of the performance counter associated with this
@@ -392,6 +416,17 @@ namespace hpx { namespace components
         std::string const& get_counter_name() const
         {
             return counter_name_;
+        }
+
+        /// Returns the number of associated localities for this distribution
+        /// policy
+        ///
+        /// \note This function is part of the creation policy implemented by
+        ///       this class
+        ///
+        std::size_t get_num_localities() const
+        {
+            return localities_.size();
         }
 
     protected:

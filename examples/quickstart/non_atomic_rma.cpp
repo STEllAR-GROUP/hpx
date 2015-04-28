@@ -1,6 +1,9 @@
 // Copyright (c) 2011 Matt Anderson <matt@phys.lsu.edu>
 // Copyright (c) 2011 Pedro Diniz
 //
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
 // This is the non-atomic version of the random memory access.  The array length
 // is given by the variable array_length and N is the number of random accesses
 // to this array.
@@ -10,11 +13,10 @@
 //
 // Note that this is a *non-atomic* example.
 
-//HPX includes
+// HPX includes
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
@@ -77,10 +79,8 @@ int hpx_main(po::variables_map &vm)
     int result = 0;
     double elapsed = 0.0;
 
-    components::component_type type =
-       components::get_component_type<components::server::plain_function<set_initialdata_action> >();
     std::vector<naming::id_type> localities =
-        hpx::find_remote_localities(type);
+        hpx::find_remote_localities();
 
     naming::id_type this_prefix = hpx::find_here();
 

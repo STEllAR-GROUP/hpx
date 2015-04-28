@@ -39,7 +39,17 @@ namespace hpx { namespace serialization { namespace detail
 
         void register_class(const std::string& name, ctor_type fun)
         {
-            map_.emplace(name, fun);
+            if(name.empty())
+            {
+                HPX_THROW_EXCEPTION(serialization_error
+                  , "polymorphic_intrusive_factory::register_class"
+                  , "Cannot register a factory with an empty name");
+            }
+            auto it = map_.find(name);
+            if(it == map_.end())
+            {
+                map_.emplace(name, fun);
+            }
         }
 
         template <class T>
@@ -157,61 +167,16 @@ namespace hpx { namespace serialization { namespace detail
       Class, BOOST_PP_STRINGIZE(Class))                                       \
 /**/
 
-namespace hpx { namespace serialization { namespace detail {
-
-    struct unique_suffix_for_template_name: boost::noncopyable
-    {
-        static unique_suffix_for_template_name& instance()
-        {
-            hpx::util::static_<unique_suffix_for_template_name> instance;
-            return instance.get();
-        }
-
-        std::string get_new_suffix()
-        {
-            const uint32_t temp = ++suffix;
-            return util::safe_lexical_cast<std::string>(temp);
-        }
-
-    private:
-        unique_suffix_for_template_name():
-            suffix(0U)
-        {}
-
-        friend struct hpx::util::static_<unique_suffix_for_template_name>;
-        boost::atomic<boost::uint32_t> suffix;
-    };
-
-    template <class T>
-    std::string get_unique_suffix_for_template_name()
-    {
-        static std::string suffix =
-            unique_suffix_for_template_name::instance().get_new_suffix();
-        return suffix;
-    }
-
-}}}
-
 #include <hpx/config/warnings_suffix.hpp>
 
-#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_WITH_NAME(Class, Name)             \
-  HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(Class, (Name +                          \
-    ::hpx::serialization::detail::get_unique_suffix_for_template_name<Class>()))  \
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(Class)                         \
+  HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(                                    \
+      Class, hpx::util::type_id<Class>::typeid_.type_id();)                   \
 /**/
 
-#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_WITH_NAME_SPLITTED(Class, Name)    \
-  HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(Class, (Name +                 \
-    ::hpx::serialization::detail::get_unique_suffix_for_template_name<Class>()))  \
-/**/
-
-#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(Class)                             \
-  HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_WITH_NAME(                               \
-      Class, BOOST_PP_STRINGIZE(Class) BOOST_PP_STRINGIZE(__COUNTER__))           \
-/**/
-
-#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED(Class)                    \
-  HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_WITH_NAME_SPLITTED(                      \
-      Class, BOOST_PP_STRINGIZE(Class) BOOST_PP_STRINGIZE(__COUNTER__))           \
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED(Class)                \
+  HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(                           \
+      Class, hpx::util::type_id<T>::typeid_.type_id();)                       \
 /**/
 
 #endif

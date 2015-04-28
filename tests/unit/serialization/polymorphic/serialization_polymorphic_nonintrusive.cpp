@@ -47,7 +47,7 @@ void serialize(Archive& ar, B& b, unsigned)
   ar & b.b;
 }
 
-HPX_SERIALIZATION_REGISTER_CLASS(B);
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(B);
 
 struct D : B
 {

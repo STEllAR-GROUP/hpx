@@ -10,7 +10,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
@@ -290,10 +289,10 @@ using hpx::agas::notify_worker_action;
 HPX_ACTION_HAS_CRITICAL_PRIORITY(register_worker_action);
 HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_worker_action);
 
-HPX_REGISTER_PLAIN_ACTION(register_worker_action,
-    register_worker_action, hpx::components::factory_enabled)
-HPX_REGISTER_PLAIN_ACTION(notify_worker_action,
-    notify_worker_action, hpx::components::factory_enabled)
+HPX_REGISTER_ACTION(register_worker_action,
+    register_worker_action)
+HPX_REGISTER_ACTION(notify_worker_action,
+    notify_worker_action)
 
 #if defined(HPX_HAVE_SECURITY)
 using hpx::agas::register_worker_security_action;
@@ -302,10 +301,10 @@ using hpx::agas::notify_worker_security_action;
 HPX_ACTION_HAS_CRITICAL_PRIORITY(register_worker_security_action);
 HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_worker_security_action);
 
-HPX_REGISTER_PLAIN_ACTION(register_worker_security_action,
-    register_worker_security_action, hpx::components::factory_enabled)
-HPX_REGISTER_PLAIN_ACTION(notify_worker_security_action,
-    notify_worker_security_action, hpx::components::factory_enabled)
+HPX_REGISTER_ACTION(register_worker_security_action,
+    register_worker_security_action)
+HPX_REGISTER_ACTION(notify_worker_security_action,
+    notify_worker_security_action)
 #endif
 
 namespace hpx { namespace agas

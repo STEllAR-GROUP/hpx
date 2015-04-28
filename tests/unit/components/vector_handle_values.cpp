@@ -139,11 +139,12 @@ void handle_values_tests()
         handle_values_tests(v);
     }
 
-    handle_values_tests_with_policy<T>(length, 1, hpx::layout);
-    handle_values_tests_with_policy<T>(length, 3, hpx::layout(3));
-    handle_values_tests_with_policy<T>(length, 3, hpx::layout(3, localities));
+    handle_values_tests_with_policy<T>(length, 1, hpx::container_layout);
+    handle_values_tests_with_policy<T>(length, 3, hpx::container_layout(3));
+    handle_values_tests_with_policy<T>(length, 3,
+        hpx::container_layout(3, localities));
     handle_values_tests_with_policy<T>(length, localities.size(),
-        hpx::layout(localities));
+        hpx::container_layout(localities));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

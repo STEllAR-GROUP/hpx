@@ -78,6 +78,11 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_TESTS_REGRESSIONS HPX_WITH_TESTS_REGRESSIONS]
 * [link build_system.cmake_variables.HPX_WITH_TESTS_UNIT HPX_WITH_TESTS_UNIT]
 * [link build_system.cmake_variables.HPX_WITH_TOOLS HPX_WITH_TOOLS]
+* [link build_system.cmake_variables.HPX_WITH_TESTS HPX_WITH_TESTS]
+* [link build_system.cmake_variables.HPX_WITH_TESTS_BENCHMARKS HPX_WITH_TESTS_BENCHMARKS]
+* [link build_system.cmake_variables.HPX_WITH_TESTS_EXTERNAL_BUILD HPX_WITH_TESTS_EXTERNAL_BUILD]
+* [link build_system.cmake_variables.HPX_WITH_TESTS_REGRESSIONS HPX_WITH_TESTS_REGRESSIONS]
+* [link build_system.cmake_variables.HPX_WITH_TESTS_UNIT HPX_WITH_TESTS_UNIT]
 
 [variablelist
         [[[#build_system.cmake_variables.HPX_WITH_DEFAULT_TARGETS] `HPX_WITH_DEFAULT_TARGETS:BOOL`][Associate the core HPX library with the default build target (default: ON).]]
@@ -91,6 +96,11 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_TESTS_REGRESSIONS] `HPX_WITH_TESTS_REGRESSIONS:BOOL`][Build HPX regression tests (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_TESTS_UNIT] `HPX_WITH_TESTS_UNIT:BOOL`][Build HPX unit tests (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_TOOLS] `HPX_WITH_TOOLS:BOOL`][Build HPX tools (default: OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_TESTS] `HPX_WITH_TESTS:BOOL`][Build the HPX tests (default ON)]]
+        [[[#build_system.cmake_variables.HPX_WITH_TESTS_BENCHMARKS] `HPX_WITH_TESTS_BENCHMARKS:BOOL`][Build HPX benchmark tests (default: ON)]]
+        [[[#build_system.cmake_variables.HPX_WITH_TESTS_EXTERNAL_BUILD] `HPX_WITH_TESTS_EXTERNAL_BUILD:BOOL`][Build external cmake build tests (default: ON)]]
+        [[[#build_system.cmake_variables.HPX_WITH_TESTS_REGRESSIONS] `HPX_WITH_TESTS_REGRESSIONS:BOOL`][Build HPX regression tests (default: ON)]]
+        [[[#build_system.cmake_variables.HPX_WITH_TESTS_UNIT] `HPX_WITH_TESTS_UNIT:BOOL`][Build HPX unit tests (default: ON)]]
 ] [/ Build Targets Options]
 
 [#build_system.cmake_variables.Thread_Manager][h3 Thread Manager Options]

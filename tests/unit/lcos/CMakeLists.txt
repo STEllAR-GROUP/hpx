@@ -25,6 +25,8 @@ set(tests
     future_ref
     future_then
     future_wait
+    latch_local
+    latch_remote
     local_barrier
     local_dataflow
     local_event
@@ -54,6 +56,9 @@ set(future_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(latch_local_PARAMETERS THREADS_PER_LOCALITY 4)
+set(latch_remote_PARAMETERS LOCALITIES 2)
 
 set(local_event_PARAMETERS THREADS_PER_LOCALITY 4)
 

@@ -176,10 +176,6 @@ namespace hpx { namespace components { namespace server
     {};
 }}}
 
-HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
-    (template <typename Component>),
-    (hpx::components::server::trigger_migrate_from_storage_here_action<Component>))
-
 #endif
 
 

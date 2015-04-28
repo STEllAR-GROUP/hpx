@@ -12,6 +12,8 @@ set(tests
     zero_copy_serialization
 )
 
+add_subdirectory(polymorphic)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)

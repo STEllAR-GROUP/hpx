@@ -190,7 +190,7 @@ namespace hpx { namespace actions
     struct name : hpx::actions::make_direct_action<                           \
         decltype(&component::func), &component::func, name>::type {}          \
     /**/
-    /**/
+
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                 \
     HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(component, func,                     \
         BOOST_PP_CAT(func, _action))                                          \

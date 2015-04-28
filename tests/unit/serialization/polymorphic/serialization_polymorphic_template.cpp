@@ -1,3 +1,8 @@
+//  Copyright (c) 2014-2015 Anton Bikineev
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 #include <iostream>
 #include <vector>
 
@@ -70,8 +75,10 @@ int main()
     boost::shared_ptr<A<int> > b;
     boost::shared_ptr<A<char> > c;
     archive >> b >> c;
-    std::cout << "b: " << boost::static_pointer_cast<B<int> >(b)->a << ", " << boost::static_pointer_cast<B<int> >(b)->b << std::endl;
-    std::cout << "c: " << boost::static_pointer_cast<B<char> >(c)->a << ", " << boost::static_pointer_cast<B<char> >(c)->b << std::endl;
+    std::cout << "b: " << boost::static_pointer_cast<B<int> >(b)->a << ", "
+        << boost::static_pointer_cast<B<int> >(b)->b << std::endl;
+    std::cout << "c: " << boost::static_pointer_cast<B<char> >(c)->a << ", "
+        << boost::static_pointer_cast<B<char> >(c)->b << std::endl;
   }
 
 }

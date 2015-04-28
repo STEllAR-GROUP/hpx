@@ -246,8 +246,26 @@ namespace hpx { namespace components
             static type call(DistPolicy const& policy, std::size_t count,
                 Ts&&... vs)
             {
-                return policy.template bulk_create<Component>(count,
-                    std::forward<Ts>(vs)...);
+                typedef typename DistPolicy::bulk_locality_result
+                    bulk_locality_result;
+
+                hpx::future<std::vector<bulk_locality_result> > f =
+                    policy.template bulk_create<Component>(count,
+                        std::forward<Ts>(vs)...);
+
+                return f.then(launch::sync,
+                    [count](hpx::future<std::vector<bulk_locality_result> > && f) -> std::vector<hpx::id_type>
+                    {
+                        std::vector<hpx::id_type> result;
+                        result.reserve(count);
+
+                        for (bulk_locality_result& r: f.get())
+                        {
+                            std::move(r.second.begin(), r.second.end(),
+                                std::back_inserter(result));
+                        }
+                        return result;
+                    });
             }
         };
     }

@@ -22,8 +22,6 @@ namespace hpx { namespace serialization
         ar >> size;
 
         s.clear();
-        if(size == 0) return;
-
         s.resize(size);
 
         load_binary(ar, &s[0], size * sizeof(Char));
@@ -34,8 +32,6 @@ namespace hpx { namespace serialization
     void serialize(output_archive & ar, std::basic_string<Char, CharTraits, Allocator> & s, unsigned)
     {
         ar << s.size();
-        if(s.empty()) return;
-
         save_binary(ar, s.data(), s.size() * sizeof(Char));
     }
 }}

@@ -94,23 +94,23 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
         {
-            hpx::vector<int> v(vector_size, hpx::layout(2));
+            hpx::vector<int> v(vector_size, hpx::container_layout(2));
 
-            hpx::cout << "hpx::vector<int>(seq, layout(2)): "
+            hpx::cout << "hpx::vector<int>(seq, container_layout(2)): "
                 << foreach_vector(hpx::parallel::seq, v)/double(seq_ref)
                 << "\n";
-            hpx::cout << "hpx::vector<int>(par, layout(2)): "
+            hpx::cout << "hpx::vector<int>(par, container_layout(2)): "
                 << foreach_vector(hpx::parallel::par(chunk_size), v)/double(par_ref) //-V106
                 << "\n";
         }
 
         {
-            hpx::vector<int> v(vector_size, hpx::layout(10));
+            hpx::vector<int> v(vector_size, hpx::container_layout(10));
 
-            hpx::cout << "hpx::vector<int>(seq, layout(10)): "
+            hpx::cout << "hpx::vector<int>(seq, container_layout(10)): "
                 << foreach_vector(hpx::parallel::seq, v)/double(seq_ref)
                 << "\n";
-            hpx::cout << "hpx::vector<int>(par, layout(10)): "
+            hpx::cout << "hpx::vector<int>(par, container_layout(10)): "
                 << foreach_vector(hpx::parallel::par(chunk_size), v)/double(par_ref) //-V106
                 << "\n";
         }

@@ -24,7 +24,7 @@
                          || defined(__ARM_ARCH_6Z__) || defined(__ARM_ARCH_6ZK__) \
                          || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_7A__))
 
-    #include <boost/atomic/detail/gcc-armv6+.hpp>
+    #include <boost/atomic/detail/gcc-armv6plus.hpp>
 
 #elif defined(__linux__) && defined(__arm__)
 

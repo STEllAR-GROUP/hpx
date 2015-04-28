@@ -16,6 +16,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/assign.hpp>
+
 #include <cstdio>
 #include <cstdlib>
 

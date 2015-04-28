@@ -13,6 +13,7 @@
 #include <hpx/util/unwrapped.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/assign.hpp>
 #include <boost/atomic.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -45,9 +46,7 @@ void null_thread()
     ++void_counter;
 }
 
-typedef action<void (*)(), null_thread> null_action;
-
-HPX_REGISTER_PLAIN_ACTION(null_action);
+HPX_PLAIN_ACTION(null_thread, null_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::atomic<std::size_t> result_counter;
@@ -58,9 +57,7 @@ bool null_result_thread()
     return true;
 }
 
-typedef action<bool (*)(), null_result_thread> null_result_action;
-
-HPX_REGISTER_PLAIN_ACTION(null_result_action);
+HPX_PLAIN_ACTION(null_result_thread, null_result_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int increment(int c)

@@ -32,13 +32,13 @@ struct A
 };
 
 template <typename T>
-void test(T min, T max)
+void test(T minval, T maxval)
 {
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
         std::vector<T> os;
-        for(T c = min; c < max; ++c)
+        for(T c = minval; c < maxval; ++c)
         {
             os.push_back(c);
         }
@@ -57,7 +57,7 @@ void test(T min, T max)
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
         std::vector<A<T> > os;
-        for(T c = min; c < max; ++c)
+        for(T c = minval; c < maxval; ++c)
         {
             os.push_back(c);
         }
@@ -75,13 +75,13 @@ void test(T min, T max)
 }
 
 template <typename T>
-void test_fp(T min, T max)
+void test_fp(T minval, T maxval)
 {
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
         std::vector<T> os;
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        for(T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
             os.push_back(c);
         }
@@ -100,7 +100,7 @@ void test_fp(T min, T max)
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
         std::vector<A<T> > os;
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        for(T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
             os.push_back(c);
         }
@@ -154,24 +154,24 @@ void test_boost_array(T first)
 
 int main()
 {
-    test<char>(std::numeric_limits<char>::min(), std::numeric_limits<char>::max());
-    test<int>(std::numeric_limits<int>::min(), std::numeric_limits<int>::min() + 100);
-    test<int>(std::numeric_limits<int>::max() - 100, std::numeric_limits<int>::max());
+    test<char>((std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
+    test<int>((std::numeric_limits<int>::min)(), (std::numeric_limits<int>::min)() + 100);
+    test<int>((std::numeric_limits<int>::max)() - 100, (std::numeric_limits<int>::max)());
     test<int>(-100, 100);
-    test<unsigned>(std::numeric_limits<unsigned>::min(), std::numeric_limits<unsigned>::min() + 100);
-    test<unsigned>(std::numeric_limits<unsigned>::max() - 100, std::numeric_limits<unsigned>::max());
-    test<long>(std::numeric_limits<long>::min(), std::numeric_limits<long>::min() + 100);
-    test<long>(std::numeric_limits<long>::max() - 100, std::numeric_limits<long>::max());
+    test<unsigned>((std::numeric_limits<unsigned>::min)(), (std::numeric_limits<unsigned>::min)() + 100);
+    test<unsigned>((std::numeric_limits<unsigned>::max)() - 100, (std::numeric_limits<unsigned>::max)());
+    test<long>((std::numeric_limits<long>::min)(), (std::numeric_limits<long>::min)() + 100);
+    test<long>((std::numeric_limits<long>::max)() - 100, (std::numeric_limits<long>::max)());
     test<long>(-100, 100);
-    test<unsigned long>(std::numeric_limits<unsigned long>::min(), std::numeric_limits<unsigned long>::min() + 100);
-    test<unsigned long>(std::numeric_limits<unsigned long>::max() - 100, std::numeric_limits<unsigned long>::max());
-    test_fp<float>(std::numeric_limits<float>::min(), std::numeric_limits<float>::min() + 100);
+    test<unsigned long>((std::numeric_limits<unsigned long>::min)(), (std::numeric_limits<unsigned long>::min)() + 100);
+    test<unsigned long>((std::numeric_limits<unsigned long>::max)() - 100, (std::numeric_limits<unsigned long>::max)());
+    test_fp<float>((std::numeric_limits<float>::min)(), (std::numeric_limits<float>::min)() + 100);
     test_fp<float>(-100, 100);
-    test<double>(std::numeric_limits<double>::min(), std::numeric_limits<double>::min() + 100);
+    test<double>((std::numeric_limits<double>::min)(), (std::numeric_limits<double>::min)() + 100);
     test<double>(-100, 100);
 
     test_boost_array<char, 100U>('\0');
-    test_boost_array<double, 40U>(std::numeric_limits<double>::min());
+    test_boost_array<double, 40U>((std::numeric_limits<double>::min)());
     test_boost_array<float, 100U>(0.f);
     return hpx::util::report_errors();
 }

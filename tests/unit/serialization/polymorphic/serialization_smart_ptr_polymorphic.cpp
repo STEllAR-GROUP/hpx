@@ -62,7 +62,7 @@ struct B: A
 
 class C: public B
 {
-  friend hpx::serialization::access;
+  friend class hpx::serialization::access;
   int c;
 
   template <class Archive>
@@ -105,8 +105,8 @@ void test_shared()
     HPX_TEST_NEQ(op1.get(), ip.get());
     HPX_TEST_NEQ(op2.get(), ip.get());
     HPX_TEST_EQ(op1.get(), op2.get());
-    HPX_TEST_EQ(op1->foo(), "C::foo");
-    HPX_TEST_EQ(op2->foo(), "C::foo");
+    HPX_TEST_EQ(op1->foo(), std::string("C::foo"));
+    HPX_TEST_EQ(op2->foo(), std::string("C::foo"));
     HPX_TEST_EQ(static_cast<C*>(op1.get())->a, 1);
     HPX_TEST_EQ(static_cast<C*>(op1.get())->b, 2);
     HPX_TEST_EQ(static_cast<C*>(op1.get())->get_c(), 3);
@@ -128,7 +128,7 @@ struct D
   virtual const char* foo() = 0;
 
 private:
-  friend hpx::serialization::access;
+  friend class hpx::serialization::access;
 
   template <class Archive>
   void load(Archive& ar, unsigned)
@@ -186,7 +186,7 @@ struct E: D
 
 class F: public E
 {
-  friend hpx::serialization::access;
+  friend class hpx::serialization::access;
   int c;
 
   template <class Archive>
@@ -228,8 +228,8 @@ void test_intrusive()
     HPX_TEST_NEQ(op1.get(), ip.get());
     HPX_TEST_NEQ(op2.get(), ip.get());
     HPX_TEST_EQ(op1.get(), op2.get());
-    HPX_TEST_EQ(op1->foo(), "F::foo");
-    HPX_TEST_EQ(op2->foo(), "F::foo");
+    HPX_TEST_EQ(op1->foo(), std::string("F::foo"));
+    HPX_TEST_EQ(op2->foo(), std::string("F::foo"));
     HPX_TEST_EQ(static_cast<F*>(op1.get())->a, 1);
     HPX_TEST_EQ(static_cast<F*>(op1.get())->b, 2);
     HPX_TEST_EQ(static_cast<F*>(op1.get())->get_c(), 3);

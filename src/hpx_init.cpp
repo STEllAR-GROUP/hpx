@@ -17,7 +17,6 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/find_prefix.hpp>
@@ -61,11 +60,11 @@ namespace hpx { namespace detail
 }}
 
 HPX_PLAIN_ACTION(hpx::detail::console_print,
-    console_print_action, hpx::components::factory_enabled)
+    console_print_action)
 HPX_PLAIN_ACTION(hpx::detail::list_symbolic_name,
-    list_symbolic_name_action, hpx::components::factory_enabled)
+    list_symbolic_name_action)
 HPX_PLAIN_ACTION(hpx::detail::list_component_type,
-    list_component_type_action, hpx::components::factory_enabled)
+    list_component_type_action)
 
 typedef
     hpx::util::detail::bound_action<
