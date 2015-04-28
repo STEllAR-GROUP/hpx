@@ -57,6 +57,8 @@ namespace boost
       // called after all paths visited, but still in time to call error():
       virtual void close() {}
 
+      virtual void print_summary(std::ostream& out) = 0;
+
       // callback used by constructor to register leaf() signature.
       // Signature can be a full file name (Jamfile) or partial (.cpp)
       void register_signature( const string & signature );

@@ -34,10 +34,13 @@ namespace boost
         const path & full_path,
         const std::string & contents);
 
-      virtual ~minmax_check()
+      virtual void print_summary(std::ostream& out)
       {
-        std::cout << "  " << m_errors << " violations of the Boost min/max guidelines" << line_break();
+        out << "  " << m_errors << " violations of the Boost min/max guidelines"
+            << line_break();
       }
+
+      virtual ~minmax_check() {}
     };
   }
 }

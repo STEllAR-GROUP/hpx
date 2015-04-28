@@ -30,9 +30,12 @@ namespace boost
         const path & full_path,
         const std::string & contents );
 
-      virtual ~license_check()
-        { std::cout << "  "
-            << m_files_with_errors << " files missing Boost license info or having wrong reference text" << line_break(); }
+      virtual void print_summary(std::ostream& out)
+        { out << "  " << m_files_with_errors
+              << " files missing Boost license info or having wrong reference text"
+              << line_break(); }
+
+      virtual ~license_check() {}
     };
   }
 }

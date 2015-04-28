@@ -29,8 +29,12 @@ namespace boost
         const path & full_path,
         const std::string & contents );
 
-      virtual ~unnamed_namespace_check()
-        { std::cout << "  " << m_errors << " usages of unnamed namespaces in headers (including .ipp files)" << line_break(); }
+      virtual void print_summary(std::ostream& out)
+        { out << "  " << m_errors
+            << " usages of unnamed namespaces in headers (including .ipp files)"
+            << line_break(); }
+
+      virtual ~unnamed_namespace_check() {}
     };
   }
 }

@@ -24,7 +24,6 @@ namespace boost
     public:
 
       file_name_check();
-      virtual ~file_name_check();
 
       virtual const char * name() const { return "*N*"; }
       virtual const char * desc() const { return "file and directory name issues"; }
@@ -39,8 +38,10 @@ namespace boost
         const string &)
       { /* empty */ }
 
+      virtual void print_summary(std::ostream& out)
+        { out << "  " << m_name_errors << " " << desc() << line_break(); }
 
-
+      virtual ~file_name_check() {}
     };
   }
 }

@@ -29,8 +29,10 @@ namespace boost
         const path & full_path,
         const std::string & contents );
 
-      virtual ~ascii_check()
-        { std::cout << "  " << m_files_with_errors << " files with non-ASCII chars" << line_break(); }
+      virtual void print_summary(std::ostream& out)
+        { out << "  " << m_files_with_errors << " files with non-ASCII chars" << line_break(); }
+
+      virtual ~ascii_check() {}
     };
   }
 }

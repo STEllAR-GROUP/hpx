@@ -38,7 +38,7 @@ namespace boost
       const path & full_path )
     {
       string::size_type pos;
-      
+
       //  called for each file and directory, so only the leaf need be tested
       string const leaf( full_path.leaf().string() );
 
@@ -97,14 +97,6 @@ namespace boost
             + generic_root + ", and this exceeds ISO 9660:1999 limit of 207"  )
             ;
       }
-
     }
-
-    file_name_check::~file_name_check()
-    {
-      std::cout << "  " << m_name_errors << " " << desc() << line_break();
-    }
-
-
   } // namespace inspect
 } // namespace boost

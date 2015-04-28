@@ -31,8 +31,10 @@ namespace boost
         const path & full_path,
         const std::string & contents );
 
-      virtual ~end_check()
-        { std::cout << "  " << m_files_with_errors << " files that don't end with a newline" << line_break(); }
+      virtual void print_summary(std::ostream& out)
+        { out << "  " << m_files_with_errors << " files that don't end with a newline" << line_break(); }
+
+      virtual ~end_check() {}
     };
   }
 }

@@ -55,16 +55,18 @@ namespace boost
 
       virtual void close();
 
-      virtual ~link_check()
+      virtual void print_summary(std::ostream& out)
         {
-          std::cout << "  " << m_bookmark_errors
-                    << " bookmarks with invalid characters" << line_break();
-          std::cout << "  " << m_duplicate_bookmark_errors
-                    << " duplicate bookmarks" << line_break();
-          std::cout << "  " << m_invalid_errors << " invalid urls" << line_break();
-          std::cout << "  " << m_broken_errors << " broken links" << line_break();
-          std::cout << "  " << m_unlinked_errors << " unlinked files" << line_break();
+          out << "  " << m_bookmark_errors
+              << " bookmarks with invalid characters" << line_break();
+          out << "  " << m_duplicate_bookmark_errors
+              << " duplicate bookmarks" << line_break();
+          out << "  " << m_invalid_errors << " invalid urls" << line_break();
+          out << "  " << m_broken_errors << " broken links" << line_break();
+          out << "  " << m_unlinked_errors << " unlinked files" << line_break();
         }
+
+      virtual ~link_check() {}
     };
   }
 }

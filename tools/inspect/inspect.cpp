@@ -635,27 +635,6 @@ namespace
       out << "</blockquote>\n";
   }
 
-
-  const char * options()
-  {
-    return
-         "  -license\n"
-         "  -copyright\n"
-         "  -crlf\n"
-         "  -end\n"
-         "  -link\n"
-         "  -path_name\n"
-         "  -tab\n"
-         "  -ascii\n"
-         "  -apple_macro\n"
-         "  -assert_macro\n"
-         "  -deprecated_macro\n"
-         "  -minmax\n"
-         "  -unnamed\n"
-         " default is all checks on; otherwise options specify desired checks"
-         "\n";
-  }
-
   const char * doctype_declaration()
   {
     return
@@ -838,23 +817,37 @@ int cpp_main( int argc_param, char * argv_param[] )
 
     desc_commandline.add_options()
         ("help,h", " print some command line help")
-        ("output,o", value<std::string>(), "the filename to write the output to")
+        ("output,o", value<std::string>(),
+            "the filename to write the output to")
         ("text,t", "write a text file (default: html)")
         ("brief,b", "write a short report only (default: comprehensive)")
 
-        ("license", value<bool>(&license_ck), "check for license violations")
-        ("copyright", value<bool>(&copyright_ck), "check for copyright violations")
-        ("crlf", value<bool>(&crlf_ck), "check for crlf (line endings) violations")
-        ("end", value<bool>(&end_ck), "check for missing newline at end of file violations")
-        ("link", value<bool>(&link_ck), "check for unlinked files violations")
-        ("path_name", value<bool>(&path_name_ck), "check for path name violations")
-        ("tab", value<bool>(&tab_ck), "check for tab violations")
-        ("ascii", value<bool>(&ascii_ck), "check for non-ascii character usage violations")
-        ("apple_macro", value<bool>(&apple_ck), "check for apple macro violations")
-        ("assert_macro", value<bool>(&assert_ck), "check for plain assert usage violations")
-        ("deprecated_macro", value<bool>(&deprecated_ck), "check for deprecated macro usage violations")
-        ("minmax", value<bool>(&minmax_ck), "check for minmax usage violations")
-        ("unnamed", value<bool>(&unnamed_ck), "check for unnamed namespace usage violations")
+        ("license", value<bool>(&license_ck)->implicit_value(false),
+            "check for license violations (default: off)")
+        ("copyright", value<bool>(&copyright_ck)->implicit_value(false),
+            "check for copyright violations (default: off)")
+        ("crlf", value<bool>(&crlf_ck)->implicit_value(false),
+            "check for crlf (line endings) violations (default: off)")
+        ("end", value<bool>(&end_ck)->implicit_value(false),
+            "check for missing newline at end of file violations (default: off)")
+        ("link", value<bool>(&link_ck)->implicit_value(false),
+            "check for unlinked files violations (default: off)")
+        ("path_name", value<bool>(&path_name_ck)->implicit_value(false),
+            "check for path name violations (default: off)")
+        ("tab", value<bool>(&tab_ck)->implicit_value(false),
+            "check for tab violations (default: off)")
+        ("ascii", value<bool>(&ascii_ck)->implicit_value(false),
+            "check for non-ascii character usage violations (default: off)")
+        ("apple_macro", value<bool>(&apple_ck)->implicit_value(false),
+            "check for apple macro violations (default: off)")
+        ("assert_macro", value<bool>(&assert_ck)->implicit_value(false),
+            "check for plain assert usage violations (default: off)")
+        ("deprecated_macro", value<bool>(&deprecated_ck)->implicit_value(false),
+            "check for deprecated macro usage violations (default: off)")
+        ("minmax", value<bool>(&minmax_ck)->implicit_value(false),
+            "check for minmax usage violations (default: off)")
+        ("unnamed", value<bool>(&unnamed_ck)->implicit_value(false),
+            "check for unnamed namespace usage violations (default: off)")
 
         ("all,a", "check for all violations (default: no checks are performed)")
         ;
@@ -862,14 +855,18 @@ int cpp_main( int argc_param, char * argv_param[] )
     positional_options_description pd;
     pd.add("hpx:positional", -1);
 
-    desc_commandline.add_options()
-        ("hpx:positional", value<std::vector<std::string> >(), "positional options")
+    options_description cmdline;
+    cmdline.add(desc_commandline);
+    cmdline.add_options()
+        ("hpx:positional", value<std::vector<std::string> >()->composing(),
+            "positional options")
         ;
 
     variables_map vm;
     parsed_options opts(
         command_line_parser(argc_param, argv_param)
-            .options(desc_commandline)
+            .options(cmdline)
+            .positional(pd)
             .style(command_line_style::unix_style)
             .run()
         );
@@ -1021,7 +1018,7 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       // we should not use a table, of course [gps]
       "<table>\n"
       "<tr>\n"
-      "<td><img src=\"https://avatars3.githubusercontent.com/u/1780988?v=3&s=200\" alt=\"STE||AR logo\" />"
+      "<td><img src=\"http://stellar.cct.lsu.edu/files/stellar100.png\" alt=\"STE||AR logo\" />"
       "</td>\n"
       "<td>\n"
       "<h1>HPX Inspection Report</h1>\n"
@@ -1032,9 +1029,9 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       "</table>\n"
 
       "<p>This report is generated by an inspection "
-      "program that checks files for the problems noted below. The tool "
-      "is based on the <a href=\"http://www.boost.org/tools/inspect/\">"
-      "Boost.Inspect tool</a></p>\n"
+      "program that checks files for the problems noted below. The HPX inspect "
+      "tool is based on the <a href=\"http://www.boost.org/tools/inspect/\">"
+      "Boost.Inspect</a> tool</p>\n"
       ;
 
 // FIXME: Extract latest GIT commit hash here
@@ -1069,10 +1066,13 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
   else
     out << "\n<h2>Problem counts</h2>\n<blockquote><p>\n" ;
 
+  for (auto const& i: inspectors)
+    i.inspector->print_summary(out);
+
   if (display_format == display_text)
     out << "\n" ;
   else
-    out << "</blockquote>\n";
+    out << "</p></blockquote>\n";
 
   std::sort( msgs.begin(), msgs.end() );
 

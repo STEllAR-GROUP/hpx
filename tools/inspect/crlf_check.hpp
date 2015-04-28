@@ -31,8 +31,10 @@ namespace boost
         const path & full_path,
         const std::string & contents );
 
-      virtual ~crlf_check()
-        { std::cout << "  " << m_files_with_errors << " files with invalid line endings" << line_break(); }
+      virtual void print_summary(std::ostream& out)
+        { out << "  " << m_files_with_errors << " files with invalid line endings" << line_break(); }
+
+      virtual ~crlf_check() {}
     };
   }
 }

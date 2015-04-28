@@ -31,8 +31,10 @@ namespace boost
         const path & full_path,
         const std::string & contents );
 
-      virtual ~deprecated_macro_check()
-        { std::cout << "  " << m_files_with_errors << " files with a deprecated BOOST macro" << line_break(); }
+      virtual void print_summary(std::ostream& out)
+        { out << "  " << m_files_with_errors << " files with a deprecated BOOST macro" << line_break(); }
+
+      virtual ~deprecated_macro_check() {}
     };
   }
 }

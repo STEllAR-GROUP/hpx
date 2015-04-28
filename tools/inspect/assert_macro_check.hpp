@@ -31,8 +31,10 @@ namespace boost
         const path & full_path,
         const std::string & contents );
 
-      virtual ~assert_macro_check()
-        { std::cout << "  " << m_files_with_errors << " files with a C-style assert macro" << line_break(); }
+      virtual void print_summary(std::ostream& out)
+        { out << "  " << m_files_with_errors << " files with a C-style assert macro" << line_break(); }
+
+      virtual ~assert_macro_check() {}
     };
   }
 }
