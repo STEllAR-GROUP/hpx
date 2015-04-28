@@ -37,7 +37,7 @@
 #include <numeric>
 #include <sstream>
 
-#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
@@ -139,7 +139,7 @@ namespace hpx { namespace threads
       : startup_(NULL),
         num_threads_(num_threads),
         thread_count_(0),
-#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS) && defined(HPX_THREAD_MAINTAIN_IDLE_RATES)
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
         timestamp_scale_(1.),
 #endif
         state_(starting),
@@ -357,7 +357,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
     template <typename SchedulingPolicy, typename NotificationPolicy>
     char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_backtrace(thread_id_type const& thrd) const
@@ -377,7 +377,7 @@ namespace hpx { namespace threads
         return thrd ? thrd->get_backtrace() : 0;
     }
 
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
     template <typename SchedulingPolicy, typename NotificationPolicy>
     char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_backtrace(thread_id_type const& thrd, char const* bt)
@@ -492,7 +492,7 @@ namespace hpx { namespace threads
             thrd->interruption_point();      // notify thread
     }
 
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
@@ -790,7 +790,7 @@ namespace hpx { namespace threads
         return naming::invalid_gid;
     }
 
-#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
     // average pending thread wait time
     template <typename SchedulingPolicy, typename NotificationPolicy>
     naming::gid_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
@@ -975,7 +975,7 @@ namespace hpx { namespace threads
         return true;
     }
 
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
     ///////////////////////////////////////////////////////////////////////////
     // idle rate counter creation function
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -1100,7 +1100,7 @@ namespace hpx { namespace threads
         std::size_t shepherd_count = threads_.size();
         creator_data data[] =
         {
-#if defined(HPX_THREAD_MAINTAIN_IDLE_RATES) && defined(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
+#if defined(HPX_HAVE_THREAD_IDLE_RATES) && defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
             // /threads{locality#%d/total}/creation-idle-rate
             // /threads{locality#%d/worker-thread%d}/creation-idle-rate
             { "creation-idle-rate",
@@ -1116,7 +1116,7 @@ namespace hpx { namespace threads
               "", 0
             },
 #endif
-#ifdef HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
+#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
             // /threads{locality#%d/total}/count/cumulative
             // /threads{locality#%d/worker-thread%d}/count/cumulative
             { "count/cumulative",
@@ -1133,7 +1133,7 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
             // /threads{locality#%d/total}/time/average
             // /threads{locality#%d/worker-thread%d}/time/average
             { "time/average",
@@ -1248,7 +1248,7 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "allocator", HPX_COROUTINE_NUM_ALL_HEAPS
             },
-#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
             // /threads{locality#%d/total}/count/pending-misses
             // /threads{locality#%d/worker-thread%d}/count/pending-misses
             { "count/pending-misses",
@@ -1341,7 +1341,7 @@ namespace hpx { namespace threads
               &performance_counters::locality_thread_counter_discoverer,
               ""
             },
-#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             // average thread wait time for queue(s)
             { "/threads/wait-time/pending", performance_counters::counter_raw,
               "returns the average wait time of pending threads for the referenced queue",
@@ -1360,7 +1360,7 @@ namespace hpx { namespace threads
               "ns"
             },
 #endif
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
             // idle rate
             { "/threads/idle-rate", performance_counters::counter_raw,
               "returns the idle rate for the referenced object",
@@ -1369,7 +1369,7 @@ namespace hpx { namespace threads
               &performance_counters::locality_thread_counter_discoverer,
               "0.01%"
             },
-#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
             { "/threads/creation-idle-rate", performance_counters::counter_raw,
               "returns the % of idle-rate spent creating HPX-threads for the "
               "referenced object", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
@@ -1384,7 +1384,7 @@ namespace hpx { namespace threads
             },
 #endif
 #endif
-#ifdef HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
+#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
             // thread counts
             { "/threads/count/cumulative", performance_counters::counter_raw,
               "returns the overall number of executed (retired) HPX-threads for "
@@ -1398,7 +1398,7 @@ namespace hpx { namespace threads
               &performance_counters::locality_thread_counter_discoverer,
               ""
             },
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
             { "/threads/time/average", performance_counters::counter_raw,
               "returns the average time spent executing one HPX-thread",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
@@ -1483,7 +1483,7 @@ namespace hpx { namespace threads
               &locality_allocator_counter_discoverer,
               ""
             },
-#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
             { "/threads/count/pending-misses", performance_counters::counter_raw,
               "returns the number of times that the referenced worker-thread "
               "on the referenced locality failed to find pending HPX-threads "
@@ -1578,7 +1578,7 @@ namespace hpx { namespace threads
                 "threadmanager_impl::run", "number of threads is zero");
         }
 
-#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS) && defined(HPX_THREAD_MAINTAIN_IDLE_RATES)
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
         // scale timestamps to nanoseconds
         boost::uint64_t base_timestamp = util::hardware::timestamp();
         boost::uint64_t base_time = util::high_resolution_clock::now();
@@ -1628,7 +1628,7 @@ namespace hpx { namespace threads
 
                 LTM_(info) << "run: create OS thread " << thread_num //-V128
                     << ": will run on processing units within this mask: "
-#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
+#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
                     << std::hex << "0x" << mask;
 #else
                     << "0b" << mask;
@@ -1723,7 +1723,7 @@ namespace hpx { namespace threads
         startup_ = NULL;
     }
 
-#ifdef HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
+#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
     template <typename SchedulingPolicy, typename NotificationPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_executed_threads(std::size_t num, bool reset)
@@ -1764,7 +1764,7 @@ namespace hpx { namespace threads
         return result;
     }
 
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
     template <typename SchedulingPolicy, typename NotificationPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_thread_phase_duration(std::size_t num, bool reset)
@@ -1892,7 +1892,7 @@ namespace hpx { namespace threads
 #endif
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
@@ -1938,7 +1938,7 @@ namespace hpx { namespace threads
     }
 #endif
 
-#if defined(HPX_THREAD_MAINTAIN_IDLE_RATES) && defined(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
+#if defined(HPX_HAVE_THREAD_IDLE_RATES) && defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
     template <typename SchedulingPolicy, typename NotificationPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         avg_creation_idle_rate(bool reset)
@@ -1997,14 +1997,14 @@ namespace hpx { namespace threads
 /// explicit template instantiation for the thread manager of our choice
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 
-#if defined(HPX_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_queue_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 #endif
 
-#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::static_priority_queue_scheduler<>,
@@ -2016,20 +2016,20 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_priority_queue_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 
-#if defined(HPX_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::abp_fifo_priority_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif
 
-#if defined(HPX_HIERARCHY_SCHEDULER)
+#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
 #include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::hierarchy_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 #endif
 
-#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/periodic_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::periodic_priority_queue_scheduler<>,

@@ -430,7 +430,7 @@ namespace hpx
     ///                     runtime system will not support any of the default
     ///                     command line options as described in the section
     ///                     'HPX Command Line Options'.
-#if !defined(HPX_STATIC_LINKING)
+#if !defined(HPX_HAVE_STATIC_LINKING)
     inline
 #endif
     int init(int argc = 0, char** argv = 0,

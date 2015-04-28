@@ -86,7 +86,7 @@ void print_results(
 
     if (ac)
         counter_values = ac->evaluate_counters_sync();
-    
+
     if (csv_header)
     {
         header = false;
@@ -97,7 +97,7 @@ void print_results(
             cout << "," << counter_shortnames[i];
         }
         cout << "\n";
-        
+
 
     }
 
@@ -107,7 +107,7 @@ void print_results(
                  << " (" << scaling << " scaling, "
                  << distribution << " distribution)\n";
 
-        cout << "# VERSION: " << HPX_GIT_COMMIT << " "
+        cout << "# VERSION: " << HPX_HAVE_GIT_COMMIT << " "
                  << format_build_date(__DATE__) << "\n"
              << "#\n";
 
@@ -354,7 +354,7 @@ int hpx_main(
     {
         if (vm.count("no-header"))
             header = false;
-        
+
         if (vm.count("csv-header"))
             csv_header = true;
 
@@ -558,7 +558,7 @@ int main(
 
         ( "no-header"
         , "do not print out the header")
-        
+
         ( "csv-header"
         , "print out csv header")
         ;

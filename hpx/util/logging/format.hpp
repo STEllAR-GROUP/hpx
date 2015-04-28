@@ -602,7 +602,7 @@ In the above case:
 #include <hpx/util/logging/format/destination/defaults.hpp>
 #include <hpx/util/logging/gather/ostream_like.hpp>
 
-#if !defined(HPX_LOG_NO_TS)
+#if !defined(HPX_HAVE_LOG_NO_TS)
 #include <hpx/util/logging/writer/ts_write.hpp>
 #endif
 

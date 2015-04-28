@@ -2864,7 +2864,7 @@ void addressing_service::send_refcnt_requests(
         ec = make_success_code();
 }
 
-#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+#if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     void dump_refcnt_requests(
         addressing_service::mutex_type::scoped_lock& l
       , addressing_service::refcnt_requests_type const& requests
@@ -2917,7 +2917,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
             "requests(%1%)")
             % p->size());
 
-#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+#if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
         if (LAGAS_ENABLED(debug))
             dump_refcnt_requests(l, *p,
                 "addressing_service::send_refcnt_requests_non_blocking");
@@ -2981,7 +2981,7 @@ addressing_service::send_refcnt_requests_async(
         "requests(%1%)")
         % p->size());
 
-#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+#if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     if (LAGAS_ENABLED(debug))
         dump_refcnt_requests(l, *p,
             "addressing_service::send_refcnt_requests_sync");

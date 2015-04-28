@@ -52,7 +52,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   {};                                                                         \
 /**/
 
-  BOOST_PP_REPEAT(BOOST_PP_INC(HPX_COROUTINE_ARG_MAX), 
+  BOOST_PP_REPEAT(BOOST_PP_INC(HPX_HAVE_COROUTINE_ARG_MAX),
     HPX_COROUTINE_SIGNATURE_GENERATOR, ~)
 
 #undef HPX_COROUTINE_SIGNATURE_GENERATOR

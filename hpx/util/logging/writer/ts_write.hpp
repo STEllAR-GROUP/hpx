@@ -25,7 +25,7 @@
 #include <hpx/util/logging/detail/forward_constructor.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
 
-#if !defined(HPX_LOG_NO_TS)
+#if !defined(HPX_HAVE_LOG_NO_TS)
 
 namespace hpx { namespace util { namespace logging { namespace writer {
 

@@ -181,14 +181,14 @@ namespace hpx { namespace util { namespace coroutines
         return m_pimpl->get_thread_id();
     }
 
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
     std::size_t get_thread_phase() const
     {
         return m_pimpl->get_thread_phase();
     }
 #endif
 
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
     std::size_t get_thread_data() const
     {
         return m_pimpl.get() ? m_pimpl->get_thread_data() : 0;
@@ -219,14 +219,14 @@ namespace hpx { namespace util { namespace coroutines
     BOOST_PP_CAT(BOOST_PP_CAT(arg, n), _type);                                \
 /**/
 
-    BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
+    BOOST_PP_REPEAT(HPX_HAVE_COROUTINE_ARG_MAX,
                     HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE,
                     arg_slot_traits)
 
     static const int arity = arg_slot_traits::length;
 
     struct yield_traits {
-      BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
+      BOOST_PP_REPEAT(HPX_HAVE_COROUTINE_ARG_MAX,
                       HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE,
                       result_slot_traits)
       static const int arity = result_slot_traits::length;
@@ -243,17 +243,21 @@ namespace hpx { namespace util { namespace coroutines
                 BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()           \
 /**/
 
-    BOOST_FORCEINLINE result_type operator()(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX,
-        HPX_COROUTINE_PARAM_WITH_DEFAULT, arg))
+    BOOST_FORCEINLINE result_type operator()(
+        BOOST_PP_ENUM(HPX_HAVE_COROUTINE_ARG_MAX,
+            HPX_COROUTINE_PARAM_WITH_DEFAULT, arg))
     {
-      return call_impl(arg_slot_type(BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
+      return call_impl(arg_slot_type(
+        BOOST_PP_ENUM_PARAMS(HPX_HAVE_COROUTINE_ARG_MAX, arg)));
     }
 
     BOOST_FORCEINLINE typename detail::optional_result_type<result_type>::type
     operator()(const std::nothrow_t&
-        BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX, HPX_COROUTINE_PARAM_WITH_DEFAULT, arg))
+        BOOST_PP_ENUM_TRAILING(HPX_HAVE_COROUTINE_ARG_MAX,
+            HPX_COROUTINE_PARAM_WITH_DEFAULT, arg))
     {
-      return call_impl_nothrow(arg_slot_type(BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
+      return call_impl_nothrow(arg_slot_type(
+        BOOST_PP_ENUM_PARAMS(HPX_HAVE_COROUTINE_ARG_MAX, arg)));
     }
 
 #undef HPX_COROUTINE_PARAM_WITH_DEFAULT

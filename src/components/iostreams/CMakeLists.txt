@@ -8,7 +8,7 @@ set(root "${hpx_SOURCE_DIR}/hpx/components/iostreams")
 
 add_definitions(-DHPX_IOSTREAMS_MODULE_EXPORTS)
 
-if(HPX_BUILD_DEFAULT_TARGETS)
+if(HPX_WITH_DEFAULT_TARGETS)
   add_hpx_component(iostreams
     FOLDER "Core/Components/IO"
     HEADER_ROOT ${root}

@@ -15,7 +15,7 @@ set(tests
     thread_suspension_executor
    )
 
-if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+if(HPX_HAVE_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
 

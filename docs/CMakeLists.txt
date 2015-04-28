@@ -274,7 +274,7 @@ hpx_quickbook_to_html(hpx
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
   AUTOINDEX_ARGS --internal-index
-  SINGLEPAGE ${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
+  SINGLEPAGE ${HPX_WITH_DOCUMENTATION_SINGLEPAGE})
 
 if(FOP_FOUND)
   # This assumes that Quickbook -> BoostBook succeeded above.
@@ -303,7 +303,7 @@ else()
     SOURCES ${documentation_files})
 endif()
 
-if(HPX_BUILD_DOCUMENTATION_SINGLEPAGE)
+if(HPX_WITH_DOCUMENTATION_SINGLEPAGE)
   add_custom_target(singlepage_docs
     DEPENDS hpx_singlepage_HTML.manifest
     SOURCES ${documentation_files})
@@ -347,6 +347,6 @@ add_custom_target(git_docs
 #  VERBATIM)
 
 add_dependencies(git_docs docs)
-if(HPX_BUILD_DOCUMENTATION_SINGLEPAGE)
+if(HPX_WITH_DOCUMENTATION_SINGLEPAGE)
   add_dependencies(git_docs singlepage_docs)
 endif()

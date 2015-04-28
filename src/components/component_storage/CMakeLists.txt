@@ -7,7 +7,7 @@ set(root "${hpx_SOURCE_DIR}/hpx/components/component_storage")
 
 add_definitions(-DHPX_MIGRATE_TO_STORAGE_MODULE_EXPORTS)
 
-if(HPX_BUILD_DEFAULT_TARGETS)
+if(HPX_WITH_DEFAULT_TARGETS)
   add_hpx_component(component_storage
     DEPENDENCIES unordered_component
     FOLDER "Core/Components/IO"

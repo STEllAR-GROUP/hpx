@@ -40,7 +40,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
    * NOTE: we are really abusing BOOST_PP_ENUM_BINARY_PARAMS,
    * Should simply use BOOST_PP_ENUM.
    */
-  enum { BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, index_) };
+  enum { BOOST_PP_ENUM_PARAMS(HPX_HAVE_COROUTINE_ARG_MAX, index_) };
 }}}}
 
 #endif

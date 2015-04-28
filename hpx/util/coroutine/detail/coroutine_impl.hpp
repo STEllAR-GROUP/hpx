@@ -98,7 +98,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     static inline void rebind(type* p, BOOST_FWD_REF(Functor),
         BOOST_RV_REF(naming::id_type) target, thread_id_repr_type = 0);
 
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES) || HPX_COROUTINE_ARG_MAX > 1
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES) || HPX_HAVE_COROUTINE_ARG_MAX > 1
     result_slot_type * result() {
       HPX_ASSERT(m_result);
       HPX_ASSERT(*m_result);
@@ -181,7 +181,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       this->wake_up();
     }
 
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
     std::size_t get_thread_phase() const
     {
         return this->phase();

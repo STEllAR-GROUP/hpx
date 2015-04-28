@@ -245,7 +245,7 @@ namespace hpx { namespace threads { namespace policies
             return result;
         }
 
-#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         ///////////////////////////////////////////////////////////////////////
         boost::int64_t get_average_thread_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
@@ -320,7 +320,7 @@ namespace hpx { namespace threads { namespace policies
         }
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         boost::uint64_t get_creation_time(bool reset)
         {
             boost::uint64_t time = 0;
@@ -348,7 +348,7 @@ namespace hpx { namespace threads { namespace policies
         }
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
         boost::uint64_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
             boost::uint64_t num_pending_misses = 0;
