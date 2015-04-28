@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Anton Bikineev
+//  Copyright (c) 2015 Anton Bikineev
 //  Copyright (c) 2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0.
@@ -76,7 +76,7 @@ namespace hpx { namespace serialization { namespace detail
 
             HPX_THROW_EXCEPTION(serialization_error
               , "polymorphic_intrusive_factory::create"
-              , "Unknown type descriptor" + util::safe_lexical_cast<std::string>(desc));
+              , "Unknown type descriptor " + util::safe_lexical_cast<std::string>(desc));
         }
 
         static std::vector<std::string> get_registered_typenames()
@@ -202,7 +202,8 @@ namespace hpx { namespace serialization { namespace detail
     };
 
     template <boost::uint32_t desc>
-    add_constant_entry<desc> add_constant_entry<desc>::instance(get_constant_entry_name<desc>());
+    add_constant_entry<desc> add_constant_entry<desc>::instance(
+            get_constant_entry_name<desc>());
 
 }}}
 

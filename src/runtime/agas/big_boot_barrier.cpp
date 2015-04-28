@@ -319,16 +319,11 @@ HPX_REGISTER_ACTION(notify_worker_security_action,
 namespace hpx { namespace agas
 {
 
-template <class Base>
 struct unique_typeid_registry
 {
-    unique_typeid_registry():
-        map(), count(0)
-    {}
-
     static boost::uint32_t get_type_descriptor(const std::string& type_id)
     {
-        unique_typeid_registry& registry = get_instance();
+        unique_typeid_registry& registry = instance();
         boost::mutex::scoped_lock lock(registry.mutex);
 
         if (registry.map.count(type_id) > 0)
@@ -341,15 +336,47 @@ struct unique_typeid_registry
     }
 
 private:
-    static unique_typeid_registry& get_instance()
+    unique_typeid_registry():
+        map(), count(0)
+    {}
+
+    static unique_typeid_registry& instance()
     {
         util::static_<unique_typeid_registry> registry;
         return registry.get();
     }
 
+    friend struct util::static_<unique_typeid_registry>;
+
     std::map<std::string, boost::uint32_t> map;
     boost::uint32_t count;
     boost::mutex mutex;
+};
+
+struct predefined_actions
+{
+    static void register_new_action(const std::string& type_name)
+    {
+        predefined_actions& inst = instance();
+
+        serialization::detail::polymorphic_centralized_factory
+            ::register_type_descriptor(type_name, inst.count++);
+    }
+
+private:
+    predefined_actions():
+        count(0)
+    {}
+
+    static predefined_actions& instance()
+    {
+        util::static_<predefined_actions> inst;
+        return inst;
+    }
+
+    friend struct util::static_<predefined_actions>;
+
+    boost::atomic_int32_t count;
 };
 
 // remote call to AGAS
@@ -435,7 +462,7 @@ void register_worker(registration_header const& header)
     std::for_each(header.typeids.cbegin(), header.typeids.cend(),
         [&](const std::string& str){
             desc_map.insert(std::make_pair(
-                str, unique_typeid_registry<actions::base_action>::get_type_descriptor(str))
+                str, unique_typeid_registry::get_type_descriptor(str))
             );
         });
 
@@ -775,10 +802,8 @@ big_boot_barrier::big_boot_barrier(
   , connected(get_number_of_bootstrap_connections(ini_))
   , thunks(32)
 {
-    serialization::detail::polymorphic_centralized_factory
-        ::register_type_descriptor("register_worker_action", 0u);
-    serialization::detail::polymorphic_centralized_factory
-        ::register_type_descriptor("notify_worker_action", 1u);
+    predefined_actions::register_new_action("register_worker_action");
+    predefined_actions::register_new_action("notify_worker_action");
     if(pp_)
         pp_->register_event_handler(&early_parcel_sink);
 }
