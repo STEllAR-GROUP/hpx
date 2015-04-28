@@ -802,8 +802,10 @@ big_boot_barrier::big_boot_barrier(
   , connected(get_number_of_bootstrap_connections(ini_))
   , thunks(32)
 {
-    predefined_actions::register_new_action("register_worker_action");
-    predefined_actions::register_new_action("notify_worker_action");
+    predefined_actions::register_new_action(
+            actions::detail::get_action_name<register_worker_action::derived_type>());
+    predefined_actions::register_new_action(
+            actions::detail::get_action_name<notify_worker_action::derived_type>());
     if(pp_)
         pp_->register_event_handler(&early_parcel_sink);
 }
