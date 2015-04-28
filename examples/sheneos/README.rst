@@ -1,5 +1,10 @@
+.. Copyright (c) 2012 Matt Anderson
+
+   Distributed under the Boost Software License, Version 1.0. (See accompanying
+   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 *************
- HPX ShenEOS 
+ HPX ShenEOS
 *************
 
 The Shen equation of state (EOS) tables of nuclear matter at finite temperature
@@ -13,7 +18,7 @@ several GB. This will prevent loading the whole data set into main memory on
 each locality. In conventional, MPI based applications the full tables would
 have to be either loaded into each MPI process or a distributed partitioning
 scheme would have to be implemented. Both options are either not viable or
-difficult to implement. 
+difficult to implement.
 
 We created an HPX component encapsulating the non-overlapping partitioning and
 distribution of the Shen EOS tables to all available localities, thus reducing
@@ -65,10 +70,10 @@ Example Run
 
     sheneos_test --file my_shen_table.h5 --num-partitions 2
 
-.. |sheneos_tables| replace:: ShenEOS tables 
+.. |sheneos_tables| replace:: ShenEOS tables
 .. _sheneos_tables: http://stellarcollapse.org/equationofstate
 
-.. |hdf5| replace:: HDF5 
+.. |hdf5| replace:: HDF5
 .. _hdf5: http://www.hdfgroup.org/HDF5
- 
+
 

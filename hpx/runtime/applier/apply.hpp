@@ -75,6 +75,10 @@ namespace hpx
         struct put_parcel
         {
             typedef void result_type;
+            typedef
+                typename hpx::actions::extract_action<Action>::type
+                action_type;
+            typedef typename action_type::arguments_type arguments_type;
 
             explicit put_parcel(naming::id_type const& id,
                     naming::address&& addr
@@ -92,10 +96,6 @@ namespace hpx
             template <typename ...Ts>
             result_type operator()(Ts&&... vs)
             {
-                typedef
-                    typename hpx::actions::extract_action<Action>::type
-                    action_type;
-
                 actions::base_action* action =
                     new hpx::actions::transfer_action<action_type>(priority_,
                         std::forward<Ts>(vs)...);
@@ -137,7 +137,9 @@ namespace hpx
     {
         template <typename Action>
         struct serialize_as_future<applier::detail::put_parcel<Action> >
-          : boost::mpl::false_
+          : traits::serialize_as_future<
+                typename applier::detail::put_parcel<Action>::arguments_type
+            >
         {
             static bool call_if(applier::detail::put_parcel<Action>& pp)
             {

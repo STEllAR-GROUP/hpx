@@ -263,6 +263,8 @@ namespace hpx { namespace actions
           : cont_(std::forward<Cont_>(cont)), target_(target)
         {}
 
+        virtual ~continuation_impl() {}
+
         template <typename T>
         T operator()(hpx::id_type const& lco, T && t) const
         {
@@ -324,6 +326,8 @@ namespace hpx { namespace actions
             target_(target),
             f_(std::forward<F_>(f))
         {}
+
+        virtual ~continuation2_impl() {}
 
         template <typename T>
         T operator()(hpx::id_type const& lco, T && t) const

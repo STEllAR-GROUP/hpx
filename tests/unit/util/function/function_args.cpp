@@ -23,12 +23,12 @@ struct counter
         copy_constructions = 0;
         move_constructions = 0;
     }
-    
+
     static void print()
     {
-	    std::cout << "default-constructions: " << default_constructions << "\n";
-	    std::cout << "copy-constructions: " << copy_constructions << "\n";
-	    std::cout << "move-constructions: " << move_constructions << "\n" << std::endl;
+        std::cout << "default-constructions: " << default_constructions << "\n";
+        std::cout << "copy-constructions: " << copy_constructions << "\n";
+        std::cout << "move-constructions: " << move_constructions << "\n" << std::endl;
     }
 
     counter(){ ++default_constructions; }
@@ -38,8 +38,8 @@ struct counter
 private:
     ;
 
-	counter& operator=(counter const&);
-	counter& operator=(counter &&);
+    counter& operator=(counter const&);
+    counter& operator=(counter &&);
 };
 
 int counter::default_constructions = 0;
@@ -52,8 +52,8 @@ void f_value(counter){}
 void test_by_value()
 {
     hpx::util::function_nonser<void(counter)> f = f_value;
-    
-	counter::reset();
+
+    counter::reset();
 
     counter c;
     f(c);
@@ -62,8 +62,8 @@ void test_by_value()
     HPX_TEST(counter::default_constructions == 1);
     HPX_TEST(counter::copy_constructions <= 1);
     HPX_TEST(counter::move_constructions <= 3);
-    
-	counter::print();
+
+    counter::print();
 }
 
 void f_lvalue_ref(counter&){}
@@ -71,8 +71,8 @@ void f_lvalue_ref(counter&){}
 void test_by_lvalue_ref()
 {
     hpx::util::function_nonser<void(counter&)> f = f_lvalue_ref;
-    
-	counter::reset();
+
+    counter::reset();
 
     counter c;
     f(c);
@@ -81,8 +81,8 @@ void test_by_lvalue_ref()
     HPX_TEST(counter::default_constructions == 1);
     HPX_TEST(counter::copy_constructions == 0);
     HPX_TEST(counter::move_constructions == 0);
-    
-	counter::print();
+
+    counter::print();
 }
 
 void f_const_lvalue_ref(counter const&){}
@@ -90,8 +90,8 @@ void f_const_lvalue_ref(counter const&){}
 void test_by_const_lvalue_ref()
 {
     hpx::util::function_nonser<void(counter const&)> f = f_const_lvalue_ref;
-    
-	counter::reset();
+
+    counter::reset();
 
     counter c;
     f(c);
@@ -100,8 +100,8 @@ void test_by_const_lvalue_ref()
     HPX_TEST(counter::default_constructions == 1);
     HPX_TEST(counter::copy_constructions == 0);
     HPX_TEST(counter::move_constructions == 0);
-    
-	counter::print();
+
+    counter::print();
 }
 
 void f_rvalue_ref(counter &&){}
@@ -109,8 +109,8 @@ void f_rvalue_ref(counter &&){}
 void test_by_rvalue_ref()
 {
     hpx::util::function_nonser<void(counter &&)> f = f_rvalue_ref;
-    
-	counter::reset();
+
+    counter::reset();
 
     counter c;
     //f(c); // cannot bind lvalue to rvalue-ref
@@ -119,8 +119,8 @@ void test_by_rvalue_ref()
     HPX_TEST(counter::default_constructions == 1);
     HPX_TEST(counter::copy_constructions == 0);
     HPX_TEST(counter::move_constructions == 0);
-    
-	counter::print();
+
+    counter::print();
 }
 
 int main(int, char* [])
