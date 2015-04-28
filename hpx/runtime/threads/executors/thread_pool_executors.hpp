@@ -108,7 +108,7 @@ namespace hpx { namespace threads { namespace executors
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     struct HPX_EXPORT local_queue_executor : public scheduled_executor
     {
         local_queue_executor();
@@ -126,7 +126,7 @@ namespace hpx { namespace threads { namespace executors
             std::size_t min_punits = 1);
     };
 
-#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     struct HPX_EXPORT static_priority_queue_executor : public scheduled_executor
     {
         static_priority_queue_executor();

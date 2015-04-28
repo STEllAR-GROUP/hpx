@@ -92,7 +92,7 @@ namespace hpx { namespace actions
     {
         template <typename Action>
         char const* get_action_name()
-#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
+#ifndef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
         ;
 #else
         {

@@ -138,7 +138,7 @@ namespace locker {
     };
 
 
-#ifndef HPX_LOG_NO_TSS
+#ifndef HPX_HAVE_LOG_NO_TSS
 
     /**
         Locks a resource, and uses TSS (Thread-specific storage). This holds the value, and each thread caches it.

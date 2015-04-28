@@ -91,9 +91,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     };                                                                        \
 /**/
 
-  BOOST_PP_REPEAT(BOOST_PP_INC(HPX_COROUTINE_ARG_MAX),
+  BOOST_PP_REPEAT(BOOST_PP_INC(HPX_HAVE_COROUTINE_ARG_MAX),
     HPX_COROUTINE_ARGUMENT_UNPACKER, ~)
-  BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
+  BOOST_PP_REPEAT(HPX_HAVE_COROUTINE_ARG_MAX,
     HPX_COROUTINE_ARGUMENT_UNPACKER_EX, ~)
 
   // Somehow VCPP 8.0 chokes if the Trait for unpack[_ex]

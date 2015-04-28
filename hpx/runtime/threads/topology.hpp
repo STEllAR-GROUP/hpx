@@ -21,14 +21,14 @@
 #include <vector>
 #include <iosfwd>
 #include <limits>
-#if defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT > 64)
+#if defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT > 64)
 #include <bitset>
 #endif
 
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
-#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
+#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
     typedef boost::uint64_t mask_type;
     typedef boost::uint64_t mask_cref_type;
 
@@ -93,9 +93,9 @@ namespace hpx { namespace threads
 #define HPX_CPU_MASK_PREFIX "0x"
 
 #else
-# if defined(HPX_MAX_CPU_COUNT)
-    typedef std::bitset<HPX_MAX_CPU_COUNT> mask_type;
-    typedef std::bitset<HPX_MAX_CPU_COUNT> const& mask_cref_type;
+# if defined(HPX_HAVE_MAX_CPU_COUNT)
+    typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> mask_type;
+    typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> const& mask_cref_type;
 # else
     typedef boost::dynamic_bitset<boost::uint64_t> mask_type;
     typedef boost::dynamic_bitset<boost::uint64_t> const& mask_cref_type;
@@ -128,7 +128,7 @@ namespace hpx { namespace threads
 
     inline void resize(mask_type& mask, std::size_t s)
     {
-# if defined(HPX_MAX_CPU_COUNT)
+# if defined(HPX_HAVE_MAX_CPU_COUNT)
         HPX_ASSERT(s <= mask.size());
 # else
         return mask.resize(s);
@@ -137,10 +137,10 @@ namespace hpx { namespace threads
 
     inline std::size_t find_first(mask_cref_type mask)
     {
-# if defined(HPX_MAX_CPU_COUNT)
+# if defined(HPX_HAVE_MAX_CPU_COUNT)
         if (mask.any())
         {
-            for (std::size_t i = 0; i != HPX_MAX_CPU_COUNT; ++i)
+            for (std::size_t i = 0; i != HPX_HAVE_MAX_CPU_COUNT; ++i)
             {
                 if (mask[i])
                     return i;
@@ -152,7 +152,7 @@ namespace hpx { namespace threads
 # endif
     }
 
-# if defined(HPX_MAX_CPU_COUNT)
+# if defined(HPX_HAVE_MAX_CPU_COUNT)
 #define HPX_CPU_MASK_PREFIX "0b"
 #else
 #define HPX_CPU_MASK_PREFIX "0x"

@@ -35,7 +35,7 @@
 #include <hpx/util/coroutine/detail/arg_max.hpp>
 #include <hpx/util/coroutine/tuple_traits.hpp>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
   /*
    * Given a mpl::vector, returns a nullary metafunction
@@ -62,7 +62,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
    * @note This could be done more elegantly with a recursive metafunction,
    * but this is simpler and works well anyway.
    */
-  BOOST_PP_REPEAT(BOOST_PP_INC(HPX_COROUTINE_ARG_MAX),
+  BOOST_PP_REPEAT(BOOST_PP_INC(HPX_HAVE_COROUTINE_ARG_MAX),
       HPX_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR, ~)
 
 #undef HPX_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR

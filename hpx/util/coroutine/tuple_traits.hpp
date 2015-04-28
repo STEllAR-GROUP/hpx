@@ -39,7 +39,7 @@
 #include <boost/mpl/bool.hpp>
 #include <hpx/util/coroutine/detail/arg_max.hpp>
 
-namespace hpx { namespace util { namespace coroutines 
+namespace hpx { namespace util { namespace coroutines
 {
   namespace detail {
     /*
@@ -70,12 +70,12 @@ namespace hpx { namespace util { namespace coroutines
 
       tuple_workaround
       (BOOST_PP_ENUM
-       (HPX_COROUTINE_ARG_MAX,
+       (HPX_HAVE_COROUTINE_ARG_MAX,
         HPX_COROUTINE_arg_null_typecr,
         ~)){}
 
       tuple_workaround(const tuple_workaround&) {}
-#if HPX_COROUTINE_ARG_MAX > 0
+#if HPX_HAVE_COROUTINE_ARG_MAX > 0
       tuple_workaround() {}
 #endif
 #     undef HPX_COROUTINE_arg_null_typecr
@@ -135,7 +135,7 @@ namespace hpx { namespace util { namespace coroutines
       >
   {};
 
-  template<BOOST_PP_ENUM_BINARY_PARAMS(HPX_COROUTINE_ARG_MAX,
+  template<BOOST_PP_ENUM_BINARY_PARAMS(HPX_HAVE_COROUTINE_ARG_MAX,
       typename T, = boost::tuples::null_type BOOST_PP_INTERCEPT)>
   struct tuple_traits
     : tuple_traits_tag
@@ -146,7 +146,7 @@ namespace hpx { namespace util { namespace coroutines
     // derived from the argument list. It is not
     // directly used in all cases.
     typedef
-        boost::tuple<BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, T)>
+        boost::tuple<BOOST_PP_ENUM_PARAMS(HPX_HAVE_COROUTINE_ARG_MAX, T)>
     internal_tuple_type;
 
     // FIXME: Currently coroutine code does not use this typedef in all cases
