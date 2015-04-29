@@ -14,7 +14,7 @@ general:
         ignore:
             - gh-pages
     artifacts:
-        - /hpx/build/hpx_inspect_report.html
+        - $PWD/build/hpx_inspect_report.html
 
 dependencies:
     pre:
@@ -24,15 +24,15 @@ dependencies:
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} cmake .. -DHPX_WITH_MALLOC=system -DHPX_WITH_TOOLS=On -DCMAKE_CXX_FLAGS="-fcolor-diagnostics"
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 core
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k components
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k examples
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tools.inspect
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k examples
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance
 
 test:
     override:
         - docker run -v $PWD:/hpx -w /hpx ${IMAGE_NAME} ./build/bin/inspect --all --output=./build/hpx_inspect_report.html /hpx
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ./bin/hello_world --hpx:bind=none
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ./bin/hello_world --hpx:bind=none
         #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.unit --output-on-failure
         #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.regressions --output-on-failure
