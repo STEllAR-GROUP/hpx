@@ -384,8 +384,8 @@ the `documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/buil
 ******************
 
 We also provide a several HPX docker images.
-This can be used for rapid prototyping, demonstrations or writing minimal
-examples for issue reports. It also provides an HPX build environment for
+They can be used for rapid prototyping, demonstrations or writing minimal
+examples for issue reports. This also provides an HPX build environment for
 continuous integration of external projects.
 
 The following images are currently available:
