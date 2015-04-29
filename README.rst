@@ -383,13 +383,12 @@ the `documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/buil
  Docker
 ******************
 
-We also provide a Docker image with the current HEAD revision of the HPX master
-branch built and installed.
+We also provide a several HPX docker images.
 This can be used for rapid prototyping, demonstrations or writing minimal
 examples for issue reports. It also provides an HPX build environment for
 continuous integration of external projects.
 
-We currently provide the following images:
+The following images are currently available:
 
     - stellargroup/hpx:dev		(HEAD)
     - stellargroup/hpx:latest	(latest release)
@@ -397,7 +396,7 @@ We currently provide the following images:
 
 While a more detailed introduction to docker can be found at the official
 `docker homepage <https://docs.docker.com/userguide/>`_, here are some easy
-steps how to use a docker image::
+steps that explain how to use a docker image::
 
     # Download/Update the image
     docker pull stellargroup/hpx:dev
