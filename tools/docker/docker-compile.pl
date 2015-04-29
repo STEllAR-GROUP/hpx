@@ -1,9 +1,14 @@
 #!/usr/bin/env perl
 
-# copyright: Maciej Pasternacki
+# Copyright (c)      2015 Martin Stumpf
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#
+# original author: Maciej Pasternacki
 # http://3ofcoins.net/2013/09/22/flat-docker-images/
 #
-# TODO: replace with something homemade
 
 
 use feature 'switch';
