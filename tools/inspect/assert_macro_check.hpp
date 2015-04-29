@@ -24,7 +24,8 @@ namespace boost
 
       assert_macro_check();
       virtual const char * name() const { return "*ASSERT-MACROS*"; }
-      virtual const char * desc() const { return "presence of C-style assert macro in file (use BOOST_ASSERT instead)"; }
+      virtual const char * desc() const
+        { return "presence of C-style assert macro in file (use HPX_ASSERT instead)"; }
 
       virtual void inspect(
         const std::string & library_name,
