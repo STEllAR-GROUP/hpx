@@ -390,11 +390,12 @@ continuous integration of external projects.
 
 The following images are currently available:
 
-* stellargroup/hpx:dev		(HEAD, updated on every commit, see 
+* **stellargroup/hpx:dev**		(HEAD, updated on every commit to master which 
+  builds successfully, see 
   `here <https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master>`_ for the
   build status)
-* stellargroup/hpx:latest	(latest release)
-* stellargroup/hpx:0.9.10	(release v0.9.10)
+* **stellargroup/hpx:latest**	(latest release)
+* **stellargroup/hpx:0.9.10**	(release v0.9.10)
 
 While a more detailed introduction to docker can be found at the official
 `docker homepage <https://docs.docker.com/userguide/>`_, here are some easy
