@@ -389,10 +389,9 @@ examples for issue reports. This also provides an HPX build environment for
 continuous integration of external projects.
 
 The following images are currently available:
-
-    - stellargroup/hpx:dev		(HEAD)
-    - stellargroup/hpx:latest	(latest release)
-    - stellargroup/hpx:0.9.10	(release v0.9.10)
+* stellargroup/hpx:dev		(HEAD)
+* stellargroup/hpx:latest	(latest release)
+* stellargroup/hpx:0.9.10	(release v0.9.10)
 
 While a more detailed introduction to docker can be found at the official
 `docker homepage <https://docs.docker.com/userguide/>`_, here are some easy
@@ -414,7 +413,8 @@ steps that explain how to use a docker image::
     # For example, build the binary "example" from "example.cpp" using
     # the built-in hpx compilation script "hpxcxx". Note that hpx libraries
     # other than the core library have to be linked explicitely (like iostreams).
-    docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev hpxcxx example.cpp --exe=example -liostreams
+    docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev \
+        hpxcxx example.cpp --exe=example -liostreams
 
     # Now run the resulting program:
     docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev ./example
