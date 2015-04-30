@@ -799,7 +799,7 @@ int cpp_main( int argc_param, char * argv_param[] )
 {
     using namespace boost::program_options;
     options_description desc_commandline(
-        "Usage: inpect [options]");
+        "Usage: inspect [dir [dir ...]] [options]");
 
     bool license_ck = false;
     bool copyright_ck = false;
@@ -816,14 +816,14 @@ int cpp_main( int argc_param, char * argv_param[] )
     bool unnamed_ck = false;
 
     desc_commandline.add_options()
-        ("help,h", " print some command line help")
+        ("help,h", "print some command line help")
         ("output,o", value<std::string>(),
-            "the filename to write the output to")
+            "the filename to write the output to (default: stdout)")
         ("text,t", "write a text file (default: html)")
         ("brief,b", "write a short report only (default: comprehensive)")
 
         ("license", value<bool>(&license_ck)->implicit_value(false),
-            "check for license violations (default: off)")
+            "check for Boost license violations (default: off)")
         ("copyright", value<bool>(&copyright_ck)->implicit_value(false),
             "check for copyright violations (default: off)")
         ("crlf", value<bool>(&crlf_ck)->implicit_value(false),
@@ -843,7 +843,8 @@ int cpp_main( int argc_param, char * argv_param[] )
         ("assert_macro", value<bool>(&assert_ck)->implicit_value(false),
             "check for plain assert usage violations (default: off)")
         ("deprecated_macro", value<bool>(&deprecated_ck)->implicit_value(false),
-            "check for deprecated macro usage violations (default: off)")
+            "check for deprecated Boost configuration macro usage violations "
+            "(default: off)")
         ("minmax", value<bool>(&minmax_ck)->implicit_value(false),
             "check for minmax usage violations (default: off)")
         ("unnamed", value<bool>(&unnamed_ck)->implicit_value(false),
