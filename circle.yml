@@ -41,7 +41,7 @@ dependencies:
 test:
     override:
         - docker run -v $PWD:/hpx -w /hpx ${IMAGE_NAME} ./build/bin/inspect --all --output=./build/hpx_inspect_report.html /hpx
-        - cp $PWD/build/hpx_inspect_report.html $CIRCLE_ARTIFACTS/
+        - cp $PWD/build/hpx_inspect_report.html ${CIRCLE_ARTIFACTS}/
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ./bin/hello_world --hpx:bind=none
         #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.unit --output-on-failure
         #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.regressions --output-on-failure
@@ -54,5 +54,5 @@ deployment:
     hub:
         branch: master
         commands:
-            - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+            - docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
             - docker push ${TARGET_IMAGE_NAME}
