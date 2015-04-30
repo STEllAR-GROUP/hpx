@@ -383,14 +383,16 @@ the `documentation <http://stellar-group.github.io/hpx/docs/html/hpx/manual/buil
  Docker
 ******************
 
-We also provide a several HPX docker images.
-They can be used for rapid prototyping, demonstrations or writing minimal
+We also provide several HPX docker images.
+Those can be used for rapid prototyping, demonstrations or writing minimal
 examples for issue reports. This also provides an HPX build environment for
 continuous integration of external projects.
 
 The following images are currently available:
 
-* stellargroup/hpx:dev		(HEAD)
+* stellargroup/hpx:dev		(HEAD, updated on every commit, see 
+  `here <https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master>`_ for the
+  build status)
 * stellargroup/hpx:latest	(latest release)
 * stellargroup/hpx:0.9.10	(release v0.9.10)
 
