@@ -389,6 +389,7 @@ examples for issue reports. This also provides an HPX build environment for
 continuous integration of external projects.
 
 The following images are currently available:
+
 * stellargroup/hpx:dev		(HEAD)
 * stellargroup/hpx:latest	(latest release)
 * stellargroup/hpx:0.9.10	(release v0.9.10)
