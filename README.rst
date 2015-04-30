@@ -175,6 +175,7 @@ we describe two possibilities:
    ``/path/to/libcxx/lib``, respectively.
 
 3) Build (and install) a recent version of Boost, using Clang and libc++::
+
    To build Boost with Clang and make it link to libc++ as standard library,
    you'll need to set up the following in your Boost ``~/user-config.jam``
    file::
@@ -390,12 +391,12 @@ continuous integration of external projects.
 
 The following images are currently available:
 
-* **stellargroup/hpx:dev**		(HEAD, updated on every commit to master which 
+* ``stellargroup/hpx:dev``		(HEAD, updated on every commit to master which 
   builds successfully, see 
   `here <https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master>`_ for the
   build status)
-* **stellargroup/hpx:latest**	(latest release)
-* **stellargroup/hpx:0.9.10**	(release v0.9.10)
+* ``stellargroup/hpx:latest``	(latest release)
+* ``stellargroup/hpx:0.9.10``	(release v0.9.10)
 
 While a more detailed introduction to docker can be found at the official
 `docker homepage <https://docs.docker.com/userguide/>`_, here are some easy
