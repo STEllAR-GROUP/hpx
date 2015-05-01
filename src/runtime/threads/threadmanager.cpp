@@ -37,11 +37,10 @@
 #include <numeric>
 #include <sstream>
 
-#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
-#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
     // We control whether to collect queue wait times using this global bool.
     // It will be set by any of the related performance counters. Once set it
     // stays set, thus no race conditions will occur.

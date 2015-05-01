@@ -551,8 +551,8 @@ system and application performance.
          is `worker-thread#*` the counter will return the average time spent
          executing one __hpx__-thread for all worker threads separately.
          This counter is available only if the configuration time constants
-         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
+         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) are set to
+         `ON` (default: OFF).]
     ]
     [   [`/threads/time/average-overhead`]
         [`locality#*/total` or[br]
@@ -579,8 +579,8 @@ system and application performance.
          will return the average time spent on overhead executing
          one __hpx__-thread for all worker threads separately.
          This counter is available only if the configuration time constants
-         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
+         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) are set to
+         `ON` (default: OFF).]
     ]
     [   [`/threads/count/cumulative-phases`]
         [`locality#*/total` or[br]
@@ -636,8 +636,8 @@ system and application performance.
          the counter will return the average time spent executing one
          __hpx__-thread phase for all worker threads separately.
          This counter is available only if the configuration time constants
-         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
+         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) are set to `ON`
+         (default: OFF).]
     ]
     [   [`/threads/time/average-phase-overhead`]
         [`locality#*/total` or[br]
@@ -666,8 +666,8 @@ system and application performance.
         the average time spent on overhead executing one __hpx__-thread phase
         for all worker threads separately.  This counter is available only
         if the configuration time constants
-        `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
-        `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
+        `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) are set to `ON`
+        (default: OFF).]
     ]
     [   [`/threads/count/instantaneous/<thread-state>`
 
@@ -816,7 +816,6 @@ system and application performance.
          cleaning up terminated thread objects and the overall time spent
          executing work since the application started.
          This counter is available only if the configuration time constants
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` (default: OFF) and
          `HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES` are set to `ON`.]
     ]
     [   [`/threadqueue/length`]
