@@ -52,7 +52,6 @@ void test_condition_with_mutex()
 
 int main()
 {
-    hpx::lcos::local::condition_variable cv;
-
+    test_condition_with_mutex();
     return hpx::util::report_errors();
 }
