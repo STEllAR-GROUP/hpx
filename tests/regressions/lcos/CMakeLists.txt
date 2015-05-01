@@ -15,6 +15,7 @@ set(tests
     future_timed_wait_1025
     future_unwrap_878
     future_unwrap_1182
+    ignore_while_locked_1485
     lifetime_588
     lifetime_588_1
     promise_leak_996
@@ -43,6 +44,8 @@ set(after_588_PARAMETERS LOCALITIES 2)
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
+
+set(ignore_while_locked_1485_PARAMETERS THREADS_PER_LOCALITY 2)
 
 set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)

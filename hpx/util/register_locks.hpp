@@ -41,6 +41,27 @@ namespace hpx { namespace util
     HPX_API_EXPORT void reset_ignored(void const* lock);
 
     ///////////////////////////////////////////////////////////////////////////
+    // The default (main) template definition assumes that the address of the
+    // Lock itself has to be used as the identifying key.
+    template <typename Lock, typename Enable>
+    struct ignore_while_checking
+    {
+        ignore_while_checking(Lock const* lock)
+          : mtx_(lock)
+        {
+            ignore_lock(mtx_);
+        }
+
+        ~ignore_while_checking()
+        {
+            reset_ignored(mtx_);
+        }
+
+        void const* mtx_;
+    };
+
+    // Scoped locks are allowed if they have a mutex() member which exposes the
+    // wrapped mutex.
 #if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
     template <typename Lock>
     struct ignore_while_checking<Lock,
