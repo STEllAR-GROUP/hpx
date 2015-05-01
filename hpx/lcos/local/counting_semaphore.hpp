@@ -129,6 +129,8 @@ namespace hpx { namespace lcos { namespace local
                 value_ += count;
                 for (boost::int64_t i = 0; value_ >= 0 && i < count; ++i)
                 {
+                    // notify_one() returns false if no more threads are
+                    // waiting
                     if (!cond_.notify_one(l))
                         break;
                 }

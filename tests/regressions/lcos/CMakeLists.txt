@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +18,7 @@ set(tests
     lifetime_588
     lifetime_588_1
     promise_leak_996
+    safely_destroy_cv_1481
     set_hpx_limit_798
     shared_stated_leaked_1211
    )
@@ -30,7 +31,7 @@ set(tests ${tests}
     dataflow_future_swap
     dataflow_791
    )
- if(HPX_WITH_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
   set(tests ${tests}
       dataflow_const_functor_773
       dataflow_future_swap2
@@ -56,6 +57,9 @@ if(HPX_WITH_CXX11_LAMBDAS)
     future_hang_on_wait_with_callback_629)
 endif()
 
+set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
+
+# Create test cases
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
