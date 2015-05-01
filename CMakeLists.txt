@@ -641,7 +641,7 @@ if(CMAKE_COMPILER_IS_GNUCXX AND HPX_WITH_GCC_VERSION_CHECK)
 endif()
 
 if(MSVC)
-  if(NOT (MSVC11 OR MSVC12 OR MSVC13))
+  if(NOT (MSVC11 OR MSVC12 OR MSVC14))
     hpx_error("MSVC x64 2012 or higher is required.")
   elseif(NOT CMAKE_CL_64)
     hpx_warn("MSVC (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
