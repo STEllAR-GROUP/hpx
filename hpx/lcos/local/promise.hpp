@@ -484,4 +484,128 @@ namespace hpx { namespace lcos
 }}
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_AWAIT)
+
+#include <experimental/resumable>
+
+namespace hpx { namespace lcos
+{
+    template <typename T>
+    bool await_ready(future<T> const& f)
+    {
+        return f.is_ready();
+    }
+
+    template <typename T, typename Promise>
+    void await_suspend(future<T>& f,
+        std::experimental::coroutine_handle<Promise> rh)
+    {
+        // f.then([=](future<T> result) mutable
+        typename hpx::lcos::detail::shared_state_ptr<T>::type ss =
+            lcos::detail::get_shared_state(f);
+
+        ss->set_on_completed(
+            [ss, rh]() mutable
+            {
+                if (ss->has_exception())
+                {
+                    try {
+                        boost::rethrow_exception(ss->get_result().get_error());
+                    }
+                    catch (...) {
+                        rh.promise().set_exception(std::current_exception());
+                    }
+                }
+
+                rh();   // resume
+            });
+    }
+
+    template <typename T>
+    T await_resume(future<T>& f)
+    {
+        return f.get();
+    }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace std { namespace experimental
+{
+    template <typename T, typename ...Args>
+    struct coroutine_traits<hpx::lcos::future<T>, Args...>
+    {
+        struct promise_type
+        {
+            bool cancelling = false;
+            hpx::lcos::local::promise<T> promise;
+
+            hpx::lcos::future<T> get_return_object()
+            {
+                return promise.get_future();
+            }
+
+            bool initial_suspend() { return false; }
+            bool final_suspend() { return false; }
+
+            template <typename U>
+            void set_result(U&& value)
+            {
+                promise.set_value(std::forward<U>(value));
+            }
+
+            void set_exception(std::exception_ptr e)
+            {
+                try {
+                    std::rethrow_exception(e);
+                }
+                catch (...) {
+                    promise.set_exception(boost::current_exception());
+                    cancelling = true;
+                }
+            }
+
+            bool cancellation_requested() { return cancelling; }
+        };
+    };
+
+    template <typename ...Args>
+    struct coroutine_traits<hpx::lcos::future<void>, Args...>
+    {
+        struct promise_type
+        {
+            bool cancelling = false;
+            hpx::lcos::local::promise<void> promise;
+
+            hpx::lcos::future<void> get_return_object()
+            {
+                return promise.get_future();
+            }
+
+            bool initial_suspend() { return false; }
+            bool final_suspend() { return false; }
+
+            void set_result()
+            {
+                promise.set_value();
+            }
+
+            void set_exception(std::exception_ptr e)
+            {
+                try {
+                    std::rethrow_exception(e);
+                }
+                catch (...) {
+                    promise.set_exception(boost::current_exception());
+                    cancelling = true;
+                }
+            }
+
+            bool cancellation_requested() { return cancelling; }
+        };
+    };
+}}
+
+#endif // HPX_HAVE_AWAIT
+
 #endif

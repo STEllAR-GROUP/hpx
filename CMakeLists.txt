@@ -665,6 +665,16 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
+if(MSVC14 AND CMAKE_CL_64)
+  hpx_option(HPX_WITH_AWAIT BOOL
+      "Enable the use of experimental __await functionality"
+      OFF ADVANCED CATEGORY "LCOs")
+  if(HPX_WITH_AWAIT)
+    hpx_add_config_define(HPX_HAVE_AWAIT)
+    hpx_add_compile_flag(-await LANGUAGES CXX)
+  endif()
+endif()
+
 ################################################################################
 
 ################################################################################
@@ -836,8 +846,13 @@ if(MSVC)
   enable_language(ASM_MASM)
   hpx_add_compile_flag(-Ox
     CONFIGURATIONS Release LANGUAGES CXX C)
-  hpx_add_compile_flag(-RTC1
-    CONFIGURATIONS Debug LANGUAGES CXX C)
+
+  if(NOT HPX_WITH_AWAIT)
+    hpx_add_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
+  else()
+    # /RTC1 is incompatible with /await
+    hpx_remove_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
+  endif()
 
   # VS2012 and above has a special flag for improving the debug experience by
   # adding more symbol information to the build (-d2Zi)
@@ -847,7 +862,7 @@ if(MSVC)
   # VS2013 and above know how to do link time constant data segment folding
   # VS2013 update 2 and above know how to remove debug information for
   #     non-referenced functions and data (-Zc:inline)
-  if(MSVC12 OR MSVC13)
+  if(MSVC12 OR MSVC14)
     hpx_add_compile_flag(-Zc:inline)
     hpx_add_compile_flag(-Gw
       CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)

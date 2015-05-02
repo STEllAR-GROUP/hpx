@@ -38,6 +38,11 @@ set(tests
     unwrapped
    )
 
+if(HPX_WITH_AWAIT)
+  set(tests ${tests} await)
+  set(await_PARAMETERS THREADS_PER_LOCALITY 4)
+endif()
+
 set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(apply_remote_PARAMETERS LOCALITIES 2)
 set(async_cb_colocated_PARAMETERS LOCALITIES 2)

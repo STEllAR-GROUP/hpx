@@ -200,7 +200,7 @@ namespace hpx { namespace lcos { namespace local
             ///////////////////////////////////////////////////////////////////
             template <typename Policy_, typename Iter>
             BOOST_FORCEINLINE
-            void await(Policy_ &&, Iter &&, boost::mpl::true_)
+            void do_await(Policy_ &&, Iter &&, boost::mpl::true_)
             {
                  done_ = true;
             }
@@ -225,7 +225,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
 
-                await(
+                do_await(
                     policy_
                   , boost::fusion::next(iter)
                   , boost::mpl::bool_<
@@ -287,7 +287,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<TupleIter>::type
                     next_type;
 
-                await(
+                do_await(
                     policy_
                   , boost::fusion::next(iter)
                   , boost::mpl::bool_<
@@ -355,7 +355,7 @@ namespace hpx { namespace lcos { namespace local
                     return;
                 }
 
-                await(
+                do_await(
                     policy_
                   , boost::fusion::next(iter)
                   , boost::mpl::bool_<
@@ -367,7 +367,7 @@ namespace hpx { namespace lcos { namespace local
             ///////////////////////////////////////////////////////////////////////
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Policy&, Iter iter, boost::mpl::false_)
+            void do_await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename util::decay_unwrap<
@@ -387,13 +387,13 @@ namespace hpx { namespace lcos { namespace local
             }
 
         public:
-            BOOST_FORCEINLINE void await()
+            BOOST_FORCEINLINE void do_await()
             {
                 typedef
                     typename boost::fusion::result_of::begin<Futures>::type
                     begin_type;
 
-                await(
+                do_await(
                     policy_
                   , boost::fusion::begin(futures_)
                   , boost::mpl::bool_<
@@ -450,7 +450,7 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(
                     hpx::traits::acquire_future_disp()(std::forward<Ts>(vs))...)
             ));
-        p->await();
+        p->do_await();
 
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
@@ -492,7 +492,7 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(
                     hpx::traits::acquire_future_disp()(std::forward<Ts>(vs))...)
             ));
-        p->await();
+        p->do_await();
 
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
@@ -530,7 +530,7 @@ namespace hpx { namespace lcos { namespace local
               , hpx::util::forward_as_tuple(
                     hpx::traits::acquire_future_disp()(std::forward<Ts>(vs))...)
             ));
-        p->await();
+        p->do_await();
 
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));

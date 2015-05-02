@@ -172,7 +172,7 @@ namespace hpx { namespace lcos
             // End of the tuple is reached
             template <typename TupleIter>
             BOOST_FORCEINLINE
-            void await(TupleIter&&, boost::mpl::true_)
+            void do_await(TupleIter&&, boost::mpl::true_)
             {
                 this->set_result(util::unused);     // simply make ourself ready
             }
@@ -215,7 +215,7 @@ namespace hpx { namespace lcos
                     next_type;
                 typedef boost::is_same<next_type, end_type> pred;
 
-                await(boost::fusion::next(iter), pred());
+                do_await(boost::fusion::next(iter), pred());
             }
 
             template <typename TupleIter>
@@ -266,13 +266,13 @@ namespace hpx { namespace lcos
                         next_type;
                     typedef boost::is_same<next_type, end_type> pred;
 
-                    await(boost::fusion::next(iter), pred());
+                    do_await(boost::fusion::next(iter), pred());
                 }
             }
 
             template <typename TupleIter>
             BOOST_FORCEINLINE
-            void await(TupleIter&& iter, boost::mpl::false_)
+            void do_await(TupleIter&& iter, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
                     typename boost::fusion::result_of::deref<TupleIter>::type
@@ -293,7 +293,7 @@ namespace hpx { namespace lcos
                     begin_type;
                 typedef boost::is_same<begin_type, end_type> pred;
 
-                await(boost::fusion::begin(t_), pred());
+                do_await(boost::fusion::begin(t_), pred());
 
                 // If there are still futures which are not ready, suspend and
                 // wait.
