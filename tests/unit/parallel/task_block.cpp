@@ -10,8 +10,10 @@
 #include <hpx/util/lightweight_test.hpp>
 
 using hpx::parallel::define_task_block;
-using hpx::parallel::async_define_task_block;
 using hpx::parallel::task_block;
+using hpx::parallel::par;
+using hpx::parallel::task;
+using hpx::parallel::parallel_task_execution_policy;
 
 ///////////////////////////////////////////////////////////////////////////////
 void define_task_block_test1()
@@ -24,7 +26,7 @@ void define_task_block_test1()
     bool task21_flag = false;
     bool task3_flag = false;
 
-    define_task_block([&](task_block& trh)
+    define_task_block(par, [&](task_block<>& trh)
     {
         parent_flag = true;
 
@@ -37,7 +39,7 @@ void define_task_block_test1()
             task2_flag = true;
             hpx::cout << "task2" << hpx::endl;
 
-            define_task_block([&](task_block& trh) {
+            define_task_block(par, [&](task_block<>& trh) {
                 trh.run([&]() {
                     task21_flag = true;
                     hpx::cout << "task2.1" << hpx::endl;
@@ -72,35 +74,36 @@ void define_task_block_test2()
     bool task21_flag = false;
     bool task3_flag = false;
 
-    hpx::future<void> f = async_define_task_block([&](task_block& trh)
-    {
-        parent_flag = true;
+    hpx::future<void> f = define_task_block(par(task),
+        [&](task_block<parallel_task_execution_policy>& trh)
+        {
+            parent_flag = true;
 
-        trh.run([&]() {
-            task1_flag = true;
-            hpx::cout << "task1: " << s << hpx::endl;
-        });
+            trh.run([&]() {
+                task1_flag = true;
+                hpx::cout << "task1: " << s << hpx::endl;
+            });
 
-        trh.run([&]() {
-            task2_flag = true;
-            hpx::cout << "task2" << hpx::endl;
+            trh.run([&]() {
+                task2_flag = true;
+                hpx::cout << "task2" << hpx::endl;
 
-            define_task_block([&](task_block& trh) {
-                trh.run([&]() {
-                    task21_flag = true;
-                    hpx::cout << "task2.1" << hpx::endl;
+                define_task_block(par, [&](task_block<>& trh) {
+                    trh.run([&]() {
+                        task21_flag = true;
+                        hpx::cout << "task2.1" << hpx::endl;
+                    });
                 });
             });
-        });
 
-        int i = 0, j = 10, k = 20;
-        trh.run([=, &task3_flag]() {
-            task3_flag = true;
-            hpx::cout << "task3: " << i << " " << j << " " << k << hpx::endl;
-        });
+            int i = 0, j = 10, k = 20;
+            trh.run([=, &task3_flag]() {
+                task3_flag = true;
+                hpx::cout << "task3: " << i << " " << j << " " << k << hpx::endl;
+            });
 
-        hpx::cout << "parent" << hpx::endl;
-    });
+            hpx::cout << "parent" << hpx::endl;
+        });
 
     f.wait();
 
@@ -114,7 +117,7 @@ void define_task_block_test2()
 void define_task_block_exceptions_test1()
 {
     try {
-        define_task_block([](task_block& trh) {
+        define_task_block(par, [](task_block<>& trh) {
             trh.run([]() {
                 hpx::cout << "task1" << hpx::endl;
                 throw 1;
@@ -141,21 +144,22 @@ void define_task_block_exceptions_test1()
 
 void define_task_block_exceptions_test2()
 {
-    hpx::future<void> f = async_define_task_block([](task_block& trh)
-    {
-        trh.run([]() {
-            hpx::cout << "task1" << hpx::endl;
-            throw 1;
-        });
+    hpx::future<void> f = define_task_block(par(task),
+        [](task_block<parallel_task_execution_policy>& trh)
+        {
+            trh.run([]() {
+                hpx::cout << "task1" << hpx::endl;
+                throw 1;
+            });
 
-        trh.run([]() {
-            hpx::cout << "task2" << hpx::endl;
-            throw 2;
-        });
+            trh.run([]() {
+                hpx::cout << "task2" << hpx::endl;
+                throw 2;
+            });
 
-        hpx::cout << "parent" << hpx::endl;
-        throw 100;
-    });
+            hpx::cout << "parent" << hpx::endl;
+            throw 100;
+        });
 
     try {
         f.get();
@@ -173,7 +177,7 @@ void define_task_block_exceptions_test2()
 void define_task_block_exceptions_test3()
 {
     try {
-        define_task_block([&](task_block& trh)
+        define_task_block(par, [&](task_block<>& trh)
         {
             trh.run([&]()
             {
@@ -203,19 +207,20 @@ void define_task_block_exceptions_test3()
 
 void define_task_block_exceptions_test4()
 {
-    hpx::future<void> f = async_define_task_block([&](task_block& trh)
-    {
-        trh.run([&]()
+    hpx::future<void> f = define_task_block(par(task),
+        [&](task_block<parallel_task_execution_policy>& trh)
         {
-            // Error: tr is not active
-            trh.run([]()
+            trh.run([&]()
             {
-                HPX_TEST(false);    // should not be called
-            });
+                // Error: tr is not active
+                trh.run([]()
+                {
+                    HPX_TEST(false);    // should not be called
+                });
 
-            HPX_TEST(false);
+                HPX_TEST(false);
+            });
         });
-    });
 
     try {
         f.get();
@@ -262,6 +267,7 @@ int main(int argc, char* argv[])
         ("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run")
         ;
+
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +

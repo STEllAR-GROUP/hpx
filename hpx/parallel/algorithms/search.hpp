@@ -13,11 +13,11 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <hpx/parallel/util/partitioner.hpp>
@@ -53,7 +53,9 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
@@ -63,7 +65,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type;
                 typedef typename std::iterator_traits<FwdIter2>::difference_type
                     s_difference_type;
-                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
 
                 s_difference_type diff = std::distance(s_first, s_last);
                 if (diff <= 0)
@@ -176,7 +178,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename FwdIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search(ExPolicy && policy, FwdIter first, FwdIter last,
         FwdIter2 s_first, FwdIter2 s_last)
@@ -275,7 +277,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search(ExPolicy && policy, FwdIter first, FwdIter last,
         FwdIter2 s_first, FwdIter2 s_last, Pred && op)
@@ -329,7 +331,9 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
             parallel(ExPolicy const& policy, FwdIter first, std::size_t count,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
@@ -339,7 +343,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type;
                 typedef typename std::iterator_traits<FwdIter2>::difference_type
                     s_difference_type;
-                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
 
                 s_difference_type diff = std::distance(s_first, s_last);
                 if (diff <= 0)
@@ -450,7 +454,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename FwdIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search_n(ExPolicy && policy, FwdIter first, std::size_t count,
         FwdIter2 s_first, FwdIter2 s_last)
@@ -549,7 +553,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search_n(ExPolicy && policy, FwdIter first, std::size_t count,
         FwdIter2 s_first, FwdIter2 s_last, Pred && op)

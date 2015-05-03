@@ -16,8 +16,8 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -74,11 +74,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename T, typename Op>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutIter
+            >::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                  OutIter dest, T && init, Op && op)
             {
-                typedef detail::algorithm_result<ExPolicy, OutIter> result;
+                typedef util::detail::algorithm_result<
+                        ExPolicy, OutIter
+                    > result;
                 typedef hpx::util::zip_iterator<FwdIter, T*> zip_iterator;
 
                 if (first == last)
@@ -92,12 +96,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                   *dest = init;
                   return result::get(std::move(dest));
                 }
-              
+
                 // The scan may use the same array for output as input
                 // don't write initial value until after sum to avoid trampling on input
                 OutIter iout = dest++;
                 T temp = init;
-              
+
 
                 boost::shared_array<T> data(new T[count]);
 
@@ -225,7 +229,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Op>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     exclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
         T init, Op && op)
@@ -320,7 +324,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     exclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
         T init)

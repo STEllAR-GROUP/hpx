@@ -13,9 +13,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
@@ -54,12 +54,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename T>
-        typename detail::algorithm_result<ExPolicy>::type
+        typename util::detail::algorithm_result<ExPolicy>::type
         parallel_sequential_uninitialized_fill_n(ExPolicy const& policy,
             Iter first, std::size_t count, T const& value)
         {
             if (count == 0)
-                return detail::algorithm_result<ExPolicy>::get();
+                return util::detail::algorithm_result<ExPolicy>::get();
 
             typedef std::pair<Iter, Iter> partition_result_type;
             typedef typename std::iterator_traits<Iter>::value_type
@@ -111,12 +111,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename Iter, typename T>
-            static typename detail::algorithm_result<ExPolicy>::type
+            static typename util::detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy const& policy, Iter first, Iter last,
                 T const& value)
             {
                 if (first == last)
-                    return detail::algorithm_result<ExPolicy>::get();
+                    return util::detail::algorithm_result<ExPolicy>::get();
 
                 return parallel_sequential_uninitialized_fill_n(policy, first,
                     std::distance(first, last), value);
@@ -168,7 +168,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy>::type
+        typename util::detail::algorithm_result<ExPolicy>::type
     >::type
     uninitialized_fill(ExPolicy && policy, InIter first, InIter last,
         T const& value)
@@ -213,7 +213,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename T>
-            static typename detail::algorithm_result<ExPolicy>::type
+            static typename util::detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy const& policy, FwdIter first, std::size_t count,
                 T const& value)
             {
@@ -270,7 +270,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename Size, typename T>
     typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy>::type
+        typename util::detail::algorithm_result<ExPolicy>::type
     >::type
     uninitialized_fill_n(ExPolicy && policy, FwdIter first, Size count,
         T const& value)
@@ -285,7 +285,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // if count is representing a negative value, we do nothing
         if (detail::is_negative<Size>::call(count))
-            return detail::algorithm_result<ExPolicy>::get();
+            return util::detail::algorithm_result<ExPolicy>::get();
 
         typedef typename is_sequential_execution_policy<ExPolicy>::type is_seq;
 
