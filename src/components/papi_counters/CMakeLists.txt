@@ -19,7 +19,7 @@ if(HPX_WITH_PAPI)
 
   include_directories(${PAPI_INCLUDE_DIR})
 
-  if(HPX_BUILD_DEFAULT_TARGETS)
+  if(HPX_WITH_DEFAULT_TARGETS)
     add_hpx_component(papi_counters
       FOLDER "Core/Components"
       HEADER_ROOT ${root}

@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#if defined(HPX_WITH_LOGGING)
+#if defined(HPX_HAVE_LOGGING)
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -1085,7 +1085,7 @@ namespace hpx { namespace util { namespace detail
     }
 }}}
 
-#else  // HPX_WITH_LOGGING
+#else  // HPX_HAVE_LOGGING
 
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/logging.hpp>
@@ -1125,4 +1125,4 @@ namespace hpx { namespace util { namespace detail
     }
 }}}
 
-#endif // HPX_WITH_LOGGING
+#endif // HPX_HAVE_LOGGING

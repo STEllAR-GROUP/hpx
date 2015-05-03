@@ -65,7 +65,7 @@ function(hpx_setup_target target)
   endif()
 
   set(target_STATIC_LINKING OFF)
-  if(HPX_STATIC_LINKING)
+  if(HPX_WITH_STATIC_LINKING)
     set(target_STATIC_LINKING ON)
   else()
     if(POLICY CMP0045)

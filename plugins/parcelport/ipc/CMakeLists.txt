@@ -6,11 +6,11 @@
 
 include(HPX_AddLibrary)
 
-if(HPX_PARCELPORT_IPC)
+if(HPX_WITH_PARCELPORT_IPC)
   if(NOT Boost_VERSION GREATER 105100)
-    hpx_error("HPX_PARCELPORT_IPC=On is on but the ipc parcelport only works with at least Boost 1.52")
+    hpx_error("HPX_WITH_PARCELPORT_IPC=On is on but the ipc parcelport only works with at least Boost 1.52")
   endif()
-  hpx_add_config_define(HPX_PARCELPORT_IPC)
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_IPC)
 
   macro(add_parcelport_ipc_module)
     hpx_debug("add_parcelport_ipc_module")

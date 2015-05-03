@@ -187,9 +187,6 @@ namespace hpx
         // global ID's of the underlying partition_vectors.
         partitions_vector_type partitions_;
 
-        // will be set for created (non-attached) objects
-        std::string registered_name_;
-
     public:
         typedef vector_iterator<T> iterator;
         typedef const_vector_iterator<T> const_iterator;
@@ -279,7 +276,7 @@ namespace hpx
 
         // this will be called by the base class once the registered id becomes
         // available
-        future<void> connect_to_helper(future<id_type> && f)
+        future<void> connect_to_helper(shared_future<id_type> && f)
         {
             using util::placeholders::_1;
             typedef typename components::server::distributed_metadata_base<
@@ -295,9 +292,11 @@ namespace hpx
         future<void> connect_to(std::string const& symbolic_name)
         {
             using util::placeholders::_1;
-            return this->base_type::connect_to(symbolic_name,
+            this->base_type::connect_to(symbolic_name);
+            return this->base_type::share().then(
                 util::bind(&vector::connect_to_helper, this, _1));
         }
+
         void connect_to_sync(std::string const& symbolic_name)
         {
             connect_to(symbolic_name).get();
@@ -318,7 +317,6 @@ namespace hpx
                         server::vector_config_data> >(
                     hpx::find_here(), std::move(data)));
 
-            registered_name_ = symbolic_name;
             return this->base_type::register_as(symbolic_name);
         }
         void register_as_sync(std::string const& symbolic_name)
@@ -621,7 +619,6 @@ namespace hpx
             size_ = rhs.size_;
             partition_size_ = rhs.partition_size_;
             std::swap(partitions_, partitions);
-            registered_name_.clear();
         }
 
     public:
@@ -704,15 +701,6 @@ namespace hpx
                 create(val, policy);
         }
 
-        ~vector()
-        {
-            if (!registered_name_.empty())
-            {
-                error_code ec;      // ignore all exceptions
-                agas::unregister_name_sync(registered_name_, ec);
-            }
-        }
-
         /// Copy construction performs a deep copy of the right hand side
         /// vector.
         vector(vector const& rhs)
@@ -727,8 +715,7 @@ namespace hpx
           : base_type(std::move(rhs)),
             size_(rhs.size_),
             partition_size_(rhs.partition_size_),
-            partitions_(std::move(rhs.partitions_)),
-            registered_name_(std::move(rhs.registered_name_))
+            partitions_(std::move(rhs.partitions_))
         {
             rhs.size_ = 0;
             rhs.partition_size_ = std::size_t(-1);
@@ -786,7 +773,6 @@ namespace hpx
                 size_ = rhs.size_;
                 partition_size_ = rhs.partition_size_;
                 partitions_ = std::move(rhs.partitions_);
-                registered_name_ = std::move(rhs.registered_name_);
 
                 rhs.size_ = 0;
                 rhs.partition_size_ = std::size_t(-1);

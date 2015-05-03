@@ -5,7 +5,7 @@
 
 # We first try to find the required minimum set of Boost libraries. This will
 # also give us the version of the found boost installation
-if(HPX_STATIC_LINKING)
+if(HPX_WITH_STATIC_LINKING)
   set(Boost_USE_STATIC_LIBS ON)
 endif()
 
@@ -109,7 +109,7 @@ endif()
 
 # Boost preprocessor definitions
 hpx_add_config_define(BOOST_PARAMETER_MAX_ARITY 7)
-hpx_add_config_define(HPX_COROUTINE_ARG_MAX 1)
+hpx_add_config_define(HPX_HAVE_COROUTINE_ARG_MAX 1)
 if(MSVC)
   HPX_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL "Add BOOST_ALL_DYN_LINK to compile flags" OFF)
   if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK)
@@ -118,8 +118,8 @@ if(MSVC)
 else()
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
-hpx_add_config_define(HPX_LOG_NO_TSS)
-hpx_add_config_define(HPX_LOG_NO_TS)
+hpx_add_config_define(HPX_HAVE_LOG_NO_TSS)
+hpx_add_config_define(HPX_HAVE_LOG_NO_TS)
 hpx_add_config_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
 # Disable usage of std::atomics in lockfree

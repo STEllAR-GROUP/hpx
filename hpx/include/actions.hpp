@@ -13,8 +13,6 @@
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/action_invoke_no_more_than.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
 
 #endif
 

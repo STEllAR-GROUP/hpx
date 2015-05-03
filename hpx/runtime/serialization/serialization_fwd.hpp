@@ -9,20 +9,29 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
+#include <boost/shared_ptr.hpp>
+#else
 #include <memory>
+#endif
 
 namespace hpx { namespace serialization
 {
     namespace detail
     {
         struct ptr_helper;
+#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
+        typedef boost::shared_ptr<ptr_helper> ptr_helper_ptr;
+#else
+        typedef std::unique_ptr<ptr_helper> ptr_helper_ptr;
+#endif
     }
 
     struct input_archive;
     struct output_archive;
 
     BOOST_FORCEINLINE
-    void register_pointer(input_archive & ar, boost::uint64_t pos, std::unique_ptr<detail::ptr_helper> helper);
+    void register_pointer(input_archive & ar, boost::uint64_t pos, detail::ptr_helper_ptr helper);
 
     template <typename Helper>
     Helper & tracked_pointer(input_archive & ar, boost::uint64_t pos);

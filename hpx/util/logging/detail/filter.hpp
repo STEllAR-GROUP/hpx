@@ -158,7 +158,7 @@ private:
 
 
 
-#ifndef HPX_LOG_NO_TSS
+#ifndef HPX_HAVE_LOG_NO_TSS
 
 /**
     @brief Uses TSS (Thread Specific Storage) to find out if a filter is enabled or not.
@@ -208,7 +208,7 @@ private:
 };
 
 
-#endif // #ifndef HPX_LOG_NO_TSS
+#endif // #ifndef HPX_HAVE_LOG_NO_TSS
 
 
 } // namespace filter

@@ -239,7 +239,10 @@ namespace hpx
 
     private:
         typedef hpx::components::client_base<
-                unordered_map, server::unordered_map_config_data
+                unordered_map,
+                hpx::components::server::distributed_metadata_base<
+                    server::unordered_map_config_data
+                >
             > base_type;
         typedef detail::unordered_base<Hash, KeyEqual> hash_base_type;
 
@@ -273,9 +276,6 @@ namespace hpx
         // This is the vector representing the base_index and corresponding
         // global ID's of the underlying partition_vectors.
         partitions_vector_type partitions_;
-
-        // will be set for created (non-attached) objects
-        std::string registered_name_;
 
         ///////////////////////////////////////////////////////////////////////
         // Connect this unordered_map to the existing unordered_mapusing the
@@ -441,7 +441,6 @@ namespace hpx
             wait_all(ptrs);
 
             std::swap(partitions_, partitions);
-            registered_name_.clear();
         }
 
     public:
@@ -461,7 +460,6 @@ namespace hpx
                     typename base_type::server_component_type> >(
                 hpx::find_here(), std::move(data)));
 
-            registered_name_ = symbolic_name;
             return base_type::register_as(symbolic_name);
         }
 
@@ -531,18 +529,8 @@ namespace hpx
         unordered_map(unordered_map && rhs)
           : base_type(std::move(rhs)),
             hash_base_type(std::move(rhs)),
-            partitions_(std::move(rhs.partitions_)),
-            registered_name_(std::move(rhs.registered_name_))
+            partitions_(std::move(rhs.partitions_))
         {}
-
-        ~unordered_map()
-        {
-            if (!registered_name_.empty())
-            {
-                error_code ec;      // ignore all exceptions
-                agas::unregister_name_sync(registered_name_, ec);
-            }
-        }
 
         unordered_map& operator=(unordered_map const& rhs)
         {
@@ -558,7 +546,6 @@ namespace hpx
                 this->hash_base_type::operator=(std::move(rhs));
 
                 partitions_ = std::move(rhs.partitions_);
-                registered_name_ = std::move(rhs.registered_name_);
             }
             return *this;
         }

@@ -14,14 +14,13 @@ set(tests
     threads_all_1422
    )
 
-if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+if(HPX_HAVE_THREAD_LOCAL_STORAGE)
   set(tests ${tests} thread_data_1111)
 endif()
 
-if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
+if(HPX_HAVE_LOCAL_SCHEDULER OR HPX_HAVE_ALL_SCHEDULERS)
   set(tests ${tests}
     thread_pool_executor_1114
-#    thread_pool_executor_1127
     )
 endif()
 

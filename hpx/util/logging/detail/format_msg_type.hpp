@@ -23,7 +23,7 @@
 
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/find_gather.hpp>
-#ifndef HPX_LOG_NO_TSS
+#ifndef HPX_HAVE_LOG_NO_TSS
   #include <hpx/util/logging/detail/tss/tss_ostringstream.hpp>
 #else
   #include <sstream>

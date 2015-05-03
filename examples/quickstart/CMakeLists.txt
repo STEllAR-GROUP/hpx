@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2014 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +25,8 @@ set(example_programs
     fractals
     fractals_struct
     interest_calculator
+    latch_local
+    latch_remote
     non_atomic_rma
     pingpong
     print_to_console
@@ -53,7 +55,7 @@ set(simplest_hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
-if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
+if(HPX_HAVE_LOCAL_SCHEDULER OR HPX_HAVE_ALL_SCHEDULERS)
   set(example_programs ${example_programs}
       fractals_executor
      )

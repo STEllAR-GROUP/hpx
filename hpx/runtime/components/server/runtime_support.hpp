@@ -355,7 +355,7 @@ namespace hpx { namespace components { namespace server
         bool load_components(util::section& ini, naming::gid_type const& prefix,
             naming::resolver_client& agas_client);
 
-#if !defined(HPX_STATIC_LINKING)
+#if !defined(HPX_HAVE_STATIC_LINKING)
         bool load_component(hpx::util::plugin::dll& d,
             util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path const& lib,
@@ -395,7 +395,7 @@ namespace hpx { namespace components { namespace server
         // Load all plugins from the ini files found in the configuration
         bool load_plugins(util::section& ini);
 
-#if !defined(HPX_STATIC_LINKING)
+#if !defined(HPX_HAVE_STATIC_LINKING)
         bool load_plugin(util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path const& lib,
             bool isenabled);

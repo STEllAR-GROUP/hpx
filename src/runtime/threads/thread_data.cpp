@@ -199,7 +199,7 @@ namespace hpx { namespace threads
             );
     }
 
-#ifndef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
     thread_id_repr_type get_parent_id()
     {
         return threads::invalid_thread_id_repr;
@@ -242,7 +242,7 @@ namespace hpx { namespace threads
 
     naming::address::address_type get_self_component_id()
     {
-#ifndef HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
         return 0;
 #else
         thread_self* self = get_self_ptr();

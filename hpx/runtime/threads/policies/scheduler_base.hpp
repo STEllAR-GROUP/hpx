@@ -20,7 +20,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
-#if defined(HPX_THREAD_BACKOFF_ON_IDLE)
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
     namespace detail
     {
         struct reset_on_exit
@@ -47,7 +47,7 @@ namespace hpx { namespace threads { namespace policies
         scheduler_base(std::size_t num_threads)
           : topology_(get_topology())
           , affinity_data_(num_threads)
-#if defined(HPX_THREAD_BACKOFF_ON_IDLE)
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
           , waiting_(false)
 #endif
@@ -79,7 +79,7 @@ namespace hpx { namespace threads { namespace policies
 
         void idle_callback(std::size_t /*num_thread*/)
         {
-#if defined(HPX_THREAD_BACKOFF_ON_IDLE)
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
 #if BOOST_VERSION < 105000
@@ -103,7 +103,7 @@ namespace hpx { namespace threads { namespace policies
         /// possibly idling OS threads
         void do_some_work(std::size_t /*num_thread*/)
         {
-#if defined(HPX_THREAD_BACKOFF_ON_IDLE)
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
             wait_count_.store(0, boost::memory_order_release);
             if (waiting_)
             {
@@ -115,12 +115,12 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         virtual bool numa_sensitive() const { return false; }
 
-#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         virtual boost::uint64_t get_creation_time(bool reset) = 0;
         virtual boost::uint64_t get_cleanup_time(bool reset) = 0;
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
         virtual boost::uint64_t get_num_pending_misses(std::size_t num_thread,
             bool reset) = 0;
         virtual boost::uint64_t get_num_pending_accesses(std::size_t num_thread,
@@ -171,7 +171,7 @@ namespace hpx { namespace threads { namespace policies
         virtual void on_stop_thread(std::size_t num_thread) = 0;
         virtual void on_error(std::size_t num_thread, boost::exception_ptr const& e) = 0;
 
-#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         virtual boost::int64_t get_average_thread_wait_time(
             std::size_t num_thread = std::size_t(-1)) const = 0;
         virtual boost::int64_t get_average_task_wait_time(
@@ -182,7 +182,7 @@ namespace hpx { namespace threads { namespace policies
         topology const& topology_;
         detail::affinity_data affinity_data_;
 
-#if defined(HPX_THREAD_BACKOFF_ON_IDLE)
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
         boost::mutex mtx_;
         boost::condition_variable cond_;

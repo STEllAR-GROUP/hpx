@@ -103,7 +103,8 @@ namespace hpx
         typedef agas::addressing_service resolver_client;
 
         struct HPX_API_EXPORT gid_type;
-        // NOTE: we do not export the symbol here as id_type was already exported and generates a warning on gcc otherwise
+        // NOTE: We do not export the symbol here as id_type was already
+        //       exported and generates a warning on gcc otherwise.
         struct id_type;
         struct HPX_API_EXPORT address;
 
@@ -138,8 +139,8 @@ namespace hpx
         }
 
         HPX_API_EXPORT policies::message_handler* get_message_handler(
-            parcelhandler* ph, char const* name, char const* type, std::size_t num,
-            std::size_t interval, locality const& l,
+            parcelhandler* ph, char const* name, char const* type,
+            std::size_t num, std::size_t interval, locality const& l,
             error_code& ec = throws);
 
         HPX_API_EXPORT bool do_background_work(std::size_t num_thread = 0);
@@ -196,7 +197,7 @@ namespace hpx
                      >
             class HPX_EXPORT local_queue_scheduler;
 
-#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
                     , typename StagedQueuing = lockfree_fifo
@@ -205,7 +206,7 @@ namespace hpx
             class HPX_EXPORT periodic_priority_queue_scheduler;
 #endif
 
-#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
                     , typename StagedQueuing = lockfree_fifo
@@ -214,7 +215,7 @@ namespace hpx
             class HPX_EXPORT static_priority_queue_scheduler;
 #endif
 
-#if defined(HPX_HIERARCHY_SCHEDULER)
+#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
                     , typename StagedQueuing = lockfree_fifo
@@ -230,7 +231,7 @@ namespace hpx
                 lockfree_lifo  // LIFO terminated queuing
             > fifo_priority_queue_scheduler;
 
-#if defined(HPX_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER)
             struct lockfree_abp_fifo;
             struct lockfree_abp_lifo;
 
@@ -404,7 +405,7 @@ namespace hpx
         /// HPX thread).
         ///
         /// \note This function will return a meaningful value only if the
-        ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+        ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
         ///       being defined.
         HPX_API_EXPORT thread_id_repr_type get_parent_id();
 
@@ -413,7 +414,7 @@ namespace hpx
         /// HPX thread).
         ///
         /// \note This function will return a meaningful value only if the
-        ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+        ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
         ///       being defined.
         HPX_API_EXPORT std::size_t get_parent_phase();
 
@@ -422,7 +423,7 @@ namespace hpx
         /// HPX thread).
         ///
         /// \note This function will return a meaningful value only if the
-        ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+        ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
         ///       being defined.
         HPX_API_EXPORT boost::uint32_t get_parent_locality_id();
 
@@ -430,7 +431,7 @@ namespace hpx
         /// component the current thread is acting on
         ///
         /// \note This function will return a meaningful value only if the
-        ///       code was compiled with HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+        ///       code was compiled with HPX_HAVE_THREAD_TARGET_ADDRESS
         ///       being defined.
         HPX_API_EXPORT boost::uint64_t get_self_component_id();
 
@@ -548,41 +549,46 @@ namespace hpx
             // component creation, etc). One per locality.
             component_runtime_support = 0,
 
+            // Pseudo-component to be used for plain actions
+            component_plain_function = 1,
+
             // Pseudo-component for direct access to local virtual memory.
-            component_memory = 1,
+            component_memory = 2,
 
             // Generic memory blocks.
-            component_memory_block = 2,
+            component_memory_block = 3,
 
             // Base component for LCOs that do not produce a value.
-            component_base_lco = 3,
+            component_base_lco = 4,
 
             // Base component for LCOs that do produce values.
-            component_base_lco_with_value = 4,
+            component_base_lco_with_value = 5,
 
-            // Synchronization barrier LCO.
-            component_barrier = ((5 << 16) | component_base_lco),
+            // Synchronization latch, barrier, and flex_barrier LCOs.
+            component_latch = ((6 << 16) | component_base_lco_with_value),
+            component_barrier = ((7 << 16) | component_base_lco),
+            component_flex_barrier = ((8 << 16) | component_base_lco),
 
             // An LCO representing a value which may not have been computed yet.
-            component_promise = ((6 << 16) | component_base_lco_with_value),
+            component_promise = ((9 << 16) | component_base_lco_with_value),
 
             // AGAS locality services.
-            component_agas_locality_namespace = 7,
+            component_agas_locality_namespace = 10,
 
             // AGAS primary address resolution services.
-            component_agas_primary_namespace = 8,
+            component_agas_primary_namespace = 11,
 
             // AGAS global type system.
-            component_agas_component_namespace = 9,
+            component_agas_component_namespace = 12,
 
             // AGAS symbolic naming services.
-            component_agas_symbol_namespace = 10,
+            component_agas_symbol_namespace = 13,
 
 #if defined(HPX_HAVE_SODIUM)
             // root CA, subordinate CA
-            signed_certificate_promise = ((11 << 16) | component_base_lco_with_value),
-            component_root_certificate_authority = 12,
-            component_subordinate_certificate_authority = 13,
+            signed_certificate_promise = ((14 << 16) | component_base_lco_with_value),
+            component_root_certificate_authority = 15,
+            component_subordinate_certificate_authority = 16,
 #endif
 
             component_last,

@@ -80,19 +80,14 @@ hpx::future<void> plain_future_void()
 {
     return hpx::make_ready_future();
 }
-
-HPX_DEFINE_PLAIN_ACTION(plain_future_void, plain_future_void_action);
-HPX_REGISTER_PLAIN_ACTION_DECLARATION(plain_future_void_action);
-HPX_REGISTER_PLAIN_ACTION(plain_future_void_action);
+HPX_PLAIN_ACTION(plain_future_void, plain_future_void_action);
 
 hpx::future<int> plain_future_int()
 {
     return hpx::make_ready_future(42);
 }
 
-HPX_DEFINE_PLAIN_ACTION(plain_future_int, plain_future_int_action);
-HPX_REGISTER_PLAIN_ACTION_DECLARATION(plain_future_int_action);
-HPX_REGISTER_PLAIN_ACTION(plain_future_int_action);
+HPX_PLAIN_ACTION(plain_future_int, plain_future_int_action);
 
 void test_plain_call_future_void()
 {

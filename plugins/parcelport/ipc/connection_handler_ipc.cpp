@@ -6,7 +6,7 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_PARCELPORT_IPC)
+#if defined(HPX_HAVE_PARCELPORT_IPC)
 
 #include <hpx/exception_list.hpp>
 #include <hpx/plugins/parcelport/ipc/connection_handler.hpp>

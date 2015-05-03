@@ -88,7 +88,7 @@ namespace detail {
     ///////////// find_writer_with_thread_safety
     template<class thread_safety, class format_write> struct find_writer_with_thread_safety {
         // for default_
-#ifndef HPX_LOG_NO_TS
+#ifndef HPX_HAVE_LOG_NO_TS
         // use ts_write
         typedef writer::ts_write<format_write> type;
 #else

@@ -19,7 +19,7 @@
 #include <benchmarks/network/osu_coll.hpp>
 #include <benchmarks/network/broadcast.hpp>
 
-HPX_REGISTER_PLAIN_ACTION(hpx::lcos::detail::broadcast_impl_action, broadcast_impl_action);
+HPX_PLAIN_ACTION(hpx::lcos::detail::broadcast_impl_action, broadcast_impl_action);
 
 
 struct broadcast_component
