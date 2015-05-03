@@ -488,6 +488,7 @@ namespace hpx { namespace lcos
 #if defined(HPX_HAVE_AWAIT)
 
 #include <experimental/resumable>
+#include <type_traits>
 
 namespace hpx { namespace lcos
 {
@@ -547,68 +548,91 @@ namespace hpx { namespace lcos
     {
         return f.get();
     }
+
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////////
+        // special allocator for combined shared state and stack frame for future
+        // instances returned from resumable functions
+        template <typename Value, typename T = char>
+        struct shared_state_allocator
+        {
+            typedef T value_type;
+            typedef T* pointer;
+            typedef T const* const_pointer;
+            typedef T& reference;
+            typedef T const& const_reference;
+            typedef std::size_t size_type;
+            typedef std::ptrdiff_t difference_type;
+
+            template <typename U>
+            struct rebind
+            {
+                typedef shared_state_allocator<Value, U> other;
+            };
+
+            pointer allocate(size_type n, void const* hint = 0)
+            {
+                HPX_ASSERT(sizeof(future_data<Value>) <= n);
+
+                future_data<Value>* p = new future_data<Value>();
+                intrusive_ptr_add_ref(p);
+                return reinterpret_cast<pointer>(p);
+            }
+
+            void deallocate(pointer p, size_type n)
+            {
+                HPX_ASSERT(sizeof(future_data<Value>) <= n);
+                intrusive_ptr_release(reinterpret_cast<future_data<Value>*>(p));
+            }
+        };
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace std { namespace experimental
 {
     // Allow for functions which use __await to return an hpx::future<T>
-    template <typename T, typename ...Args>
-    struct coroutine_traits<hpx::lcos::future<T>, Args...>
+    template <typename T, typename ...Ts>
+    struct coroutine_traits<hpx::lcos::future<T>, Ts...>
     {
-        struct promise_type
+        template <typename... Us>
+        static hpx::lcos::detail::shared_state_allocator<T>
+        get_allocator(Us&&...)
         {
+            return hpx::lcos::detail::shared_state_allocator<T>();
+        }
+
+        // derive from future shared state as this will be combined with the 
+        // necessary stack frame for the resumable function
+        struct promise_type : hpx::lcos::detail::future_data<T>
+        {
+            typedef hpx::lcos::detail::future_data<T> base_type;
+
             bool cancelling = false;
-            hpx::lcos::local::promise<T> promise;
 
             hpx::lcos::future<T> get_return_object()
             {
-                return promise.get_future();
+                boost::intrusive_ptr<base_type> shared_state(this);
+                return hpx::traits::future_access<future<T> >::create(
+                    std::move(shared_state));
             }
 
             bool initial_suspend() { return false; }
             bool final_suspend() { return false; }
 
-            template <typename U>
-            void set_result(U&& value)
+            template <typename U, typename U2 = T,
+                typename = std::enable_if<!std::is_void<U2>::value>::type>
+            void set_result(U && value)
             {
-                promise.set_value(std::forward<U>(value));
+                this->base_type::set_value(std::forward<U>(value));
             }
 
-            void set_exception(std::exception_ptr e)
-            {
-                try {
-                    std::rethrow_exception(e);
-                }
-                catch (...) {
-                    promise.set_exception(boost::current_exception());
-                    cancelling = true;
-                }
-            }
-
-            bool cancellation_requested() { return cancelling; }
-        };
-    };
-
-    template <typename ...Args>
-    struct coroutine_traits<hpx::lcos::future<void>, Args...>
-    {
-        struct promise_type
-        {
-            bool cancelling = false;
-            hpx::lcos::local::promise<void> promise;
-
-            hpx::lcos::future<void> get_return_object()
-            {
-                return promise.get_future();
-            }
-
-            bool initial_suspend() { return false; }
-            bool final_suspend() { return false; }
-
+            template <typename U = T,
+                typename = std::enable_if<std::is_void<U>::value>::type>
             void set_result()
             {
-                promise.set_value();
+                this->base_type::set_value();
             }
 
             void set_exception(std::exception_ptr e)
@@ -617,7 +641,7 @@ namespace std { namespace experimental
                     std::rethrow_exception(e);
                 }
                 catch (...) {
-                    promise.set_exception(boost::current_exception());
+                    this->base_type::set_exception(boost::current_exception());
                     cancelling = true;
                 }
             }
