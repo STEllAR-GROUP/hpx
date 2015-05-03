@@ -10,6 +10,7 @@
 //
 #include <vector>
 #include <functional>
+#include "RdmaLogging.h"
 //
 namespace hpx { namespace util { namespace detail
 {

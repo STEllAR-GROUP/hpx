@@ -8,8 +8,8 @@ include(HPX_AddLibrary)
 ################################################################################
 # Decide whether to use the VERBS based parcelport
 ################################################################################
-if(HPX_PARCELPORT_VERBS)
-  hpx_add_config_define(HPX_PARCELPORT_VERBS)
+if(HPX_WITH_PARCELPORT_VERBS)
+  hpx_add_config_define(HPX_WITH_PARCELPORT_VERBS)
 
   include(GitExternal)
   include(SubProject)
@@ -25,26 +25,52 @@ if(HPX_PARCELPORT_VERBS)
     NO_UPDATE
   )
 
-  ## ibverbs parcelport settings
-  hpx_option(HPX_PARCELPORT_VERBS_IFNAME STRING "The interface name of the ibverbs capable network adapter (default: ib0)" "ib0" CATEGORY "Parcelport" ADVANCED)
-  hpx_option(HPX_PARCELPORT_VERBS_DEVICE STRING "The device name of the ibverbs capable network adapter (default: roq0)" "roq" CATEGORY "Parcelport" ADVANCED)
-  hpx_option(HPX_PARCELPORT_VERBS_INTERFACE STRING "The interface name of the ibverbs capable network adapter (default: roq0)" "roq0" CATEGORY "Parcelport" ADVANCED)
-  hpx_option(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE STRING "Number of bytes a chunk in the memory pool can hold (default: 4K)" "4096" CATEGORY "Parcelport" ADVANCED)
-  hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of chunks that can be allocated (default: 16)" "64" CATEGORY "Parcelport" ADVANCED)
+  if (NOT Boost_USE_STATIC_LIBS)
+    hpx_add_config_define(BOOST_LOG_DYN_LINK)
+  endif()
 
-  hpx_add_config_define(HPX_PARCELPORT_VERBS)
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_IFNAME "\"${HPX_PARCELPORT_VERBS_IFNAME}\"")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_DEVICE "\"${HPX_PARCELPORT_VERBS_DEVICE}\"")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_INTERFACE "\"${HPX_PARCELPORT_VERBS_INTERFACE}\"")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD "${HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD}")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE "${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE}")
-  hpx_add_config_define(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS "${HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS}")
+## ibverbs parcelport settings
+#hpx_option(HPX_WITH_PARCELPORT_VERBS_IFNAME STRING
+#  "The interface name of the ibverbs capable network adapter (default: ib0)"
+#  "ib0" CATEGORY "Parcelport" ADVANCED)
+
+#hpx_option(HPX_WITH_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE STRING
+#  "Number of bytes a chunk in the memory pool can hold (default: 64MB)"
+#  "67108864" CATEGORY "Parcelport" ADVANCED)
+
+hpx_option(HPX_WITH_PARCELPORT_VERBS_MESSAGE_PAYLOAD STRING
+  "Size of the message payload not sent with RDMA (default: 512 byte)"
+  "512" CATEGORY "Parcelport" ADVANCED)
+
+hpx_option(HPX_WITH_PARCELPORT_VERBS_DEVICE STRING 
+  "The device name of the ibverbs capable network adapter (default: roq0)" 
+  "roq" CATEGORY "Parcelport" ADVANCED)
+
+hpx_option(HPX_WITH_PARCELPORT_VERBS_INTERFACE STRING 
+  "The interface name of the ibverbs capable network adapter (default: roq0)" 
+  "roq0" CATEGORY "Parcelport" ADVANCED)
+
+hpx_option(HPX_WITH_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE STRING 
+  "Number of bytes a chunk in the memory pool can hold (default: 4K)" 
+  "4096" CATEGORY "Parcelport" ADVANCED)
+  
+hpx_option(HPX_WITH_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING 
+  "Maximum number of chunks that can be allocated (default: 16)" 
+  "64" CATEGORY "Parcelport" ADVANCED)
+
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS)
+#  hpx_add_config_define(HPX_WITH_PARCELPORT_VERBS_IFNAME "\"${HPX_WITH_PARCELPORT_VERBS_IFNAME}\"")
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS_DEVICE "\"${HPX_WITH_PARCELPORT_VERBS_DEVICE}\"")
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS_INTERFACE "\"${HPX_WITH_PARCELPORT_VERBS_INTERFACE}\"")
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS_MESSAGE_PAYLOAD "${HPX_WITH_PARCELPORT_VERBS_MESSAGE_PAYLOAD}")
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE "${HPX_WITH_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE}")
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS "${HPX_WITH_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS}")
 
   message("Adding subproject")
   set(rdmahelper_EXPORTED_TARGETS HPXTargets)
   
   # build rdma helperlibrary with HPX support
-  add_definitions(-DRDMAHELPER_HPX_COMPATIBILITY)
+  add_definitions(-DRDMAHELPER_HAVE_HPX)
   
   add_subproject(rdmahelper rdmahelper)
 

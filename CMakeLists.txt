@@ -572,7 +572,6 @@ if(HPX_WITH_PARCELPORT_ACTION_COUNTERS)
   hpx_add_config_define(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
 endif()
 
-
 ## mpi parcelport settings
 hpx_option(HPX_WITH_PARCELPORT_MPI_ENV STRING
   "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE)."

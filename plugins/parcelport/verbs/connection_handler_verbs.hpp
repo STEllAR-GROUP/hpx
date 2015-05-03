@@ -6,7 +6,7 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_CONNECTION_HANDLER_HPP
 #define HPX_PARCELSET_POLICIES_VERBS_CONNECTION_HANDLER_HPP
 
-#if defined(HPX_PARCELPORT_VERBS)
+#if defined(HPX_HAVE_PARCELPORT_VERBS)
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
