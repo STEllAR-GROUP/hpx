@@ -491,6 +491,8 @@ namespace hpx { namespace lcos
 
 namespace hpx { namespace lcos
 {
+    // Allow for using __await with and expression which evaluates to
+    // hpx::future<T>.
     template <typename T>
     bool await_ready(future<T> const& f)
     {
@@ -502,28 +504,46 @@ namespace hpx { namespace lcos
         std::experimental::coroutine_handle<Promise> rh)
     {
         // f.then([=](future<T> result) mutable
-        typename hpx::lcos::detail::shared_state_ptr<T>::type ss =
-            lcos::detail::get_shared_state(f);
-
-        ss->set_on_completed(
-            [ss, rh]() mutable
-            {
-                if (ss->has_exception())
-                {
-                    try {
-                        boost::rethrow_exception(ss->get_result().get_error());
-                    }
-                    catch (...) {
-                        rh.promise().set_exception(std::current_exception());
-                    }
-                }
-
-                rh();   // resume
-            });
+        lcos::detail::get_shared_state(f)->set_on_completed(rh);
     }
 
     template <typename T>
     T await_resume(future<T>& f)
+    {
+        return f.get();
+    }
+
+    // allow for wrapped futures to be unwrapped, if possible
+    template <typename T>
+    T await_resume(future<future<T> >& f)
+    {
+        return f.get().get();
+    }
+
+    template <typename T>
+    T await_resume(future<shared_future<T> >& f)
+    {
+        return f.get().get();
+    }
+
+    // Allow for using __await with and expression which evaluates to
+    // hpx::shared_future<T>.
+    template <typename T>
+    bool await_ready(shared_future<T> const& f)
+    {
+        return f.is_ready();
+    }
+
+    template <typename T, typename Promise>
+    void await_suspend(shared_future<T>& f,
+        std::experimental::coroutine_handle<Promise> rh)
+    {
+        // f.then([=](shared_future<T> result) mutable
+        lcos::detail::get_shared_state(f)->set_on_completed(rh);
+    }
+
+    template <typename T>
+    T await_resume(shared_future<T>& f)
     {
         return f.get();
     }
@@ -532,6 +552,7 @@ namespace hpx { namespace lcos
 ///////////////////////////////////////////////////////////////////////////////
 namespace std { namespace experimental
 {
+    // Allow for functions which use __await to return an hpx::future<T>
     template <typename T, typename ...Args>
     struct coroutine_traits<hpx::lcos::future<T>, Args...>
     {

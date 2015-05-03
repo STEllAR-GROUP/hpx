@@ -16,8 +16,6 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<int> fib1(int n)
 {
@@ -26,9 +24,17 @@ hpx::future<int> fib1(int n)
     return n;
 }
 
+hpx::future<int> fib2(int n)
+{
+    if (n >= 2)
+        n = __await hpx::async(&fib2, n - 1) + __await fib2(n - 2);
+    return n;
+}
+
 void simple_await_test()
 {
     HPX_TEST_EQ(fib1(10).get(), 55);
+    HPX_TEST_EQ(fib2(10).get(), 55);
 }
 
 int hpx_main()
@@ -43,10 +49,9 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // We force this test to use several threads by default.
-    using namespace boost::assign;
     std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
+    cfg.push_back("hpx.os_threads=" +
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
 
     // Initialize and run HPX
     return hpx::init(argc, argv, cfg);
