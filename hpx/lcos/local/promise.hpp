@@ -603,7 +603,7 @@ namespace std { namespace experimental
             return hpx::lcos::detail::shared_state_allocator<T>();
         }
 
-        // derive from future shared state as this will be combined with the 
+        // derive from future shared state as this will be combined with the
         // necessary stack frame for the resumable function
         struct promise_type : hpx::lcos::detail::future_data<T>
         {
@@ -614,7 +614,7 @@ namespace std { namespace experimental
             hpx::lcos::future<T> get_return_object()
             {
                 boost::intrusive_ptr<base_type> shared_state(this);
-                return hpx::traits::future_access<future<T> >::create(
+                return hpx::traits::future_access<hpx::future<T> >::create(
                     std::move(shared_state));
             }
 
@@ -625,7 +625,7 @@ namespace std { namespace experimental
                 typename = std::enable_if<!std::is_void<U2>::value>::type>
             void set_result(U && value)
             {
-                this->base_type::set_value(std::forward<U>(value));
+                this->base_type::set_result(std::forward<U>(value));
             }
 
             template <typename U = T,
