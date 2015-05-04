@@ -33,35 +33,49 @@ namespace hpx { namespace serialization
         template <class... Args>
         struct load_helper_t{};
 
-        template <class Variant, class Head, class... Args>
+        template <class Variant, class... Tail>
         BOOST_FORCEINLINE void load_helper(input_archive& ar, Variant& var,
-                load_helper_t<Head, boost::detail::variant::void_, Args...>)
+                int which, load_helper_t<boost::detail::variant::void_, Tail...>)
         {
-            Head value; //default ctor concept
-            ar >> value;
-            var = value;
+            HPX_ASSERT(false);
         }
 
-        template <class Variant, class Head1, class Head2, class... Tail>
+        template <class Variant, class Head, class... Tail>
         BOOST_FORCEINLINE void load_helper(input_archive& ar, Variant& var,
-                load_helper_t<Head1, Head2, Tail...>)
+                int which, load_helper_t<Head, Tail...>)
         {
-            load_helper(ar, var, load_helper_t<Head2, Tail...>());
+            if (which == 0)
+            {
+                Head value; // default ctor concept
+                ar >> value;
+                var = value;
+            }
+            else
+            {
+                load_helper(ar, var, which - 1, load_helper_t<Tail...>());
+            }
         }
     }
 
     template <class... Args>
-    void serialize(output_archive& ar, boost::variant<Args...>& variant, unsigned)
+    void save(output_archive& ar, const boost::variant<Args...>& variant, unsigned)
     {
+        int which = variant.which();
+        ar << which;
         detail::variant_save_visitor visitor(ar);
         variant.apply_visitor(visitor);
     }
 
     template <class... Args>
-    void serialize(input_archive& ar, boost::variant<Args...>& variant, unsigned)
+    void load(input_archive& ar, boost::variant<Args...>& variant, unsigned)
     {
-        detail::load_helper(ar, variant, detail::load_helper_t<Args...>());
+        int which;
+        ar >> which;
+        detail::load_helper(ar, variant, which, detail::load_helper_t<Args...>());
     }
+
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template <class... Args>),
+            (boost::variant<Args...>));
 }}
 
 #endif
