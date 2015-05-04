@@ -588,10 +588,17 @@ namespace hpx { namespace lcos
 ///////////////////////////////////////////////////////////////////////////////
 namespace std { namespace experimental
 {
+    // Please note that the variable naming conventions are deliberately kept
+    // in sync with those used by the VS2015rc headers.
+    // This specialization will go away once the changes introduced by this
+    // specialization have made it into Visual Studio.
     template<typename _Traits>
     struct _Construct_promise {
         template <typename _Uty, typename _Prom>
-        static auto _Fn(int, _Identity<decltype(_Uty::construct_promise(declval<_Prom*>()))>*, _Prom* p) {
+        static auto _Fn(int,
+            _Identity<decltype(_Uty::construct_promise(declval<_Prom*>()))>*,
+            _Prom* p)
+        {
             return _Traits::construct_promise(p);
         }
         template <typename _Uty, typename _Prom>
@@ -607,7 +614,10 @@ namespace std { namespace experimental
     template<typename _Traits>
     struct _Destruct_promise {
         template <typename _Uty, typename _Prom>
-        static void _Fn(int, _Identity<decltype(_Uty::destruct_promise(declval<_Prom*>()))>*, _Prom* p) {
+        static void _Fn(int,
+            _Identity<decltype(_Uty::destruct_promise(declval<_Prom*>()))>*,
+            _Prom* p)
+        {
             _Traits::destruct_promise(p);
         }
         template <typename _Uty, typename _Prom>
@@ -627,9 +637,11 @@ namespace std { namespace experimental
         using _PromiseT = typename _Traits::promise_type;
         using _Handle_type = coroutine_handle<_PromiseT>;
 
-        using _Alloc_type = decltype(_Get_coroutine_allocator<_Traits>::_Get(declval<_Ts>()...));
+        using _Alloc_type =
+            decltype(_Get_coroutine_allocator<_Traits>::_Get(declval<_Ts>()...));
         using _Alloc_traits = allocator_traits<_Alloc_type>;
-        using _Alloc_of_char_type = typename _Alloc_traits::template rebind_alloc<char>;
+        using _Alloc_of_char_type =
+            typename _Alloc_traits::template rebind_alloc<char>;
         using _Alloc_char_traits = allocator_traits<_Alloc_of_char_type>;
 
         static const size_t _ALIGN_REQ = sizeof(void*) * 2;
@@ -639,11 +651,13 @@ namespace std { namespace experimental
             ? 0
             : ((sizeof(_Alloc_type) + _ALIGN_REQ - 1) & ~(_ALIGN_REQ - 1));
 
-        static const size_t _EXTRA_SIZE = _ALIGNED_ALLOCATOR_SIZE + _Handle_type::_ALIGNED_SIZE;
+        static const size_t _EXTRA_SIZE =
+            _ALIGNED_ALLOCATOR_SIZE + _Handle_type::_ALIGNED_SIZE;
 
         static _PromiseT * _Promise_from_frame(void* _Addr) noexcept
         {
-            return reinterpret_cast<_PromiseT*>(reinterpret_cast<char*>(_Addr) - _Handle_type::_ALIGNED_SIZE);
+            return reinterpret_cast<_PromiseT*>(
+                reinterpret_cast<char*>(_Addr) - _Handle_type::_ALIGNED_SIZE);
         }
 
         static _Handle_type _Handle_from_frame(void* _Addr) noexcept
@@ -668,7 +682,8 @@ namespace std { namespace experimental
         template <typename... _Us>
         static void * _Alloc(size_t _Size, _Us&&... _Args)
         {
-            _Alloc_type _Al = _Get_coroutine_allocator<_Traits>::_Get(_STD forward<_Us>(_Args)...);
+            _Alloc_type _Al = _Get_coroutine_allocator<_Traits>::
+                _Get(_STD forward<_Us>(_Args)...);
             _Alloc_of_char_type _RealAlloc(_Al);
 
             _Size += _EXTRA_SIZE;
@@ -691,7 +706,8 @@ namespace std { namespace experimental
 
         static void _ConstructPromise(void* _Addr, void* resume_addr) {
             *reinterpret_cast<void**>(_Addr) = resume_addr;
-            *reinterpret_cast<uintptr_t*>(reinterpret_cast<uintptr_t>(_Addr) + sizeof(void*)) = 2;
+            *reinterpret_cast<uintptr_t*>(
+                reinterpret_cast<uintptr_t>(_Addr) + sizeof(void*)) = 2;
             auto _Prom = _Promise_from_frame(_Addr);
             _Construct_promise<_Traits>::_Call(_Prom);
         }
@@ -749,13 +765,8 @@ namespace std { namespace experimental
                 }
                 catch (...) {
                     this->base_type::set_exception(boost::current_exception());
-                    cancelling = true;
                 }
             }
-
-            bool cancellation_requested() { return cancelling; }
-
-            bool cancelling = false;
         };
 
         static promise_type* construct_promise(promise_type* p)
