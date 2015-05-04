@@ -574,16 +574,12 @@ namespace hpx { namespace lcos
             pointer allocate(size_type n, void const* hint = 0)
             {
                 HPX_ASSERT(sizeof(future_data<Value>) <= n);
-
-                future_data<Value>* p = new future_data<Value>();
-                intrusive_ptr_add_ref(p);
-                return reinterpret_cast<pointer>(p);
+                return new char[n];
             }
 
             void deallocate(pointer p, size_type n)
             {
-                HPX_ASSERT(sizeof(future_data<Value>) <= n);
-                intrusive_ptr_release(reinterpret_cast<future_data<Value>*>(p));
+                // deallocation will be performed through reference counting
             }
         };
     }
@@ -592,6 +588,119 @@ namespace hpx { namespace lcos
 ///////////////////////////////////////////////////////////////////////////////
 namespace std { namespace experimental
 {
+    template<typename _Traits>
+    struct _Construct_promise {
+        template <typename _Uty, typename _Prom>
+        static auto _Fn(int, _Identity<decltype(_Uty::construct_promise(declval<_Prom*>()))>*, _Prom* p) {
+            return _Traits::construct_promise(p);
+        }
+        template <typename _Uty, typename _Prom>
+        static auto _Fn(_Wrap_int, void*, _Prom* p) {
+            return ::new (static_cast<void*>(p)) _Prom();
+        }
+        template <typename _Prom>
+        static auto _Call(_Prom* p) {
+            return _Fn<_Traits>(0, nullptr, p);
+        }
+    };
+
+    template<typename _Traits>
+    struct _Destruct_promise {
+        template <typename _Uty, typename _Prom>
+        static void _Fn(int, _Identity<decltype(_Uty::destruct_promise(declval<_Prom*>()))>*, _Prom* p) {
+            _Traits::destruct_promise(p);
+        }
+        template <typename _Uty, typename _Prom>
+        static void _Fn(_Wrap_int, void*, _Prom* p) {
+            p->~_Prom();
+        }
+        template <typename _Prom>
+        static void _Call(_Prom* p) {
+            _Fn<_Traits>(0, nullptr, p);
+        }
+    };
+
+    template <typename _Ret, typename... _Ts>
+    struct _Resumable_helper_traits<hpx::lcos::future<_Ret>, _Ts...>
+    {
+        using _Traits = coroutine_traits<hpx::lcos::future<_Ret>, _Ts...>;
+        using _PromiseT = typename _Traits::promise_type;
+        using _Handle_type = coroutine_handle<_PromiseT>;
+
+        using _Alloc_type = decltype(_Get_coroutine_allocator<_Traits>::_Get(declval<_Ts>()...));
+        using _Alloc_traits = allocator_traits<_Alloc_type>;
+        using _Alloc_of_char_type = typename _Alloc_traits::template rebind_alloc<char>;
+        using _Alloc_char_traits = allocator_traits<_Alloc_of_char_type>;
+
+        static const size_t _ALIGN_REQ = sizeof(void*) * 2;
+
+        static const size_t _ALIGNED_ALLOCATOR_SIZE =
+            is_empty<_Alloc_type>::value
+            ? 0
+            : ((sizeof(_Alloc_type) + _ALIGN_REQ - 1) & ~(_ALIGN_REQ - 1));
+
+        static const size_t _EXTRA_SIZE = _ALIGNED_ALLOCATOR_SIZE + _Handle_type::_ALIGNED_SIZE;
+
+        static _PromiseT * _Promise_from_frame(void* _Addr) noexcept
+        {
+            return reinterpret_cast<_PromiseT*>(reinterpret_cast<char*>(_Addr) - _Handle_type::_ALIGNED_SIZE);
+        }
+
+        static _Handle_type _Handle_from_frame(void* _Addr) noexcept
+        {
+            return _Handle_type::from_promise(_Promise_from_frame(_Addr));
+        }
+
+        static void _Set_exception(void* _Addr) {
+            _Promise_from_frame(_Addr)->set_exception(_STD current_exception());
+        }
+
+        static decltype(auto) _Initial_suspend(void* _Addr)
+        {
+            return _Promise_from_frame(_Addr)->initial_suspend();
+        }
+
+        static decltype(auto) _Final_suspend(void* _Addr)
+        {
+            return _Promise_from_frame(_Addr)->final_suspend();
+        }
+
+        template <typename... _Us>
+        static void * _Alloc(size_t _Size, _Us&&... _Args)
+        {
+            _Alloc_type _Al = _Get_coroutine_allocator<_Traits>::_Get(_STD forward<_Us>(_Args)...);
+            _Alloc_of_char_type _RealAlloc(_Al);
+
+            _Size += _EXTRA_SIZE;
+
+            auto _Ptr = _RealAlloc.allocate(_Size);
+            ::new (static_cast<void*>(_Ptr)) _Alloc_of_char_type(_STD move(_RealAlloc));
+
+            _Ptr += _EXTRA_SIZE;
+            return _Ptr;
+        }
+
+        static void _Free(size_t _Size, void* _FramePointer) {
+            auto _Ptr = reinterpret_cast<char*>(_FramePointer);
+            _Ptr -= _EXTRA_SIZE;
+            _Size += _EXTRA_SIZE;
+            auto _AlPtr = reinterpret_cast<_Alloc_of_char_type*>(_Ptr);
+            _Alloc_of_char_type _Allocator(_STD move(*_AlPtr));
+            _Allocator.deallocate(_Ptr, _Size);
+        }
+
+        static void _ConstructPromise(void* _Addr, void* resume_addr) {
+            *reinterpret_cast<void**>(_Addr) = resume_addr;
+            *reinterpret_cast<uintptr_t*>(reinterpret_cast<uintptr_t>(_Addr) + sizeof(void*)) = 2;
+            auto _Prom = _Promise_from_frame(_Addr);
+            _Construct_promise<_Traits>::_Call(_Prom);
+        }
+
+        static void _DestructPromise(void* _Addr) {
+            _Destruct_promise<_Traits>::_Call(_Promise_from_frame(_Addr));
+        }
+    };
+
     // Allow for functions which use __await to return an hpx::future<T>
     template <typename T, typename ...Ts>
     struct coroutine_traits<hpx::lcos::future<T>, Ts...>
@@ -608,8 +717,6 @@ namespace std { namespace experimental
         struct promise_type : hpx::lcos::detail::future_data<T>
         {
             typedef hpx::lcos::detail::future_data<T> base_type;
-
-            bool cancelling = false;
 
             hpx::lcos::future<T> get_return_object()
             {
@@ -647,7 +754,21 @@ namespace std { namespace experimental
             }
 
             bool cancellation_requested() { return cancelling; }
+
+            bool cancelling = false;
         };
+
+        static promise_type* construct_promise(promise_type* p)
+        {
+            ::new (static_cast<void*>(p)) promise_type();
+            hpx::lcos::detail::intrusive_ptr_add_ref(p);
+            return p;
+        }
+
+        static void destruct_promise(promise_type* p)
+        {
+            hpx::lcos::detail::intrusive_ptr_release(p);
+        }
     };
 }}
 
