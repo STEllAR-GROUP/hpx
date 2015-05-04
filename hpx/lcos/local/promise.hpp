@@ -614,8 +614,8 @@ namespace std { namespace experimental
             hpx::lcos::future<T> get_return_object()
             {
                 boost::intrusive_ptr<base_type> shared_state(this);
-                return hpx::traits::future_access<hpx::future<T> >::create(
-                    std::move(shared_state));
+                return hpx::traits::future_access<hpx::lcos::future<T> >::
+                    create(std::move(shared_state));
             }
 
             bool initial_suspend() { return false; }
@@ -632,7 +632,7 @@ namespace std { namespace experimental
                 typename = std::enable_if<std::is_void<U>::value>::type>
             void set_result()
             {
-                this->base_type::set_value();
+                this->base_type::set_result();
             }
 
             void set_exception(std::exception_ptr e)
