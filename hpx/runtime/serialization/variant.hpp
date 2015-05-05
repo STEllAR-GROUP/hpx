@@ -80,6 +80,13 @@ namespace hpx { namespace serialization
     {
         int which;
         ar >> which;
+        if (which >= sizeof...(Args))
+        {
+            HPX_THROW_EXCEPTION(serialization_error
+              , "load variant"
+              , "which of loaded variant is greater then saved one");
+        }
+
         detail::load_helper(ar, variant, which, detail::load_helper_t<Args...>());
     }
 
