@@ -80,7 +80,7 @@ namespace hpx { namespace serialization
     {
         int which;
         ar >> which;
-        if (which >= sizeof...(Args))
+        if (static_cast<std::size_t>(which) >= sizeof...(Args))
         {
             HPX_THROW_EXCEPTION(serialization_error
               , "load variant"
