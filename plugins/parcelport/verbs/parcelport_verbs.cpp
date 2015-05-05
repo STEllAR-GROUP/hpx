@@ -402,13 +402,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // the rdmaController calls this callback function and we must clean up all temporary
         // memory etc and signal hpx when sends or receives finish.
         // ----------------------------------------------------------------------------------------------
-        int handle_verbs_completion(struct ibv_wc *completion, RdmaClient *client)
+        int handle_verbs_completion(struct ibv_wc completion, RdmaClient *client)
         {
-            uint64_t wr_id = completion->wr_id;
+            uint64_t wr_id = completion.wr_id;
             //
             // When a send completes, release memory and trigger write_handler
             //
-            if (completion->opcode==IBV_WC_SEND) {
+            if (completion.opcode==IBV_WC_SEND) {
                 bool                 found_wr_id;
                 active_send_iterator current_send;
                 {   // locked region : // make sure map isn't modified whilst we are querying it
@@ -441,7 +441,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             // When an Rdma Get operation completes, either add it to an ongoing parcel
             // receive, or if it is the last one, trigger decode message
             //
-            if (completion->opcode==IBV_WC_RDMA_READ) {
+            if (completion.opcode==IBV_WC_RDMA_READ) {
                 bool                 found_wr_id;
                 active_recv_iterator current_recv;
                 {   // locked region : // make sure map isn't modified whilst we are querying it
@@ -513,15 +513,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             // a zero byte receive indicates we are being informed that remote GET operations are complete
             // we can release any data we were holding onto and signal a send as finished
             //
-            else if (completion->opcode==IBV_WC_RECV && completion->byte_len==0) {
-                uint32_t tag = completion->imm_data;
+            else if (completion.opcode==IBV_WC_RECV && completion.byte_len==0) {
+                uint32_t tag = completion.imm_data;
                 LOG_DEBUG_MSG("zero byte receive with tag " << hexuint32(tag));
 
                 // bookkeeping : decrement counter that keeps preposted queue full
                 client->popReceive();
 
                 // let go of this region (waste really as this was a zero byte message)
-                RdmaMemoryRegion *region = (RdmaMemoryRegion *)completion->wr_id;
+                RdmaMemoryRegion *region = (RdmaMemoryRegion *)completion.wr_id;
                 chunk_pool_->deallocate(region);
 
                 // now release any zero copy regions we were holding until parcel complete
@@ -547,10 +547,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             // the header, call decode message, otherwise, queue all the Rdma Get operations
             // necessary to complete the message
             //
-            else if (completion->opcode==IBV_WC_RECV) {
+            else if (completion.opcode==IBV_WC_RECV) {
 
                 util::high_resolution_timer timer;
-                LOG_DEBUG_MSG("Entering receive (completion handler) section with received size " << decnumber(completion->byte_len));
+                LOG_DEBUG_MSG("Entering receive (completion handler) section with received size " << decnumber(completion.byte_len));
 
                 // bookkeeping : decrement counter that keeps preposted queue full
                 client->popReceive();
@@ -566,7 +566,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 parcel_recv_data &recv_data = *current_recv;
                 // get the header of the new message/parcel
                 recv_data.counter        = 0;
-                recv_data.header_region  = (RdmaMemoryRegion *)completion->wr_id;;
+                recv_data.header_region  = (RdmaMemoryRegion *)completion.wr_id;;
                 recv_data.message_region = NULL;
                 recv_data.chunk_region   = NULL;
 
