@@ -68,6 +68,13 @@ hpx_option(HPX_WITH_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING
 
   message("Adding subproject")
   set(rdmahelper_EXPORTED_TARGETS HPXTargets)
+ 
+  if (RDMAHELPER_WITH_LOGGING)
+    set_source_files_properties(
+      "${hpx_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
+      PROPERTIES COMPILE_DEFINITIONS "RDMAHELPER_HAVE_LOGGING"
+    )
+  endif()
   
   # build rdma helperlibrary with HPX support
   add_definitions(-DRDMAHELPER_HAVE_HPX)
