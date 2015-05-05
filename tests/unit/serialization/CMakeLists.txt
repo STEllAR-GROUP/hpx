@@ -8,6 +8,7 @@ set(tests
     serialization_builtins
     serialization_smart_ptr
     serialization_vector
+    serialization_variant
     serialize_buffer
     zero_copy_serialization
 )
