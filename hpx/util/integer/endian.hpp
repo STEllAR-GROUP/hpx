@@ -16,11 +16,12 @@
 //  partial specialization to correctly extend the sign when cover integer size
 //  differs from endian representation size.
 
-#ifndef BOOST_INTEGER_ENDIAN_HPP
-#define BOOST_INTEGER_ENDIAN_HPP
+#ifndef HPX_UTIL_INTEGER_ENDIAN_HPP
+#define HPX_UTIL_INTEGER_ENDIAN_HPP
+
+#include <hpx/util/integer/cover_operators.hpp>
 
 #include <boost/detail/endian.hpp>
-#include <boost/integer/cover_operators.hpp>
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/static_assert.hpp>
@@ -31,7 +32,7 @@
 #   error Platforms with CHAR_BIT != 8 are not supported
 # endif
 
-namespace boost
+namespace hpx { namespace util
 {
   namespace detail
   {
@@ -333,6 +334,6 @@ namespace boost
 # endif
 
   } // namespace integer
-} // namespace boost
+}} // namespace hpx::util
 
-#endif // BOOST_INTEGER_ENDIAN_HPP
+#endif // HPX_UTIL_INTEGER_ENDIAN_HPP

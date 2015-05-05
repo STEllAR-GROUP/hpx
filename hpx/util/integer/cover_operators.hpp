@@ -7,13 +7,13 @@
 
 //----------------------------------------------------------------------------//
 
-#ifndef BOOST_INTEGER_ENDIAN_COVER_OPERATORS_HPP
-#define BOOST_INTEGER_ENDIAN_COVER_OPERATORS_HPP
+#ifndef HPX_UTIL_INTEGER_ENDIAN_COVER_OPERATORS_HPP
+#define HPX_UTIL_INTEGER_ENDIAN_COVER_OPERATORS_HPP
 
 #include <boost/operators.hpp>
 #include <iosfwd>
 
-namespace boost
+namespace hpx { namespace util
 {
   namespace integer
   {
@@ -72,6 +72,6 @@ namespace boost
         }
     };
   } // namespace integer
-} // namespace boost
+}} // namespace hpx::util
 
-#endif // BOOST_INTEGER_ENDIAN_COVER_OPERATORS_HPP
+#endif // HPX_UTIL_INTEGER_ENDIAN_COVER_OPERATORS_HPP

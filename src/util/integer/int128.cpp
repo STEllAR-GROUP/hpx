@@ -7,7 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/numerics/int128.hpp>
+#include <hpx/util/integer/int128.hpp>
 
 #include <memory>
 #include <cmath>
@@ -15,7 +15,7 @@
 
 // IMPLEMENTATION
 
-namespace hpx { namespace util { namespace numerics
+namespace hpx { namespace util { namespace integer
 {
     const char * int128::toString (unsigned int radix) const throw () {
         if (!*this) return "0";
@@ -280,7 +280,7 @@ namespace hpx { namespace util { namespace numerics
 
             // get lower N bits of high qword
             boost::uint64_t mask = 0ull;
-            for (unsigned int i = 0; i < n; ++i) 
+            for (unsigned int i = 0; i < n; ++i)
                 mask |= (1ll << i);
 
             // and add them to low qword
