@@ -689,7 +689,8 @@ namespace std { namespace experimental
             _Size += _EXTRA_SIZE;
 
             auto _Ptr = _RealAlloc.allocate(_Size);
-            ::new (static_cast<void*>(_Ptr)) _Alloc_of_char_type(_STD move(_RealAlloc));
+            ::new (static_cast<void*>(_Ptr))
+                _Alloc_of_char_type(_STD move(_RealAlloc));
 
             _Ptr += _EXTRA_SIZE;
             return _Ptr;
@@ -708,8 +709,7 @@ namespace std { namespace experimental
             *reinterpret_cast<void**>(_Addr) = resume_addr;
             *reinterpret_cast<uintptr_t*>(
                 reinterpret_cast<uintptr_t>(_Addr) + sizeof(void*)) = 2;
-            auto _Prom = _Promise_from_frame(_Addr);
-            _Construct_promise<_Traits>::_Call(_Prom);
+            _Construct_promise<_Traits>::_Call(_Promise_from_frame(_Addr));
         }
 
         static void _DestructPromise(void* _Addr) {
@@ -721,13 +721,6 @@ namespace std { namespace experimental
     template <typename T, typename ...Ts>
     struct coroutine_traits<hpx::lcos::future<T>, Ts...>
     {
-        template <typename... Us>
-        static hpx::lcos::detail::shared_state_allocator<T>
-        get_allocator(Us&&...)
-        {
-            return hpx::lcos::detail::shared_state_allocator<T>();
-        }
-
         // derive from future shared state as this will be combined with the
         // necessary stack frame for the resumable function
         struct promise_type : hpx::lcos::detail::future_data<T>
@@ -768,6 +761,13 @@ namespace std { namespace experimental
                 }
             }
         };
+
+        template <typename... Us>
+        static hpx::lcos::detail::shared_state_allocator<T>
+        get_allocator(Us&&...)
+        {
+            return hpx::lcos::detail::shared_state_allocator<T>();
+        }
 
         static promise_type* construct_promise(promise_type* p)
         {
