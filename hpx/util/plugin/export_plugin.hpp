@@ -4,7 +4,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// Make Boost inspect tool happy: boostinspect:nounnamed
+// Make HPX inspect tool happy: hpxinspect:nounnamed
 
 #ifndef HPX_EXPORT_PLUGIN_VP_2004_08_25
 #define HPX_EXPORT_PLUGIN_VP_2004_08_25
