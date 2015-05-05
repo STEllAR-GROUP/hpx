@@ -21,7 +21,7 @@ namespace hpx { namespace serialization
             {}
 
             template <class T>
-            void operator()(const T& value)
+            void operator()(const T& value) const
             {
                 ar << value;
             }
@@ -33,9 +33,18 @@ namespace hpx { namespace serialization
         template <class... Args>
         struct load_helper_t{};
 
+        // overload for non-variadic version of variant library
         template <class Variant, class... Tail>
-        BOOST_FORCEINLINE void load_helper(input_archive& ar, Variant& var,
-                int which, load_helper_t<boost::detail::variant::void_, Tail...>)
+        BOOST_FORCEINLINE void load_helper(input_archive&, Variant&,
+                int, load_helper_t<boost::detail::variant::void_, Tail...>)
+        {
+            HPX_ASSERT(false);
+        }
+
+        // overload for variadic version of variant library
+        template <class Variant>
+        BOOST_FORCEINLINE void load_helper(input_archive&, Variant&,
+                int, load_helper_t<>)
         {
             HPX_ASSERT(false);
         }
