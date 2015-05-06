@@ -13,16 +13,19 @@
 namespace hpx { namespace serialization
 {
     template <typename T>
-    void serialize(input_archive & ar, boost::intrusive_ptr<T> & ptr, unsigned n)
+    void load(input_archive & ar, boost::intrusive_ptr<T> & ptr, unsigned n)
     {
-        detail::serialize_pointer(ar, ptr, n);
+        detail::serialize_pointer_tracked(ar, ptr, n);
     }
 
     template <typename T>
-    void serialize(output_archive & ar, boost::intrusive_ptr<T> ptr, unsigned n)
+    void save(output_archive & ar, const boost::intrusive_ptr<T>& ptr, unsigned n)
     {
-        detail::serialize_pointer(ar, ptr, n);
+        detail::serialize_pointer_tracked(ar, ptr, n);
     }
+
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template <class T>),
+            (boost::intrusive_ptr<T>));
 }}
 
 #endif

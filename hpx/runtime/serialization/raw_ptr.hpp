@@ -53,13 +53,13 @@ namespace hpx { namespace serialization
 
             void serialize(output_archive& ar, unsigned n) const
             {
-                serialize_pointer(ar, raw_ptr_type<T>(t), n);
+                serialize_pointer_tracked(ar, raw_ptr_type<T>(t), n);
             }
 
             void serialize(input_archive& ar, unsigned n)
             {
                 raw_ptr_type<T> ptr(t);
-                serialize_pointer(ar, ptr, n);
+                serialize_pointer_tracked(ar, ptr, n);
                 t = ptr.get();
             }
 
