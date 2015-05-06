@@ -13,15 +13,15 @@
 namespace hpx { namespace serialization
 {
     template <typename T>
-    void load(input_archive & ar, std::unique_ptr<T>& ptr, unsigned n)
+    void load(input_archive & ar, std::unique_ptr<T>& ptr, unsigned)
     {
-        detail::serialize_pointer_untracked(ar, ptr, n);
+        detail::serialize_pointer_untracked(ar, ptr);
     }
 
     template <typename T>
-    void save(output_archive & ar, const std::unique_ptr<T>& ptr, unsigned n)
+    void save(output_archive & ar, const std::unique_ptr<T>& ptr, unsigned)
     {
-        detail::serialize_pointer_untracked(ar, ptr, n);
+        detail::serialize_pointer_untracked(ar, ptr);
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template <typename T>), (std::unique_ptr<T>));

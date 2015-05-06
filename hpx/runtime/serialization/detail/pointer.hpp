@@ -122,7 +122,7 @@ namespace hpx { namespace serialization
 
         // forwarded serialize pointer functions
         template <typename Pointer> BOOST_FORCEINLINE
-        void serialize_pointer_tracked(output_archive & ar, const Pointer& ptr, unsigned)
+        void serialize_pointer_tracked(output_archive & ar, const Pointer& ptr)
         {
             bool valid = static_cast<bool>(ptr);
             ar << valid;
@@ -140,7 +140,7 @@ namespace hpx { namespace serialization
         }
 
         template <class Pointer> BOOST_FORCEINLINE
-        void serialize_pointer_tracked(input_archive& ar, Pointer& ptr, unsigned)
+        void serialize_pointer_tracked(input_archive& ar, Pointer& ptr)
         {
             bool valid = false;
             ar >> valid;
@@ -167,7 +167,7 @@ namespace hpx { namespace serialization
         }
 
         template <typename Pointer> BOOST_FORCEINLINE
-        void serialize_pointer_untracked(output_archive & ar, const Pointer& ptr, unsigned)
+        void serialize_pointer_untracked(output_archive & ar, const Pointer& ptr)
         {
             bool valid = static_cast<bool>(ptr);
             ar << valid;
@@ -178,7 +178,7 @@ namespace hpx { namespace serialization
         }
 
         template <class Pointer> BOOST_FORCEINLINE
-        void serialize_pointer_untracked(input_archive& ar, Pointer& ptr, unsigned)
+        void serialize_pointer_untracked(input_archive& ar, Pointer& ptr)
         {
             bool valid = false;
             ar >> valid;
