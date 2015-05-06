@@ -60,6 +60,7 @@ set(tests
     set_union
     swapranges
     task_block
+    task_block_par
     transform
     transform_binary
     transform_exclusive_scan
@@ -72,6 +73,7 @@ set(tests
    )
 
 set(task_block_FLAGS DEPENDENCIES iostreams_component)
+set(task_block_par_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(test ${tests})
   set(sources

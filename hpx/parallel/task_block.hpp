@@ -145,9 +145,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         /// \cond NOINTERNAL
         typedef hpx::lcos::local::spinlock mutex_type;
 
-        template <typename ExPolicy, typename F>
-        friend typename util::detail::algorithm_result<ExPolicy>::type
-        define_task_block(ExPolicy &&, F &&);
+        template <typename ExPolicy_, typename F>
+        friend typename util::detail::algorithm_result<ExPolicy_>::type
+        define_task_block(ExPolicy_ &&, F &&);
 
         explicit task_block(ExPolicy const& policy = ExPolicy())
           : id_(threads::get_self_id()),
@@ -339,9 +339,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// Constructs a \a task_block, tr, and invokes the expression
     /// \a f(tr) on the user-provided object, \a f.
     ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the task block may be parallelized.
     /// \tparam F   The type of the user defined function to invoke inside the
     ///             define_task_block (deduced). \a F shall be MoveConstructible.
     ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
     /// \param f    The user defined function to invoke inside the task block.
     ///             Given an lvalue \a tr of type \a task_block, the
     ///             expression, (void)f(tr), shall be well-formed.
@@ -377,27 +382,53 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         return trh.when(true);
     }
 
+    /// Constructs a \a task_block, tr, and invokes the expression
+    /// \a f(tr) on the user-provided object, \a f. This version uses
+    /// \a parallel_execution_policy for task scheduling.
+    ///
+    /// \tparam F   The type of the user defined function to invoke inside the
+    ///             define_task_block (deduced). \a F shall be MoveConstructible.
+    ///
+    /// \param f    The user defined function to invoke inside the task block.
+    ///             Given an lvalue \a tr of type \a task_block, the
+    ///             expression, (void)f(tr), shall be well-formed.
+    ///
+    /// Postcondition: All tasks spawned from \a f have finished execution.
+    ///                A call to define_task_block may return on a different
+    ///                thread than that on which it was called.
+    ///
+    /// \throws An \a exception_list, as specified in Exception Handling.
+    ///
+    /// \note It is expected (but not mandated) that f will (directly or
+    ///       indirectly) call tr.run(_callable_object_).
+    ///
+    template <typename F>
+    void define_task_block(F && f)
+    {
+        define_task_block(parallel::par, std::forward<F>(f));
+    }
+
     /// \cond NOINTERNAL
     template <typename F>
     inline void
     define_task_block(parallel::execution_policy && policy, F && f)
     {
-        switch(detail::which(policy))
+        switch(parallel::v1::detail::which(policy))
         {
-        case detail::execution_policy_enum::sequential:
+        case parallel::v1::detail::execution_policy_enum::sequential:
             return define_task_block(
                 *policy.get<sequential_execution_policy>(),
                 std::forward<f>(f));
 
-        case detail::execution_policy_enum::sequential_task:
+        case parallel::v1::detail::execution_policy_enum::sequential_task:
             return define_task_block(parallel::seq, std::forward<f>(f));
 
-        case detail::execution_policy_enum::parallel:
+        case parallel::v1::detail::execution_policy_enum::parallel:
             return define_task_block(
                 *policy.get<parallel_execution_policy>(),
                 std::forward<f>(f));
 
-        case detail::execution_policy_enum::parallel_task:
+        case parallel::v1::detail::execution_policy_enum::parallel_task:
             {
                 parallel_task_execution_policy const& t =
                     *policy.get<parallel_task_execution_policy>();
@@ -406,7 +437,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     std::forward<f>(f));
             }
 
-        case detail::execution_policy_enum::parallel_vector:
+        case parallel::v1::detail::execution_policy_enum::parallel_vector:
             return define_task_block(
                 *policy.get<parallel_vector_execution_policy>(),
                 std::forward<f>(f));
@@ -421,6 +452,42 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
     /// Constructs a \a task_block, tr, and invokes the expression
     /// \a f(tr) on the user-provided object, \a f.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the task block may be parallelized.
+    /// \tparam F   The type of the user defined function to invoke inside the
+    ///             define_task_block (deduced). \a F shall be MoveConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param f    The user defined function to invoke inside the define_task_block.
+    ///             Given an lvalue \a tr of type \a task_block, the
+    ///             expression, (void)f(tr), shall be well-formed.
+    ///
+    /// \throws An \a exception_list, as specified in Exception Handling.
+    ///
+    /// Postcondition: All tasks spawned from \a f have finished execution.
+    ///                A call to \a define_task_block_restore_thread always returns on the
+    ///                same thread as that on which it was called.
+    ///
+    /// \note It is expected (but not mandated) that f will (directly or
+    ///       indirectly) call tr.run(_callable_object_).
+    ///
+    template <typename ExPolicy, typename F>
+    typename util::detail::algorithm_result<ExPolicy>::type
+    define_task_block_restore_thread(ExPolicy && policy, F && f)
+    {
+        BOOST_STATIC_ASSERT(parallel::is_execution_policy<ExPolicy>::value);
+
+        // By design we always return on the same (HPX-) thread as we started
+        // executing define_task_block_restore_thread.
+        define_task_block(std::forward<ExPolicy>(policy), std::forward<F>(f));
+    }
+
+    /// Constructs a \a task_block, tr, and invokes the expression
+    /// \a f(tr) on the user-provided object, \a f. This version uses
+    /// \a parallel_execution_policy for task scheduling.
     ///
     /// \tparam F   The type of the user defined function to invoke inside the
     ///             define_task_block (deduced). \a F shall be MoveConstructible.
@@ -438,16 +505,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    template <typename ExPolicy, typename F>
-    inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy>::type
-    >::type
-    define_task_block_restore_thread(ExPolicy && policy, F && f)
+    template <typename F>
+    void define_task_block_restore_thread(F && f)
     {
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
-        define_task_block(std::forward<ExPolicy>(policy), std::forward<F>(f));
+        define_task_block(parallel::par, std::forward<F>(f));
     }
 }}}
 
