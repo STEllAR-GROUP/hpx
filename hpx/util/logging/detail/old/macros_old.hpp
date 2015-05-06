@@ -13,7 +13,7 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-// Make Boost inspect tool happy: boostinspect:nounnamed
+// Make HPX inspect tool happy: hpxinspect:nounnamed
 
 // IMPORTANT : the JT28092007_macros_HPP_DEFINED needs to remain constant - don't change the macro name!
 #ifndef JT28092007_macros_HPP_DEFINED

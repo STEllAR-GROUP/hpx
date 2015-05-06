@@ -680,7 +680,7 @@ namespace hpx { namespace lcos
 
         typedef util::unused_type result_type;
 
-        ~promise()
+        virtual ~promise()
         {}
 
         lcos::future<void> get_future(error_code& ec = throws)

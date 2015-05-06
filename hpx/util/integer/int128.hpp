@@ -19,7 +19,7 @@
 
 #include <boost/cstdint.hpp>
 
-namespace hpx { namespace util { namespace numerics
+namespace hpx { namespace util { namespace integer
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT int128
@@ -179,6 +179,6 @@ namespace hpx { namespace util { namespace numerics
 
 // MISC
 
-// typedef hpx::util::numerics::int128 __int128_t;
+// typedef hpx::util::integer::int128 __int128_t;
 
 #endif
