@@ -72,9 +72,8 @@ int main()
     oarchive << A();
 
     B * const b1 = new D;
-    B * cb1 = new D;
     oarchive << hpx::serialization::raw_ptr(b1);
-    oarchive << hpx::serialization::raw_ptr(cb1);
+    oarchive << hpx::serialization::raw_ptr(b1);
 
     hpx::serialization::input_archive iarchive(buffer);
     A a;
@@ -85,6 +84,7 @@ int main()
 
     HPX_TEST_EQ(a.a, 8);
     HPX_TEST_NEQ(b2, b1);
+    HPX_TEST_EQ(b2, b3); //trackable
     HPX_TEST_EQ(b2->b, b1->b);
 
     delete b2;
