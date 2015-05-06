@@ -185,6 +185,8 @@ namespace hpx { namespace util
 #else
 // logging is disabled all together
 
+#include <vector>
+
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
