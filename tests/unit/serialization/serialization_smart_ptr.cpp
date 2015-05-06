@@ -5,6 +5,7 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
+#include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
@@ -31,6 +32,27 @@ void test_shared()
     HPX_TEST_EQ(op1.get(), op2.get());
     HPX_TEST_EQ(*op1, *ip);
     op1.reset();
+    HPX_TEST_EQ(*op2, *ip);
+}
+
+void test_unique()
+{
+    std::unique_ptr<int> ip(new int(7));
+    std::unique_ptr<int> op1;
+    std::unique_ptr<int> op2;
+    {
+        std::vector<char> buffer;
+        hpx::serialization::output_archive oarchive(buffer);
+        oarchive << ip << ip;
+
+        hpx::serialization::input_archive iarchive(buffer);
+        iarchive >> op1;
+        iarchive >> op2;
+    }
+    HPX_TEST_NEQ(op1.get(), ip.get());
+    HPX_TEST_NEQ(op2.get(), ip.get());
+    HPX_TEST_NEQ(op1.get(), op2.get()); //untracked
+    HPX_TEST_EQ(*op1, *ip);
     HPX_TEST_EQ(*op2, *ip);
 }
 
@@ -90,6 +112,7 @@ void test_intrusive()
 int main()
 {
     test_shared();
+    test_unique();
     test_intrusive();
 
     return hpx::util::report_errors();
