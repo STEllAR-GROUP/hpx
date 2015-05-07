@@ -84,7 +84,7 @@ int main()
 
     HPX_TEST_EQ(a.a, 8);
     HPX_TEST_NEQ(b2, b1);
-    HPX_TEST_EQ(b2, b3); //trackable
+    HPX_TEST_NEQ(b2, b3); //untrackable
     HPX_TEST_EQ(b2->b, b1->b);
 
     delete b2;
