@@ -550,23 +550,23 @@ namespace hpx { namespace actions
 /// \code
 ///      namespace app
 ///      {
-///          // Define a simple component exposing one action 'print_greating'
+///          // Define a simple component exposing one action 'print_greeting'
 ///          class HPX_COMPONENT_EXPORT server
 ///            : public hpx::components::simple_component_base<server>
 ///          {
-///              void print_greating ()
+///              void print_greeting ()
 ///              {
 ///                  hpx::cout << "Hey, how are you?\n" << hpx::flush;
 ///              }
 ///
 ///              // Component actions need to be declared, this also defines the
-///              // type 'print_greating_action' representing the action.
-///              HPX_DEFINE_COMPONENT_ACTION(server, print_greating, print_greating_action);
+///              // type 'print_greeting_action' representing the action.
+///              HPX_DEFINE_COMPONENT_ACTION(server, print_greeting, print_greeting_action);
 ///          };
 ///      }
 ///
 ///      // Declare boilerplate code required for each of the component actions.
-///      HPX_REGISTER_ACTION_DECLARATION(app::server::print_greating_action);
+///      HPX_REGISTER_ACTION_DECLARATION(app::server::print_greeting_action);
 /// \endcode
 ///
 /// \note This macro has to be used once for each of the component actions
