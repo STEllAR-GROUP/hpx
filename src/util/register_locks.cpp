@@ -71,6 +71,7 @@ namespace hpx { namespace util
             static hpx::util::thread_specific_ptr<held_locks_data, tls_tag> held_locks_;
 
             static bool lock_detection_enabled_;
+            static bool ignore_all_locks_;
 
             static held_locks_map& get_lock_map()
             {
@@ -99,6 +100,7 @@ namespace hpx { namespace util
             register_locks::held_locks_data, register_locks::tls_tag
         > register_locks::held_locks_;
         bool register_locks::lock_detection_enabled_ = false;
+        bool register_locks::ignore_all_locks_ = false;
 
         struct reset_on_exit
         {
@@ -128,7 +130,8 @@ namespace hpx { namespace util
     {
         using detail::register_locks;
 
-        if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
+        if (register_locks::lock_detection_enabled_ &&
+            0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -154,7 +157,8 @@ namespace hpx { namespace util
     {
         using detail::register_locks;
 
-        if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
+        if (register_locks::lock_detection_enabled_ &&
+            0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -195,6 +199,7 @@ namespace hpx { namespace util
         bool& enabled = register_locks::get_lock_enabled();
 
         if (enabled && register_locks::lock_detection_enabled_ &&
+            !register_locks::ignore_all_locks_ &&
             0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
@@ -273,7 +278,8 @@ namespace hpx { namespace util
     {
         void set_ignore_status(void const* lock, bool status)
         {
-            if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
+            if (register_locks::lock_detection_enabled_ &&
+                0 != threads::get_self_ptr())
             {
                 register_locks::held_locks_map& held_locks =
                     register_locks::get_lock_map();
@@ -304,6 +310,15 @@ namespace hpx { namespace util
         detail::set_ignore_status(lock, false);
     }
 
+    void ignore_all_locks()
+    {
+        detail::register_locks::ignore_all_locks_ = true;
+    }
+
+    void reset_ignored_all()
+    {
+        detail::register_locks::ignore_all_locks_ = false;
+    }
 #else
 
     bool register_lock(void const*, util::register_lock_data*)
@@ -332,6 +347,13 @@ namespace hpx { namespace util
     {
     }
 
+    void ignore_all_locks()
+    {
+    }
+
+    void reset_ignored_all()
+    {
+    }
 #endif
 }}
 
