@@ -11,6 +11,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 int test_count = 100;

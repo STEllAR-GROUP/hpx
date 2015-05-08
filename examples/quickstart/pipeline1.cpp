@@ -12,6 +12,7 @@
 #include <regex>
 
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/range/functions.hpp>
 
 struct pipeline
 {

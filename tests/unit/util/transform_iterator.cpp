@@ -14,6 +14,8 @@
 #include <vector>
 #include <algorithm>
 
+#include <boost/range/functions.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace test
 {
