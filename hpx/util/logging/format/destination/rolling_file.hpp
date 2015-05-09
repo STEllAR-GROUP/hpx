@@ -92,15 +92,18 @@ namespace detail {
             namespace fs = boost::filesystem;
 
             if ( m_flags.initial_erase()) {
-                for ( unsigned idx = 0; idx < m_flags.file_count(); ++idx)
-                    if ( fs::exists( file_name(idx) ))
+                for ( unsigned idx = 0; idx < m_flags.file_count(); ++idx) {
+                    boost::system::error_code ec;
+                    if ( fs::exists( file_name(idx), ec) && ec)
                         fs::remove( file_name(idx) );
+                }
             }
 
             // see what file to start from
             if ( m_flags.start_where_size_not_exceeded() ) {
-                for ( m_cur_idx = 0; m_cur_idx < m_flags.file_count(); ++m_cur_idx )
-                    if ( fs::exists( file_name(m_cur_idx) )) {
+                for ( m_cur_idx = 0; m_cur_idx < m_flags.file_count(); ++m_cur_idx ) {
+                    boost::system::error_code ec;
+                    if ( fs::exists( file_name(m_cur_idx), ec) && ec) {
                         if ( fs::file_size( file_name(m_cur_idx))  < m_flags.max_size_bytes() )
                             // file hasn't reached max size
                             break;
@@ -108,6 +111,7 @@ namespace detail {
                     else
                         // file not found, we'll create it now
                         break;
+                }
 
                 if ( m_cur_idx >= m_flags.file_count())
                     // all files are too full (we'll overwrite the first one)
