@@ -6,11 +6,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// 190022816: VS2015RC
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER <= 190022816
-#error "Inline namespaces are broken on VS2015 (versions below don't support it)"
-#endif
-
 inline namespace my_ns {
 
     int data = 0;
