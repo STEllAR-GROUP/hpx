@@ -1,10 +1,12 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARALLEL_TEST_ITERATOR_MAY_29_2014_0110PM)
 #define HPX_PARALLEL_TEST_ITERATOR_MAY_29_2014_0110PM
+
+#include <hpx/include/parallel_execution_policy.hpp>
 
 #include <boost/iterator/iterator_adaptor.hpp>
 
@@ -156,7 +158,7 @@ namespace test
         {
             using namespace hpx::parallel::v1::detail;
 
-            if (which(policy) == static_cast<int>(execution_policy_enum::sequential)) {
+            if (policy.type() == typeid(hpx::parallel::sequential_execution_policy)) {
                 HPX_TEST_EQ(e.size(), 1u);
             }
             else {
