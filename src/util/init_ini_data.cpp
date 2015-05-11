@@ -35,7 +35,8 @@ namespace hpx { namespace util
     {
         try {
             namespace fs = boost::filesystem;
-            if (!fs::exists(loc))
+            boost::system::error_code ec;
+            if (!fs::exists(loc, ec) || !ec)
                 return false;       // avoid exception on missing file
             ini.read (loc);
         }
@@ -130,7 +131,8 @@ namespace hpx { namespace util
 
         if (!hpx_ini_file.empty()) {
             namespace fs = boost::filesystem;
-            if (!fs::exists(hpx_ini_file)) {
+            boost::system::error_code ec;
+            if (!fs::exists(hpx_ini_file, ec) || !ec) {
                 std::cerr << "hpx::init: command line warning: file specified using "
                              "--hpx::config does not exist ("
                     << hpx_ini_file << ")." << std::endl;
@@ -176,7 +178,8 @@ namespace hpx { namespace util
                 fs::directory_iterator nodir;
                 fs::path this_path (hpx::util::create_path(*it));
 
-                if (!fs::exists(this_path))
+                boost::system::error_code ec;
+                if (!fs::exists(this_path, ec) || !ec)
                     continue;
 
                 for (fs::directory_iterator dir(this_path); dir != nodir; ++dir)
@@ -377,7 +380,8 @@ namespace hpx { namespace util
             fs::directory_iterator nodir;
             fs::path libs_path (hpx::util::create_path(libs));
 
-            if (!fs::exists(libs_path))
+            boost::system::error_code ec;
+            if (!fs::exists(libs_path, ec) || !ec)
                 return plugin_registries;     // given directory doesn't exist
 
             // retrieve/create section [hpx.components]
