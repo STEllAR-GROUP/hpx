@@ -39,8 +39,23 @@ namespace hpx { namespace util
     HPX_API_EXPORT void enable_lock_detection();
     HPX_API_EXPORT void ignore_lock(void const* lock);
     HPX_API_EXPORT void reset_ignored(void const* lock);
+    HPX_API_EXPORT void ignore_all_locks();
+    HPX_API_EXPORT void reset_ignored_all();
 
     ///////////////////////////////////////////////////////////////////////////
+    struct ignore_all_while_checking
+    {
+        ignore_all_while_checking()
+        {
+            ignore_all_locks();
+        }
+
+        ~ignore_all_while_checking()
+        {
+            reset_ignored_all();
+        }
+    };
+
 #if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
     template <typename Lock>
     struct ignore_while_checking<Lock,
@@ -139,6 +154,11 @@ namespace hpx { namespace util
         ignore_while_checking(void const* lock) {}
     };
 
+    struct ignore_all_while_checking
+    {
+        ignore_all_while_checking() {}
+    };
+
     inline bool register_lock(void const*, util::register_lock_data* = 0)
     {
         return true;
@@ -160,6 +180,13 @@ namespace hpx { namespace util
     {
     }
     inline void reset_ignored(void const* /*lock*/)
+    {
+    }
+
+    inline void ignore_all_locks()
+    {
+    }
+    inline void reset_ignored_all()
     {
     }
 #endif
