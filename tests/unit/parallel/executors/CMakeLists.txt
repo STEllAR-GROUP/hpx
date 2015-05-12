@@ -1,14 +1,11 @@
-# Copyright (c) 2007-2015 Hartmut Kaiser
+# Copyright (c) 2014-2015 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# add tests
 set(tests
-    task_block
+    sequential_executor
    )
-
-set(task_block_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(test ${tests})
   set(sources
@@ -24,31 +21,18 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Parallel/")
+                     FOLDER "Tests/Unit/Parallel/Executors")
 
   add_hpx_unit_test("parallel" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.parallel.${test})
+  add_hpx_pseudo_target(tests.unit.parallel.executors.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.parallel
-                              tests.unit.parallel.${test})
+  add_hpx_pseudo_dependencies(tests.unit.parallel.executors
+                              tests.unit.parallel.executors.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.parallel.${test}
+  add_hpx_pseudo_dependencies(tests.unit.parallel.executors.${test}
                               ${test}_test_exe)
 endforeach()
-
-# add subdirectories
-set(subdirs
-    algorithms
-    executors
-   )
-
-foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.parallel.${subdir})
-  add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit.parallel tests.unit.parallel.${subdir})
-endforeach()
-
