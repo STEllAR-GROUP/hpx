@@ -19,18 +19,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     {
         typedef sequential_execution_tag execution_category;
 
-        template <typename F, typename ...Ts>
+        template <typename F>
         typename util::result_of<F()>::type
-        execute(F f, Ts&&... ts)
+        execute(F f)
         {
-            return f(std::forward<Ts>(ts)...);
+            return f();
         }
 
-        template <typename F, typename ...Ts>
+        template <typename F>
         hpx::future<typename util::result_of<F()>::type>
-        async_execute(F f, Ts&&... ts)
+        async_execute(F f)
         {
-            return hpx::async(hpx::launch::deferred, f, std::forward<Ts>(ts)...);
+            return hpx::async(hpx::launch::deferred, f);
         }
 
         template <typename F, typename Shape>
@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         bulk_async_execute(F f, Shape const& shape)
         {
             return hpx::async(hpx::launch::deferred,
-                [=] { this->execute(f, shape); });
+                [=] { this->bulk_execute(f, shape); });
         }
     };
 }}}
