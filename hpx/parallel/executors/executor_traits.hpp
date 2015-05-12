@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executor_traits.hpp
+/// \file parallel/executors/executor_traits.hpp
 
 #if !defined(HPX_PARALLEL_EXECUTOR_TRAITS_MAY_10_2015_1128AM)
 #define HPX_PARALLEL_EXECUTOR_TRAITS_MAY_10_2015_1128AM
@@ -15,6 +15,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <type_traits>
@@ -50,6 +51,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     namespace detail
     {
         /// \cond NOINTERNAL
+#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
+        template <typename T, typename NameGetter>
+        struct has_member_impl
+        {
+            typedef char yes;
+            typedef long no;
+
+            template <typename C>
+            static yes f(typename NameGetter::template get<C>*);
+
+            template <typename C>
+            static no f(...);
+
+            static const bool value = (sizeof(f<T>(0)) == sizeof(yes));
+        };
+
+        template <typename T, typename NameGetter>
+        struct has_member
+          : std::integral_constant<bool, has_member_impl<T, NameGetter>::value>
+        {};
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Enable = void>
@@ -59,30 +81,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         template <typename Executor>
-        struct execution_category<
-            Executor,
+        struct execution_category<Executor,
             typename util::always_void<
                 typename Executor::execution_category
             >::type>
         {
             typedef typename Executor::execution_category type;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Executor, typename Enable = void>
-        struct shape_type
-        {
-            typedef boost::integer_range<std::size_t> type;
-        };
-
-        template <typename Executor>
-        struct shape_type<
-            Executor,
-            typename util::always_void<
-                typename Executor::shape_type
-            >::type>
-        {
-            typedef typename Executor::shape_type type;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -93,11 +97,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         template <typename Executor, typename T>
-        struct future_type<
-            Executor, T,
-            typename util::always_void<
-                typename Executor::future_type
-            >::type>
+        struct future_type<Executor, T,
+            typename util::always_void<typename Executor::future_type>::type>
         {
             typedef typename Executor::future_type type;
         };
@@ -109,29 +110,58 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             typedef typename util::result_of<F()>::type result_type;
             typedef typename future_type<Executor, result_type>::type type;
 
-            static type call(Executor&, F const& f)
+            template <typename ...Ts>
+            static type call(Executor&, F const& f, Ts&&... ts)
             {
-                return hpx::async(f);
+                return hpx::async(f, std::forward<Ts>(ts)...);
             }
         };
 
+#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
         template <typename Executor, typename F>
-        struct async_execute<
-            Executor, F,
-            typename util::always_void<
-                decltype(
-                    std::declval<Executor>().async_execute(std::declval<F>())
-                )
+        struct check_has_async_execute
+        {
+            typedef typename util::result_of<F()>::type result_type;
+            typedef typename future_type<Executor, result_type>::type type;
+
+            template <typename T, type (T::*)(F) = &T::async_execute>
+            struct get {};
+        };
+
+        template <typename Executor, typename F>
+        struct async_execute<Executor, F,
+            typename std::enable_if<
+                has_member<Executor, check_has_async_execute<
+                    Executor, F
+                > >::value
             >::type>
         {
             typedef typename util::result_of<F()>::type result_type;
             typedef typename future_type<Executor, result_type>::type type;
 
-            static type call(Executor& exec, F const& f)
+            template <typename ...Ts>
+            static type call(Executor& exec, F const& f, Ts&&... ts)
             {
-                return exec.async_execute(f);
+                return exec.async_execute(f, std::forward<Ts>(ts)...);
             }
         };
+#else
+        template <typename Executor, typename F>
+        struct async_execute<Executor, F,
+            typename util::always_void<decltype(
+                std::declval<Executor>().async_execute(std::declval<F>())
+            )>::type>
+        {
+            typedef typename util::result_of<F()>::type result_type;
+            typedef typename future_type<Executor, result_type>::type type;
+
+            template <typename ...Ts>
+            static type call(Executor& exec, F const& f, Ts&&... ts)
+            {
+                return exec.async_execute(f, std::forward<Ts>(ts)...);
+            }
+        };
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename F, typename Enable = void>
@@ -139,26 +169,55 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             typedef typename util::result_of<F()>::type type;
 
-            static type call(Executor&, F const& f)
+            template <typename ...Ts>
+            static type call(Executor&, F const& f, Ts&&... ts)
             {
-                return hpx::async(f).get();
+                return hpx::async(f, std::forward<Ts>(ts)...).get();
             }
         };
 
+#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
         template <typename Executor, typename F>
-        struct execute<
-            Executor, F,
+        struct check_has_execute
+        {
+            typedef typename util::result_of<F()>::type type;
+
+            template <typename T, type (T::*)(F) = &T::execute>
+            struct get {};
+        };
+
+        template <typename Executor, typename F>
+        struct execute<Executor, F,
+            typename std::enable_if<
+                has_member<Executor, check_has_execute<
+                    Executor, F
+                > >::value
+            >::type>
+        {
+            typedef typename util::result_of<F()>::type type;
+
+            template <typename ...Ts>
+            static type call(Executor& exec, F const& f, Ts&&... ts)
+            {
+                return exec.execute(f, std::forward<Ts>(ts)...);
+            }
+        };
+#else
+        template <typename Executor, typename F>
+        struct execute<Executor, F,
             typename util::always_void<
                 decltype(std::declval<Executor>().execute(std::declval<F>()))
             >::type>
         {
             typedef typename util::result_of<F()>::type type;
 
-            static type call(Executor& exec, F const& f)
+            template <typename ...Ts>
+            static type call(Executor& exec, F const& f, Ts&&... ts)
             {
-                return exec.execute(f);
+                return exec.execute(f, std::forward<Ts>(ts)...);
             }
         };
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename F, typename S,
@@ -167,25 +226,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             typedef typename future_type<Executor, void>::type type;
 
-            static type call(Executor&, F const& f, S shape)
+            static type call(Executor& exec, F const& f, S const& shape)
             {
                 std::vector<hpx::future<void> > results;
-
-                auto end = boost::end(shape);
-                for (auto it = boost::begin(shape); it != end; ++it)
-                    results.push_back(hpx::async(f, *it));
-
+                for (auto const& elem: shape)
+                {
+                    results.push_back(
+                        async_execute<Executor, F>::call(exec, f, elem)
+                    );
+                }
                 return hpx::when_all(results);
             }
         };
 
+#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
         template <typename Executor, typename F, typename S>
-        struct bulk_async_execute<
-            Executor, F, S,
-            typename util::always_void<
-                decltype(std::declval<Executor>()
-                    .bulk_async_execute(std::declval<F>(), std::declval<S>())
-                )
+        struct check_has_bulk_async_execute
+        {
+            typedef typename future_type<Executor, void>::type type;
+
+            template <typename T,
+                type (T::*)(F, S const&) = &T::bulk_async_execute>
+            struct get {};
+        };
+
+        template <typename Executor, typename F, typename S>
+        struct bulk_async_execute<Executor, F, S,
+            typename std::enable_if<
+                has_member<Executor, check_has_bulk_async_execute<
+                    Executor, F, S
+                > >::value
             >::type>
         {
             typedef typename future_type<Executor, void>::type type;
@@ -195,31 +265,53 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 return exec.bulk_async_execute(f, shape);
             }
         };
+#else
+        template <typename Executor, typename F, typename S>
+        struct bulk_async_execute<Executor, F, S,
+            typename util::always_void<decltype(
+                declval<Executor>()
+                    .bulk_async_execute(std::declval<F>(), std::declval<S>())
+            )>::type>
+        {
+            typedef typename future_type<Executor, void>::type type;
+
+            static type call(Executor& exec, F const& f, S const& shape)
+            {
+                return exec.bulk_async_execute(f, shape);
+            }
+        };
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename F, typename S,
             typename Enable = void>
         struct bulk_execute
         {
-            static void call(Executor&, F const& f, shape_type shape)
+            static void call(Executor& exec, F const& f, S const& shape)
             {
                 std::vector<hpx::future<void> > results;
-
-                auto end = boost::end(shape);
-                for (auto it = boost::begin(shape); it != end; ++it)
-                    results.push_back(hpx::async(f, *it));
-
+                for (auto const& elem: shape)
+                {
+                    results.push_back(
+                        async_execute<Executor, F>::call(exec, f, elem)
+                    );
+                }
                 hpx::when_all(results).get();
             }
         };
 
+#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
+        template <typename F, typename S>
+        struct check_has_bulk_execute
+        {
+            template <typename T, void (T::*)(F, S const&) = &T::bulk_execute>
+            struct get {};
+        };
+
         template <typename Executor, typename F, typename S>
-        struct bulk_execute<
-            Executor, F, S,
-            typename util::always_void<
-                decltype(std::declval<Executor>()
-                    .bulk_execute(std::declval<F>(), std::declval<S>())
-                )
+        struct bulk_execute<Executor, F, S,
+            typename std::enable_if<
+                has_member<Executor, check_has_bulk_execute<F, S> >::value
             >::type>
         {
             static void call(Executor& exec, F const& f, S const& shape)
@@ -227,6 +319,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 exec.bulk_execute(f, shape);
             }
         };
+#else
+        template <typename Executor, typename F, typename S>
+        struct bulk_execute<Executor, F, S,
+            typename util::always_void<decltype(
+                std::declval<Executor>()
+                    .bulk_execute(std::declval<F>(), std::declval<S>())
+            )>::type>
+        {
+            static void call(Executor& exec, F const& f, S const& shape)
+            {
+                exec.bulk_execute(f, shape);
+            }
+        };
+#endif
         /// \endcond
     }
 
@@ -246,14 +352,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         typedef typename detail::execution_category<executor_type>::type
             execution_category;
-
-        /// The type of bulk-form execute() & async_execute()'s shape parameter
-        ///
-        /// \note This evaluates to executor_type::shape_type if it exists;
-        ///       otherwise this evaluates to a range which iterates over
-        ///       std::size_t.
-        ///
-        typedef typename detail::shape_type<executor_type>::type shape_type;
 
         /// The type of future returned by async_execute()
         ///
@@ -335,11 +433,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls exec.async_execute(f, shape) if it exists;
         ///       otherwise it executes hpx::async(f, i) as often as needed.
         ///
-        template <typename F>
+        template <typename F, typename Shape>
         static future<void>
-        async_execute(executor_type& exec, F f, shape_type shape)
+        async_execute(executor_type& exec, F const& f, Shape const& shape)
         {
-            return detail::bulk_async_execute<executor_type, F, shape_type>::
+            return detail::bulk_async_execute<executor_type, F, Shape>::
                 call(exec, f, shape);
         }
 
@@ -365,10 +463,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls exec.execute(f, shape) if it exists;
         ///       otherwise it executes hpx::async(f, i) as often as needed.
         ///
-        template <typename F>
-        static void execute(executor_type& exec, F f, shape_type shape)
+        template <typename F, typename Shape>
+        static void execute(executor_type& exec, F const& f, Shape const& shape)
         {
-            return detail::bulk_execute<executor_type, F, shape_type>::
+            return detail::bulk_execute<executor_type, F, Shape>::
                 call(exec, f, shape);
         }
     };
