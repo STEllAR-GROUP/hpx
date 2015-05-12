@@ -18,7 +18,7 @@ set(tests
     lifetime_588
     lifetime_588_1
     promise_leak_996
-    safely_destroy_cv_1481
+    safely_destroy_promise_1481
     set_hpx_limit_798
     shared_stated_leaked_1211
    )
