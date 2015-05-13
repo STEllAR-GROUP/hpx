@@ -409,6 +409,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     }
 
     /// \cond NOINTERNAL
+#if defined(HPX_HAVE_CXX14_LAMBDAS)
     template <typename F>
     inline void
     define_task_block(parallel::execution_policy && policy, F && f)
@@ -418,15 +419,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         case parallel::v1::detail::execution_policy_enum::sequential:
             return define_task_block(
                 *policy.get<sequential_execution_policy>(),
-                std::forward<f>(f));
+                std::forward<F>(f));
 
         case parallel::v1::detail::execution_policy_enum::sequential_task:
-            return define_task_block(parallel::seq, std::forward<f>(f));
+            return define_task_block(parallel::seq, std::forward<F>(f));
 
         case parallel::v1::detail::execution_policy_enum::parallel:
             return define_task_block(
                 *policy.get<parallel_execution_policy>(),
-                std::forward<f>(f));
+                std::forward<F>(f));
 
         case parallel::v1::detail::execution_policy_enum::parallel_task:
             {
@@ -434,13 +435,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     *policy.get<parallel_task_execution_policy>();
                 return define_task_block(
                     par(t.get_executor(), t.get_chunk_size()),
-                    std::forward<f>(f));
+                    std::forward<F>(f));
             }
 
         case parallel::v1::detail::execution_policy_enum::parallel_vector:
             return define_task_block(
                 *policy.get<parallel_vector_execution_policy>(),
-                std::forward<f>(f));
+                std::forward<F>(f));
 
         default:
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -448,6 +449,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 "The given execution policy is not supported");
         }
     }
+#endif
     /// \endcond
 
     /// Constructs a \a task_block, tr, and invokes the expression
