@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/parallel_executor.hpp>
 #include <hpx/parallel/executors/sequential_executor.hpp>
 
 #endif
