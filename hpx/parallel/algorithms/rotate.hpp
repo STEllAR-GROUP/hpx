@@ -14,10 +14,10 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -103,11 +103,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
             parallel(ExPolicy const& policy, FwdIter first,
                 FwdIter new_first, FwdIter last)
             {
-                return detail::algorithm_result<ExPolicy, FwdIter>::get(
+                return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
                     rotate_helper(policy, first, new_first, last));
             }
         };
@@ -160,7 +162,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     rotate(ExPolicy && policy, FwdIter first, FwdIter new_first, FwdIter last)
     {
@@ -225,11 +227,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutIter
+            >::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter new_first,
                 FwdIter last, OutIter dest_first)
             {
-                return detail::algorithm_result<ExPolicy, OutIter>::get(
+                return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                     rotate_copy_helper(policy, first, new_first, last, dest_first));
             }
         };
@@ -284,7 +288,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename OutIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     rotate_copy(ExPolicy && policy, FwdIter first, FwdIter new_first,
         FwdIter last, OutIter dest_first)

@@ -6,9 +6,11 @@
 # add tests
 set(tests
     task_block
+    task_block_par
    )
 
 set(task_block_FLAGS DEPENDENCIES iostreams_component)
+set(task_block_par_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(test ${tests})
   set(sources

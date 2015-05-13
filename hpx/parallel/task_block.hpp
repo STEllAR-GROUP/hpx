@@ -16,16 +16,18 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/async.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 
-#if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
 #include <memory>                           // std::addressof
 #include <boost/utility/addressof.hpp>      // boost::addressof
-#endif
+
+#include <boost/static_assert.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 {
@@ -45,6 +47,34 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             catch (...) {
                 errors.add(boost::current_exception());
             }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        hpx::launch get_launch_policy(std::true_type)
+        {
+            return hpx::launch::sync;
+        }
+
+        hpx::launch get_launch_policy(std::false_type)
+        {
+            return hpx::launch::fork;
+        }
+
+        template <typename ExPolicy>
+        BOOST_SCOPED_ENUM(launch)
+        get_launch_policy(ExPolicy const&)
+        {
+            typedef std::integral_constant<
+                    bool,
+                    parallel::is_sequential_execution_policy<ExPolicy>::value
+                > is_seq;
+            return get_launch_policy(is_seq());
+        }
+
+        inline BOOST_SCOPED_ENUM(launch)
+        get_launch_policy(parallel::execution_policy const& policy)
+        {
+            return policy.launch_policy();
         }
         /// \endcond
     }
@@ -102,34 +132,55 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     ///     });
     /// \endcode
     ///
+    template <typename ExPolicy = parallel::parallel_execution_policy>
     class task_block
     {
     private:
         /// \cond NOINTERNAL
         typedef hpx::lcos::local::spinlock mutex_type;
 
-        template <typename F> friend void define_task_block(F &&);
-        template <typename F> friend void define_task_block_restore_thread(F &&);
+        template <typename ExPolicy_, typename F>
+        friend typename util::detail::algorithm_result<ExPolicy_>::type
+        define_task_block(ExPolicy_ &&, F &&);
 
-        template <typename F> friend
-            hpx::future<void> async_define_task_block(F &&);
-        template <typename F> friend
-            hpx::future<void> async_define_task_block_restore_thread(F &&);
-
-        task_block()
-          : id_(threads::get_self_id())
+        explicit task_block(ExPolicy const& policy = ExPolicy())
+          : id_(threads::get_self_id()),
+            policy_(policy)
         {
+        }
+
+        void wait_for_completion(std::false_type)
+        {
+           when();
+        }
+
+        void wait_for_completion(std::true_type)
+        {
+           when().wait();
+        }
+
+        void wait_for_completion()
+        {
+            typedef typename util::detail::algorithm_result<ExPolicy>::type
+                result_type;
+            typedef std::integral_constant<
+                    bool, traits::is_future<result_type>::value
+                > is_fut;
+            wait_for_completion(is_fut());
         }
 
         ~task_block()
         {
-            when().wait();
+            wait_for_completion();
         }
 
-        HPX_MOVABLE_BUT_NOT_COPYABLE(task_block);
-        BOOST_DELETED_FUNCTION(task_block* operator&() const);
+        task_block(task_block const &) = delete;
+        task_block& operator=(task_block const &) = delete;
 
-        static void on_ready(std::vector<hpx::future<void> > && results,
+        task_block* operator&() const = delete;
+
+        static void
+        on_ready(std::vector<hpx::future<void> > && results,
             parallel::exception_list && errors)
         {
             for (hpx::future<void>& f: results)
@@ -142,7 +193,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         }
 
         // return future representing the execution of all tasks
-        hpx::future<void> when(bool throw_on_error = false)
+        typename util::detail::algorithm_result<ExPolicy>::type
+        when(bool throw_on_error = false)
         {
             std::vector<hpx::future<void> > tasks;
             parallel::exception_list errors;
@@ -153,16 +205,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 std::swap(errors_, errors);
             }
 
+            typedef util::detail::algorithm_result<ExPolicy> result;
+
             if (tasks.empty() && errors.size() == 0)
-                return hpx::make_ready_future();
+                return result::get();
 
             if (!throw_on_error)
-                return hpx::when_all(tasks);
+                return result::get(hpx::when_all(tasks));
 
-            return hpx::lcos::local::dataflow(
-                util::bind(util::one_shot(&task_block::on_ready),
-                    util::placeholders::_1, std::move(errors)),
-                std::move(tasks));
+            return
+                result::get(
+                    hpx::lcos::local::dataflow(
+                        hpx::util::bind(hpx::
+                            util::one_shot(&task_block::on_ready),
+                            hpx::util::placeholders::_1, std::move(errors)),
+                        std::move(tasks)
+                    ));
         }
         /// \endcond
 
@@ -209,7 +267,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     "the task_block is not active");
             }
 
-            hpx::future<void> result = hpx::async(hpx::launch::fork, boost::move(f));
+            hpx::future<void> result;
+            threads::executor exec = policy_.get_executor();
+
+            if (exec)
+            {
+                result = hpx::async(exec, boost::move(f));
+            }
+            else
+            {
+                result = hpx::async(detail::get_launch_policy(policy_),
+                    boost::move(f));
+            }
 
             mutex_type::scoped_lock l(mtx_);
             tasks_.push_back(std::move(result));
@@ -246,11 +315,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             if (id_ != threads::get_self_id())
             {
                 HPX_THROW_EXCEPTION(task_block_not_active,
-                    "task_block::run",
-                    "the task_block is not active");
+                    "task_block::run", "the task_block is not active");
+                return;
             }
 
-            when().wait();
+            wait_for_completion();
         }
 
     private:
@@ -258,10 +327,58 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         std::vector<hpx::future<void> > tasks_;
         parallel::exception_list errors_;
         threads::thread_id_type id_;
+        ExPolicy policy_;
     };
 
     /// Constructs a \a task_block, tr, and invokes the expression
     /// \a f(tr) on the user-provided object, \a f.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the task block may be parallelized.
+    /// \tparam F   The type of the user defined function to invoke inside the
+    ///             define_task_block (deduced). \a F shall be MoveConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param f    The user defined function to invoke inside the task block.
+    ///             Given an lvalue \a tr of type \a task_block, the
+    ///             expression, (void)f(tr), shall be well-formed.
+    ///
+    /// Postcondition: All tasks spawned from \a f have finished execution.
+    ///                A call to define_task_block may return on a different
+    ///                thread than that on which it was called.
+    ///
+    /// \throws An \a exception_list, as specified in Exception Handling.
+    ///
+    /// \note It is expected (but not mandated) that f will (directly or
+    ///       indirectly) call tr.run(_callable_object_).
+    ///
+    template <typename ExPolicy, typename F>
+    typename util::detail::algorithm_result<ExPolicy>::type
+    define_task_block(ExPolicy && policy, F && f)
+    {
+        BOOST_STATIC_ASSERT(parallel::is_execution_policy<ExPolicy>::value);
+
+        typedef typename hpx::util::decay<ExPolicy>::type policy_type;
+        task_block<policy_type> trh(std::forward<ExPolicy>(policy));
+
+        // invoke the user supplied function
+        try {
+            f(trh);
+        }
+        catch (...) {
+            detail::handle_task_block_exceptions(trh.errors_);
+        }
+
+        // regardless of whether f(trh) has thrown an exception we need to
+        // obey the contract and wait for all tasks to join
+        return trh.when(true);
+    }
+
+    /// Constructs a \a task_block, tr, and invokes the expression
+    /// \a f(tr) on the user-provided object, \a f. This version uses
+    /// \a parallel_execution_policy for task scheduling.
     ///
     /// \tparam F   The type of the user defined function to invoke inside the
     ///             define_task_block (deduced). \a F shall be MoveConstructible.
@@ -282,23 +399,99 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     template <typename F>
     void define_task_block(F && f)
     {
-        task_block trh;
-
-        // invoke the user supplied function
-        try {
-            f(trh);
-        }
-        catch (...) {
-            detail::handle_task_block_exceptions(trh.errors_);
-        }
-
-        // regardless of whether f(trh) has thrown an exception we need to
-        // obey the contract and wait for all tasks to join
-        trh.when(true).get();
+        define_task_block(parallel::par, std::forward<F>(f));
     }
+
+    /// \cond NOINTERNAL
+#if defined(HPX_HAVE_CXX14_LAMBDAS)
+    template <typename F>
+    inline void define_task_block(parallel::execution_policy && policy, F && f)
+    {
+        // this implementation is not nice, however we don't have variadic
+        // virtual functions accepting template arguments and supporting
+        // perfect forwarding
+        std::type_info const& t = policy.type();
+
+        if (t == typeid(sequential_execution_policy))
+        {
+            return define_task_block(
+                *policy.get<sequential_execution_policy>(),
+                std::forward<F>(f));
+        }
+
+        if (t == typeid(sequential_task_execution_policy))
+        {
+            return define_task_block(parallel::seq, std::forward<F>(f));
+        }
+
+        if (t == typeid(parallel_execution_policy))
+        {
+            return define_task_block(
+                *policy.get<parallel_execution_policy>(),
+                std::forward<F>(f));
+        }
+
+        if (t == typeid(parallel_task_execution_policy))
+        {
+            parallel_task_execution_policy const& t =
+                *policy.get<parallel_task_execution_policy>();
+            return define_task_block(
+                par(t.get_chunk_size()).on(t.get_executor()),
+                std::forward<F>(f));
+        }
+
+        if (t == typeid(parallel_vector_execution_policy))
+        {
+            return define_task_block(
+                *policy.get<parallel_vector_execution_policy>(),
+                std::forward<F>(f));
+        }
+
+        HPX_THROW_EXCEPTION(hpx::bad_parameter,
+            "define_task_block",
+            "The given execution policy is not supported");
+    }
+#endif
+    /// \endcond
 
     /// Constructs a \a task_block, tr, and invokes the expression
     /// \a f(tr) on the user-provided object, \a f.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the task block may be parallelized.
+    /// \tparam F   The type of the user defined function to invoke inside the
+    ///             define_task_block (deduced). \a F shall be MoveConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param f    The user defined function to invoke inside the define_task_block.
+    ///             Given an lvalue \a tr of type \a task_block, the
+    ///             expression, (void)f(tr), shall be well-formed.
+    ///
+    /// \throws An \a exception_list, as specified in Exception Handling.
+    ///
+    /// Postcondition: All tasks spawned from \a f have finished execution.
+    ///                A call to \a define_task_block_restore_thread always returns on the
+    ///                same thread as that on which it was called.
+    ///
+    /// \note It is expected (but not mandated) that f will (directly or
+    ///       indirectly) call tr.run(_callable_object_).
+    ///
+    template <typename ExPolicy, typename F>
+    typename util::detail::algorithm_result<ExPolicy>::type
+    define_task_block_restore_thread(ExPolicy && policy, F && f)
+    {
+        BOOST_STATIC_ASSERT(parallel::is_execution_policy<ExPolicy>::value);
+
+        // By design we always return on the same (HPX-) thread as we started
+        // executing define_task_block_restore_thread.
+        define_task_block(std::forward<ExPolicy>(policy), std::forward<F>(f));
+    }
+
+    /// Constructs a \a task_block, tr, and invokes the expression
+    /// \a f(tr) on the user-provided object, \a f. This version uses
+    /// \a parallel_execution_policy for task scheduling.
     ///
     /// \tparam F   The type of the user defined function to invoke inside the
     ///             define_task_block (deduced). \a F shall be MoveConstructible.
@@ -321,96 +514,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     {
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
-        define_task_block(std::forward<F>(f));
-    }
-
-    /// Constructs a \a task_block, tr, and invokes the expression
-    /// \a f(tr) on the user-provided object, \a f.
-    ///
-    /// \tparam F   The type of the user defined function to invoke inside the
-    ///             define_task_block (deduced). \a F shall be MoveConstructible.
-    ///
-    /// \param f    The user defined function to invoke inside the define_task_block
-    ///             Given an lvalue \a tr of type \a task_block, the
-    ///             expression, (void)f(tr), shall be well-formed.
-    ///
-    /// Postcondition: All tasks spawned from \a f have finished execution once
-    ///                once the returned future has become ready.
-    ///                A call to define_task_block may return on a different thread
-    ///                than that on which it was called.
-    ///
-    /// \returns An instance of future<void> which will become ready once all
-    ///          tasks spawned inside the \a define_task_block have finished
-    ///          executing. Any exceptions thrown during execution of the
-    ///          \a define_task_block or any of the spawned tasks are accessible
-    ///          through the returned value as well.
-    ///
-    /// \throws An \a exception_list, as specified in Exception Handling.
-    ///
-    /// \note It is expected (but not mandated) that f will (directly or
-    ///       indirectly) call tr.run(_callable_object_).
-    ///
-    template <typename F>
-    hpx::future<void> async_define_task_block(F && f)
-    {
-        task_block trh;
-        try {
-            f(trh);
-        }
-        catch (...) {
-            detail::handle_task_block_exceptions(trh.errors_);
-        }
-        return trh.when(true);
-    }
-
-    /// Constructs a \a task_block, tr, and invokes the expression
-    /// \a f(tr) on the user-provided object, \a f.
-    ///
-    /// \tparam F   The type of the user defined function to invoke inside the
-    ///             define_task_block (deduced). \a F shall be MoveConstructible.
-    ///
-    /// \param f    The user defined function to invoke inside the task block.
-    ///             Given an lvalue \a tr of type \a task_block, the
-    ///             expression, (void)f(tr), shall be well-formed.
-    ///
-    /// Postcondition: All tasks spawned from \a f have finished execution once
-    ///                the returned future has become ready.
-    ///                A call to \a define_task_block_restore_thread always
-    ///                returns on the same thread as that on which it was called.
-    ///
-    /// \throws An \a exception_list, as specified in Exception Handling.
-    ///
-    /// \returns An instance of future<void> which will become ready once all
-    ///          tasks spawned inside the \a define_task_block have finished
-    ///          executing. Any exceptions thrown during execution of the
-    ///          \a define_task_block or any of the spawned tasks are accessible
-    ///          through the returned value as well.
-    ///
-    /// \note It is expected (but not mandated) that f will (directly or
-    ///       indirectly) call tr.run(_callable_object_).
-    ///
-    template <typename F>
-    hpx::future<void> async_define_task_block_restore_thread(F && f)
-    {
-        // By design we always return on the same (HPX-) thread as we started
-        // executing define_task_block_restore_thread.
-        return async_define_task_block(std::forward<F>(f));
+        define_task_block(parallel::par, std::forward<F>(f));
     }
 }}}
 
 /// \cond NOINTERNAL
-#if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
 namespace std
 {
-    hpx::parallel::v2::task_block*
-    addressof(hpx::parallel::v2::task_block&) = delete;
+    template <typename ExPolicy>
+    hpx::parallel::v2::task_block<ExPolicy>*
+    addressof(hpx::parallel::v2::task_block<ExPolicy>&) = delete;
 }
 namespace boost
 {
-    hpx::parallel::v2::task_block*
-    addressof(hpx::parallel::v2::task_block&) = delete;
+    template <typename ExPolicy>
+    hpx::parallel::v2::task_block<ExPolicy>*
+    addressof(hpx::parallel::v2::task_block<ExPolicy>&) = delete;
 }
-#endif
 /// \endcond
 
 #endif
