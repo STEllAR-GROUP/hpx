@@ -55,7 +55,7 @@ namespace hpx
         class registry;
     }
 
-    bool pre_main(runtime_mode);
+    int pre_main(runtime_mode);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>

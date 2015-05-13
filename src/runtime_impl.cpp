@@ -218,7 +218,7 @@ namespace hpx {
         LRT_(debug) << "~runtime_impl(finished)";
     }
 
-    bool pre_main(hpx::runtime_mode);
+    int pre_main(hpx::runtime_mode);
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     threads::thread_state
@@ -231,7 +231,8 @@ namespace hpx {
         threads::set_thread_description(threads::get_self_id(), "pre_main");
 
         // Finish the bootstrap
-        if (!hpx::pre_main(mode_)) {
+        result = hpx::pre_main(mode_);
+        if (result) {
             LBT_(info) << "runtime_impl::run_helper: bootstrap "
                           "aborted, bailing out";
             return threads::thread_state(threads::terminated);
@@ -250,7 +251,6 @@ namespace hpx {
             // Call hpx_main
             result = func();
         }
-
         return threads::thread_state(threads::terminated);
     }
 
