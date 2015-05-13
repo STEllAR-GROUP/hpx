@@ -48,6 +48,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 [=] { this->bulk_execute(f, shape); });
         }
     };
+
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <>
+        struct is_executor<sequential_executor>
+          : std::true_type
+        {};
+        // \endcond
+    }
 }}}
 
 #endif

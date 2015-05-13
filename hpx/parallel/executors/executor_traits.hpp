@@ -524,6 +524,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             return detail::call_bulk_execute(exec, f, shape);
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <typename T>
+        struct is_executor
+          : std::false_type
+        {};
+        /// \endcond
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// 1. The type is_executor can be used to detect executor types
+    ///    for the purpose of excluding function signatures
+    ///    from otherwise ambiguous overload resolution participation.
+    /// 2. If T is the type of a standard or implementation-defined executor,
+    ///    is_executor<T> shall be publicly derived from
+    ///    integral_constant<bool, true>, otherwise from
+    ///    integral_constant<bool, false>.
+    /// 3. The behavior of a program that adds specializations for
+    ///    is_executor is undefined.
+    ///
+    template <typename T>
+    struct is_executor
+      : detail::is_executor<typename hpx::util::decay<T>::type>
+    {};
 }}}
 
 #endif

@@ -20,6 +20,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// The \a parallel_executor inherits all of its functionality from
         /// the default behavior of \a executor_traits.
     };
+
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <>
+        struct is_executor<parallel_executor>
+          : std::true_type
+        {};
+        // \endcond
+    }
 }}}
 
 #endif
