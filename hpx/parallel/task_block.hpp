@@ -49,18 +49,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             }
         }
 
-        hpx::launch get_launch_policy(std::true_type)
+        BOOST_SCOPED_ENUM_START(hpx::launch) get_launch_policy(std::true_type)
         {
             return hpx::launch::sync;
         }
 
-        hpx::launch get_launch_policy(std::false_type)
+        BOOST_SCOPED_ENUM_START(hpx::launch) get_launch_policy(std::false_type)
         {
             return hpx::launch::fork;
         }
 
         template <typename ExPolicy>
-        hpx::launch get_launch_policy(ExPolicy const&)
+        BOOST_SCOPED_ENUM_START(hpx::launch) get_launch_policy(ExPolicy const&)
         {
             typedef std::integral_constant<
                     bool,
@@ -69,7 +69,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             return get_launch_policy(is_seq());
         }
 
-        inline hpx::launch
+        inline BOOST_SCOPED_ENUM_START(hpx::launch)
         get_launch_policy(parallel::execution_policy const& policy)
         {
             using namespace parallel::v1::detail;
