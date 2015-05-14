@@ -17,6 +17,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/traits/extract_partitioner.hpp>
 
 #include <algorithm>
@@ -202,7 +203,7 @@ namespace hpx { namespace parallel { namespace util
                     errors.push_back(boost::current_exception());
                 }
 
-                typedef typename parallel::detail::algorithm_result<
+                typedef typename parallel::util::detail::algorithm_result<
                         parallel_task_execution_policy, R
                     >::type result_type;
 

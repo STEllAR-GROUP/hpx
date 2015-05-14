@@ -14,7 +14,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_lvalue_reference.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
+namespace hpx { namespace parallel { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T>
@@ -26,7 +26,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         // Obtain initiating function's return type.
         static type get(T && t)
         {
-            return std::move(t);
+            return t;
         }
 
         static type get(hpx::future<T> && t)
@@ -48,7 +48,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
         static type get(hpx::future<void> && t)
         {
-            t.wait();
+            t.get();
+        }
+
+        template <typename T>
+        static type get(hpx::future<T> && t)
+        {
+            t.get();
         }
     };
 
@@ -109,6 +115,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         {
             return std::move(t);
         }
+
+        template <typename T>
+        static type get(hpx::future<T> && t)
+        {
+            return hpx::future<void>(std::move(t));
+        }
     };
 
     template <>
@@ -131,6 +143,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         static type get(hpx::future<void> && t)
         {
             return std::move(t);
+        }
+
+        template <typename T>
+        static type get(hpx::future<T> && t)
+        {
+            return hpx::future<void>(std::move(t));
         }
     };
 
