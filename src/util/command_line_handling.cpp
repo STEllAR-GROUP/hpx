@@ -954,12 +954,16 @@ namespace hpx { namespace util
         rtcfg_.reconfigure(ini_config_);
 
         // print version/copyright information
-        if (vm_.count("hpx:version"))
+        if (vm_.count("hpx:version")) {
             detail::print_version(std::cout);
+            return 1;
+        }
 
         // print configuration information (static and dynamic)
-        if (vm_.count("hpx:info"))
+        if (vm_.count("hpx:info")) {
             detail::print_info(std::cout, *this);
+            return 1;
+        }
 
         // all is good
         return 0;

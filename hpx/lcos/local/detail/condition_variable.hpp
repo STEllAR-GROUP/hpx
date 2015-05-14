@@ -74,7 +74,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         {
             if (!queue_.empty())
             {
-                LERR_(fatal) << "~condition_variable: queue is not empty, aborting threads";
+                LERR_(fatal)
+                    << "~condition_variable: queue is not empty, "
+                       "aborting threads";
 
                 local::no_mutex no_mtx;
                 abort_all(no_mtx);
@@ -97,6 +99,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             return queue_.size();
         }
 
+        // Return false if no more threads are waiting. If it returns false
+        // the lock is left unlocked, otherwise it will be relocked before
+        // returning.
         template <typename Lock>
         bool notify_one(Lock& lock, error_code& ec = throws)
         {
@@ -115,20 +120,36 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 queue_.front().id_ = threads::invalid_thread_id_repr;
                 queue_.pop_front();
 
-                util::scoped_unlock<Lock> unlock(lock);
+                if (!queue_.empty())
+                {
+                    util::scoped_unlock<Lock> unlock(lock);
 
-                threads::set_thread_state(threads::thread_id_type(
-                    reinterpret_cast<threads::thread_data_base*>(id)),
-                    threads::pending, threads::wait_timeout,
-                    threads::thread_priority_default, ec);
-                if (!ec) return true;
+                    threads::set_thread_state(threads::thread_id_type(
+                        reinterpret_cast<threads::thread_data_base*>(id)),
+                        threads::pending, threads::wait_timeout,
+                        threads::thread_priority_default, ec);
+                    if (!ec) return true;
+                }
+                else
+                {
+                    // Since this is the last thread waiting on this condition
+                    // variable it could happen that this instance will be
+                    // destroyed before set_thread_state() returns. We have to
+                    // make sure that this instance is not touched anymore.
+                    lock.unlock();
+
+                    threads::set_thread_state(threads::thread_id_type(
+                        reinterpret_cast<threads::thread_data_base*>(id)),
+                        threads::pending, threads::wait_timeout,
+                        threads::thread_priority_default, ec);
+                }
             }
-
             return false;
         }
 
+        // This leaves the lock unlocked
         template <typename Lock>
-        void notify_all(Lock& lock, error_code& ec = throws) // leaves the lock unlocked
+        void notify_all(Lock& lock, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
