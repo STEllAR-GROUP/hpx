@@ -1600,7 +1600,7 @@ namespace hpx
     // This should be used carefully as it disables the possible attaching of
     // a debugger for all exceptions, not only the expected ones.
     HPX_EXPORT bool expect_exception(bool flag = true);
-    // \endcond
+    /// \endcond
 }
 
 /// \cond NOEXTERNAL

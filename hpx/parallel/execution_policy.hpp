@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct sequential_task_execution_policy
     {
         typedef parallel::sequential_executor executor_type;
-        typedef typename executor_type::executor_category executor_category;
+        typedef parallel::sequential_execution_tag execution_category;
 
         /// \cond NOINTERNAL
         static threads::executor get_executor() { return threads::executor(); }
@@ -140,7 +140,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
       : sequential_task_execution_policy
     {
         typedef Executor executor_type;
-        typedef typename executor_type::executor_category executor_category;
+        typedef typename executor_traits<executor_type>::execution_category
+            execution_category;
 
         /// \cond NOINTERNAL
         static threads::executor get_executor() { return threads::executor(); }
@@ -205,14 +206,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct sequential_execution_policy
     {
         typedef parallel::sequential_executor executor_type;
-        typedef typename executor_type::executor_category executor_category;
+        typedef parallel::sequential_execution_tag execution_category;
 
         /// \cond NOINTERNAL
         sequential_execution_policy() {}
 
         static threads::executor get_executor() { return threads::executor(); }
         static std::size_t get_chunk_size() { return 0; }
-        // \endcond
+        /// \endcond
 
         /// Create a new sequential_task_execution_policy.
         ///
@@ -280,7 +281,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct sequential_execution_policy_shim : sequential_execution_policy
     {
         typedef Executor executor_type;
-        typedef typename executor_type::executor_category executor_category;
+        typedef typename executor_traits<executor_type>::execution_category
+            execution_category;
 
         /// Create a new sequential_task_execution_policy.
         ///
@@ -344,7 +346,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct parallel_task_execution_policy
     {
         typedef parallel::parallel_executor executor_type;
-        typedef typename executor_type::executor_category executor_category;
+        typedef parallel::parallel_execution_tag execution_category;
 
         /// \cond NOINTERNAL
         parallel_task_execution_policy() {}
@@ -467,7 +469,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct parallel_task_execution_policy_shim : parallel_task_execution_policy
     {
         typedef Executor executor_type;
-        typedef typename executor_type::executor_category executor_category;
+        typedef typename executor_traits<executor_type>::execution_category
+            execution_category;
 
         /// Create a new parallel_task_execution_policy_shim from itself
         ///
@@ -529,7 +532,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct parallel_execution_policy
     {
         typedef parallel::parallel_executor executor_type;
-        typedef typename executor_type::executor_category executor_category;
+        typedef parallel::parallel_execution_tag execution_category;
 
         /// \cond NOINTERNAL
         parallel_execution_policy() {}
@@ -657,7 +660,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct parallel_execution_policy_shim : parallel_execution_policy
     {
         typedef Executor executor_type;
-        typedef typename executor_type::executor_category executor_category;
+        typedef typename executor_traits<executor_type>::execution_category
+            execution_category;
 
         /// Create a new parallel_execution_policy referencing an executor and
         /// a chunk size.
@@ -743,7 +747,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct parallel_vector_execution_policy
     {
         typedef parallel::parallel_executor executor_type;
-        typedef typename executor_type::executor_category executor_category;
+        typedef parallel::parallel_execution_tag execution_category;
 
         /// \cond NOINTERNAL
         parallel_vector_execution_policy() {}
