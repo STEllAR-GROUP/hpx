@@ -57,6 +57,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct sequential_task_execution_policy
     {
         typedef parallel::sequential_executor executor_type;
+        typedef typename executor_type::executor_category executor_category;
 
         /// \cond NOINTERNAL
         static threads::executor get_executor() { return threads::executor(); }
@@ -136,9 +137,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// sequential_execution_policy.
     template <typename Executor>
     struct sequential_task_execution_policy_shim
-      :  sequential_task_execution_policy
+      : sequential_task_execution_policy
     {
         typedef Executor executor_type;
+        typedef typename executor_type::executor_category executor_category;
 
         /// \cond NOINTERNAL
         static threads::executor get_executor() { return threads::executor(); }
@@ -156,6 +158,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             task_execution_policy_tag tag) const
         {
             return *this;
+        }
+
+        /// Create a new sequential_task_execution_policy_shim from the given
+        /// executor
+        ///
+        /// \tparam Executor    The type of the executor to associate with this
+        ///                     execution policy.
+        ///
+        /// \param exec         [in] The executor to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor<Executor>::value is true
+        ///
+        /// \returns The new parallel_task_execution_policy
+        ///
+        template <typename Executor_>
+        sequential_task_execution_policy_shim<Executor_>
+        on(Executor_& exec) const
+        {
+            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
+            return sequential_task_execution_policy_shim<Executor_>(exec);
         }
 
         /// Return the associated executor object.
@@ -181,6 +205,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct sequential_execution_policy
     {
         typedef parallel::sequential_executor executor_type;
+        typedef typename executor_type::executor_category executor_category;
 
         /// \cond NOINTERNAL
         sequential_execution_policy() {}
@@ -255,6 +280,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct sequential_execution_policy_shim : sequential_execution_policy
     {
         typedef Executor executor_type;
+        typedef typename executor_type::executor_category executor_category;
 
         /// Create a new sequential_task_execution_policy.
         ///
@@ -317,8 +343,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// corresponding algorithm when invoked with the parallel_execution_policy.
     struct parallel_task_execution_policy
     {
-    public:
         typedef parallel::parallel_executor executor_type;
+        typedef typename executor_type::executor_category executor_category;
 
         /// \cond NOINTERNAL
         parallel_task_execution_policy() {}
@@ -441,6 +467,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct parallel_task_execution_policy_shim : parallel_task_execution_policy
     {
         typedef Executor executor_type;
+        typedef typename executor_type::executor_category executor_category;
 
         /// Create a new parallel_task_execution_policy_shim from itself
         ///
@@ -501,8 +528,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// indicate that a parallel algorithm's execution may be parallelized.
     struct parallel_execution_policy
     {
-    public:
         typedef parallel::parallel_executor executor_type;
+        typedef typename executor_type::executor_category executor_category;
 
         /// \cond NOINTERNAL
         parallel_execution_policy() {}
@@ -629,8 +656,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename Executor>
     struct parallel_execution_policy_shim : parallel_execution_policy
     {
-    public:
         typedef Executor executor_type;
+        typedef typename executor_type::executor_category executor_category;
 
         /// Create a new parallel_execution_policy referencing an executor and
         /// a chunk size.
@@ -716,6 +743,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct parallel_vector_execution_policy
     {
         typedef parallel::parallel_executor executor_type;
+        typedef typename executor_type::executor_category executor_category;
 
         /// \cond NOINTERNAL
         parallel_vector_execution_policy() {}
