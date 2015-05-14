@@ -48,34 +48,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 errors.add(boost::current_exception());
             }
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        hpx::launch get_launch_policy(std::true_type)
-        {
-            return hpx::launch::sync;
-        }
-
-        hpx::launch get_launch_policy(std::false_type)
-        {
-            return hpx::launch::fork;
-        }
-
-        template <typename ExPolicy>
-        BOOST_SCOPED_ENUM(launch)
-        get_launch_policy(ExPolicy const&)
-        {
-            typedef std::integral_constant<
-                    bool,
-                    parallel::is_sequential_execution_policy<ExPolicy>::value
-                > is_seq;
-            return get_launch_policy(is_seq());
-        }
-
-        inline BOOST_SCOPED_ENUM(launch)
-        get_launch_policy(parallel::execution_policy const& policy)
-        {
-            return policy.launch_policy();
-        }
         /// \endcond
     }
 
@@ -267,18 +239,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     "the task_block is not active");
             }
 
-            hpx::future<void> result;
-            threads::executor exec = policy_.get_executor();
+            typedef typename ExPolicy::executor_type executor_type;
 
-            if (exec)
-            {
-                result = hpx::async(exec, boost::move(f));
-            }
-            else
-            {
-                result = hpx::async(detail::get_launch_policy(policy_),
-                    boost::move(f));
-            }
+            hpx::future<void> result =
+                executor_traits<executor_type>::async_execute(
+                    policy_.executor(), boost::move(f));
 
             mutex_type::scoped_lock l(mtx_);
             tasks_.push_back(std::move(result));

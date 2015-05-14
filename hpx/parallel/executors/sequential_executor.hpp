@@ -9,8 +9,11 @@
 #define HPX_PARALLEL_EXECUTORS_SEQUENTIAL_EXECUTOR_MAY_11_2015_1050AM
 
 #include <hpx/config.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
+
+#include <type_traits>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -20,17 +23,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         typedef sequential_execution_tag execution_category;
 
         template <typename F>
-        typename util::result_of<F()>::type
+        typename hpx::util::result_of<F()>::type
         execute(F f)
         {
             return f();
         }
 
         template <typename F>
-        hpx::future<typename util::result_of<F()>::type>
+        hpx::future<typename hpx::util::result_of<F()>::type>
         async_execute(F f)
         {
-            return hpx::async(hpx::launch::deferred, f);
+            return hpx::async(hpx::launch::sync, f);
         }
 
         template <typename F, typename Shape>
@@ -44,7 +47,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         hpx::future<void>
         bulk_async_execute(F f, Shape const& shape)
         {
-            return hpx::async(hpx::launch::deferred,
+            return hpx::async(hpx::launch::sync,
                 [=] { this->bulk_execute(f, shape); });
         }
     };

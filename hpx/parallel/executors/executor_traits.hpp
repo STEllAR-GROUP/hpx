@@ -120,7 +120,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename F, typename Enable = void>
         struct async_execute
         {
-            typedef typename util::result_of<F()>::type result_type;
+            typedef typename hpx::util::result_of<F()>::type result_type;
             typedef typename future_type<Executor, result_type>::type type;
 
             typedef typename execution_category<Executor>::type category;
@@ -141,7 +141,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename F>
         struct check_has_async_execute
         {
-            typedef typename util::result_of<F()>::type result_type;
+            typedef typename hpx::util::result_of<F()>::type result_type;
             typedef typename future_type<Executor, result_type>::type type;
 
             template <typename T, type (T::*)(F) = &T::async_execute>
@@ -156,7 +156,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 > >::value
             >::type>
         {
-            typedef typename util::result_of<F()>::type result_type;
+            typedef typename hpx::util::result_of<F()>::type result_type;
             typedef typename future_type<Executor, result_type>::type type;
 
             static type call(Executor& exec, F const& f)
@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 std::declval<Executor>().async_execute(std::declval<F>())
             )>::type>
         {
-            typedef typename util::result_of<F()>::type result_type;
+            typedef typename hpx::util::result_of<F()>::type result_type;
             typedef typename future_type<Executor, result_type>::type type;
 
             static type call(Executor& exec, F const& f)
@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename F, typename Enable = void>
         struct execute
         {
-            typedef typename util::result_of<F()>::type type;
+            typedef typename hpx::util::result_of<F()>::type type;
             typedef typename execution_category<Executor>::type category;
 
             static type call(Executor&, F const& f)
@@ -211,7 +211,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename F>
         struct check_has_execute
         {
-            typedef typename util::result_of<F()>::type type;
+            typedef typename hpx::util::result_of<F()>::type type;
 
             template <typename T, type (T::*)(F) = &T::execute>
             struct get {};
@@ -225,7 +225,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 > >::value
             >::type>
         {
-            typedef typename util::result_of<F()>::type type;
+            typedef typename hpx::util::result_of<F()>::type type;
 
             static type call(Executor& exec, F const& f)
             {
@@ -239,7 +239,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 decltype(std::declval<Executor>().execute(std::declval<F>()))
             >::type>
         {
-            typedef typename util::result_of<F()>::type type;
+            typedef typename hpx::util::result_of<F()>::type type;
 
             static type call(Executor& exec, F const& f)
             {

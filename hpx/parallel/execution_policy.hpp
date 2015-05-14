@@ -106,12 +106,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor>
-        typename std::enable_if<
-            is_executor<Executor>::value,
-            sequential_task_execution_policy_shim<Executor>
-        >::type
+        sequential_task_execution_policy_shim<Executor>
         on(Executor& exec) const
         {
+            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
             return sequential_task_execution_policy_shim<Executor>(exec);
         }
 
@@ -182,6 +180,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// require that a parallel algorithm's execution may not be parallelized.
     struct sequential_execution_policy
     {
+        typedef parallel::sequential_executor executor_type;
+
         /// \cond NOINTERNAL
         sequential_execution_policy() {}
 
@@ -194,7 +194,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \param tag          [in] Specify that the corresponding asynchronous
         ///                     execution policy should be used
         ///
-        /// \returns The new parallel_execution_policy
+        /// \returns The new sequential_task_execution_policy
         ///
         sequential_task_execution_policy operator()(
             task_execution_policy_tag tag) const
@@ -230,13 +230,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor>
-        typename std::enable_if<
-            is_executor<Executor>::value,
-            sequential_execution_policy_shim<Executor>
-        >::type
+        sequential_execution_policy_shim<Executor>
         on(Executor& exec) const
         {
+            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
             return sequential_execution_policy_shim<Executor>(exec);
+        }
+
+        /// Return the associated executor object.
+        executor_type& executor()
+        {
+            static parallel::sequential_executor exec;
+            return exec;
         }
     };
 
@@ -249,12 +254,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename Executor>
     struct sequential_execution_policy_shim : sequential_execution_policy
     {
+        typedef Executor executor_type;
+
         /// Create a new sequential_task_execution_policy.
         ///
         /// \param tag          [in] Specify that the corresponding asynchronous
         ///                     execution policy should be used
         ///
-        /// \returns The new parallel_execution_policy
+        /// \returns The new sequential_task_execution_policy_shim
         ///
         sequential_task_execution_policy_shim<Executor> operator()(
             task_execution_policy_tag tag) const
@@ -277,14 +284,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor_>
-        typename std::enable_if<
-            is_executor<Executor_>::value,
-            sequential_execution_policy_shim<Executor_>
-        >::type
+        sequential_execution_policy_shim<Executor_>
         on(Executor_& exec) const
         {
+            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
             return sequential_execution_policy_shim<Executor_>(exec);
         }
+
+        /// Return the associated executor object.
+        Executor& executor() { return exec_; }
 
     private:
         /// \cond NOINTERNAL
@@ -344,12 +352,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor>
-        typename std::enable_if<
-            is_executor<Executor>::value,
-            parallel_task_execution_policy_shim<Executor>
-        >::type
+        parallel_task_execution_policy_shim<Executor>
         on(Executor& exec) const
         {
+            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
             return parallel_task_execution_policy_shim<Executor>(
                 exec, chunk_size_);
         }
@@ -402,11 +408,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ar & chunk_size_;
         }
 
+    protected:
+        parallel_task_execution_policy(std::size_t chunk_size)
+          : chunk_size_(chunk_size)
+        {}
+
         parallel_task_execution_policy(threads::executor const& exec,
                 std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
         {}
 
+    private:
         threads::executor exec_;
         std::size_t chunk_size_;
         /// \endcond
@@ -458,12 +470,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor_>
-        typename std::enable_if<
-            is_executor<Executor_>::value,
-            parallel_task_execution_policy_shim<Executor_>
-        >::type
+        parallel_task_execution_policy_shim<Executor_>
         on(Executor_& exec) const
         {
+            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
             return parallel_task_execution_policy_shim<Executor_>(
                 exec, this->get_chunk_size());
         }
@@ -486,9 +496,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Executor>
-    struct parallel_execution_policy_shim;
-
     /// The class parallel_execution_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
     /// indicate that a parallel algorithm's execution may be parallelized.
@@ -513,6 +520,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         parallel_execution_policy on(threads::executor const& exec) const
         {
             return parallel_execution_policy(exec, chunk_size_);
+        }
+
+        /// Create a new parallel_execution_policy referencing an executor and
+        /// a chunk size.
+        ///
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        template <typename Executor>
+        parallel_execution_policy_shim<Executor>
+        on(Executor& exec) const
+        {
+            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+            return parallel_execution_policy_shim<Executor>(
+                exec, this->get_chunk_size());
         }
 
         /// Create a new parallel_execution_policy referencing a chunk size.
@@ -579,11 +604,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ar & chunk_size_;
         }
 
+    protected:
         parallel_execution_policy(threads::executor const& exec,
                 std::size_t chunk_size)
           : exec_(exec), chunk_size_(chunk_size)
         {}
 
+        parallel_execution_policy(std::size_t chunk_size)
+          : chunk_size_(chunk_size)
+        {}
+
+    private:
         threads::executor exec_;
         std::size_t chunk_size_;
         /// \endcond
@@ -611,12 +642,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy
         ///
         template <typename Executor_>
-        typename std::enable_if<
-            is_executor<Executor_>::value,
-            parallel_execution_policy_shim<Executor_>
-        >::type
+        parallel_execution_policy_shim<Executor_>
         on(Executor_& exec) const
         {
+            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
             return parallel_execution_policy_shim<Executor_>(
                 exec, this->get_chunk_size());
         }
@@ -670,6 +699,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     private:
         /// \cond NOINTERNAL
+        friend parallel_execution_policy;
+
         parallel_execution_policy_shim(Executor& exec, std::size_t chunk_size)
           : parallel_execution_policy(chunk_size), exec_(exec)
         {}
@@ -684,6 +715,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// indicate that a parallel algorithm's execution may be vectorized.
     struct parallel_vector_execution_policy
     {
+        typedef parallel::parallel_executor executor_type;
+
         /// \cond NOINTERNAL
         parallel_vector_execution_policy() {}
 
@@ -715,6 +748,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         parallel_vector_execution_policy on(threads::executor const&) const
         {
             return *this;
+        }
+
+        /// Return the associated executor object.
+        executor_type& executor()
+        {
+            static parallel::parallel_executor exec;
+            return exec;
         }
     };
 
