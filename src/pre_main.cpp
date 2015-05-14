@@ -151,11 +151,11 @@ bool pre_main(runtime_mode mode)
 
         register_counter_types();
 
-        rt.set_state(runtime::state_pre_startup);
+        rt.set_state(pre_startup);
         runtime_support::call_startup_functions(find_here(), true);
         LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
 
-        rt.set_state(runtime::state_startup);
+        rt.set_state(startup);
         runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
     }

@@ -10,7 +10,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/utility/binary.hpp>
 
 #include <hpx/config.hpp>
 
@@ -18,11 +17,19 @@ namespace hpx
 {
     enum state
     {
-        initialized = BOOST_BINARY_U(000),
-        starting    = BOOST_BINARY_U(001),
-        running     = BOOST_BINARY_U(010),
-        stopping    = BOOST_BINARY_U(100),
-        terminating = BOOST_BINARY_U(101)
+        invalid        = -1,
+        initialized    = 0,
+        pre_startup    = 1,
+        startup        = 2,
+        state_pre_main = 3,
+        starting       = 4,
+        running        = 5,
+        pre_shutdown   = 6,
+        state_shutdown       = 7,
+        stopping       = 8,
+        terminating    = 9,
+        state_stopped  = 10,
+        last           = state_stopped
     };
 
     namespace threads

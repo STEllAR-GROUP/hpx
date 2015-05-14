@@ -1127,17 +1127,17 @@ namespace hpx { namespace components { namespace server
         return load_plugins(ini) && result;
     }
 
-    void runtime_support::call_startup_functions(bool pre_startup)
+    void runtime_support::call_startup_functions(bool state_pre_startup)
     {
-        if (pre_startup) {
-            get_runtime().set_state(runtime::state_pre_startup);
+        if (state_pre_startup) {
+            get_runtime().set_state(pre_startup);
             for (util::function_nonser<void()> const& f : pre_startup_functions_)
             {
                 f();
             }
         }
         else {
-            get_runtime().set_state(runtime::state_startup);
+            get_runtime().set_state(startup);
             for (util::function_nonser<void()> const& f : startup_functions_)
             {
                 f();
@@ -1145,11 +1145,11 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-    void runtime_support::call_shutdown_functions(bool pre_shutdown)
+    void runtime_support::call_shutdown_functions(bool state_pre_shutdown)
     {
         runtime& rt = get_runtime();
-        if (pre_shutdown) {
-            rt.set_state(runtime::state_pre_shutdown);
+        if (state_pre_shutdown) {
+            rt.set_state(pre_shutdown);
             for (util::function_nonser<void()> const& f : pre_shutdown_functions_)
             {
                 try {
@@ -1161,7 +1161,7 @@ namespace hpx { namespace components { namespace server
             }
         }
         else {
-            rt.set_state(runtime::state_shutdown);
+            rt.set_state(state_shutdown);
             for (util::function_nonser<void()> const& f : shutdown_functions_)
             {
                 try {
