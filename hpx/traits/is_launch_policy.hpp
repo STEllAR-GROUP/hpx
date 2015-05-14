@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,13 +21,13 @@ namespace hpx { namespace traits
     {};
 
     template <typename Policy>
-    struct is_executor
+    struct is_threads_executor
       : boost::is_base_and_derived<threads::executor, Policy>
     {};
 
     template <typename Policy>
     struct is_launch_policy_or_executor
-      : boost::mpl::or_<is_launch_policy<Policy>, is_executor<Policy> >
+      : boost::mpl::or_<is_launch_policy<Policy>, is_threads_executor<Policy> >
     {};
 }}
 

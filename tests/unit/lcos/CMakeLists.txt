@@ -14,6 +14,7 @@ set(tests
     async_continue_cb
     async_continue_cb_colocated
     async_local
+    async_local_executor
     async_remote
     broadcast
     broadcast_apply

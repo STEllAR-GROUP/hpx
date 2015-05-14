@@ -11,6 +11,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/async.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/always_void.hpp>
@@ -393,7 +394,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Executor>
+    template <typename Executor, typename Enable>
     class executor_traits
     {
     public:
@@ -526,17 +527,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <typename T>
-        struct is_executor
-          : std::false_type
-        {};
-        /// \endcond
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     /// 1. The type is_executor can be used to detect executor types
     ///    for the purpose of excluding function signatures
     ///    from otherwise ambiguous overload resolution participation.
@@ -548,9 +538,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///    is_executor is undefined.
     ///
     template <typename T>
-    struct is_executor
-      : detail::is_executor<typename hpx::util::decay<T>::type>
-    {};
+    struct is_executor;         // defined in hpx/traits/is_executor.hpp
 }}}
 
 #endif

@@ -15,6 +15,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/is_executor.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_void.hpp>
@@ -143,6 +144,21 @@ namespace hpx
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...));
         p.apply();
         return p.get_future();
+    }
+
+    template <typename Executor, typename F, typename ...Ts>
+    typename boost::lazy_enable_if_c<
+        traits::is_executor<Executor>::value
+     && traits::detail::is_callable_not_action<
+            typename util::decay<F>::type(typename util::decay<Ts>::type...)
+        >::value
+     && !traits::is_bound_action<typename util::decay<F>::type>::value
+      , detail::create_future<F(Ts...)>
+    >::type
+    async(Executor& exec, F&& f, Ts&&... vs)
+    {
+        return parallel::executor_traits<Executor>::async_execute(exec,
+            util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...));
     }
 
     template <typename F, typename ...Ts>
