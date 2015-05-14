@@ -71,9 +71,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                     >::get(Derived::sequential(policy, std::forward<Args>(args)...));
             }
             catch (...) {
-                parallel::detail::handle_exception<
-                        ExPolicy, local_result_type
-                    >::call();
+                detail::handle_exception<ExPolicy, local_result_type>::call();
             }
         }
 
@@ -90,7 +88,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                     >::get(Derived::sequential(policy, std::forward<Args>(args)...));
             }
             catch (...) {
-                return parallel::detail::handle_exception<
+                return detail::handle_exception<
                         sequential_task_execution_policy, local_result_type
                     >::call();
             }
@@ -112,7 +110,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                     >::get(std::move(result));
             }
             catch (...) {
-                return parallel::detail::handle_exception<
+                return detail::handle_exception<
                         sequential_task_execution_policy, local_result_type
                     >::call();
             }
@@ -132,7 +130,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                         std::forward<Args>(args)...));
             }
             catch (...) {
-                return parallel::detail::handle_exception<
+                return detail::handle_exception<
                         parallel_task_execution_policy, local_result_type
                     >::call();
             }
