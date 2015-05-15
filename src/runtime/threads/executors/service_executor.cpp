@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/threads/executors/service_executor.hpp>
+#include <hpx/runtime/threads/executors/service_executors.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <boost/asio/basic_deadline_timer.hpp>

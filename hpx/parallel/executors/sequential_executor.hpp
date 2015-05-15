@@ -12,6 +12,8 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/util/move.hpp>
 
 #include <type_traits>
 
@@ -33,7 +35,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         hpx::future<typename hpx::util::result_of<F()>::type>
         async_execute(F f)
         {
-            return hpx::async(hpx::launch::sync, f);
+            return hpx::async(hpx::launch::sync, std::move(f));
         }
 
         template <typename F, typename Shape>
