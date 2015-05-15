@@ -338,9 +338,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     chunk_pool_->deallocate(r);
                 }
             }
+            //
+            // when a parcel is deleted, it takes a lock, since we are locking before delete
+            // we must grab a reference to the parcel and keep it alive until we unlock
+            // parcelset::parcel parcel = std::move(send->parcel);
+            // erratum : the parcel destructor takes a lock even when empty, so better
+            // to avoid the lock held detection by using util::ignore_while_checking
             {
-                scoped_lock lock(active_send_mutex);
+                unique_lock lock(active_send_mutex);
+                util::ignore_while_checking<unique_lock> il(&lock);
                 active_sends.erase(send);
+                lock.unlock();
+                active_send_condition.notify_one();
                 LOG_DEBUG_MSG("Active send after erase size " << active_sends.size() );
             }
         }
