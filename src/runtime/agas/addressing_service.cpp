@@ -216,7 +216,7 @@ addressing_service::addressing_service(
         threads::thread_priority_normal : threads::thread_priority_boost)
   , rts_lva_(0)
   , mem_lva_(0)
-  , state_(starting)
+  , state_(state_starting)
   , locality_()
 { // {{{
     boost::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
@@ -254,7 +254,7 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
             &hosted->primary_ns_server_, &hosted->symbol_ns_server_);
     }
 
-    set_status(running);
+    set_status(state_running);
 } // }}}
 
 void* addressing_service::get_hosted_primary_ns_ptr() const
@@ -653,7 +653,7 @@ bool addressing_service::get_console_locality(
     )
 { // {{{
     try {
-        if (get_status() != running)
+        if (get_status() != state_running)
         {
             if (&ec != &throws)
                 ec = make_success_code();
