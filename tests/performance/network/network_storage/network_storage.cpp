@@ -80,8 +80,8 @@
 // a background thread can be spawned to check for ready futures and remove
 // them from the waiting list. The vars are used for this bookkeeping task.
 //
-#define USE_CLEANING_THREAD
-
+// #define USE_CLEANING_THREAD
+#define USE_PARCELPORT_THREAD
 
 //----------------------------------------------------------------------------
 // Array allocation on start assumes a certain maximum number of localities will be used
@@ -113,7 +113,7 @@
 std::vector<std::vector<hpx::future<int> > > ActiveFutures;
 boost::array<boost::atomic<int>, MAX_RANKS>  FuturesWaiting;
 
-#ifdef USE_CLEANING_THREAD
+#if defined(USE_CLEANING_THREAD) || defined(USE_PARCELPORT_THREAD)
  boost::atomic<bool>                        FuturesActive;
  hpx::lcos::local::spinlock                 FuturesMutex;
 #endif
@@ -351,6 +351,24 @@ HPX_ACTION_INVOKE_NO_MORE_THAN(CopyFromStorage_action, 5);
 HPX_REGISTER_ACTION(CopyToStorage_action);
 HPX_REGISTER_ACTION(CopyFromStorage_action);
 
+
+//----------------------------------------------------------------------------
+#ifdef USE_PARCELPORT_THREAD
+// the main message sending loop may generate many thousands of send requests
+// and each is associated with a future. To reduce the number we must wait on
+// this loop runs in a background thread and simply removes any completed futures
+// from the main list of active futures.
+int background_work()
+{
+    while(FuturesActive)
+    {
+        hpx::parcelset::do_background_work(0);
+        hpx::this_thread::suspend(boost::chrono::microseconds(10));
+    }
+    return 1;
+}
+#endif
+
 //----------------------------------------------------------------------------
 #ifdef USE_CLEANING_THREAD
 // the main message sending loop may generate many thousands of send requests
@@ -437,6 +455,15 @@ void test_write(
         FuturesActive = true;
         hpx::future<int> cleaner = hpx::async(RemoveCompletions);
 #endif
+
+#ifdef USE_PARCELPORT_THREAD
+        //
+        // start a thread which will keep the parcelport active.
+        //
+        FuturesActive = true;
+        hpx::future<int> background = hpx::async(background_work);
+#endif
+
         //
         // Start main message sending loop
         //
@@ -504,6 +531,12 @@ void test_write(
             "Cleaning thread rank " << rank << " removed " << removed
           );
         }
+#endif
+
+#ifdef USE_PARCELPORT_THREAD
+        // tell the parcelport thread it's time to stop
+        FuturesActive = false;
+        background.get();
 #endif
         //
         hpx::util::simple_profiler prof_move(iteration, "Moving futures");
@@ -608,6 +641,14 @@ void test_read(
         FuturesActive = true;
         hpx::future<int> cleaner = hpx::async(RemoveCompletions);
 #endif
+
+#ifdef USE_PARCELPORT_THREAD
+        //
+        // start a thread which will keep the parcelport active.
+        //
+        FuturesActive = true;
+        hpx::future<int> background = hpx::async(background_work);
+#endif
         //
         // Start main message sending loop
         //
@@ -684,6 +725,12 @@ void test_read(
         );
 #else
         int removed = 0;
+#endif
+
+#ifdef USE_PARCELPORT_THREAD
+        // tell the parcelport thread it's time to stop
+        FuturesActive = false;
+        background.get();
 #endif
         //
         hpx::util::high_resolution_timer movetimer;
