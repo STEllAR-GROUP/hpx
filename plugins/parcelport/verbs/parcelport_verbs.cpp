@@ -261,8 +261,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // struct we use to keep track of all memory regions used during a send, they must
         // be held onto until all transfers of data are complete.
         // ----------------------------------------------------------------------------------------------
-        typedef struct {
+        typedef struct parcel_send_data_ {
             uint32_t                                         tag;
+            std::atomic_flag                                 delete_flag;
             parcelset::parcel                                parcel;
             parcelset::parcelhandler::write_handler_type     handler;
             RdmaMemoryRegion *header_region, *chunk_region, *message_region;
@@ -417,29 +418,42 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         int handle_verbs_completion(struct ibv_wc completion, RdmaClient *client)
         {
             uint64_t wr_id = completion.wr_id;
+            LOG_DEBUG_MSG("Handle verbs completion " << hexpointer(wr_id) << RdmaCompletionQueue::wc_opcode_str(completion.opcode));
             //
             // When a send completes, release memory and trigger write_handler
             //
             if (completion.opcode==IBV_WC_SEND) {
                 bool                 found_wr_id;
                 active_send_iterator current_send;
-                {   // locked region : // make sure map isn't modified whilst we are querying it
+                {
+                    // we must be very careful here.
+                    // if the lock is not obtained and this thread is waiting, then
+                    // zero copy Gets might complete and another thread might receive a zero copy
+                    // complete message then delete the current send data whilst we are still waiting
                     scoped_lock lock(SendCompletionMap_mutex);
                     send_wr_map::iterator it = SendCompletionMap.find(wr_id);
                     found_wr_id = (it != SendCompletionMap.end());
                     if (found_wr_id) {
                         current_send = it->second;
-                        LOG_DEBUG_MSG("erasing iterator from SendCompletionMap : size before erase " << SendCompletionMap.size());
+                        LOG_DEBUG_MSG("erasing " << hexpointer(wr_id) << "from SendCompletionMap : size before erase " << SendCompletionMap.size());
                         SendCompletionMap.erase(it);
                     }
                     else {
                         LOG_ERROR_MSG("FATAL : SendCompletionMap did not find " << hexpointer(wr_id));
+                        for (auto & pair : SendCompletionMap) {
+                            std::cout << hexpointer(pair.first) << "\n";
+                        }
                         std::terminate();
                     }
                 }
                 if (found_wr_id) {
                     // if the send had no zero_copy regions, then it has completed
                     if (current_send->zero_copy_regions.empty()) {
+                        LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "normal");
+                        delete_send_data(current_send);
+                    }
+                    else if (current_send->delete_flag.test_and_set(std::memory_order_acquire)) {
+                        LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "after race detection");
                         delete_send_data(current_send);
                     }
                 }
@@ -462,7 +476,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     found_wr_id = (it != ReadCompletionMap.end());
                     if (found_wr_id) {
                         current_recv = it->second;
-                        LOG_DEBUG_MSG("erasing iterator from ReadCompletionMap : size before erase " << ReadCompletionMap.size());
+                        LOG_DEBUG_MSG("erasing " << hexpointer(wr_id) << "from ReadCompletionMap : size before erase " << ReadCompletionMap.size());
                         ReadCompletionMap.erase(it);
                     }
                     else {
@@ -548,8 +562,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     current_send = it->second;
                     TagSendCompletionMap.erase(it);
                 }
-                //
-                delete_send_data(current_send);
+                // we cannot delete the send data until we are absolutely sure that
+                // the initial send has been cleaned up
+                if (current_send->delete_flag.test_and_set(std::memory_order_acquire)) {
+                    LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "with no race detection");
+                    delete_send_data(current_send);
+                }
                 //
                 _rdmaController->refill_client_receives();
                 return 0;
@@ -684,6 +702,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 _rdmaController->refill_client_receives();
                 return 0;
             }
+
+            throw std::runtime_error("Unexpected opcode in handle_verbs_completion");
             return 0;
         }
 
@@ -908,16 +928,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     active_send_condition.wait(lock, [this] {
                       return !active_sends.size()<HPX_HAVE_PARCELPORT_VERBS_SEND_QUEUE;
                     });
-                    current_send = active_sends.insert(active_sends.end(), parcel_send_data());
+
+                    active_sends.emplace_back();
+                    current_send = std::prev(active_sends.end());
                     LOG_DEBUG_MSG("Active send after insert size " << active_sends.size());
                 }
                 parcel_send_data &send_data = *current_send;
-                send_data.tag     = tag;
-                send_data.parcel  = p;
-                send_data.handler = f;
+                send_data.tag            = tag;
+                send_data.parcel         = p;
+                send_data.handler        = f;
                 send_data.header_region  = NULL;
                 send_data.message_region = NULL;
                 send_data.chunk_region   = NULL;
+                send_data.delete_flag.clear();
 
                 LOG_DEBUG_MSG("Generated unique dest " << hexnumber(dest_ip) << " coded tag " << hexuint32(send_data.tag));
 
