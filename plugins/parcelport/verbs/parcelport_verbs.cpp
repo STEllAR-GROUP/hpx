@@ -17,6 +17,8 @@
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 
+#include <hpx/apply.hpp>
+
 // The memory pool specialization need to be pulled in before encode_parcels
 #include "RdmaMemoryPool.h"
 
@@ -46,7 +48,7 @@
 
 #define HPX_HAVE_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
 //#define HPX_HAVE_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD 256
-
+#define HPX_HAVE_PARCELPORT_VERBS_SEND_QUEUE 32
 using namespace hpx::parcelset::policies;
 
 namespace hpx { namespace parcelset { namespace policies { namespace verbs
@@ -178,6 +180,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         //      , parcels_sent_(0)
         {
             FUNC_START_DEBUG_MSG;
+            parcelport::_parcelport_instance = this;
             //    _port   = 0;
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -294,8 +297,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
         recv_wr_map ReadCompletionMap;
 
-        active_send_list_type active_sends;
-        mutex_type       active_send_mutex;
+        active_send_list_type   active_sends;
+        mutex_type              active_send_mutex;
+        condition_type          active_send_condition;
 
         active_recv_list_type active_recvs;
         mutex_type       active_recv_mutex;
@@ -821,7 +825,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // This must be thread safe in order to function as any thread may invoke an action
         // ----------------------------------------------------------------------------------------------
         void put_parcel(parcelset::locality const & dest, parcel p, write_handler_type f) {
-            // FUNC_START_DEBUG_MSG;
+            FUNC_START_DEBUG_MSG;
+            //
+            // All the parcelport code should run on hpx threads and not OS threads
+            //
+            if (threads::get_self_ptr() == 0) {
+                hpx::apply(&parcelport::put_parcel, this, dest, p, f);
+                return;
+            }
+            {
+                unique_lock lock(active_send_mutex);
+                if (active_sends.size()>(HPX_HAVE_PARCELPORT_VERBS_SEND_QUEUE-2)) {
+                    lock.unlock();
+                    LOG_DEBUG_MSG("Extra HPX Background work");
+                    hpx_background_work();
+                    return;
+                }
+                lock.unlock();
+            }
+
             boost::uint32_t dest_ip = dest.get<locality>().ip_;
             LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " put_parcel to " << ipaddress(dest_ip) );
 
@@ -829,7 +851,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             RdmaClientPtr client;
             {
                 // lock this region as we are creating a connection to a remote locality
-                // if two threads attempt to do this at the same time, we'll get multiple clients
+                // if two threads attempt to do this at the same time, we'll get duplicated clients
                 scoped_lock lock(connection_mutex);
                 ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
                 if (ip_it!=ip_qp_map.end()) {
@@ -839,7 +861,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 else {
                     LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
                     client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
-                    client->setInitiatedConnection(true);
                     LOG_DEBUG_MSG("Setting qpnum in main client map");
                     ip_qp_map[dest_ip] = client->getQpNum();
                 }
@@ -871,6 +892,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 active_send_iterator current_send;
                 {
                     scoped_lock lock(active_send_mutex);
+
+                    // if more than N parcels are currently queued, then yield
+                    // otherwise we can fill the send queues with so many requests that memory buffers
+                    // are exhausted.
+                    active_send_condition.wait(lock, [this] {
+                      return !active_sends.size()<HPX_HAVE_PARCELPORT_VERBS_SEND_QUEUE;
+                    });
                     current_send = active_sends.insert(active_sends.end(), parcel_send_data());
                     LOG_DEBUG_MSG("Active send after insert size " << active_sends.size());
                 }
@@ -1009,27 +1037,59 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
                 // parcels_sent_.add_data(buffer.data_point_);
             }
+
+            // after putting a parcel, immediately poll for completions to help
+            // prevent the send queue from becoming full
+            hpx_background_work();
+
             FUNC_END_DEBUG_MSG;
         }
 
-        mutable mutex_type background_mtx;
+        // ----------------------------------------------------------------------------------------------
+        // This is called to poll for completions and handle all incoming messages as well as complete
+        // outgoing messages.
+        //
+        // @TODO : It is assumed that hpx_bakground_work is only going to be called from
+        // an hpx thread.
+        // Since the parcelport can be serviced by hpx threads or by OS threads, we must use extra
+        // care when dealing with mutexes and condition_variables since we do not want to suspend an
+        // OS thread, but we do want to suspend hpx threads when necessary.
+        // ----------------------------------------------------------------------------------------------
+        bool hpx_background_work() {
+            bool done = false;
+            // this must be called on an HPX thread
+            HPX_ASSERT(threads::get_self_ptr() != 0);
+            //
+            do {
+                // if an event comes in, we may spend time processing/handling it and another may arrive
+                // during this handling, so keep checking until none are received
+                done = (_rdmaController->eventMonitor(0) == 0);
+            } while (!done);
+            return true;
+        }
+
+        static bool OS_background_work() {
+            return parcelport::get_singleton()->hpx_background_work();
+        }
 
         // ----------------------------------------------------------------------------------------------
         // This is called whenever a HPX OS thread is idling, can be used to poll for incoming messages
         // this should be thread safe as eventMonitor only polls and dispatches and is thread safe.
         // ----------------------------------------------------------------------------------------------
         bool do_background_work(std::size_t num_thread) {
-            if (stopped_)
+            if (stopped_) {
                 return false;
-            //        mutex_type::scoped_lock mtx(background_mtx);
-            // if an event comes in, we may spend time processing/handling it and another may arrive
-            // during this handling, so keep checking until none are received
-            bool done = false;
-            do {
-                done = (_rdmaController->eventMonitor(0) == 0);
-            } while (!done);
+			}
+            return hpx::apply(&parcelport::OS_background_work);
             return true;
         }
+
+        static parcelport *get_singleton()
+        {
+            return _parcelport_instance;
+        }
+
+        static parcelport *_parcelport_instance;
 
     private:
 
@@ -1125,6 +1185,6 @@ std::string       hpx::parcelset::policies::verbs::parcelport::_ibverbs_device;
 std::string       hpx::parcelset::policies::verbs::parcelport::_ibverbs_interface;
 boost::uint32_t   hpx::parcelset::policies::verbs::parcelport::_ibv_ip;
 boost::uint32_t   hpx::parcelset::policies::verbs::parcelport::_port;
-
+hpx::parcelset::policies::verbs::parcelport *hpx::parcelset::policies::verbs::parcelport::_parcelport_instance;
 
 HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::verbs::parcelport, verbs);
