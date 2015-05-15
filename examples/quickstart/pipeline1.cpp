@@ -57,7 +57,7 @@ int main()
         "Notice: qux",
         "\tError: abc"
       };
-    std::vector<std::string> input(boost::begin(inputs), std::end(inputs));
+    std::vector<std::string> input(boost::begin(inputs), boost::end(inputs));
 
     pipeline::process(input);
 

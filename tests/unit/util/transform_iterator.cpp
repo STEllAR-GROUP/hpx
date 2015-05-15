@@ -144,7 +144,7 @@ void test_right_element_full()
 {
     // demonstrate use of 'previous' and 'next' transformers
     std::vector<int> values(10);
-    std::iota(boost::begin(values), std::end(values), 0);
+    std::iota(boost::begin(values), boost::end(values), 0);
 
     auto transformer = test::make_next_transformer(
         boost::end(values)-1, &values.front());
