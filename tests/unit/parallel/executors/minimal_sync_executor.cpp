@@ -88,23 +88,6 @@ void test_executor()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_empty_sync_executor
-{
-    typedef hpx::parallel::sequential_execution_tag execution_category;
-};
-
-struct test_sync_executor1
-{
-    typedef hpx::parallel::sequential_execution_tag execution_category;
-
-    template <typename F>
-    typename hpx::util::result_of<F()>::type
-    execute(F f)
-    {
-        return f();
-    }
-};
-
 struct test_sync_executor2
 {
     typedef hpx::parallel::sequential_execution_tag execution_category;
@@ -117,7 +100,19 @@ struct test_sync_executor2
     }
 };
 
-struct test_sync_executor3
+struct test_sync_executor1 : test_sync_executor2
+{
+    typedef hpx::parallel::sequential_execution_tag execution_category;
+
+    template <typename F>
+    typename hpx::util::result_of<F()>::type
+    execute(F f)
+    {
+        return f();
+    }
+};
+
+struct test_sync_executor3 : test_sync_executor2
 {
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
@@ -129,7 +124,7 @@ struct test_sync_executor3
     }
 };
 
-struct test_sync_executor4
+struct test_sync_executor4 : test_sync_executor2
 {
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
@@ -149,7 +144,6 @@ struct test_sync_executor4
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
-    test_executor<test_empty_sync_executor>();
     test_executor<test_sync_executor1>();
     test_executor<test_sync_executor2>();
     test_executor<test_sync_executor3>();

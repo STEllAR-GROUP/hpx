@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 parallel_task_execution_policy const& t =
                     *policy.get<parallel_task_execution_policy>();
 
-                return call(par(t.get_chunk_size()).on(t.get_executor()),
+                return call(par(t.get_chunk_size()),
                     boost::mpl::false_(), std::forward<Args>(args)...);
             }
 

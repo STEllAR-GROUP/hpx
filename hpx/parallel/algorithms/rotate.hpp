@@ -70,7 +70,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef boost::mpl::false_ non_seq;
 
             parallel_task_execution_policy p =
-                par_task(policy.get_chunk_size()).on(policy.get_executor());
+                par_task(policy.get_chunk_size());
+
             detail::reverse r;
             return lcos::local::dataflow(
                 hpx::util::unwrapped([=]() mutable -> hpx::future<FwdIter>
@@ -196,7 +197,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef boost::mpl::false_ non_seq;
 
             parallel_task_execution_policy p =
-                par(task, policy.get_chunk_size()).on(policy.get_executor());
+                par_task(policy.get_chunk_size());
 
             hpx::future<OutIter> f =
                 detail::copy<OutIter>().call(p, non_seq(),

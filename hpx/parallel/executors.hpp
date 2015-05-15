@@ -6,10 +6,9 @@
 #if !defined(HPX_PARALLEL_EXECUTORS_MAY_11_2015_0728PM)
 #define HPX_PARALLEL_EXECUTORS_MAY_11_2015_0728PM
 
-#include <hpx/hpx_fwd.hpp>
-
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/parallel_executor.hpp>
+#include <hpx/parallel/executors/parallel_fork_executor.hpp>
 #include <hpx/parallel/executors/sequential_executor.hpp>
 
 #endif

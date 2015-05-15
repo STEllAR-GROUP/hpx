@@ -88,20 +88,6 @@ void test_executor()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_empty_async_executor
-{
-};
-
-struct test_async_executor1
-{
-    template <typename F>
-    typename hpx::util::result_of<F()>::type
-    execute(F f)
-    {
-        return hpx::async(hpx::launch::async, f).get();
-    }
-};
-
 struct test_async_executor2
 {
     template <typename F>
@@ -112,7 +98,17 @@ struct test_async_executor2
     }
 };
 
-struct test_async_executor3
+struct test_async_executor1 : test_async_executor2
+{
+    template <typename F>
+    typename hpx::util::result_of<F()>::type
+    execute(F f)
+    {
+        return hpx::async(hpx::launch::async, f).get();
+    }
+};
+
+struct test_async_executor3 : test_async_executor2
 {
     template <typename F, typename Shape>
     void bulk_execute(F f, Shape const& shape)
@@ -126,7 +122,7 @@ struct test_async_executor3
     }
 };
 
-struct test_async_executor4
+struct test_async_executor4 : test_async_executor2
 {
     template <typename F, typename Shape>
     hpx::future<void>
@@ -144,7 +140,6 @@ struct test_async_executor4
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
-    test_executor<test_empty_async_executor>();
     test_executor<test_async_executor1>();
     test_executor<test_async_executor2>();
     test_executor<test_async_executor3>();

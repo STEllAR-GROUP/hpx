@@ -401,8 +401,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             parallel_task_execution_policy const& t =
                 *policy.get<parallel_task_execution_policy>();
             return define_task_block(
-                par(t.get_chunk_size()).on(t.get_executor()),
-                std::forward<F>(f));
+                par(t.get_chunk_size()), std::forward<F>(f));
         }
 
         if (t == typeid(parallel_vector_execution_policy))

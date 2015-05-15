@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/parallel_executor.hpp
+/// \file parallel/executors/parallel_fork_executor.hpp
 
 #if !defined(HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_MAY_13_2015_1057AM)
 #define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_MAY_13_2015_1057AM
@@ -15,13 +15,13 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct parallel_executor
+    struct parallel_fork_executor
     {
         template <typename F>
         hpx::future<typename hpx::util::result_of<F()>::type>
         async_execute(F f)
         {
-            return hpx::async(launch::async, f);
+            return hpx::async(launch::fork, f);
         }
     };
 
@@ -29,7 +29,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     {
         /// \cond NOINTERNAL
         template <>
-        struct is_executor<parallel_executor>
+        struct is_executor<parallel_fork_executor>
           : std::true_type
         {};
         /// \endcond

@@ -27,6 +27,8 @@
 #include <memory>
 #include <type_traits>
 
+#include <boost/static_assert.hpp>
+
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -36,6 +38,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         task_execution_policy_tag() {}
     };
     /// \endcond
+
+    /// Rebind the type of executor used by an execution policy. The execution
+    /// category of Executor shall not be weaker than that of ExecutionPolicy.
+    template <typename ExecutionPolicy, typename Executor>
+    struct rebind_executor
+    {
+        /// \cond NOINTERNAL
+        typedef typename ExecutionPolicy::execution_category category1;
+        typedef typename executor_traits<Executor>::execution_category category2;
+
+        BOOST_STATIC_ASSERT(
+            parallel::v3::detail::is_not_weaker<category2, category1>::value
+        );
+        /// \endcond
+
+        /// The type of the rebound execution policy
+        typedef typename ExecutionPolicy::template rebind<Executor>::type type;
+    };
 
     /// The execution policy tag \a task can be used to create a execution
     /// policy which forces the given algorithm to be executed in an
@@ -56,8 +76,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// sequential_execution_policy.
     struct sequential_task_execution_policy
     {
+        /// The type of the executor associated with this execution policy
         typedef parallel::sequential_executor executor_type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
         typedef parallel::sequential_execution_tag execution_category;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            typedef sequential_task_execution_policy_shim<Executor> type;
+        };
 
         /// \cond NOINTERNAL
         static threads::executor get_executor() { return threads::executor(); }
@@ -79,19 +113,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return *this;
         }
 
-        /// Create a new sequential_task_execution_policy from itself
-        ///
-        /// \param exec         [in] (ignored) The executor to use for the
-        ///                     execution of the parallel algorithm the
-        ///                     returned execution policy is used with
-        ///
-        /// \returns The new parallel_task_execution_policy
-        ///
-        sequential_task_execution_policy on(threads::executor const&) const
-        {
-            return *this;
-        }
-
         /// Create a new sequential_task_execution_policy from the given
         /// executor
         ///
@@ -107,15 +128,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor>
-        sequential_task_execution_policy_shim<Executor>
+        typename rebind_executor<
+            sequential_task_execution_policy, Executor
+        >::type
         on(Executor& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
-            return sequential_task_execution_policy_shim<Executor>(exec);
+
+            typedef typename rebind_executor<
+                sequential_task_execution_policy, Executor
+            >::type rebound_type;
+            return rebound_type(exec);
         }
 
         /// Return the associated executor object.
-        executor_type& executor()
+        static executor_type& executor()
         {
             static parallel::sequential_executor exec;
             return exec;
@@ -139,9 +166,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct sequential_task_execution_policy_shim
       : sequential_task_execution_policy
     {
+        /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
         typedef typename executor_traits<executor_type>::execution_category
             execution_category;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            typedef sequential_task_execution_policy_shim<Executor> type;
+        };
 
         /// \cond NOINTERNAL
         static threads::executor get_executor() { return threads::executor(); }
@@ -176,15 +217,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor_>
-        sequential_task_execution_policy_shim<Executor_>
+        typename rebind_executor<
+            sequential_task_execution_policy, Executor_
+        >::type
         on(Executor_& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
-            return sequential_task_execution_policy_shim<Executor_>(exec);
+
+            typedef typename rebind_executor<
+                sequential_task_execution_policy, Executor_
+            >::type rebound_type;
+            return rebound_type(exec);
         }
 
         /// Return the associated executor object.
         Executor& executor() { return exec_; }
+        Executor const& executor() const { return exec_; }
 
     private:
         /// \cond NOINTERNAL
@@ -205,8 +253,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// require that a parallel algorithm's execution may not be parallelized.
     struct sequential_execution_policy
     {
+        /// The type of the executor associated with this execution policy
         typedef parallel::sequential_executor executor_type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
         typedef parallel::sequential_execution_tag execution_category;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            typedef sequential_execution_policy_shim<Executor> type;
+        };
 
         /// \cond NOINTERNAL
         sequential_execution_policy() {}
@@ -228,19 +290,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return seq_task;
         }
 
-        /// Create a new sequential_execution_policy from itself
-        ///
-        /// \param exec         [in] (ignored) The executor to use for the
-        ///                     execution of the parallel algorithm the
-        ///                     returned execution policy is used with
-        ///
-        /// \returns The new parallel_task_execution_policy
-        ///
-        sequential_execution_policy on(threads::executor const&) const
-        {
-            return *this;
-        }
-
         /// Create a new sequential_execution_policy_shim from the given
         /// executor
         ///
@@ -256,15 +305,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor>
-        sequential_execution_policy_shim<Executor>
+        typename rebind_executor<sequential_execution_policy, Executor>::type
         on(Executor& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
-            return sequential_execution_policy_shim<Executor>(exec);
+
+            typedef typename rebind_executor<
+                sequential_execution_policy, Executor
+            >::type rebound_type;
+            return rebound_type(exec);
         }
 
         /// Return the associated executor object.
-        executor_type& executor()
+        static executor_type& executor()
         {
             static parallel::sequential_executor exec;
             return exec;
@@ -280,9 +333,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename Executor>
     struct sequential_execution_policy_shim : sequential_execution_policy
     {
+        /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
         typedef typename executor_traits<executor_type>::execution_category
             execution_category;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            typedef sequential_execution_policy_shim<Executor> type;
+        };
 
         /// Create a new sequential_task_execution_policy.
         ///
@@ -312,15 +379,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor_>
-        sequential_execution_policy_shim<Executor_>
+        typename rebind_executor<sequential_execution_policy, Executor_>::type
         on(Executor_& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
-            return sequential_execution_policy_shim<Executor_>(exec);
+
+            typedef typename rebind_executor<
+                sequential_execution_policy, Executor_
+            >::type rebound_type;
+            return rebound_type(exec);
         }
 
         /// Return the associated executor object.
         Executor& executor() { return exec_; }
+        Executor const& executor() const { return exec_; }
 
     private:
         /// \cond NOINTERNAL
@@ -345,26 +417,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// corresponding algorithm when invoked with the parallel_execution_policy.
     struct parallel_task_execution_policy
     {
+        /// The type of the executor associated with this execution policy
         typedef parallel::parallel_executor executor_type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
         typedef parallel::parallel_execution_tag execution_category;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            typedef parallel_task_execution_policy_shim<Executor> type;
+        };
 
         /// \cond NOINTERNAL
         parallel_task_execution_policy() {}
         /// \endcond
-
-        /// Create a new parallel_task_execution_policy referencing an executor
-        /// and a chunk size.
-        ///
-        /// \param exec         [in] The executor to use for the execution of
-        ///                     the parallel algorithm the returned execution
-        ///                     policy is used with
-        ///
-        /// \returns The new parallel_task_execution_policy
-        ///
-        parallel_task_execution_policy on(threads::executor const& exec) const
-        {
-            return parallel_task_execution_policy(exec, chunk_size_);
-        }
 
         /// Create a new parallel_task_execution_policy from given executor
         ///
@@ -380,12 +452,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor>
-        parallel_task_execution_policy_shim<Executor>
+        typename rebind_executor<
+            parallel_task_execution_policy, Executor
+        >::type
         on(Executor& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
-            return parallel_task_execution_policy_shim<Executor>(
-                exec, chunk_size_);
+
+            typedef typename rebind_executor<
+                parallel_task_execution_policy, Executor
+            >::type rebound_type;
+            return rebound_type(exec, chunk_size_);
         }
 
         /// Create a new parallel_task_execution_policy referencing a chunk size.
@@ -398,7 +475,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         parallel_task_execution_policy operator()(std::size_t chunk_size) const
         {
-            return parallel_task_execution_policy(exec_, chunk_size);
+            return parallel_task_execution_policy(chunk_size);
         }
 
         /// Create a new parallel_task_execution_policy from itself
@@ -415,14 +492,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// Return the associated executor object.
-        executor_type& executor()
+        static executor_type& executor()
         {
             static parallel::parallel_executor exec;
             return exec;
         }
 
         /// \cond NOINTERNAL
-        threads::executor get_executor() const { return exec_; }
+        static threads::executor get_executor() { return threads::executor(); }
         std::size_t get_chunk_size() const { return chunk_size_; }
         /// \endcond
 
@@ -441,13 +518,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : chunk_size_(chunk_size)
         {}
 
-        parallel_task_execution_policy(threads::executor const& exec,
-                std::size_t chunk_size)
-          : exec_(exec), chunk_size_(chunk_size)
-        {}
-
     private:
-        threads::executor exec_;
         std::size_t chunk_size_;
         /// \endcond
     };
@@ -468,9 +539,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename Executor>
     struct parallel_task_execution_policy_shim : parallel_task_execution_policy
     {
+        /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
         typedef typename executor_traits<executor_type>::execution_category
             execution_category;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            typedef parallel_task_execution_policy_shim<Executor> type;
+        };
 
         /// Create a new parallel_task_execution_policy_shim from itself
         ///
@@ -500,16 +585,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor_>
-        parallel_task_execution_policy_shim<Executor_>
+        typename rebind_executor<
+            parallel_task_execution_policy, Executor_
+        >::type
         on(Executor_& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
-            return parallel_task_execution_policy_shim<Executor_>(
-                exec, this->get_chunk_size());
+
+            typedef typename rebind_executor<
+                parallel_task_execution_policy, Executor_
+            >::type rebound_type;
+            return rebound_type(exec, this->get_chunk_size());
         }
 
         /// Return the associated executor object.
         Executor& executor() { return exec_; }
+        Executor const& executor() const { return exec_; }
 
     private:
         /// \cond NOINTERNAL
@@ -531,8 +622,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// indicate that a parallel algorithm's execution may be parallelized.
     struct parallel_execution_policy
     {
+        /// The type of the executor associated with this execution policy
         typedef parallel::parallel_executor executor_type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
         typedef parallel::parallel_execution_tag execution_category;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            typedef parallel_execution_policy_shim<Executor> type;
+        };
 
         /// \cond NOINTERNAL
         parallel_execution_policy() {}
@@ -547,27 +652,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_execution_policy
         ///
-        parallel_execution_policy on(threads::executor const& exec) const
-        {
-            return parallel_execution_policy(exec, chunk_size_);
-        }
-
-        /// Create a new parallel_execution_policy referencing an executor and
-        /// a chunk size.
-        ///
-        /// \param exec         [in] The executor to use for the execution of
-        ///                     the parallel algorithm the returned execution
-        ///                     policy is used with
-        ///
-        /// \returns The new parallel_execution_policy
-        ///
         template <typename Executor>
-        parallel_execution_policy_shim<Executor>
+        typename rebind_executor<parallel_execution_policy, Executor>::type
         on(Executor& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
-            return parallel_execution_policy_shim<Executor>(
-                exec, this->get_chunk_size());
+
+            typedef typename rebind_executor<
+                parallel_execution_policy, Executor
+            >::type rebound_type;
+            return rebound_type(exec, this->get_chunk_size());
         }
 
         /// Create a new parallel_execution_policy referencing a chunk size.
@@ -580,7 +674,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         parallel_execution_policy operator()(std::size_t chunk_size) const
         {
-            return parallel_execution_policy(exec_, chunk_size);
+            return parallel_execution_policy(chunk_size);
         }
 
         /// Create a new parallel_execution_policy referencing a chunk size.
@@ -596,7 +690,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         parallel_task_execution_policy operator()(task_execution_policy_tag tag,
             std::size_t chunk_size) const
         {
-            return par_task(chunk_size).on(exec_);
+            return par_task(chunk_size);
         }
 
         /// Create a new parallel_execution_policy referencing a chunk size.
@@ -609,16 +703,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         parallel_task_execution_policy operator()(
             task_execution_policy_tag tag) const
         {
-            return par_task(chunk_size_).on(exec_);
+            return par_task(chunk_size_);
         }
 
         /// \cond NOINTERNAL
-        threads::executor get_executor() const { return exec_; }
+        static threads::executor get_executor() { return threads::executor(); }
         std::size_t get_chunk_size() const { return chunk_size_; }
         /// \endcond
 
         /// Return the associated executor object.
-        executor_type& executor()
+        static executor_type& executor()
         {
             static parallel::parallel_executor exec;
             return exec;
@@ -635,17 +729,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
     protected:
-        parallel_execution_policy(threads::executor const& exec,
-                std::size_t chunk_size)
-          : exec_(exec), chunk_size_(chunk_size)
-        {}
-
         parallel_execution_policy(std::size_t chunk_size)
           : chunk_size_(chunk_size)
         {}
 
     private:
-        threads::executor exec_;
         std::size_t chunk_size_;
         /// \endcond
     };
@@ -659,9 +747,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename Executor>
     struct parallel_execution_policy_shim : parallel_execution_policy
     {
+        /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
         typedef typename executor_traits<executor_type>::execution_category
             execution_category;
+
+        /// Rebind the type of executor used by this execution policy. The
+        /// execution category of Executor shall not be weaker than that of
+        /// this execution policy
+        template <typename Executor>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            typedef parallel_execution_policy_shim<Executor> type;
+        };
 
         /// Create a new parallel_execution_policy referencing an executor and
         /// a chunk size.
@@ -673,12 +775,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_execution_policy
         ///
         template <typename Executor_>
-        parallel_execution_policy_shim<Executor_>
+        typename rebind_executor<parallel_execution_policy, Executor_>::type
         on(Executor_& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
-            return parallel_execution_policy_shim<Executor_>(
-                exec, this->get_chunk_size());
+
+            typedef typename rebind_executor<
+                parallel_execution_policy, Executor_
+            >::type rebound_type;
+            return rebound_type(exec, this->get_chunk_size());
         }
 
         /// Create a new parallel_execution_policy_shim referencing a chunk size.
@@ -727,6 +832,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// Return the associated executor object.
         Executor& executor() { return exec_; }
+        Executor const& executor() const { return exec_; }
 
     private:
         /// \cond NOINTERNAL
@@ -746,7 +852,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// indicate that a parallel algorithm's execution may be vectorized.
     struct parallel_vector_execution_policy
     {
+        /// The type of the executor associated with this execution policy
         typedef parallel::parallel_executor executor_type;
+
+        /// The category of the execution agents created by this execution
+        /// policy.
         typedef parallel::parallel_execution_tag execution_category;
 
         /// \cond NOINTERNAL
@@ -769,21 +879,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return *this;
         }
 
-        /// Create a new parallel_vector_execution_policy from itself
-        ///
-        /// \param exec         [in] (ignored) The executor to use for the
-        ///                     execution of the parallel algorithm the
-        ///                     returned execution policy is used with
-        ///
-        /// \returns The new parallel_task_execution_policy
-        ///
-        parallel_vector_execution_policy on(threads::executor const&) const
-        {
-            return *this;
-        }
-
         /// Return the associated executor object.
-        executor_type& executor()
+        static executor_type& executor()
         {
             static parallel::parallel_executor exec;
             return exec;
@@ -807,8 +904,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             virtual execution_policy make_async(
                 task_execution_policy_tag tag) const = 0;
-            virtual execution_policy on(
-                threads::executor const& exec) const = 0;
             virtual BOOST_SCOPED_ENUM(launch) launch_policy() const = 0;
 
             virtual void* get() BOOST_NOEXCEPT = 0;
@@ -832,7 +927,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             // defined below
             execution_policy make_async(task_execution_policy_tag tag) const;
-            execution_policy on(threads::executor const& exec) const;
             BOOST_SCOPED_ENUM(launch) launch_policy() const;
 
             void* get() BOOST_NOEXCEPT
@@ -1130,19 +1224,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return inner_->make_async(tag);
         }
 
-        /// Extension: Create a new execution_policy holding the current policy
-        /// running on the given executor.
-        ///
-        /// \param tag  [in] Specify that the corresponding asynchronous
-        ///             execution policy should be used
-        ///
-        /// \returns The new execution_policy
-        ///
-        execution_policy on(threads::executor exec) const
-        {
-            return inner_->on(exec);
-        }
-
         /// Extension: Retrieve default launch policy for this execution policy.
         ///
         /// \returns The associated default launch policy
@@ -1236,13 +1317,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             task_execution_policy_tag tag) const
         {
             return policy_(tag);
-        }
-
-        template <typename ExPolicy>
-        execution_policy execution_policy_shim<ExPolicy>::on(
-            threads::executor const& exec) const
-        {
-            return policy_.on(exec);
         }
 
         template <typename ExPolicy, typename Enable = void>

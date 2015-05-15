@@ -16,6 +16,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 
@@ -47,6 +48,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// \note \a vector_execution_tag is weaker than
     ///       \a parallel_execution_tag.
     struct vector_execution_tag {};
+
+    namespace detail
+    {
+        /// \cond NOINTERNAL
+        template <typename Category1, typename Category2>
+        struct is_not_weaker
+          : std::false_type
+        {};
+
+        template <typename Category>
+        struct is_not_weaker<Category, Category>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_not_weaker<parallel_execution_tag, vector_execution_tag>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_not_weaker<sequential_execution_tag, vector_execution_tag>
+          : std::true_type
+        {};
+
+        template <>
+        struct is_not_weaker<sequential_execution_tag, parallel_execution_tag>
+          : std::true_type
+        {};
+        /// \endcond
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -105,106 +136,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Category>
-        struct get_launch_policy
-        {
-            static BOOST_SCOPED_ENUM(launch) call() { return launch::async; }
-        };
-
-        template <>
-        struct get_launch_policy<sequential_execution_tag>
-        {
-            static BOOST_SCOPED_ENUM(launch) call() { return launch::sync; }
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Executor, typename F, typename Enable = void>
-        struct async_execute
-        {
-            typedef typename hpx::util::result_of<F()>::type result_type;
-            typedef typename future_type<Executor, result_type>::type type;
-
-            typedef typename execution_category<Executor>::type category;
-
-            static type call(Executor& exec, F const& f)
-            {
-                return hpx::async(get_launch_policy<category>::call(), f);
-            }
-
-            template <typename Shape>
-            static type call(Executor& exec, F const& f, Shape const& shape)
-            {
-                return hpx::async(get_launch_policy<category>::call(), f, shape);
-            }
-        };
-
-#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
-        template <typename Executor, typename F>
-        struct check_has_async_execute
-        {
-            typedef typename hpx::util::result_of<F()>::type result_type;
-            typedef typename future_type<Executor, result_type>::type type;
-
-            template <typename T, type (T::*)(F) = &T::async_execute>
-            struct get {};
-        };
-
-        template <typename Executor, typename F>
-        struct async_execute<Executor, F,
-            typename std::enable_if<
-                has_member<Executor, check_has_async_execute<
-                    Executor, F
-                > >::value
-            >::type>
-        {
-            typedef typename hpx::util::result_of<F()>::type result_type;
-            typedef typename future_type<Executor, result_type>::type type;
-
-            static type call(Executor& exec, F const& f)
-            {
-                return exec.async_execute(f);
-            }
-        };
-#else
-        template <typename Executor, typename F>
-        struct async_execute<Executor, F,
-            typename util::always_void<decltype(
-                std::declval<Executor>().async_execute(std::declval<F>())
-            )>::type>
-        {
-            typedef typename hpx::util::result_of<F()>::type result_type;
-            typedef typename future_type<Executor, result_type>::type type;
-
-            static type call(Executor& exec, F const& f)
-            {
-                return exec.async_execute(f);
-            }
-        };
-#endif
-
-        template <typename Executor, typename F>
-        typename async_execute<Executor, F>::type
-        call_async_execute(Executor& exec, F const& f)
-        {
-            return async_execute<Executor, F>::call(exec, f);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename F, typename Enable = void>
         struct execute
         {
             typedef typename hpx::util::result_of<F()>::type type;
             typedef typename execution_category<Executor>::type category;
 
-            static type call(Executor&, F const& f)
+            static type call(Executor& exec, F const& f)
             {
-                return hpx::async(get_launch_policy<category>::call(), f).get();
-            }
-
-            template <typename Shape>
-            static type call(Executor&, F const& f, Shape const&)
-            {
-                return hpx::async(get_launch_policy<category>::call(), f).get();
+                return exec.async_execute(f).get();
             }
         };
 
@@ -269,7 +209,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 for (auto const& elem: shape)
                 {
                     results.push_back(
-                        call_async_execute(exec, util::bind(f, elem))
+                        exec.async_execute(util::deferred_call(f, elem))
                     );
                 }
                 return hpx::when_all(results);
@@ -339,7 +279,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 for (auto const& elem: shape)
                 {
                     results.push_back(
-                        call_async_execute(exec, util::bind(f, elem))
+                        exec.async_execute(util::deferred_call(f, elem))
                     );
                 }
                 hpx::when_all(results).get();
@@ -394,11 +334,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// The executor_traits type is used to request execution agents from an
+    /// executor. It is analogous to the interaction between containers and
+    /// allocator_traits.
+    ///
+    /// \note For maximum implementation flexibility, executor_traits does not
+    ///       require executors to implement a particular exception reporting
+    ///       mechanism. Executors may choose whether or not to report
+    ///       exceptions, and if so, in what manner they are communicated back
+    ///       to the caller. However, we expect many executors to report
+    ///       exceptions in a manner consistent with the behavior of execution
+    ///       policies described by the Parallelism TS, where multiple exceptions
+    ///       are collected into an exception_list. This list would be reported
+    ///       through async_execute()'s returned future, or thrown directly by
+    ///       execute().
+    ///
     template <typename Executor, typename Enable>
     class executor_traits
     {
     public:
-        /// The type of the executor
+        /// The type of the executor associated with this instance of
+        /// \a executor_traits
         typedef Executor executor_type;
 
         /// The category of agents created by the bulk-form execute() and
@@ -416,12 +372,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       otherwise it evaluates to \a hpx::future<T>
         ///
         template <typename T>
-        struct future_type
+        struct future
         {
             typedef typename detail::future_type<executor_type, T>::type type;
         };
 
-        /// brief Singleton form of asynchronous execution agent creation.
+        /// \brief Singleton form of asynchronous execution agent creation.
         ///
         /// This asynchronously creates a single function invocation f() using
         /// the associated executor.
@@ -431,16 +387,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
         ///
+        /// \note Executors have to implement only `async_execute()`. All other
+        ///       functions will be emulated by this `executor_traits` in terms
+        ///       of this single basic primitive. However, some executors will
+        ///       naturally specialize all four operations for maximum
+        ///       efficiency.
+        ///
+        /// \note This calls exec.async_execute(f)
+        ///
         /// \returns f()'s result through a future
         ///
-        /// \note This calls exec.async_execute(f) if it exists;
-        ///       otherwise hpx::async(f)
-        ///
         template <typename F>
-        static typename detail::async_execute<executor_type, F>::type
+        static typename future<typename hpx::util::result_of<F()>::type>::type
         async_execute(executor_type& exec, F f)
         {
-            return detail::call_async_execute(exec, f);
+            return exec.async_execute(f);
         }
 
         /// \brief Singleton form of synchronous execution agent creation.
@@ -491,7 +452,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       otherwise it executes hpx::async(f, i) as often as needed.
         ///
         template <typename F, typename Shape>
-        static typename future_type<void>::type
+        static typename future<void>::type
         async_execute(executor_type& exec, F const& f, Shape const& shape)
         {
             return detail::call_bulk_async_execute(exec, f, shape);
