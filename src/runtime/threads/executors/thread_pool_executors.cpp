@@ -81,7 +81,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         states_.resize(max_punits);
         for (std::size_t i = 0; i != max_punits; ++i)
-            states_[i].store(initialized);
+            states_[i].store(state_initialized);
 
         // Inform the resource manager about this new executor. This causes the
         // resource manager to interact with this executor using the
@@ -95,7 +95,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         typedef boost::atomic<hpx::state> state_type;
         for (state_type& state : states)
         {
-            if (state.load() < running)
+            if (state.load() < state_running)
                 return true;
         }
         return false;
@@ -277,11 +277,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     void thread_pool_executor<Scheduler>::run(std::size_t virt_core,
         std::size_t thread_num)
     {
-        // Set the state to 'running' only if it's still in 'starting' state,
+        // Set the state to 'state_running' only if it's still in 'state_starting' state,
         // otherwise our destructor is currently being executed, which means
         // we need to still execute all threads.
-        state expected = starting;
-        if (states_[virt_core].compare_exchange_strong(expected, running))
+        state expected = state_starting;
+        if (states_[virt_core].compare_exchange_strong(expected, state_running))
         {
             ++max_current_concurrency_;
 
@@ -351,8 +351,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     void thread_pool_executor<Scheduler>::add_processing_unit(
         std::size_t virt_core, std::size_t thread_num, error_code& ec)
     {
-        state expected = initialized;
-        if (states_[virt_core].compare_exchange_strong(expected, starting))
+        state expected = state_initialized;
+        if (states_[virt_core].compare_exchange_strong(expected, state_starting))
         {
             register_thread_nullary(
                 util::bind(
@@ -371,7 +371,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::size_t virt_core, error_code& ec)
     {
         // inform the scheduler to stop the virtual core
-        states_[virt_core].store(stopping);
+        states_[virt_core].store(state_stopping);
     }
 }}}}
 

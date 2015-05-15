@@ -160,7 +160,7 @@ namespace hpx { namespace naming
                     if (e.get_error() != invalid_status) {
                         throw;      // rethrow if not invalid_status
                     }
-                    else if (!threads::threadmanager_is(hpx::stopping)) {
+                    else if (!threads::threadmanager_is(hpx::state_stopping)) {
                         throw;      // rethrow if not stopping
                     }
                 }

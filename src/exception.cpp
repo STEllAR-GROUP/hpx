@@ -40,7 +40,7 @@ extern char **environ;
 
 namespace hpx
 {
-    char const* get_runtime_state_name(runtime::state state);
+    char const* get_runtime_state_name(state st);
 
     ///////////////////////////////////////////////////////////////////////////
     // For testing purposes we sometime expect to see exceptions, allow those
@@ -228,11 +228,11 @@ namespace hpx { namespace detail
         hpx::runtime* rt = get_runtime_ptr();
         if (rt)
         {
-            runtime::state rts_state = rt->get_state();
+            state rts_state = rt->get_state();
             state_name = get_runtime_state_name(rts_state);
 
-            if (rts_state >= runtime::state_initialized &&
-                rts_state < runtime::state_stopped)
+            if (rts_state >= state_initialized &&
+                rts_state < state_stopped)
             {
                 std::ostringstream strm;
                 strm << get_runtime().here();
@@ -252,7 +252,7 @@ namespace hpx { namespace detail
         threads::thread_self* self = threads::get_self_ptr();
         if (NULL != self)
         {
-            if (threads::threadmanager_is(running))
+            if (threads::threadmanager_is(state_running))
                 shepherd = threads::threadmanager_base::get_worker_thread_num();
 
             thread_id = threads::get_self_id();
