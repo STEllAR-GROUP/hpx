@@ -388,7 +388,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
             if (ip_it==ip_qp_map.end()) {
                 ip_qp_map.insert(std::make_pair(dest_ip, qpinfo.first));
-                client->setInitiatedConnection(false);
                 LOG_DEBUG_MSG("handle_verbs_connection OK adding " << ipaddress(dest_ip));
             }
             else {
