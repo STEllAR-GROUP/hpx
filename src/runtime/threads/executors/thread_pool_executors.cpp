@@ -127,7 +127,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         for (std::size_t i = 0; i != states_.size(); ++i)
         {
             hpx::state s = states_[i].load();
-            HPX_ASSERT(s == initialized || s == stopping);
+            HPX_ASSERT(s == state_initialized || s == state_stopping);
         }
 
         // all scheduled tasks should have completed executing
