@@ -358,7 +358,7 @@ results:
     {
         int left = 0, right = 0;
         define_task_block(
-            [&](task_block& tr) {
+            [&](task_block<>& tr) {
                 if (n.left)
                     tr.run([&] { left = traverse(*n.left, compute); });
                 if (n.right)
@@ -392,7 +392,7 @@ function passed to `define_task_block`:
 
     void g();
 
-    void f(task_block& tr)
+    void f(task_block<>& tr)
     {
         tr.run(g);          // OK, invoked from within task_block in h
     }
@@ -404,10 +404,49 @@ function passed to `define_task_block`:
 
     int main()
     {
-        task_block tr;      // Error: no public constructor
+        task_block<> tr;      // Error: no public constructor
         tr.run(g);          // No way to call run outside of a define_task_block
         return 0;
     }
+
+[endsect]
+
+[section:task_block Extensions for Task Blocks]
+
+In __hpx__ we implemented some extensions for `task_block` beyond the actual
+standards porposal __cpp11_n4088__. The main addition is that a `task_block`
+can be invoked with a execution policy as its first argument, very similar to
+the parallel algorithms.
+
+    template <typename Func>
+    int traverse(node& n, Func && compute)
+    {
+        int left = 0, right = 0;
+        define_task_block(
+            par,                        // specify an execution policy
+            [&](task_block<>& tr) {
+                if (n.left)
+                    tr.run([&] { left = traverse(*n.left, compute); });
+                if (n.right)
+                    tr.run([&] { right = traverse(*n.right, compute); });
+            });
+
+        return compute(n) + left + right;
+    }
+
+This also causes the [classref hpx::parallel::v2::task_block `hpx::parallel::task_block`]
+object to be a template in our implementation.
+The template argment is the type of the execution policy used to create the
+task block. The template argment defaults to
+[classref hpx::parallel::v1::parallel_execution_policy `hpx::parallel::parallel_execution_policy`].
+
+__hpx__ still supports calling
+[funcref hpx::parallel::v2::define_task_block `hpx::parallel::define_task_block`]
+without an explicit execution policy. In this case the task block will run using
+the [classref hpx::parallel::v1::parallel_execution_policy `hpx::parallel::parallel_execution_policy`].
+
+__hpx__ also adds the ability to access the execution policy which was used to
+create a given `task_block`.
 
 [endsect]
 
