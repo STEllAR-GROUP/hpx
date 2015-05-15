@@ -86,11 +86,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor>
+        template <typename Executor_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequential_task_execution_policy_shim<Executor> type;
+            typedef sequential_task_execution_policy_shim<Executor_> type;
         };
 
         /// \cond NOINTERNAL
@@ -177,11 +177,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor>
+        template <typename Executor_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequential_task_execution_policy_shim<Executor> type;
+            typedef sequential_task_execution_policy_shim<Executor_> type;
         };
 
         /// \cond NOINTERNAL
@@ -263,11 +263,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor>
+        template <typename Executor_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequential_execution_policy_shim<Executor> type;
+            typedef sequential_execution_policy_shim<Executor_> type;
         };
 
         /// \cond NOINTERNAL
@@ -344,11 +344,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor>
+        template <typename Executor_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequential_execution_policy_shim<Executor> type;
+            typedef sequential_execution_policy_shim<Executor_> type;
         };
 
         /// Create a new sequential_task_execution_policy.
@@ -427,11 +427,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor>
+        template <typename Executor_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_task_execution_policy_shim<Executor> type;
+            typedef parallel_task_execution_policy_shim<Executor_> type;
         };
 
         /// \cond NOINTERNAL
@@ -550,11 +550,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor>
+        template <typename Executor_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_task_execution_policy_shim<Executor> type;
+            typedef parallel_task_execution_policy_shim<Executor_> type;
         };
 
         /// Create a new parallel_task_execution_policy_shim from itself
@@ -632,11 +632,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor>
+        template <typename Executor_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_execution_policy_shim<Executor> type;
+            typedef parallel_execution_policy_shim<Executor_> type;
         };
 
         /// \cond NOINTERNAL
@@ -758,11 +758,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor>
+        template <typename Executor_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_execution_policy_shim<Executor> type;
+            typedef parallel_execution_policy_shim<Executor_> type;
         };
 
         /// Create a new parallel_execution_policy referencing an executor and
