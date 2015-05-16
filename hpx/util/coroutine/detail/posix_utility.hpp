@@ -235,8 +235,8 @@ HPX_EXPORT extern bool use_guard_pages;
   template<typename T>
   inline
   void
-  trampoline(T * fun) {
-    (*fun)();
+  trampoline(void * fun) {
+    (*reinterpret_cast<T *>(fun))();
   }
 }
 
