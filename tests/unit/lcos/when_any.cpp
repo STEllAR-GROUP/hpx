@@ -680,6 +680,32 @@ void test_wait_for_either_of_five_futures_5()
 //     }
 // }
 
+void test_wait_for_either_of_two_late_futures()
+{
+    hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
+    hpx::lcos::future<int> f1(pt1.get_future());
+    hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
+    hpx::lcos::future<int> f2(pt2.get_future());
+
+    hpx::lcos::future<hpx::when_any_result<hpx::util::tuple<
+        hpx::lcos::future<int>
+      , hpx::lcos::future<int> > > > r =
+        hpx::when_any(f1, f2);
+
+    HPX_TEST(!f1.valid());
+    HPX_TEST(!f2.valid());
+
+    pt2();
+    pt1();
+
+    hpx::util::tuple<
+        hpx::lcos::future<int>
+      , hpx::lcos::future<int> > t = r.get().futures;
+
+    HPX_TEST(hpx::util::get<1>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<1>(t).get(), 42);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -707,6 +733,7 @@ int hpx_main(variables_map&)
         test_wait_for_either_of_five_futures_5();
 //         test_wait_for_either_invokes_callbacks();
 //         test_wait_for_any_from_range();
+        test_wait_for_either_of_two_late_futures();
     }
 
     hpx::finalize();
