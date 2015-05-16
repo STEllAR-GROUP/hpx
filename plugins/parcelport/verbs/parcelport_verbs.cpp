@@ -275,7 +275,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // be held onto until all transfers of data are complete.
         // ----------------------------------------------------------------------------------------------
         typedef struct {
-            int                                              counter;
+            std::atomic_uint                                 counter;
             uint32_t                                         tag;
             std::vector<serialization::serialization_chunk>  chunks;
             RdmaMemoryRegion *header_region, *chunk_region, *message_region;
@@ -470,7 +470,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             if (completion.opcode==IBV_WC_RDMA_READ) {
                 bool                 found_wr_id;
                 active_recv_iterator current_recv;
-                {   // locked region : // make sure map isn't modified whilst we are querying it
+                {   // locked region : make sure map isn't modified whilst we are querying it
                     scoped_lock lock(ReadCompletionMap_mutex);
                     recv_wr_map::iterator it = ReadCompletionMap.find(wr_id);
                     found_wr_id = (it != ReadCompletionMap.end());
@@ -590,17 +590,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 active_recv_iterator current_recv;
                 {
                     scoped_lock lock(active_recv_mutex);
-                    current_recv = active_recvs.insert(active_recvs.end(), parcel_recv_data());
+                    active_recvs.emplace_back();
+                    current_recv = std::prev(active_recvs.end());
                     LOG_DEBUG_MSG("Active recv after insert size " << active_recvs.size());
                 }
                 parcel_recv_data &recv_data = *current_recv;
                 // get the header of the new message/parcel
-                recv_data.counter        = 0;
                 recv_data.header_region  = (RdmaMemoryRegion *)completion.wr_id;;
+                header_type *h = (header_type*)recv_data.header_region->getAddress();
                 recv_data.message_region = NULL;
                 recv_data.chunk_region   = NULL;
+                recv_data.counter        = h->num_chunks().first;
 
-                header_type *h = (header_type*)recv_data.header_region->getAddress();
                 LOG_DEBUG_MSG( "received IBV_WC_RECV " <<
                         "buffsize " << decnumber(h->size())
                         << "numbytes " << decnumber(h->numbytes())
@@ -625,7 +626,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     LOG_DEBUG_MSG("Copied chunk data from header : size " << decnumber(chunkbytes));
 
                     // setup info for zero-copy rdma get chunks (if there are any)
-                    recv_data.counter = h->num_chunks().first;
                     if (recv_data.counter>0) {
                         parcel_complete = false;
                         int index = 0;
