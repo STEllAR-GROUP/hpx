@@ -48,7 +48,7 @@
 
 #define HPX_HAVE_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
 //#define HPX_HAVE_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD 256
-#define HPX_HAVE_PARCELPORT_VERBS_SEND_QUEUE 32
+#define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE 32
 using namespace hpx::parcelset::policies;
 
 namespace hpx { namespace parcelset { namespace policies { namespace verbs
@@ -176,7 +176,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
                 util::function_nonser<void()> const& on_stop_thread) :
                     parcelset::parcelport(ini, here(ini), "verbs"), archive_flags_(0)
-        , stopped_(false)
+        , stopped_(false), active_send_count_(0)
         //      , parcels_sent_(0)
         {
             FUNC_START_DEBUG_MSG;
@@ -251,6 +251,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         //
         int                       archive_flags_;
         boost::atomic<bool>       stopped_;
+        boost::atomic_uint        active_send_count_;
         memory_pool_ptr_type      chunk_pool_;
         verbs::tag_provider       tag_provider_;
 
@@ -349,9 +350,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 unique_lock lock(active_send_mutex);
                 util::ignore_while_checking<unique_lock> il(&lock);
                 active_sends.erase(send);
+                --active_send_count_;
+                LOG_DEBUG_MSG("Active send after erase size " << active_send_count_ );
                 lock.unlock();
                 active_send_condition.notify_one();
-                LOG_DEBUG_MSG("Active send after erase size " << active_sends.size() );
             }
         }
 
@@ -859,18 +861,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             // All the parcelport code should run on hpx threads and not OS threads
             //
             if (threads::get_self_ptr() == 0) {
+                // this is an OS thread, so call put_parcel on an hpx thread
                 hpx::apply(&parcelport::put_parcel, this, dest, p, f);
                 return;
             }
-            {
-                unique_lock lock(active_send_mutex);
-                if (active_sends.size()>(HPX_HAVE_PARCELPORT_VERBS_SEND_QUEUE-2)) {
-                    lock.unlock();
+            {   // if we already have a lot of sends in the queue, process them first
+                while (active_send_count_ >= HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE) {
                     LOG_DEBUG_MSG("Extra HPX Background work");
                     hpx_background_work();
-                    return;
                 }
-                lock.unlock();
             }
 
             boost::uint32_t dest_ip = dest.get<locality>().ip_;
@@ -926,12 +925,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     // otherwise we can fill the send queues with so many requests that memory buffers
                     // are exhausted.
                     active_send_condition.wait(lock, [this] {
-                      return !active_sends.size()<HPX_HAVE_PARCELPORT_VERBS_SEND_QUEUE;
+                      return !active_sends.size()<HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE;
                     });
 
                     active_sends.emplace_back();
                     current_send = std::prev(active_sends.end());
-                    LOG_DEBUG_MSG("Active send after insert size " << active_sends.size());
+                    ++active_send_count_;
+                    LOG_DEBUG_MSG("Active send after insert size " << active_send_count_);
                 }
                 parcel_send_data &send_data = *current_send;
                 send_data.tag            = tag;
