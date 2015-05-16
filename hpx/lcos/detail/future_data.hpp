@@ -244,12 +244,7 @@ namespace detail
                 state_ = full;
 
                 // handle all threads waiting for the block to become full
-                cond_.notify_all(l, ec);
-
-                // Note: cond_.notify_all() may cause this shared state to be
-                // destroyed. This is, however, safe as the scoped lock above
-                // will not touch the wrapped mutex if it was unlocked inside
-                // notify_all().
+                cond_.notify_all(std::move(l), ec);
             }
 
             // invoke the callback (continuation) function

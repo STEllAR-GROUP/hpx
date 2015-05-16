@@ -44,7 +44,7 @@ namespace hpx { namespace lcos { namespace local
             }
             else {
                 // release the threads
-                cond_.notify_all(l);
+                cond_.notify_all(std::move(l));
             }
         }
 

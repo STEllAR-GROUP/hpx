@@ -109,7 +109,7 @@ namespace hpx { namespace lcos { namespace server
             node.release();
 
             // resume the first thread waiting to pick up that value
-            cond_.notify_one(l);
+            cond_.notify_one(std::move(l));
         }
 
         /// The \a function set_exception is called whenever a
@@ -120,7 +120,7 @@ namespace hpx { namespace lcos { namespace server
         void set_exception(boost::exception_ptr const& /*e*/)
         {
             boost::unique_lock<mutex_type> l(mtx_);
-            cond_.abort_all(l);
+            cond_.abort_all(std::move(l));
         }
 
         // Retrieve the next value from the queue (pop value from front of

@@ -98,7 +98,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(counter_ > 0);
 
             if (--counter_ == 0)
-                cond_.notify_all(l);    // release the threads
+                cond_.notify_all(std::move(l));    // release the threads
             else
                 cond_.wait(l, "hpx::local::latch::count_down_and_wait");
         }
@@ -120,7 +120,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(counter_ >= n);
 
             if ((counter_ -= n) == 0)
-                cond_.notify_all(l);    // release the threads
+                cond_.notify_all(std::move(l));    // release the threads
         }
 
         /// Returns: counter_ == 0. Does not block.
@@ -149,7 +149,7 @@ namespace hpx { namespace lcos { namespace local
         void abort_all()
         {
             boost::unique_lock<mutex_type> l(mtx_);
-            cond_.abort_all(l);
+            cond_.abort_all(std::move(l));
         }
 
     private:

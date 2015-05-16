@@ -103,7 +103,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 {
                     boost::unique_lock<mutex_type> l(this_->connections_mtx_);
                     --this_->num_connections_;
-                    this_->connections_cond_.notify_all(l);
+                    this_->connections_cond_.notify_all(std::move(l));
                 }
             }
 

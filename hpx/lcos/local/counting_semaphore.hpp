@@ -101,14 +101,14 @@ namespace hpx { namespace lcos { namespace local
             void signal(boost::int64_t count = 1)
             {
                 boost::unique_lock<mutex_type> l(mtx_);
-                signal_locked(count, l);
+                signal_locked(count, std::move(l));
             }
 
             boost::int64_t signal_all()
             {
                 boost::unique_lock<mutex_type> l(mtx_);
                 boost::int64_t count = static_cast<boost::int64_t>(cond_.size(l));
-                signal_locked(count, l);
+                signal_locked(count, std::move(l));
                 return count;
             }
 
@@ -126,18 +126,20 @@ namespace hpx { namespace lcos { namespace local
 
         private:
             void signal_locked(boost::int64_t count,
-                boost::unique_lock<mutex_type>& l)
+                boost::unique_lock<mutex_type> l)
             {
                 HPX_ASSERT(l.owns_lock());
 
+                mutex_type* mtx = l.mutex();
                 // release no more threads than we get resources
                 value_ += count;
                 for (boost::int64_t i = 0; value_ >= 0 && i < count; ++i)
                 {
                     // notify_one() returns false if no more threads are
                     // waiting
-                    if (!cond_.notify_one(l))
+                    if (!cond_.notify_one(std::move(l)))
                         break;
+                    l = boost::unique_lock<mutex_type>(*mtx);
                 }
             }
 

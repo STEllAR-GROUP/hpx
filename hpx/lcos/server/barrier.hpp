@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace server
                 cond_.wait(l, "barrier::set_event");
             }
             else {
-                cond_.notify_all(l);
+                cond_.notify_all(std::move(l));
             }
         }
 
@@ -87,7 +87,7 @@ namespace hpx { namespace lcos { namespace server
         {
             try {
                 boost::unique_lock<mutex_type> l(mtx_);
-                cond_.abort_all(l);
+                cond_.abort_all(std::move(l));
 
                 boost::rethrow_exception(e);
             }

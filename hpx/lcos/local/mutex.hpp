@@ -177,7 +177,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_RELEASED(this);
             owner_id_ = threads::invalid_thread_id_repr;
 
-            cond_.notify_one(l, ec);
+            cond_.notify_one(std::move(l), ec);
         }
 
     private:

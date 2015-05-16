@@ -81,12 +81,12 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 local::no_mutex no_mtx;
                 boost::unique_lock<local::no_mutex> lock(no_mtx);
-                abort_all(lock);
+                abort_all(std::move(lock));
             }
         }
 
         template <typename Mutex>
-        bool empty(boost::unique_lock<Mutex>& lock) const
+        bool empty(boost::unique_lock<Mutex> const& lock) const
         {
             HPX_ASSERT(lock.owns_lock());
 
@@ -94,18 +94,16 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         template <typename Mutex>
-        std::size_t size(boost::unique_lock<Mutex>& lock) const
+        std::size_t size(boost::unique_lock<Mutex> const& lock) const
         {
             HPX_ASSERT(lock.owns_lock());
 
             return queue_.size();
         }
 
-        // Return false if no more threads are waiting. If it returns false
-        // the lock is left unlocked, otherwise it will be relocked before
-        // returning.
+        // Return false if no more threads are waiting.
         template <typename Mutex>
-        bool notify_one(boost::unique_lock<Mutex>& lock, error_code& ec = throws)
+        bool notify_one(boost::unique_lock<Mutex> lock, error_code& ec = throws)
         {
             HPX_ASSERT(lock.owns_lock());
 
@@ -122,36 +120,20 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 queue_.front().id_ = threads::invalid_thread_id_repr;
                 queue_.pop_front();
 
-                if (!queue_.empty())
-                {
-                    util::scoped_unlock<boost::unique_lock<Mutex> > unlock(lock);
+                bool empty = queue_.empty();
+                lock.unlock();
 
-                    threads::set_thread_state(threads::thread_id_type(
-                        reinterpret_cast<threads::thread_data_base*>(id)),
-                        threads::pending, threads::wait_timeout,
-                        threads::thread_priority_default, ec);
-                    if (!ec) return true;
-                }
-                else
-                {
-                    // Since this is the last thread waiting on this condition
-                    // variable it could happen that this instance will be
-                    // destroyed before set_thread_state() returns. We have to
-                    // make sure that this instance is not touched anymore.
-                    lock.unlock();
-
-                    threads::set_thread_state(threads::thread_id_type(
-                        reinterpret_cast<threads::thread_data_base*>(id)),
-                        threads::pending, threads::wait_timeout,
-                        threads::thread_priority_default, ec);
-                }
+                threads::set_thread_state(threads::thread_id_type(
+                    reinterpret_cast<threads::thread_data_base*>(id)),
+                    threads::pending, threads::wait_timeout,
+                    threads::thread_priority_default, ec);
+                if (!ec) return empty;
             }
             return false;
         }
 
-        // This leaves the lock unlocked
         template <typename Mutex>
-        void notify_all(boost::unique_lock<Mutex>& lock, error_code& ec = throws)
+        void notify_all(boost::unique_lock<Mutex> lock, error_code& ec = throws)
         {
             HPX_ASSERT(lock.owns_lock());
 
@@ -182,7 +164,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         template <typename Mutex>
-        void abort_all(boost::unique_lock<Mutex>& lock) // leaves the lock unlocked
+        void abort_all(boost::unique_lock<Mutex> lock)
         {
             HPX_ASSERT(lock.owns_lock());
 

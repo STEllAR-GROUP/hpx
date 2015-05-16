@@ -34,13 +34,13 @@ namespace hpx { namespace lcos { namespace local
         void notify_one(error_code& ec = throws)
         {
             boost::unique_lock<mutex_type> l(mtx_);
-            cond_.notify_one(l, ec);
+            cond_.notify_one(std::move(l), ec);
         }
 
         void notify_all(error_code& ec = throws)
         {
             boost::unique_lock<mutex_type> l(mtx_);
-            cond_.notify_all(l, ec);
+            cond_.notify_all(std::move(l), ec);
         }
 
         template <class Lock>
