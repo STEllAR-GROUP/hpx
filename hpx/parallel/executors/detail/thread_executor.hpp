@@ -19,26 +19,26 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct threads_executor
-    {
-        threads_executor(threads::executor exec)
-          : exec_(exec)
-        {}
-
-        template <typename F>
-        hpx::future<typename hpx::util::result_of<F()>::type>
-        async_execute(F f)
-        {
-            return hpx::async(exec_, std::move(f));
-        }
-
-    private:
-        threads::executor exec_;
-    };
-
     namespace detail
     {
         /// \cond NOINTERNAL
+        struct threads_executor
+        {
+            threads_executor(threads::executor exec)
+              : exec_(exec)
+            {}
+
+            template <typename F>
+            hpx::future<typename hpx::util::result_of<F()>::type>
+            async_execute(F f)
+            {
+                return hpx::async(exec_, std::move(f));
+            }
+
+        private:
+            threads::executor exec_;
+        };
+
         template <>
         struct is_executor<threads_executor>
           : std::true_type

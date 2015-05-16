@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/parallel/executors/thread_executor.hpp>
+#include <hpx/parallel/executors/detail/thread_executor.hpp>
 #include <hpx/runtime/threads/executors/service_executors.hpp>
 #include <hpx/util/move.hpp>
 
@@ -20,31 +20,31 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct io_pool_executor : threads_executor
+    struct io_pool_executor : detail::threads_executor
     {
         io_pool_executor()
-          : threads_executor(threads::io_pool_executor())
+          : threads_executor(threads::executors::io_pool_executor())
         {}
     };
 
-    struct parcel_pool_executor : threads_executor
+    struct parcel_pool_executor : detail::threads_executor
     {
         parcel_pool_executor()
-          : threads_executor(threads::parcel_pool_executor())
+          : threads_executor(threads::executors::parcel_pool_executor())
         {}
     };
 
-    struct timer_pool_executor : threads_executor
+    struct timer_pool_executor : detail::threads_executor
     {
         explicit timer_pool_executor()
-          : threads_executor(threads::timer_pool_executor())
+          : threads_executor(threads::executors::timer_pool_executor())
         {}
     };
 
-    struct main_pool_executor : threads_executor
+    struct main_pool_executor : detail::threads_executor
     {
         explicit main_pool_executor()
-          : threads_executor(threads::main_pool_executor())
+          : threads_executor(threads::executors::main_pool_executor())
         {}
     };
 

@@ -24,7 +24,7 @@ namespace hpx { namespace threads { namespace executors
           : public threads::detail::scheduled_executor_base
         {
         public:
-            service_executor(char const* pool_name);
+            service_executor(char const* pool_name, char const* pool_name_suffix = "");
             ~service_executor();
 
             // Schedule the specified function for execution in this executor.
@@ -79,8 +79,9 @@ namespace hpx { namespace threads { namespace executors
 
     struct parcel_pool_executor : public scheduled_executor
     {
-        parcel_pool_executor()
-          : scheduled_executor(new detail::service_executor("parcel-pool"))
+        parcel_pool_executor(char const* pool_name_suffix = "-tcp")
+          : scheduled_executor(
+                new detail::service_executor("parcel-pool", pool_name_suffix))
         {}
     };
 

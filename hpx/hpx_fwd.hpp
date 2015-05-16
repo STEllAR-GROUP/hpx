@@ -796,7 +796,8 @@ namespace hpx
     HPX_API_EXPORT util::runtime_configuration const& get_config();
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(char const* name);
+    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(
+        char const* name, char const* pool_name_suffix = "");
 
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace

@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <boost/range/functions.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::thread::id sync_test()
@@ -76,9 +77,10 @@ void test_executor()
     typedef typename hpx::parallel::executor_traits<
             Executor
         >::execution_category execution_category;
-    HPX_TEST(
-        typeid(hpx::parallel::sequential_execution_tag) ==
-        typeid(execution_category));
+
+    HPX_TEST((boost::is_same<
+            hpx::parallel::sequential_execution_tag, execution_category
+        >::value));
 
     Executor exec;
     test_sync(exec);

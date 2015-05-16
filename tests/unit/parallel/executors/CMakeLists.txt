@@ -7,7 +7,10 @@ set(tests
     minimal_async_executor
     minimal_sync_executor
     parallel_executor
+    parallel_fork_executor
     sequential_executor
+    service_executors
+    thread_pool_executors
    )
 
 foreach(test ${tests})

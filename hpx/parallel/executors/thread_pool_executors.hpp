@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/parallel/executors/thread_executor.hpp>
+#include <hpx/parallel/executors/detail/thread_executor.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 #include <hpx/util/move.hpp>
 
@@ -21,33 +21,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-    struct local_queue_executor : threads_executor
+    struct local_queue_executor : detail::threads_executor
     {
         explicit local_queue_executor(std::size_t max_punits,
                 std::size_t min_punits = 1)
-          : threads_executor(
-                threads::local_queue_executor(max_punits, min_punits))
+          : threads_executor(threads::executors::local_queue_executor(
+                max_punits, min_punits))
         {}
     };
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    struct local_priority_queue_executor : threads_executor
+    struct local_priority_queue_executor : detail::threads_executor
     {
         explicit local_priority_queue_executor(std::size_t max_punits,
                 std::size_t min_punits = 1)
-          : threads_executor(
-                threads::local_priority_queue_executor(max_punits, min_punits))
+          : threads_executor(threads::executors::local_priority_queue_executor(
+                max_punits, min_punits))
         {}
     };
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-    struct static_priority_queue_executor : threads_executor
+    struct static_priority_queue_executor : detail::threads_executor
     {
         explicit static_priority_queue_executor(std::size_t max_punits,
                 std::size_t min_punits = 1)
-          : threads_executor(
-                threads::static_priority_queue_executor(max_punits, min_punits))
+          : threads_executor(threads::executors::static_priority_queue_executor(
+                max_punits, min_punits))
         {}
     };
 #endif
