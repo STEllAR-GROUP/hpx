@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_PREPARE(this);
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if(owner_id_ == self_id)
@@ -84,7 +84,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_PREPARE(this);
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             if (owner_id_ != threads::invalid_thread_id_repr)
             {
@@ -110,7 +110,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_PREPARE(this);
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if (owner_id_ != threads::invalid_thread_id_repr)
@@ -161,7 +161,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_RELEASING(this);
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if (HPX_UNLIKELY(owner_id_ != self_id))

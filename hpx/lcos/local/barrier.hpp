@@ -9,6 +9,8 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/thread/lock_types.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
@@ -36,7 +38,7 @@ namespace hpx { namespace lcos { namespace local
         /// entered this function.
         void wait()
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             if (cond_.size(l) < number_of_threads_-1) {
                 cond_.wait(l, "barrier::wait");
             }
