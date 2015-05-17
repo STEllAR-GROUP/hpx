@@ -21,6 +21,10 @@ struct HPX_EXPORT primary_namespace
     typedef server::primary_namespace server_type;
     typedef server::primary_namespace server_component_type;
 
+    typedef util::function_nonser<
+            void(boost::system::error_code const&, parcelset::parcel const&)
+        > parcel_sent_func;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     static lcos::future<Result> service_async(
@@ -41,8 +45,7 @@ struct HPX_EXPORT primary_namespace
     static void service_non_blocking(
         naming::id_type const& gid
       , request const& req
-      , util::function_nonser<void(boost::system::error_code const&,
-            parcelset::parcel const&)> const& f
+      , parcel_sent_func const& cb
       , threads::thread_priority priority = threads::thread_priority_default
         );
 
@@ -60,6 +63,7 @@ struct HPX_EXPORT primary_namespace
     static lcos::future<std::vector<response> > bulk_service_async(
         naming::id_type const& gid
       , std::vector<request> const& reqs
+      , parcel_sent_func const& cb
       , threads::thread_priority priority = threads::thread_priority_default
         );
 
@@ -69,6 +73,7 @@ struct HPX_EXPORT primary_namespace
     static void bulk_service_non_blocking(
         naming::id_type const& gid
       , std::vector<request> const& reqs
+      , parcel_sent_func const& cb
       , threads::thread_priority priority = threads::thread_priority_default
         );
 
@@ -77,10 +82,7 @@ struct HPX_EXPORT primary_namespace
       , std::vector<request> const& reqs
       , threads::thread_priority priority = threads::thread_priority_default
       , error_code& ec = throws
-        )
-    {
-        return bulk_service_async(gid, reqs, priority).get(ec);
-    }
+        );
 
     static naming::gid_type get_service_instance(naming::gid_type const& dest)
     {

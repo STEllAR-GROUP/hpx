@@ -2893,6 +2893,12 @@ void addressing_service::send_refcnt_requests(
     }
 #endif
 
+template <typename T>
+void keep_data_alive(boost::shared_ptr<T>)
+{
+    // do nothing, just keep argument alive
+}
+
 void addressing_service::send_refcnt_requests_non_blocking(
     addressing_service::mutex_type::scoped_lock& l
   , error_code& ec
@@ -2925,7 +2931,8 @@ void addressing_service::send_refcnt_requests_non_blocking(
 
         // collect all requests for each locality
         typedef std::map<naming::id_type, std::vector<request> > requests_type;
-        requests_type requests;
+        boost::shared_ptr<requests_type> requests =
+            boost::make_shared<requests_type>();
 
         for (refcnt_requests_type::const_reference e : *p)
         {
@@ -2938,15 +2945,17 @@ void addressing_service::send_refcnt_requests_non_blocking(
                 stubs::primary_namespace::get_service_instance(raw)
               , naming::id_type::unmanaged);
 
-            requests[target].push_back(req);
+            (*requests)[target].push_back(req);
         }
 
         // send requests to all locality
-        requests_type::const_iterator end = requests.end();
-        for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
+        requests_type::const_iterator end = requests->end();
+        for (requests_type::const_iterator it = requests->begin(); it != end; ++it)
         {
             stubs::primary_namespace::bulk_service_non_blocking(
-                (*it).first, (*it).second, action_priority_);
+                (*it).first, (*it).second,
+                util::bind(&keep_data_alive<requests_type>, requests),
+                action_priority_);
         }
 
         if (&ec != &throws)
@@ -2989,7 +2998,8 @@ addressing_service::send_refcnt_requests_async(
 
     // collect all requests for each locality
     typedef std::map<naming::id_type, std::vector<request> > requests_type;
-    requests_type requests;
+    boost::shared_ptr<requests_type> requests =
+        boost::make_shared<requests_type>();
 
     std::vector<hpx::future<std::vector<response> > > lazy_results;
     for (refcnt_requests_type::const_reference e : *p)
@@ -3003,16 +3013,21 @@ addressing_service::send_refcnt_requests_async(
             stubs::primary_namespace::get_service_instance(raw)
           , naming::id_type::unmanaged);
 
-        requests[target].push_back(req);
+        (*requests)[target].push_back(req);
     }
 
     // send requests to all locality
-    requests_type::const_iterator end = requests.end();
-    for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
+    requests_type::const_iterator end = requests->end();
+    for (requests_type::const_iterator it = requests->begin(); it != end; ++it)
     {
-        lazy_results.push_back(
+        // make sure requests vector goes out of scope only after the
+        // parcel-send operation is complete
+        future<std::vector<response> > f =
             stubs::primary_namespace::bulk_service_async(
-                (*it).first, (*it).second, action_priority_));
+                (*it).first, (*it).second,
+                util::bind(&keep_data_alive<requests_type>, requests),
+                action_priority_);
+        lazy_results.push_back(std::move(f));
     }
 
     return lazy_results;
