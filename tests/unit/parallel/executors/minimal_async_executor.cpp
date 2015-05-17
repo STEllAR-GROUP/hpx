@@ -7,10 +7,12 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <algorithm>
 #include <cstdlib>
 #include <vector>
+#include <utility>
 
 #include <boost/range/functions.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -93,20 +95,22 @@ void test_executor()
 struct test_async_executor2
 {
     template <typename F>
-    hpx::future<typename hpx::util::result_of<F()>::type>
-    async_execute(F f)
+    hpx::future<typename hpx::util::result_of<
+        typename hpx::util::decay<F>::type()
+    >::type>
+    async_execute(F && f)
     {
-        return hpx::async(hpx::launch::async, f);
+        return hpx::async(hpx::launch::async, std::forward<F>(f));
     }
 };
 
 struct test_async_executor1 : test_async_executor2
 {
     template <typename F>
-    typename hpx::util::result_of<F()>::type
-    execute(F f)
+    typename hpx::util::result_of<typename hpx::util::decay<F>::type()>::type
+    execute(F && f)
     {
-        return hpx::async(hpx::launch::async, f).get();
+        return hpx::async(hpx::launch::async, std::forward<F>(f)).get();
     }
 };
 

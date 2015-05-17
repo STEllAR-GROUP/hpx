@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <vector>
+#include <utility>
 
 #include <boost/range/functions.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -95,10 +96,12 @@ struct test_sync_executor2
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
     template <typename F>
-    hpx::future<typename hpx::util::result_of<F()>::type>
-    async_execute(F f)
+    hpx::future<typename hpx::util::result_of<
+        typename hpx::util::decay<F>::type()
+    >::type>
+    async_execute(F && f)
     {
-        return hpx::async(hpx::launch::sync, f);
+        return hpx::async(hpx::launch::sync, std::forward<F>(f));
     }
 };
 

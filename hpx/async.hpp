@@ -104,7 +104,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, F&& f, Ts&&... vs)
     {
         typedef typename util::deferred_call_result_of<
-            F(Ts...)
+            typename util::decay<F>::type(Ts...)
         >::type result_type;
 
         if (policy == launch::sync) {
@@ -137,7 +137,7 @@ namespace hpx
     async(threads::executor& sched, F&& f, Ts&&... vs)
     {
         typedef typename util::deferred_call_result_of<
-            F(Ts...)
+            typename util::decay<F>::type(Ts...)
         >::type result_type;
 
         lcos::local::futures_factory<result_type()> p(sched,

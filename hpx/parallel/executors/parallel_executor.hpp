@@ -12,9 +12,10 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -22,10 +23,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     struct parallel_executor
     {
         template <typename F>
-        hpx::future<typename hpx::util::result_of<F()>::type>
-        async_execute(F f)
+        hpx::future<typename hpx::util::result_of<
+            typename hpx::util::decay<F>::type()
+        >::type>
+        async_execute(F && f)
         {
-            return hpx::async(launch::async, std::move(f));
+            return hpx::async(launch::async, std::forward<F>(f));
         }
     };
 

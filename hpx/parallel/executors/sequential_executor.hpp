@@ -13,9 +13,10 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -25,21 +26,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         typedef sequential_execution_tag execution_category;
 
         template <typename F>
-        typename hpx::util::result_of<F()>::type
-        execute(F f)
+        typename hpx::util::result_of<
+            typename hpx::util::decay<F>::type()
+        >::type
+        execute(F && f)
         {
             return f();
         }
 
         template <typename F>
-        hpx::future<typename hpx::util::result_of<F()>::type>
-        async_execute(F f)
+        hpx::future<typename hpx::util::result_of<
+            typename hpx::util::decay<F>::type()
+        >::type>
+        async_execute(F && f)
         {
-            return hpx::async(hpx::launch::sync, std::move(f));
+            return hpx::async(hpx::launch::sync, std::forward<F>(f));
         }
 
         template <typename F, typename Shape>
-        void bulk_execute(F f, Shape const& shape)
+        void bulk_execute(F && f, Shape const& shape)
         {
             for (auto const& elem: shape)
                 f(elem);
@@ -47,10 +52,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename F, typename Shape>
         hpx::future<void>
-        bulk_async_execute(F f, Shape const& shape)
+        bulk_async_execute(F && f, Shape const& shape)
         {
             return hpx::async(hpx::launch::sync,
-                [=] { this->bulk_execute(f, shape); });
+                [=] { this->bulk_execute(std::forward<F>(f), shape); });
         }
     };
 
