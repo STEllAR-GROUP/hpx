@@ -14,7 +14,6 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/deferred_call.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -56,7 +55,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         bulk_async_execute(F && f, Shape const& shape)
         {
             return hpx::async(hpx::launch::sync,
-                &sequential_executor::bulk_execute, std::forward<F>(f), shape);
+                &sequential_executor::bulk_execute<F, Shape>,
+                std::forward<F>(f), shape);
         }
 
         std::size_t os_thread_count()
