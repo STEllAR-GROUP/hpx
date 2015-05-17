@@ -335,11 +335,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 #endif
 
         template <typename Executor, typename F, typename S>
-        typename bulk_execute<Executor, F, S>::type
-        call_bulk_execute(Executor& exec, F && f, S const& shape)
+        void call_bulk_execute(Executor& exec, F && f, S const& shape)
         {
             typedef typename hpx::util::decay<F>::type func_type;
-            return bulk_execute<Executor, func_type, S>::call(
+            bulk_execute<Executor, func_type, S>::call(
                 exec, std::forward<F>(f), shape);
         }
 
@@ -377,7 +376,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 #else
         template <typename Executor>
-        struct bulk_execute<Executor,
+        struct os_thread_count<Executor,
             typename util::always_void<decltype(
                 std::declval<Executor>().os_thread_count()
             )>::type>
