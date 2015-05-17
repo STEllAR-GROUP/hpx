@@ -94,7 +94,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         /// \cond NOINTERNAL
-        static threads::executor get_executor() { return threads::executor(); }
         static std::size_t get_chunk_size() { return 0; }
 
         sequential_task_execution_policy() {}
@@ -185,7 +184,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         /// \cond NOINTERNAL
-        static threads::executor get_executor() { return threads::executor(); }
         static std::size_t get_chunk_size() { return 0; }
         /// \endcond
 
@@ -273,7 +271,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         sequential_execution_policy() {}
 
-        static threads::executor get_executor() { return threads::executor(); }
         static std::size_t get_chunk_size() { return 0; }
         /// \endcond
 
@@ -499,7 +496,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// \cond NOINTERNAL
-        static threads::executor get_executor() { return threads::executor(); }
         std::size_t get_chunk_size() const { return chunk_size_; }
         /// \endcond
 
@@ -707,7 +703,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         /// \cond NOINTERNAL
-        static threads::executor get_executor() { return threads::executor(); }
         std::size_t get_chunk_size() const { return chunk_size_; }
         /// \endcond
 
@@ -862,7 +857,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         parallel_vector_execution_policy() {}
 
-        static threads::executor get_executor() { return threads::executor(); }
         static std::size_t get_chunk_size() { return 0; }
         /// \endcond
 

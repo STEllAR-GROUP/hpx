@@ -342,6 +342,60 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             return bulk_execute<Executor, func_type, S>::call(
                 exec, std::forward<F>(f), shape);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Executor, typename Enable = void>
+        struct os_thread_count
+        {
+            typedef std::size_t type;
+
+            static std::size_t call(Executor& exec)
+            {
+                return hpx::get_os_thread_count();
+            }
+        };
+
+#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
+        struct check_os_thread_count
+        {
+            template <typename T, void (T::*)() = &T::os_thread_count>
+            struct get {};
+        };
+
+        template <typename Executor>
+        struct os_thread_count<Executor,
+            typename std::enable_if<
+                has_member<Executor, check_os_thread_count>::value
+            >::type>
+        {
+            typedef std::size_t type;
+
+            static std::size_t call(Executor& exec)
+            {
+                return exec.os_thread_count();
+            }
+        };
+#else
+        template <typename Executor>
+        struct bulk_execute<Executor,
+            typename util::always_void<decltype(
+                std::declval<Executor>().os_thread_count()
+            )>::type>
+        {
+            typedef std::size_t type;
+
+            static std::size_t call(Executor& exec)
+            {
+                return exec.os_thread_count();
+            }
+        };
+#endif
+
+        template <typename Executor>
+        std::size_t call_os_thread_count(Executor& exec)
+        {
+            return os_thread_count<Executor>::call(exec);
+        }
         /// \endcond
     }
 
@@ -503,6 +557,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         static void execute(executor_type& exec, F && f, Shape const& shape)
         {
             return detail::call_bulk_execute(exec, std::forward<F>(f), shape);
+        }
+
+        /// Retrieve the number of (kernel-)threads used by the associated
+        /// executor.
+        ///
+        /// \param exec  [in] The executor object to use for scheduling of the
+        ///              function \a f.
+        ///
+        /// \note This calls exec.os_thread_count() if it exists;
+        ///       otherwise it executes hpx::get_os_thread_count().
+        ///
+        static std::size_t os_thread_count(executor_type const& exec)
+        {
+            return detail::call_os_thread_count(exec);
         }
     };
 

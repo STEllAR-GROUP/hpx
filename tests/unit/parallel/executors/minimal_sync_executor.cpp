@@ -103,6 +103,11 @@ struct test_sync_executor2
     {
         return hpx::async(hpx::launch::sync, std::forward<F>(f));
     }
+
+    std::size_t os_thread_count()
+    {
+        return 1;
+    }
 };
 
 struct test_sync_executor1 : test_sync_executor2

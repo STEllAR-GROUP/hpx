@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -82,7 +83,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         boost::shared_array<buffer_type> buffer(
             new buffer_type[combiner(len1, len2)]);
 
-        std::size_t cores = hpx::get_os_thread_count(policy.get_executor());
+        typedef typename ExPolicy::executor_type executor_type;
+        std::size_t cores = executor_traits<executor_type>::os_thread_count(
+            policy.executor());
         std::size_t step = (len1 + cores - 1) / cores;
         boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
 

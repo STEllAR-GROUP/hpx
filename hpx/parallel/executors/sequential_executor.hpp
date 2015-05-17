@@ -58,6 +58,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             return hpx::async(hpx::launch::sync,
                 &sequential_executor::bulk_execute, std::forward<F>(f), shape);
         }
+
+        std::size_t os_thread_count()
+        {
+            return 1;
+        }
     };
 
     namespace detail
