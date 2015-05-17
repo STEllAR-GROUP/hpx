@@ -439,6 +439,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename T>
         struct future
         {
+            /// The future type returned from async_execute
             typedef typename detail::future_type<executor_type, T>::type type;
         };
 

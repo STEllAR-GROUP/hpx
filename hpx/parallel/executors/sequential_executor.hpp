@@ -11,18 +11,37 @@
 #include <hpx/config.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
 #include <utility>
 
+/// \cond NOINTERNAL
+namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
+{
+    struct sequential_execution_policy;
+}}}
+/// \endcond
+
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
+    /// A \a sequential_executor creates groups of sequential execution agents
+    /// which execute in the calling thread. The sequential order is given by
+    /// the lexicographical order of indices in the index space.
+    ///
     struct sequential_executor
     {
+#if defined(DOXYGEN)
+        /// Create a new sequential executor
+        sequential_executor() {}
+#endif
+
+        /// \cond NOINTERNAL
         typedef sequential_execution_tag execution_category;
 
         template <typename F>
@@ -46,8 +65,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename F, typename Shape>
         static void bulk_execute(F && f, Shape const& shape)
         {
-            for (auto const& elem: shape)
-                f(elem);
+            std::list<boost::exception_ptr> errors;
+            try {
+                for (auto const& elem: shape)
+                    f(elem);
+            }
+            catch (...) {
+                // properly handle exceptions
+                parallel::util::detail::handle_local_exceptions<
+                        sequential_execution_policy
+                    >::call(boost::current_exception(), errors);
+
+                if (!errors.empty())
+                    boost::throw_exception(exception_list(std::move(errors)));
+            }
         }
 
         template <typename F, typename Shape>
@@ -63,6 +94,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             return 1;
         }
+        /// \endcond
     };
 
     namespace detail

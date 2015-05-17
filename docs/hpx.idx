@@ -84,8 +84,9 @@ parallel::sequential_task_execution_policy_shim "sequential_task_execution_polic
 parallel::parallel_vector_execution_policy "parallel_vector_execution_policy"        "hpx\.parallel\.v1\.parallel_vector_e.*"
 
 parallel::is_execution_policy              "is_execution_policy"            "hpx\.parallel\.v1\.is_execution_policy.*"
-parallel::is_parallel_execution_policy     "is_parallel_execution_policy"   "hpx\.parallel\.v1\.is_parallel_execution_policy.*"
-parallel::is_sequential_execution_policy   "is_sequential_execution_policy" "hpx\.parallel\.v1\.is_sequential_execution_policy.*"
+parallel::is_parallel_execution_policy     "is_parallel_execution_policy"   "hpx\.parallel\.v1\.is_parallel_execu_.*"
+parallel::is_sequential_execution_policy   "is_sequential_execution_policy" "hpx\.parallel\.v1\.is_sequential_exe_.*"
+parallel::is_async_execution_policy        "is_async_execution_policy"            "hpx\.parallel\.v1\.is_async_execution_policy.*"
 
 # hpx/parallel/executors/execution_traits.hpp
 parallel::executor_traits                  "executor_traits"               "hpx\.parallel\.v3\.executor_traits.*"
@@ -95,10 +96,21 @@ parallel::parallel_execution_tag           "parallel_execution_tag"        "hpx\
 parallel::vector_execution_tag             "vector_execution_tag"          "hpx\.parallel\.v3\.vector_execution_tag.*"
 
 # hpx/parallel/executors/sequential_executor.hpp
-#parallel::sequential_executor              "sequential_executor"           "hpx\.parallel\.v3\.sequential_executor.*"
+parallel::sequential_executor              "sequential_executor"           "hpx\.parallel\.v3\.sequential_executor.*"
 
 # hpx/parallel/executors/parallel_executor.hpp
-#parallel::parallel_executor                "parallel_executor"             "hpx\.parallel\.v3\.parallel_executor.*"
+parallel::parallel_executor                "parallel_executor"             "hpx\.parallel\.v3\.parallel_executor.*"
+
+# hpx/parallel/executors/service_executors.hpp
+parallel::service_executor                 "service_executor"              "hpx\.parallel\.v3\.service_executor.*"
+
+# hpx/parallel/executors/service_executors.hpp
+parallel::service_executor                 "service_executor"              "hpx\.parallel\.v3\.service_executor.*"
+
+# hpx/parallel/executors/thread_pool_executors.hpp
+parallel::local_queue_executor           "local_queue_executor"             "hpx\.parallel\.v3\.local_queue_executor.*"
+parallel::local_priority_queue_executor  "local_priority_queue_executor"    "hpx\.parallel\.v3\.local_priority_qu_.*"
+parallel::static_priority_queue_executor "static_priority_queue_executor"   "hpx\.parallel\.v3\.static_priority_q_.*"
 
 # hpx/parallel/algorithms/adjacent_find.hpp
 parallel::adjacent_find               "adjacent_find" "hpx\.parallel\.v1\.adjacent_find.*"

@@ -104,6 +104,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     ///     });
     /// \endcode
     ///
+    /// \tparam ExPolicy The execution policy an instance of a \a task_block
+    ///         was created with. This defaults to \a parallel_execution_policy.
+    ///
     template <typename ExPolicy = parallel::parallel_execution_policy>
     class task_block
     {
@@ -287,6 +290,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             wait_for_completion();
         }
 
+        /// Returns a reference to the execution policy used to construct this
+        /// object.
+        ///
+        /// Precondition: this shall be the active task_block.
+        ///
+        ExPolicy& policy() { return policy_; }
+
+        /// Returns a reference to the execution policy used to construct this
+        /// object.
+        ///
+        /// Precondition: this shall be the active task_block.
+        ///
+        ExPolicy const& policy() const { return policy_; }
+
     private:
         mutable mutex_type mtx_;
         std::vector<hpx::future<void> > tasks_;
@@ -295,7 +312,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         ExPolicy policy_;
     };
 
-    /// Constructs a \a task_block, tr, and invokes the expression
+    /// Constructs a \a task_block, \a tr, using the given execution policy
+    /// \a policy,and invokes the expression
     /// \a f(tr) on the user-provided object, \a f.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).

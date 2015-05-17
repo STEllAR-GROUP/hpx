@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/thread_pool_executor.hpp
+/// \file parallel/executors/thread_pool_executors.hpp
 
 #if !defined(HPX_PARALLEL_EXECUTORS_THREAD_POOL_EXECUTORS_MAY_15_2015_0548PM)
 #define HPX_PARALLEL_EXECUTORS_THREAD_POOL_EXECUTORS_MAY_15_2015_0548PM
@@ -21,8 +21,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-    struct local_queue_executor : detail::threads_executor
+    struct local_queue_executor
+#if !defined(DOXYGEN)
+      : detail::threads_executor
+#endif
     {
+        /// Creates a new local_queue_executor
+        ///
+        /// \param max_punits   [in] The maximum number of processing units to
+        ///                     associate with the newly created executor.
+        /// \param min_punits   [in] The minimum number of processing units to
+        ///                     associate with the newly created executor
+        ///                     (default: 1).
+        ///
         explicit local_queue_executor(std::size_t max_punits,
                 std::size_t min_punits = 1)
           : threads_executor(threads::executors::local_queue_executor(
@@ -32,8 +43,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    struct local_priority_queue_executor : detail::threads_executor
+    struct local_priority_queue_executor
+#if !defined(DOXYGEN)
+      : detail::threads_executor
+#endif
     {
+        /// Creates a new local_priority_queue_executor
+        ///
+        /// \param max_punits   [in] The maximum number of processing units to
+        ///                     associate with the newly created executor.
+        /// \param min_punits   [in] The minimum number of processing units to
+        ///                     associate with the newly created executor
+        ///                     (default: 1).
+        ///
         explicit local_priority_queue_executor(std::size_t max_punits,
                 std::size_t min_punits = 1)
           : threads_executor(threads::executors::local_priority_queue_executor(
@@ -42,8 +64,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     };
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-    struct static_priority_queue_executor : detail::threads_executor
+    struct static_priority_queue_executor
+#if !defined(DOXYGEN)
+      : detail::threads_executor
+#endif
     {
+        /// Creates a new static_priority_queue_executor
+        ///
+        /// \param max_punits   [in] The maximum number of processing units to
+        ///                     associate with the newly created executor.
+        /// \param min_punits   [in] The minimum number of processing units to
+        ///                     associate with the newly created executor
+        ///                     (default: 1).
+        ///
         explicit static_priority_queue_executor(std::size_t max_punits,
                 std::size_t min_punits = 1)
           : threads_executor(threads::executors::static_priority_queue_executor(
@@ -54,6 +87,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
     namespace detail
     {
+        /// \cond NOINTERNAL
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
         template <>
         struct is_executor<local_queue_executor>

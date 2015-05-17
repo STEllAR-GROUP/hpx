@@ -20,8 +20,19 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
+    /// A \a parallel_executor creates groups of parallel execution agents
+    /// which execute in threads implicitly created by the executor. This
+    /// executor prefers continuing with the creating thread first before
+    /// executing newly created threads.
+    ///
     struct parallel_executor
     {
+#if defined(DOXYGEN)
+        /// Create a new parallel executor
+        parallel_executor() {}
+#endif
+
+        /// \cond NOINTERNAL
         template <typename F>
         hpx::future<typename hpx::util::result_of<
             typename hpx::util::decay<F>::type()
@@ -30,6 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             return hpx::async(launch::async, std::forward<F>(f));
         }
+        /// \endcond
     };
 
     namespace detail

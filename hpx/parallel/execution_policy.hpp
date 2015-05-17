@@ -230,6 +230,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// Return the associated executor object.
         Executor& executor() { return exec_; }
+        /// Return the associated executor object.
         Executor const& executor() const { return exec_; }
 
     private:
@@ -389,6 +390,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// Return the associated executor object.
         Executor& executor() { return exec_; }
+        /// Return the associated executor object.
         Executor const& executor() const { return exec_; }
 
     private:
@@ -596,6 +598,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// Return the associated executor object.
         Executor& executor() { return exec_; }
+        /// Return the associated executor object.
         Executor const& executor() const { return exec_; }
 
     private:
@@ -827,6 +830,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// Return the associated executor object.
         Executor& executor() { return exec_; }
+        /// Return the associated executor object.
         Executor const& executor() const { return exec_; }
 
     private:
