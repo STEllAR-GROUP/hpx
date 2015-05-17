@@ -9,11 +9,16 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/exception_list.hpp>
+#include <hpx/lcos/future.hpp>
+
 #include <hpx/parallel/config/inline_namespace.hpp>
-#include <hpx/parallel/execution_policy.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
+    struct sequential_task_execution_policy;
+    struct parallel_task_execution_policy;
+    struct parallel_vector_execution_policy;
+
     namespace detail
     {
         /// \cond NOINTERNAL

@@ -13,19 +13,11 @@
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
 #include <utility>
-
-/// \cond NOINTERNAL
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
-{
-    struct sequential_execution_policy;
-}}}
-/// \endcond
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -50,7 +42,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         >::type
         execute(F && f)
         {
-            return f();
+            try {
+                return f();
+            }
+            catch (std::bad_alloc const& ba) {
+                boost::throw_exception(ba);
+            }
+            catch (...) {
+                boost::throw_exception(
+                    exception_list(boost::current_exception())
+                );
+            }
         }
 
         template <typename F>
@@ -65,19 +67,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename F, typename Shape>
         static void bulk_execute(F && f, Shape const& shape)
         {
-            std::list<boost::exception_ptr> errors;
             try {
                 for (auto const& elem: shape)
                     f(elem);
             }
+            catch (std::bad_alloc const& ba) {
+                boost::throw_exception(ba);
+            }
             catch (...) {
-                // properly handle exceptions
-                parallel::util::detail::handle_local_exceptions<
-                        sequential_execution_policy
-                    >::call(boost::current_exception(), errors);
-
-                if (!errors.empty())
-                    boost::throw_exception(exception_list(std::move(errors)));
+                boost::throw_exception(
+                    exception_list(boost::current_exception())
+                );
             }
         }
 
