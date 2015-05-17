@@ -68,10 +68,9 @@ namespace hpx { namespace serialization { namespace detail
     {
         register_class_name()
         {
-            T* t = 0; //dirty
             polymorphic_intrusive_factory::instance().
               register_class(
-                t->T::hpx_serialization_get_name(), //non-virtual call
+                T::hpx_serialization_get_name_impl(),
                 &factory_function
               );
         }
@@ -98,11 +97,15 @@ namespace hpx { namespace serialization { namespace detail
   template <class> friend                                                     \
   struct ::hpx::serialization::detail::register_class_name;                   \
                                                                               \
-  virtual std::string hpx_serialization_get_name() const                      \
+  static std::string hpx_serialization_get_name_impl()                        \
   {                                                                           \
       hpx::serialization::detail::register_class_name<                        \
           Class>::instance.instantiate();                                     \
       return Name;                                                            \
+  }                                                                           \
+  virtual std::string hpx_serialization_get_name() const                      \
+  {                                                                           \
+      return Class ::hpx_serialization_get_name_impl();                       \
   }                                                                           \
 /**/
 
