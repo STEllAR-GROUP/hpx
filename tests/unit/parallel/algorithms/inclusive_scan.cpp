@@ -488,7 +488,7 @@ void test_inclusive_scan_validate(ExPolicy const& p, std::vector<int> &a, std::v
     hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(), 0,
                                   [](int bar, int baz){ return bar+baz; });
     //
-    for (int i=0; i<b.size(); ++i) {
+    for (int i=0; i<static_cast<int>(b.size()); ++i) {
         // counting from zero,
         int value = b[i];
         int expected_value  = check_n_triangle(i);
@@ -502,7 +502,7 @@ void test_inclusive_scan_validate(ExPolicy const& p, std::vector<int> &a, std::v
     hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(), 0,
                                   [](int bar, int baz){ return bar+baz; });
     //
-    for (int i=0; i<b.size(); ++i) {
+    for (int i=0; i<static_cast<int>(b.size()); ++i) {
         // counting from 1, use i+1
         int value = b[i];
         int expected_value  = check_n_triangle(i+1);
@@ -516,7 +516,7 @@ void test_inclusive_scan_validate(ExPolicy const& p, std::vector<int> &a, std::v
     hpx::parallel::inclusive_scan(p, a.begin(), a.end(), b.begin(), 0,
                                   [](int bar, int baz){ return bar+baz; });
     //
-    for (int i=0; i<b.size(); ++i) {
+    for (int i=0; i<static_cast<int>(b.size()); ++i) {
         int value = b[i];
         int expected_value  = check_n_const(i+1, FILL_VALUE);
         if (!HPX_TEST(value == expected_value)) break;
