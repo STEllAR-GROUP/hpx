@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         bulk_async_execute(F && f, Shape const& shape)
         {
             return hpx::async(hpx::launch::sync,
-                [=] { this->bulk_execute(std::forward<F>(f), shape); });
+                [=] { this->bulk_execute(f, shape); });
         }
     };
 
