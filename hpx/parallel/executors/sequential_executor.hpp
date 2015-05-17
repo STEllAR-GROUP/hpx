@@ -14,6 +14,7 @@
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/deferred_call.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -26,7 +27,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         typedef sequential_execution_tag execution_category;
 
         template <typename F>
-        typename hpx::util::result_of<
+        static typename hpx::util::result_of<
             typename hpx::util::decay<F>::type()
         >::type
         execute(F && f)
@@ -35,7 +36,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F>
-        hpx::future<typename hpx::util::result_of<
+        static hpx::future<typename hpx::util::result_of<
             typename hpx::util::decay<F>::type()
         >::type>
         async_execute(F && f)
@@ -44,18 +45,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F, typename Shape>
-        void bulk_execute(F && f, Shape const& shape)
+        static void bulk_execute(F && f, Shape const& shape)
         {
             for (auto const& elem: shape)
                 f(elem);
         }
 
         template <typename F, typename Shape>
-        hpx::future<void>
+        static hpx::future<void>
         bulk_async_execute(F && f, Shape const& shape)
         {
             return hpx::async(hpx::launch::sync,
-                [=] { this->bulk_execute(f, shape); });
+                &sequential_executor::bulk_execute, std::forward<F>(f), shape);
         }
     };
 
