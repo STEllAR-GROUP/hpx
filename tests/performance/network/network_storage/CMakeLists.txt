@@ -5,6 +5,8 @@
 
 ###############################################################################
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_hpx_executable(network_storage
   AUTOGLOB
   EXCLUDE_FROM_ALL
