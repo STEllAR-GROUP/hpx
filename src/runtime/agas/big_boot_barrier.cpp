@@ -436,7 +436,7 @@ void register_worker(registration_header const& header)
 
     // TODO: Handle cases where localities try to connect to AGAS while it's
     // shutting down.
-    if (agas_client.get_status() != starting)
+    if (agas_client.get_status() != state_starting)
     {
         // We can just send the parcel now, the connecting locality isn't a part
         // of startup synchronization.
@@ -481,7 +481,7 @@ void notify_worker(notification_header const& header)
     runtime& rt = get_runtime();
     naming::resolver_client& agas_client = rt.get_agas_client();
 
-    if (HPX_UNLIKELY(agas_client.get_status() != starting))
+    if (HPX_UNLIKELY(agas_client.get_status() != state_starting))
     {
         std::ostringstream strm;
         strm << "locality " << rt.here() << " has launched early";

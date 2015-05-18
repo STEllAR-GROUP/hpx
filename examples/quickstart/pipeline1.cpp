@@ -12,6 +12,7 @@
 #include <regex>
 
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/range/functions.hpp>
 
 struct pipeline
 {
@@ -56,7 +57,7 @@ int main()
         "Notice: qux",
         "\tError: abc"
       };
-    std::vector<std::string> input(std::begin(inputs), std::end(inputs));
+    std::vector<std::string> input(boost::begin(inputs), boost::end(inputs));
 
     pipeline::process(input);
 

@@ -1378,7 +1378,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently being
     /// started or not, e.g. whether the current state of the runtime system is
-    /// \a hpx::runtime::state_startup
+    /// \a hpx::state_startup
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -1389,7 +1389,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently running
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::runtime::state_running
+    /// \a hpx::state_running
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -1400,7 +1400,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently stopped
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::runtime::state_stopped
+    /// \a hpx::state_stopped
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -1411,7 +1411,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently being
     /// shut down or not, e.g.  whether the current state of the runtime system
-    /// is \a hpx::runtime::state_stopped or \a hpx::runtime::state_shutdown
+    /// is \a hpx::state_stopped or \a hpx::state_shutdown
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.

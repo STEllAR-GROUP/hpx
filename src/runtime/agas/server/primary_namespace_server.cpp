@@ -1192,7 +1192,7 @@ void primary_namespace::free_components_sync(
     for (free_entry const& e : free_list)
     {
         // Bail if we're in late shutdown and non-local.
-        if (HPX_UNLIKELY(!threads::threadmanager_is(running)) &&
+        if (HPX_UNLIKELY(!threads::threadmanager_is(state_running)) &&
             e.locality_ != locality_)
         {
             LAGAS_(info) << (boost::format(

@@ -187,23 +187,26 @@ namespace hpx
     {
         char const* const runtime_state_names[] =
         {
-            "invalid",      // -1
-            "initialized",  // 0
-            "pre_startup",  // 1
-            "startup",      // 2
-            "pre_main",     // 3
-            "running",      // 4
-            "pre_shutdown"  // 5
-            "shutdown",     // 6
-            "stopped"       // 7
+            "state_invalid",      // -1
+            "state_initialized",  // 0
+            "state_pre_startup",  // 1
+            "state_startup",      // 2
+            "state_pre_main",     // 3
+            "state_starting",     // 4
+            "state_running",      // 5
+            "state_pre_shutdown"  // 6
+            "state_shutdown",     // 7
+            "state_stopping",     // 8
+            "state_terminating",  // 9
+            "state_stopped"       // 10
         };
     }
 
-    char const* get_runtime_state_name(runtime::state state)
+    char const* get_runtime_state_name(state st)
     {
-        if (state < runtime::state_invalid || state >= runtime::state_last)
+        if (st < state_invalid || st >= last_valid_runtime_state)
             return "invalid (value out of bounds)";
-        return strings::runtime_state_names[state+1];
+        return strings::runtime_state_names[st+1];
     }
 
 #if defined(HPX_HAVE_SECURITY)
@@ -808,7 +811,7 @@ namespace hpx
     void report_error(std::size_t num_thread, boost::exception_ptr const& e)
     {
         // Early and late exceptions
-        if (!threads::threadmanager_is(running))
+        if (!threads::threadmanager_is(state_running))
         {
             hpx::runtime* rt = hpx::get_runtime_ptr();
             if (rt)
@@ -824,7 +827,7 @@ namespace hpx
     void report_error(boost::exception_ptr const& e)
     {
         // Early and late exceptions
-        if (!threads::threadmanager_is(running))
+        if (!threads::threadmanager_is(state_running))
         {
             hpx::runtime* rt = hpx::get_runtime_ptr();
             if (rt)
@@ -1123,7 +1126,7 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
-            return rt->get_state() == runtime::state_running;
+            return rt->get_state() == state_running;
         return false;
     }
 
@@ -1131,7 +1134,7 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
-            return rt->get_state() == runtime::state_stopped;
+            return rt->get_state() == state_stopped;
         return true;        // assume stopped
     }
 
@@ -1140,8 +1143,8 @@ namespace hpx
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
         {
-            runtime::state state = rt->get_state();
-            return state == runtime::state_stopped || state == runtime::state_shutdown;
+            state st = rt->get_state();
+            return st == state_stopped || st == state_shutdown;
         }
         return true;        // assume stopped
     }
@@ -1149,7 +1152,7 @@ namespace hpx
     bool HPX_EXPORT is_starting()
     {
         runtime* rt = get_runtime_ptr();
-        return NULL != rt ? rt->get_state() <= runtime::state_startup : true;
+        return NULL != rt ? rt->get_state() <= state_startup : true;
     }
 }
 
@@ -1228,8 +1231,8 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (0 == rt ||
-            rt->get_state() < runtime::state_initialized ||
-            rt->get_state() >= runtime::state_stopped)
+            rt->get_state() < state_initialized ||
+            rt->get_state() >= state_stopped)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
@@ -1252,8 +1255,8 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (0 == rt ||
-            rt->get_state() < runtime::state_initialized ||
-            rt->get_state() >= runtime::state_stopped)
+            rt->get_state() < state_initialized ||
+            rt->get_state() >= state_stopped)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",

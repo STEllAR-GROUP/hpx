@@ -78,14 +78,14 @@ namespace hpx { namespace parcelset
     void parcelhandler::parcel_sink(parcel const& p)
     {
         // wait for thread-manager to become active
-        while (tm_->status() & starting)
+        while (threads::threadmanager_is(state_starting))
         {
             boost::this_thread::sleep(boost::get_system_time() +
                 boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
         // Give up if we're shutting down.
-        if (tm_->status() & stopping)
+        if (threads::threadmanager_is(state_stopping))
         {
             LPT_(debug) << "parcel_sink: dropping late parcel";
             return;

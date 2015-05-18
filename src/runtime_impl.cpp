@@ -50,7 +50,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_pre_startup) {
+            if (rt->get_state() > state_pre_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_startup_function",
                     "Too late to register a new pre-startup function.");
@@ -67,7 +67,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_startup) {
+            if (rt->get_state() > state_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_startup_function",
                     "Too late to register a new startup function.");
@@ -84,7 +84,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_pre_shutdown) {
+            if (rt->get_state() > state_pre_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_shutdown_function",
                     "Too late to register a new pre-shutdown function.");
@@ -101,7 +101,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_shutdown) {
+            if (rt->get_state() > state_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_shutdown_function",
                     "Too late to register a new shutdown function.");
@@ -447,7 +447,7 @@ namespace hpx {
         std::size_t num_thread, boost::exception_ptr const& e)
     {
         // Early and late exceptions, errors outside of HPX-threads
-        if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
+        if (!threads::get_self_ptr() || !threads::threadmanager_is(state_running))
         {
             // report the error to the local console
             detail::report_exception_and_continue(e);
@@ -498,7 +498,7 @@ namespace hpx {
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::rethrow_exception()
     {
-        if (state_.load() > running)
+        if (state_.load() > state_running)
         {
             boost::mutex::scoped_lock l(mtx_);
             if (exception_)

@@ -200,6 +200,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         /// \endcond
 
     public:
+        /// Refers to the type of the execution policy used to create the
+        /// \a task_block.
+        typedef ExPolicy execution_policy;
+
+        /// Return the execution policy instance used to create this
+        /// \a task_block
+        execution_policy const& get_execution_policy() const { return policy_; }
+
         /// Causes the expression f() to be invoked asynchronously.
         /// The invocation of f is permitted to run on an unspecified thread
         /// in an unordered fashion relative to the sequence of operations

@@ -146,7 +146,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     state get_status() const
     {
         if (!hosted && !bootstrap)
-            return stopping;
+            return state_stopping;
         return state_.load();
     }
 

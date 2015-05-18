@@ -142,7 +142,7 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
         timestamp_scale_(1.),
 #endif
-        state_(starting),
+        state_(state_starting),
         timer_pool_(timer_pool),
         thread_logger_("threadmanager_impl::register_thread"),
         work_logger_("threadmanager_impl::register_work"),
@@ -157,7 +157,7 @@ namespace hpx { namespace threads
     {
         //LTM_(debug) << "~threadmanager_impl";
         if (!threads_.empty()) {
-            if (state_.load() == running)
+            if (state_.load() == state_running)
                 stop();
             threads_.clear();
         }
@@ -221,7 +221,7 @@ namespace hpx { namespace threads
         util::block_profiler_wrapper<register_thread_tag> bp(thread_logger_);
 
         // verify state
-        if ((thread_count_ == 0 && state_ != running))
+        if ((thread_count_ == 0 && state_ != state_running))
         {
             // thread-manager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -241,7 +241,7 @@ namespace hpx { namespace threads
         util::block_profiler_wrapper<register_work_tag> bp(work_logger_);
 
         // verify state
-        if ((thread_count_ == 0 && state_ != running))
+        if ((thread_count_ == 0 && state_ != state_running))
         {
             // thread-manager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -1561,7 +1561,7 @@ namespace hpx { namespace threads
         // or if some other thread has terminated
         HPX_ASSERT(!scheduler_.get_thread_count(
             unknown, thread_priority_default, num_thread) ||
-            state_ == terminating);
+            state_ == state_terminating);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1601,7 +1601,7 @@ namespace hpx { namespace threads
 #endif
 
         mutex_type::scoped_lock lk(mtx_);
-        if (!threads_.empty() || (state_.load() == running))
+        if (!threads_.empty() || (state_.load() == state_running))
             return true;    // do nothing if already running
 
         LTM_(info) << "run: running timer pool";
@@ -1617,7 +1617,7 @@ namespace hpx { namespace threads
             HPX_ASSERT (NULL == startup_);
             startup_ = new boost::barrier(static_cast<unsigned>(num_threads+1));
 
-            state_.store(running);
+            state_.store(state_running);
 
             topology const& topology_ = get_topology();
 
@@ -1691,8 +1691,8 @@ namespace hpx { namespace threads
 
         mutex_type::scoped_lock l(mtx_);
         if (!threads_.empty()) {
-            if (state_.load() == running) {
-                state_.store(stopping);
+            if (state_.load() == state_running) {
+                state_.store(state_stopping);
                 do_some_work();         // make sure we're not waiting
             }
 

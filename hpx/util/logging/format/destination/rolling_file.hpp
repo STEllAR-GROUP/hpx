@@ -94,7 +94,7 @@ namespace detail {
             if ( m_flags.initial_erase()) {
                 for ( unsigned idx = 0; idx < m_flags.file_count(); ++idx) {
                     boost::system::error_code ec;
-                    if ( fs::exists( file_name(idx), ec) && ec)
+                    if ( fs::exists( file_name(idx), ec) && !ec)
                         fs::remove( file_name(idx) );
                 }
             }
@@ -103,7 +103,7 @@ namespace detail {
             if ( m_flags.start_where_size_not_exceeded() ) {
                 for ( m_cur_idx = 0; m_cur_idx < m_flags.file_count(); ++m_cur_idx ) {
                     boost::system::error_code ec;
-                    if ( fs::exists( file_name(m_cur_idx), ec) && ec) {
+                    if ( fs::exists( file_name(m_cur_idx), ec) && !ec) {
                         if ( fs::file_size( file_name(m_cur_idx))  < m_flags.max_size_bytes() )
                             // file hasn't reached max size
                             break;
