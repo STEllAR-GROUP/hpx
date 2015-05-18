@@ -174,6 +174,7 @@ namespace hpx { namespace lcos
                         > next_future_data = lcos::detail::get_shared_state(*next);
 
                         boost::intrusive_ptr<when_each_frame> this_(this);
+                        next_future_data->execute_deferred();
                         next_future_data->set_on_completed(util::bind(
                             f, this_, std::move(iter),
                             std::move(next), std::move(end)));
@@ -235,6 +236,7 @@ namespace hpx { namespace lcos
                     > next_future_data = lcos::detail::get_shared_state(fut);
 
                     boost::intrusive_ptr<when_each_frame> this_(this);
+                    next_future_data->execute_deferred();
                     next_future_data->set_on_completed(hpx::util::bind(
                         f, this_, std::move(iter), true_(), false_()));
 

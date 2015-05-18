@@ -230,6 +230,26 @@ void test_wait_for_all_late_futures()
     HPX_TEST(hpx::util::get<1>(result).is_ready());
 }
 
+void test_wait_for_all_deferred_futures()
+{
+    hpx::lcos::future<int> f1 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+    hpx::lcos::future<int> f2 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+
+    typedef hpx::util::tuple<
+        hpx::lcos::future<int>
+      , hpx::lcos::future<int> > result_type;
+    hpx::lcos::future<result_type> r =
+        hpx::when_all(f1, f2);
+
+    HPX_TEST(!f1.valid());
+    HPX_TEST(!f2.valid());
+
+    result_type result = r.get();
+
+    HPX_TEST(hpx::util::get<0>(result).is_ready());
+    HPX_TEST(hpx::util::get<1>(result).is_ready());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -244,6 +264,7 @@ int hpx_main(variables_map&)
         test_wait_for_all_four_futures();
         test_wait_for_all_five_futures();
         test_wait_for_all_late_futures();
+        test_wait_for_all_deferred_futures();
     }
 
     hpx::finalize();

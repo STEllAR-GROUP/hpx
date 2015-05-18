@@ -322,6 +322,7 @@ namespace hpx { namespace lcos
                         shared_state_ptr const& shared_state =
                             lcos::detail::get_shared_state(future);
 
+                        shared_state->execute_deferred();
                         shared_state->set_on_completed(util::bind(
                             &when_some<Sequence>::on_future_ready, when_.shared_from_this(),
                             idx_, threads::get_self_id()));

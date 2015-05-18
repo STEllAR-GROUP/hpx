@@ -269,6 +269,7 @@ namespace hpx { namespace lcos { namespace local
                             = lcos::detail::get_shared_state(*next);
 
                         boost::intrusive_ptr<dataflow_frame> this_(this);
+                        next_future_data->execute_deferred();
                         next_future_data->set_on_completed(
                             boost::bind(
                                 f
@@ -342,6 +343,7 @@ namespace hpx { namespace lcos { namespace local
                         = lcos::detail::get_shared_state(f_);
 
                     boost::intrusive_ptr<dataflow_frame> this_(this);
+                    next_future_data->execute_deferred();
                     next_future_data->set_on_completed(
                         hpx::util::bind(
                             f
