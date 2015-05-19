@@ -124,6 +124,7 @@ namespace hpx { namespace lcos { namespace detail
             // Bind an on_completed handler to this future which will transfer
             // its result to the new future.
             boost::intrusive_ptr<Continuation> cont_(&cont);
+            inner_state->execute_deferred();
             inner_state->set_on_completed(util::bind(
                 transfer_result<inner_future>(), inner_state, cont_));
         }
@@ -470,6 +471,7 @@ namespace hpx { namespace lcos { namespace detail
                         "the inner future has no valid shared state");
                 }
 
+                inner_state->execute_deferred();
                 inner_state->set_on_completed(
                     util::bind(inner_ready, std::move(this_), inner_state));
             }

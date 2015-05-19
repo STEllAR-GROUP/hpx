@@ -322,6 +322,7 @@ namespace hpx { namespace lcos
                         shared_state_ptr const& shared_state =
                             lcos::detail::get_shared_state(future);
 
+                        shared_state->execute_deferred();
                         shared_state->set_on_completed(util::bind(
                             &when_some<Sequence>::on_future_ready, when_.shared_from_this(),
                             idx_, threads::get_self_id()));
@@ -370,18 +371,19 @@ namespace hpx { namespace lcos
         public:
             void on_future_ready(std::size_t idx, threads::thread_id_type const& id)
             {
-                if (count_.fetch_add(1) + 1 == needed_count_)
+                std::size_t const new_count = count_.fetch_add(1) + 1;
+                if (new_count <= needed_count_)
                 {
-                    // reactivate waiting thread only if it's not us
-                    if (id != threads::get_self_id()) {
-                        {
-                            typename mutex_type::scoped_lock l(this->mtx_);
-                            lazy_values_.indices.push_back(idx);
-                        }
-                        threads::set_thread_state(id, threads::pending);
-                    } else {
+                    {
+                        typename mutex_type::scoped_lock l(this->mtx_);
                         lazy_values_.indices.push_back(idx);
-                        goal_reached_on_calling_thread_ = true;
+                    }
+                    if (new_count == needed_count_) {
+                        if (id != threads::get_self_id()) {
+                            threads::set_thread_state(id, threads::pending);
+                        } else {
+                            goal_reached_on_calling_thread_ = true;
+                        }
                     }
                 }
             }

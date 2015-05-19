@@ -57,16 +57,12 @@ namespace hpx { namespace serialization
         {}
 
         template <typename T>
-        void invoke(T * t)
-        {
-            BOOST_STATIC_ASSERT_MSG(!boost::is_pointer<T *>::value,
-                "HPX does not support serialization of raw pointers. "
-                "Please use smart pointers.");
-        }
-
-        template <typename T>
         void invoke(T & t)
         {
+            BOOST_STATIC_ASSERT_MSG(!boost::is_pointer<T>::value,
+                "HPX does not support serialization of raw pointers. "
+                "Please use smart pointers.");
+
             static_cast<Archive *>(this)->invoke_impl(t);
         }
 

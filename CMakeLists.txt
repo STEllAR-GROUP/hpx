@@ -176,6 +176,10 @@ hpx_option(HPX_WITH_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests 
 hpx_option(HPX_WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
+hpx_option(HPX_WITH_COMPILE_ONLY_TESTS BOOL
+  "Create build system support for compile time only HPX tests (default ON)"
+  ON CATEGORY "Build Targets")
+
 set(HPX_FULL_RPATH_DEFAULT ON)
 if(APPLE)
   set(HPX_FULL_RPATH_DEFAULT OFF)

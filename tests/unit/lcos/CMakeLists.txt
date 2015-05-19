@@ -38,6 +38,9 @@ set(tests
     reduce
     shared_future
     unwrapped
+    when_all
+    when_any
+    when_some
    )
 
 set(apply_colocated_PARAMETERS LOCALITIES 2)
