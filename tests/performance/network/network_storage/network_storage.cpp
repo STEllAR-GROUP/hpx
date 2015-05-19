@@ -82,6 +82,7 @@
 //
 // #define USE_CLEANING_THREAD
 #define USE_PARCELPORT_THREAD
+#define USE_ASYNC_CB
 
 //----------------------------------------------------------------------------
 // Array allocation on start assumes a certain maximum number of localities will be used
@@ -89,7 +90,7 @@
 
 //----------------------------------------------------------------------------
 // control the amount of debug messaging that is output 
-#define DEBUG_LEVEL 9
+#define DEBUG_LEVEL 0
 
 //----------------------------------------------------------------------------
 // if we have access to boost logging via the verbs aprcelport include this
@@ -136,12 +137,6 @@ typedef struct {
     bool            all2all;
     bool            distribution;
 } test_options;
-
-
-
-
-
-} }
 
 //----------------------------------------------------------------------------
 void allocate_local_storage(uint64_t local_storage_bytes)
@@ -271,6 +266,21 @@ typedef pointer_allocator<char>                             PointerAllocator;
 typedef hpx::serialization::serialize_buffer<char,
     PointerAllocator> transfer_buffer_type;
 
+typedef std::map<uint64_t, boost::shared_ptr<general_buffer_type>>  alive_map;
+typedef hpx::lcos::local::spinlock                                  mutex_type;
+typedef hpx::lcos::local::spinlock::scoped_lock                     scoped_lock;
+//
+mutex_type keep_alive_mutex;
+alive_map  keep_alive_buffers;
+//
+void async_callback(const uint64_t index, boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
+{
+    scoped_lock lock(keep_alive_mutex);
+    alive_map::iterator it = keep_alive_buffers.find(index);
+    std::cout << "Async callback triggered for index " << index << std::endl;
+    keep_alive_buffers.erase(it);
+}
+
 //----------------------------------------------------------------------------
 //
 // Two actions which are called from remote or local localities
@@ -351,7 +361,6 @@ HPX_ACTION_INVOKE_NO_MORE_THAN(CopyFromStorage_action, 5);
 HPX_REGISTER_ACTION(CopyToStorage_action);
 HPX_REGISTER_ACTION(CopyFromStorage_action);
 
-
 //----------------------------------------------------------------------------
 #ifdef USE_PARCELPORT_THREAD
 // the main message sending loop may generate many thousands of send requests
@@ -384,7 +393,7 @@ int RemoveCompletions()
             std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
             for(std::vector<hpx::future<int> > &futvec : ActiveFutures) {
                 for(std::vector<hpx::future<int> >::iterator fut = futvec.begin();
-                    fut != futvec.end(); /**/)
+                    fut != futvec.end(); )
                 {
                     if(fut->is_ready()){
                         int ret = fut->get();
@@ -441,6 +450,7 @@ void test_write(
     hpx::util::high_resolution_timer timerWrite;
     hpx::util::simple_profiler level1("Write function");
 
+    //
     bool active = (rank==0) | (rank>0 && options.all2all);
     for(std::uint64_t i = 0; active && i < options.iterations; i++) {
         hpx::util::simple_profiler iteration(level1,"Iteration");
@@ -463,6 +473,9 @@ void test_write(
         FuturesActive = true;
         hpx::future<int> background = hpx::async(background_work);
 #endif
+
+        // used to track callbacks to free buffers for async_cb
+        uint64_t buffer_index = 0;
 
         //
         // Start main message sending loop
@@ -503,11 +516,17 @@ void test_write(
                 ++FuturesWaiting[send_rank];
                 std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
 #endif
+
+                boost::shared_ptr<general_buffer_type> temp_buffer = boost::make_shared<general_buffer_type>(
+                        static_cast<char*>(buffer), options.transfer_size_B, general_buffer_type::reference);
+                using hpx::util::placeholders::_1;
+                using hpx::util::placeholders::_2;
+                keep_alive_buffers[buffer_index] = temp_buffer;
                 ActiveFutures[send_rank].push_back(
-                    hpx::async(actWrite, locality,
-                        general_buffer_type(static_cast<char*>(buffer),
-                            options.transfer_size_B, general_buffer_type::reference),
-                        memory_offset, options.transfer_size_B
+                    hpx::async_cb(actWrite, locality,
+                            hpx::util::bind(&async_callback, buffer_index, _1, _2),
+                            *temp_buffer,
+                            memory_offset, options.transfer_size_B
                     ).then(
                         hpx::launch::sync,
                         [send_rank](hpx::future<int> &&fut) -> int {
@@ -516,6 +535,7 @@ void test_write(
                             return result;
                         })
                 );
+                buffer_index++;
             }
         }
 
@@ -846,7 +866,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
-    test_read (rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
+//    test_read (rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
     //
     delete_local_storage();
 
@@ -931,5 +951,3 @@ int main(int argc, char* argv[])
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
-
-
