@@ -97,7 +97,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         static std::size_t get_chunk_size() { return 0; }
 
         sequential_task_execution_policy() {}
-        /// \endcnod
+        /// \endcond
 
         /// Create a new sequential_task_execution_policy from itself
         ///
