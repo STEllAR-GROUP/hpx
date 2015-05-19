@@ -247,9 +247,9 @@ namespace hpx { namespace components { namespace stubs
             return create_memory_block_async(id, count, act).get();
         }
 
-        static lcos::future<bool>
+        static lcos::future<int>
         load_components_async(naming::id_type const& gid);
-        static bool load_components(naming::id_type const& gid);
+        static int load_components(naming::id_type const& gid);
 
         static lcos::future<void>
         call_startup_functions_async(naming::id_type const& gid,
