@@ -40,30 +40,33 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   # add compile time tests
   set(compile_tests
       fail_compile_non_const_array_argument
+      fail_compile_const_array_argument
+      fail_compile_non_const_pointer_argument
+      fail_compile_const_pointer_argument
       fail_compile_non_const_ref_argument
-      fail_compile_pointer_argument
-      succeed_compile_const_array_argument
       succeed_compile_const_ref_argument
      )
 
   set(fail_compile_non_const_array_argument_FLAGS FAILURE_EXPECTED)
+  set(fail_compile_const_array_argument_FLAGS FAILURE_EXPECTED)
   set(fail_compile_non_const_ref_argument_FLAGS FAILURE_EXPECTED)
-  set(fail_compile_pointer_argument_FLAGS FAILURE_EXPECTED)
+  set(fail_compile_non_const_pointer_argument_FLAGS FAILURE_EXPECTED)
+  set(fail_compile_const_pointer_argument_FLAGS FAILURE_EXPECTED)
+
   foreach(compile_test ${compile_tests})
     set(sources
         ${compile_test}.cpp)
 
     source_group("Source Files" FILES ${sources})
 
-    # add example executable
-#     add_hpx_executable(${compile_test}_test
-#                        SOURCES ${sources}
-#                        ${${compile_test}_FLAGS}
-#                        EXCLUDE_FROM_ALL
-#                        HPX_PREFIX ${HPX_BUILD_PREFIX}
-#                        FOLDER "Tests/Unit/Actions/CompileOnly")
-#
-#     add_hpx_unit_test("actions" ${compile_test})
+    if(MSVC)
+      # add dummy library for MSVC to generate a project in VS
+      add_hpx_library(${compile_test}_compile_test
+                      SOURCES ${sources}
+                      EXCLUDE_FROM_ALL
+                      FOLDER "Tests/Unit/Actions/CompileOnly")
+    endif()
+
     add_hpx_unit_compile_test(
       "actions"
       ${compile_test}

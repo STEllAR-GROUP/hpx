@@ -3,22 +3,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This must succeed compiling
+// This must fail compiling
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/apply.hpp>
 
-void test (int const (&ptr)[20]) {}
+void test (int const* ptr) {}
 HPX_PLAIN_ACTION(test);
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    int arr[20] = { 0 };
+    int const* ptr = 0;
 
     test_action act;
-    hpx::apply(act, hpx::find_here(), arr);
+    hpx::apply(act, hpx::find_here(), ptr);
 
     return 0;
 }

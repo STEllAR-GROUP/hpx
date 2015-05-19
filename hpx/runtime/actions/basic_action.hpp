@@ -91,19 +91,6 @@ namespace hpx { namespace actions
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
-        struct is_non_const_array_impl
-          : std::integral_constant<bool,
-                std::is_array<T>::value && !std::is_const<T>::value
-            >
-        {};
-
-        template <typename T>
-        struct is_non_const_array
-          : is_non_const_array_impl<typename std::remove_reference<T>::type>
-        {};
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T>
         struct is_non_const_reference
           : std::integral_constant<bool,
                 std::is_lvalue_reference<T>::value &&
@@ -127,14 +114,18 @@ namespace hpx { namespace actions
             !util::detail::any_of<std::is_pointer<Args>...>::value,
             "Using raw pointers as arguments for actions is not supported.");
 
-        // Flag the use of non-const array types as action arguments
+        // Flag the use of array types as action arguments
         BOOST_STATIC_ASSERT_MSG(
-            !util::detail::any_of<detail::is_non_const_array<Args>...>::value,
-            "Using non-const arrays as arguments for actions is not supported.");
+            !util::detail::any_of<
+                std::is_array<typename std::remove_reference<Args>::type>...
+            >::value,
+            "Using arrays as arguments for actions is not supported.");
 
         // Flag the use of non-const reference types as action arguments
         BOOST_STATIC_ASSERT_MSG(
-            !util::detail::any_of<detail::is_non_const_reference<Args>...>::value,
+            !util::detail::any_of<
+                detail::is_non_const_reference<Args>...
+            >::value,
             "Using non-const references as arguments for actions is not supported.");
 
         typedef Component component_type;
