@@ -9,8 +9,6 @@
 #include <hpx/runtime/serialization/array.hpp>
 #include <boost/multi_array.hpp>
 
-#include <iostream>
-
 namespace hpx { namespace serialization
 {
     template <class T, std::size_t N, class Allocator>
