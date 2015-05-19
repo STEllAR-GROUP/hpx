@@ -236,14 +236,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Executor>
         struct os_thread_count_helper
         {
+            template <typename Executor>
             static auto call(wrap_int, Executor& exec) -> std::size_t
             {
                 return hpx::get_os_thread_count();
             }
 
+            template <typename Executor>
             static auto call(int, Executor& exec)
                 ->  decltype(exec.os_thread_count())
             {
