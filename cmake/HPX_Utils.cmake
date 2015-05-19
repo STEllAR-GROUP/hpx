@@ -10,6 +10,7 @@ hpx_include(
   Option
   AppendProperty
   AddCompileFlag
+  AddCompileTest
   AddLinkFlag
   AddComponent
   AddLibrary

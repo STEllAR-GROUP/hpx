@@ -32,6 +32,8 @@
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/cat.hpp>
+#include <boost/type_traits/is_array.hpp>
+#include <boost/type_traits/is_pointer.hpp>
 
 #include <sstream>
 
@@ -86,6 +88,15 @@ namespace hpx { namespace actions
               , util::tuple<typename util::decay_unwrap<Ts>::type...>
             > f_;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct is_non_const_reference
+          : std::integral_constant<bool,
+                std::is_lvalue_reference<T>::value &&
+               !std::is_const<typename std::remove_reference<T>::type>::value
+            >
+        {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -98,6 +109,25 @@ namespace hpx { namespace actions
     template <typename Component, typename R, typename ...Args, typename Derived>
     struct basic_action<Component, R(Args...), Derived>
     {
+        // Flag the use of raw pointer types as action arguments
+        BOOST_STATIC_ASSERT_MSG(
+            !util::detail::any_of<std::is_pointer<Args>...>::value,
+            "Using raw pointers as arguments for actions is not supported.");
+
+        // Flag the use of array types as action arguments
+        BOOST_STATIC_ASSERT_MSG(
+            !util::detail::any_of<
+                std::is_array<typename std::remove_reference<Args>::type>...
+            >::value,
+            "Using arrays as arguments for actions is not supported.");
+
+        // Flag the use of non-const reference types as action arguments
+        BOOST_STATIC_ASSERT_MSG(
+            !util::detail::any_of<
+                detail::is_non_const_reference<Args>...
+            >::value,
+            "Using non-const references as arguments for actions is not supported.");
+
         typedef Component component_type;
         typedef Derived derived_type;
 
