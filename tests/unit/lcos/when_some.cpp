@@ -150,6 +150,40 @@ void test_wait_for_two_out_of_five_late_futures()
     HPX_TEST(!hpx::util::get<4>(result.futures).is_ready());
 }
 
+void test_wait_for_two_out_of_five_deferred_futures()
+{
+    unsigned const count = 2;
+
+    hpx::lcos::future<int> f1 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+    hpx::lcos::future<int> f2 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+    hpx::lcos::future<int> f3 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+    hpx::lcos::future<int> f4 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+    hpx::lcos::future<int> f5 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+
+    typedef hpx::when_some_result<hpx::util::tuple<
+        hpx::lcos::future<int>
+      , hpx::lcos::future<int>
+      , hpx::lcos::future<int>
+      , hpx::lcos::future<int>
+      , hpx::lcos::future<int> > > result_type;
+    hpx::lcos::future<result_type> r = hpx::when_some(count, f1, f2, f3, f4, f5);
+
+    HPX_TEST(!f1.valid());
+    HPX_TEST(!f2.valid());
+    HPX_TEST(!f3.valid());
+    HPX_TEST(!f4.valid());
+    HPX_TEST(!f5.valid());
+
+    result_type result = r.get();
+
+    HPX_TEST_EQ(result.indices.size(), count);
+    HPX_TEST(hpx::util::get<0>(result.futures).is_ready());
+    HPX_TEST(hpx::util::get<1>(result.futures).is_ready());
+    HPX_TEST(!hpx::util::get<2>(result.futures).is_ready());
+    HPX_TEST(!hpx::util::get<3>(result.futures).is_ready());
+    HPX_TEST(!hpx::util::get<4>(result.futures).is_ready());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -160,6 +194,7 @@ int hpx_main(variables_map&)
         test_wait_for_two_out_of_five_futures();
         test_wait_for_three_out_of_five_futures();
         test_wait_for_two_out_of_five_late_futures();
+        test_wait_for_two_out_of_five_deferred_futures();
     }
 
     hpx::finalize();

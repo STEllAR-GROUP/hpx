@@ -108,6 +108,12 @@ void test_simple_then()
     HPX_TEST(f2.get()==2);
 }
 
+void test_simple_deferred_then()
+{
+    hpx::lcos::future<int> f2 = hpx::async(hpx::launch::deferred, p1).then(&p2);
+    HPX_TEST(f2.get()==2);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 void test_complex_then()
 {
@@ -143,6 +149,7 @@ int hpx_main(variables_map&)
         test_return_void();
         test_implicit_unwrapping();
         test_simple_then();
+        test_simple_deferred_then();
         test_complex_then();
         test_complex_then_chain_one();
         test_complex_then_chain_two();
