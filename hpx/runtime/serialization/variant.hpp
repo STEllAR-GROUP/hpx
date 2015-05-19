@@ -33,6 +33,7 @@ namespace hpx { namespace serialization
         template <class... Args>
         struct load_helper_t{};
 
+#if defined(BOOST_VARIANT_DO_NOT_USE_VARIADIC_TEMPLATES)
         // overload for non-variadic version of variant library
         template <class Variant, class... Tail>
         BOOST_FORCEINLINE void load_helper(input_archive&, Variant&,
@@ -40,7 +41,7 @@ namespace hpx { namespace serialization
         {
             HPX_ASSERT(false);
         }
-
+#elif
         // overload for variadic version of variant library
         template <class Variant>
         BOOST_FORCEINLINE void load_helper(input_archive&, Variant&,
@@ -48,7 +49,7 @@ namespace hpx { namespace serialization
         {
             HPX_ASSERT(false);
         }
-
+#endif
         template <class Variant, class Head, class... Tail>
         BOOST_FORCEINLINE void load_helper(input_archive& ar, Variant& var,
                 int which, load_helper_t<Head, Tail...>)
