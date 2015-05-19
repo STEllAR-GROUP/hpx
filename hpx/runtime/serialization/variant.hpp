@@ -41,7 +41,7 @@ namespace hpx { namespace serialization
         {
             HPX_ASSERT(false);
         }
-#elif
+#else
         // overload for variadic version of variant library
         template <class Variant>
         BOOST_FORCEINLINE void load_helper(input_archive&, Variant&,
