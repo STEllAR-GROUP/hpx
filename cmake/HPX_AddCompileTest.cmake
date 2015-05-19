@@ -45,9 +45,9 @@ macro(add_hpx_compile_test category name)
   )
 
   if(MSVC)
-    set(cmd ${cmd} -c /Fo"${CMAKE_FILES_DIRECTORY}")
+    set(cmd ${cmd} -c /Fo"${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}")
   else()
-    set(cmd ${cmd} -c -o "${CMAKE_FILES_DIRECTORY}/${name}.o")
+    set(cmd ${cmd} -c -o "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${name}.o")
   endif()
 
   add_test(
