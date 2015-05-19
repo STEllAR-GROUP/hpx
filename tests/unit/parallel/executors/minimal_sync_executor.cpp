@@ -22,12 +22,33 @@ hpx::thread::id sync_test()
     return hpx::this_thread::get_id();
 }
 
+void apply_test(hpx::lcos::local::latch& l, hpx::thread::id& id)
+{
+    id = hpx::this_thread::get_id();
+    l.count_down(1);
+}
+
 void sync_bulk_test(hpx::thread::id tid, int value)
 {
     HPX_TEST(tid == hpx::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename Executor>
+void test_apply(Executor& exec)
+{
+    hpx::lcos::local::latch l(2);
+    hpx::thread::id id;
+
+    typedef hpx::parallel::executor_traits<Executor> traits;
+    traits::apply_execute(exec,
+        hpx::util::bind(&apply_test, boost::ref(l), boost::ref(id))
+    );
+    l.count_down_and_wait();
+
+    HPX_TEST(id == hpx::this_thread::get_id());
+}
+
 template <typename Executor>
 void test_sync(Executor& exec)
 {
@@ -84,6 +105,8 @@ void test_executor()
         >::value));
 
     Executor exec;
+
+    test_apply(exec);
     test_sync(exec);
     test_async(exec);
     test_bulk_sync(exec);
@@ -151,6 +174,17 @@ struct test_sync_executor4 : test_sync_executor2
     }
 };
 
+struct test_sync_executor5 : test_sync_executor1  // derive from sync execute
+{
+    typedef hpx::parallel::sequential_execution_tag execution_category;
+
+    template <typename F>
+    void apply_execute(F && f)
+    {
+        this->execute(std::forward<F>(f));
+    }
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
@@ -158,6 +192,7 @@ int hpx_main(int argc, char* argv[])
     test_executor<test_sync_executor2>();
     test_executor<test_sync_executor3>();
     test_executor<test_sync_executor4>();
+    test_executor<test_sync_executor5>();
 
     return hpx::finalize();
 }

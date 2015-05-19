@@ -37,6 +37,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         typedef sequential_execution_tag execution_category;
 
         template <typename F>
+        static void apply_execute(F && f)
+        {
+            execute(std::forward<F>(f));
+        }
+
+        template <typename F>
         static typename hpx::util::result_of<
             typename hpx::util::decay<F>::type()
         >::type

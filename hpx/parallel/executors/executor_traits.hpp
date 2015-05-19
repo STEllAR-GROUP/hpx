@@ -138,10 +138,71 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename F, typename Enable = void>
+        struct apply
+        {
+            typedef void type;
+
+            template <typename F_>
+            static void call(Executor& exec, F_ && f)
+            {
+                exec.async_execute(std::forward<F_>(f)).get();
+            }
+        };
+
+#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
+        template <typename Executor, typename F>
+        struct check_has_apply
+        {
+            template <typename T, void (T::*)(F) = &T::apply>
+            struct get {};
+        };
+
+        template <typename Executor, typename F>
+        struct apply<Executor, F,
+            typename std::enable_if<
+                has_member<Executor, check_has_apply<
+                    Executor, F
+                > >::value
+            >::type>
+        {
+            typedef void type;
+
+            template <typename F_>
+            static void call(Executor& exec, F_ && f)
+            {
+                exec.apply(std::forward<F_>(f));
+            }
+        };
+#else
+        template <typename Executor, typename F>
+        struct apply<Executor, F,
+            typename util::always_void<
+                decltype(std::declval<Executor>().apply(std::declval<F>()))
+            >::type>
+        {
+            typedef void type;
+
+            template <typename F_>
+            static type call(Executor& exec, F_ && f)
+            {
+                return exec.apply(std::forward<F_>(f));
+            }
+        };
+#endif
+
+        template <typename Executor, typename F>
+        typename apply<Executor, typename hpx::util::decay<F>::type>::type
+        call_apply_execute(Executor& exec, F && f)
+        {
+            typedef typename hpx::util::decay<F>::type func_type;
+            return apply<Executor, func_type>::call(exec, std::forward<F>(f));
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Executor, typename F, typename Enable = void>
         struct execute
         {
             typedef typename hpx::util::result_of<F()>::type type;
-            typedef typename execution_category<Executor>::type category;
 
             template <typename F_>
             static type call(Executor& exec, F_ && f)
@@ -442,6 +503,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             /// The future type returned from async_execute
             typedef typename detail::future_type<executor_type, T>::type type;
         };
+
+        /// \brief Singleton form of asynchronous fire & forget execution agent
+        ///        creation.
+        ///
+        /// This asynchronously (fire & forget) creates a single function
+        /// invocation f() using the associated executor.
+        ///
+        /// \param exec [in] The executor object to use for scheduling of the
+        ///             function \a f.
+        /// \param f    [in] The function which will be scheduled using the
+        ///             given executor.
+        ///
+        /// \note This calls exec.apply_execute(f), if available, otherwise
+        ///       it calls exec.async_execute() while discarding the returned
+        ///       future
+        ///
+        template <typename F>
+        static void apply_execute(executor_type& exec, F && f)
+        {
+            detail::call_apply_execute(exec, std::forward<F>(f));
+        }
 
         /// \brief Singleton form of asynchronous execution agent creation.
         ///

@@ -34,6 +34,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         /// \cond NOINTERNAL
         template <typename F>
+        void apply_execute(F && f)
+        {
+            return hpx::apply(std::forward<F>(f));
+        }
+
+        template <typename F>
         hpx::future<typename hpx::util::result_of<
             typename hpx::util::decay<F>::type()
         >::type>

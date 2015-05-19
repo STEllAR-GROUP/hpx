@@ -7,6 +7,7 @@
 set(tests
     apply_colocated
     apply_local
+    apply_local_executor
     apply_remote
     async_cb_colocated
     async_cb_remote
