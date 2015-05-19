@@ -56,9 +56,7 @@ namespace hpx
     >::type
     apply(Executor& exec, F&& f, Ts&&... vs)
     {
-        // for simplicity we fall back invoking async_execute while discarding
-        // the returned future
-        parallel::executor_traits<Executor>::async_execute(exec,
+        parallel::executor_traits<Executor>::apply_execute(exec,
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...));
         return false;
     }
