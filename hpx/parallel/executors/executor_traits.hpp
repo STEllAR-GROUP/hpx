@@ -84,27 +84,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     namespace detail
     {
         /// \cond NOINTERNAL
-#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
-        template <typename T, typename NameGetter>
-        struct has_member_impl
+
+        // wraps int so that int argument is favored over wrap_int
+        struct wrap_int
         {
-            typedef char yes;
-            typedef long no;
-
-            template <typename C>
-            static yes f(typename NameGetter::template get<C>*);
-
-            template <typename C>
-            static no f(...);
-
-            static const bool value = (sizeof(f<T>(0)) == sizeof(yes));
+            wrap_int(int) {}
         };
-
-        template <typename T, typename NameGetter>
-        struct has_member
-          : std::integral_constant<bool, has_member_impl<T, NameGetter>::value>
-        {};
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Enable = void>
@@ -137,139 +122,61 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Executor, typename F, typename Enable = void>
-        struct apply
+        struct apply_helper
         {
-            typedef void type;
-
-            template <typename F_>
-            static void call(Executor& exec, F_ && f)
+            template <typename Executor, typename F>
+            static auto call(wrap_int, Executor& exec, F && f) -> void
             {
-                exec.async_execute(std::forward<F_>(f)).get();
+                exec.async_execute(std::forward<F>(f));
+            }
+
+            template <typename Executor, typename F>
+            static auto call(int, Executor& exec, F && f)
+                -> decltype(exec.apply_execute(std::forward<F>(f)))
+            {
+                exec.apply_execute(std::forward<F>(f));
             }
         };
 
-#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
         template <typename Executor, typename F>
-        struct check_has_apply
+        void call_apply_execute(Executor& exec, F && f)
         {
-            template <typename T, void (T::*)(F) = &T::apply>
-            struct get {};
-        };
-
-        template <typename Executor, typename F>
-        struct apply<Executor, F,
-            typename std::enable_if<
-                has_member<Executor, check_has_apply<
-                    Executor, F
-                > >::value
-            >::type>
-        {
-            typedef void type;
-
-            template <typename F_>
-            static void call(Executor& exec, F_ && f)
-            {
-                exec.apply(std::forward<F_>(f));
-            }
-        };
-#else
-        template <typename Executor, typename F>
-        struct apply<Executor, F,
-            typename util::always_void<
-                decltype(std::declval<Executor>().apply(std::declval<F>()))
-            >::type>
-        {
-            typedef void type;
-
-            template <typename F_>
-            static type call(Executor& exec, F_ && f)
-            {
-                return exec.apply(std::forward<F_>(f));
-            }
-        };
-#endif
-
-        template <typename Executor, typename F>
-        typename apply<Executor, typename hpx::util::decay<F>::type>::type
-        call_apply_execute(Executor& exec, F && f)
-        {
-            typedef typename hpx::util::decay<F>::type func_type;
-            return apply<Executor, func_type>::call(exec, std::forward<F>(f));
+            return apply_helper::call(0, exec, std::forward<F>(f));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Executor, typename F, typename Enable = void>
-        struct execute
+        struct execute_helper
         {
-            typedef typename hpx::util::result_of<F()>::type type;
-
-            template <typename F_>
-            static type call(Executor& exec, F_ && f)
+            template <typename Executor, typename F>
+            static auto call(wrap_int, Executor& exec, F && f)
+                ->  typename hpx::util::result_of<
+                        typename hpx::util::decay<F>::type()
+                    >::type
             {
-                return exec.async_execute(std::forward<F_>(f)).get();
+                return exec.async_execute(std::forward<F>(f)).get();
+            }
+
+            template <typename Executor, typename F>
+            static auto call(int, Executor& exec, F && f)
+                -> decltype(exec.execute(std::forward<F>(f)))
+            {
+                return exec.execute(std::forward<F>(f));
             }
         };
 
-#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
         template <typename Executor, typename F>
-        struct check_has_execute
-        {
-            typedef typename hpx::util::result_of<F()>::type type;
-
-            template <typename T, type (T::*)(F) = &T::execute>
-            struct get {};
-        };
-
-        template <typename Executor, typename F>
-        struct execute<Executor, F,
-            typename std::enable_if<
-                has_member<Executor, check_has_execute<
-                    Executor, F
-                > >::value
-            >::type>
-        {
-            typedef typename hpx::util::result_of<F()>::type type;
-
-            template <typename F_>
-            static type call(Executor& exec, F_ && f)
-            {
-                return exec.execute(std::forward<F_>(f));
-            }
-        };
-#else
-        template <typename Executor, typename F>
-        struct execute<Executor, F,
-            typename util::always_void<
-                decltype(std::declval<Executor>().execute(std::declval<F>()))
-            >::type>
-        {
-            typedef typename hpx::util::result_of<F()>::type type;
-
-            template <typename F_>
-            static type call(Executor& exec, F_ && f)
-            {
-                return exec.execute(std::forward<F_>(f));
-            }
-        };
-#endif
-
-        template <typename Executor, typename F>
-        typename execute<Executor, typename hpx::util::decay<F>::type>::type
+        typename hpx::util::result_of<typename hpx::util::decay<F>::type()>::type
         call_execute(Executor& exec, F && f)
         {
-            typedef typename hpx::util::decay<F>::type func_type;
-            return execute<Executor, func_type>::call(exec, std::forward<F>(f));
+            return execute_helper::call(0, exec, std::forward<F>(f));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Executor, typename F, typename S,
-            typename Enable = void>
-        struct bulk_async_execute
+        struct bulk_async_execute_helper
         {
-            typedef typename future_type<Executor, void>::type type;
-
-            static type call(Executor& exec, F const& f, S const& shape)
+            template <typename Executor, typename F, typename S>
+            static auto call(wrap_int, Executor& exec, F && f, S const& shape)
+                ->  typename future_type<Executor, void>::type
             {
                 std::vector<hpx::future<void> > results;
                 for (auto const& elem: shape)
@@ -280,71 +187,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 }
                 return hpx::when_all(results);
             }
-        };
 
-#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
-        template <typename Executor, typename F, typename S>
-        struct check_has_bulk_async_execute
-        {
-            typedef typename future_type<Executor, void>::type type;
-
-            template <typename T,
-                type (T::*)(F, S const&) = &T::bulk_async_execute>
-            struct get {};
-        };
-
-        template <typename Executor, typename F, typename S>
-        struct bulk_async_execute<Executor, F, S,
-            typename std::enable_if<
-                has_member<Executor, check_has_bulk_async_execute<
-                    Executor, F, S
-                > >::value
-            >::type>
-        {
-            typedef typename future_type<Executor, void>::type type;
-
-            template <typename F_>
-            static type call(Executor& exec, F_ && f, S const& shape)
+            template <typename Executor, typename F, typename S>
+            static auto call(int, Executor& exec, F && f, S const& shape)
+                ->  decltype(exec.bulk_async_execute(std::forward<F>(f), shape))
             {
-                return exec.bulk_async_execute(std::forward<F_>(f), shape);
+                return exec.bulk_async_execute(std::forward<F>(f), shape);
             }
         };
-#else
-        template <typename Executor, typename F, typename S>
-        struct bulk_async_execute<Executor, F, S,
-            typename util::always_void<decltype(
-                std::declval<Executor>()
-                    .bulk_async_execute(std::declval<F>(), std::declval<S>())
-            )>::type>
-        {
-            typedef typename future_type<Executor, void>::type type;
-
-            template <typename F_>
-            static type call(Executor& exec, F_ && f, S const& shape)
-            {
-                return exec.bulk_async_execute(std::forward<F_>(f), shape);
-            }
-        };
-#endif
 
         template <typename Executor, typename F, typename S>
-        typename bulk_async_execute<Executor, F, S>::type
+        typename future_type<Executor, void>::type
         call_bulk_async_execute(Executor& exec, F && f, S const& shape)
         {
-            typedef typename hpx::util::decay<F>::type func_type;
-            return bulk_async_execute<Executor, func_type, S>::call(
-                exec, std::forward<F>(f), shape);
+            return bulk_async_execute_helper::call(
+                0, exec, std::forward<F>(f), shape);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Executor, typename F, typename S,
-            typename Enable = void>
-        struct bulk_execute
+        struct bulk_execute_helper
         {
-            typedef void type;
-
-            template <typename F_>
-            static void call(Executor& exec, F_ const& f, S const& shape)
+            template <typename Executor, typename F, typename S>
+            static auto call(wrap_int, Executor& exec, F && f, S const& shape)
+                ->  void
             {
                 std::vector<hpx::future<void> > results;
                 for (auto const& elem: shape)
@@ -355,106 +220,41 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 }
                 hpx::when_all(results).get();
             }
-        };
 
-#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
-        template <typename F, typename S>
-        struct check_has_bulk_execute
-        {
-            template <typename T, void (T::*)(F, S const&) = &T::bulk_execute>
-            struct get {};
-        };
-
-        template <typename Executor, typename F, typename S>
-        struct bulk_execute<Executor, F, S,
-            typename std::enable_if<
-                has_member<Executor, check_has_bulk_execute<F, S> >::value
-            >::type>
-        {
-            typedef void type;
-
-            static void call(Executor& exec, F && f, S const& shape)
+            template <typename Executor, typename F, typename S>
+            static auto call(int, Executor& exec, F && f, S const& shape)
+                ->  decltype(exec.bulk_execute(std::forward<F>(f), shape))
             {
-                exec.bulk_execute(std::forward<F>(f), shape);
+                return exec.bulk_execute(std::forward<F>(f), shape);
             }
         };
-#else
-        template <typename Executor, typename F, typename S>
-        struct bulk_execute<Executor, F, S,
-            typename util::always_void<decltype(
-                std::declval<Executor>()
-                    .bulk_execute(std::declval<F>(), std::declval<S>())
-            )>::type>
-        {
-            typedef void type;
-
-            static void call(Executor& exec, F && f, S const& shape)
-            {
-                exec.bulk_execute(std::forward<F>(f), shape);
-            }
-        };
-#endif
 
         template <typename Executor, typename F, typename S>
         void call_bulk_execute(Executor& exec, F && f, S const& shape)
         {
-            typedef typename hpx::util::decay<F>::type func_type;
-            bulk_execute<Executor, func_type, S>::call(
-                exec, std::forward<F>(f), shape);
+            return bulk_execute_helper::call(0, exec, std::forward<F>(f), shape);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Executor, typename Enable = void>
-        struct os_thread_count
+        template <typename Executor>
+        struct os_thread_count_helper
         {
-            typedef std::size_t type;
-
-            static std::size_t call(Executor& exec)
+            static auto call(wrap_int, Executor& exec) -> std::size_t
             {
                 return hpx::get_os_thread_count();
             }
-        };
 
-#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276)
-        struct check_os_thread_count
-        {
-            template <typename T, void (T::*)() = &T::os_thread_count>
-            struct get {};
-        };
-
-        template <typename Executor>
-        struct os_thread_count<Executor,
-            typename std::enable_if<
-                has_member<Executor, check_os_thread_count>::value
-            >::type>
-        {
-            typedef std::size_t type;
-
-            static std::size_t call(Executor& exec)
+            static auto call(int, Executor& exec)
+                ->  decltype(exec.os_thread_count())
             {
                 return exec.os_thread_count();
             }
         };
-#else
-        template <typename Executor>
-        struct os_thread_count<Executor,
-            typename util::always_void<decltype(
-                std::declval<Executor>().os_thread_count()
-            )>::type>
-        {
-            typedef std::size_t type;
-
-            static std::size_t call(Executor& exec)
-            {
-                return exec.os_thread_count();
-            }
-        };
-#endif
 
         template <typename Executor>
         std::size_t call_os_thread_count(Executor& exec)
         {
-            return os_thread_count<Executor>::call(exec);
+            return os_thread_count_helper::call(0, exec);
         }
         /// \endcond
     }
@@ -573,8 +373,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       otherwise hpx::async(f).get()
         ///
         template <typename F>
-        static typename detail::execute<
-            executor_type, typename hpx::util::decay<F>::type
+        static
+        typename hpx::util::result_of<
+            typename hpx::util::decay<F>::type()
         >::type
         execute(executor_type& exec, F && f)
         {
