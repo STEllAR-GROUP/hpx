@@ -8,6 +8,7 @@
 #define HPX_LCOS_MUTEX_JUN_23_2008_0530PM
 
 #include <hpx/config.hpp>
+#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -18,13 +19,12 @@
 #include <hpx/util/scoped_unlock.hpp>
 
 #include <boost/intrusive/slist.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
-    class mutex : boost::noncopyable
+    class mutex
     {
     private:
         typedef lcos::local::spinlock mutex_type;
@@ -40,6 +40,8 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_CREATE(this, "lcos::local::mutex", description);
             HPX_ITT_SYNC_RENAME(this, "lcos::local::mutex");
         }
+
+        HPX_NON_COPYABLE(mutex);
 
         ~mutex()
         {
