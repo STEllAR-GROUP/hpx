@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
-//  Copyright (c) 2015 John Biddiscombe
+//  Copyright (c) 2015      John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -829,14 +829,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     }
                 } while (!finished);
 
-                unique_lock lock(stop_mutex);
-                _rdmaController->for_each_client(
-                        [](std::pair<const uint32_t, RdmaClientPtr> &map_pair) {
-                    if (map_pair.second->getInitiatedConnection()) {
-                        _rdmaController->removeServerToServerConnection(map_pair.second);
-                    }
-                }
-                );
+                scoped_lock lock(stop_mutex);
+                LOG_DEBUG_MSG("Removing all initiated connections");
+                _rdmaController->removeAllInitiatedConnections();
+
                 // wait for all clients initiated elsewhere to be disconnected
                 while (_rdmaController->num_clients()!=0) {
                     _rdmaController->eventMonitor(0);
