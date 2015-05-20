@@ -33,7 +33,8 @@ namespace hpx { namespace serialization
         template <class... Args>
         struct load_helper_t{};
 
-#if defined(BOOST_VARIANT_DO_NOT_USE_VARIADIC_TEMPLATES)
+#if defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || \
+    defined(BOOST_VARIANT_DO_NOT_USE_VARIADIC_TEMPLATES) // intr. only in 1.56
         // overload for non-variadic version of variant library
         template <class Variant, class... Tail>
         BOOST_FORCEINLINE void load_helper(input_archive&, Variant&,
