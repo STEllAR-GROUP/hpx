@@ -265,6 +265,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         typedef struct parcel_send_data_ {
             uint32_t                                         tag;
             std::atomic_flag                                 delete_flag;
+            bool                                             has_zero_copy;
             parcelset::parcel                                parcel;
             parcelset::parcelhandler::write_handler_type     handler;
             RdmaMemoryRegion *header_region, *chunk_region, *message_region;
@@ -450,7 +451,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 }
                 if (found_wr_id) {
                     // if the send had no zero_copy regions, then it has completed
-                    if (current_send->zero_copy_regions.empty()) {
+                    if (!current_send->has_zero_copy) {
                         LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "normal");
                         delete_send_data(current_send);
                     }
@@ -526,8 +527,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     }
 
                     buffer.num_chunks_ = h->num_chunks();
-                    buffer.data_.resize(static_cast<std::size_t>(h->size()));
-                    buffer.data_size_ = h->size();
+                    //buffer.data_.resize(static_cast<std::size_t>(h->size()));
+                    //buffer.data_size_ = h->size();
                     buffer.chunks_.resize(recv_data.chunks.size());
                     decode_message_with_chunks(*this, std::move(buffer), 1, recv_data.chunks);
                     LOG_DEBUG_MSG("parcel decode called for ZEROCOPY complete parcel");
@@ -603,6 +604,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 recv_data.message_region = NULL;
                 recv_data.chunk_region   = NULL;
                 recv_data.counter        = h->num_chunks().first;
+                // each parcel has a unique tag which we use to organize zero-copy data if we need any
+                recv_data.tag            = h->tag();
 
                 LOG_DEBUG_MSG( "received IBV_WC_RECV " <<
                         "buffsize " << decnumber(h->size())
@@ -613,8 +616,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                         << " piggyback " << decnumber((h->piggy_back()!=NULL))
                         << " tag " << hexuint32(h->tag())
                 );
-                // each parcel has a unique tag which we use to organize zero-copy data if we need any
-                recv_data.tag = h->tag();
 
                 // setting this flag to false - if more data is needed - disables final parcel receive call
                 bool parcel_complete = true;
@@ -936,6 +937,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 send_data.header_region  = NULL;
                 send_data.message_region = NULL;
                 send_data.chunk_region   = NULL;
+                send_data.has_zero_copy  = false;
                 send_data.delete_flag.clear();
 
                 LOG_DEBUG_MSG("Generated unique dest " << hexnumber(dest_ip) << " coded tag " << hexuint32(send_data.tag));
@@ -952,6 +954,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 int index = 0;
                 for (serialization::serialization_chunk &c : buffer.chunks_) {
                     if (c.type_ == serialization::chunk_type_pointer) {
+                        send_data.has_zero_copy  = true;
                         // if the data chunk fits into a memory block, copy it
                         util::high_resolution_timer regtimer;
                         RdmaMemoryRegion *zero_copy_region;
