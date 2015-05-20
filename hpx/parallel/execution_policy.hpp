@@ -1329,7 +1329,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 is_sequential_execution_policy<ExPolicy>::value
             >::type>
         {
-            static BOOST_SCOPED_ENUM(launch) call() { return launch::sync; }
+            static BOOST_SCOPED_ENUM(launch) call() { return launch::deferred; }
         };
 
         template <typename ExPolicy>

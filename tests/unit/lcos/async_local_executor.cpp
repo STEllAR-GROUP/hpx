@@ -188,11 +188,10 @@ void test_async_with_executor(Executor& exec)
 
 int hpx_main()
 {
-// FIXME: enable this once launch::deferred works properly
-//     {
-//         hpx::parallel::sequential_executor exec;
-//         test_async_with_executor(exec);
-//     }
+    {
+        hpx::parallel::sequential_executor exec;
+        test_async_with_executor(exec);
+    }
 
     {
         hpx::parallel::parallel_executor exec;

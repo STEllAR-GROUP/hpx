@@ -124,7 +124,7 @@ struct test_sync_executor2
     >::type>
     async_execute(F && f)
     {
-        return hpx::async(hpx::launch::sync, std::forward<F>(f));
+        return hpx::async(hpx::launch::deferred, std::forward<F>(f));
     }
 
     std::size_t os_thread_count()
@@ -166,7 +166,7 @@ struct test_sync_executor4 : test_sync_executor2
     bulk_async_execute(F f, Shape const& shape)
     {
         return hpx::async(
-            hpx::launch::sync,
+            hpx::launch::deferred,
             [=] {
                 for (auto const& elem: shape)
                     f(elem);

@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         >::type>
         async_execute(F && f)
         {
-            return hpx::async(hpx::launch::sync, std::forward<F>(f));
+            return hpx::async(hpx::launch::deferred, std::forward<F>(f));
         }
 
         template <typename F, typename Shape>
@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         static hpx::future<void>
         bulk_async_execute(F && f, Shape const& shape)
         {
-            return hpx::async(hpx::launch::sync,
+            return hpx::async(hpx::launch::deferred,
                 &sequential_executor::bulk_execute<F, Shape>,
                 std::forward<F>(f), shape);
         }

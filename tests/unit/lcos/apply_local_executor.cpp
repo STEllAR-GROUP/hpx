@@ -73,13 +73,13 @@ void test_apply_with_executor(Executor& exec)
         hpx::promise<boost::int32_t> p;
         hpx::shared_future<boost::int32_t> f = p.get_future();
 
+        p.set_value(1);
+
         using hpx::util::placeholders::_1;
 
         hpx::apply(exec, &increment_with_future, f);
         hpx::apply(exec, hpx::util::bind(&increment_with_future, f));
         hpx::apply(exec, hpx::util::bind(&increment_with_future, _1), f);
-
-        p.set_value(1);
     }
 
     {
@@ -124,18 +124,18 @@ void test_apply_with_executor(Executor& exec)
     hpx::lcos::local::no_mutex result_mutex;
     hpx::lcos::local::no_mutex::scoped_lock l(result_mutex);
     result_cv.wait_for(l, boost::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 18));
+        hpx::util::bind(std::equal_to<boost::int32_t>(),
+            boost::ref(accumulator), 18));
 
     HPX_TEST_EQ(accumulator.load(), 18);
 }
 
 int hpx_main()
 {
-// FIXME: enable this once launch::deferred works properly
-//     {
-//         hpx::parallel::sequential_executor exec;
-//         test_apply_with_executor(exec);
-//     }
+    {
+        hpx::parallel::sequential_executor exec;
+        test_apply_with_executor(exec);
+    }
 
     {
         hpx::parallel::parallel_executor exec;
