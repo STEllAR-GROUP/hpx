@@ -82,7 +82,7 @@
 * Replaced the use of Boost.Serialization with our own solution. While the new
   version is mostly compatible with Boost.Serialization, this change requires
   some minor code modifications in user code. For more information, please see the
-  corresponding [@https://mail.cct.lsu.edu/mailman/private/hpx-users/2015-April/000558.html announcement]
+  corresponding [@https://mail.cct.lsu.edu/pipermail//hpx-users/2015-April/000558.html announcement]
   on the __stellar_list__ mailing list.
 * The names used by cmake to influence various configuration options have been
   unified. The new naming scheme relies on all configuration constants to start
