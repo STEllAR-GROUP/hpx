@@ -7,6 +7,7 @@
 set(tests
     after_588
     async_unwrap_1037
+    call_promise_get_gid_more_than_once
     dataflow_launch_775
     async_callback_non_deduced_context
     future_790
