@@ -5,7 +5,10 @@
 
 set(tests
     serialization
+    serialization_array
     serialization_builtins
+    serialization_complex
+    serialization_map
     serialization_smart_ptr
     serialization_vector
     serialize_buffer
