@@ -6,7 +6,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
@@ -91,8 +90,8 @@ void test_bulk_async(Executor& exec)
     using hpx::util::placeholders::_1;
 
     typedef hpx::parallel::executor_traits<Executor> traits;
-    hpx::wait_all(traits::async_execute(
-        exec, hpx::util::bind(&sync_bulk_test, tid, _1), v));
+    hpx::when_all(traits::async_execute(
+        exec, hpx::util::bind(&sync_bulk_test, tid, _1), v)).get();
 }
 
 template <typename Executor>
@@ -164,15 +163,15 @@ struct test_sync_executor4 : test_sync_executor2
     typedef hpx::parallel::sequential_execution_tag execution_category;
 
     template <typename F, typename Shape>
-    hpx::future<void>
+    std::vector<hpx::future<void> >
     bulk_async_execute(F f, Shape const& shape)
     {
-        return hpx::async(
-            hpx::launch::deferred,
-            [=] {
-                for (auto const& elem: shape)
-                    f(elem);
-            });
+        std::vector<hpx::future<void> > results;
+        for (auto const& elem: shape)
+            results.push_back(
+                async_execute(hpx::util::deferred_call(f, elem))
+            );
+        return std::move(results);
     }
 };
 

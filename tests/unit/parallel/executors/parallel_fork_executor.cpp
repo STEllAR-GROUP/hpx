@@ -6,7 +6,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
@@ -73,8 +72,8 @@ void test_bulk_async()
     using hpx::util::placeholders::_1;
 
     executor exec;
-    hpx::wait_all(traits::async_execute(
-        exec, hpx::util::bind(&bulk_test, tid, _1), v));
+    hpx::when_all(traits::async_execute(
+        exec, hpx::util::bind(&bulk_test, tid, _1), v)).get();
 }
 
 int hpx_main(int argc, char* argv[])

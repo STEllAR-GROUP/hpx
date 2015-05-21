@@ -107,7 +107,7 @@ private:
 // Create shape argument for parallel_executor
 std::vector<range> split(iter first, iter last, int parts)
 {
-    typedef typename std::iterator_traits<iter>::difference_type sz_type;
+    typedef std::iterator_traits<iter>::difference_type sz_type;
     sz_type count = std::distance(first, last);
     sz_type increment = count/parts;
     std::vector<range> results;
