@@ -415,109 +415,111 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         }
 
         // ----------------------------------------------------------------------------------------------
-        // Every (signalled) rdma operation triggers a completion event when it completes,
-        // the rdmaController calls this callback function and we must clean up all temporary
-        // memory etc and signal hpx when sends or receives finish.
+        // When a send completes take one of two actions ...
+        // if there are no zero copy chunks, we consider the parcel sending complete
+        // so release memory and trigger write_handler.
+        // If there are zero copy chunks to be RDMA GET from the remote end, then
+        // we hold onto data until the have completed.
         // ----------------------------------------------------------------------------------------------
-        int handle_verbs_completion(struct ibv_wc completion, RdmaClient *client)
+        void handle_send_completion(uint64_t wr_id)
         {
-            uint64_t wr_id = completion.wr_id;
-            LOG_DEBUG_MSG("Handle verbs completion " << hexpointer(wr_id) << RdmaCompletionQueue::wc_opcode_str(completion.opcode));
-            //
-            // When a send completes, release memory and trigger write_handler
-            //
-            if (completion.opcode==IBV_WC_SEND) {
-                bool                 found_wr_id;
-                active_send_iterator current_send;
-                {
-                    // we must be very careful here.
-                    // if the lock is not obtained and this thread is waiting, then
-                    // zero copy Gets might complete and another thread might receive a zero copy
-                    // complete message then delete the current send data whilst we are still waiting
-                    scoped_lock lock(SendCompletionMap_mutex);
-                    send_wr_map::iterator it = SendCompletionMap.find(wr_id);
-                    found_wr_id = (it != SendCompletionMap.end());
-                    if (found_wr_id) {
-                        current_send = it->second;
-                        LOG_DEBUG_MSG("erasing " << hexpointer(wr_id) << "from SendCompletionMap : size before erase " << SendCompletionMap.size());
-                        SendCompletionMap.erase(it);
-                    }
-                    else {
-                        LOG_ERROR_MSG("FATAL : SendCompletionMap did not find " << hexpointer(wr_id));
-                        for (auto & pair : SendCompletionMap) {
-                            std::cout << hexpointer(pair.first) << "\n";
-                        }
-                        std::terminate();
-                    }
-                }
+            bool                 found_wr_id;
+            active_send_iterator current_send;
+            {
+                // we must be very careful here.
+                // if the lock is not obtained and this thread is waiting, then
+                // zero copy Gets might complete and another thread might receive a zero copy
+                // complete message then delete the current send data whilst we are still waiting
+                scoped_lock lock(SendCompletionMap_mutex);
+                send_wr_map::iterator it = SendCompletionMap.find(wr_id);
+                found_wr_id = (it != SendCompletionMap.end());
                 if (found_wr_id) {
-                    // if the send had no zero_copy regions, then it has completed
-                    if (!current_send->has_zero_copy) {
-                        LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "normal");
-                        delete_send_data(current_send);
-                    }
-                    else if (current_send->delete_flag.test_and_set(std::memory_order_acquire)) {
-                        LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "after race detection");
-                        delete_send_data(current_send);
-                    }
+                    current_send = it->second;
+                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id) << "from SendCompletionMap : size before erase " << SendCompletionMap.size());
+                    SendCompletionMap.erase(it);
                 }
                 else {
-                    throw std::runtime_error("RDMA Send completed with unmatched Id");
+                    LOG_ERROR_MSG("FATAL : SendCompletionMap did not find " << hexpointer(wr_id));
+                    for (auto & pair : SendCompletionMap) {
+                        std::cout << hexpointer(pair.first) << "\n";
+                    }
+                    std::terminate();
                 }
-                return 0;
             }
-
-            //
-            // When an Rdma Get operation completes, either add it to an ongoing parcel
-            // receive, or if it is the last one, trigger decode message
-            //
-            if (completion.opcode==IBV_WC_RDMA_READ) {
-                bool                 found_wr_id;
-                active_recv_iterator current_recv;
-                {   // locked region : make sure map isn't modified whilst we are querying it
-                    scoped_lock lock(ReadCompletionMap_mutex);
-                    recv_wr_map::iterator it = ReadCompletionMap.find(wr_id);
-                    found_wr_id = (it != ReadCompletionMap.end());
-                    if (found_wr_id) {
-                        current_recv = it->second;
-                        LOG_DEBUG_MSG("erasing " << hexpointer(wr_id) << "from ReadCompletionMap : size before erase " << ReadCompletionMap.size());
-                        ReadCompletionMap.erase(it);
-                    }
-                    else {
-                        std::terminate();
-                    }
+            if (found_wr_id) {
+                // if the send had no zero_copy regions, then it has completed
+                if (!current_send->has_zero_copy) {
+                    LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "normal");
+                    delete_send_data(current_send);
                 }
-                if (found_wr_id) {
-                    parcel_recv_data &recv_data = *current_recv;
-                    LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag) << " has count of " << recv_data.counter);
-                    if (--recv_data.counter > 0) {
-                        // we can't do anything until all zero copy chunks are here
-                        return 0;
-                    }
-                    //
-                    LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag) << " has completed : posting zero byte ack to origin");
-                    client->postSend_x0((RdmaMemoryRegion*)recv_data.tag, false, true, recv_data.tag);
-                    //
-                    LOG_DEBUG_MSG("Zero copy regions size is (completion) " << recv_data.zero_copy_regions.size());
+                else if (current_send->delete_flag.test_and_set(std::memory_order_acquire)) {
+                    LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "after race detection");
+                    delete_send_data(current_send);
+                }
+            }
+            else {
+                throw std::runtime_error("RDMA Send completed with unmatched Id");
+            }
+        }
 
-                    header_type *h = (header_type*)recv_data.header_region->getAddress();
-                    LOG_DEBUG_MSG( "get completion " <<
-                            "buffsize " << decnumber(h->size())
-                            << "numbytes " << decnumber(h->numbytes())
-                            << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
-                            << ", normal( " << decnumber(h->num_chunks().second) << ") "
-                            << " chunkdata " << decnumber((h->chunk_data()!=NULL))
-                            << " piggyback " << decnumber((h->piggy_back()!=NULL))
-                            << " tag " << hexuint32(h->tag())
-                    );
+        // ----------------------------------------------------------------------------------------------
+        // When a recv completes, take one of two actions ...
+        // if there are no zero copy chunks, we consider the parcel receive complete
+        // so release memory and trigger  (I had contacted them write_handler.
+        // If there are zero copy chunks to be RDMA GET from the remote end, then
+        // we hold onto data until the have completed.
+        // ----------------------------------------------------------------------------------------------
+        void handle_recv_completion(uint64_t wr_id, RdmaClient* client)
+        {
+            util::high_resolution_timer timer;
 
-                    char *piggy_back = h->piggy_back();
-                    LOG_DEBUG_MSG("Creating a release buffer callback for tag " << hexuint32(recv_data.tag));
-                    rcv_data_type wrapped_pointer(piggy_back, h->size(),
-                            boost::bind(&parcelport::delete_recv_data, this, current_recv));
-                    rcv_buffer_type buffer(std::move(wrapped_pointer));
-                    LOG_DEBUG_MSG("calling parcel decode for complete ZEROCOPY parcel");
+            // bookkeeping : decrement counter that keeps preposted queue full
+            client->popReceive();
 
+            // store details about this parcel so that all memory buffers can be kept
+            // until all recv operations have completed.
+            active_recv_iterator current_recv;
+            {
+                scoped_lock lock(active_recv_mutex);
+                active_recvs.emplace_back();
+                current_recv = std::prev(active_recvs.end());
+                LOG_DEBUG_MSG("Active recv after insert size " << active_recvs.size());
+            }
+            parcel_recv_data &recv_data = *current_recv;
+            // get the header of the new message/parcel
+            recv_data.header_region  = (RdmaMemoryRegion *)wr_id;
+            header_type *h = (header_type*)recv_data.header_region->getAddress();
+            recv_data.message_region = NULL;
+            recv_data.chunk_region   = NULL;
+            recv_data.counter        = h->num_chunks().first;
+            // each parcel has a unique tag which we use to organize zero-copy data if we need any
+            recv_data.tag            = h->tag();
+
+            LOG_DEBUG_MSG( "received IBV_WC_RECV " <<
+                    "buffsize " << decnumber(h->size())
+                    << "numbytes " << decnumber(h->numbytes())
+                    << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
+                    << ", normal( " << decnumber(h->num_chunks().second) << ") "
+                    << " chunkdata " << decnumber((h->chunk_data()!=NULL))
+                    << " piggyback " << decnumber((h->piggy_back()!=NULL))
+                    << " tag " << hexuint32(h->tag())
+            );
+
+            // setting this flag to false - if more data is needed - disables final parcel receive call
+            bool parcel_complete = true;
+
+            char *chunk_data = h->chunk_data();
+            if (chunk_data) {
+                // all the info about chunks we need is stored inside the header
+                recv_data.chunks.resize(h->num_chunks().first + h->num_chunks().second);
+                size_t chunkbytes = recv_data.chunks.size() * sizeof(serialization::serialization_chunk);
+                std::memcpy(recv_data.chunks.data(), chunk_data, chunkbytes);
+                LOG_DEBUG_MSG("Copied chunk data from header : size " << decnumber(chunkbytes));
+
+                // setup info for zero-copy rdma get chunks (if there are any)
+                if (recv_data.counter>0) {
+                    parcel_complete = false;
+                    int index = 0;
                     for (serialization::serialization_chunk &c : recv_data.chunks) {
                         LOG_DEBUG_MSG("chunk : size " << hexnumber(c.size_)
                                 << " type " << decnumber((uint64_t)c.type_)
@@ -526,89 +528,161 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                                 << " pos " << hexpointer(c.data_.pos_)
                                 << " index " << decnumber(c.data_.index_));
                     }
+                    for (serialization::serialization_chunk &c : recv_data.chunks) {
+                        if (c.type_ == serialization::chunk_type_pointer) {
+                            RdmaMemoryRegion *get_region;
+                            if (c.size_<=DEFAULT_MEMORY_POOL_CHUNK_SIZE) {
+                                get_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
+                            }
+                            else {
+                                get_region = chunk_pool_->AllocateTemporaryBlock(c.size_);
+                            }
+                            LOG_DEBUG_MSG("RDMA Get address " << hexpointer(c.data_.cpos_)
+                                    << " rkey " << decnumber(c.rkey_) << " size " << hexnumber(c.size_)
+                                    << " tag " << hexuint32(recv_data.tag)
+                                    << " local address " << get_region->getAddress() << " length " << c.size_);
+                            recv_data.zero_copy_regions.push_back(get_region);
+                            LOG_DEBUG_MSG("Zero copy regions size is (create) " << recv_data.zero_copy_regions.size());
+                            // put region into map before posting read in case it completes whilst this thread is suspended
+                            {
+                                scoped_lock lock(ReadCompletionMap_mutex);
+                                ReadCompletionMap[(uint64_t)get_region] = current_recv;
+                            }
+                            // overwrite the serialization data to account for the local pointers instead of remote ones
+                            /// post the rdma read/get
+                            const void *remoteAddr = c.data_.cpos_;
+                            recv_data.chunks[index] = hpx::serialization::create_pointer_chunk(get_region->getAddress(), c.size_, c.rkey_);
+                            client->postRead(get_region, c.rkey_, remoteAddr, c.size_);
+                        }
+                        index++;
+                    }
+                }
+            }
+            else {
+                std::terminate();
+                throw std::runtime_error("@TODO implement RDMA GET of mass chunk information when header too small");
+            }
 
-                    buffer.num_chunks_ = h->num_chunks();
-                    //buffer.data_.resize(static_cast<std::size_t>(h->size()));
-                    //buffer.data_size_ = h->size();
-                    buffer.chunks_.resize(recv_data.chunks.size());
+            char *piggy_back = h->piggy_back();
+            LOG_DEBUG_MSG("piggy_back is " << hexpointer(piggy_back) << " chunk data is " << hexpointer(h->chunk_data()));
+            // if the main serialization chunk is piggybacked in second SGE
+            if (piggy_back) {
+                if (parcel_complete) {
+                    rcv_data_type wrapped_pointer(piggy_back, h->size(),
+                            boost::bind(&parcelport::delete_recv_data, this, current_recv));
+
+                    LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
+                    rcv_buffer_type buffer(std::move(wrapped_pointer));
+                    buffer.data_.resize(static_cast<std::size_t>(h->size()));
                     decode_message_with_chunks(*this, std::move(buffer), 1, recv_data.chunks);
-                    LOG_DEBUG_MSG("parcel decode called for ZEROCOPY complete parcel");
+                    LOG_DEBUG_MSG("parcel decode called for complete NORMAL parcel");
+                }
+            }
+            else {
+                std::terminate();
+                throw std::runtime_error("@TODO implement RDMA GET of message when header too small");
+            }
+
+            // @TODO replace performance counter data
+            //          performance_counters::parcels::data_point& data = buffer.data_point_;
+            //          data.time_ = timer.elapsed_nanoseconds();
+            //          data.bytes_ = static_cast<std::size_t>(buffer.size_);
+            //          ...
+            //          data.time_ = timer.elapsed_nanoseconds() - data.time_;
+            _rdmaController->refill_client_receives();
+        }
+
+#ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
+        void handle_tag_send_completion(uint64_t wr_id)
+        {
+            RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
+            uint32_t tag = *(uint32_t*) (region->getAddress());
+            chunk_pool_->deallocate(region);
+            LOG_DEBUG_MSG("Cleaned up from 4 byte ack message with tag " << hexuint32(tag));
+        }
+#endif
+
+        void handle_tag_recv_completion(uint64_t wr_id, RdmaClient *client)
+        {
+#ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
+            RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
+            uint32_t tag = *((uint32_t*) (region->getAddress()));
+            LOG_DEBUG_MSG("Received 4 byte ack message with tag " << hexuint32(tag));
+#else
+            uint32_t tag = completion.imm_data;
+            RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
+            LOG_DEBUG_MSG("Received 0 byte ack message with tag " << hexuint32(tag));
+#endif
+            // bookkeeping : decrement counter that keeps preposted queue full
+            client->popReceive();
+
+            // let go of this region (waste really as this was a zero byte message)
+            chunk_pool_->deallocate(region);
+
+            // now release any zero copy regions we were holding until parcel complete
+            active_send_iterator current_send;
+            {
+                scoped_lock lock(TagSendCompletionMap_mutex);
+                send_wr_map::iterator it = TagSendCompletionMap.find(tag);
+                if (it==TagSendCompletionMap.end()) {
+                    LOG_ERROR_MSG("Tag not present in Send map, FATAL");
+                    std::terminate();
+                }
+                current_send = it->second;
+                TagSendCompletionMap.erase(it);
+            }
+            // we cannot delete the send data until we are absolutely sure that
+            // the initial send has been cleaned up
+            if (current_send->delete_flag.test_and_set(std::memory_order_acquire)) {
+                LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "with no race detection");
+                delete_send_data(current_send);
+            }
+            //
+            _rdmaController->refill_client_receives();
+
+        }
+
+        void handle_rdma_get_completion(uint64_t wr_id, RdmaClient *client)
+        {
+            bool                 found_wr_id;
+            active_recv_iterator current_recv;
+            {   // locked region : make sure map isn't modified whilst we are querying it
+                scoped_lock lock(ReadCompletionMap_mutex);
+                recv_wr_map::iterator it = ReadCompletionMap.find(wr_id);
+                found_wr_id = (it != ReadCompletionMap.end());
+                if (found_wr_id) {
+                    current_recv = it->second;
+                    LOG_DEBUG_MSG("erasing " << hexpointer(wr_id) << "from ReadCompletionMap : size before erase " << ReadCompletionMap.size());
+                    ReadCompletionMap.erase(it);
                 }
                 else {
-                    throw std::runtime_error("RDMA Send completed with unmatched Id");
+                    std::terminate();
                 }
-                return 0;
             }
-            //
-            // a zero byte receive indicates we are being informed that remote GET operations are complete
-            // we can release any data we were holding onto and signal a send as finished
-            //
-            else if (completion.opcode==IBV_WC_RECV && completion.byte_len==0) {
-                uint32_t tag = completion.imm_data;
-                LOG_DEBUG_MSG("zero byte receive with tag " << hexuint32(tag));
-
-                // bookkeeping : decrement counter that keeps preposted queue full
-                client->popReceive();
-
-                // let go of this region (waste really as this was a zero byte message)
-                RdmaMemoryRegion *region = (RdmaMemoryRegion *)completion.wr_id;
-                chunk_pool_->deallocate(region);
-
-                // now release any zero copy regions we were holding until parcel complete
-                active_send_iterator current_send;
-                {
-                    scoped_lock lock(TagSendCompletionMap_mutex);
-                    send_wr_map::iterator it = TagSendCompletionMap.find(tag);
-                    if (it==TagSendCompletionMap.end()) {
-                        LOG_ERROR_MSG("Tag not present in Send map, FATAL");
-                        std::terminate();
-                    }
-                    current_send = it->second;
-                    TagSendCompletionMap.erase(it);
-                }
-                // we cannot delete the send data until we are absolutely sure that
-                // the initial send has been cleaned up
-                if (current_send->delete_flag.test_and_set(std::memory_order_acquire)) {
-                    LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "with no race detection");
-                    delete_send_data(current_send);
+            if (found_wr_id) {
+                parcel_recv_data &recv_data = *current_recv;
+                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag) << " has count of " << recv_data.counter);
+                if (--recv_data.counter > 0) {
+                    // we can't do anything until all zero copy chunks are here
+                    return;
                 }
                 //
-                _rdmaController->refill_client_receives();
-                return 0;
-            }
-            //
-            // When an unmatched receive completes, it is a new parcel, if everything fits into
-            // the header, call decode message, otherwise, queue all the Rdma Get operations
-            // necessary to complete the message
-            //
-            else if (completion.opcode==IBV_WC_RECV) {
+#ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
+                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag) << " has completed : posting 4 byte ack to origin");
+                RdmaMemoryRegion *tag_region = chunk_pool_->allocateRegion(4); // space for a uint32_t
+                uint32_t *tag_memory = (uint32_t*)(tag_region->getAddress());
+                *tag_memory = recv_data.tag;
+                tag_region->setMessageLength(4);
+                client->postSend(tag_region, true, false, 0);
+#else
+                LOG_DEBUG_MSG("RDMA Get tag " << hexuint32(recv_data.tag) << " has completed : posting zero byte ack to origin");
+                client->postSend_x0((RdmaMemoryRegion*)recv_data.tag, false, true, recv_data.tag);
+#endif
+                //
+                LOG_DEBUG_MSG("Zero copy regions size is (completion) " << recv_data.zero_copy_regions.size());
 
-                util::high_resolution_timer timer;
-                LOG_DEBUG_MSG("Entering receive (completion handler) section with received size " << decnumber(completion.byte_len));
-
-                // bookkeeping : decrement counter that keeps preposted queue full
-                client->popReceive();
-
-                // store details about this parcel so that all memory buffers can be kept
-                // until all recv operations have completed.
-                active_recv_iterator current_recv;
-                {
-                    scoped_lock lock(active_recv_mutex);
-                    active_recvs.emplace_back();
-                    current_recv = std::prev(active_recvs.end());
-                    LOG_DEBUG_MSG("Active recv after insert size " << active_recvs.size());
-                }
-                parcel_recv_data &recv_data = *current_recv;
-                // get the header of the new message/parcel
-                recv_data.header_region  = (RdmaMemoryRegion *)completion.wr_id;;
                 header_type *h = (header_type*)recv_data.header_region->getAddress();
-                recv_data.message_region = NULL;
-                recv_data.chunk_region   = NULL;
-                recv_data.counter        = h->num_chunks().first;
-                // each parcel has a unique tag which we use to organize zero-copy data if we need any
-                recv_data.tag            = h->tag();
-
-                LOG_DEBUG_MSG( "received IBV_WC_RECV " <<
+                LOG_DEBUG_MSG( "get completion " <<
                         "buffsize " << decnumber(h->size())
                         << "numbytes " << decnumber(h->numbytes())
                         << "chunks zerocopy( " << decnumber(h->num_chunks().first) << ") "
@@ -618,96 +692,86 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                         << " tag " << hexuint32(h->tag())
                 );
 
-                // setting this flag to false - if more data is needed - disables final parcel receive call
-                bool parcel_complete = true;
-
-                char *chunk_data = h->chunk_data();
-                if (chunk_data) {
-                    // all the info about chunks we need is stored inside the header
-                    recv_data.chunks.resize(h->num_chunks().first + h->num_chunks().second);
-                    size_t chunkbytes = recv_data.chunks.size() * sizeof(serialization::serialization_chunk);
-                    std::memcpy(recv_data.chunks.data(), chunk_data, chunkbytes);
-                    LOG_DEBUG_MSG("Copied chunk data from header : size " << decnumber(chunkbytes));
-
-                    // setup info for zero-copy rdma get chunks (if there are any)
-                    if (recv_data.counter>0) {
-                        parcel_complete = false;
-                        int index = 0;
-                        for (serialization::serialization_chunk &c : recv_data.chunks) {
-                            LOG_DEBUG_MSG("chunk : size " << hexnumber(c.size_)
-                                    << " type " << decnumber((uint64_t)c.type_)
-                                    << " rkey " << decnumber(c.rkey_)
-                                    << " cpos " << hexpointer(c.data_.cpos_)
-                                    << " pos " << hexpointer(c.data_.pos_)
-                                    << " index " << decnumber(c.data_.index_));
-                        }
-                        for (serialization::serialization_chunk &c : recv_data.chunks) {
-                            if (c.type_ == serialization::chunk_type_pointer) {
-                                RdmaMemoryRegion *get_region;
-                                if (c.size_<=DEFAULT_MEMORY_POOL_CHUNK_SIZE) {
-                                    get_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
-                                }
-                                else {
-                                    get_region = chunk_pool_->AllocateTemporaryBlock(c.size_);
-                                }
-                                LOG_DEBUG_MSG("RDMA Get address " << hexpointer(c.data_.cpos_)
-                                        << " rkey " << decnumber(c.rkey_) << " size " << hexnumber(c.size_)
-                                        << " tag " << hexuint32(recv_data.tag)
-                                        << " local address " << get_region->getAddress() << " length " << c.size_);
-                                recv_data.zero_copy_regions.push_back(get_region);
-                                LOG_DEBUG_MSG("Zero copy regions size is (create) " << recv_data.zero_copy_regions.size());
-                                // put region into map before posting read in case it completes whilst this thread is suspended
-                                {
-                                    scoped_lock lock(ReadCompletionMap_mutex);
-                                    ReadCompletionMap[(uint64_t)get_region] = current_recv;
-                                }
-                                // overwrite the serialization data to account for the local pointers instead of remote ones
-                                /// post the rdma read/get
-                                const void *remoteAddr = c.data_.cpos_;
-                                recv_data.chunks[index] = hpx::serialization::create_pointer_chunk(get_region->getAddress(), c.size_, c.rkey_);
-                                client->postRead(get_region, c.rkey_, remoteAddr, c.size_);
-                            }
-                            index++;
-                        }
-                    }
-                }
-                else {
-                    std::terminate();
-                    throw std::runtime_error("@TODO implement RDMA GET of mass chunk information when header too small");
-                }
-
                 char *piggy_back = h->piggy_back();
-                LOG_DEBUG_MSG("piggy_back is " << hexpointer(piggy_back) << " chunk data is " << hexpointer(h->chunk_data()));
-                // if the main serialization chunk is piggybacked in second SGE
-                if (piggy_back) {
-                    if (parcel_complete) {
-                        rcv_data_type wrapped_pointer(piggy_back, h->size(),
-                                boost::bind(&parcelport::delete_recv_data, this, current_recv));
+                LOG_DEBUG_MSG("Creating a release buffer callback for tag " << hexuint32(recv_data.tag));
+                rcv_data_type wrapped_pointer(piggy_back, h->size(),
+                        boost::bind(&parcelport::delete_recv_data, this, current_recv));
+                rcv_buffer_type buffer(std::move(wrapped_pointer));
+                LOG_DEBUG_MSG("calling parcel decode for complete ZEROCOPY parcel");
 
-                        LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
-                        rcv_buffer_type buffer(std::move(wrapped_pointer));
-                        buffer.data_.resize(static_cast<std::size_t>(h->size()));
-                        decode_message_with_chunks(*this, std::move(buffer), 1, recv_data.chunks);
-                        LOG_DEBUG_MSG("parcel decode called for complete NORMAL parcel");
-                        //                      chunk_pool_->deallocate(receive_data.header_region);
-                    }
-                }
-                else {
-                    std::terminate();
-                    throw std::runtime_error("@TODO implement RDMA GET of message when header too small");
+                for (serialization::serialization_chunk &c : recv_data.chunks) {
+                    LOG_DEBUG_MSG("chunk : size " << hexnumber(c.size_)
+                            << " type " << decnumber((uint64_t)c.type_)
+                            << " rkey " << decnumber(c.rkey_)
+                            << " cpos " << hexpointer(c.data_.cpos_)
+                            << " pos " << hexpointer(c.data_.pos_)
+                            << " index " << decnumber(c.data_.index_));
                 }
 
-                // @TODO replace performance counter data
-                //          performance_counters::parcels::data_point& data = buffer.data_point_;
-                //          data.time_ = timer.elapsed_nanoseconds();
-                //          data.bytes_ = static_cast<std::size_t>(buffer.size_);
-                //          ...
-                //          data.time_ = timer.elapsed_nanoseconds() - data.time_;
-                _rdmaController->refill_client_receives();
+                buffer.num_chunks_ = h->num_chunks();
+                //buffer.data_.resize(static_cast<std::size_t>(h->size()));
+                //buffer.data_size_ = h->size();
+                buffer.chunks_.resize(recv_data.chunks.size());
+                decode_message_with_chunks(*this, std::move(buffer), 1, recv_data.chunks);
+                LOG_DEBUG_MSG("parcel decode called for ZEROCOPY complete parcel");
+            }
+            else {
+                throw std::runtime_error("RDMA Send completed with unmatched Id");
+            }
+        }
+
+        // ----------------------------------------------------------------------------------------------
+        // Every (signalled) rdma operation triggers a completion event when it completes,
+        // the rdmaController calls this callback function and we must clean up all temporary
+        // memory etc and signal hpx when sends or receives finish.
+        // ----------------------------------------------------------------------------------------------
+        int handle_verbs_completion(struct ibv_wc completion, RdmaClient *client)
+        {
+            uint64_t wr_id = completion.wr_id;
+            LOG_DEBUG_MSG("Handle verbs completion " << hexpointer(wr_id) << RdmaCompletionQueue::wc_opcode_str(completion.opcode));
+
+            if (completion.opcode==IBV_WC_SEND && completion.byte_len!=4) {
+                handle_send_completion(wr_id);
                 return 0;
             }
 
-            throw std::runtime_error("Unexpected opcode in handle_verbs_completion");
+            //
+            // When an Rdma Get operation completes, either add it to an ongoing parcel
+            // receive, or if it is the last one, trigger decode message
+            //
+            else if (completion.opcode==IBV_WC_RDMA_READ) {
+                handle_rdma_get_completion(wr_id, client);
+                return 0;
+            }
+
+            //
+            // a zero byte receive indicates we are being informed that remote GET operations are complete
+            // we can release any data we were holding onto and signal a send as finished
+            //
+#ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
+            else if (completion.opcode==IBV_WC_SEND && completion.byte_len==4) {
+                handle_tag_send_completion(wr_id);
+                return 0;
+            }
+#endif
+
+            else if (completion.opcode==IBV_WC_RECV && completion.byte_len<=4) {
+                handle_tag_recv_completion(wr_id, client);
+                return 0;
+            }
+            //
+            // When an unmatched receive completes, it is a new parcel, if everything fits into
+            // the header, call decode message, otherwise, queue all the Rdma Get operations
+            // necessary to complete the message
+            //
+            else if (completion.opcode==IBV_WC_RECV) {
+                LOG_DEBUG_MSG("Entering receive (completion handler) section with received size " << decnumber(completion.byte_len));
+                handle_recv_completion(wr_id, client);
+                return 0;
+            }
+
+            throw std::runtime_error("Unexpected opcode in handle_verbs_completion ");
+            //        << RdmaConnection::wr_opcode_str((ibv_wr_opcode)(completion.opcode)).c_str());
             return 0;
         }
 
