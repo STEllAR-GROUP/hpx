@@ -17,7 +17,7 @@
 #include <iterator>
 
 using hpx::parallel::parallel_executor;
-using hpx::util::deferred_call
+using hpx::util::deferred_call;
 using iter = std::vector<int>::iterator;
 using std::begin;
 using std::end;

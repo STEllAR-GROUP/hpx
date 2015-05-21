@@ -266,7 +266,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor>
         std::size_t call_os_thread_count(Executor& exec)
         {
-            return os_thread_count_helper<Executor>::call(0, exec);
+            return os_thread_count_helper::call(0, exec);
         }
         /// \endcond
     }
