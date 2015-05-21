@@ -185,6 +185,7 @@ void sum_test()
     HPX_TEST(f_void_par.get() == sum);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int)std::time(0);
