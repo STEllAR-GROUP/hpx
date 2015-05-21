@@ -13,7 +13,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/thread/lock_types.hpp>
+#include <boost/thread/locks.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)

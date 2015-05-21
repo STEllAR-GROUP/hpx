@@ -11,7 +11,7 @@
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 
-#include <boost/thread/lock_types.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {

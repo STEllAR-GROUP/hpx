@@ -14,7 +14,7 @@
 #include <hpx/util/date_time_chrono.hpp>
 
 #include <boost/detail/scoped_enum_emulation.hpp>
-#include <boost/thread/lock_types.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local

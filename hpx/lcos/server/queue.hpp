@@ -16,7 +16,7 @@
 #include <hpx/traits/get_remote_result.hpp>
 
 #include <boost/intrusive/slist.hpp>
-#include <boost/thread/lock_types.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <memory>
 

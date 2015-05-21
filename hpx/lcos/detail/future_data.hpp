@@ -22,7 +22,7 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
-#include <boost/thread/lock_types.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos

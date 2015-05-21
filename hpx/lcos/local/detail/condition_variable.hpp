@@ -15,7 +15,7 @@
 
 #include <boost/intrusive/slist.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/thread/lock_types.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local { namespace detail
