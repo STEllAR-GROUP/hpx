@@ -7,7 +7,7 @@
 set(HPX_ADDCONFIGTEST_LOADED TRUE)
 
 macro(add_hpx_config_test variable)
-  set(options FILE)
+  set(options FILE EXECUTE)
   set(one_value_args SOURCE ROOT)
   set(multi_value_args INCLUDE_DIRECTORIES LINK_DIRECTORIES COMPILE_DEFINITIONS LIBRARIES ARGS DEFINITIONS REQUIRED)
   cmake_parse_arguments(${variable} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -45,33 +45,44 @@ macro(add_hpx_config_test variable)
     set(CONFIG_TEST_COMPILE_DEFINITIONS ${CONFIG_TEST_COMPILE_DEFINITIONS} ${${variable}_COMPILE_DEFINITIONS})
     set(CONFIG_TEST_LINK_LIBRARIES ${HPX_LIBRARIES} ${${variable}_LIBRARIES})
 
-    try_compile(${variable}_RESULT
-      ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
-      ${test_source}
-      CMAKE_FLAGS
-        "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
-        "-DLINK_DIRECTORIES=${CONFIG_TEST_LINK_DIRS}"
-        "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
-        "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
-      OUTPUT_VARIABLE ${variable}_OUTPUT
-      COPY_FILE ${test_binary})
+    if(${variable}_EXECUTE)
+      if(NOT CMAKE_CROSSCOMPILING)
+        try_run(${variable}_RUN_RESULT ${variable}_COMPILE_RESULT
+          ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
+          ${test_source}
+          CMAKE_FLAGS
+            "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
+            "-DLINK_DIRECTORIES=${CONFIG_TEST_LINK_DIRS}"
+            "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
+            "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
+          RUN_OUTPUT_VARIABLE ${variable}_OUTPUT
+          ARGS ${${variable}_ARGS})
+          if(${variable}_COMPILE_RESULT AND NOT ${variable}_RUN_RESULT)
+            set(${variable}_RESULT TRUE)
+          else()
+            set(${variable}_RESULT FALSE)
+          endif()
+        else()
+          set(${variable}_RESULT FALSE)
+        endif()
+    else()
+      try_compile(${variable}_RESULT
+        ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
+        ${test_source}
+        CMAKE_FLAGS
+          "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
+          "-DLINK_DIRECTORIES=${CONFIG_TEST_LINK_DIRS}"
+          "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
+          "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
+        OUTPUT_VARIABLE ${variable}_OUTPUT
+        COPY_FILE ${test_binary})
+    endif()
 
     string(TOUPPER "${variable}" variable_uc)
     set(_msg "Performing Test ${variable_uc}")
 
     if(${variable}_RESULT)
       set(_run_msg "Success")
-      #if(NOT CMAKE_CROSSCOMPILING)
-      #  execute_process(
-      #    COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}"
-      #      ${${variable}_ARGS}
-      #      RESULT_VARIABLE test_result OUTPUT_QUIET ERROR_QUIET)
-      #  if(NOT test_result STREQUAL "0")
-      #    set(${variable}_RESULT OFF)
-      #    set(_run_msg "Failed executing.")
-      #  endif()
-      #endif()
-
       set(_msg "${_msg} - ${_run_msg}")
     else()
       set(_msg "${_msg} - Failed")
@@ -97,7 +108,7 @@ macro(hpx_cpuid target variable)
   add_hpx_config_test(${variable}
     SOURCE cmake/tests/cpuid.cpp
     FLAGS "${boost_include_dir}" "${include_dir}"
-    FILE ARGS "${target}" ${ARGN})
+    FILE EXECUTE ARGS "${target}" ${ARGN})
 endmacro()
 
 ###############################################################################
