@@ -9,12 +9,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
-#include <hpx/util/assert_owns_lock.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/intrusive/slist.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/thread/lock_types.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local { namespace detail
@@ -79,33 +80,32 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                        "aborting threads";
 
                 local::no_mutex no_mtx;
-                abort_all(no_mtx);
+                boost::unique_lock<local::no_mutex> lock(no_mtx);
+                abort_all(std::move(lock));
             }
         }
 
-        template <typename Lock>
-        bool empty(Lock& lock) const
+        template <typename Mutex>
+        bool empty(boost::unique_lock<Mutex> const& lock) const
         {
-            HPX_ASSERT_OWNS_LOCK(lock);
+            HPX_ASSERT(lock.owns_lock());
 
             return queue_.empty();
         }
 
-        template <typename Lock>
-        std::size_t size(Lock& lock) const
+        template <typename Mutex>
+        std::size_t size(boost::unique_lock<Mutex> const& lock) const
         {
-            HPX_ASSERT_OWNS_LOCK(lock);
+            HPX_ASSERT(lock.owns_lock());
 
             return queue_.size();
         }
 
-        // Return false if no more threads are waiting. If it returns false
-        // the lock is left unlocked, otherwise it will be relocked before
-        // returning.
-        template <typename Lock>
-        bool notify_one(Lock& lock, error_code& ec = throws)
+        // Return false if no more threads are waiting.
+        template <typename Mutex>
+        bool notify_one(boost::unique_lock<Mutex> lock, error_code& ec = throws)
         {
-            HPX_ASSERT_OWNS_LOCK(lock);
+            HPX_ASSERT(lock.owns_lock());
 
             if (!queue_.empty())
             {
@@ -120,38 +120,22 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 queue_.front().id_ = threads::invalid_thread_id_repr;
                 queue_.pop_front();
 
-                if (!queue_.empty())
-                {
-                    util::scoped_unlock<Lock> unlock(lock);
+                bool empty = queue_.empty();
+                lock.unlock();
 
-                    threads::set_thread_state(threads::thread_id_type(
-                        reinterpret_cast<threads::thread_data_base*>(id)),
-                        threads::pending, threads::wait_timeout,
-                        threads::thread_priority_default, ec);
-                    if (!ec) return true;
-                }
-                else
-                {
-                    // Since this is the last thread waiting on this condition
-                    // variable it could happen that this instance will be
-                    // destroyed before set_thread_state() returns. We have to
-                    // make sure that this instance is not touched anymore.
-                    lock.unlock();
-
-                    threads::set_thread_state(threads::thread_id_type(
-                        reinterpret_cast<threads::thread_data_base*>(id)),
-                        threads::pending, threads::wait_timeout,
-                        threads::thread_priority_default, ec);
-                }
+                threads::set_thread_state(threads::thread_id_type(
+                    reinterpret_cast<threads::thread_data_base*>(id)),
+                    threads::pending, threads::wait_timeout,
+                    threads::thread_priority_default, ec);
+                if (!ec) return empty;
             }
             return false;
         }
 
-        // This leaves the lock unlocked
-        template <typename Lock>
-        void notify_all(Lock& lock, error_code& ec = throws)
+        template <typename Mutex>
+        void notify_all(boost::unique_lock<Mutex> lock, error_code& ec = throws)
         {
-            HPX_ASSERT_OWNS_LOCK(lock);
+            HPX_ASSERT(lock.owns_lock());
 
             // swap the list
             queue_type queue;
@@ -179,10 +163,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             }
         }
 
-        template <typename Lock>
-        void abort_all(Lock& lock) // leaves the lock unlocked
+        template <typename Mutex>
+        void abort_all(boost::unique_lock<Mutex> lock)
         {
-            HPX_ASSERT_OWNS_LOCK(lock);
+            HPX_ASSERT(lock.owns_lock());
 
             // swap the list
             queue_type queue;
@@ -218,12 +202,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             }
         }
 
-        template <typename Lock>
+        template <typename Mutex>
         threads::thread_state_ex_enum
-        wait(Lock& lock, char const* description, error_code& ec = throws)
+        wait(boost::unique_lock<Mutex>& lock,
+            char const* description, error_code& ec = throws)
         {
             HPX_ASSERT(threads::get_self_ptr() != 0);
-            HPX_ASSERT_OWNS_LOCK(lock);
+            HPX_ASSERT(lock.owns_lock());
 
             // enqueue the request and block this thread
             queue_entry f(threads::get_self_id().get());
@@ -233,7 +218,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             threads::thread_state_ex_enum reason = threads::wait_unknown;
             {
                 // yield this thread
-                util::scoped_unlock<Lock> unlock(lock);
+                util::scoped_unlock<boost::unique_lock<Mutex> > unlock(lock);
                 reason = this_thread::suspend(threads::suspended, description, ec);
                 if (ec) return threads::wait_unknown;
             }
@@ -242,20 +227,21 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 threads::wait_timeout : reason;
         }
 
-        template <typename Lock>
+        template <typename Mutex>
         threads::thread_state_ex_enum
-        wait(Lock& lock, error_code& ec = throws)
+        wait(boost::unique_lock<Mutex>& lock, error_code& ec = throws)
         {
             return wait(lock, "condition_variable::wait", ec);
         }
 
-        template <typename Lock>
+        template <typename Mutex>
         threads::thread_state_ex_enum
-        wait_until(Lock& lock, util::steady_time_point const& abs_time,
+        wait_until(boost::unique_lock<Mutex>& lock,
+            util::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws)
         {
             HPX_ASSERT(threads::get_self_ptr() != 0);
-            HPX_ASSERT_OWNS_LOCK(lock);
+            HPX_ASSERT(lock.owns_lock());
 
             // enqueue the request and block this thread
             queue_entry f(threads::get_self_id().get());
@@ -265,7 +251,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             threads::thread_state_ex_enum reason = threads::wait_unknown;
             {
                 // yield this thread
-                util::scoped_unlock<Lock> unlock(lock);
+                util::scoped_unlock<boost::unique_lock<Mutex> > unlock(lock);
                 reason = this_thread::suspend(abs_time, description, ec);
                 if (ec) return threads::wait_unknown;
             }
@@ -274,26 +260,29 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 threads::wait_timeout : reason;
         }
 
-        template <typename Lock>
+        template <typename Mutex>
         threads::thread_state_ex_enum
-        wait_until(Lock& lock, util::steady_time_point const& abs_time,
+        wait_until(boost::unique_lock<Mutex>& lock,
+            util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
             return wait_until(lock, abs_time,
                 "condition_variable::wait_until", ec);
         }
 
-        template <typename Lock>
+        template <typename Mutex>
         threads::thread_state_ex_enum
-        wait_for(Lock& lock, util::steady_duration const& rel_time,
+        wait_for(boost::unique_lock<Mutex>& lock,
+            util::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), description, ec);
         }
 
-        template <typename Lock>
+        template <typename Mutex>
         threads::thread_state_ex_enum
-        wait_for(Lock& lock, util::steady_duration const& rel_time,
+        wait_for(boost::unique_lock<Mutex>& lock,
+            util::steady_duration const& rel_time,
             error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(),

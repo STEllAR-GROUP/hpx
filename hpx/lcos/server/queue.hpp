@@ -6,8 +6,6 @@
 #if !defined(HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM)
 #define HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM
 
-#include <boost/intrusive/slist.hpp>
-
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -16,6 +14,9 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+
+#include <boost/intrusive/slist.hpp>
+#include <boost/thread/lock_types.hpp>
 
 #include <memory>
 
@@ -102,13 +103,13 @@ namespace hpx { namespace lcos { namespace server
                 new queue_entry(
                     traits::get_remote_result<ValueType, RemoteType>::call(result)));
 
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             queue_.push_back(*node);
 
             node.release();
 
             // resume the first thread waiting to pick up that value
-            cond_.notify_one(l);
+            cond_.notify_one(std::move(l));
         }
 
         /// The \a function set_exception is called whenever a
@@ -118,8 +119,8 @@ namespace hpx { namespace lcos { namespace server
         ///               to this LCO instance.
         void set_exception(boost::exception_ptr const& /*e*/)
         {
-            mutex_type::scoped_lock l(mtx_);
-            cond_.abort_all(l);
+            boost::unique_lock<mutex_type> l(mtx_);
+            cond_.abort_all(std::move(l));
         }
 
         // Retrieve the next value from the queue (pop value from front of
@@ -128,7 +129,7 @@ namespace hpx { namespace lcos { namespace server
         // into the value queue.
         ValueType get_value()
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             if (queue_.empty()) {
                 cond_.wait(l, "queue::get_value");
             }
