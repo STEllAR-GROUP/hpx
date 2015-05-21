@@ -6,6 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/parallel/executors/thread_pool_executors.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
@@ -66,7 +67,8 @@ void test_bulk_async(Executor& exec)
     std::iota(boost::begin(v), boost::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
-    traits::async_execute(exec, hpx::util::bind(&bulk_test, tid, _1), v).get();
+    hpx::wait_all(
+        traits::async_execute(exec, hpx::util::bind(&bulk_test, tid, _1), v));
 }
 
 template <typename Executor>
@@ -117,4 +119,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-

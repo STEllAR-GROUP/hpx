@@ -6,6 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -91,7 +92,8 @@ void test_bulk_async(Executor& exec)
     using hpx::util::placeholders::_1;
 
     typedef hpx::parallel::executor_traits<Executor> traits;
-    traits::async_execute(exec, hpx::util::bind(&async_bulk_test, tid, _1), v).get();
+    hpx::wait_all(traits::async_execute(
+        exec, hpx::util::bind(&async_bulk_test, tid, _1), v));
 }
 
 template <typename Executor>
@@ -200,4 +202,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-
