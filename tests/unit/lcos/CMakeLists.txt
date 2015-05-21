@@ -101,3 +101,49 @@ foreach(test ${tests})
                               ${test}_test_exe)
 endforeach()
 
+if(HPX_WITH_COMPILE_ONLY_TESTS)
+  # add compile time tests
+  set(compile_tests
+      fail_compile_mutex_move
+      fail_compile_spinlock_move
+      fail_compile_spinlock_no_backoff_move
+     )
+
+  set(fail_compile_mutex_move_FLAGS FAILURE_EXPECTED)
+  set(fail_compile_spinlock_move_FLAGS FAILURE_EXPECTED)
+  set(fail_compile_spinlock_no_backoff_move_FLAGS FAILURE_EXPECTED)
+
+  foreach(compile_test ${compile_tests})
+    set(sources
+        ${compile_test}.cpp)
+
+    source_group("Source Files" FILES ${sources})
+
+    if(MSVC)
+      # add dummy library for MSVC to generate a project in VS
+      add_hpx_library(${compile_test}_compile_test
+                      SOURCES ${sources}
+                      EXCLUDE_FROM_ALL
+                      FOLDER "Tests/Unit/LCOs/CompileOnly")
+    endif()
+
+    add_hpx_unit_compile_test(
+      "lcos"
+      ${compile_test}
+      SOURCES ${sources}
+      ${${compile_test}_FLAGS}
+      FOLDER "Tests/Unit/LCOs/CompileOnly")
+
+    # add a custom target for this example
+    add_hpx_pseudo_target(tests.unit.lcos.${compile_test})
+
+    # make pseudo-targets depend on master pseudo-target
+    add_hpx_pseudo_dependencies(tests.unit.lcos
+                                tests.unit.lcos.${compile_test})
+
+    # add dependencies to pseudo-target
+    add_hpx_pseudo_dependencies(tests.unit.lcos.${compile_test}
+                                ${compile_test}_test_exe)
+  endforeach()
+endif()
+

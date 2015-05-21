@@ -6,9 +6,9 @@
 #if !defined(HPX_CONFIG_EMULATE_DELETED_JAN_06_2013_0919PM)
 #define HPX_CONFIG_EMULATE_DELETED_JAN_06_2013_0919PM
 
-#include <boost/config.hpp>
+#include <hpx/config.hpp>
 
-#if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
+#ifdef HPX_HAVE_CXX11_DELETED_FUNCTIONS
 
 #define HPX_DELETE_COPY_CTOR(cls)                                             \
     cls(cls const&) = delete;                                                 \
@@ -32,15 +32,17 @@
     public:                                                                   \
 /**/
 
-#endif // BOOST_NO_CXX11_DELETED_FUNCTIONS
+#endif // HPX_HAVE_CXX11_DELETED_FUNCTIONS
 
 #define HPX_NON_COPYABLE(cls)                                                 \
     HPX_DELETE_COPY_CTOR(cls)                                                 \
     HPX_DELETE_COPY_ASSIGN(cls)                                               \
 /**/
 
+#include <boost/config.hpp>
+
 #if !defined(BOOST_DELETED_FUNCTION)
-#if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
+#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
 #   define BOOST_DELETED_FUNCTION(fun) fun = delete;
 #else
 #   define BOOST_DELETED_FUNCTION(fun) private: fun;
