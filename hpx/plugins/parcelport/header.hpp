@@ -55,9 +55,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             set<pos_size>(static_cast<value_type>(size));
             set<pos_numbytes>(static_cast<value_type>(numbytes));
             set<pos_numchunks_first>(static_cast<value_type>(buffer.num_chunks_.first));
-            set<pos_numchunks_second>(static_cast<value_type>
-                (buffer.num_chunks_.second));
-
+            set<pos_numchunks_second>(static_cast<value_type>(buffer.num_chunks_.second));
             // find out how much space is needed for chunk information
             const std::vector<serialization::serialization_chunk>& chunks = buffer.chunks_;
             size_t chunkbytes = chunks.size() * sizeof(serialization::serialization_chunk);
@@ -65,7 +63,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if (chunkbytes <= (data_size_ - pos_data_zone)) {
               set<pos_chunk_flag>(static_cast<value_type>(1));
               set<pos_chunk_offset>(static_cast<value_type>(pos_data_zone));
-              std::memcpy(&data_[data_[pos_chunk_offset]], chunks.data(), chunkbytes);
+              std::memcpy(&data_[get<pos_chunk_offset>()], chunks.data(), chunkbytes);
             }
             else {
               chunkbytes = 0;
@@ -76,7 +74,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 set<pos_piggy_back_flag>(static_cast<value_type>(1));
                 set<pos_piggy_back_offset>(static_cast<value_type>(pos_data_zone + chunkbytes));
                 if (enable_piggyback_copy) {
-                  std::memcpy(&data_[data_[pos_piggy_back_offset]], &buffer.data_[0], buffer.data_.size());
+                  std::memcpy(&data_[get<pos_piggy_back_offset>()], &buffer.data_[0], buffer.data_.size());
                 }
             }
         }
@@ -89,7 +87,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         void reset()
         {
             std::memset(&data_[0], -1, data_size_);
-            data_[pos_piggy_back_flag] = 1;
+            set<pos_piggy_back_flag>(static_cast<value_type>(1));
         }
 
         bool valid() const
@@ -134,21 +132,23 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         char * piggy_back()
         {
-            if(data_[pos_piggy_back_flag])
-                return &data_[data_[pos_piggy_back_offset]];
+            if(get<pos_piggy_back_flag>()!=0) {
+                return &data_[get<pos_piggy_back_offset>()];
+            }
             return 0;
         }
 
         char * chunk_data()
         {
-            if(data_[pos_chunk_flag])
-                return &data_[data_[pos_chunk_offset]];
+            if(get<pos_chunk_flag>()!=0) {
+                return &data_[get<pos_chunk_offset>()];
+            }
             return 0;
         }
 
         std::size_t header_length()
         {
-            if(data_[pos_chunk_flag])
+            if(get<pos_chunk_flag>())
                 return *reinterpret_cast<value_type*>(&data_[pos_piggy_back_offset]);
             else
                 return *reinterpret_cast<value_type*>(&data_[pos_chunk_offset]);
