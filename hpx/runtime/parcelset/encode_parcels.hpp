@@ -72,7 +72,7 @@ namespace hpx
 
         template <typename Buffer>
         std::size_t
-        encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
+        encode_parcels(parcel* ps, std::size_t num_parcels, Buffer & buffer,
             int archive_flags_, boost::uint64_t max_outbound_size)
         {
             HPX_ASSERT(buffer.data_.empty());
@@ -129,7 +129,22 @@ namespace hpx
                             archive << parcels_sent;
 
                         for(std::size_t i = 0; i != parcels_sent; ++i)
+                        {
+                            std::size_t num_chunks = buffer.chunks_.size();
                             archive << ps[i];
+
+                            // mark the current parcel that part of its data
+                            // were zero-copy-serialized
+                            for (/**/; num_chunks != buffer.chunks_.size();
+                                 ++num_chunks)
+                            {
+                                if (buffer.chunks_[num_chunks-1].type_ ==
+                                    serialization::chunk_type_pointer)
+                                {
+                                    ps[i].was_zero_copy_serialized(true);
+                                }
+                            }
+                        }
 
                         arg_size = archive.bytes_written();
                     }

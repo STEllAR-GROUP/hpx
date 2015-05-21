@@ -104,6 +104,9 @@ namespace hpx { namespace parcelset
 
             virtual void wait_for_futures() = 0;
 
+            virtual bool was_zero_copy_serialized() const = 0;
+            virtual void was_zero_copy_serialized(bool flag) = 0;
+
             // default copy constructor is ok
             // default assignment operator is ok
 
@@ -187,6 +190,7 @@ namespace hpx { namespace parcelset
         {
         public:
             single_destination_parcel_data()
+              : was_zero_copy_serialized_(false)
             {
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
@@ -199,6 +203,7 @@ namespace hpx { namespace parcelset
               : parcel_data(act)
               , dest_(apply_to)
               , addr_(addr)
+              , was_zero_copy_serialized_(false)
             {
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
@@ -215,6 +220,7 @@ namespace hpx { namespace parcelset
               : parcel_data(act, do_after)
               , dest_(apply_to)
               , addr_(addr)
+              , was_zero_copy_serialized_(false)
             {
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
@@ -231,6 +237,7 @@ namespace hpx { namespace parcelset
               : parcel_data(act, do_after)
               , dest_(apply_to)
               , addr_(addr)
+              , was_zero_copy_serialized_(false)
             {
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
@@ -345,6 +352,15 @@ namespace hpx { namespace parcelset
 
             void load(serialization::input_archive& ar);
 
+            bool was_zero_copy_serialized() const
+            {
+                return was_zero_copy_serialized_;
+            }
+            void was_zero_copy_serialized(bool flag)
+            {
+                was_zero_copy_serialized_ = flag;
+            }
+
         private:
             friend std::ostream& operator<< (std::ostream& os,
                 single_destination_parcel_data const& req);
@@ -377,6 +393,8 @@ namespace hpx { namespace parcelset
             // other parcel data
             naming::id_type dest_;
             naming::address addr_;
+
+            bool was_zero_copy_serialized_;
         };
 
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
@@ -734,6 +752,16 @@ namespace hpx { namespace parcelset
         void wait_for_futures()
         {
             return data_->wait_for_futures();
+        }
+
+        // stop-gap support for async/zero-copy-optimization issue
+        bool was_zero_copy_serialized() const
+        {
+            return data_->was_zero_copy_serialized();
+        }
+        void was_zero_copy_serialized(bool flag)
+        {
+            data_->was_zero_copy_serialized(flag);
         }
 
         // generate unique parcel id
