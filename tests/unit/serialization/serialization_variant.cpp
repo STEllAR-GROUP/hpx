@@ -46,7 +46,7 @@ int main()
     hpx::serialization::output_archive oar(buf);
     hpx::serialization::input_archive iar(buf);
 
-    boost::variant<int, std::string, double, A<int> > ovar = std::string{"dfsdf"};
+    boost::variant<int, std::string, double, A<int> > ovar = std::string("dfsdf");
     boost::variant<int, std::string, double, A<int> > ivar;
     oar << ovar;
     iar >> ivar;
