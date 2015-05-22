@@ -18,6 +18,7 @@
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/deferred_call.hpp>
+#include <hpx/util/unwrapped.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 
@@ -177,20 +178,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             template <typename Executor, typename F, typename S>
             static auto call(wrap_int, Executor& exec, F && f, S const& shape)
-                -> std::vector<
-                    decltype(exec.async_execute(
-                        util::deferred_call(f, *std::begin(shape))))
+                ->  std::vector<
+                        decltype(exec.async_execute(
+                            util::deferred_call(f, *boost::begin(shape))))
                     >
             {
-                std::vector<decltype(exec.async_execute(
-                    util::deferred_call(f, *std::begin(shape))))> results;
+                std::vector<
+                    decltype(exec.async_execute(
+                        util::deferred_call(f, *boost::begin(shape))))
+                > results;
+
                 for (auto const& elem: shape)
                 {
                     results.push_back(
                         exec.async_execute(util::deferred_call(f, elem))
                     );
                 }
-                return std::move(results);
+
+                return results;
             }
 
             template <typename Executor, typename F, typename S>
@@ -203,8 +208,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename Executor, typename F, typename S>
         auto call_bulk_async_execute(Executor& exec, F && f, S const& shape)
-            -> decltype(bulk_async_execute_helper::call(
-                0, exec, std::forward<F>(f), shape))
+            ->  decltype(bulk_async_execute_helper::call(
+                    0, exec, std::forward<F>(f), shape))
         {
             return bulk_async_execute_helper::call(
                 0, exec, std::forward<F>(f), shape);
@@ -216,11 +221,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template <typename Executor, typename F, typename S>
             static auto call(wrap_int, Executor& exec, F && f, S const& shape)
                 ->  decltype(hpx::util::unwrapped(exec.async_execute(
-                        util::deferred_call(f, *std::begin(shape)))))
-                //returns void if F returns void
+                        util::deferred_call(f, *boost::begin(shape)))))
+                // returns void if F returns void
             {
-                std::vector<decltype(exec.async_execute(
-                    util::deferred_call(f, *std::begin(shape))))> results;
+                std::vector<
+                    decltype(exec.async_execute(
+                        util::deferred_call(f, *boost::begin(shape))))
+                > results;
+
                 for (auto const& elem: shape)
                 {
                     results.push_back(
@@ -240,8 +248,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename Executor, typename F, typename S>
         auto call_bulk_execute(Executor& exec, F && f, S const& shape)
-            -> decltype(bulk_execute_helper::call(
-                0, exec, std::forward<F>(f), shape))
+            ->  decltype(bulk_execute_helper::call(
+                    0, exec, std::forward<F>(f), shape))
         {
             return bulk_execute_helper::call(0, exec, std::forward<F>(f), shape);
         }
@@ -422,8 +430,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename F, typename Shape>
         static auto
         async_execute(executor_type& exec, F && f, Shape const& shape)
-            -> decltype(detail::call_bulk_async_execute(
-                exec, std::forward<F>(f), shape))
+            ->  decltype(detail::call_bulk_async_execute(
+                    exec, std::forward<F>(f), shape))
         {
             return detail::call_bulk_async_execute(
                 exec, std::forward<F>(f), shape);

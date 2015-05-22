@@ -16,11 +16,12 @@
 #include <numeric>
 #include <iterator>
 
+#include <boost/range/iterator_range.hpp>
+#include <boost/range/functions.hpp>
+
 using hpx::parallel::parallel_executor;
 using hpx::util::deferred_call;
-using iter = std::vector<int>::iterator;
-using std::begin;
-using std::end;
+typedef std::vector<int>::iterator iter;
 
 ////////////////////////////////////////////////////////////////////////////////
 // A parallel executor that returns void for bulk_execute and hpx::future<void>
@@ -94,23 +95,15 @@ void test_void_bulk_async()
 ////////////////////////////////////////////////////////////////////////////////
 // Sum using hpx's parallel_executor and the above void_parallel_executor
 
-struct range
-{
-    range(iter first, iter last): first_(first), last_(last) {}
-    iter begin() const { return first_; }
-    iter end() const { return last_; }
-private:
-    iter first_;
-    iter last_;
-};
-
 // Create shape argument for parallel_executor
-std::vector<range> split(iter first, iter last, int parts)
+std::vector<boost::iterator_range<iter> >
+split(iter first, iter last, int parts)
 {
     typedef std::iterator_traits<iter>::difference_type sz_type;
     sz_type count = std::distance(first, last);
     sz_type increment = count/parts;
-    std::vector<range> results;
+
+    std::vector<boost::iterator_range<iter> > results;
     while(first != last)
     {
         iter prev = first;
@@ -118,9 +111,9 @@ std::vector<range> split(iter first, iter last, int parts)
             first,
             (std::min)(increment, std::distance(first,last))
         );
-        results.push_back(range(prev, first));
+        results.push_back(boost::make_iterator_range(prev, first));
     }
-    return std::move(results);
+    return results;
 }
 
 // parallel sum using hpx's parallel executor
@@ -129,14 +122,20 @@ int parallel_sum(iter first, iter last, int num_parts)
     parallel_executor exec;
     typedef hpx::parallel::executor_traits<parallel_executor> traits;
 
-    std::vector<hpx::future<int> > v =
-        traits::async_execute(exec, [](const range& rng)
-        {
-            return std::accumulate(begin(rng), end(rng), 0);
-        }, split(first, last, num_parts));
+    std::vector<boost::iterator_range<iter> > input =
+        split(first, last, num_parts);
 
-    return std::accumulate(begin(v), end(v), 0,
-        [](int a, hpx::future<int>& b)
+    std::vector<hpx::future<int> > v =
+        traits::async_execute(exec,
+            [](boost::iterator_range<iter> const& rng) -> int
+            {
+                return std::accumulate(boost::begin(rng), boost::end(rng), 0);
+            },
+            input);
+
+    return std::accumulate(
+        boost::begin(v), boost::end(v), 0,
+        [](int a, hpx::future<int>& b) -> int
         {
             return a + b.get();
         });
@@ -149,16 +148,21 @@ int void_parallel_sum(iter first, iter last, int num_parts)
     typedef hpx::parallel::executor_traits<void_parallel_executor> traits;
 
     std::vector<int> temp(num_parts + 1, 0);
-    std::iota(begin(temp), end(temp), 0);
+    std::iota(boost::begin(temp), boost::end(temp), 0);
 
-    int section_size = std::distance(first,last)/num_parts;
+    std::ptrdiff_t section_size = std::distance(first, last) / num_parts;
 
-    hpx::future<void> f = traits::async_execute(exec, [&](const int& i)
-    {
-        iter b = first + i*section_size;
-        iter e = first + (std::min)(int(std::distance(first, last)), (i+1)*section_size);
-        temp[i] = std::accumulate(b, e, 0);
-    }, temp);
+    hpx::future<void> f = traits::async_execute(exec,
+        [&](const int& i)
+        {
+            iter b = first + i*section_size;
+            iter e = first + (std::min)(
+                    std::distance(first, last),
+                    static_cast<std::ptrdiff_t>((i+1)*section_size)
+                );
+            temp[i] = std::accumulate(b, e, 0);
+        },
+        temp);
 
     f.get();
 
@@ -171,15 +175,20 @@ void sum_test()
     auto random_num = [](){ return std::rand() % 50 - 25; };
     std::generate(begin(vec), end(vec), random_num);
 
-    int sum = std::accumulate(begin(vec), end(vec), 0);
+    int sum = std::accumulate(boost::begin(vec), boost::end(vec), 0);
     int num_parts = std::rand() % 5 + 3;
 
     // Return futures holding results of parallel_sum and void_parallel_sum
     parallel_executor exec;
-    hpx::future<int> f_par = exec.async_execute(deferred_call(
-        parallel_sum, begin(vec), end(vec), num_parts));
-    hpx::future<int> f_void_par = exec.async_execute(deferred_call(
-        void_parallel_sum, begin(vec), end(vec), num_parts));
+
+    typedef hpx::parallel::executor_traits<parallel_executor> traits;
+    hpx::future<int> f_par =
+        traits::async_execute(exec, deferred_call(&parallel_sum,
+            boost::begin(vec), boost::end(vec), num_parts));
+
+    hpx::future<int> f_void_par =
+        traits::async_execute(exec, deferred_call(&void_parallel_sum,
+            boost::begin(vec), boost::end(vec), num_parts));
 
     HPX_TEST(f_par.get() == sum);
     HPX_TEST(f_void_par.get() == sum);
@@ -188,9 +197,10 @@ void sum_test()
 ////////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(0);
+    unsigned int seed = static_cast<unsigned int>(std::time(0));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
+
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 

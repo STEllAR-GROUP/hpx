@@ -12,6 +12,8 @@
 
 #include <algorithm>
 
+#include <boost/range/functions.hpp>
+
 ////////////////////////////////////////////////////////////////////////////////
 int bulk_test(hpx::thread::id tid, int value, bool is_par)
 {
@@ -27,7 +29,7 @@ void test_bulk_async(Executor& exec, bool is_par = true)
     hpx::thread::id tid = hpx::this_thread::get_id();
 
     std::vector<int> v(107);
-    std::iota(std::begin(v), std::end(v), 0);
+    std::iota(boost::begin(v), boost::end(v), 0);
 
     using hpx::util::placeholders::_1;
 
@@ -36,7 +38,8 @@ void test_bulk_async(Executor& exec, bool is_par = true)
         exec, hpx::util::bind(&bulk_test, tid, _1, is_par), v
     );
 
-    HPX_TEST(std::equal(std::begin(results), std::end(results), std::begin(v),
+    HPX_TEST(std::equal(
+        boost::begin(results), boost::end(results), boost::begin(v),
         [](hpx::future<int>& lhs, const int& rhs)
         {
             return lhs.get() == rhs;

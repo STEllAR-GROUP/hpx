@@ -19,6 +19,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <boost/range/functions.hpp>
+
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -72,8 +74,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename F, typename Shape>
         static auto bulk_execute(F && f, Shape const& shape)
-            -> decltype(hpx::util::unwrapped(
-                bulk_async_execute(std::forward<F>(f), shape)))
+            ->  decltype(hpx::util::unwrapped(
+                    bulk_async_execute(std::forward<F>(f), shape)))
         {
             return hpx::util::unwrapped(
                 bulk_async_execute(std::forward<F>(f), shape));
@@ -81,14 +83,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename F, typename Shape>
         static auto bulk_async_execute(F && f, Shape const& shape)
-            -> std::vector<decltype(
-                    hpx::async(hpx::launch::sync, f, *std::begin(shape)))>
+            ->  std::vector<
+                    decltype(hpx::async(launch::sync, f, *boost::begin(shape)))
+                >
         {
-            std::vector<decltype(
-                hpx::async(hpx::launch::sync, f, *std::begin(shape)))> results;
+            std::vector<
+                decltype(hpx::async(launch::sync, f, *boost::begin(shape)))
+            > results;
+
             try {
                 for (auto const& elem: shape)
-                    results.push_back(hpx::async(hpx::launch::sync, f, elem));
+                    results.push_back(hpx::async(launch::sync, f, elem));
             }
             catch (std::bad_alloc const& ba) {
                 boost::throw_exception(ba);
