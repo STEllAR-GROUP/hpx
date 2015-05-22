@@ -104,11 +104,22 @@ namespace hpx { namespace util
 
         cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
 
+#if defined(PARCELPORT_MPI_MULTITHREADED)
         int flag = (detail::get_cfg_entry(
             cfg, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
                 MPI_THREAD_MULTIPLE : MPI_THREAD_SINGLE;
 
+#if defined(MVAPICH2_VERSION) && defined(_POSIX_SOURCE)
+        // This enables multi threading support in MVAPICH2 if requested.
+        if(flag == MPI_THREAD_MULTIPLE)
+            setenv("MV2_ENABLE_AFFINITY", "0", 1);
+#endif
+
         int retval = MPI_Init_thread(argc, argv, flag, &provided_threading_flag_);
+#else
+        int retval = MPI_Init(argc, argv);
+        provided_threading_flag_ = MPI_THREAD_SINGLE;
+#endif
         if (MPI_SUCCESS != retval)
         {
             if (MPI_ERR_OTHER != retval)

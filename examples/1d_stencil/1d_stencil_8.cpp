@@ -188,9 +188,16 @@ std::ostream& operator<<(std::ostream& os, partition_data const& c)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-inline std::size_t idx(std::size_t i, std::size_t size)
+inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    return (boost::int64_t(i) < 0) ? (i + size) % size : i % size;
+    if(i == 0 && dir == -1)
+        return size-1;
+    if(i == size-1 && dir == +1)
+        return 0;
+
+    HPX_ASSERT((i + dir) < size);
+
+    return i + dir;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -314,8 +321,8 @@ struct stepper_server : hpx::components::simple_component_base<stepper_server>
     stepper_server() {}
 
     stepper_server(std::size_t nl)
-      : left_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id()-1, nl))),
-        right_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id()+1, nl))),
+      : left_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id(), -1, nl))),
+        right_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id(), +1, nl))),
         U_(2)
     {
     }
@@ -499,29 +506,47 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         space const& current = U_[t % 2];
         space& next = U_[(t + 1) % 2];
 
-        next[0] = dataflow(
-                hpx::launch::async, &stepper_server::heat_part,
-                receive_left(t), current[0], current[1]
-            );
-
-        // send to left if not last
-        if (t != nt-1) send_left(t + 1, next[0]);
-
-        for (std::size_t i = 1; i != local_np-1; ++i)
+        // handle special case (one partition per locality) in a special way
+        if (local_np == 1)
         {
-            next[i] = dataflow(
+            next[0] = dataflow(
                     hpx::launch::async, &stepper_server::heat_part,
-                    current[i-1], current[i], current[i+1]
+                    receive_left(t), current[0], receive_right(t)
                 );
+
+            // send to left and right if not last time step
+            if (t != nt-1)
+            {
+                send_left(t + 1, next[0]);
+                send_right(t + 1, next[0]);
+            }
         }
+        else
+        {
+            next[0] = dataflow(
+                    hpx::launch::async, &stepper_server::heat_part,
+                    receive_left(t), current[0], current[1]
+                );
 
-        next[local_np-1] = dataflow(
-                hpx::launch::async, &stepper_server::heat_part,
-                current[local_np-2], current[local_np-1], receive_right(t)
-            );
+            // send to left if not last time step
+            if (t != nt-1) send_left(t + 1, next[0]);
 
-        // send to right if not last
-        if (t != nt-1) send_right(t + 1, next[local_np-1]);
+            for (std::size_t i = 1; i != local_np-1; ++i)
+            {
+                next[i] = dataflow(
+                        hpx::launch::async, &stepper_server::heat_part,
+                        current[i-1], current[i], current[i+1]
+                    );
+            }
+
+            next[local_np-1] = dataflow(
+                    hpx::launch::async, &stepper_server::heat_part,
+                    current[local_np-2], current[local_np-1], receive_right(t)
+                );
+
+            // send to right if not last time step
+            if (t != nt-1) send_right(t + 1, next[local_np-1]);
+        }
     }
 
     return U_[nt % 2];

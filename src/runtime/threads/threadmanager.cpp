@@ -1550,8 +1550,10 @@ namespace hpx { namespace threads
             util::bind(&threadmanager_impl::idle_callback, this, num_thread));
 
         // the OS thread is allowed to exit only if no more HPX threads exist
+        // or if some other thread has terminated
         HPX_ASSERT(!scheduler_.get_thread_count(
-            unknown, thread_priority_default, num_thread));
+            unknown, thread_priority_default, num_thread) ||
+            state_ == terminating);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1618,7 +1620,7 @@ namespace hpx { namespace threads
 
                 LTM_(info) << "run: create OS thread " << thread_num //-V128
                     << ": will run on processing units within this mask: "
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
+#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
                     << std::hex << "0x" << mask;
 #else
                     << "0b" << mask;

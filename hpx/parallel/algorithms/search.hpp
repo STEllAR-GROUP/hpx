@@ -46,8 +46,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first, FwdIter last, FwdIter2 s_first,
-                FwdIter2 s_last, Pred && op)
+            sequential(ExPolicy const&, FwdIter first, FwdIter last,
+                FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
                 return std::search(first, last, s_first, s_last, op);
             }
@@ -57,7 +57,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
-                typedef typename std::iterator_traits<FwdIter>::reference reference;
+                typedef typename std::iterator_traits<FwdIter>::reference
+                    reference;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
                 typedef typename std::iterator_traits<FwdIter2>::difference_type
@@ -66,7 +67,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 s_difference_type diff = std::distance(s_first, s_last);
                 if (diff <= 0)
-                    return result::get(std::move(last));
+                    return result::get(std::move(first));
 
                 difference_type count = std::distance(first, last);
                 if (diff > count)
@@ -77,7 +78,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
                     policy, first, count-(diff-1),
-                    [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
+                    [=](std::size_t base_idx, FwdIter it,
+                        std::size_t part_size) mutable
                     {
                         FwdIter curr = it;
 
@@ -258,8 +260,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           the first subsequence [s_first, s_last) in range [first, last).
     ///           If the length of the subsequence [s_first, s_last) is greater
     ///           than the length of the range [first, last), \a last is returned.
-    ///           Additionally if the size of the subsequence is empty or no subsequence
-    ///           is found, \a last is also returned.
+    ///           Additionally if the size of the subsequence is empty \a first is
+    ///           returned. If no subsequence is found, \a last is returned.
     ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
         typename Pred>
@@ -323,7 +325,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, FwdIter first, std::size_t count,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
-                typedef typename std::iterator_traits<FwdIter>::reference reference;
+                typedef typename std::iterator_traits<FwdIter>::reference
+                    reference;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
                 typedef typename std::iterator_traits<FwdIter2>::difference_type
@@ -342,7 +345,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 util::cancellation_token<difference_type> tok(count);
                 return partitioner::call_with_index(
                     policy, first, count-(diff-1),
-                    [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
+                    [=](std::size_t base_idx, FwdIter it,
+                        std::size_t part_size) mutable
                     {
                         FwdIter curr = it;
 
@@ -358,7 +362,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                     FwdIter mid = curr;
 
                                     for(difference_type len = 0;
-                                        local_count != diff && len != difference_type(count);
+                                        local_count != diff &&
+                                        len != difference_type(count);
                                         ++local_count, ++len, ++mid)
                                     {
                                         if(*mid != *++needle)

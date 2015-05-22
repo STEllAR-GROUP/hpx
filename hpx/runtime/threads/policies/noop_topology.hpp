@@ -140,6 +140,17 @@ public:
         return empty_mask;
     }
 
+    mask_type get_cpubind_mask(
+        boost::thread & handle
+      , error_code& ec = throws
+        ) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return empty_mask;
+    }
+
     static std::size_t hardware_concurrency()
     {
 #if defined(__ANDROID__) && defined(ANDROID)
@@ -151,7 +162,7 @@ public:
 
     std::size_t get_number_of_cores() const
     {
-        return ~std::size_t(0);
+        return noop_topology::hardware_concurrency();
     }
 
     std::size_t get_number_of_pus() const

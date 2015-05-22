@@ -74,8 +74,6 @@ namespace hpx { namespace lcos
 }}
 #else
 
-#if !BOOST_PP_IS_ITERATING
-
 #if !defined(HPX_LCOS_REDUCE_SEP_28_2013_1105AM)
 #define HPX_LCOS_REDUCE_SEP_28_2013_1105AM
 
@@ -87,16 +85,14 @@ namespace hpx { namespace lcos
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/calculate_fanout.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pack.hpp>
+
+#include <boost/preprocessor/cat.hpp>
+#include <boost/serialization/vector.hpp>
 
 #include <vector>
-
-#include <boost/serialization/vector.hpp>
-#include <boost/preprocessor/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_binary_params.hpp>
-#include <boost/preprocessor/cat.hpp>
 
 #if !defined(HPX_REDUCE_FANOUT)
 #define HPX_REDUCE_FANOUT 16
@@ -128,20 +124,138 @@ namespace hpx { namespace lcos
         {};
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Action, int N>
+        template <
+            typename Action
+          , typename ReduceOp
+          , typename ...Ts
+        >
+        typename reduce_result<Action>::type
+        reduce_impl(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , ReduceOp && reduce_op
+          , std::size_t global_idx
+          , Ts const&... vs
+        );
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action
+          , typename Futures
+          , typename ...Ts
+        >
+        void
+        reduce_invoke(Action /*act*/
+          , Futures& futures
+          , hpx::id_type const& id
+          , std::size_t
+          , Ts const&... vs)
+        {
+            futures.push_back(
+                hpx::async<Action>(
+                    id
+                  , vs...
+                )
+            );
+        }
+
+        template <
+            typename Action
+          , typename Futures
+          , typename ...Ts
+        >
+        void
+        reduce_invoke(reduce_with_index<Action>
+          , Futures& futures
+          , hpx::id_type const& id
+          , std::size_t global_idx
+          , Ts const&... vs)
+        {
+            futures.push_back(
+                hpx::async<Action>(
+                    id
+                  , vs...
+                  , global_idx
+                )
+            );
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action
+          , typename ReduceOp
+          , typename ...Ts
+        >
+        struct reduce_invoker
+        {
+            //static hpx::future<typename reduce_result<Action>::type>
+            static typename reduce_result<Action>::type
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , ReduceOp const& reduce_op
+              , std::size_t global_idx
+              , Ts const&... vs
+            )
+            {
+                return
+                    reduce_impl(
+                        act
+                      , ids
+                      , reduce_op
+                      , global_idx
+                      , vs...
+                    );
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Action, typename Is>
         struct make_reduce_action_impl;
+
+
+        template <typename Action, std::size_t ...Is>
+        struct make_reduce_action_impl<Action, util::detail::pack_c<std::size_t, Is...> >
+        {
+            typedef
+                typename reduce_result<Action>::type
+                action_result;
+
+            template <typename ReduceOp>
+            struct reduce_invoker
+            {
+                typedef
+                    typename util::decay<ReduceOp>::type
+                    reduce_op_type;
+
+                typedef detail::reduce_invoker<
+                        Action
+                      , reduce_op_type
+                      , typename util::tuple_element<
+                            Is, typename Action::arguments_type
+                        >::type...
+                    >
+                    reduce_invoker_type;
+
+                typedef
+                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
+                    type;
+            };
+        };
 
         template <typename Action>
         struct make_reduce_action
           : make_reduce_action_impl<
-                Action, Action::arity
+                Action
+              , typename util::detail::make_index_pack<Action::arity>::type
             >
         {};
 
         template <typename Action>
         struct make_reduce_action<reduce_with_index<Action> >
           : make_reduce_action_impl<
-                reduce_with_index<Action>, Action::arity - 1
+                reduce_with_index<Action>
+              , typename util::detail::make_index_pack<Action::arity - 1>::type
             >
         {};
 
@@ -172,39 +286,189 @@ namespace hpx { namespace lcos
 
             ReduceOp const& reduce_op_;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action
+          , typename ReduceOp
+          , typename ...Ts
+        >
+        typename reduce_result<Action>::type
+        reduce_impl(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , ReduceOp && reduce_op
+          , std::size_t global_idx
+          , Ts const&... vs
+        )
+        {
+            typedef
+                typename reduce_result<Action>::type
+                result_type;
+
+            if(ids.empty()) return result_type();
+
+            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+
+            std::vector<hpx::future<result_type> > reduce_futures;
+            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
+            {
+                reduce_invoke(
+                    act
+                  , reduce_futures
+                  , ids[i]
+                  , global_idx + i
+                  , vs...
+                );
+            }
+
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
+
+                typedef
+                    typename detail::make_reduce_action<Action>::
+                        template reduce_invoker<ReduceOp>::type
+                    reduce_impl_action;
+
+                while(it != ids.end())
+                {
+                    HPX_ASSERT(ids.size() >= applied);
+
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+
+                    hpx::id_type id(ids_next[0]);
+                    reduce_futures.push_back(
+                        hpx::async_colocated<reduce_impl_action>(
+                            id
+                          , act
+                          , std::move(ids_next)
+                          , reduce_op
+                          , global_idx + applied
+                          , vs...
+                        )
+                    );
+
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
+
+            return hpx::when_all(reduce_futures).
+                then(perform_reduction<result_type, ReduceOp>(reduce_op)).
+                get();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Action
+      , typename ReduceOp
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::reduce_result<Action>::type
+    >
+    reduce(
+        std::vector<hpx::id_type> const & ids
+      , ReduceOp && reduce_op
+      , Ts const&... vs)
+    {
+        typedef
+            typename detail::make_reduce_action<Action>::
+                template reduce_invoker<ReduceOp>::type
+            reduce_impl_action;
+
+        typedef
+            typename detail::reduce_result<Action>::type
+            action_result;
+
+        if (ids.empty())
+        {
+            return hpx::make_exceptional_future<action_result>(
+                HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::reduce",
+                    "empty list of targets for reduce operation"));
+        }
+
+        return
+            hpx::async_colocated<reduce_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , std::forward<ReduceOp>(reduce_op)
+              , 0
+              , vs...
+            );
+    }
+
+    template <
+        typename Component, typename Signature, typename Derived
+      , typename ReduceOp
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::reduce_result<Derived>::type
+    >
+    reduce(
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
+      , std::vector<hpx::id_type> const & ids
+      , ReduceOp && reduce_op
+      , Ts const&... vs)
+    {
+        return reduce<Derived>(
+                ids
+              , std::forward<ReduceOp>(reduce_op)
+              , vs...
+            );
+    }
+
+    template <
+        typename Action
+      , typename ReduceOp
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::reduce_result<Action>::type
+    >
+    reduce_with_index(
+        std::vector<hpx::id_type> const & ids
+      , ReduceOp && reduce_op
+      , Ts const&... vs)
+    {
+        return reduce<detail::reduce_with_index<Action> >(
+                ids
+              , std::forward<ReduceOp>(reduce_op)
+              , vs...
+            );
+    }
+
+    template <
+        typename Component, typename Signature, typename Derived
+      , typename ReduceOp
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::reduce_result<Derived>::type
+    >
+    reduce_with_index(
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
+      , std::vector<hpx::id_type> const & ids
+      , ReduceOp && reduce_op
+      , Ts const&... vs)
+    {
+        return reduce<detail::reduce_with_index<Derived> >(
+                ids
+              , std::forward<ReduceOp>(reduce_op)
+              , vs...
+            );
     }
 }}
-
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/reduce.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/reduce_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define HPX_LCOS_REDUCE_EXTRACT_ACTION_ARGUMENTS(Z, N, D)                     \
-    typename boost::fusion::result_of::value_at_c<                            \
-        typename Action::arguments_type, N                                    \
-    >::type                                                                   \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-// bring in all N-nary overloads for reduce
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (0, HPX_ACTION_ARGUMENT_LIMIT, <hpx/lcos/reduce.hpp>))                \
-    /**/
-
-#include BOOST_PP_ITERATE()
-
-#undef HPX_LCOS_REDUCE_EXTRACT_ACTION_ARGUMENTS
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_REDUCE_ACTION_DECLARATION(...)                           \
@@ -310,294 +574,6 @@ namespace hpx { namespace lcos
       , BOOST_PP_CAT(reduce_, Name)                                           \
     )                                                                         \
 /**/
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else
-
-#define N BOOST_PP_ITERATION()
-
-namespace hpx { namespace lcos
-{
-    namespace detail
-    {
-        template <
-            typename Action
-          , typename Futures
-          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-        >
-        void
-        reduce_invoke(Action /*act*/
-          , Futures& futures
-          , hpx::id_type const& id
-          BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a)
-          , std::size_t)
-        {
-            futures.push_back(
-                hpx::async<Action>(
-                    id
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                )
-            );
-        }
-
-        template <
-            typename Action
-          , typename Futures
-          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-        >
-        void
-        reduce_invoke(reduce_with_index<Action>
-          , Futures& futures
-          , hpx::id_type const& id
-          BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a)
-          , std::size_t global_idx)
-        {
-            futures.push_back(
-                hpx::async<Action>(
-                    id
-                  BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-                  , global_idx
-                )
-            );
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action
-          , typename ReduceOp
-          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-        >
-        typename reduce_result<Action>::type
-        BOOST_PP_CAT(reduce_impl, N)(
-            Action const & act
-          , std::vector<hpx::id_type> const & ids
-          , ReduceOp && reduce_op
-          BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a)
-          , std::size_t global_idx
-        )
-        {
-            typedef
-                typename reduce_result<Action>::type
-                result_type;
-
-            if(ids.empty()) return result_type();
-
-            std::size_t const local_fanout = HPX_REDUCE_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
-
-            std::vector<hpx::future<result_type> > reduce_futures;
-            reduce_futures.reserve(local_size + (ids.size()/fanout) + 1);
-            for(std::size_t i = 0; i != local_size; ++i)
-            {
-                reduce_invoke(
-                    act
-                  , reduce_futures
-                  , ids[i]
-                  BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-                  , global_idx + i
-                );
-            }
-
-            if(ids.size() > local_fanout)
-            {
-                std::size_t applied = local_fanout;
-                std::vector<hpx::id_type>::const_iterator it =
-                    ids.begin() + local_fanout;
-
-                typedef
-                    typename detail::make_reduce_action<Action>::
-                        template reduce_invoker<ReduceOp>::type
-                    reduce_impl_action;
-
-                while(it != ids.end())
-                {
-                    HPX_ASSERT(ids.size() >= applied);
-
-                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
-
-                    hpx::id_type id(ids_next[0]);
-                    reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_next)
-                          , reduce_op
-                          BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-                          , global_idx + applied
-                        )
-                    );
-
-                    applied += next_fan;
-                    it += next_fan;
-                }
-            }
-
-            return hpx::when_all(reduce_futures).
-                then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                get();
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action
-          , typename ReduceOp
-          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-        >
-        struct BOOST_PP_CAT(reduce_invoker, N)
-        {
-            //static hpx::future<typename reduce_result<Action>::type>
-            static typename reduce_result<Action>::type
-            call(
-                Action const & act
-              , std::vector<hpx::id_type> const & ids
-              , ReduceOp const& reduce_op
-              BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a)
-              , std::size_t global_idx
-            )
-            {
-                return
-                    BOOST_PP_CAT(reduce_impl, N)(
-                        act
-                      , ids
-                      , reduce_op
-                      BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-                      , global_idx
-                    );
-            }
-        };
-
-        template <typename Action>
-        struct make_reduce_action_impl<Action, N>
-        {
-            typedef
-                typename reduce_result<Action>::type
-                action_result;
-
-            template <typename ReduceOp>
-            struct reduce_invoker
-            {
-                typedef
-                    typename util::decay<ReduceOp>::type
-                    reduce_op_type;
-
-                typedef BOOST_PP_CAT(reduce_invoker, N)<
-                        Action
-                      , reduce_op_type
-                      BOOST_PP_ENUM_TRAILING(
-                            N
-                          , HPX_LCOS_REDUCE_EXTRACT_ACTION_ARGUMENTS
-                          , _
-                        )
-                    >
-                    reduce_invoker_type;
-
-                typedef
-                    typename HPX_MAKE_ACTION(reduce_invoker_type::call)::type
-                    type;
-            };
-        };
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Action
-      , typename ReduceOp
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::reduce_result<Action>::type
-    >
-    reduce(
-        std::vector<hpx::id_type> const & ids
-      , ReduceOp && reduce_op
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        typedef
-            typename detail::make_reduce_action<Action>::
-                template reduce_invoker<ReduceOp>::type
-            reduce_impl_action;
-
-        typedef
-            typename detail::reduce_result<Action>::type
-            action_result;
-
-        return
-            hpx::async_colocated<reduce_impl_action>(
-                ids[0]
-              , Action()
-              , ids
-              , std::forward<ReduceOp>(reduce_op)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-              , 0
-            );
-    }
-
-    template <
-        typename Component, typename Signature, typename Derived
-      , typename ReduceOp
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::reduce_result<Derived>::type
-    >
-    reduce(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-      , std::vector<hpx::id_type> const & ids
-      , ReduceOp && reduce_op
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        return reduce<Derived>(
-                ids
-              , std::forward<ReduceOp>(reduce_op)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-            );
-    }
-
-    template <
-        typename Action
-      , typename ReduceOp
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::reduce_result<Action>::type
-    >
-    reduce_with_index(
-        std::vector<hpx::id_type> const & ids
-      , ReduceOp && reduce_op
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        return reduce<detail::reduce_with_index<Action> >(
-                ids
-              , std::forward<ReduceOp>(reduce_op)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-            );
-    }
-
-    template <
-        typename Component, typename Signature, typename Derived
-      , typename ReduceOp
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::reduce_result<Derived>::type
-    >
-    reduce_with_index(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-      , std::vector<hpx::id_type> const & ids
-      , ReduceOp && reduce_op
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        return reduce<detail::reduce_with_index<Derived> >(
-                ids
-              , std::forward<ReduceOp>(reduce_op)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-            );
-    }
-}}
 
 #endif
 

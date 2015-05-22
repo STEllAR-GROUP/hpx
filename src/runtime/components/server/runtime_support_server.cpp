@@ -1065,7 +1065,8 @@ namespace hpx { namespace components { namespace server
 
             stopped_ = true;
 
-            while (tm.get_thread_count() > 1) {
+            while (tm.get_thread_count() > 1)
+            {
                 // let thread-manager clean up threads
                 cleanup_threads(tm, l);
 
@@ -1081,7 +1082,8 @@ namespace hpx { namespace components { namespace server
             // well.
             if (timed_out) {
                 // now we have to wait for all threads to be aborted
-                while (tm.get_thread_count() > 1) {
+                while (tm.get_thread_count() > 1)
+                {
                     // abort all suspended threads
                     tm.abort_all_suspended_threads();
 
@@ -1108,10 +1110,8 @@ namespace hpx { namespace components { namespace server
 
                 naming::address addr;
                 if (agas::is_local_address_cached(respond_to, addr)) {
-                    // execute locally, action is executed immediately as it is
-                    // a direct_action
-                    hpx::applier::detail::apply_l<action_type>(respond_to,
-                        std::move(addr));
+                    // this should never happen
+                    HPX_ASSERT(false);
                 }
                 else {
                     // apply remotely, parcel is sent synchronously
@@ -1125,13 +1125,23 @@ namespace hpx { namespace components { namespace server
         }
     }
 
+    void runtime_support::notify_waiting_main()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (!stopped_) {
+            stopped_ = true;
+            wait_condition_.notify_all();
+            stop_condition_.wait(l);        // wait for termination
+        }
+    }
+
     // this will be called after the thread manager has exited
     void runtime_support::stopped()
     {
         mutex_type::scoped_lock l(mtx_);
         if (!terminated_) {
-            stop_condition_.notify_all();   // finished cleanup/termination
             terminated_ = true;
+            stop_condition_.notify_all();   // finished cleanup/termination
         }
     }
 
@@ -1247,6 +1257,7 @@ namespace hpx { namespace components { namespace server
             std::ostringstream strm;
             strm << "attempt to create message handler plugin instance of "
                     "invalid/unknown type: " << message_handler_type;
+            l.unlock();
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_message_handler",
                 strm.str());
@@ -1591,7 +1602,8 @@ namespace hpx { namespace components { namespace server
                     std::cout << options << std::endl;
                 }
                 else {
-                    throw std::logic_error("unknown help option: " + help_option);
+                    throw hpx::detail::command_line_error(
+                        "unknown help option: " + help_option);
                 }
                 return false;
             }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2014 Hartmut Kaiser
+//  Copyright (c) 2012-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,13 +21,18 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
 
 #include <map>
 
 #include <boost/format.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/atomic.hpp>
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
+#include <boost/shared_ptr.hpp>
+#endif
 
 namespace hpx { namespace agas
 {
@@ -113,37 +118,50 @@ struct HPX_EXPORT primary_namespace
 
     typedef boost::int32_t component_type;
 
-    typedef std::pair<gva, boost::uint32_t> gva_table_data_type;
+    typedef std::pair<gva, naming::gid_type> gva_table_data_type;
     typedef std::map<naming::gid_type, gva_table_data_type> gva_table_type;
     typedef std::map<naming::gid_type, boost::int64_t> refcnt_table_type;
+
+    typedef boost::fusion::vector3<naming::gid_type, gva, naming::gid_type>
+        resolved_type;
     // }}}
 
   private:
     // REVIEW: Separate mutexes might reduce contention here. This has to be
     // investigated carefully.
     mutex_type mutex_;
+
     gva_table_type gvas_;
     refcnt_table_type refcnts_;
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
+    typedef std::map<naming::gid_type, lcos::local::condition_variable>
+        migration_table_type;
+#else
+    typedef std::map<
+            naming::gid_type
+          , boost::shared_ptr<lcos::local::condition_variable>
+        > migration_table_type;
+#endif
+
     std::string instance_name_;
     naming::gid_type next_id_;      // next available gid
-    boost::uint32_t locality_id_;   // our locality id
+    naming::gid_type locality_;     // our locality id
+    migration_table_type migrating_objects_;
 
     struct update_time_on_exit;
 
     // data structure holding all counters for the omponent_namespace component
     struct counter_data :  boost::noncopyable
     {
-        typedef lcos::local::spinlock mutex_type;
-
         struct api_counter_data
         {
             api_counter_data()
-                : count_(0)
-                , time_(0)
+              : count_(0)
+              , time_(0)
             {}
 
-            boost::int64_t count_;
-            boost::int64_t time_;
+            boost::atomic<boost::int64_t> count_;
+            boost::atomic<boost::int64_t> time_;
         };
 
         counter_data()
@@ -158,6 +176,8 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_increment_credit_count(bool);
         boost::int64_t get_decrement_credit_count(bool);
         boost::int64_t get_allocate_count(bool);
+        boost::int64_t get_begin_migration_count(bool);
+        boost::int64_t get_end_migration_count(bool);
         boost::int64_t get_overall_count(bool);
 
         boost::int64_t get_route_time(bool);
@@ -167,6 +187,8 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_increment_credit_time(bool);
         boost::int64_t get_decrement_credit_time(bool);
         boost::int64_t get_allocate_time(bool);
+        boost::int64_t get_begin_migration_time(bool);
+        boost::int64_t get_end_migration_time(bool);
         boost::int64_t get_overall_time(bool);
 
         // increment counter values
@@ -177,12 +199,13 @@ struct HPX_EXPORT primary_namespace
         void increment_increment_credit_count();
         void increment_decrement_credit_count();
         void increment_allocate_count();
+        void increment_begin_migration_count();
+        void increment_end_migration_count();
 
     private:
         friend struct update_time_on_exit;
         friend struct primary_namespace;
 
-        mutable mutex_type mtx_;
         api_counter_data route_;                // primary_ns_
         api_counter_data bind_gid_;             // primary_ns_bind_gid
         api_counter_data resolve_gid_;          // primary_ns_resolve_gid
@@ -190,26 +213,25 @@ struct HPX_EXPORT primary_namespace
         api_counter_data increment_credit_;     // primary_ns_increment_credit
         api_counter_data decrement_credit_;     // primary_ns_decrement_credit
         api_counter_data allocate_;             // primary_ns_allocate
+        api_counter_data begin_migration_;      // primary_ns_begin_migration
+        api_counter_data end_migration_;        // primary_ns_end_migration
     };
     counter_data counter_data_;
 
     struct update_time_on_exit
     {
-        update_time_on_exit(counter_data& data, boost::int64_t& t)
+        update_time_on_exit(boost::atomic<boost::int64_t>& t)
           : started_at_(hpx::util::high_resolution_clock::now())
-          , data_(data)
           , t_(t)
         {}
 
         ~update_time_on_exit()
         {
-            counter_data::mutex_type::scoped_lock l(data_.mtx_);
             t_ += (hpx::util::high_resolution_clock::now() - started_at_);
         }
 
         boost::uint64_t started_at_;
-        primary_namespace::counter_data& data_;
-        boost::int64_t& t_;
+        boost::atomic<boost::int64_t>& t_;
     };
 
 #if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
@@ -225,17 +247,31 @@ struct HPX_EXPORT primary_namespace
         );
 #endif
 
+    // API
+    response begin_migration(
+        request const& req
+      , error_code& ec);
+    response end_migration(
+        request const& req
+      , error_code& ec);
+
+    // helper function
+    void wait_for_migration_locked(
+        mutex_type::scoped_lock& l
+      , naming::gid_type id
+      , error_code& ec);
+
   public:
     primary_namespace()
       : base_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB)
-      , locality_id_(naming::invalid_locality_id)
+      , locality_(naming::invalid_gid)
     {}
 
     void finalize();
 
     void set_local_locality(naming::gid_type const& g)
     {
-        locality_id_ = naming::get_locality_id_from_gid(g);
+        locality_ = g;
         next_id_ = naming::gid_type(g.get_msb() + 1, 0x1000);
     }
 
@@ -267,6 +303,9 @@ struct HPX_EXPORT primary_namespace
 
     /// Register all performance counter types exposed by this component.
     static void register_counter_types(
+        error_code& ec = throws
+        );
+    static void register_global_counter_types(
         error_code& ec = throws
         );
 
@@ -321,8 +360,7 @@ struct HPX_EXPORT primary_namespace
         );
 
   private:
-    boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
-    resolve_gid_locked(
+    resolved_type resolve_gid_locked(
         naming::gid_type const& gid
       , error_code& ec
         );
@@ -337,14 +375,14 @@ struct HPX_EXPORT primary_namespace
     ///////////////////////////////////////////////////////////////////////////
     struct free_entry
     {
-        free_entry(agas::gva gva, naming::gid_type gid,
-                boost::uint32_t locality_id)
-          : gva_(gva), gid_(gid), locality_id_(locality_id)
+        free_entry(agas::gva gva, naming::gid_type const& gid,
+                naming::gid_type const& loc)
+          : gva_(gva), gid_(gid), locality_(loc)
         {}
 
         agas::gva gva_;
         naming::gid_type gid_;
-        boost::uint32_t locality_id_;
+        naming::gid_type locality_;
     };
 
     void resolve_free_list(
@@ -386,6 +424,8 @@ struct HPX_EXPORT primary_namespace
       , namespace_increment_credit              = primary_ns_increment_credit
       , namespace_decrement_credit              = primary_ns_decrement_credit
       , namespace_allocate                      = primary_ns_allocate
+      , namespace_begin_migration               = primary_ns_begin_migration
+      , namespace_end_migration                 = primary_ns_end_migration
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
 

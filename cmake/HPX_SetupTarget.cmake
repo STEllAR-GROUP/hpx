@@ -5,6 +5,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+cmake_policy(PUSH)
+if(POLICY CMP0054)
+  cmake_policy(SET CMP0054 NEW)
+endif()
+
 function(hpx_setup_target target)
   # retrieve arguments
   set(options EXPORT NOHPX_INIT INSTALL NOLIBS PLUGIN)
@@ -104,6 +109,7 @@ function(hpx_setup_target target)
                  "HPX_PREFIX=\"${_prefix}\""
                  "HPX_APPLICATION_EXPORTS")
   endif()
+
   if("${_type}" STREQUAL "LIBRARY")
     set(nohpxinit FALSE)
     if(DEFINED HPX_LIBRARY_VERSION AND DEFINED HPX_SOVERSION)
@@ -126,9 +132,8 @@ function(hpx_setup_target target)
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
-                   "HPX_LIBRARY_EXPORTS"
-                   ${plugin_name})
-
+                 "HPX_LIBRARY_EXPORTS"
+                 ${plugin_name})
   endif()
 
   if("${_type}" STREQUAL "COMPONENT")
@@ -157,9 +162,26 @@ function(hpx_setup_target target)
 
   # We force the -DDEBUG and -D_DEBUG defines in debug mode to avoid
   # ABI differences
+  # if hpx is an imported target, get the config debug/release
+  set(HPX_IMPORT_CONFIG "NOTFOUND")
+  if (TARGET "hpx")
+    get_target_property(HPX_IMPORT_CONFIG "hpx" IMPORTED_CONFIGURATIONS)
+  endif()
+  if(HPX_IMPORT_CONFIG MATCHES NOTFOUND)
+    # we are building HPX not importing, so we should use the $<CONFIG:variable
+    set(_USE_CONFIG 1)
+  else()
+    # hpx is an imported target, so set HPX_DEBUG based on build config of hpx library
+    set(_USE_CONFIG 0)
+  endif()
   if(CMAKE_MAJOR_VERSION GREATER 2)
-    set_property(TARGET ${target} APPEND PROPERTY
-	    COMPILE_DEFINITIONS $<$<CONFIG:Debug>:HPX_DEBUG>)
+    if(_USE_CONFIG)
+      set_property(TARGET ${target} APPEND PROPERTY
+        COMPILE_DEFINITIONS $<$<CONFIG:Debug>:HPX_DEBUG>)
+    else()
+      set_property(TARGET ${target} APPEND PROPERTY
+        COMPILE_DEFINITIONS $<$<STREQUAL:${HPX_IMPORT_CONFIG},DEBUG>:HPX_DEBUG>)
+    endif()
   else()
     set_property(TARGET ${target} APPEND PROPERTY
       COMPILE_DEFINITIONS_DEBUG HPX_DEBUG)
@@ -200,3 +222,5 @@ function(hpx_setup_target target)
     )
   endif()
 endfunction()
+
+cmake_policy(POP)

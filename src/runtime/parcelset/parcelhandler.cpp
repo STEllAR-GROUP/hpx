@@ -25,18 +25,10 @@
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
-#include <boost/version.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/io_service.hpp>
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/read.hpp>
-#include <boost/asio/write.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/ref.hpp>
-#include <boost/bind.hpp>
 #include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
@@ -71,29 +63,17 @@ namespace hpx { namespace parcelset
     // A parcel is submitted for transport at the source locality site to
     // the parcel set of the locality with the put-parcel command
     // This function is synchronous.
-
-    struct wait_for_put_parcel
-    {
-        wait_for_put_parcel() : sema_(new lcos::local::counting_semaphore) {}
-
-        void operator()(boost::system::error_code const&, parcel const&)
-        {
-            sema_->signal();
-        }
-
-        void wait()
-        {
-            sema_->wait();
-        }
-
-        boost::shared_ptr<lcos::local::counting_semaphore> sema_;
-    };
-
     void parcelhandler::sync_put_parcel(parcel& p) //-V669
     {
-        wait_for_put_parcel wfp;
-        put_parcel(p, wfp);  // schedule parcel send
-        wfp.wait();          // wait for the parcel to be sent
+        lcos::local::promise<void> promise;
+        put_parcel(
+            p
+          , [&promise](boost::system::error_code const&, parcel const&)
+            {
+                promise.set_value();
+            }
+        );  // schedule parcel send
+        promise.get_future().wait(); // wait for the parcel to be sent
     }
 
     void parcelhandler::parcel_sink(parcel const& p)
@@ -124,7 +104,8 @@ namespace hpx { namespace parcelset
         parcels_(policy),
         use_alternative_parcelports_(false),
         enable_parcel_handling_(true),
-        count_routed_(0)
+        count_routed_(0),
+        write_handler_(&parcelhandler::default_write_handler)
     {
         BOOST_FOREACH(plugins::parcelport_factory_base *factory,
             get_parcelport_factories())
@@ -174,8 +155,9 @@ namespace hpx { namespace parcelset
             }
             else
             {
+                using util::placeholders::_1;
                 pp.second->register_event_handler(
-                    boost::bind(&parcelhandler::parcel_sink, this, _1));
+                    util::bind(&parcelhandler::parcel_sink, this, _1));
             }
         }
     }
@@ -216,10 +198,12 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> const& pp)
     {
+        using util::placeholders::_1;
+
         if(!pp) return;
 
         // register our callback function with the parcelport
-        pp->register_event_handler(boost::bind(&parcelhandler::parcel_sink, this, _1));
+        pp->register_event_handler(util::bind(&parcelhandler::parcel_sink, this, _1));
 
         // add the new parcelport to the list of parcel-ports we care about
         int priority = pp->priority();
@@ -256,9 +240,11 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelhandler::do_background_work(std::size_t num_thread,
+    bool parcelhandler::do_background_work(std::size_t num_thread,
         bool stop_buffering)
     {
+        bool did_some_work = false;
+
         // flush all parcel buffers
         if(0 == num_thread)
         {
@@ -274,7 +260,7 @@ namespace hpx { namespace parcelset
                     {
                         boost::shared_ptr<policies::message_handler> p((*it).second);
                         util::scoped_unlock<mutex_type::scoped_try_lock> ul(l);
-                        p->flush(stop_buffering);
+                        did_some_work = p->flush(stop_buffering) || did_some_work;
                     }
                 }
             }
@@ -285,9 +271,12 @@ namespace hpx { namespace parcelset
         {
             if(pp.first > 0)
             {
-                pp.second->do_background_work(num_thread);
+                did_some_work = pp.second->do_background_work(num_thread) ||
+                    did_some_work;
             }
         }
+
+        return did_some_work;
     }
 
     void parcelhandler::stop(bool blocking)
@@ -378,21 +367,6 @@ namespace hpx { namespace parcelset
         return result;
     }
 
-    void parcelhandler::rethrow_exception()
-    {
-        boost::exception_ptr exception;
-        {
-            // store last error for now only
-            mutex_type::scoped_lock l(mtx_);
-            boost::swap(exception, exception_);
-        }
-
-        if (exception) {
-            // report any pending exceptions
-            boost::rethrow_exception(exception);
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -414,7 +388,6 @@ namespace hpx { namespace parcelset
     void parcelhandler::put_parcel(parcel& p, write_handler_type const& f)
     {
         HPX_ASSERT(resolver_);
-        rethrow_exception();
 
         // properly initialize parcel
         init_parcel(p);
@@ -483,7 +456,7 @@ namespace hpx { namespace parcelset
         resolver_->route(p, f);
     }
 
-    std::size_t parcelhandler::get_outgoing_queue_length(bool reset) const
+    boost::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const
     {
         std::size_t parcel_count = 0;
         BOOST_FOREACH(pports_type::value_type const& pp, pports_)
@@ -503,6 +476,7 @@ namespace hpx { namespace parcelset
             if (hpx::is_stopped_or_shutting_down())
             {
                 if (ec == boost::asio::error::connection_aborted ||
+                    ec == boost::asio::error::connection_reset ||
                     ec == boost::asio::error::broken_pipe ||
                     ec == boost::asio::error::not_connected ||
                     ec == boost::asio::error::eof)
@@ -511,14 +485,13 @@ namespace hpx { namespace parcelset
                 }
             }
 
+            // all unhandled exceptions terminate the whole application
             boost::exception_ptr exception =
                 hpx::detail::get_exception(hpx::exception(ec),
                     "parcelhandler::default_write_handler", __FILE__,
                     __LINE__, parcelset::dump_parcel(p));
 
-            // store last error for now only
-            mutex_type::scoped_lock l(mtx_);
-            exception_ = exception;
+            hpx::report_error(exception);
         }
     }
 
@@ -802,13 +775,16 @@ namespace hpx { namespace parcelset
             register_counter_types(pp.second->type());
         }
 
+        using util::placeholders::_1;
+        using util::placeholders::_2;
+
         // register common counters
         util::function_nonser<boost::int64_t(bool)> incoming_queue_length(
-            boost::bind(&parcelhandler::get_incoming_queue_length, this, ::_1));
+            util::bind(&parcelhandler::get_incoming_queue_length, this, _1));
         util::function_nonser<boost::int64_t(bool)> outgoing_queue_length(
-            boost::bind(&parcelhandler::get_outgoing_queue_length, this, ::_1));
+            util::bind(&parcelhandler::get_outgoing_queue_length, this, _1));
         util::function_nonser<boost::int64_t(bool)> outgoing_routed_count(
-            boost::bind(&parcelhandler::get_parcel_routed_count, this, ::_1));
+            util::bind(&parcelhandler::get_parcel_routed_count, this, _1));
 
         performance_counters::generic_counter_type_data const counter_types[] =
         {
@@ -816,7 +792,7 @@ namespace hpx { namespace parcelset
               performance_counters::counter_raw,
               "returns the number current length of the queue of incoming parcels",
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, incoming_queue_length, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -825,7 +801,7 @@ namespace hpx { namespace parcelset
               performance_counters::counter_raw,
               "returns the number current length of the queue of outgoing parcels",
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, outgoing_queue_length, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -835,7 +811,7 @@ namespace hpx { namespace parcelset
               "returns the number of (outbound) parcel routed through the "
                   "responsible AGAS service",
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, outgoing_routed_count, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -847,46 +823,49 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::register_counter_types(std::string const& pp_type)
     {
+        using util::placeholders::_1;
+        using util::placeholders::_2;
+
         util::function_nonser<boost::int64_t(bool)> num_parcel_sends(
-            boost::bind(&parcelhandler::get_parcel_send_count, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_parcel_send_count, this, pp_type, _1));
         util::function_nonser<boost::int64_t(bool)> num_parcel_receives(
-            boost::bind(&parcelhandler::get_parcel_receive_count, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_parcel_receive_count, this, pp_type, _1));
 
         util::function_nonser<boost::int64_t(bool)> num_message_sends(
-            boost::bind(&parcelhandler::get_message_send_count, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_message_send_count, this, pp_type, _1));
         util::function_nonser<boost::int64_t(bool)> num_message_receives(
-            boost::bind(&parcelhandler::get_message_receive_count, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_message_receive_count, this, pp_type, _1));
 
         util::function_nonser<boost::int64_t(bool)> sending_time(
-            boost::bind(&parcelhandler::get_sending_time, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_sending_time, this, pp_type, _1));
         util::function_nonser<boost::int64_t(bool)> receiving_time(
-            boost::bind(&parcelhandler::get_receiving_time, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_receiving_time, this, pp_type, _1));
 
         util::function_nonser<boost::int64_t(bool)> sending_serialization_time(
-            boost::bind(&parcelhandler::get_sending_serialization_time, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_sending_serialization_time, this, pp_type, _1));
         util::function_nonser<boost::int64_t(bool)> receiving_serialization_time(
-            boost::bind(&parcelhandler::get_receiving_serialization_time, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_receiving_serialization_time, this, pp_type, _1));
 
 #if defined(HPX_HAVE_SECURITY)
         util::function_nonser<boost::int64_t(bool)> sending_security_time(
-            boost::bind(&parcelhandler::get_sending_security_time, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_sending_security_time, this, pp_type, _1));
         util::function_nonser<boost::int64_t(bool)> receiving_security_time(
-            boost::bind(&parcelhandler::get_receiving_security_time, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_receiving_security_time, this, pp_type, _1));
 #endif
         util::function_nonser<boost::int64_t(bool)> data_sent(
-            boost::bind(&parcelhandler::get_data_sent, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_data_sent, this, pp_type, _1));
         util::function_nonser<boost::int64_t(bool)> data_received(
-            boost::bind(&parcelhandler::get_data_received, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_data_received, this, pp_type, _1));
 
         util::function_nonser<boost::int64_t(bool)> data_raw_sent(
-            boost::bind(&parcelhandler::get_raw_data_sent, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_raw_data_sent, this, pp_type, _1));
         util::function_nonser<boost::int64_t(bool)> data_raw_received(
-            boost::bind(&parcelhandler::get_raw_data_received, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_raw_data_received, this, pp_type, _1));
 
         util::function_nonser<boost::int64_t(bool)> buffer_allocate_time_sent(
-            boost::bind(&parcelhandler::get_buffer_allocate_time_sent, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_buffer_allocate_time_sent, this, pp_type, _1));
         util::function_nonser<boost::int64_t(bool)> buffer_allocate_time_received(
-            boost::bind(&parcelhandler::get_buffer_allocate_time_received, this, pp_type, ::_1));
+            util::bind(&parcelhandler::get_buffer_allocate_time_received, this, pp_type, _1));
 
         performance_counters::generic_counter_type_data const counter_types[] =
         {
@@ -895,7 +874,7 @@ namespace hpx { namespace parcelset
               boost::str(boost::format("returns the number of parcels sent using the %s "
                   "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_parcel_sends, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -905,7 +884,7 @@ namespace hpx { namespace parcelset
               boost::str(boost::format("returns the number of parcels received using the %s "
                   "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_parcel_receives, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -915,7 +894,7 @@ namespace hpx { namespace parcelset
               boost::str(boost::format("returns the number of messages sent using the %s "
                   "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_message_sends, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -925,7 +904,7 @@ namespace hpx { namespace parcelset
               boost::str(boost::format("returns the number of messages received using the %s "
                   "connection type for the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_message_receives, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -938,7 +917,7 @@ namespace hpx { namespace parcelset
                   "using the %s connection type for the referenced locality") %
                       pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, sending_time, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
@@ -950,7 +929,7 @@ namespace hpx { namespace parcelset
                   "using the %s connection type for the referenced locality") %
                       pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, receiving_time, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
@@ -961,7 +940,7 @@ namespace hpx { namespace parcelset
                   "all sent parcels using the %s connection type for the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, sending_serialization_time, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
@@ -972,7 +951,7 @@ namespace hpx { namespace parcelset
                   "all received parcels using the %s connection type for the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, receiving_serialization_time, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
@@ -986,7 +965,7 @@ namespace hpx { namespace parcelset
                   "using the %s connection type for the referenced locality") %
                         pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, sending_security_time, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
@@ -998,7 +977,7 @@ namespace hpx { namespace parcelset
                   "using the %s connection type for the referenced locality") %
                         pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, receiving_security_time, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
@@ -1010,7 +989,7 @@ namespace hpx { namespace parcelset
                   "argument data sent using the %s connection type by the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_raw_sent, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
@@ -1021,7 +1000,7 @@ namespace hpx { namespace parcelset
                   "argument data received using the %s connection type by the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_raw_received, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
@@ -1032,7 +1011,7 @@ namespace hpx { namespace parcelset
                   "headers, possibly compressed) sent using the %s connection type "
                   "by the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_sent, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
@@ -1043,7 +1022,7 @@ namespace hpx { namespace parcelset
                   "headers, possibly compressed) received using the %s connection type "
                   "by the referenced locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_received, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
@@ -1053,7 +1032,7 @@ namespace hpx { namespace parcelset
               boost::str(boost::format("returns the time needed to allocate the "
                 "buffers for serializing using the %s connection type") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, buffer_allocate_time_received, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
@@ -1063,7 +1042,7 @@ namespace hpx { namespace parcelset
               boost::str(boost::format("returns the time needed to allocate the "
                 "buffers for serializing using the %s connection type") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, buffer_allocate_time_sent, _2),
               &performance_counters::locality_counter_discoverer,
               "ns"
@@ -1075,20 +1054,20 @@ namespace hpx { namespace parcelset
         // register connection specific performance counters related to connection
         // caches
         util::function_nonser<boost::int64_t(bool)> cache_insertions(
-            boost::bind(&parcelhandler::get_connection_cache_statistics,
-                this, pp_type, parcelport::connection_cache_insertions, ::_1));
+            util::bind(&parcelhandler::get_connection_cache_statistics,
+                this, pp_type, parcelport::connection_cache_insertions, _1));
         util::function_nonser<boost::int64_t(bool)> cache_evictions(
-            boost::bind(&parcelhandler::get_connection_cache_statistics,
-                this, pp_type, parcelport::connection_cache_evictions, ::_1));
+            util::bind(&parcelhandler::get_connection_cache_statistics,
+                this, pp_type, parcelport::connection_cache_evictions, _1));
         util::function_nonser<boost::int64_t(bool)> cache_hits(
-            boost::bind(&parcelhandler::get_connection_cache_statistics,
-                this, pp_type, parcelport::connection_cache_hits, ::_1));
+            util::bind(&parcelhandler::get_connection_cache_statistics,
+                this, pp_type, parcelport::connection_cache_hits, _1));
         util::function_nonser<boost::int64_t(bool)> cache_misses(
-            boost::bind(&parcelhandler::get_connection_cache_statistics,
-                this, pp_type, parcelport::connection_cache_misses, ::_1));
+            util::bind(&parcelhandler::get_connection_cache_statistics,
+                this, pp_type, parcelport::connection_cache_misses, _1));
         util::function_nonser<boost::int64_t(bool)> cache_reclaims(
-            boost::bind(&parcelhandler::get_connection_cache_statistics,
-                this, pp_type, parcelport::connection_cache_reclaims, ::_1));
+            util::bind(&parcelhandler::get_connection_cache_statistics,
+                this, pp_type, parcelport::connection_cache_reclaims, _1));
 
         performance_counters::generic_counter_type_data const connection_cache_types[] =
         {
@@ -1098,7 +1077,7 @@ namespace hpx { namespace parcelset
                   "the connection cache for the %s connection type on the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, cache_insertions, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -1109,7 +1088,7 @@ namespace hpx { namespace parcelset
                   "the connection cache for the %s connection type on the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, cache_evictions, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -1120,7 +1099,7 @@ namespace hpx { namespace parcelset
                   "the connection cache for the %s connection type on the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, cache_hits, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -1131,7 +1110,7 @@ namespace hpx { namespace parcelset
                   "the connection cache for the %s connection type on the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, cache_misses, _2),
               &performance_counters::locality_counter_discoverer,
               ""
@@ -1142,7 +1121,7 @@ namespace hpx { namespace parcelset
                   "the connection cache for the %s connection type on the referenced "
                   "locality") % pp_type),
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&performance_counters::locality_raw_counter_creator,
+              util::bind(&performance_counters::locality_raw_counter_creator,
                   _1, cache_reclaims, _2),
               &performance_counters::locality_counter_discoverer,
               ""

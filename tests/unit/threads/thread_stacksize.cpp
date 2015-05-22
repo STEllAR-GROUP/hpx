@@ -12,9 +12,13 @@
 // Define the amount of stack space that we need to reserve for management
 // purposes.
 #if defined(HPX_DEBUG)
-    enum { management_space = 0x1600 };
+    static const std::size_t management_space = 0x1600;
 #else
-    enum { management_space = 0x800 };
+#if defined(HPX_INTEL_VERSION)
+    static const std::size_t management_space = 0x2000;
+#else
+    static const std::size_t management_space = 0x800;
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,6 +100,7 @@ int main()
 
     BOOST_FOREACH(hpx::id_type id, localities)
     {
+        if(id != hpx::find_here())
         {
             test_small_stacksize_action test_action;
             test_action(id);

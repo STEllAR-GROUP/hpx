@@ -193,6 +193,12 @@ namespace hpx { namespace util
         }
     }
 
+    bool io_service_pool::stopped()
+    {
+        boost::mutex::scoped_lock l(mtx_);
+        return stopped_;
+    }
+
     boost::asio::io_service& io_service_pool::get_io_service(int index)
     {
         // use this function for single group io_service pools only

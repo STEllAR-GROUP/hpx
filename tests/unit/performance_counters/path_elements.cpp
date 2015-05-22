@@ -392,26 +392,27 @@ namespace test
         using namespace hpx::performance_counters;
 
         // test non-throwing version
-        hpx::error_code ec;
         counter_path_elements p;
         int i = 0;
         for (char const* t = data_bad[0]; NULL != t; t = data_bad[++i])
         {
-            HPX_TEST(status_invalid_data == get_counter_path_elements(t, p, ec));
-            HPX_TEST(ec.value() == hpx::bad_parameter);
+            hpx::error_code ec;
+            HPX_TEST_EQ(status_invalid_data, get_counter_path_elements(t, p, ec));
+            HPX_TEST_EQ(ec.value(), hpx::bad_parameter);
         }
 
         // test throwing version
         i = 0;
         for (char const* t = data_bad[0]; NULL != t; t = data_bad[++i])
         {
+            hpx::error_code ec;
             bool caught_exception = false;
             try {
                 get_counter_path_elements(t, p);
                 HPX_TEST(false);
             }
             catch (hpx::exception const& e) {
-                HPX_TEST(e.get_error() == hpx::bad_parameter);
+                HPX_TEST_EQ(e.get_error(), hpx::bad_parameter);
                 caught_exception = true;
             }
             HPX_TEST(caught_exception);

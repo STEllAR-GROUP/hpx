@@ -393,7 +393,7 @@ namespace hpx { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // report an early or late exception and abort
-    void report_exception_and_terminate(boost::exception_ptr const& e)
+    void report_exception_and_continue(boost::exception_ptr const& e)
     {
         if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
             get_config_entry("hpx.attach_debugger", "") == "exception")
@@ -402,18 +402,28 @@ namespace hpx { namespace detail
         }
 
         std::cerr << hpx::diagnostic_information(e) << std::endl;
+    }
+
+    void report_exception_and_continue(hpx::exception const& e)
+    {
+        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
+            get_config_entry("hpx.attach_debugger", "") == "exception")
+        {
+            util::attach_debugger();
+        }
+
+        std::cerr << hpx::diagnostic_information(e) << std::endl;
+    }
+
+    void report_exception_and_terminate(boost::exception_ptr const& e)
+    {
+        report_exception_and_continue(e);
         std::abort();
     }
 
     void report_exception_and_terminate(hpx::exception const& e)
     {
-        if (!expect_exception_flag.load(boost::memory_order_relaxed) &&
-            get_config_entry("hpx.attach_debugger", "") == "exception")
-        {
-            util::attach_debugger();
-        }
-
-        std::cerr << hpx::diagnostic_information(e) << std::endl;
+        report_exception_and_continue(e);
         std::abort();
     }
 

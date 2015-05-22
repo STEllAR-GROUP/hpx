@@ -6,6 +6,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/config/defines.hpp>
+
+#if defined(HPX_PARCELPORT_MPI)
+#include <mpi.h>
+#endif
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/command_line_handling.hpp>
@@ -20,9 +26,6 @@
 
 #if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
-#endif
-#if defined(HPX_PARCELPORT_MPI)
-#include <mpi.h>
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,8 +72,10 @@ namespace hpx
              << OMPI_MINOR_VERSION << "." << OMPI_RELEASE_VERSION;
 #elif defined(MPICH)
         strm << "MPICH V" << MPICH_VERSION;
+#elif defined(MVAPICH2_VERSION)
+        strm << "MVAPICH2 V" << MVAPICH2_VERSION;
 #else
-        strm << "Unknown MPI"
+        strm << "Unknown MPI";
 #endif
         // add general MPI version
         strm << ", MPI V" << MPI_VERSION << "." << MPI_SUBVERSION;
@@ -123,8 +128,6 @@ namespace hpx
     //  HPX_HAVE_CXX11_AUTO
     //  HPX_HAVE_CXX11_DECLTYPE
     //  HPX_HAVE_CXX11_STD_UNIQUE_PTR
-    //  HPX_ACTION_ARGUMENT_LIMIT=4
-    //  HPX_FUNCTION_ARGUMENT_LIMIT=7
 
     std::string configuration_string()
     {
@@ -215,28 +218,6 @@ namespace hpx
 
 #if defined(HPX_LIMIT)
         strm << "  HPX_LIMIT=" << HPX_LIMIT << "\n";
-#endif
-#if defined(HPX_ACTION_ARGUMENT_LIMIT)
-        strm << "  HPX_ACTION_ARGUMENT_LIMIT="
-             << HPX_ACTION_ARGUMENT_LIMIT << "\n";
-#endif
-#if defined(HPX_COMPONENT_CREATE_ARGUMENT_LIMIT)
-        strm << "  HPX_COMPONENT_CREATE_ARGUMENT_LIMIT="
-             << HPX_COMPONENT_CREATE_ARGUMENT_LIMIT << "\n";
-#endif
-#if defined(HPX_FUNCTION_ARGUMENT_LIMIT)
-        strm << "  HPX_FUNCTION_ARGUMENT_LIMIT="
-             << HPX_FUNCTION_ARGUMENT_LIMIT << "\n";
-#endif
-#if defined(HPX_LOCK_LIMIT)
-        strm << "  HPX_LOCK_LIMIT=" << HPX_LOCK_LIMIT << "\n";
-#endif
-#if defined(HPX_TUPLE_LIMIT)
-        strm << "  HPX_TUPLE_LIMIT=" << HPX_TUPLE_LIMIT << "\n";
-#endif
-#if defined(HPX_WAIT_ARGUMENT_LIMIT)
-        strm << "  HPX_WAIT_ARGUMENT_LIMIT="
-             << HPX_WAIT_ARGUMENT_LIMIT << "\n";
 #endif
 #if defined(HPX_PARCEL_MAX_CONNECTIONS)
         strm << "  HPX_PARCEL_MAX_CONNECTIONS="

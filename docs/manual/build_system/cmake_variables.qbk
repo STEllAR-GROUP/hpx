@@ -26,7 +26,6 @@ The options are split into these categories:
 * [link build_system.cmake_variables.Debugging Debugging Options]
 
 [#build_system.cmake_variables.Generic][h3 Generic Options]
-* [link build_system.cmake_variables.HPX_AUTOMATIC_PREPROCESSING HPX_AUTOMATIC_PREPROCESSING]
 * [link build_system.cmake_variables.HPX_AUTOMATIC_SERIALIZATION_REGISTRATION HPX_AUTOMATIC_SERIALIZATION_REGISTRATION]
 * [link build_system.cmake_variables.HPX_BENCHMARK_SCRIPTS_PATH HPX_BENCHMARK_SCRIPTS_PATH]
 * [link build_system.cmake_variables.HPX_BUILD_WITH_INSTALL_PREFIX HPX_BUILD_WITH_INSTALL_PREFIX]
@@ -36,13 +35,8 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_HIDDEN_VISIBILITY HPX_HIDDEN_VISIBILITY]
 * [link build_system.cmake_variables.HPX_MALLOC HPX_MALLOC]
 * [link build_system.cmake_variables.HPX_NATIVE_TLS HPX_NATIVE_TLS]
-* [link build_system.cmake_variables.HPX_PREPROCESSOR_LIMIT_EXPANSION HPX_PREPROCESSOR_LIMIT_EXPANSION]
 * [link build_system.cmake_variables.HPX_RUN_MAIN_EVERYWHERE HPX_RUN_MAIN_EVERYWHERE]
 * [link build_system.cmake_variables.HPX_STATIC_LINKING HPX_STATIC_LINKING]
-* [link build_system.cmake_variables.HPX_UNIQUE_FUTURE_ALIAS HPX_UNIQUE_FUTURE_ALIAS]
-* [link build_system.cmake_variables.HPX_UTIL_FUNCTION HPX_UTIL_FUNCTION]
-* [link build_system.cmake_variables.HPX_UTIL_TUPLE HPX_UTIL_TUPLE]
-* [link build_system.cmake_variables.HPX_WAVE_ADDITIONAL_INCLUDE_DIRS HPX_WAVE_ADDITIONAL_INCLUDE_DIRS]
 * [link build_system.cmake_variables.HPX_WITH_BOOST_ALL_DYNAMIC_LINK HPX_WITH_BOOST_ALL_DYNAMIC_LINK]
 * [link build_system.cmake_variables.HPX_WITH_COMPRESSION_BZIP2 HPX_WITH_COMPRESSION_BZIP2]
 * [link build_system.cmake_variables.HPX_WITH_COMPRESSION_SNAPPY HPX_WITH_COMPRESSION_SNAPPY]
@@ -53,7 +47,6 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_SECURITY HPX_WITH_SECURITY]
 
 [variablelist
-        [[[#build_system.cmake_variables.HPX_AUTOMATIC_PREPROCESSING] `HPX_AUTOMATIC_PREPROCESSING:BOOL`][True if the automatic header preprocessing target should be created (default: OFF).]]
         [[[#build_system.cmake_variables.HPX_AUTOMATIC_SERIALIZATION_REGISTRATION] `HPX_AUTOMATIC_SERIALIZATION_REGISTRATION:BOOL`][Use automatic serialization registration for actions and functions. This affects compatibility between HPX applications compiled with different compilers (default ON)]]
         [[[#build_system.cmake_variables.HPX_BENCHMARK_SCRIPTS_PATH] `HPX_BENCHMARK_SCRIPTS_PATH:PATH`][Directory to place batch scripts in]]
         [[[#build_system.cmake_variables.HPX_BUILD_WITH_INSTALL_PREFIX] `HPX_BUILD_WITH_INSTALL_PREFIX:BOOL`][Always set the HPX_PREFIX default to the install directory (default: OFF)]]
@@ -63,13 +56,8 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_HIDDEN_VISIBILITY] `HPX_HIDDEN_VISIBILITY:BOOL`][Use -fvisibility=hidden for builds on platforms which support it (default ON)]]
         [[[#build_system.cmake_variables.HPX_MALLOC] `HPX_MALLOC:STRING`][Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc and tbbmalloc (default is: tcmalloc)]]
         [[[#build_system.cmake_variables.HPX_NATIVE_TLS] `HPX_NATIVE_TLS:BOOL`][Use native TLS support if available (default: ON)]]
-        [[[#build_system.cmake_variables.HPX_PREPROCESSOR_LIMIT_EXPANSION] `HPX_PREPROCESSOR_LIMIT_EXPANSION:BOOL`][Do not use preprocessed headers (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_RUN_MAIN_EVERYWHERE] `HPX_RUN_MAIN_EVERYWHERE:BOOL`][Run hpx_main by default on all localities (default: OFF).]]
         [[[#build_system.cmake_variables.HPX_STATIC_LINKING] `HPX_STATIC_LINKING:BOOL`][Compile HPX statically linked libraries (Default: OFF)]]
-        [[[#build_system.cmake_variables.HPX_UNIQUE_FUTURE_ALIAS] `HPX_UNIQUE_FUTURE_ALIAS:BOOL`][HPX will defined unique_future<R> as a template alias to future<R>. (default OFF).]]
-        [[[#build_system.cmake_variables.HPX_UTIL_FUNCTION] `HPX_UTIL_FUNCTION:BOOL`][Use hpx::util::function instead of boost::function or std::function (default: ON)]]
-        [[[#build_system.cmake_variables.HPX_UTIL_TUPLE] `HPX_UTIL_TUPLE:BOOL`][Use hpx::util::tuple instead of boost::tuple or std::tuple (default: ON)]]
-        [[[#build_system.cmake_variables.HPX_WAVE_ADDITIONAL_INCLUDE_DIRS] `HPX_WAVE_ADDITIONAL_INCLUDE_DIRS:STRING`][Additional (compiler specific) include directories for the wave preprocessing tool.]]
         [[[#build_system.cmake_variables.HPX_WITH_BOOST_ALL_DYNAMIC_LINK] `HPX_WITH_BOOST_ALL_DYNAMIC_LINK:BOOL`][Add BOOST_ALL_DYN_LINK to compile flags]]
         [[[#build_system.cmake_variables.HPX_WITH_COMPRESSION_BZIP2] `HPX_WITH_COMPRESSION_BZIP2:BOOL`][Enable bzip2 compression for parcel data (default: OFF).]]
         [[[#build_system.cmake_variables.HPX_WITH_COMPRESSION_SNAPPY] `HPX_WITH_COMPRESSION_SNAPPY:BOOL`][Enable snappy compression for parcel data (default: OFF).]]
@@ -160,6 +148,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_PARCELPORT_IPC HPX_PARCELPORT_IPC]
 * [link build_system.cmake_variables.HPX_PARCELPORT_MPI HPX_PARCELPORT_MPI]
 * [link build_system.cmake_variables.HPX_PARCELPORT_MPI_ENV HPX_PARCELPORT_MPI_ENV]
+* [link build_system.cmake_variables.HPX_PARCELPORT_MPI_MULTITHREADED HPX_PARCELPORT_MPI_MULTITHREADED]
 * [link build_system.cmake_variables.HPX_PARCELPORT_TCP HPX_PARCELPORT_TCP]
 
 [variablelist
@@ -170,7 +159,8 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD] `HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD:STRING`][Size of the message payload not sent with RDMA (default: 512 byte)]]
         [[[#build_system.cmake_variables.HPX_PARCELPORT_IPC] `HPX_PARCELPORT_IPC:BOOL`][Enable the IPC (inter process communication) based parcelport. This is currently an experimental feature]]
         [[[#build_system.cmake_variables.HPX_PARCELPORT_MPI] `HPX_PARCELPORT_MPI:BOOL`][Enable the MPI based parcelport.]]
-        [[[#build_system.cmake_variables.HPX_PARCELPORT_MPI_ENV] `HPX_PARCELPORT_MPI_ENV:STRING`][List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE).]]
+        [[[#build_system.cmake_variables.HPX_PARCELPORT_MPI_ENV] `HPX_PARCELPORT_MPI_ENV:STRING`][List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE).]]
+        [[[#build_system.cmake_variables.HPX_PARCELPORT_MPI_MULTITHREADED] `HPX_PARCELPORT_MPI_MULTITHREADED:BOOL`][Turn on MPI multithreading support (default: ON).]]
         [[[#build_system.cmake_variables.HPX_PARCELPORT_TCP] `HPX_PARCELPORT_TCP:BOOL`][Enable the TCP based parcelport.]]
 ] [/ Parcelport Options]
 
@@ -245,12 +235,6 @@ directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
       necessary to compile a special component exposing PAPI hardware events and
       counters as __hpx__ performance counters. This is not available on
       the Windows platform.]
-    ]
-    [[`BOOSTWAVE_ROOT:PATH`]
-     [Specifies where to look for a built __boost_wave__ binary. Set this if
-      you want to recreate the preprocessed header files used by __hpx__.
-      Normally this will not be necessary, unless you modified the sources
-      those preprocessed headers depend on.]
     ]
     [[`AMPLIFIER_ROOT:PATH`]
      [Specifies where to look for one of the tools of the Intel Parallel

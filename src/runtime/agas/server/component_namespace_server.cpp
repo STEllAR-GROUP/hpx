@@ -46,8 +46,7 @@ response component_namespace::service(
         case component_ns_bind_prefix:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.bind_prefix_.time_
+                    counter_data_.bind_prefix_.time_
                 );
                 counter_data_.increment_bind_prefix_count();
                 return bind_prefix(req, ec);
@@ -55,8 +54,7 @@ response component_namespace::service(
         case component_ns_bind_name:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.bind_name_.time_
+                    counter_data_.bind_name_.time_
                 );
                 counter_data_.increment_bind_name_count();
                 return bind_name(req, ec);
@@ -64,8 +62,7 @@ response component_namespace::service(
         case component_ns_resolve_id:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.resolve_id_.time_
+                    counter_data_.resolve_id_.time_
                 );
                 counter_data_.increment_resolve_id_count();
                 return resolve_id(req, ec);
@@ -73,8 +70,7 @@ response component_namespace::service(
         case component_ns_unbind_name:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.unbind_name_.time_
+                    counter_data_.unbind_name_.time_
                 );
                 counter_data_.increment_unbind_name_ount();
                 return unbind(req, ec);
@@ -82,8 +78,7 @@ response component_namespace::service(
         case component_ns_iterate_types:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.iterate_types_.time_
+                    counter_data_.iterate_types_.time_
                 );
                 counter_data_.increment_iterate_types_count();
                 return iterate_types(req, ec);
@@ -91,8 +86,7 @@ response component_namespace::service(
         case component_ns_get_component_type_name:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.get_component_type_name_.time_
+                    counter_data_.get_component_type_name_.time_
                 );
                 counter_data_.increment_get_component_type_name_count();
                 return get_component_type_name(req, ec);
@@ -100,8 +94,7 @@ response component_namespace::service(
         case component_ns_num_localities:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.num_localities_.time_
+                    counter_data_.num_localities_.time_
                 );
                 counter_data_.increment_num_localities_count();
                 return get_num_localities(req, ec);
@@ -130,6 +123,8 @@ response component_namespace::service(
         case primary_ns_increment_credit:
         case primary_ns_decrement_credit:
         case primary_ns_allocate:
+        case primary_ns_begin_migration:
+        case primary_ns_end_migration:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "
@@ -184,27 +179,59 @@ void component_namespace::register_counter_types(
           i != detail::num_component_namespace_services;
           ++i)
     {
+        // global counters are handled elsewhere
+        if (detail::component_namespace_services[i].code_ == component_ns_statistics_counter)
+            continue;
+
         std::string name(detail::component_namespace_services[i].name_);
         std::string help;
         std::string::size_type p = name.find_last_of('/');
-        if (p != std::string::npos) {
-            if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
-                help = boost::str(help_count % name.substr(p+1));
-            else
-                help = boost::str(help_time % name.substr(p+1));
-        }
-        else {
-            HPX_ASSERT(detail::component_namespace_services[i].code_ ==
-                component_ns_statistics_counter);
-            name = component_namespace_service_name + name;
-            if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
-                help = "returns the overall number of invocations of all component AGAS services";
-            else
-                help = "returns the overall execution time of all component AGAS services";
-        }
+        HPX_ASSERT(p != std::string::npos);
+
+        if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
+            help = boost::str(help_count % name.substr(p+1));
+        else
+            help = boost::str(help_time % name.substr(p+1));
 
         performance_counters::install_counter_type(
             agas::performance_counter_basename + name
+          , performance_counters::counter_raw
+          , help
+          , creator
+          , &performance_counters::locality0_counter_discoverer
+          , HPX_PERFORMANCE_COUNTER_V1
+          , detail::component_namespace_services[i].uom_
+          , ec
+          );
+        if (ec) return;
+    }
+}
+
+void component_namespace::register_global_counter_types(
+    error_code& ec
+    )
+{
+    performance_counters::create_counter_func creator(
+        boost::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+      , agas::server::component_namespace_service_name));
+
+    for (std::size_t i = 0;
+          i != detail::num_component_namespace_services;
+          ++i)
+    {
+        // local counters are handled elsewhere
+        if (detail::component_namespace_services[i].code_ != component_ns_statistics_counter)
+            continue;
+
+        std::string help;
+        if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
+            help = "returns the overall number of invocations of all component AGAS services";
+        else
+            help = "returns the overall execution time of all component AGAS services";
+
+        performance_counters::install_counter_type(
+            std::string(agas::performance_counter_basename) +
+                detail::component_namespace_services[i].name_
           , performance_counters::counter_raw
           , help
           , creator
@@ -767,49 +794,41 @@ response component_namespace::statistics_counter(
 // access current counter values
 boost::int64_t component_namespace::counter_data::get_bind_prefix_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_prefix_.count_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_bind_name_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_name_.count_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_resolve_id_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolve_id_.count_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_unbind_name_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(unbind_name_.count_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_iterate_types_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(iterate_types_.count_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_component_type_name_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(get_component_type_name_.count_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_num_localities_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(num_localities_.count_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_overall_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_prefix_.count_, reset) +
         util::get_and_reset_value(bind_name_.count_, reset) +
         util::get_and_reset_value(resolve_id_.count_, reset) +
@@ -822,49 +841,41 @@ boost::int64_t component_namespace::counter_data::get_overall_count(bool reset)
 // access execution time counters
 boost::int64_t component_namespace::counter_data::get_bind_prefix_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_prefix_.time_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_bind_name_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_name_.time_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_resolve_id_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolve_id_.time_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_unbind_name_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(unbind_name_.time_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_iterate_types_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(iterate_types_.time_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_component_type_name_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(get_component_type_name_.time_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_num_localities_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(num_localities_.time_, reset);
 }
 
 boost::int64_t component_namespace::counter_data::get_overall_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_prefix_.time_, reset) +
         util::get_and_reset_value(bind_name_.time_, reset) +
         util::get_and_reset_value(resolve_id_.time_, reset) +
@@ -877,43 +888,36 @@ boost::int64_t component_namespace::counter_data::get_overall_time(bool reset)
 // increment counter values
 void component_namespace::counter_data::increment_bind_prefix_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++bind_prefix_.count_;
 }
 
 void component_namespace::counter_data::increment_bind_name_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++bind_name_.count_;
 }
 
 void component_namespace::counter_data::increment_resolve_id_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++resolve_id_.count_;
 }
 
 void component_namespace::counter_data::increment_unbind_name_ount()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++unbind_name_.count_;
 }
 
 void component_namespace::counter_data::increment_iterate_types_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++iterate_types_.count_;
 }
 
 void component_namespace::counter_data::increment_get_component_type_name_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++get_component_type_name_.count_;
 }
 
 void component_namespace::counter_data::increment_num_localities_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++num_localities_.count_;
 }
 

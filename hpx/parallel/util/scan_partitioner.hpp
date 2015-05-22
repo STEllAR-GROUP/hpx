@@ -48,20 +48,26 @@ namespace hpx { namespace parallel { namespace util
 
                     // estimate a chunk size based on number of cores used
                     std::size_t count = count_;
+                    HPX_ASSERT(count > 0);
+
                     chunk_size = get_static_chunk_size(policy, workitems, f1,
                         first, count, chunk_size);
-
-                    HPX_ASSERT(workitems.size() == 2);
 
                     // schedule every chunk on a separate thread
                     workitems.reserve(count_ / chunk_size + 2);
                     chunk_sizes.reserve(workitems.capacity());
 
-                    chunk_sizes.push_back(count_ - count);
+                    // If the size of count was enough to warrant testing for a
+                    // chunk_size, add to chunk_sizes and pre-initialize second
+                    // intermediate result.
+                    if (workitems.size() == 2)
+                    {
+                        chunk_sizes.push_back(count_ - count);
+                        workitems[1] = lcos::local::dataflow(hpx::launch::sync,
+                            f2, workitems[0], workitems[1]);
+                    }
 
-                    // pre-initialize second intermediate result
-                    workitems[1] = lcos::local::dataflow(hpx::launch::sync,
-                        f2, workitems[0], workitems[1]);
+                    std::size_t parts = 0;
 
                     // Schedule first step of scan algorithm, step 2 is
                     // performed as soon as the current partition and the
@@ -70,12 +76,14 @@ namespace hpx { namespace parallel { namespace util
                     while (count != 0)
                     {
                         std::size_t chunk = (std::min)(chunk_size, count);
+                        BOOST_SCOPED_ENUM(hpx::launch) p = (++parts & 0x7) ?
+                            hpx::launch::sync : hpx::launch::async;
+
                         if (exec)
                         {
                             workitems.push_back(
                                 lcos::local::dataflow(
-                                    hpx::launch::sync, f2,
-                                    workitems.back(),
+                                    p, f2, workitems.back(),
                                     hpx::async(exec, f1, first, chunk)
                                 ));
                         }
@@ -83,8 +91,7 @@ namespace hpx { namespace parallel { namespace util
                         {
                             workitems.push_back(
                                 lcos::local::dataflow(
-                                    hpx::launch::sync, f2,
-                                    workitems.back(),
+                                    p, f2, workitems.back(),
                                     hpx::async(hpx::launch::fork,
                                         f1, first, chunk)
                                 ));
@@ -131,20 +138,26 @@ namespace hpx { namespace parallel { namespace util
 
                     // estimate a chunk size based on number of cores used
                     std::size_t count = count_;
+                    HPX_ASSERT(count > 0);
+
                     chunk_size = get_static_chunk_size(policy, workitems, f1,
                         first, count, chunk_size);
-
-                    HPX_ASSERT(workitems.size() == 2);
 
                     // schedule every chunk on a separate thread
                     workitems.reserve(count_ / chunk_size + 2);
                     chunk_sizes.reserve(workitems.capacity());
 
-                    chunk_sizes.push_back(count_ - count);
+                    // If the size of count was enough to warrant testing for a
+                    // chunk_size, add to chunk_sizes and pre-initialize second
+                    // intermediate result.
+                    if (workitems.size() == 2)
+                    {
+                        chunk_sizes.push_back(count_ - count);
+                        workitems[1] = lcos::local::dataflow(hpx::launch::sync,
+                            f2, workitems[0], workitems[1]);
+                    }
 
-                    // pre-initialize second intermediate result
-                    workitems[1] = lcos::local::dataflow(hpx::launch::sync,
-                        f2, workitems[0], workitems[1]);
+                    std::size_t parts = 0;
 
                     // Schedule first step of scan algorithm, step 2 is
                     // performed as soon as the current partition and the
@@ -153,12 +166,14 @@ namespace hpx { namespace parallel { namespace util
                     while (count != 0)
                     {
                         std::size_t chunk = (std::min)(chunk_size, count);
+                        BOOST_SCOPED_ENUM(hpx::launch) p = (++parts & 0x7) ?
+                            hpx::launch::sync : hpx::launch::async;
+
                         if (exec)
                         {
                             workitems.push_back(
                                 lcos::local::dataflow(
-                                    hpx::launch::sync, f2,
-                                    workitems.back(),
+                                    p, f2, workitems.back(),
                                     hpx::async(exec, f1, first, chunk)
                                 ));
                         }
@@ -166,8 +181,7 @@ namespace hpx { namespace parallel { namespace util
                         {
                             workitems.push_back(
                                 lcos::local::dataflow(
-                                    hpx::launch::sync, f2,
-                                    workitems.back(),
+                                    p, f2, workitems.back(),
                                     hpx::async(hpx::launch::fork,
                                         f1, first, chunk)
                                 ));

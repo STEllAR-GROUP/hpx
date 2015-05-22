@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PP_IS_ITERATING
-
 #if !defined(HPX_COMPONENTS_MEMORY_BLOCK_OCT_22_2008_0416PM)
 #define HPX_COMPONENTS_MEMORY_BLOCK_OCT_22_2008_0416PM
 
@@ -14,12 +12,13 @@
 #include <hpx/runtime/components/stubs/memory_block.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/util/unwrapped.hpp>
+#include <hpx/util/detail/pack.hpp>
 
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/repeat.hpp>
-#include <boost/preprocessor/iterate.hpp>
-#include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/is_const.hpp>
+#include <boost/type_traits/is_convertible.hpp>
+#include <boost/type_traits/remove_const.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/conditional.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -335,60 +334,17 @@ namespace hpx { namespace components
         // now return the resolved result
         return lazy_result.get();
     }
-}}
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/runtime/components/preprocessed/memory_block.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/memory_block_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (2, HPX_WAIT_ARGUMENT_LIMIT,                                          \
-    "hpx/runtime/components/memory_block.hpp"))                               \
-    /**/
-
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-//  Preprocessor vertical repetition code
-///////////////////////////////////////////////////////////////////////////////
-#else // defined(BOOST_PP_IS_ITERATING)
-
-#define N BOOST_PP_ITERATION()
-#define HPX_ACCESS_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)                  \
-        access_memory_block<T>                                                \
-    /**/
-#define HPX_GET_ASYNC_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)               \
-        naming::id_type const& BOOST_PP_CAT(g, n)                            \
-    /**/
-#define HPX_WAIT_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)                    \
-        stubs::memory_block::get_async(BOOST_PP_CAT(g, n))                    \
-    /**/
-
-namespace hpx { namespace components
-{
-    template <typename T>
-    inline util::tuple<BOOST_PP_REPEAT(N, HPX_ACCESS_ARGUMENT, _)>
-    get_memory_block_async(BOOST_PP_REPEAT(N, HPX_GET_ASYNC_ARGUMENT, _))
+    template <typename T, typename ...Us>
+    inline typename boost::enable_if<
+        util::detail::all_of<
+            boost::is_convertible<Us const&, naming::id_type>...>,
+        util::tuple<typename boost::conditional<
+            false, Us, access_memory_block<T> >::type...>
+    >::type get_memory_block_async(Us const&... vs)
     {
-        return util::unwrapped(BOOST_PP_REPEAT(N, HPX_WAIT_ARGUMENT, _));
+        return util::unwrapped(stubs::memory_block::get_async(vs)...);
     }
 }}
-
-#undef HPX_WAIT_ARGUMENT
-#undef HPX_GET_ASYNC_ARGUMENT
-#undef HPX_ACCESS_ARGUMENT
-#undef N
 
 #endif

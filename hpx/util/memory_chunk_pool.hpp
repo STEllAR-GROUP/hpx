@@ -10,6 +10,7 @@
 
 #include <hpx/util/memory_chunk.hpp>
 
+#include <cstdlib>
 #include <vector>
 
 namespace hpx { namespace util
@@ -27,23 +28,29 @@ namespace hpx { namespace util
         typedef memory_chunk<mutex_type> memory_chunk_type;
 
         typedef typename memory_chunk_type::size_type size_type;
-        typedef std::multimap<size_type, char *> large_chunks_type;
+        typedef std::multimap<size_type, char *> backup_chunks_type;
+
+        static const std::size_t offset_ = sizeof(memory_chunk_type *);
 
         memory_chunk_pool(std::size_t chunk_size, std::size_t max_chunks)
-          : memory_chunks_(max_chunks, memory_chunk_type(chunk_size))
+          : last_used_chunk_(0)
+          , memory_chunks_(max_chunks, memory_chunk_type(chunk_size))
           , chunk_size_(chunk_size)
           , max_chunks_(max_chunks)
+          , backup_size_(0)
+          , backup_threshold_(max_chunks * chunk_size)
         {
         }
 
         ~memory_chunk_pool()
         {
-            BOOST_FOREACH(typename large_chunks_type::value_type &v, large_chunks_)
+            BOOST_FOREACH(typename backup_chunks_type::value_type &v, backup_chunks_)
             {
-#if POSIX_VERSION_
-                free(v.second);
+                char *ptr = v.second - offset_;
+#if _POSIX_SOURCE
+                free(ptr);
 #else
-                delete[] v.second;
+                delete[] ptr;
 #endif
             }
         }
@@ -53,12 +60,13 @@ namespace hpx { namespace util
             if(size > chunk_size_)
                 return std::make_pair(p, size);
 
-            typename mutex_type::scoped_lock l(chunks_mtx_);
-            BOOST_FOREACH(memory_chunk_type & chunk, memory_chunks_)
+            memory_chunk_type *chunk = 0;
+            std::memcpy(&chunk, p - offset_, offset_);
+            if(chunk)
             {
-                if(chunk.contains(p))
-                    return std::make_pair(chunk.data_.get(), chunk_size_);
+                return std::make_pair(chunk->data_.get(), chunk_size_);
             }
+
             return std::make_pair(p, size);
         }
 
@@ -66,69 +74,114 @@ namespace hpx { namespace util
         {
             char * result = 0;
 
-            if(size <= chunk_size_)
+            if(size + offset_ <= chunk_size_)
             {
-                typename mutex_type::scoped_lock l(chunks_mtx_);
-                BOOST_FOREACH(memory_chunk_type & chunk, memory_chunks_)
+                std::size_t i = last_used_chunk_;
+                HPX_ASSERT(i < memory_chunks_.size());
+                std::size_t count = 0;
+                while(count != memory_chunks_.size())
                 {
-                    result = chunk.allocate(size);
+                    memory_chunk_type & chunk = memory_chunks_[i];
+
+                    // We encode the chunk address at the first few bytes to
+                    // avoid a linear search on deallocation
+                    result = chunk.allocate(size + offset_);
                     if(result != 0)
-                        return result;
+                    {
+                        void * chunk_addr = &chunk;
+                        std::memcpy(result, &chunk_addr, offset_);
+#if defined(HPX_DEBUG)
+                        memory_chunk_type *chunk_test = 0;
+                        std::memcpy(&chunk_test, result, offset_);
+                        HPX_ASSERT(chunk_test == &chunk);
+#endif
+                        last_used_chunk_.store(i);
+                        return result + offset_;
+                    }
+                    i = (i + 1) % memory_chunks_.size();
+                    ++count;
                 }
             }
 
             {
-                typename mutex_type::scoped_lock l(large_chunks_mtx_);
-                typename large_chunks_type::iterator it =
-                    large_chunks_.find(size);
+                typename mutex_type::scoped_lock l(backup_chunks_mtx_);
+                typename backup_chunks_type::iterator it =
+                    backup_chunks_.lower_bound(size);
 
-                if(it != large_chunks_.end())
+                if(it != backup_chunks_.end())
                 {
                     result = it->second;
-                    large_chunks_.erase(it);
+                    backup_size_ -= it->first;
+                    backup_chunks_.erase(it);
                     return result;
                 }
             }
 
-#if POSIX_VERSION_
+#if _POSIX_SOURCE
             int ret = posix_memalign(
                 reinterpret_cast<void **>(&result),
-                EXEC_PAGESIZE, size);
-            if(ret != 0)
+                EXEC_PAGESIZE, size + offset_);
+            if(ret != 0 && !result)
                 throw std::bad_alloc();
 #else
             result = new char[size];
 #endif
-            return result;
+            std::memset(result, 0, offset_);
+            return result + offset_;
         }
 
         void deallocate(char * p, size_type size)
         {
-            if(size <= chunk_size_)
+            memory_chunk_type *chunk = 0;
+            std::memcpy(&chunk, p - offset_, offset_);
+            if(chunk)
             {
-                typename mutex_type::scoped_lock l(chunks_mtx_);
-                BOOST_FOREACH(memory_chunk_type & chunk, memory_chunks_)
+#if defined(HPX_DEBUG)
+                bool valid_chunk = false;
+                BOOST_FOREACH(memory_chunk_type & c, memory_chunks_)
                 {
-                    if(chunk.deallocate(p, size))
+                    if(&c == chunk)
                     {
-                        return;
+                        valid_chunk = true;
+                        break;
                     }
                 }
+                HPX_ASSERT(valid_chunk);
+#endif
+                HPX_ASSERT(chunk->contains(p - offset_));
+                chunk->deallocate(p - offset_, size + offset_);
+                HPX_ASSERT(std::size_t(chunk - &memory_chunks_[0]) < memory_chunks_.size());
+                last_used_chunk_.store(chunk - &memory_chunks_[0]);
             }
-
+            else
             {
-                typename mutex_type::scoped_lock l(large_chunks_mtx_);
-                large_chunks_.insert(std::make_pair(size, p));
+                typename mutex_type::scoped_lock l(backup_chunks_mtx_);
+                if(backup_size_ <= backup_threshold_)
+                {
+                    backup_size_ += size;
+                    backup_chunks_.insert(std::make_pair(size, p));
+                }
+                else
+                {
+                    char *ptr = p - offset_;
+#if _POSIX_SOURCE
+                    free(ptr);
+#else
+                    delete[] ptr;
+#endif
+                }
             }
         }
 
-        mutable mutex_type chunks_mtx_;
+        boost::atomic<std::size_t> last_used_chunk_;
         std::vector<memory_chunk_type> memory_chunks_;
         std::size_t const chunk_size_;
         std::size_t const max_chunks_;
 
-        mutable mutex_type large_chunks_mtx_;
-        large_chunks_type large_chunks_;
+        mutable mutex_type backup_chunks_mtx_;
+        backup_chunks_type backup_chunks_;
+        std::size_t backup_size_;
+        std::size_t const backup_threshold_;
     };
 
     namespace detail

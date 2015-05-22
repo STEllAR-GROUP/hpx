@@ -23,14 +23,14 @@ namespace hpx { namespace util
 
         static void deleter(char * p)
         {
-#ifdef POSIX_VERSION_
+#ifdef _POSIX_SOURCE
             free(p);
 #else
             delete[] p;
 #endif
         }
 
-        memory_chunk(std::size_t chunk_size)
+        explicit memory_chunk(std::size_t chunk_size)
           : chunk_size_(chunk_size)
           , allocated_(0)
           , current_(0)
@@ -41,7 +41,7 @@ namespace hpx { namespace util
             HPX_ASSERT(allocated_ == 0);
             HPX_ASSERT(free_list_.empty());
             HPX_ASSERT(!data_);
-#ifdef POSIX_VERSION_
+#ifdef _POSIX_SOURCE
             char * ptr = 0;
             int ret = posix_memalign(
                 reinterpret_cast<void **>(&ptr), EXEC_PAGESIZE,
@@ -143,7 +143,7 @@ namespace hpx { namespace util
         char *allocate(size_type size)
         {
             typename mutex_type::scoped_lock l(mtx_);
-            check_invariants_locked(0, size);
+            check_invariants_locked();
 
             if(!data_) charge();
 
@@ -193,12 +193,11 @@ namespace hpx { namespace util
 
         bool deallocate(char * p, size_type size)
         {
+            typename mutex_type::scoped_lock l(mtx_);
             HPX_ASSERT(data_);
-            if(!contains(p))
+            if(!contains_locked(p))
                 return false;
 
-            typename mutex_type::scoped_lock l(mtx_);
-            HPX_ASSERT(contains_locked(p));
             HPX_ASSERT(p != current_);
 
             check_invariants_locked(p, size);
@@ -240,16 +239,16 @@ namespace hpx { namespace util
                 if(p == chunk_end)
                 {
                     size_type new_size = size + jt->first;
-                    iterator new_free_block = jt->second;
+                    iterator new_free = jt->second;
                     free_list_.erase(jt);
-                    if(p + size == current_)
+                    if(new_free + new_size == current_)
                     {
                         current_ -= new_size;
                         allocated_ -= new_size;
                         check_invariants_locked(0, size);
                         return true;
                     }
-                    free_list_.insert(std::make_pair(new_size, new_free_block));
+                    free_list_.insert(std::make_pair(new_size, new_free));
                     check_invariants_locked(0, size);
                     return true;
                 }

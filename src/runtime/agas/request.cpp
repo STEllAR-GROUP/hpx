@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Thomas Heller
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -101,13 +101,15 @@ namespace hpx { namespace agas
           , util::tuple<
                 naming::gid_type // gid
               , gva              // resolved address
-              , boost::uint32_t  // locality_id
+              , naming::gid_type // locality
             >
             // 0x3
             // primary_ns_resolve_gid
             // primary_ns_change_credit_one
             // primary_ns_free
             // primary_ns_resolve_locality
+            // primary_ns_begin_migration
+            // primary_ns_end_migration
           , util::tuple<
                 naming::gid_type // gid
             >
@@ -270,10 +272,10 @@ namespace hpx { namespace agas
         namespace_action_code type_
       , naming::gid_type const& gid_
       , gva const& gva_
-      , boost::uint32_t locality_id_
+      , naming::gid_type locality_
         )
       : mc(type_)
-      , data(new request_data(util::make_tuple(gid_, gva_, locality_id_)))
+      , data(new request_data(util::make_tuple(gid_, gva_, locality_)))
     {
         HPX_ASSERT(type_ == primary_ns_bind_gid);
     }
@@ -503,7 +505,8 @@ namespace hpx { namespace agas
         switch (data->which())
         {
             case request_data::subtype_gid_gva_prefix:
-                return data->get_data<request_data::subtype_gid_gva_prefix, 2>(ec);
+                return naming::get_locality_id_from_gid(
+                    data->get_data<request_data::subtype_gid_gva_prefix, 2>(ec));
 
             case request_data::subtype_name_prefix:
                 return data->get_data<request_data::subtype_name_prefix, 1>(ec);
@@ -515,6 +518,14 @@ namespace hpx { namespace agas
                 return naming::invalid_locality_id;
             }
         }
+    }
+
+    naming::gid_type request::get_locality(
+        error_code& ec
+        ) const
+    {
+        HPX_ASSERT(data->which() == request_data::subtype_gid_gva_prefix);
+        return data->get_data<request_data::subtype_gid_gva_prefix, 2>(ec);
     }
 
     request::iterate_names_function_type request::get_iterate_names_function(
@@ -549,7 +560,7 @@ namespace hpx { namespace agas
 
             default: {
                 HPX_THROWS_IF(ec, bad_parameter,
-                    "request::get_locality",
+                    "request::get_endpoints",
                     "invalid operation for request type");
                 return parcelset::endpoints_type();
             }

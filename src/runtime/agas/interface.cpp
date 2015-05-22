@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -313,6 +313,18 @@ bool bind_sync(
     return agas_.bind_async(gid_, addr, locality_id).get(ec);
 }
 
+bool bind_sync(
+    naming::gid_type const& gid
+  , naming::address const& addr
+  , naming::gid_type const& locality_
+  , error_code& ec
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    naming::gid_type gid_(naming::detail::get_stripped_gid(gid));
+    return agas_.bind_async(gid_, addr, locality_).get(ec);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 void garbage_collect_non_blocking(
     error_code& ec
@@ -476,6 +488,21 @@ hpx::future<hpx::id_type> on_symbol_namespace_event(
 {
     naming::resolver_client& resolver = naming::get_agas_client();
     return resolver.on_symbol_namespace_event(name, evt, call_for_past_events);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+hpx::future<std::pair<naming::id_type, naming::address> >
+    begin_migration(naming::id_type const& id,
+        naming::id_type const& target_locality)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.begin_migration_async(id, target_locality);
+}
+
+hpx::future<bool> end_migration(naming::id_type const& id)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.end_migration_async(id);
 }
 
 }}

@@ -4,6 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
+#if defined(HPX_PARCELPORT_MPI)
+#include <mpi.h>
+#endif
+
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
@@ -15,13 +21,18 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
-#include <hpx/runtime/parcelset/decode_parcels.hpp>
+
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
+
 #include <hpx/plugins/parcelport/mpi/locality.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/sender.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver.hpp>
 
 #include <hpx/util/memory_chunk_pool.hpp>
+#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 namespace hpx
 {
@@ -43,6 +54,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     )
                 );
         }
+
+        static std::size_t max_connections(util::runtime_configuration const& ini)
+        {
+            return hpx::util::get_entry_as<std::size_t>(
+                ini, "hpx.parcel.mpi.max_connections", HPX_PARCEL_MAX_CONNECTIONS);
+        }
     public:
         parcelport(util::runtime_configuration const& ini,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
@@ -51,9 +68,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , archive_flags_(boost::archive::no_header)
           , stopped_(false)
           , bootstrapping_(true)
-          , chunk_pool_(4194304, 512)
-          , sender_(stopped_)
-          , receiver_(*this, chunk_pool_, stopped_)
+          , max_connections_(max_connections(ini))
+          , chunk_pool_(4096, max_connections_)
+          , sender_(max_connections_)
+          , receiver_(*this, chunk_pool_, max_connections_)
+          , enable_parcel_handling_(true)
+          , handles_parcels_(0)
         {
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -80,7 +100,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         ~parcelport()
         {
-            receive_early_parcels_thread_.join();
+            if(receive_early_parcels_thread_.joinable())
+                receive_early_parcels_thread_.join();
             util::mpi_environment::finalize();
         }
 
@@ -162,8 +183,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         void stop(bool blocking = true)
         {
             stopped_ = true;
-            sender_.stop();
-            receiver_.stop();
+            while(handles_parcels_ != 0)
+            {
+                if(threads::get_self_ptr())
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "mpi::parcelport::enable");
+            }
             if(blocking)
             {
                 MPI_Barrier(util::mpi_environment::communicator());
@@ -172,18 +197,49 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         void enable(bool new_state)
         {
+            enable_parcel_handling_ = new_state;
+            if(!new_state)
+            {
+                while(handles_parcels_ != 0)
+                {
+                    if(threads::get_self_ptr())
+                        hpx::this_thread::suspend(hpx::threads::pending,
+                            "mpi::parcelport::enable");
+                }
+            }
+        }
+
+        void wait_for_enabled_put_parcel(parcelset::locality const & dest, parcel p,
+            write_handler_type f)
+        {
+            while(!enable_parcel_handling_)
+            {
+                if(threads::get_self_ptr())
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "mpi::parcelport::put_parcel");
+            }
+
+            put_parcel(dest, p, f);
         }
 
         void put_parcel(parcelset::locality const & dest, parcel p,
             write_handler_type f)
         {
-            //std::cout << "put parcel ...\n";
-            if(stopped_) return;
+            handles_parcels h(this);
+
+            if(!enable_parcel_handling_)
+            {
+                hpx::threads::register_thread(
+                    util::bind(&parcelport::wait_for_enabled_put_parcel, this, dest, p, f)
+                  , "mpi::parcelport::put_parcel");
+                return;
+            }
+
             util::high_resolution_timer timer;
 
             allocator_type alloc(chunk_pool_);
             snd_buffer_type buffer(alloc);
-            encode_parcel(p, buffer, archive_flags_, this->get_max_outbound_message_size());
+            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, this->get_max_outbound_message_size());
 
             buffer.data_point_.time_ = timer.elapsed_nanoseconds();
 
@@ -205,10 +261,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             //do_background_work();
         }
 
-        void do_background_work(std::size_t num_thread)
+        bool do_background_work(std::size_t num_thread)
         {
-            if(stopped_) return;
-            receiver_.receive();
+            if (stopped_)
+                return false;
+            handles_parcels h(this);
+
+            if(!enable_parcel_handling_)
+                return false;
+
+            return receiver_.receive();
         }
 
     private:
@@ -219,18 +281,41 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             data_type;
         typedef parcel_buffer<data_type> snd_buffer_type;
         typedef parcel_buffer<data_type, data_type> rcv_buffer_type;
+        typedef lcos::local::spinlock mutex_type;
 
         int archive_flags_;
 
         boost::atomic<bool> stopped_;
         boost::atomic<bool> bootstrapping_;
+        std::size_t const max_connections_;
 
         memory_pool_type chunk_pool_;
 
+        mutex_type connections_mtx_;
+        lcos::local::detail::condition_variable connections_cond_;
         sender sender_;
         receiver receiver_;
 
         boost::thread receive_early_parcels_thread_;
+
+        boost::atomic<bool> enable_parcel_handling_;
+        boost::atomic<std::size_t> handles_parcels_;
+
+        struct handles_parcels
+        {
+            handles_parcels(parcelport *pp)
+              : this_(pp)
+            {
+                ++this_->handles_parcels_;
+            }
+
+            ~handles_parcels()
+            {
+                --this_->handles_parcels_;
+            }
+
+            parcelport *this_;
+        };
 
         void receive_early_parcels(hpx::runtime * rt)
         {
@@ -246,7 +331,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 rt->unregister_thread();
                 throw;
-                return;
             }
             rt->unregister_thread();
         }
@@ -256,16 +340,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if (ec) {
                 // all errors during early parcel handling are fatal
-                try {
-                    HPX_THROW_EXCEPTION(network_error, "early_write_handler",
+                boost::exception_ptr exception =
+                    hpx::detail::get_exception(hpx::exception(ec),
+                        "mpi::early_write_handler", __FILE__, __LINE__,
                         "error while handling early parcel: " +
                             ec.message() + "(" +
-                            boost::lexical_cast<std::string>(ec.value())+ ")");
-                }
-                catch (hpx::exception const& e) {
-                    hpx::detail::report_exception_and_terminate(e);
-                }
-                return;
+                            boost::lexical_cast<std::string>(ec.value()) +
+                            ")" + parcelset::dump_parcel(p));
+
+                hpx::report_error(exception);
             }
         }
     };
@@ -299,9 +382,10 @@ namespace hpx { namespace traits
 #if defined(HPX_PARCELPORT_MPI_ENV)
                 "env = ${HPX_PARCELPORT_MPI_ENV:" HPX_PARCELPORT_MPI_ENV "}\n"
 #else
-                "env = ${HPX_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE}\n"
+                "env = ${HPX_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE}\n"
 #endif
                 "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:1}\n"
+                "max_connections = ${HPX_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"
                 ;
         }
     };

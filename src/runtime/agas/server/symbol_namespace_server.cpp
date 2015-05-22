@@ -45,8 +45,7 @@ response symbol_namespace::service(
         case symbol_ns_bind:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.bind_.time_
+                    counter_data_.bind_.time_
                 );
                 counter_data_.increment_bind_count();
                 return bind(req, ec);
@@ -54,8 +53,7 @@ response symbol_namespace::service(
         case symbol_ns_resolve:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.resolve_.time_
+                    counter_data_.resolve_.time_
                 );
                 counter_data_.increment_resolve_count();
                 return resolve(req, ec);
@@ -63,8 +61,7 @@ response symbol_namespace::service(
         case symbol_ns_unbind:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.unbind_.time_
+                    counter_data_.unbind_.time_
                 );
                 counter_data_.increment_unbind_count();
                 return unbind(req, ec);
@@ -72,8 +69,7 @@ response symbol_namespace::service(
         case symbol_ns_iterate_names:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.iterate_names_.time_
+                    counter_data_.iterate_names_.time_
                 );
                 counter_data_.increment_iterate_names_count();
                 return iterate(req, ec);
@@ -81,8 +77,7 @@ response symbol_namespace::service(
         case symbol_ns_on_event:
             {
                 update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.on_event_.time_
+                    counter_data_.on_event_.time_
                 );
                 counter_data_.increment_on_event_count();
                 return on_event(req, ec);
@@ -111,6 +106,8 @@ response symbol_namespace::service(
         case primary_ns_increment_credit:
         case primary_ns_decrement_credit:
         case primary_ns_allocate:
+        case primary_ns_begin_migration:
+        case primary_ns_end_migration:
         {
             LAGAS_(warning) <<
                 "symbol_namespace::service, redirecting request to "
@@ -167,27 +164,59 @@ void symbol_namespace::register_counter_types(
           i != detail::num_symbol_namespace_services;
           ++i)
     {
+        // global counters are handled elsewhere
+        if (detail::symbol_namespace_services[i].code_ == symbol_ns_statistics_counter)
+            continue;
+
         std::string name(detail::symbol_namespace_services[i].name_);
         std::string help;
         std::string::size_type p = name.find_last_of('/');
-        if (p != std::string::npos) {
-            if (detail::symbol_namespace_services[i].target_ == detail::counter_target_count)
-                help = boost::str(help_count % name.substr(p+1));
-            else
-                help = boost::str(help_time % name.substr(p+1));
-        }
-        else {
-            HPX_ASSERT(detail::symbol_namespace_services[i].code_ ==
-                symbol_ns_statistics_counter);
-            name = symbol_namespace_service_name + name;
-            if (detail::symbol_namespace_services[i].target_ == detail::counter_target_count)
-                help = "returns the overall number of invocations of all symbol AGAS services";
-            else
-                help = "returns the overall execution time of all symbol AGAS services";
-        }
+        HPX_ASSERT(p != std::string::npos);
+
+        if (detail::symbol_namespace_services[i].target_ == detail::counter_target_count)
+            help = boost::str(help_count % name.substr(p+1));
+        else
+            help = boost::str(help_time % name.substr(p+1));
 
         performance_counters::install_counter_type(
             agas::performance_counter_basename + name
+          , performance_counters::counter_raw
+          , help
+          , creator
+          , &performance_counters::locality_counter_discoverer
+          , HPX_PERFORMANCE_COUNTER_V1
+          , detail::symbol_namespace_services[i].uom_
+          , ec
+          );
+        if (ec) return;
+    }
+}
+
+void symbol_namespace::register_global_counter_types(
+    error_code& ec
+    )
+{
+    performance_counters::create_counter_func creator(
+        boost::bind(&performance_counters::agas_raw_counter_creator, _1, _2
+      , agas::server::symbol_namespace_service_name));
+
+    for (std::size_t i = 0;
+          i != detail::num_symbol_namespace_services;
+          ++i)
+    {
+        // local counters are handled elsewhere
+        if (detail::symbol_namespace_services[i].code_ != symbol_ns_statistics_counter)
+            continue;
+
+        std::string help;
+        if (detail::symbol_namespace_services[i].target_ == detail::counter_target_count)
+            help = "returns the overall number of invocations of all symbol AGAS services";
+        else
+            help = "returns the overall execution time of all symbol AGAS services";
+
+        performance_counters::install_counter_type(
+            std::string(agas::performance_counter_basename) +
+                detail::symbol_namespace_services[i].name_
           , performance_counters::counter_raw
           , help
           , creator
@@ -696,37 +725,31 @@ response symbol_namespace::statistics_counter(
 // access current counter values
 boost::int64_t symbol_namespace::counter_data::get_bind_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_.count_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_resolve_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolve_.count_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_unbind_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(unbind_.count_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_iterate_names_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(iterate_names_.count_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_on_event_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(on_event_.count_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_overall_count(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_.count_, reset) +
         util::get_and_reset_value(resolve_.count_, reset) +
         util::get_and_reset_value(unbind_.count_, reset) +
@@ -737,37 +760,31 @@ boost::int64_t symbol_namespace::counter_data::get_overall_count(bool reset)
 // access execution time counters
 boost::int64_t symbol_namespace::counter_data::get_bind_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_.time_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_resolve_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(resolve_.time_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_unbind_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(unbind_.time_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_iterate_names_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(iterate_names_.time_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_on_event_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(on_event_.time_, reset);
 }
 
 boost::int64_t symbol_namespace::counter_data::get_overall_time(bool reset)
 {
-    mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(bind_.time_, reset) +
         util::get_and_reset_value(resolve_.time_, reset) +
         util::get_and_reset_value(unbind_.time_, reset) +
@@ -778,31 +795,26 @@ boost::int64_t symbol_namespace::counter_data::get_overall_time(bool reset)
 // increment counter values
 void symbol_namespace::counter_data::increment_bind_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++bind_.count_;
 }
 
 void symbol_namespace::counter_data::increment_resolve_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++resolve_.count_;
 }
 
 void symbol_namespace::counter_data::increment_unbind_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++unbind_.count_;
 }
 
 void symbol_namespace::counter_data::increment_iterate_names_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++iterate_names_.count_;
 }
 
 void symbol_namespace::counter_data::increment_on_event_count()
 {
-    mutex_type::scoped_lock l(mtx_);
     ++on_event_.count_;
 }
 

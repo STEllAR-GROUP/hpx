@@ -72,6 +72,7 @@ include(CMakeDependentOption)
 include(HPX_Utils)
 include(HPX_ExportTargets)
 include(HPX_Libraries)
+include(HPX_LibraryDir)
 include(HPX_AddConfigTest)
 include(HPX_AddDefinitions)
 
@@ -110,7 +111,7 @@ endif()
 
 hpx_option(HPX_MALLOC
   STRING
-  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc and tbbmalloc (default is: tcmalloc)"
+  "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)"
   ${DEFAULT_MALLOC} ADVANCED)
 
 hpx_option(HPX_WITH_HWLOC
@@ -138,9 +139,6 @@ hpx_option(HPX_BUILD_DOCUMENTATION BOOL "Build the HPX documentation (default OF
 
 hpx_option(HPX_BUILD_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be build as a single page HTML (default OFF)." OFF CATEGORY "Build Targets")
 
-hpx_option(HPX_AUTOMATIC_PREPROCESSING BOOL "True if the automatic header preprocessing target should be created (default: OFF)." OFF ADVANCED)
-hpx_option(HPX_WAVE_ADDITIONAL_INCLUDE_DIRS STRING "Additional (compiler specific) include directories for the wave preprocessing tool." "" CATEGORY "Generic" ADVANCED)
-
 ################################################################################
 # Some platforms do not support dynamic linking. Enable this to link all
 # libraries statically. This also changes some of the internals of HPX related
@@ -167,7 +165,11 @@ hpx_option(HPX_BUILD_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests
 hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_BUILD_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 
-hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" ON ADVANCED)
+set(HPX_FULL_RPATH_DEFAULT ON)
+if(APPLE)
+  set(HPX_FULL_RPATH_DEFAULT OFF)
+endif()
+hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" OFF ADVANCED)
 hpx_option(HPX_BUILD_WITH_INSTALL_PREFIX BOOL "Always set the HPX_PREFIX default to the install directory (default: OFF)" OFF ADVANCED)
 
 ################################################################################
@@ -181,16 +183,6 @@ hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON
 if(HPX_NATIVE_TLS)
   hpx_info("Native TLS is enabled.")
   hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
-endif()
-
-################################################################################
-# Disable the use of partially preprocessed header files
-################################################################################
-hpx_option(HPX_PREPROCESSOR_LIMIT_EXPANSION BOOL "Do not use preprocessed headers (default: OFF)" OFF ADVANCED)
-
-if(HPX_PREPROCESSOR_LIMIT_EXPANSION)
-  hpx_info("Use of preprocessed headers is disabled.")
-  hpx_add_config_define(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 endif()
 
 ################################################################################
@@ -226,10 +218,6 @@ if(NOT HPX_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_config_define(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
-hpx_option(HPX_UNIQUE_FUTURE_ALIAS BOOL
-  "HPX will defined unique_future<R> as a template alias to future<R>. (default OFF)."
-  OFF ADVANCED)
-
 ## Thread Manager related build options
 
 set(HPX_MAX_CPU_COUNT_DEFAULT "64")
@@ -238,6 +226,14 @@ hpx_option(HPX_MAX_CPU_COUNT STRING
   ${HPX_MAX_CPU_COUNT_DEFAULT}
   CATEGORY "Thread Manager" ADVANCED)
 hpx_add_config_define(HPX_MAX_CPU_COUNT ${HPX_MAX_CPU_COUNT})
+
+if(NOT (${HPX_MAX_CPU_COUNT} LESS 65))
+  set(HPX_WITH_MORE_THAN_64_THREADS_DEFAULT OFF)
+  hpx_option(HPX_WITH_MORE_THAN_64_THREADS STRING
+    "HPX applications will be able to run on more than 64 cores"
+    ${HPX_WITH_MORE_THAN_64_THREADS_DEFAULT}
+    CATEGORY "Thread Manager" ADVANCED)
+endif()
 
 hpx_option(HPX_THREAD_STACK_MMAP BOOL
   "Use mmap for stack allocation on appropriate platforms"
@@ -399,8 +395,11 @@ hpx_option(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS STRING "Maximum number of ch
 
 ## mpi parcelport settings
 hpx_option(HPX_PARCELPORT_MPI_ENV STRING
-  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE)."
-  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE" CATEGORY "Parcelport" ADVANCED)
+  "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE)."
+  "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE:ALPS_APP_PE" CATEGORY "Parcelport" ADVANCED)
+hpx_option(HPX_PARCELPORT_MPI_MULTITHREADED BOOL
+  "Turn on MPI multithreading support (default: ON)."
+  ON CATEGORY "Parcelport" ADVANCED)
 
 ## Profiling related build options
 hpx_option(HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
@@ -739,6 +738,9 @@ if(MSVC)
 
   hpx_add_config_define(BOOST_USE_WINDOWS_H)
   hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+  if(NOT CMAKE_CL_64)
+    hpx_add_config_define(BOOST_NO_ALIGNMENT)
+  endif()
   if(NOT HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
   endif()
@@ -978,13 +980,6 @@ if(MSVC)
   endif()
 endif()
 
-if(HPX_UNIQUE_FUTURE_ALIAS)
-  if(NOT HPX_WITH_CXX11_ALIAS_TEMPLATES)
-    hpx_error("template aliases are not available for this compiler. Can't create a unique_future<R> alias. Please set HPX_UNIQUE_FUTURE_ALIAS to OFF or use a modern compiler")
-  endif()
-  hpx_add_config_define(HPX_UNIQUE_FUTURE_ALIAS)
-endif()
-
 ################################################################################
 
 ################################################################################
@@ -1047,11 +1042,6 @@ hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
 ################################################################################
 hpx_include(Documentation)
 
-################################################################################
-# Creating the partially preprocessed header requires a recent version of Wave
-################################################################################
-hpx_include(Preprocessing)
-
 # Debug library postfix
 set(CMAKE_DEBUG_POSTFIX "d")
 set(HPX_DEBUG_POSTFIX "d")
@@ -1113,10 +1103,6 @@ endif()
 
 if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
-endif()
-
-if(HPX_AUTOMATIC_PREPROCESSING)
-  add_subdirectory(preprocess)
 endif()
 
 ################################################################################

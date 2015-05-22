@@ -18,8 +18,8 @@ namespace hpx
     template <typename Sequence>
     struct when_some_result
     {
-        std::vector<std::size_t> indices;
-        Sequence futures;
+        std::vector<std::size_t> indices;   ///< List of indices of futures which became ready
+        Sequence futures;   ///< The sequence of futures as passed to \a hpx::when_some
     };
 
     /// The function \a when_some is an operator allowing to join on the result
@@ -238,10 +238,6 @@ namespace hpx
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/iterate.hpp>
-#include <boost/preprocessor/repeat.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
 

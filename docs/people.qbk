@@ -96,6 +96,8 @@ our tables below.
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Daniel Bourgeois (__cct__) who contributed to __hpx__ the implementation of
+  several parallel algorithms.
 * Anuj Sharma and Christopher Bross (__inf3__), who worked on __hpx__ in the
   context of the __gsoc__ program 2014.
 * Martin Stumpf (__inf3__), who rebuilt our contiguous testing infrastructure
@@ -113,8 +115,8 @@ the project through discussions, pull requests, documentation patches, etc.
 * Andreas Buhr, who helped with improving our documentation.
 * Antoine Tran Tan (Laboratoire de Recherche en Informatique, Paris), who
   worked on integrating __hpx__ as a backend for __nt2__.
-* John Biddiscombe (CSCS - Swiss National Supercomputing Centre), who helped
-  with the BlueGene/Q port of __hpx__ and made several other contributions.
+* John Biddiscombe (__cscs__), who helped with the BlueGene/Q port of
+  __hpx__ and made several other contributions.
 * Erik Schnetter (Perimeter Institute for Theoretical Physics), who greatly
   helped to make __hpx__ more robust by sumbitting a large amount of problem
   reports, feature requests, and made several direct contributions.

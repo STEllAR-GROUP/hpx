@@ -69,9 +69,6 @@ double receive(
 
     hpx::util::high_resolution_timer t;
 
-    std::vector<hpx::future<buffer_type> > recv_buffers;
-    recv_buffers.resize(window_size);
-
     message_action msg;
     for (std::size_t i = 0; i != loop + skip; ++i) {
         // do not measure warm up phase
@@ -88,12 +85,10 @@ double receive(
         for_each(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t j)
             {
-                recv_buffers[j] = hpx::async(msg, dest,
+                msg(dest,
                     buffer_type(send_buffer, size, buffer_type::reference));
             }
         );
-
-        hpx::wait_all(recv_buffers);
     }
 
     double elapsed = t.elapsed();

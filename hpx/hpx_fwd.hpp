@@ -140,7 +140,7 @@ namespace hpx
             std::size_t interval, locality const& l,
             error_code& ec = throws);
 
-        HPX_API_EXPORT void do_background_work(std::size_t num_thread = 0);
+        HPX_API_EXPORT bool do_background_work(std::size_t num_thread = 0);
     }
 
     namespace util
@@ -691,11 +691,6 @@ namespace hpx
         template <typename R>
         class shared_future;
 
-#if defined(HPX_UNIQUE_FUTURE_ALIAS)
-        template <typename R>
-        using unique_future = future<R>;
-#endif
-
         template <typename ValueType>
         struct object_semaphore;
 
@@ -784,7 +779,7 @@ namespace hpx
     /// threads used by HPX.
     ///
     /// \param id [in] The id of the object to locate.
-    HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor& exec);
+    HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor const& exec);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool is_scheduler_numa_sensitive();
@@ -802,9 +797,6 @@ namespace hpx
 
     using lcos::future;
     using lcos::shared_future;
-#if defined(HPX_UNIQUE_FUTURE_ALIAS)
-    using lcos::unique_future;
-#endif
     using lcos::promise;
 
     /// \endcond
@@ -1687,8 +1679,9 @@ namespace hpx
 #endif
 }
 
-// Including declarations of get_locality_name
+// Including declarations of various API function declarations
 #include <hpx/runtime/get_locality_name.hpp>
+#include <hpx/runtime/set_parcel_write_handler.hpp>
 
 #include <hpx/lcos/async_fwd.hpp>
 

@@ -50,6 +50,8 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/error.hpp"
     "${hpx_SOURCE_DIR}/hpx/exception.hpp"
     "${hpx_SOURCE_DIR}/hpx/exception_list.hpp"
+    "${hpx_SOURCE_DIR}/hpx/components/component_storage/migrate_from_storage.hpp"
+    "${hpx_SOURCE_DIR}/hpx/components/component_storage/migrate_to_storage.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithm.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/task_region.hpp"
@@ -64,11 +66,14 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/for_each.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/is_partitioned.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/is_sorted.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/lexicographical_compare.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/minmax.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/mismatch.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/move.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/reduce.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/remove_copy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/replace.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/reverse.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/rotate.hpp"
@@ -82,6 +87,7 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
+    "${hpx_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/basic_action.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
@@ -162,7 +168,7 @@ if(BOOSTAUTOINDEX_FOUND)
 endif()
 
 set(image
-    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}_draft.png)
+    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}.png)
 
 set(HPX_CMAKE_OPTIONS "")
 foreach(_cat ${HPX_OPTION_CATEGORIES})
@@ -253,8 +259,8 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=488
-                boost.image.h=126
+                boost.image.w=481
+                boost.image.h=125
                 boost.image.alt="HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2014 Grant Mercer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,15 +21,19 @@
 #include <hpx/parallel/algorithms/find.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/generate.hpp>
+#include <hpx/parallel/algorithms/lexicographical_compare.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/algorithms/move.hpp>
-#include <hpx/parallel/algorithms/replace.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
+#include <hpx/parallel/algorithms/remove_copy.hpp>
+#include <hpx/parallel/algorithms/replace.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
 #include <hpx/parallel/algorithms/rotate.hpp>
 #include <hpx/parallel/algorithms/search.hpp>
 #include <hpx/parallel/algorithms/swap_ranges.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
+#include <hpx/parallel/algorithms/is_partitioned.hpp>
+#include <hpx/parallel/algorithms/is_sorted.hpp>
 #endif

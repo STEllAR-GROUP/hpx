@@ -21,7 +21,6 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/constexpr.hpp>
 #include <hpx/config/cxx11_macros.hpp>
-#include <hpx/config/preprocessor/round_up.hpp>
 
 #if BOOST_VERSION < 105600
 #include <boost/exception/detail/attribute_noreturn.hpp>
@@ -63,25 +62,11 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// We currently do not support more than 20 arguments (ask if you need more)
-#if !defined(HPX_MAX_LIMIT)
-#  define HPX_MAX_LIMIT 20
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Properly handle all preprocessing limits
 #if !defined(HPX_LIMIT)
 #  define HPX_LIMIT 5
 #elif (HPX_LIMIT < 5)
 #  error "HPX_LIMIT is too low, it must be at least 5"
-#elif (HPX_LIMIT > HPX_MAX_LIMIT) && \
-      !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  define HPX_USE_PREPROCESSOR_LIMIT_EXPANSION
-#endif
-
-// We need the same value as a string while partially preprocessing the files.
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  define HPX_LIMIT_STR BOOST_PP_STRINGIZE(HPX_LIMIT)
 #endif
 
 // make sure Fusion sizes are adjusted appropriately as well
@@ -89,104 +74,9 @@
 #  define FUSION_MAX_VECTOR_SIZE 20
 #endif
 
-#if HPX_LIMIT > 6 && !defined(BOOST_FUSION_INVOKE_MAX_ARITY)
-#  define BOOST_FUSION_INVOKE_MAX_ARITY HPX_LIMIT
-#endif
-
-#if HPX_LIMIT > 6 && !defined(BOOST_FUSION_INVOKE_PROCEDURE_MAX_ARITY)
-#  define BOOST_FUSION_INVOKE_PROCEDURE_MAX_ARITY HPX_LIMIT
-#endif
-
-#if HPX_LIMIT > 6 && !defined(BOOST_FUSION_INVOKE_FUNCTION_OBJECT_MAX_ARITY)
-#  define BOOST_FUSION_INVOKE_FUNCTION_OBJECT_MAX_ARITY HPX_LIMIT
-#endif
-
 // make sure boost::result_of is adjusted appropriately as well
 #if HPX_LIMIT > 5 && !defined(BOOST_RESULT_OF_NUM_ARGS)
 #  define BOOST_RESULT_OF_NUM_ARGS 20
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments an action can take
-#if defined(HPX_ACTION_ARGUMENT_LIMIT)
-#  error HPX_ACTION_ARGUMENT_LIMIT cannot be set directly, set HPX_LIMIT instead
-#else
-#  if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#    define HPX_ACTION_ARGUMENT_LIMIT HPX_LIMIT
-#  else
-#    define HPX_ACTION_ARGUMENT_LIMIT \
-        BOOST_PP_EXPAND(HPX_PP_ROUND_UP(HPX_LIMIT))
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments \a hpx#lcos#wait can take
-#if defined(HPX_WAIT_ARGUMENT_LIMIT)
-#  error HPX_WAIT_ARGUMENT_LIMIT cannot be set directly, set HPX_LIMIT instead
-#else
-#  if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#    define HPX_WAIT_ARGUMENT_LIMIT \
-        BOOST_PP_EXPAND(BOOST_PP_ADD(HPX_LIMIT, 3))
-#  else
-#    define HPX_WAIT_ARGUMENT_LIMIT \
-        BOOST_PP_EXPAND(HPX_PP_ROUND_UP(HPX_LIMIT))
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments a component constructor can
-/// take
-#if defined(HPX_COMPONENT_CREATE_ARGUMENT_LIMIT)
-#  error HPX_COMPONENT_CREATE_ARGUMENT_LIMIT cannot be set directly, set HPX_LIMIT instead
-#else
-#  if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#    define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT HPX_LIMIT
-#  else
-#    define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT \
-        BOOST_PP_EXPAND(HPX_PP_ROUND_UP(HPX_LIMIT))
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments a util::function can take.
-/// Note that this needs to be larger than HPX_ACTION_ARGUMENT_LIMIT by at
-/// least 3.
-#if defined(HPX_FUNCTION_ARGUMENT_LIMIT)
-#  error HPX_FUNCTION_ARGUMENT_LIMIT cannot be set directly, set HPX_LIMIT instead
-#else
-#  if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#    define HPX_FUNCTION_ARGUMENT_LIMIT \
-        BOOST_PP_EXPAND(BOOST_PP_ADD(HPX_LIMIT, 3))
-#  else
-#    define HPX_FUNCTION_ARGUMENT_LIMIT \
-        BOOST_PP_EXPAND(BOOST_PP_ADD(HPX_PP_ROUND_UP(HPX_ACTION_ARGUMENT_LIMIT), 3))
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of elements a util::tuple can have.
-/// Note that this needs to be at least of the same value as
-/// HPX_FUNCTION_ARGUMENT_LIMIT.
-#if defined(HPX_TUPLE_LIMIT)
-#  error HPX_TUPLE_LIMIT cannot be set directly, set HPX_LIMIT instead
-#else
-#  if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#    define HPX_TUPLE_LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
-#  else
-#    define HPX_TUPLE_LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_LOCK_LIMIT)
-#  error HPX_LOCK_LIMIT cannot be set directly, set HPX_LIMIT instead
-#else
-#  if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#    define HPX_LOCK_LIMIT HPX_LIMIT
-#  else
-#    define HPX_LOCK_LIMIT \
-        BOOST_PP_EXPAND(HPX_PP_ROUND_UP(HPX_LIMIT))
-#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -592,8 +482,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure we have support for more than 64 threads for Xeon Phi
-#if defined(__MIC__) && !defined(HPX_HAVE_MORE_THAN_64_THREADS)
-#  define HPX_HAVE_MORE_THAN_64_THREADS
+#if defined(__MIC__) && !defined(HPX_WITH_MORE_THAN_64_THREADS)
+#  define HPX_WITH_MORE_THAN_64_THREADS
 #endif
 #if defined(__MIC__) && !defined(HPX_MAX_CPU_COUNT)
 #  define HPX_MAX_CPU_COUNT 256

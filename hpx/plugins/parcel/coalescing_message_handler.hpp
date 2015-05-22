@@ -42,11 +42,11 @@ namespace hpx { namespace plugins { namespace parcel
 
         void put_parcel(parcelset::locality const & dest, parcelset::parcel& p, write_handler_type const& f);
 
-        void flush(bool stop_buffering = false);
+        bool flush(bool stop_buffering = false);
 
     protected:
         bool timer_flush();
-        void flush(mutex_type::scoped_lock& l, bool stop_buffering);
+        bool flush(mutex_type::scoped_lock& l, bool stop_buffering);
 
     private:
         mutable mutex_type mtx_;

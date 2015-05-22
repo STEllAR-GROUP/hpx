@@ -86,9 +86,7 @@ void early_parcel_sink(
                 (threads::thread_state_ex(threads::wait_signaled));
         }
         catch (...) {
-            std::cerr << hpx::diagnostic_information(boost::current_exception())
-                      << std::endl;
-            std::abort();
+            hpx::report_error(boost::current_exception());
         }
 //     }
 } // }}}
@@ -439,7 +437,6 @@ void register_worker(registration_header const& header)
     actions::base_action* p =
         new actions::transfer_action<notify_worker_action>(hdr);
 
-
     // TODO: Handle cases where localities try to connect to AGAS while it's
     // shutting down.
     if (agas_client.get_status() != starting)
@@ -477,7 +474,7 @@ void register_worker(registration_header const& header)
     }
 }
 
-// AGAS callback to client (first roundtrip response)
+// AGAS callback to client (first round trip response)
 void notify_worker(notification_header const& header)
 {
     // This lock acquires the bbb mutex on creation. When it goes out of scope,
@@ -556,26 +553,6 @@ void notify_worker(notification_header const& header)
 
     rt.get_id_pool().set_range(parcel_lower, parcel_upper);
 
-    //// assign the initial gid range to the unique id range allocator that our
-    //// response heap is using
-    //response_heap_type::get_heap().set_range(heap_lower, heap_upper);
-
-    //// allocate our first heap
-    //response_heap_type::block_type* p = response_heap_type::alloc_heap();
-
-    //// set the base gid that we bound to this heap
-    //p->set_gid(heap_lower);
-
-    //// push the heap onto the OSHL
-    //response_heap_type::get_heap().add_heap(p);
-
-    //// bind range of GIDs to head addresses
-    //agas_client.bind_range(
-    //    heap_lower
-    //  , response_heap_type::block_type::heap_step
-    //  , p->get_address()
-    //  , response_heap_type::block_type::heap_size);
-
     // store number of initial localities
     cfg.set_num_localities(header.num_localities);
 
@@ -603,7 +580,7 @@ void notify_worker(notification_header const& header)
 // }}}
 
 #if defined(HPX_HAVE_SECURITY)
-// remote call to AGAS (initiate second roundtrip)
+// remote call to AGAS (initiate second round trip)
 void register_worker_security(registration_header_security const& header)
 {
     // This lock acquires the bbb mutex on creation. When it goes out of scope,
@@ -725,7 +702,7 @@ inline std::size_t get_number_of_bootstrap_connections(
     }
 
 #if defined(HPX_HAVE_SECURITY)
-    result *= 2;        // we have to do 2 roundtrips
+    result *= 2;        // we have to do 2 round trips
 #endif
 
     return result;

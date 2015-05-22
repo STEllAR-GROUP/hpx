@@ -1,4 +1,4 @@
-.. Copyright (c) 2007-2014 Louisiana State University
+.. Copyright (c) 2007-2015 Louisiana State University
 
    Distributed under the Boost Software License, Version 1.0. (See accompanying
    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -46,8 +46,8 @@ What's so special about HPX?
   active, and thriving developer community.
 
 
-The documentation for the latest release of HPX (currently V0.9.9) can be
-`found here <http://stellar.cct.lsu.edu/files/hpx-0.9.9/html/index.html>`_.
+The documentation for the latest release of HPX (currently V0.9.10) can be
+`found here <http://stellar.cct.lsu.edu/files/hpx-0.9.10/html/index.html>`_.
 
 Additionally, we regularily upload the current status of the documentation
 (which is being worked on as we speak)
@@ -55,7 +55,7 @@ Additionally, we regularily upload the current status of the documentation
 single-page version of the documentation `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
-(currently HPX V0.9.9) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
+(currently HPX V0.9.10) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
 
 If you would like to work with the cutting edge version from this repository
 we suggest following the current health status of the master branch by looking at
@@ -68,7 +68,7 @@ any issue reports through the `issue tracker for this Github project
 <http://github.com/STEllAR-GROUP/hpx/issues>`_.
 
 Also, if you have any questions feel free to ask it over at `stackoverflow <http://stackoverflow.com>`_
-and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_. 
+and tag the question with `hpx <http://stackoverflow.com/questions/tagged/hpx>`_.
 
 ********************
  Build Instructions
@@ -108,7 +108,7 @@ Linux
       cmake -DBOOST_ROOT=~/packages/boost \
             -DHWLOC_ROOT=/packages/hwloc \
             -DCMAKE_INSTALL_PREFIX=~/packages/hpx \
-            ~/downloads/hpx_0.9.9
+            ~/downloads/hpx_0.9.10
 
 4) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of cores

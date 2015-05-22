@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iterator>
+#include <type_traits>
 
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -101,7 +102,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
-            T && init, Reduce && red_op, Convert && conv_op, boost::mpl::false_)
+            T && init, Reduce && red_op, Convert && conv_op, std::false_type)
         {
             typedef typename std::iterator_traits<InIter>::iterator_category
                 iterator_category;
@@ -129,8 +130,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
-        transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
-            Reduce && red_op, Convert && conv_op, boost::mpl::true_);
+        transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
+            T && init, Reduce && red_op, Convert && conv_op, std::true_type);
 
         /// \endcond
     }

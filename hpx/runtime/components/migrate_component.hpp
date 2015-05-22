@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +20,7 @@
 
 namespace hpx { namespace components
 {
-    /// \brief Migrate the given component to the specified target locality
+    /// Migrate the component with the given id to the specified target locality
     ///
     /// The function \a migrate<Component> will migrate the component
     /// referenced by \a to_migrate to the locality specified with
@@ -28,18 +28,14 @@ namespace hpx { namespace components
     /// component instance.
     ///
     /// \param to_migrate      [in] The global id of the component to migrate.
-    /// \param target_locality [in] The locality where the component should be 
+    /// \param target_locality [in] The locality where the component should be
     ///                        migrated to.
     ///
     /// \tparam  The only template argument specifies the component type of the
     ///          component to migrate.
     ///
-    /// \returns A future representing the global id of the newly (copied)
-    ///          component instance.
-    ///
-    /// \note If the second argument is omitted (or is invalid_id) the
-    ///       new component instance is created on the locality of the
-    ///       component instance which is to be copied.
+    /// \returns A future representing the global id of the migrated
+    ///          component instance. This should be the same as \a migrate_to.
     ///
     template <typename Component>
 #if defined(DOXYGEN)
@@ -47,13 +43,40 @@ namespace hpx { namespace components
 #else
     inline typename boost::enable_if<
         traits::is_component<Component>, future<naming::id_type>
-    >::type 
+    >::type
 #endif
     migrate(naming::id_type const& to_migrate,
         naming::id_type const& target_locality)
     {
-        typedef server::migrate_component_action<Component> action_type;
-        return async_colocated<action_type>(to_migrate, to_migrate, target_locality);
+        typedef server::trigger_migrate_component_action<Component> action_type;
+        return async<action_type>(naming::get_locality_from_id(to_migrate),
+            to_migrate, target_locality);
+    }
+
+    /// Migrate the given component to the specified target locality
+    ///
+    /// The function \a migrate_to_storage will migrate the component
+    /// referenced by \a to_migrate to the storage facility specified with
+    /// \a target_storage. It returns a future referring to the migrated
+    /// component instance.
+    ///
+    /// \param to_migrate      [in] The client side representation of the
+    ///                        component to migrate.
+    /// \param target_storage  [in] The id of the storage facility to migrate
+    ///                        this object to.
+    ///
+    /// \returns A client side representation of representing of the migrated
+    ///          component instance. This should be the same as \a migrate_to.
+    ///
+    template <typename Derived, typename Stub>
+    inline Derived
+    migrate(client_base<Derived, Stub> const& to_migrate,
+        naming::id_type const& target_storage)
+    {
+        typedef typename client_base<Derived, Stub>::server_component_type
+            component_type;
+        return Derived(migrate<component_type>(to_migrate.get_gid(),
+            target_storage));
     }
 }}
 

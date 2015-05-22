@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,22 +7,19 @@
 #if !defined(HPX_UTIL_ZIP_ITERATOR_MAY_29_2014_0852PM)
 #define HPX_UTIL_ZIP_ITERATOR_MAY_29_2014_0852PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/serialize_sequence.hpp>
-#include <hpx/util/functional/boolean_ops.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/iterator/iterator_facade.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <boost/mpl/assert.hpp>
-#include <boost/mpl/bool.hpp>
 
 #include <iterator>
+#include <type_traits>
 
 namespace hpx { namespace util
 {
@@ -196,7 +193,7 @@ namespace hpx { namespace util
         template <typename T>
         struct zip_iterator_category<
             tuple<T>
-          , typename boost::enable_if_c<
+          , typename std::enable_if<
                 tuple_size<tuple<T> >::value == 1
             >::type
         >
@@ -207,7 +204,7 @@ namespace hpx { namespace util
         template <typename T, typename U>
         struct zip_iterator_category<
             tuple<T, U>
-          , typename boost::enable_if_c<
+          , typename std::enable_if<
                 tuple_size<tuple<T, U> >::value == 2
             >::type
         > : zip_iterator_category_impl<
@@ -219,7 +216,7 @@ namespace hpx { namespace util
         template <typename T, typename U, typename ...Tail>
         struct zip_iterator_category<
             tuple<T, U, Tail...>
-          , typename boost::enable_if_c<
+          , typename std::enable_if<
                 (tuple_size<tuple<T, U, Tail...> >::value > 2)
             >::type
         > : zip_iterator_category_impl<
@@ -651,13 +648,13 @@ namespace hpx { namespace traits
     template <typename ...Ts>
     struct segmented_iterator_traits<
         util::zip_iterator<Ts...>,
-        typename boost::enable_if<
-            typename util::functional::all_of<
+        typename std::enable_if<
+            util::detail::all_of<
                 typename segmented_iterator_traits<Ts>::is_segmented_iterator...
-            >::type
+            >::value
         >::type>
     {
-        typedef boost::mpl::true_ is_segmented_iterator;
+        typedef std::true_type is_segmented_iterator;
 
         typedef util::zip_iterator<Ts...> iterator;
         typedef util::zip_iterator<
@@ -750,13 +747,13 @@ namespace hpx { namespace traits
     template <typename ...Ts>
     struct segmented_local_iterator_traits<
         util::zip_iterator<Ts...>,
-        typename boost::enable_if<
-            typename util::functional::all_of<
+        typename std::enable_if<
+            util::detail::all_of<
                 typename segmented_local_iterator_traits<Ts>::is_segmented_local_iterator...
-            >::type
+            >::value
         >::type>
     {
-        typedef boost::mpl::true_ is_segmented_local_iterator;
+        typedef std::true_type is_segmented_local_iterator;
 
         typedef util::zip_iterator<
                 typename segmented_local_iterator_traits<Ts>::iterator...

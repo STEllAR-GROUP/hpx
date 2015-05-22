@@ -11,6 +11,7 @@
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/util/register_locks.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 namespace hpx { namespace components
@@ -27,11 +28,9 @@ namespace hpx { namespace components
         typedef typename base_type::this_component_type this_component_type;
 
     public:
-        locking_hook() : base_type() {}
-
-        template <typename Arg>
-        locking_hook(Arg && arg)
-          : base_type(std::forward<Arg>(arg))
+        template <typename ...Arg>
+        locking_hook(Arg &&... arg)
+          : base_type(std::forward<Arg>(arg)...)
         {}
 
         /// This is the hook implementation for decorate_action which locks
@@ -71,6 +70,15 @@ namespace hpx { namespace components
 
             // now lock the mutex and execute the action
             typename mutex_type::scoped_lock l(mtx_);
+
+            // We can safely ignore this lock while checking as it is
+            // guaranteed to be unlocked before the thread is suspended.
+            //
+            // If this lock is not ignored it will cause false positives as the
+            // check for held locks is performed before this lock is unlocked.
+            util::ignore_while_checking<
+                    typename mutex_type::scoped_lock
+                > ignore_lock(&l);
 
             {
                 // register our yield decorator
@@ -115,6 +123,11 @@ namespace hpx { namespace components
                 util::scoped_unlock<mutex_type> ul(mtx_);
                 result = threads::get_self().yield_impl(state);
             }
+
+            // Re-enable ignoring the lock on the mutex above (this
+            // information is lost in the lock tracking tables once a mutex is
+            // unlocked).
+            util::ignore_lock(&mtx_);
 
             return result;
         }

@@ -162,8 +162,6 @@ namespace hpx { namespace lcos
 }}
 #else
 
-#if !BOOST_PP_IS_ITERATING
-
 #if !defined(HPX_LCOS_FOLD_SEP_29_2013_1442AM)
 #define HPX_LCOS_FOLD_SEP_29_2013_1442AM
 
@@ -175,16 +173,14 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pack.hpp>
+
+#include <boost/preprocessor/cat.hpp>
+#include <boost/serialization/vector.hpp>
 
 #include <vector>
-
-#include <boost/serialization/vector.hpp>
-#include <boost/preprocessor/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_binary_params.hpp>
-#include <boost/preprocessor/cat.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -212,20 +208,143 @@ namespace hpx { namespace lcos
         {};
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Action, int N>
+        template <
+            typename Action
+          , typename FoldOp
+          , typename ...Ts
+        >
+        typename fold_result<Action>::type
+        fold_impl(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , FoldOp && fold_op
+          , typename fold_result<Action>::type const& init
+          , long global_idx
+          , Ts const&... vs
+        );
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action
+          , typename Futures
+          , typename ...Ts
+        >
+        void
+        fold_invoke(Action /*act*/
+          , Futures& futures
+          , hpx::id_type const& id
+          , std::size_t
+          , Ts const&... vs)
+        {
+            futures.push_back(
+                hpx::async<Action>(
+                    id
+                  , vs...
+                )
+            );
+        }
+
+        template <
+            typename Action
+          , typename Futures
+          , typename ...Ts
+        >
+        void
+        fold_invoke(fold_with_index<Action>
+          , Futures& futures
+          , hpx::id_type const& id
+          , std::size_t global_idx
+          , Ts const&... vs)
+        {
+            futures.push_back(
+                hpx::async<Action>(
+                    id
+                  , vs...
+                  , global_idx
+                )
+            );
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action
+          , typename FoldOp
+          , typename ...Ts
+        >
+        struct fold_invoker
+        {
+            typedef
+                typename fold_result<Action>::type
+                result_type;
+
+            static result_type
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , FoldOp const& fold_op
+              , result_type const& init
+              , long global_idx
+              , Ts const&... vs
+            )
+            {
+                return
+                    fold_impl(
+                        act
+                      , ids
+                      , fold_op
+                      , init
+                      , global_idx
+                      , vs...
+                    );
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Action, typename Is>
         struct make_fold_action_impl;
+
+        template <typename Action, std::size_t ...Is>
+        struct make_fold_action_impl<Action, util::detail::pack_c<std::size_t, Is...> >
+        {
+            typedef
+                typename fold_result<Action>::type
+                action_result;
+
+            template <typename FoldOp>
+            struct fold_invoker
+            {
+                typedef
+                    typename util::decay<FoldOp>::type
+                    fold_op_type;
+
+                typedef detail::fold_invoker<
+                        Action
+                      , fold_op_type
+                      , typename util::tuple_element<
+                            Is, typename Action::arguments_type
+                        >::type...
+                    >
+                    fold_invoker_type;
+
+                typedef
+                    typename HPX_MAKE_ACTION(fold_invoker_type::call)::type
+                    type;
+            };
+        };
 
         template <typename Action>
         struct make_fold_action
           : make_fold_action_impl<
-                Action, Action::arity
+                Action
+              , typename util::detail::make_index_pack<Action::arity>::type
             >
         {};
 
         template <typename Action>
         struct make_fold_action<fold_with_index<Action> >
           : make_fold_action_impl<
-                fold_with_index<Action>, Action::arity - 1
+                fold_with_index<Action>
+              , typename util::detail::make_index_pack<Action::arity - 1>::type
             >
         {};
 
@@ -243,8 +362,8 @@ namespace hpx { namespace lcos
                 std::vector<hpx::future<Result> > fres = std::move(r.get());
                 HPX_ASSERT(!fres.empty());
 
-                // we're at the beginning of the folding chain, incroporate the initial
-                // value
+                // we're at the beginning of the folding chain, incorporate the
+                // initial value
                 if (fres.size() == 1)
                     return fold_op_(init_, fres[0].get());
 
@@ -257,39 +376,312 @@ namespace hpx { namespace lcos
             FoldOp const& fold_op_;
             Result const& init_;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action
+          , typename FoldOp
+          , typename ...Ts
+        >
+        typename fold_result<Action>::type
+        fold_impl(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , FoldOp && fold_op
+          , typename fold_result<Action>::type const& init
+          , long global_idx
+          , Ts const&... vs
+        )
+        {
+            typedef
+                typename fold_result<Action>::type
+                result_type;
+
+            if(ids.empty()) return result_type();
+
+            std::vector<hpx::future<result_type> > fold_futures;
+            fold_futures.reserve(2);
+
+            // first kick off the possibly remote operation
+            id_type id_first = ids.front();
+            if(ids.size() > 1)
+            {
+                std::vector<id_type> ids_next(ids.begin()+1, ids.end());
+
+                typedef
+                    typename detail::make_fold_action<Action>::
+                        template fold_invoker<FoldOp>::type
+                    fold_impl_action;
+
+                if(!ids.empty())
+                {
+                    fold_futures.push_back(
+                        hpx::async_colocated<fold_impl_action>(
+                            ids_next.front()
+                          , act
+                          , std::move(ids_next)
+                          , fold_op
+                          , init
+                          , global_idx + 1
+                          , vs...
+                        )
+                    );
+                }
+            }
+
+            // now perform the local operation
+            fold_invoke(
+                act
+              , fold_futures
+              , id_first
+              , std::abs(global_idx)
+              , vs...
+            );
+
+            return hpx::when_all(fold_futures).
+                then(perform_folding<result_type, FoldOp>(fold_op, init)).
+                get();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Action
+      , typename FoldOp
+      , typename Init
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::fold_result<Action>::type
+    >
+    fold(
+        std::vector<hpx::id_type> const & ids
+      , FoldOp && fold_op
+      , Init && init
+      , Ts const&... vs)
+    {
+        typedef
+            typename detail::fold_result<Action>::type
+            action_result;
+
+        if (ids.empty())
+        {
+            return hpx::make_exceptional_future<action_result>(
+                HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::fold",
+                    "empty list of targets for fold operation"));
+        }
+
+        typedef
+            typename detail::make_fold_action<Action>::
+                template fold_invoker<FoldOp>::type
+            fold_impl_action;
+
+        return
+            hpx::async_colocated<fold_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
+              , 0
+              , vs...
+            );
+    }
+
+    template <
+        typename Component, typename Signature, typename Derived
+      , typename FoldOp, typename Init
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::fold_result<Derived>::type
+    >
+    fold(
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
+      , std::vector<hpx::id_type> const & ids
+      , FoldOp && fold_op
+      , Init && init
+      , Ts const&... vs)
+    {
+        return fold<Derived>(
+                ids
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
+              , vs...
+            );
+    }
+
+    template <
+        typename Action
+      , typename FoldOp
+      , typename Init
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::fold_result<Action>::type
+    >
+    fold_with_index(
+        std::vector<hpx::id_type> const & ids
+      , FoldOp && fold_op
+      , Init && init
+      , Ts const&... vs)
+    {
+        return fold<detail::fold_with_index<Action> >(
+                ids
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
+              , vs...
+            );
+    }
+
+    template <
+        typename Component, typename Signature, typename Derived
+      , typename FoldOp, typename Init
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::fold_result<Derived>::type
+    >
+    fold_with_index(
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
+      , std::vector<hpx::id_type> const & ids
+      , FoldOp && fold_op
+      , Init && init
+      , Ts const&... vs)
+    {
+        return fold<detail::fold_with_index<Derived> >(
+                ids
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
+              , vs...
+            );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Action
+      , typename FoldOp
+      , typename Init
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::fold_result<Action>::type
+    >
+    inverse_fold(
+        std::vector<hpx::id_type> const & ids
+      , FoldOp && fold_op
+      , Init && init
+      , Ts const&... vs)
+    {
+        typedef
+            typename detail::fold_result<Action>::type
+            action_result;
+
+        if (ids.empty())
+        {
+            return hpx::make_exceptional_future<action_result>(
+                HPX_GET_EXCEPTION(bad_parameter,
+                    "hpx::lcos::inverse_fold",
+                    "empty list of targets for inverse_fold operation"));
+        }
+
+        std::vector<id_type> inverted_ids;
+        std::reverse_copy(ids.begin(), ids.end(), std::back_inserter(inverted_ids));
+
+        typedef
+            typename detail::make_fold_action<Action>::
+                template fold_invoker<FoldOp>::type
+            fold_impl_action;
+
+        if (ids.empty())
+        {
+            return hpx::make_exceptional_future<action_result>(
+                    hpx::exception(hpx::bad_parameter,
+                        "array of targets is empty")
+                );
+        }
+
+        return
+            hpx::async_colocated<fold_impl_action>(
+                inverted_ids[0]
+              , Action()
+              , inverted_ids
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
+              , -static_cast<long>(inverted_ids.size()-1)
+              , vs...
+            );
+    }
+
+    template <
+        typename Component, typename Signature, typename Derived
+      , typename FoldOp, typename Init
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::fold_result<Derived>::type
+    >
+    inverse_fold(
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
+      , std::vector<hpx::id_type> const & ids
+      , FoldOp && fold_op
+      , Init && init
+      , Ts const&... vs)
+    {
+        return inverse_fold<Derived>(
+                ids
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
+              , vs...
+            );
+    }
+
+    template <
+        typename Action
+      , typename FoldOp
+      , typename Init
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::fold_result<Action>::type
+    >
+    inverse_fold_with_index(
+        std::vector<hpx::id_type> const & ids
+      , FoldOp && fold_op
+      , Init && init
+      , Ts const&... vs)
+    {
+        return inverse_fold<detail::fold_with_index<Action> >(
+                ids
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
+              , vs...
+            );
+    }
+
+    template <
+        typename Component, typename Signature, typename Derived
+      , typename FoldOp, typename Init
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::fold_result<Derived>::type
+    >
+    inverse_fold_with_index(
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
+      , std::vector<hpx::id_type> const & ids
+      , FoldOp && fold_op
+      , Init && init
+      , Ts const&... vs)
+    {
+        return inverse_fold<detail::fold_with_index<Derived> >(
+                ids
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
+              , vs...
+            );
     }
 }}
-
-
-//#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-//#  include <hpx/lcos/preprocessed/fold.hpp>
-//#else
-//
-//#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-//#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/fold_" HPX_LIMIT_STR ".hpp")
-//#endif
-
-#define HPX_LCOS_FOLD_EXTRACT_ACTION_ARGUMENTS(Z, N, D)                       \
-    typename boost::fusion::result_of::value_at_c<                            \
-        typename Action::arguments_type, N                                    \
-    >::type                                                                   \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-// bring in all N-nary overloads for fold
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (0, HPX_ACTION_ARGUMENT_LIMIT, <hpx/lcos/fold.hpp>))                  \
-    /**/
-
-#include BOOST_PP_ITERATE()
-
-#undef HPX_LCOS_FOLD_EXTRACT_ACTION_ARGUMENTS
-
-//#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-//#  pragma wave option(output: null)
-//#endif
-//
-//#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_FOLD_ACTION_DECLARATION(...)                             \
@@ -395,421 +787,6 @@ namespace hpx { namespace lcos
       , BOOST_PP_CAT(fold_, Name)                                             \
     )                                                                         \
 /**/
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-#else
-
-#define N BOOST_PP_ITERATION()
-
-namespace hpx { namespace lcos
-{
-    namespace detail
-    {
-        template <
-            typename Action
-          , typename Futures
-          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-        >
-        void
-        fold_invoke(Action /*act*/
-          , Futures& futures
-          , hpx::id_type const& id
-          BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a)
-          , std::size_t)
-        {
-            futures.push_back(
-                hpx::async<Action>(
-                    id
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                )
-            );
-        }
-
-        template <
-            typename Action
-          , typename Futures
-          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-        >
-        void
-        fold_invoke(fold_with_index<Action>
-          , Futures& futures
-          , hpx::id_type const& id
-          BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a)
-          , std::size_t global_idx)
-        {
-            futures.push_back(
-                hpx::async<Action>(
-                    id
-                  BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-                  , global_idx
-                )
-            );
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action
-          , typename FoldOp
-          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-        >
-        typename fold_result<Action>::type
-        BOOST_PP_CAT(fold_impl, N)(
-            Action const & act
-          , std::vector<hpx::id_type> const & ids
-          , FoldOp && fold_op
-          , typename fold_result<Action>::type const& init
-          BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a)
-          , long global_idx
-        )
-        {
-            typedef
-                typename fold_result<Action>::type
-                result_type;
-
-            if(ids.empty()) return result_type();
-
-            std::vector<hpx::future<result_type> > fold_futures;
-            fold_futures.reserve(2);
-
-            // first kick off the possibly remote operation
-            id_type id_first = ids.front();
-            if(ids.size() > 1)
-            {
-                std::vector<id_type> ids_next(ids.begin()+1, ids.end());
-
-                typedef
-                    typename detail::make_fold_action<Action>::
-                        template fold_invoker<FoldOp>::type
-                    fold_impl_action;
-
-                if(!ids.empty())
-                {
-                    fold_futures.push_back(
-                        hpx::async_colocated<fold_impl_action>(
-                            ids_next.front()
-                          , act
-                          , std::move(ids_next)
-                          , fold_op
-                          , init
-                          BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-                          , global_idx + 1
-                        )
-                    );
-                }
-            }
-
-            // now perform the local operation
-            fold_invoke(
-                act
-              , fold_futures
-              , id_first
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-              , std::abs(global_idx)
-            );
-
-            return hpx::when_all(fold_futures).
-                then(perform_folding<result_type, FoldOp>(fold_op, init)).
-                get();
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action
-          , typename FoldOp
-          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-        >
-        struct BOOST_PP_CAT(fold_invoker, N)
-        {
-            typedef
-                typename fold_result<Action>::type
-                result_type;
-
-            static result_type
-            call(
-                Action const & act
-              , std::vector<hpx::id_type> const & ids
-              , FoldOp const& fold_op
-              , result_type const& init
-              BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a)
-              , long global_idx
-            )
-            {
-                return
-                    BOOST_PP_CAT(fold_impl, N)(
-                        act
-                      , ids
-                      , fold_op
-                      , init
-                      BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-                      , global_idx
-                    );
-            }
-        };
-
-        template <typename Action>
-        struct make_fold_action_impl<Action, N>
-        {
-            typedef
-                typename fold_result<Action>::type
-                action_result;
-
-            template <typename FoldOp>
-            struct fold_invoker
-            {
-                typedef
-                    typename util::decay<FoldOp>::type
-                    fold_op_type;
-
-                typedef BOOST_PP_CAT(fold_invoker, N)<
-                        Action
-                      , fold_op_type
-                      BOOST_PP_ENUM_TRAILING(
-                            N
-                          , HPX_LCOS_FOLD_EXTRACT_ACTION_ARGUMENTS
-                          , _
-                        )
-                    >
-                    fold_invoker_type;
-
-                typedef
-                    typename HPX_MAKE_ACTION(fold_invoker_type::call)::type
-                    type;
-            };
-        };
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Action
-      , typename FoldOp
-      , typename Init
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::fold_result<Action>::type
-    >
-    fold(
-        std::vector<hpx::id_type> const & ids
-      , FoldOp && fold_op
-      , Init && init
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        typedef
-            typename detail::fold_result<Action>::type
-            action_result;
-
-        if (ids.empty())
-        {
-            return hpx::make_exceptional_future<action_result>(
-                HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::fold",
-                    "empty list of targets for fold operation"));
-        }
-
-        typedef
-            typename detail::make_fold_action<Action>::
-                template fold_invoker<FoldOp>::type
-            fold_impl_action;
-
-        return
-            hpx::async_colocated<fold_impl_action>(
-                ids[0]
-              , Action()
-              , ids
-              , std::forward<FoldOp>(fold_op)
-              , std::forward<Init>(init)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-              , 0
-            );
-    }
-
-    template <
-        typename Component, typename Signature, typename Derived
-      , typename FoldOp, typename Init
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::fold_result<Derived>::type
-    >
-    fold(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-      , std::vector<hpx::id_type> const & ids
-      , FoldOp && fold_op
-      , Init && init
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        return fold<Derived>(
-                ids
-              , std::forward<FoldOp>(fold_op)
-              , std::forward<Init>(init)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-            );
-    }
-
-    template <
-        typename Action
-      , typename FoldOp
-      , typename Init
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::fold_result<Action>::type
-    >
-    fold_with_index(
-        std::vector<hpx::id_type> const & ids
-      , FoldOp && fold_op
-      , Init && init
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        return fold<detail::fold_with_index<Action> >(
-                ids
-              , std::forward<FoldOp>(fold_op)
-              , std::forward<Init>(init)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-            );
-    }
-
-    template <
-        typename Component, typename Signature, typename Derived
-      , typename FoldOp, typename Init
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::fold_result<Derived>::type
-    >
-    fold_with_index(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-      , std::vector<hpx::id_type> const & ids
-      , FoldOp && fold_op
-      , Init && init
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        return fold<detail::fold_with_index<Derived> >(
-                ids
-              , std::forward<FoldOp>(fold_op)
-              , std::forward<Init>(init)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-            );
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Action
-      , typename FoldOp
-      , typename Init
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::fold_result<Action>::type
-    >
-    inverse_fold(
-        std::vector<hpx::id_type> const & ids
-      , FoldOp && fold_op
-      , Init && init
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        typedef
-            typename detail::fold_result<Action>::type
-            action_result;
-
-        if (ids.empty())
-        {
-            return hpx::make_exceptional_future<action_result>(
-                HPX_GET_EXCEPTION(bad_parameter,
-                    "hpx::lcos::inverse_fold",
-                    "empty list of targets for fold operation"));
-        }
-
-        std::vector<id_type> inverted_ids;
-        std::reverse_copy(ids.begin(), ids.end(), std::back_inserter(inverted_ids));
-
-        typedef
-            typename detail::make_fold_action<Action>::
-                template fold_invoker<FoldOp>::type
-            fold_impl_action;
-
-        return
-            hpx::async_colocated<fold_impl_action>(
-                inverted_ids[0]
-              , Action()
-              , inverted_ids
-              , std::forward<FoldOp>(fold_op)
-              , std::forward<Init>(init)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-              , -static_cast<long>(inverted_ids.size()-1)
-            );
-    }
-
-    template <
-        typename Component, typename Signature, typename Derived
-      , typename FoldOp, typename Init
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::fold_result<Derived>::type
-    >
-    inverse_fold(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-      , std::vector<hpx::id_type> const & ids
-      , FoldOp && fold_op
-      , Init && init
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        return inverse_fold<Derived>(
-                ids
-              , std::forward<FoldOp>(fold_op)
-              , std::forward<Init>(init)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-            );
-    }
-
-    template <
-        typename Action
-      , typename FoldOp
-      , typename Init
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::fold_result<Action>::type
-    >
-    inverse_fold_with_index(
-        std::vector<hpx::id_type> const & ids
-      , FoldOp && fold_op
-      , Init && init
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        return inverse_fold<detail::fold_with_index<Action> >(
-                ids
-              , std::forward<FoldOp>(fold_op)
-              , std::forward<Init>(init)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-            );
-    }
-
-    template <
-        typename Component, typename Signature, typename Derived
-      , typename FoldOp, typename Init
-      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::fold_result<Derived>::type
-    >
-    inverse_fold_with_index(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-      , std::vector<hpx::id_type> const & ids
-      , FoldOp && fold_op
-      , Init && init
-      BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
-    {
-        return inverse_fold<detail::fold_with_index<Derived> >(
-                ids
-              , std::forward<FoldOp>(fold_op)
-              , std::forward<Init>(init)
-              BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
-            );
-    }
-}}
 
 #endif
 

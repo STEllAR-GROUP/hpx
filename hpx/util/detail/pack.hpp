@@ -13,7 +13,6 @@
 #endif
 
 #include <boost/mpl/bool.hpp>
-#include <boost/mpl/identity.hpp>
 #include <boost/type_traits/is_same.hpp>
 
 #include <cstddef>
@@ -66,7 +65,7 @@ namespace hpx { namespace util { namespace detail
     {};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Vs>
+    template <typename ...Ts>
     struct all_of;
 
     template <bool ...Vs>
@@ -80,42 +79,54 @@ namespace hpx { namespace util { namespace detail
     {};
 
     template <typename ...Ts>
-    struct all_of<pack<Ts...> >
+    struct all_of
       : all_of<pack_c<bool, (Ts::value)...> >
     {};
 
     template <>
-    struct all_of<pack<> > // <fake-expr>
+    struct all_of<> // <fake-type>
       : boost::mpl::true_
     {};
 
-    template <typename ...Vs>
+    template <typename ...Ts>
     struct any_of;
 
     template <bool ...Vs>
     struct any_of<pack_c<bool, Vs...> >
       : boost::mpl::bool_<
-            all_of<pack_c<bool, !Vs...> >::value
+            !all_of<pack_c<bool, !Vs...> >::value
         >
     {};
 
     template <typename ...Ts>
-    struct any_of<pack<Ts...> >
+    struct any_of
       : any_of<pack_c<bool, (Ts::value)...> >
     {};
 
     template <>
-    struct any_of<pack<> > // <fake-expr>
+    struct any_of<> // <fake-type>
       : boost::mpl::false_
     {};
 
-    template <typename T, typename Ts>
-    struct contains;
+    template <typename T, typename ...Ts>
+    struct contains
+      : any_of<boost::is_same<T, Ts>...>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <std::size_t I, typename ...Ts>
+    struct at_index;
+
+    template <std::size_t I, typename T, typename ...Ts>
+    struct at_index<I, T, Ts...>
+      : at_index<I - 1, Ts...>
+    {};
 
     template <typename T, typename ...Ts>
-    struct contains<T, pack<Ts...> >
-      : any_of<pack<boost::is_same<T, Ts>...> >
-    {};
+    struct at_index<0, T, Ts...>
+    {
+        typedef T type;
+    };
 }}}
 
 #endif

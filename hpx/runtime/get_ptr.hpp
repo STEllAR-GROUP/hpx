@@ -65,14 +65,11 @@ namespace hpx
             naming::id_type id_;                // holds component alive
         };
 
-        ///////////////////////////////////////////////////////////////////////
         template <typename Component, typename Deleter>
         boost::shared_ptr<Component>
-        get_ptr_postproc(hpx::future<naming::address> f,
+        get_ptr_postproc_helper(naming::address const& addr,
             naming::id_type const& id)
         {
-            naming::address addr = f.get();
-
             if (get_locality() != addr.locality_)
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
@@ -96,18 +93,25 @@ namespace hpx
             return ptr;
         }
 
+        template <typename Component, typename Deleter>
+        boost::shared_ptr<Component>
+        get_ptr_postproc(hpx::future<naming::address> f,
+            naming::id_type const& id)
+        {
+            return get_ptr_postproc_helper<Component, Deleter>(f.get(), id);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // This is similar to get_ptr<> below, except that the shared_ptr will
         // delete the local instance when it goes out of scope.
         template <typename Component>
-        hpx::future<boost::shared_ptr<Component> >
-        get_ptr_for_migration(naming::id_type const& id)
+        boost::shared_ptr<Component>
+        get_ptr_for_migration(naming::address const& addr,
+            naming::id_type const& id)
         {
-            using util::placeholders::_1;
-            hpx::future<naming::address> f = agas::resolve(id);
-            return f.then(util::bind(
-                &get_ptr_postproc<Component, get_ptr_for_migration_deleter>,
-                _1, id));
+            return get_ptr_postproc_helper<
+                    Component, get_ptr_for_migration_deleter
+                >(addr, id);
         }
     }
     /// \endcond

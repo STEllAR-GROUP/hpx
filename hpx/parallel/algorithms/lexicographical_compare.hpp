@@ -27,10 +27,10 @@
 #include <boost/type_traits/is_base_of.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
-{    
+{
     ///////////////////////////////////////////////////////////////////////////
     // lexicographical_compare
-    namespace detail 
+    namespace detail
     {
         /// \cond NOINTERNAL
         struct lexicographical_compare : public detail::algorithm<lexicographical_compare, bool>
@@ -55,60 +55,60 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 FwdIter2 last2, Pred && pred)
             {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
-                typedef typename zip_iterator::reference reference;            
- 
+                typedef typename zip_iterator::reference reference;
+
                 std::size_t count1 = std::distance(first1, last1);
                 std::size_t count2 = std::distance(first2, last2);
-                std::size_t count = count1 < count2 ? count1 : count2;     
-        
+
                 // An empty range is lexicographically less than any non-empty range
-                if(count1 == 0 && count2 != 0)
+                if (count1 == 0 && count2 != 0)
                 {
                     return detail::algorithm_result<ExPolicy, bool>::get(true);
                 }
 
-                if(count2 == 0 && count1 != 0)
+                if (count2 == 0 && count1 != 0)
                 {
                     return detail::algorithm_result<ExPolicy, bool>::get(false);
                 }
-        
+
+                std::size_t count = (std::min)(count1, count2);
                 util::cancellation_token<std::size_t> tok(count);
 
+                using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, bool, void>::
                     call_with_index(
-                        policy, hpx::util::make_zip_iterator(first1, first2),
-                        count, [pred, tok](std::size_t base_idx, 
-                        zip_iterator it, std::size_t part_count) mutable
-                        {   
+                        policy, make_zip_iterator(first1, first2), count,
+                        [pred, tok](std::size_t base_idx, zip_iterator it,
+                            std::size_t part_count) mutable
+                        {
                             util::loop_idx_n(
                                 base_idx, it, part_count, tok,
                                 [&pred, &tok](reference t, std::size_t i)
                                 {
                                     using hpx::util::get;
-                                    if((pred(get<0>(t), get<1>(t)) ||
-                                        pred(get<1>(t), get<0>(t))))
+                                    if (pred(get<0>(t), get<1>(t)) ||
+                                        pred(get<1>(t), get<0>(t)))
+                                    {
                                         tok.cancel(i);
+                                    }
                                 });
                         },
-                        [=, &last1, &last2]
-                        (std::vector<hpx::future<void> > &&) mutable -> bool
+                        [=](std::vector<hpx::future<void> > &&) mutable -> bool
                         {
                             std::size_t mismatched = tok.get_data();
-                            
+
                             std::advance(first1, mismatched);
                             std::advance(first2, mismatched);
-                            
-                            if(first1 != last1 && first2 != last2)
+
+                            if (first1 != last1 && first2 != last2)
                                 return pred(*first1, *first2);
-                            else
-                                return first2 != last2;
-                            
+
+                            return first2 != last2;
                         });
             }
         };
         /// \endcond
     }
-
 
     /// Checks if the first range [first1, last1) is lexicographically less than
     /// the second range [first2, last2). uses operator< to comapre elements.
@@ -141,18 +141,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the second range the algorithm will be applied to.
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare 
-    /// algorithm invoked with an execution policy object of type 
-    /// \a sequential_execution_policy execute in sequential order in the 
+    /// The comparison operations in the parallel \a lexicographical_compare
+    /// algorithm invoked with an execution policy object of type
+    /// \a sequential_execution_policy execute in sequential order in the
     /// calling thread.
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare 
+    /// The comparison operations in the parallel \a lexicographical_compare
     /// algorithm invoked with an execution policy object of type \a parallel_execution_policy
     /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparision is an operation with the following properties
+    /// \note     Lexicographical comparison is an operation with the following properties
     ///             - Two ranges are compared element by element
     ///             - The first mismatching element defines which range is lexicographically
     ///               \a less or \a greater than the other
@@ -164,13 +164,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///               range
     ///             - Two empty ranges are lexicographically \a equal
     ///
-    /// \returns  The \a lexicographically_compare algorithm returns a 
+    /// \returns  The \a lexicographically_compare algorithm returns a
     ///           \a hpx::future<bool> if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true 
-    ///           if the first range is lexicographically less, otherwise 
+    ///           The \a lexicographically_compare algorithm returns true
+    ///           if the first range is lexicographically less, otherwise
     ///           it returns false.
     ///
     template <typename ExPolicy, typename InIter1, typename InIter2>
@@ -211,7 +211,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     }
 
     /// Checks if the first range [first1, last1) is lexicographically less than
-    /// the second range [first2, last2). uses a provided predicate to comapre 
+    /// the second range [first2, last2). uses a provided predicate to comapre
     /// elements.
     ///
     /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
@@ -243,15 +243,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     of the second range the algorithm will be applied to.
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the second range the algorithm will be applied to.
-    /// \param op           Refers to the comparision function that the first
+    /// \param pred         Refers to the comparison function that the first
     ///                     and second ranges will be applied to
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare 
-    /// algorithm invoked with an execution policy object of type 
-    /// \a sequential_execution_policy execute in sequential order in the 
+    /// The comparison operations in the parallel \a lexicographical_compare
+    /// algorithm invoked with an execution policy object of type
+    /// \a sequential_execution_policy execute in sequential order in the
     /// calling thread.
     ///
-    /// The comparison operations in the parallel \a lexicographical_compare 
+    /// The comparison operations in the parallel \a lexicographical_compare
     /// algorithm invoked with an execution policy object of type \a parallel_execution_policy
     /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
@@ -269,13 +269,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///               range
     ///             - Two empty ranges are lexicographically \a equal
     ///
-    /// \returns  The \a lexicographically_compare algorithm returns a 
+    /// \returns  The \a lexicographically_compare algorithm returns a
     ///           \a hpx::future<bool> if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a bool otherwise.
-    ///           The \a lexicographically_compare algorithm returns true 
-    ///           if the first range is lexicographically less, otherwise 
+    ///           The \a lexicographically_compare algorithm returns true
+    ///           if the first range is lexicographically less, otherwise
     ///           it returns false.
     /// range [first2, last2), it returns false.
     ///
@@ -312,9 +312,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::lexicographical_compare().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, 
-            std::forward<Pred>(pred)
-            );
+            first1, last1, first2, last2,
+            std::forward<Pred>(pred));
     }
 }}}
 

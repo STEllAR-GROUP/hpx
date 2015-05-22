@@ -187,8 +187,16 @@ namespace hpx { namespace threads { namespace policies
             // Return queue length of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                HPX_ASSERT(num_thread < tree[0].size());
-                return tree[0][num_thread]->get_queue_length();
+                boost::uint64_t queue_length = 0;
+                for (size_type i = 0; i != tree.size(); ++i)
+                {
+                    level_type const& t = tree[i];
+                    if (num_thread < t.size())
+                    {
+                        queue_length += t[num_thread]->get_queue_length();
+                    }
+                }
+                return queue_length;
             }
 
             // Cumulative queue lengths of all queues.
@@ -213,8 +221,16 @@ namespace hpx { namespace threads { namespace policies
             // Return thread count of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                HPX_ASSERT(num_thread < tree[0].size());
-                return tree[0][num_thread]->get_thread_count(state);
+                boost::uint64_t thread_count = 0;
+                for (size_type i = 0; i != tree.size(); ++i)
+                {
+                    level_type const& t = tree[i];
+                    if (num_thread < t.size())
+                    {
+                        thread_count += t[num_thread]->get_thread_count(state);
+                    }
+                }
+                return thread_count;
             }
 
             // Return the cumulative count for all queues.
@@ -239,8 +255,17 @@ namespace hpx { namespace threads { namespace policies
             // Return average thread wait time of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                HPX_ASSERT(num_thread < tree[0].size());
-                return tree[0][num_thread]->get_average_thread_wait_time();
+                boost::uint64_t wait_time = 0;
+                for (size_type i = 0; i != tree.size(); ++i)
+                {
+                    level_type const& t = tree[i];
+                    if (num_thread < t.size())
+                    {
+                        wait_time += t[num_thread]->
+                            get_average_thread_wait_time();
+                    }
+                }
+                return wait_time;
             }
 
             // Return the cumulative average thread wait time for all queues.
@@ -251,6 +276,7 @@ namespace hpx { namespace threads { namespace policies
                 for(size_type j = 0; j < tree[i].size(); ++j)
                 {
                     result += tree[i][j]->get_average_thread_wait_time();
+                    ++count;
                 }
             }
 
@@ -265,8 +291,17 @@ namespace hpx { namespace threads { namespace policies
             // Return average task wait time of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                HPX_ASSERT(num_thread < tree[0].size());
-                return tree[0][num_thread]->get_average_task_wait_time();
+                boost::uint64_t wait_time = 0;
+                for (size_type i = 0; i != tree.size(); ++i)
+                {
+                    level_type const& t = tree[i];
+                    if (num_thread < t.size())
+                    {
+                        wait_time += t[num_thread]->
+                            get_average_task_wait_time();
+                    }
+                }
+                return wait_time;
             }
 
             // Return the cumulative average task wait time for all queues.
@@ -277,6 +312,7 @@ namespace hpx { namespace threads { namespace policies
                 for(size_type j = 0; j < tree[i].size(); ++j)
                 {
                     result += tree[i][j]->get_average_task_wait_time();
+                    ++count;
                 }
             }
 
@@ -328,8 +364,15 @@ namespace hpx { namespace threads { namespace policies
                 return num_pending_misses;
             }
 
-            num_pending_misses += tree[0][num_thread]->
-                get_num_pending_misses(reset);
+            for (size_type i = 0; i != tree.size(); ++i)
+            {
+                level_type& t = tree[i];
+                if (num_thread < t.size())
+                {
+                    num_pending_misses += t[num_thread]->
+                        get_num_pending_misses(reset);
+                }
+            }
             return num_pending_misses;
         }
 
@@ -348,8 +391,15 @@ namespace hpx { namespace threads { namespace policies
                 return num_pending_accesses;
             }
 
-            num_pending_accesses += tree[0][num_thread]->
-                get_num_pending_accesses(reset);
+            for (size_type i = 0; i != tree.size(); ++i)
+            {
+                level_type& t = tree[i];
+                if (num_thread < t.size())
+                {
+                    num_pending_accesses += t[num_thread]->
+                        get_num_pending_accesses(reset);
+                }
+            }
             return num_pending_accesses;
         }
 
@@ -368,8 +418,15 @@ namespace hpx { namespace threads { namespace policies
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += tree[0][num_thread]->
-                get_num_stolen_from_pending(reset);
+            for (size_type i = 0; i != tree.size(); ++i)
+            {
+                level_type& t = tree[i];
+                if (num_thread < t.size())
+                {
+                    num_stolen_threads += t[num_thread]->
+                        get_num_stolen_from_pending(reset);
+                }
+            }
             return num_stolen_threads;
         }
 
@@ -388,8 +445,15 @@ namespace hpx { namespace threads { namespace policies
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += tree[0][num_thread]->
-                get_num_stolen_to_pending(reset);
+            for (size_type i = 0; i != tree.size(); ++i)
+            {
+                level_type& t = tree[i];
+                if (num_thread < t.size())
+                {
+                    num_stolen_threads += t[num_thread]->
+                        get_num_stolen_to_pending(reset);
+                }
+            }
             return num_stolen_threads;
         }
 
@@ -408,8 +472,15 @@ namespace hpx { namespace threads { namespace policies
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += tree[0][num_thread]->
-                get_num_stolen_from_staged(reset);
+            for (size_type i = 0; i != tree.size(); ++i)
+            {
+                level_type& t = tree[i];
+                if (num_thread < t.size())
+                {
+                    num_stolen_threads += t[num_thread]->
+                        get_num_stolen_from_staged(reset);
+                }
+            }
             return num_stolen_threads;
         }
 
@@ -428,8 +499,15 @@ namespace hpx { namespace threads { namespace policies
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += tree[0][num_thread]->
-                get_num_stolen_to_staged(reset);
+            for (size_type i = 0; i != tree.size(); ++i)
+            {
+                level_type& t = tree[i];
+                if (num_thread < t.size())
+                {
+                    num_stolen_threads += t[num_thread]->
+                        get_num_stolen_to_staged(reset);
+                }
+            }
             return num_stolen_threads;
         }
 #endif

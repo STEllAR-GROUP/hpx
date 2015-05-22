@@ -92,11 +92,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 typedef detail::algorithm_result<ExPolicy, OutIter> result;
                 typedef hpx::util::zip_iterator<FwdIter, T*> zip_iterator;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
 
                 if (first == last)
                     return result::get(std::move(dest));
 
-                std::size_t count = std::distance(first, last);
+                difference_type count = std::distance(first, last);
                 boost::shared_array<T> data(new T[count]);
 
                 // The overall scan algorithm is performed by executing 2
@@ -112,10 +114,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [=](zip_iterator part_begin, std::size_t part_size) -> T
                         {
                             using hpx::util::get;
+                            T part_init = conv(get<0>(*part_begin));
+                            get<1>(*part_begin++) = part_init;
                             return sequential_transform_inclusive_scan_n(
-                                get<0>(part_begin.get_iterator_tuple()), part_size,
-                                get<1>(part_begin.get_iterator_tuple()),
-                                conv, init, op);
+                                get<0>(part_begin.get_iterator_tuple()), part_size-1,
+                                get<1>(part_begin.get_iterator_tuple()), conv,
+                                part_init, op);
                         },
                         // step 2 propagates the partition results from left
                         // to right
@@ -131,7 +135,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             // run the final copy step and produce the required
                             // result
-                            return inclusive_scan_helper(policy, std::move(r),
+                            return scan_copy_helper(policy, std::move(r),
                                 data, count, dest, op, chunk_sizes);
                         }
                     );

@@ -149,10 +149,6 @@ namespace hpx
 #include <boost/type_traits/is_same.hpp>
 #include <boost/ref.hpp>
 
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/iterate.hpp>
-
 #include <algorithm>
 #include <iterator>
 #include <vector>
@@ -339,8 +335,6 @@ namespace hpx { namespace lcos
     lcos::future<std::vector<Future> > //-V659
     when_all(std::vector<Future>&& values)
     {
-        typedef std::vector<Future> result_type;
-
         typedef detail::when_all_frame<
                 hpx::util::tuple<std::vector<Future> >
             > frame_type;

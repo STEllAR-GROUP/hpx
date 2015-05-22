@@ -10,9 +10,12 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -26,6 +29,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -41,61 +45,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         OutIter sequential_exclusive_scan(InIter first, InIter last,
             OutIter dest, T init, Op && op)
         {
+            T temp = init;
             for (/**/; first != last; (void) ++first, ++dest)
             {
-                *dest = init;
-                init = op(init, *first);
+                init  = op(init, *first);
+                *dest = temp;
+                temp  = init;
             }
             return dest;
-        }
-
-        template <typename InIter, typename OutIter, typename T, typename Op>
-        T sequential_exclusive_scan_n(InIter first, std::size_t count,
-            OutIter dest, T init, Op && op)
-        {
-            for (/**/; count-- != 0; (void) ++first, ++dest)
-            {
-                *dest = init;
-                init = op(init, *first);
-            }
-            return init;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename T, typename OutIter, typename Op>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
-        exclusive_scan_helper(ExPolicy const& policy,
-            std::vector<hpx::shared_future<T> >&& r,
-            boost::shared_array<T> data, std::size_t count,
-            OutIter dest, Op && op, std::vector<std::size_t> const& chunk_sizes)
-        {
-            typedef hpx::util::zip_iterator<T*, OutIter> zip_iterator;
-            typedef typename zip_iterator::reference reference;
-
-            using hpx::util::make_zip_iterator;
-            return
-                util::partitioner<ExPolicy, OutIter, void>::call_with_data(
-                    policy, make_zip_iterator(data.get(), dest), count,
-                    [=](hpx::shared_future<T>&& val,
-                        zip_iterator part_begin, std::size_t part_size)
-                    {
-                        T const& v = val.get();
-                        parallel::util::loop_n(part_begin, part_size,
-                            [&](zip_iterator d)
-                            {
-                                using hpx::util::get;
-                                *get<1>(d.get_iterator_tuple()) =
-                                    op(*get<0>(d.get_iterator_tuple()), v);
-                            });
-                    },
-                    [dest, count, data](
-                        std::vector<future<void> > && r) mutable -> OutIter
-                    {
-                        std::advance(dest, count);
-                        return dest;
-                    },
-                    chunk_sizes, std::move(r)
-                );
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -127,25 +84,40 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (first == last)
                     return result::get(std::move(dest));
 
-                std::size_t count = std::distance(first, last);
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
+                difference_type count = std::distance(first, last) - 1;
+
+                if (count == 0) {
+                  *dest = init;
+                  return result::get(std::move(dest));
+                }
+              
+                // The scan may use the same array for output as input
+                // don't write initial value until after sum to avoid trampling on input
+                OutIter iout = dest++;
+                T temp = init;
+              
+
                 boost::shared_array<T> data(new T[count]);
 
                 // The overall scan algorithm is performed by executing 2
                 // subsequent parallel steps. The first calculates the scan
                 // results for each partition and the second produces the
                 // overall result
-
                 using hpx::util::make_zip_iterator;
-                return
+                auto ret =
                     util::scan_partitioner<ExPolicy, OutIter, T>::call(
                         policy, make_zip_iterator(first, data.get()), count, init,
                         // step 1 performs first part of scan algorithm
                         [=](zip_iterator part_begin, std::size_t part_size) -> T
                         {
                             using hpx::util::get;
-                            return sequential_exclusive_scan_n(
-                                get<0>(part_begin.get_iterator_tuple()), part_size,
-                                get<1>(part_begin.get_iterator_tuple()), init, op);
+                            T part_init = get<0>(*part_begin);
+                            get<1>(*part_begin++) = part_init;
+                            return sequential_inclusive_scan_n(
+                                get<0>(part_begin.get_iterator_tuple()), part_size-1,
+                                get<1>(part_begin.get_iterator_tuple()), part_init, op);
                         },
                         // step 2 propagates the partition results from left
                         // to right
@@ -160,10 +132,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             // run the final copy step and produce the required
                             // result
-                            return exclusive_scan_helper(policy, std::move(r),
+                            return scan_copy_helper(policy, std::move(r),
                                 data, count, dest, op, chunk_sizes);
                         }
                     );
+                // write output initial value
+                *iout = temp;
+                return ret;
             }
         };
         /// \endcond

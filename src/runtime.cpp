@@ -809,7 +809,11 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            detail::report_exception_and_terminate(e);
+            hpx::runtime* rt = hpx::get_runtime_ptr();
+            if (rt)
+                rt->report_error(num_thread, e);
+            else
+                detail::report_exception_and_terminate(e);
             return;
         }
 
@@ -821,7 +825,11 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            detail::report_exception_and_terminate(e);
+            hpx::runtime* rt = hpx::get_runtime_ptr();
+            if (rt)
+                rt->report_error(std::size_t(-1), e);
+            else
+                detail::report_exception_and_terminate(e);
             return;
         }
 
@@ -1049,7 +1057,7 @@ namespace hpx
         return rt->get_config().get_os_thread_count();
     }
 
-    std::size_t get_os_thread_count(threads::executor& exec)
+    std::size_t get_os_thread_count(threads::executor const& exec)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL == rt)
@@ -1171,9 +1179,9 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    void do_background_work(std::size_t num_thread)
+    bool do_background_work(std::size_t num_thread)
     {
-        get_runtime().get_parcel_handler().do_background_work(num_thread);
+        return get_runtime().get_parcel_handler().do_background_work(num_thread);
     }
 }}
 
@@ -1277,7 +1285,7 @@ namespace hpx
 
     /// \brief Sign the given parcel-suffix
     ///
-    /// \param suffix         The parcel suffoix to be signed
+    /// \param suffix         The parcel suffix to be signed
     /// \param signed_suffix  The signed parcel suffix will be placed here
     ///
     void sign_parcel_suffix(

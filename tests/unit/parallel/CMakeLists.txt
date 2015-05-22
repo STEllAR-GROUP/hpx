@@ -9,7 +9,7 @@ set(tests
     all_of
     any_of
     copy
-    #copyif
+    copyif
     copyn
     count
     countif
@@ -29,6 +29,9 @@ set(tests
     generate
     generaten
     inclusive_scan
+    is_partitioned
+    is_sorted
+    is_sorted_until
     lexicographical_compare
     max_element
     min_element
@@ -38,6 +41,8 @@ set(tests
     move
     none_of
     reduce_
+    remove_copy
+    remove_copy_if
     replace
     replace_if
     replace_copy

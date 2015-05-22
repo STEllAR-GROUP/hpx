@@ -294,7 +294,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             boost::uint64_t overall_times = 0, thread_times = 0;
             threads::detail::scheduling_loop(virt_core, scheduler_,
                 states_[virt_core], executed_threads, executed_thread_phases,
-                overall_times, thread_times, &suspend_back_into_calling_context);
+                overall_times, thread_times, util::function_nonser<void()>(),
+                &suspend_back_into_calling_context);
 
 #ifdef HPX_DEBUG
             // the scheduling_loop is allowed to exit only if no more HPX

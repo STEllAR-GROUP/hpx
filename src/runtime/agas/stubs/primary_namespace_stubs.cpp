@@ -55,6 +55,13 @@ template lcos::future<naming::id_type>
       , threads::thread_priority priority
         );
 
+template lcos::future<std::pair<naming::id_type, naming::address> >
+    primary_namespace::service_async<std::pair<naming::id_type, naming::address> >(
+    naming::id_type const& gid
+  , request const& req
+  , threads::thread_priority priority
+    );
+
 void primary_namespace::service_non_blocking(
     naming::id_type const& gid
   , request const& req

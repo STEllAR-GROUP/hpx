@@ -10,6 +10,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/unwrapped.hpp>
+#include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -26,6 +28,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -64,7 +67,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename T, typename OutIter, typename Op>
         typename detail::algorithm_result<ExPolicy, OutIter>::type
-        inclusive_scan_helper(ExPolicy const& policy,
+        scan_copy_helper(ExPolicy const& policy,
             std::vector<hpx::shared_future<T> >&& r,
             boost::shared_array<T> data, std::size_t count,
             OutIter dest, Op && op, std::vector<std::size_t> const& chunk_sizes)
@@ -123,11 +126,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             {
                 typedef detail::algorithm_result<ExPolicy, OutIter> result;
                 typedef hpx::util::zip_iterator<FwdIter, T*> zip_iterator;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
 
                 if (first == last)
                     return result::get(std::move(dest));
 
-                std::size_t count = std::distance(first, last);
+                difference_type count = std::distance(first, last);
                 boost::shared_array<T> data(new T[count]);
 
                 // The overall scan algorithm is performed by executing 2
@@ -143,9 +148,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [=](zip_iterator part_begin, std::size_t part_size) -> T
                         {
                             using hpx::util::get;
+                            T part_init = get<0>(*part_begin);
+                            get<1>(*part_begin++) = part_init;
                             return sequential_inclusive_scan_n(
-                                get<0>(part_begin.get_iterator_tuple()), part_size,
-                                get<1>(part_begin.get_iterator_tuple()), init, op);
+                                get<0>(part_begin.get_iterator_tuple()), part_size-1,
+                                get<1>(part_begin.get_iterator_tuple()), part_init, op);
                         },
                         // step 2 propagates the partition results from left
                         // to right
@@ -160,7 +167,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             // run the final copy step and produce the required
                             // result
-                            return inclusive_scan_helper(policy, std::move(r),
+                            return scan_copy_helper(policy, std::move(r),
                                 data, count, dest, op, chunk_sizes);
                         }
                     );

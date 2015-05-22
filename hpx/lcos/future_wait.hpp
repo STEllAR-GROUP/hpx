@@ -11,21 +11,15 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <vector>
-
 #include <boost/atomic.hpp>
 #include <boost/foreach.hpp>
 #include <boost/dynamic_bitset.hpp>
-#include <utility>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/repeat.hpp>
-#include <boost/preprocessor/iterate.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-#include <boost/preprocessor/cat.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
+
+#include <utility>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos

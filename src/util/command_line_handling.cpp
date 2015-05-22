@@ -154,7 +154,7 @@ namespace hpx { namespace util
                     num_localities = cfg_num_localities;
             }
 
-            if ((env.run_with_pbs() || env.run_with_slurm()) &&
+            if (env.found_batch_environment() &&
                 using_nodelist && (batch_localities != num_localities) &&
                 (num_localities != 1))
             {
@@ -167,11 +167,11 @@ namespace hpx { namespace util
 
                 if (localities == 0)
                 {
-                    throw std::logic_error("Number of --hpx:localities "
-                        "must be greater than 0");
+                    throw hpx::detail::command_line_error(
+                        "Number of --hpx:localities must be greater than 0");
                 }
 
-                if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                if (env.found_batch_environment() &&
                     using_nodelist && (localities != num_localities) &&
                     (num_localities != 1))
                 {
@@ -189,54 +189,63 @@ namespace hpx { namespace util
             util::batch_environment& env, bool using_nodelist)
         {
             std::size_t batch_threads = env.retrieve_number_of_threads();
-            if(batch_threads == std::size_t(-1)) { batch_threads = 1; }
+            std::size_t default_threads = 1;
             std::string threads_str = cfgmap.get_value<std::string>(
                 "hpx.os_threads", "");
 
-            if ("all" == threads_str) {
+            if ("all" == threads_str)
+            {
+                if (batch_threads == std::size_t(-1))
+                    batch_threads = thread::hardware_concurrency();
+                else
+                    default_threads = batch_threads;
+
                 cfgmap.config_["hpx.os_threads"] =
-                    boost::lexical_cast<std::string>(
-                        thread::hardware_concurrency());
+                    boost::lexical_cast<std::string>(batch_threads);
+            }
+            else if (batch_threads != std::size_t(-1))
+            {
+                default_threads = batch_threads;
             }
 
             std::size_t threads = cfgmap.get_value<std::size_t>(
-                "hpx.os_threads", batch_threads);
+                "hpx.os_threads", default_threads);
 
-            if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                using_nodelist && (threads > batch_threads))
+            if (vm.count("hpx:threads"))
             {
-                detail::report_thread_warning(env.get_batch_name(),
-                    threads, batch_threads);
-            }
-
-            if (vm.count("hpx:threads")) {
                 threads_str = vm["hpx:threads"].as<std::string>();
                 if ("all" == threads_str)
-                    threads = thread::hardware_concurrency(); //-V101
+                {
+                    if (batch_threads == std::size_t(-1))
+                    {
+                        batch_threads = thread::hardware_concurrency();
+                    }
+                    threads = batch_threads; //-V101
+                }
                 else
                     threads = hpx::util::safe_lexical_cast<std::size_t>(threads_str);
 
                 if (threads == 0)
                 {
-                    throw std::logic_error("Number of --hpx:threads "
+                    throw hpx::detail::command_line_error("Number of --hpx:threads "
                         "must be greater than 0");
-                }
-
-                if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                    using_nodelist && (threads > batch_threads))
-                {
-                    detail::report_thread_warning(env.get_batch_name(),
-                        threads, batch_threads);
                 }
 
 #if defined(HPX_MAX_CPU_COUNT)
                 if (threads > HPX_MAX_CPU_COUNT) {
-                    throw std::logic_error("Requested more than "
+                    throw hpx::detail::command_line_error("Requested more than "
                         BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
                         "-DHPX_MAX_CPU_COUNT=<N> when configuring HPX.");
                 }
 #endif
+            }
+
+            if (env.found_batch_environment() &&
+                using_nodelist && (threads > batch_threads))
+            {
+                detail::report_thread_warning(env.get_batch_name(),
+                    threads, batch_threads);
             }
             return threads;
         }
@@ -329,14 +338,13 @@ namespace hpx { namespace util
         }
 
         // Check command line arguments.
-        util::batch_environment env(debug_clp);
 
         if (vm.count("hpx:iftransform")) {
             util::sed_transform iftransform(vm["hpx:iftransform"].as<std::string>());
 
             // Check for parsing failures
             if (!iftransform) {
-                throw std::logic_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Could not parse --hpx:iftransform argument '%1%'") %
                     vm["hpx:iftransform"].as<std::string>()));
             }
@@ -348,28 +356,53 @@ namespace hpx { namespace util
 
         bool using_nodelist = false;
 
-        if (vm.count("hpx:nodefile")) {
+        std::vector<std::string> nodelist;
+
+        if(vm.count("hpx:nodefile"))
+        {
             if (vm.count("hpx:nodes")) {
-                throw std::logic_error("Ambiguous command line options. "
+                throw hpx::detail::command_line_error(
+                    "Ambiguous command line options. "
                     "Do not specify more than one of the --hpx:nodefile and "
                     "--hpx:nodes options at the same time.");
             }
-            using_nodelist = true;
-            ini_config += "hpx.nodefile!=" +
-                env.init_from_file(vm["hpx:nodefile"].as<std::string>(), agas_host);
+            std::string node_file = vm["hpx:nodefile"].as<std::string>();
+            ini_config += "hpx.nodefile!=" + node_file;
+            std::ifstream ifs(node_file.c_str());
+            if (ifs.is_open())
+            {
+                if (debug_clp)
+                    std::cerr << "opened: " << node_file << std::endl;
+                std::string line;
+                while (std::getline(ifs, line)) {
+                    if (!line.empty()) {
+                        nodelist.push_back(line);
+                    }
+                }
+            }
+            else {
+                if (debug_clp)
+                    std::cerr << "failed opening: " << node_file << std::endl;
+
+                // raise hard error if nodefile could not be opened
+                throw hpx::detail::command_line_error(boost::str(boost::format(
+                    "Could not open nodefile: '%s'") % node_file));
+            }
         }
         else if (vm.count("hpx:nodes")) {
-            using_nodelist = true;
-            ini_config += "hpx.nodes!=" + env.init_from_nodelist(
-                vm["hpx:nodes"].as<std::vector<std::string> >(), agas_host);
-        }
-        // FIXME: What if I don't want to use the node list with SLURM?
-        else if (env.found_batch_environment()) {
-            using_nodelist = true;
-            ini_config += "hpx.nodes!=" + env.init_from_environment(agas_host);
+            nodelist = vm["hpx:nodes"].as<std::vector<std::string> >();
         }
 
-        // let the PBS environment decide about the AGAS host
+        util::batch_environment env(nodelist, debug_clp);
+
+        if(!nodelist.empty())
+        {
+            using_nodelist = true;
+            ini_config += "hpx.nodes!=" + env.init_from_nodelist(
+                nodelist, agas_host);
+        }
+
+        // let the batch environment decide about the AGAS host
         agas_host = env.agas_host_name(
             agas_host.empty() ? HPX_INITIAL_IP_ADDRESS : agas_host);
 
@@ -404,7 +437,8 @@ namespace hpx { namespace util
             if (vm.count("hpx:console") + vm.count("hpx:worker") +
                 vm.count("hpx:connect") > 1)
             {
-                throw std::logic_error("Ambiguous command line options. "
+                throw hpx::detail::command_line_error(
+                    "Ambiguous command line options. "
                     "Do not specify more than one of --hpx:console, "
                     "--hpx:worker, or --hpx:connect");
             }
@@ -449,7 +483,8 @@ namespace hpx { namespace util
             // command line overwrites the environment
             if (vm.count("hpx:node")) {
                 if (vm.count("hpx:agas")) {
-                    throw std::logic_error("Command line option --hpx:node "
+                    throw hpx::detail::command_line_error(
+                        "Command line option --hpx:node "
                         "is not compatible with --hpx:agas");
                 }
                 node = vm["hpx:node"].as<std::size_t>();
@@ -478,9 +513,13 @@ namespace hpx { namespace util
                 }
             }
 
-            // store node number in configuration
-            ini_config += "hpx.locality!=" +
-                boost::lexical_cast<std::string>(node);
+            // store node number in configuration, don't do that if we're on a
+            // worker and the node number is zero
+            if (!vm.count("hpx:worker") || node != 0)
+            {
+                ini_config += "hpx.locality!=" +
+                    boost::lexical_cast<std::string>(node);
+            }
         }
 
         if (vm.count("hpx:hpx")) {
@@ -527,8 +566,8 @@ namespace hpx { namespace util
             agas_host = hpx_host;
             agas_port = hpx_port;
         }
-        else if (env.run_with_pbs() || env.run_with_slurm()) {
-            // in PBS mode, if the network addresses are different and we
+        else if (env.found_batch_environment()) {
+            // in batch mode, if the network addresses are different and we
             // should not run the AGAS server we assume to be in worker mode
             mode_ = hpx::runtime_mode_worker;
 
@@ -555,9 +594,10 @@ namespace hpx { namespace util
                 ini_config += "hpx.components.load_external=0";
         }
         else if (vm.count("hpx:run-agas-server-only") &&
-              !(env.run_with_pbs() || env.run_with_slurm()))
+              !(env.found_batch_environment()))
         {
-            throw std::logic_error("Command line option --hpx:run-agas-server-only "
+            throw hpx::detail::command_line_error(
+                "Command line option --hpx:run-agas-server-only "
                 "can be specified only for the node running the AGAS server.");
         }
 
@@ -569,7 +609,8 @@ namespace hpx { namespace util
 
         // we can't run the AGAS server while connecting
         if (run_agas_server && mode_ == runtime_mode_connect) {
-            throw std::logic_error("Command line option error: can't run AGAS server"
+            throw hpx::detail::command_line_error(
+                "Command line option error: can't run AGAS server"
                 "while connecting to a running application.");
         }
 
@@ -701,7 +742,7 @@ namespace hpx { namespace util
                 ini_config_ += "hpx.cmd_line_help_option!=" + help_option;
             }
             else {
-                throw std::logic_error(boost::str(boost::format(
+                throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Invalid argument for option --hpx:help: '%1%', allowed values: "
                     "'minimal' (default) and 'full'") % help_option));
             }
@@ -773,7 +814,8 @@ namespace hpx { namespace util
                 // returned by the system (see #973: Would like option to
                 // report HWLOC bindings).
                 error_code ec(lightweight);
-                threads::mask_type boundcpu = top.get_cpubind_mask(ec);
+                threads::mask_type boundcpu = top.get_cpubind_mask(
+                    rt.get_thread_manager().get_os_thread_handle(i), ec);
 
                 // The masks reported by HPX must be the same as the ones
                 // reported from HWLOC.
@@ -784,7 +826,8 @@ namespace hpx { namespace util
                         "handle_print_bind",
                         boost::str(
                             boost::format("unexpected mismatch between "
-                                "locality %1%: binding reported from HWLOC(%2%) and HPX(%3%) on thread %4%"
+                                "locality %1%: binding reported from HWLOC(%2%) "
+                                " and HPX(%3%) on thread %4%"
                             ) % hpx::get_locality_id() % boundcpu % pu_mask % i));
                 }
             }

@@ -200,6 +200,8 @@ namespace hpx
 
         virtual int run() = 0;
 
+        virtual void rethrow_exception() = 0;
+
         virtual int start(util::function_nonser<hpx_main_function_type> const& func,
             bool blocking = false) = 0;
 

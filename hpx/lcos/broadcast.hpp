@@ -131,8 +131,6 @@ namespace hpx { namespace lcos
 }}
 #else
 
-#if !BOOST_PP_IS_ITERATING
-
 #ifndef HPX_LCOS_BROADCAST_HPP
 #define HPX_LCOS_BROADCAST_HPP
 
@@ -144,13 +142,14 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/calculate_fanout.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/pack.hpp>
+
+#include <boost/preprocessor/cat.hpp>
+#include <boost/serialization/vector.hpp>
 
 #include <vector>
-
-#include <boost/serialization/vector.hpp>
-#include <boost/preprocessor/enum_params.hpp>
-#include <boost/preprocessor/cat.hpp>
 
 #if !defined(HPX_BROADCAST_FANOUT)
 #define HPX_BROADCAST_FANOUT 16
@@ -160,12 +159,14 @@ namespace hpx { namespace lcos
 {
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
         template <typename Action>
         struct broadcast_with_index
         {
             typedef typename Action::arguments_type arguments_type;
         };
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename Action>
         struct broadcast_result
         {
@@ -191,38 +192,295 @@ namespace hpx { namespace lcos
         {};
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Action, int N>
+        template <
+            typename Action
+          , typename ...Ts
+        >
+        //hpx::future<typename broadcast_result<Action>::type>
+        typename broadcast_result<Action>::type
+        broadcast_impl(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , std::size_t global_idx
+          , boost::mpl::false_
+          , Ts const&... vs
+        );
+
+        template <
+            typename Action
+          , typename ...Ts
+        >
+        //hpx::future<void>
+        void
+        broadcast_impl(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , std::size_t global_idx
+          , boost::mpl::true_
+          , Ts const&... vs
+        );
+
+        template <
+            typename Action
+          , typename ...Ts
+        >
+        void
+        broadcast_apply_impl(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , std::size_t global_idx
+          , Ts const&... vs
+        );
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action
+          , typename Futures
+          , typename ...Ts
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
+          , std::size_t
+          , Ts const&... vs)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , vs...
+                )
+            );
+        }
+
+        template <
+            typename Action
+          , typename Futures
+          , typename ...Ts
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
+          , std::size_t global_idx
+          , Ts const&... vs)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , vs...
+                  , global_idx
+                )
+            );
+        }
+
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename ...Ts
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
+          , hpx::id_type const& id
+          , std::size_t
+          , Ts const&... vs)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , vs...
+                ).then(std::forward<Cont>(cont))
+            );
+        }
+
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename ...Ts
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , Cont && cont
+          , hpx::id_type const& id
+          , std::size_t global_idx
+          , Ts const&... vs)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , vs...
+                  , global_idx
+                ).then(std::forward<Cont>(cont))
+            );
+        }
+
+        template <
+            typename Action
+          , typename ...Ts
+        >
+        void
+        broadcast_invoke_apply(Action act
+          , hpx::id_type const& id
+          , std::size_t
+          , Ts const&... vs)
+        {
+            hpx::apply(
+                act
+              , id
+              , vs...
+            );
+        }
+
+        template <
+            typename Action
+          , typename ...Ts
+        >
+        void
+        broadcast_invoke_apply(broadcast_with_index<Action>
+          , hpx::id_type const& id
+          , std::size_t global_idx
+          , Ts const&... vs)
+        {
+            hpx::apply(
+                Action()
+              , id
+              , vs...
+              , global_idx
+            );
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action
+          , typename IsVoid
+          , typename ...Ts
+        >
+        struct broadcast_invoker
+        {
+            //static hpx::future<typename broadcast_result<Action>::type>
+            static typename broadcast_result<Action>::type
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , std::size_t global_idx
+              , IsVoid
+              , Ts const&... vs
+            )
+            {
+                return
+                    broadcast_impl(
+                        act
+                      , ids
+                      , global_idx
+                      , IsVoid()
+                      , vs...
+                    );
+            }
+        };
+
+        template <
+            typename Action
+          , typename ...Ts
+        >
+        struct broadcast_apply_invoker
+        {
+            static void
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              , std::size_t global_idx
+              , Ts const&... vs
+            )
+            {
+                return
+                    broadcast_apply_impl(
+                        act
+                      , ids
+                      , global_idx
+                      , vs...
+                    );
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Action, typename Is>
         struct make_broadcast_action_impl;
+
+        template <typename Action, std::size_t ...Is>
+        struct make_broadcast_action_impl<Action, util::detail::pack_c<std::size_t, Is...> >
+        {
+            typedef
+                typename broadcast_result<Action>::action_result
+                action_result;
+
+            typedef detail::broadcast_invoker<
+                        Action
+                      , typename boost::is_same<void, action_result>::type
+                      , typename util::tuple_element<
+                            Is, typename Action::arguments_type
+                        >::type...
+                    >
+                    broadcast_invoker_type;
+
+            typedef
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
+                type;
+        };
 
         template <typename Action>
         struct make_broadcast_action
           : make_broadcast_action_impl<
-                Action, Action::arity
+                Action
+              , typename util::detail::make_index_pack<Action::arity>::type
             >
         {};
 
         template <typename Action>
         struct make_broadcast_action<broadcast_with_index<Action> >
           : make_broadcast_action_impl<
-                broadcast_with_index<Action>, Action::arity - 1
+                broadcast_with_index<Action>
+              , typename util::detail::make_index_pack<Action::arity - 1>::type
             >
         {};
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, int N>
+        template <typename Action, typename Is>
         struct make_broadcast_apply_action_impl;
+
+        template <typename Action, std::size_t ...Is>
+        struct make_broadcast_apply_action_impl<Action, util::detail::pack_c<std::size_t, Is...> >
+        {
+            typedef
+                typename broadcast_result<Action>::action_result
+                action_result;
+
+            typedef detail::broadcast_apply_invoker<
+                        Action
+                      , typename util::tuple_element<
+                            Is, typename Action::arguments_type
+                        >::type...
+                    >
+                    broadcast_invoker_type;
+
+            typedef
+                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
+                type;
+        };
 
         template <typename Action>
         struct make_broadcast_apply_action
           : make_broadcast_apply_action_impl<
-                Action, Action::arity
+                Action
+              , typename util::detail::make_index_pack<Action::arity>::type
             >
         {};
 
         template <typename Action>
         struct make_broadcast_apply_action<broadcast_with_index<Action> >
           : make_broadcast_apply_action_impl<
-                broadcast_with_index<Action>, Action::arity - 1
+                broadcast_with_index<Action>
+              , typename util::detail::make_index_pack<Action::arity - 1>::type
             >
         {};
 
@@ -261,38 +519,402 @@ namespace hpx { namespace lcos
 
             return std::move(res);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action
+          , typename ...Ts
+        >
+        //hpx::future<void>
+        void
+        broadcast_impl(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , std::size_t global_idx
+          , boost::mpl::true_
+          , Ts const&... vs
+        )
+        {
+            if(ids.empty()) return;// hpx::lcos::make_ready_future();
+
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+
+            std::vector<hpx::future<void> > broadcast_futures;
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
+            {
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , ids[i]
+                  , global_idx + i
+                  , vs...
+                );
+            }
+
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
+
+                typedef
+                    typename detail::make_broadcast_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+
+                while(it != ids.end())
+                {
+                    HPX_ASSERT(ids.size() >= applied);
+
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+
+                    hpx::id_type id(ids_next[0]);
+                    broadcast_futures.push_back(
+                        hpx::async_colocated<broadcast_impl_action>(
+                            id
+                          , act
+                          , std::move(ids_next)
+                          , global_idx + applied
+                          , boost::integral_constant<bool, true>::type()
+                          , vs...
+                        )
+                    );
+
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
+
+            //return hpx::when_all(broadcast_futures).then(&return_void);
+            hpx::when_all(broadcast_futures).then(&return_void).get();
+        }
+
+        template <
+            typename Action
+          , typename ...Ts
+        >
+        //hpx::future<typename broadcast_result<Action>::type>
+        typename broadcast_result<Action>::type
+        broadcast_impl(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , std::size_t global_idx
+          , boost::mpl::false_
+          , Ts const&... vs
+        )
+        {
+            typedef
+                typename broadcast_result<Action>::action_result
+                action_result;
+            typedef
+                typename broadcast_result<Action>::type
+                result_type;
+
+            //if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            if(ids.empty()) return result_type();
+
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+
+            std::vector<hpx::future<result_type> > broadcast_futures;
+            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
+            for(std::size_t i = 0; i != local_size; ++i)
+            {
+                broadcast_invoke(
+                    act
+                  , broadcast_futures
+                  , &wrap_into_vector<action_result>
+                  , ids[i]
+                  , global_idx + i
+                  , vs...
+                );
+            }
+
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
+
+                typedef
+                    typename detail::make_broadcast_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+
+                while(it != ids.end())
+                {
+                    HPX_ASSERT(ids.size() >= applied);
+
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+
+                    hpx::id_type id(ids_next[0]);
+                    broadcast_futures.push_back(
+                        hpx::async_colocated<broadcast_impl_action>(
+                            id
+                          , act
+                          , std::move(ids_next)
+                          , global_idx + applied
+                          , boost::integral_constant<bool, false>::type()
+                          , vs...
+                        )
+                    );
+
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
+
+            return hpx::when_all(broadcast_futures).
+                then(&return_result_type<action_result>).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action
+          , typename ...Ts
+        >
+        void
+        broadcast_apply_impl(
+            Action const & act
+          , std::vector<hpx::id_type> const & ids
+          , std::size_t global_idx
+          , Ts const&... vs
+        )
+        {
+            if(ids.empty()) return;
+
+            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
+            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+
+            for(std::size_t i = 0; i != local_size; ++i)
+            {
+                broadcast_invoke_apply(
+                    act
+                  , ids[i]
+                  , global_idx + i
+                  , vs...
+                );
+            }
+
+            if(ids.size() > local_fanout)
+            {
+                std::size_t applied = local_fanout;
+                std::vector<hpx::id_type>::const_iterator it =
+                    ids.begin() + local_fanout;
+
+                typedef
+                    typename detail::make_broadcast_apply_action<
+                        Action
+                    >::type
+                    broadcast_impl_action;
+
+                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
+                while(it != ids.end())
+                {
+                    HPX_ASSERT(ids.size() >= applied);
+
+                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+
+                    hpx::id_type id(ids_next[0]);
+                    hpx::apply_colocated<broadcast_impl_action>(
+                        id
+                      , act
+                      , std::move(ids_next)
+                      , global_idx + applied
+                      , vs...
+                    );
+
+                    applied += next_fan;
+                    it += next_fan;
+                }
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Action
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast(
+        std::vector<hpx::id_type> const & ids
+      , Ts const&... vs)
+    {
+        typedef
+            typename detail::make_broadcast_action<Action>::type
+            broadcast_impl_action;
+        typedef
+            typename detail::broadcast_result<Action>::action_result
+            action_result;
+
+        if (ids.empty())
+        {
+            typedef typename detail::broadcast_result<Action>::type
+                result_type;
+
+            return hpx::make_exceptional_future<result_type>(
+                HPX_GET_EXCEPTION(bad_parameter,
+                    "hpx::lcos::broadcast",
+                    "empty list of targets for broadcast operation")
+                );
+        }
+
+        return
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , std::size_t(0)
+              , typename boost::is_same<void, action_result>::type()
+              , vs...
+            );
+    }
+
+    template <
+        typename Component, typename Signature, typename Derived
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast(
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
+      , std::vector<hpx::id_type> const & ids
+      , Ts const&... vs)
+    {
+        return broadcast<Derived>(
+                ids
+              , vs...
+            );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Action
+      , typename ...Ts
+    >
+    void
+    broadcast_apply(
+        std::vector<hpx::id_type> const & ids
+      , Ts const&... vs)
+    {
+        typedef
+            typename detail::make_broadcast_apply_action<Action>::type
+            broadcast_impl_action;
+
+        if (ids.empty())
+        {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "hpx::lcos::broadcast_apply",
+                "empty list of of targets for broadcast operation");
+            return;
+        }
+
+        hpx::apply_colocated<broadcast_impl_action>(
+                ids[0]
+              , Action()
+              , ids
+              , 0
+              , vs...
+            );
+    }
+
+    template <
+        typename Component, typename Signature, typename Derived
+      , typename ...Ts
+    >
+    void
+    broadcast_apply(
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
+      , std::vector<hpx::id_type> const & ids
+      , Ts const&... vs)
+    {
+        broadcast_apply<Derived>(
+            ids
+          , vs...
+        );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Action
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , Ts const&... vs)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , vs...
+            );
+    }
+
+    template <
+        typename Component, typename Signature, typename Derived
+      , typename ...Ts
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
+      , std::vector<hpx::id_type> const & ids
+      , Ts const&... vs)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
+                ids
+              , vs...
+            );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Action
+      , typename ...Ts
+    >
+    void
+    broadcast_apply_with_index(
+        std::vector<hpx::id_type> const & ids
+      , Ts const&... vs)
+    {
+        broadcast_apply<detail::broadcast_with_index<Action> >(
+            ids
+          , vs...
+        );
+    }
+
+    template <
+        typename Component, typename Signature, typename Derived
+      , typename ...Ts
+    >
+    void
+    broadcast_apply_with_index(
+        hpx::actions::basic_action<Component, Signature, Derived> /* act */
+      , std::vector<hpx::id_type> const & ids
+      , Ts const&... vs)
+    {
+        broadcast_apply<detail::broadcast_with_index<Derived> >(
+            ids
+          , vs...
+        );
     }
 }}
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/broadcast.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/broadcast_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define HPX_LCOS_BROADCAST_EXTRACT_ACTION_ARGUMENTS(Z, N, D)                  \
-    typename boost::fusion::result_of::value_at_c<                            \
-        typename Action::arguments_type, N                                    \
-    >::type                                                                   \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-// bring in all N-nary overloads for broadcast
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (0, HPX_ACTION_ARGUMENT_LIMIT, <hpx/lcos/broadcast.hpp>))             \
-    /**/
-
-#include BOOST_PP_ITERATE()
-
-#undef HPX_LCOS_BROADCAST_EXTRACT_ACTION_ARGUMENTS
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION(...)                  \
@@ -512,607 +1134,4 @@ namespace hpx { namespace lcos
 
 #endif
 
-///////////////////////////////////////////////////////////////////////////////
-#else
-
-#define N BOOST_PP_ITERATION()
-
-namespace hpx { namespace lcos
-{
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action
-          , typename Futures
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-        >
-        void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-          , std::size_t)
-        {
-            futures.push_back(
-                hpx::async(
-                    act
-                  , id
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                )
-            );
-        }
-
-        template <
-            typename Action
-          , typename Futures
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-        >
-        void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-          , std::size_t global_idx)
-        {
-            futures.push_back(
-                hpx::async(
-                    Action()
-                  , id
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                  , global_idx
-                )
-            );
-        }
-
-        template <
-            typename Action
-          , typename Futures
-          , typename Cont
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-        >
-        void
-        broadcast_invoke(Action act, Futures& futures, Cont && cont
-          , hpx::id_type const& id
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-          , std::size_t)
-        {
-            futures.push_back(
-                hpx::async(
-                    act
-                  , id
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                ).then(std::forward<Cont>(cont))
-            );
-        }
-
-        template <
-            typename Action
-          , typename Futures
-          , typename Cont
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-        >
-        void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , Cont && cont
-          , hpx::id_type const& id
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-          , std::size_t global_idx)
-        {
-            futures.push_back(
-                hpx::async(
-                    Action()
-                  , id
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                  , global_idx
-                ).then(std::forward<Cont>(cont))
-            );
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-        >
-        void
-        broadcast_invoke_apply(Action act
-          , hpx::id_type const& id
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-          , std::size_t)
-        {
-            hpx::apply(
-                act
-              , id
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-            );
-        }
-
-        template <
-            typename Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-        >
-        void
-        broadcast_invoke_apply(broadcast_with_index<Action>
-          , hpx::id_type const& id
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-          , std::size_t global_idx)
-        {
-            hpx::apply(
-                Action()
-              , id
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-              , global_idx
-            );
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-        >
-        //hpx::future<void>
-        void
-        BOOST_PP_CAT(broadcast_impl, N)(
-            Action const & act
-          , std::vector<hpx::id_type> const & ids
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-          , std::size_t global_idx
-          , boost::mpl::true_
-        )
-        {
-            if(ids.empty()) return;// hpx::lcos::make_ready_future();
-
-            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
-
-            std::vector<hpx::future<void> > broadcast_futures;
-            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
-            for(std::size_t i = 0; i != local_size; ++i)
-            {
-                broadcast_invoke(
-                    act
-                  , broadcast_futures
-                  , ids[i]
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                  , global_idx + i
-                );
-            }
-
-            if(ids.size() > local_fanout)
-            {
-                std::size_t applied = local_fanout;
-                std::vector<hpx::id_type>::const_iterator it =
-                    ids.begin() + local_fanout;
-
-                typedef
-                    typename detail::make_broadcast_action<
-                        Action
-                    >::type
-                    broadcast_impl_action;
-
-                while(it != ids.end())
-                {
-                    HPX_ASSERT(ids.size() >= applied);
-
-                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
-
-                    hpx::id_type id(ids_next[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_next)
-                          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                          , global_idx + applied
-                          , boost::integral_constant<bool, true>::type()
-                        )
-                    );
-
-                    applied += next_fan;
-                    it += next_fan;
-                }
-            }
-
-            //return hpx::when_all(broadcast_futures).then(&return_void);
-            hpx::when_all(broadcast_futures).then(&return_void).get();
-        }
-
-        template <
-            typename Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-        >
-        //hpx::future<typename broadcast_result<Action>::type>
-        typename broadcast_result<Action>::type
-        BOOST_PP_CAT(broadcast_impl, N)(
-            Action const & act
-          , std::vector<hpx::id_type> const & ids
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-          , std::size_t global_idx
-          , boost::mpl::false_
-        )
-        {
-            typedef
-                typename broadcast_result<Action>::action_result
-                action_result;
-            typedef
-                typename broadcast_result<Action>::type
-                result_type;
-
-            //if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
-            if(ids.empty()) return result_type();
-
-            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
-
-            std::vector<hpx::future<result_type> > broadcast_futures;
-            broadcast_futures.reserve(local_size + (ids.size()/fanout) + 1);
-            for(std::size_t i = 0; i != local_size; ++i)
-            {
-                broadcast_invoke(
-                    act
-                  , broadcast_futures
-                  , &wrap_into_vector<action_result>
-                  , ids[i]
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                  , global_idx + i
-                );
-            }
-
-            if(ids.size() > local_fanout)
-            {
-                std::size_t applied = local_fanout;
-                std::vector<hpx::id_type>::const_iterator it =
-                    ids.begin() + local_fanout;
-
-                typedef
-                    typename detail::make_broadcast_action<
-                        Action
-                    >::type
-                    broadcast_impl_action;
-
-                while(it != ids.end())
-                {
-                    HPX_ASSERT(ids.size() >= applied);
-
-                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
-
-                    hpx::id_type id(ids_next[0]);
-                    broadcast_futures.push_back(
-                        hpx::async_colocated<broadcast_impl_action>(
-                            id
-                          , act
-                          , std::move(ids_next)
-                          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                          , global_idx + applied
-                          , boost::integral_constant<bool, false>::type()
-                        )
-                    );
-
-                    applied += next_fan;
-                    it += next_fan;
-                }
-            }
-
-            return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>).get();
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-        >
-        void
-        BOOST_PP_CAT(broadcast_apply_impl, N)(
-            Action const & act
-          , std::vector<hpx::id_type> const & ids
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-          , std::size_t global_idx
-        )
-        {
-            if(ids.empty()) return;
-
-            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
-
-            for(std::size_t i = 0; i != local_size; ++i)
-            {
-                broadcast_invoke_apply(
-                    act
-                  , ids[i]
-                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                  , global_idx + i
-                );
-            }
-
-            if(ids.size() > local_fanout)
-            {
-                std::size_t applied = local_fanout;
-                std::vector<hpx::id_type>::const_iterator it =
-                    ids.begin() + local_fanout;
-
-                typedef
-                    typename detail::make_broadcast_apply_action<
-                        Action
-                    >::type
-                    broadcast_impl_action;
-
-                std::size_t fanout = util::calculate_fanout(ids.size(), local_fanout);
-                while(it != ids.end())
-                {
-                    HPX_ASSERT(ids.size() >= applied);
-
-                    std::size_t next_fan = (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
-
-                    hpx::id_type id(ids_next[0]);
-                    hpx::apply_colocated<broadcast_impl_action>(
-                        id
-                      , act
-                      , std::move(ids_next)
-                      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                      , global_idx + applied
-                    );
-
-                    applied += next_fan;
-                    it += next_fan;
-                }
-            }
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-          , typename IsVoid
-        >
-        struct BOOST_PP_CAT(broadcast_invoker, N)
-        {
-            //static hpx::future<typename broadcast_result<Action>::type>
-            static typename broadcast_result<Action>::type
-            call(
-                Action const & act
-              , std::vector<hpx::id_type> const & ids
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-              , std::size_t global_idx
-              , IsVoid
-            )
-            {
-                return
-                    BOOST_PP_CAT(broadcast_impl, N)(
-                        act
-                      , ids
-                      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                      , global_idx
-                      , IsVoid()
-                    );
-            }
-        };
-
-        template <typename Action>
-        struct make_broadcast_action_impl<Action, N>
-        {
-            typedef
-                typename broadcast_result<Action>::action_result
-                action_result;
-
-            typedef BOOST_PP_CAT(broadcast_invoker, N)<
-                        Action
-                      BOOST_PP_COMMA_IF(N)
-                        BOOST_PP_ENUM(
-                            N
-                          , HPX_LCOS_BROADCAST_EXTRACT_ACTION_ARGUMENTS
-                          , _
-                        )
-                      , typename boost::is_same<void, action_result>::type
-                    >
-                    broadcast_invoker_type;
-
-            typedef
-                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
-                type;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-        >
-        struct BOOST_PP_CAT(broadcast_apply_invoker, N)
-        {
-            static void
-            call(
-                Action const & act
-              , std::vector<hpx::id_type> const & ids
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
-              , std::size_t global_idx
-            )
-            {
-                return
-                    BOOST_PP_CAT(broadcast_apply_impl, N)(
-                        act
-                      , ids
-                      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                      , global_idx
-                    );
-            }
-        };
-
-        template <typename Action>
-        struct make_broadcast_apply_action_impl<Action, N>
-        {
-            typedef BOOST_PP_CAT(broadcast_apply_invoker, N)<
-                        Action
-                      BOOST_PP_COMMA_IF(N)
-                        BOOST_PP_ENUM(
-                            N
-                          , HPX_LCOS_BROADCAST_EXTRACT_ACTION_ARGUMENTS
-                          , _
-                        )
-                    >
-                    broadcast_invoker_type;
-
-            typedef
-                typename HPX_MAKE_ACTION(broadcast_invoker_type::call)::type
-                type;
-        };
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::broadcast_result<Action>::type
-    >
-    broadcast(
-        std::vector<hpx::id_type> const & ids
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
-    {
-        typedef
-            typename detail::make_broadcast_action<Action>::type
-            broadcast_impl_action;
-        typedef
-            typename detail::broadcast_result<Action>::action_result
-            action_result;
-
-        return
-            hpx::async_colocated<broadcast_impl_action>(
-                ids[0]
-              , Action()
-              , ids
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-              , 0
-              , typename boost::is_same<void, action_result>::type()
-            );
-    }
-
-    template <
-        typename Component, typename Signature, typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::broadcast_result<Derived>::type
-    >
-    broadcast(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-      , std::vector<hpx::id_type> const & ids
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
-    {
-        return broadcast<Derived>(
-                ids
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-            );
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    void
-    broadcast_apply(
-        std::vector<hpx::id_type> const & ids
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
-    {
-        typedef
-            typename detail::make_broadcast_apply_action<Action>::type
-            broadcast_impl_action;
-
-        hpx::apply_colocated<broadcast_impl_action>(
-                ids[0]
-              , Action()
-              , ids
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-              , 0
-            );
-    }
-
-    template <
-        typename Component, typename Signature, typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    void
-    broadcast_apply(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-      , std::vector<hpx::id_type> const & ids
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
-    {
-        broadcast_apply<Derived>(
-            ids
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-        );
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::broadcast_result<Action>::type
-    >
-    broadcast_with_index(
-        std::vector<hpx::id_type> const & ids
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
-    {
-        return broadcast<detail::broadcast_with_index<Action> >(
-                ids
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-            );
-    }
-
-    template <
-        typename Component, typename Signature, typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    hpx::future<
-        typename detail::broadcast_result<Derived>::type
-    >
-    broadcast_with_index(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-      , std::vector<hpx::id_type> const & ids
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
-    {
-        return broadcast<detail::broadcast_with_index<Derived> >(
-                ids
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-            );
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    void
-    broadcast_apply_with_index(
-        std::vector<hpx::id_type> const & ids
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
-    {
-        broadcast_apply<detail::broadcast_with_index<Action> >(
-            ids
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-        );
-    }
-
-    template <
-        typename Component, typename Signature, typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    void
-    broadcast_apply_with_index(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-      , std::vector<hpx::id_type> const & ids
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
-    {
-        broadcast_apply<detail::broadcast_with_index<Derived> >(
-            ids
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-        );
-    }
-}}
-
-#endif
 #endif // DOXYGEN

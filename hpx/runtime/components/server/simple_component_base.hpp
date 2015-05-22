@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -54,11 +54,22 @@ namespace hpx { namespace components
         }
 
         // Copy construction and copy assignment should not copy the gid_.
-        simple_component_base(simple_component_base const&)
-        {}
+        simple_component_base(simple_component_base const&) {}
 
         simple_component_base& operator=(simple_component_base const&)
         {
+            return *this;
+        }
+
+        // just move our gid_
+        simple_component_base(simple_component_base && rhs)
+          : gid_(std::move(rhs.gid_))
+        {}
+
+        simple_component_base& operator=(simple_component_base && rhs)
+        {
+            if (this != &rhs)
+                gid_ = std::move(rhs.gid_);
             return *this;
         }
 
@@ -76,6 +87,13 @@ namespace hpx { namespace components
             components::set_component_type<this_component_type>(type);
         }
 
+        naming::address get_current_address() const
+        {
+            return naming::address(get_locality(),
+                components::get_component_type<wrapped_type>(),
+                boost::uint64_t(static_cast<this_component_type const*>(this)));
+        }
+
         /// \brief Create a new GID (if called for the first time), assign this
         ///        GID to this instance of a component and register this gid
         ///        with the AGAS service
@@ -87,17 +105,15 @@ namespace hpx { namespace components
         {
             if (!gid_)
             {
-                naming::address addr(get_locality(),
-                    components::get_component_type<wrapped_type>(),
-                    boost::uint64_t(static_cast<this_component_type const*>(this)));
-
+                naming::address addr(get_current_address());
                 if (!assign_gid)
                 {
                     gid_ = hpx::detail::get_next_id();
                     if (!applier::bind_gid_local(gid_, addr))
                     {
                         std::ostringstream strm;
-                        strm << gid_;
+                        strm << "failed to bind id " << gid_
+                             << "to locality: " << hpx::get_locality();
 
                         gid_ = naming::invalid_gid;   // invalidate GID
 
@@ -115,7 +131,8 @@ namespace hpx { namespace components
                     if (!agas::bind_sync(gid_, addr, appl.get_locality_id()))
                     {
                         std::ostringstream strm;
-                        strm << gid_;
+                        strm << "failed to rebind id " << gid_
+                             << "to locality: " << hpx::get_locality();
 
                         gid_ = naming::invalid_gid;   // invalidate GID
 
@@ -253,7 +270,7 @@ namespace hpx { namespace components
         typedef simple_component<Component> component_type;
         typedef component_type derived_type;
         typedef detail::simple_heap_factory<component_type> heap_type;
-        
+
         /// \brief Construct a simple_component instance holding a new wrapped
         ///        instance
         template <typename ...Ts>

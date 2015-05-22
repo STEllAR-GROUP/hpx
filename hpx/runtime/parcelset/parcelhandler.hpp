@@ -41,7 +41,7 @@ namespace hpx { namespace parcelset
     {
     private:
         // default callback for put_parcel
-        void default_write_handler(boost::system::error_code const&,
+        static void default_write_handler(boost::system::error_code const&,
             parcel const& p);
 
         void parcel_sink(parcel const& p);
@@ -61,10 +61,7 @@ namespace hpx { namespace parcelset
             p.set_start_time(get_current_time());
         }
 
-        // exception handling
         typedef lcos::local::spinlock mutex_type;
-
-        void rethrow_exception();
 
     public:
 
@@ -99,11 +96,14 @@ namespace hpx { namespace parcelset
 
         void initialize(naming::resolver_client &resolver);
 
-        /// \brief Stop all parcelports associated with this parcelhandler
+        /// \brief Stop all parcel ports associated with this parcelhandler
         void stop(bool blocking = true);
 
-        /// \ brief do background work in the parcel layer
-        void do_background_work(std::size_t num_thread = 0, bool stop_buffering = false);
+        /// \brief do background work in the parcel layer
+        ///
+        /// \returns Whether any work has been performed
+        bool do_background_work(std::size_t num_thread = 0,
+            bool stop_buffering = false);
 
         /// \brief Allow access to AGAS resolver instance.
         ///
@@ -193,8 +193,8 @@ namespace hpx { namespace parcelset
         {
             using util::placeholders::_1;
             using util::placeholders::_2;
-            put_parcel(p, util::bind(&parcelhandler::default_write_handler,
-                this, _1, _2));
+            put_parcel(p, util::bind(
+                &parcelhandler::invoke_write_handler, this, _1, _2));
         }
 
         /// The function \a get_parcel returns the next available parcel
@@ -215,7 +215,6 @@ namespace hpx { namespace parcelset
         /// parcels.
         bool get_parcel(parcel& p)
         {
-            rethrow_exception();
             return parcels_->get_parcel(p);
         }
 
@@ -238,7 +237,6 @@ namespace hpx { namespace parcelset
         /// parcels.
         bool get_parcel(parcel& p, naming::gid_type const& parcel_id)
         {
-            rethrow_exception();
             return parcels_->get_parcel(p, parcel_id);
         }
 
@@ -429,13 +427,32 @@ namespace hpx { namespace parcelset
         void list_parcelport(std::ostringstream& strm,
             std::string const& ppname, int priority, bool bootstrap) const;
 
+        // manage default exception handler
+        void invoke_write_handler(
+            boost::system::error_code const& ec, parcel const& p) const
+        {
+            write_handler_type f;
+            {
+                mutex_type::scoped_lock l(mtx_);
+                f = write_handler_;
+            }
+            f(ec, p);
+        }
+
+        write_handler_type set_write_handler(write_handler_type f)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            std::swap(f, write_handler_);
+            return f;
+        }
+
     protected:
-        std::size_t get_incoming_queue_length(bool /*reset*/) const
+        boost::int64_t get_incoming_queue_length(bool /*reset*/) const
         {
             return parcels_->get_queue_length();
         }
 
-        std::size_t get_outgoing_queue_length(bool reset) const;
+        boost::int64_t get_outgoing_queue_length(bool reset) const;
 
         std::pair<boost::shared_ptr<parcelport>, locality>
         find_appropriate_destination(naming::gid_type const & dest_gid);
@@ -480,10 +497,6 @@ namespace hpx { namespace parcelset
         /// queue of incoming parcels
         boost::shared_ptr<parcelhandler_queue_base> parcels_;
 
-        /// Any exception thrown earlier on one of the ASIO threads is stored here
-        mutex_type mtx_;
-        boost::exception_ptr exception_;
-
         /// Allow to use alternative parcel-ports (this is enabled only after
         /// the runtime systems of all localities are guaranteed to have
         /// reached a certain state).
@@ -497,9 +510,15 @@ namespace hpx { namespace parcelset
         /// Count number of (outbound) parcels routed
         boost::atomic<boost::int64_t> count_routed_;
 
+        /// global exception handler for unhandled exceptions thrown from the
+        /// parcel layer
+        mutable mutex_type mtx_;
+        write_handler_type write_handler_;
+
     private:
         static std::vector<plugins::parcelport_factory_base *> &
             get_parcelport_factories();
+
     public:
         static void add_parcelport_factory(plugins::parcelport_factory_base *);
 

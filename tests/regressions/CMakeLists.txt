@@ -14,6 +14,7 @@ set(subdirs
     threads
     traits
     util
+    parallel
    )
 
 if(HPX_HAVE_CXX11_LAMBDAS)
@@ -29,9 +30,11 @@ endforeach()
 set(tests
     id_type_ref_counting_1032
     multiple_init
+    unhandled_exception_582
    )
 
 set(id_type_ref_counting_1032_PARAMETERS THREADS_PER_LOCALITY 1)
+set(unhandled_exception_582_PARAMETERS THREADS_PER_LOCALITY 1)
 
 foreach(test ${tests})
   set(sources

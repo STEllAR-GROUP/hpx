@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -226,6 +226,13 @@ HPX_API_EXPORT bool bind_sync(
   , error_code& ec = throws
     );
 
+HPX_API_EXPORT bool bind_sync(
+    naming::gid_type const& id
+  , naming::address const& addr
+  , naming::gid_type const& locality_
+  , error_code& ec = throws
+    );
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT void garbage_collect_non_blocking(
     error_code& ec = throws
@@ -295,6 +302,14 @@ HPX_API_EXPORT naming::id_type get_colocation_id_sync(
 HPX_API_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(
     std::string const& name, agas::namespace_action_code evt,
     bool call_for_past_events);
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT hpx::future<std::pair<naming::id_type, naming::address> >
+    begin_migration(
+        naming::id_type const& id,
+        naming::id_type const& target_locality);
+HPX_API_EXPORT hpx::future<bool> end_migration(naming::id_type const& id);
+
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

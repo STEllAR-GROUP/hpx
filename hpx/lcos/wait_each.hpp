@@ -29,7 +29,7 @@ namespace hpx
     ///       supplied function.
     ///
     template <typename F, typename Future>
-    void wait_each(F&& f, std::vector<Future>&& lazy_values),
+    void wait_each(F&& f, std::vector<Future>&& futures);
 
     /// The function \a wait_each is a operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
@@ -40,10 +40,10 @@ namespace hpx
     ///
     /// \param f        The function which will be called for each of the
     ///                 input futures once the future has become ready.
-    /// \param first    The iterator pointing to the first element of a
+    /// \param begin    The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a wait_each should wait.
-    /// \param last     The iterator pointing to the last element of a
+    /// \param end      The iterator pointing to the last element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a wait_each should wait.
     ///
@@ -53,7 +53,7 @@ namespace hpx
     template <typename F, typename Iterator>
     void wait_each(F&& f, Iterator begin, Iterator end);
 
-    /// The function \a wait_each is a operator allowing to join on the resultss
+    /// The function \a wait_each is a operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
     /// Additionally, the supplied function is called for each of the passed
@@ -97,6 +97,7 @@ namespace hpx
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/when_each.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -136,7 +137,7 @@ namespace hpx { namespace lcos
     typename boost::disable_if<
         boost::mpl::or_<
             traits::is_future<typename util::decay<F>::type>,
-            util::functional::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
+            util::detail::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
         >
     >::type
     wait_each(F&& f, Ts&&... ts)

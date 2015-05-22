@@ -24,8 +24,6 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/ref.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -427,16 +425,15 @@ namespace hpx { namespace util
 
     namespace placeholders
     {
-#       define HPX_UTIL_BIND_PLACEHOLDER(Z, N, D)                             \
-        detail::placeholder<N> const BOOST_PP_CAT(_, N) = {};                 \
-        /**/
-
-        BOOST_PP_REPEAT_FROM_TO(
-            1, HPX_FUNCTION_ARGUMENT_LIMIT
-          , HPX_UTIL_BIND_PLACEHOLDER, _
-        );
-
-#       undef HPX_UTIL_BIND_PLACEHOLDER
+        detail::placeholder<1> const _1 = {};
+        detail::placeholder<2> const _2 = {};
+        detail::placeholder<3> const _3 = {};
+        detail::placeholder<4> const _4 = {};
+        detail::placeholder<5> const _5 = {};
+        detail::placeholder<6> const _6 = {};
+        detail::placeholder<7> const _7 = {};
+        detail::placeholder<8> const _8 = {};
+        detail::placeholder<9> const _9 = {};
     }
 
     ///////////////////////////////////////////////////////////////////////////

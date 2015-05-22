@@ -32,11 +32,6 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/static_assert.hpp>
 
-#include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/enum_params.hpp>
-#include <boost/preprocessor/iterate.hpp>
-#include <boost/preprocessor/cat.hpp>
-
 #include <algorithm>
 
 namespace hpx { namespace lcos { namespace local

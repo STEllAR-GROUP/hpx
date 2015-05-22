@@ -19,7 +19,7 @@ void test_equal_binary1(ExPolicy const& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c1(10);
+    std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
 
     std::size_t first_value = std::rand(); //-V101
@@ -118,9 +118,9 @@ void test_equal_binary1()
 
 void equal_binary_test1()
 {
-    //test_equal_binary1<std::random_access_iterator_tag>();
+    test_equal_binary1<std::random_access_iterator_tag>();
     test_equal_binary1<std::forward_iterator_tag>();
-    //test_equal_binary1<std::input_iterator_tag>();
+    test_equal_binary1<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

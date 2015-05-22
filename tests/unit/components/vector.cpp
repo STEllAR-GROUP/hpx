@@ -1,10 +1,10 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/components/vector/vector.hpp>
+#include <hpx/include/vector.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
@@ -248,8 +248,10 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         std::string empty(prefix_ + "empty");
 
         hpx::vector<T> base;
-        base.register_as(empty);
-        hpx::vector<T> v(empty);
+        base.register_as_sync(empty);
+
+        hpx::vector<T> v;
+        v.connect_to_sync(empty);
 
         test_global_iteration(v, 0, T());
         test_segmented_iteration(v, 0, 0);
@@ -268,9 +270,10 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         std::string size_(prefix_ + "size");
 
         hpx::vector<T> base(size);
-        base.register_as(size_);
+        base.register_as_sync(size_);
 
-        hpx::vector<T> v(size_);
+        hpx::vector<T> v;
+        v.connect_to_sync(size_);
 
         test_global_iteration(v, size, T());
         test_segmented_iteration(v, size, 1);
@@ -288,8 +291,11 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         // create vector with initial size and values
         std::string size_value(prefix_ + "size_value");
 
-        hpx::vector<T> base(size, T(999), size_value);
-        hpx::vector<T> v(size_value);
+        hpx::vector<T> base(size, T(999));
+        base.register_as_sync(size_value);
+
+        hpx::vector<T> v;
+        v.connect_to_sync(size_value);
 
         test_global_iteration(v, size, T(999));
         test_segmented_iteration(v, size, 1);
@@ -312,8 +318,11 @@ void trivial_test_with_policy(std::size_t size, std::size_t parts,
     {
         std::string policy_(prefix_ + "policy");
 
-        hpx::vector<T> base(size, policy, policy_);
-        hpx::vector<T> v(policy_);
+        hpx::vector<T> base(size, policy);
+        base.register_as_sync(policy_);
+
+        hpx::vector<T> v;
+        v.connect_to_sync(policy_);
 
         test_global_iteration(v, size, T(0));
         test_segmented_iteration(v, size, parts);
@@ -329,8 +338,11 @@ void trivial_test_with_policy(std::size_t size, std::size_t parts,
     {
         std::string policy_value(prefix_ + "policy_value");
 
-        hpx::vector<T> base(size, T(999), policy, policy_value);
-        hpx::vector<T> v(policy_value);
+        hpx::vector<T> base(size, T(999), policy);
+        base.register_as_sync(policy_value);
+
+        hpx::vector<T> v;
+        v.connect_to_sync(policy_value);
 
         test_global_iteration(v, size, T(999));
         test_segmented_iteration(v, size, parts);

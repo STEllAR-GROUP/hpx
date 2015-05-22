@@ -31,7 +31,7 @@ namespace hpx
     ///           being ready.
     ///
     template <typename F, typename Future>
-    future<void> when_each(F&& f, std::vector<Future>&& lazy_values);
+    future<void> when_each(F&& f, std::vector<Future>&& futures);
 
     /// The function \a when_each is a operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
@@ -41,10 +41,10 @@ namespace hpx
     ///
     /// \param f        The function which will be called for each of the
     ///                 input futures once the future has become ready.
-    /// \param first    The iterator pointing to the first element of a
+    /// \param begin    The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a wait_each should wait.
-    /// \param last     The iterator pointing to the last element of a
+    /// \param end      The iterator pointing to the last element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a wait_each should wait.
     ///
@@ -76,7 +76,7 @@ namespace hpx
     ///           being ready.
     ///
     template <typename F, typename... Ts>
-    future<void> when_each(F&& f, Ts&&... ts);
+    future<void> when_each(F&& f, Ts&&... futures);
 
     /// The function \a when_each is a operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
@@ -107,7 +107,7 @@ namespace hpx
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
-#include <hpx/util/functional/boolean_ops.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/not.hpp>
@@ -383,7 +383,7 @@ namespace hpx { namespace lcos
     typename boost::disable_if<
         boost::mpl::or_<
             traits::is_future<typename util::decay<F>::type>,
-            util::functional::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
+            util::detail::any_of<boost::mpl::not_<traits::is_future<Ts> >...>
         >,
         lcos::future<void>
     >::type

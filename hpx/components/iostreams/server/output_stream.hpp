@@ -8,10 +8,11 @@
 #define HPX_4AFE0EEA_49F8_4F4C_8945_7B55BF395DA0
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/components/iostreams/write_functions.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+#include <hpx/components/iostreams/export_definitions.hpp>
+#include <hpx/components/iostreams/write_functions.hpp>
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/components/iostreams/server/order_output.hpp>
 
@@ -19,7 +20,7 @@
 
 namespace hpx { namespace iostreams { namespace server
 {
-    struct HPX_COMPONENT_EXPORT output_stream
+    struct HPX_IOSTREAMS_EXPORT output_stream
       : components::managed_component_base<output_stream>
     {
         // {{{ types

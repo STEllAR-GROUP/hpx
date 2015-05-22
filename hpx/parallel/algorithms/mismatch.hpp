@@ -72,7 +72,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::make_pair(first1, first2));
                 }
 
-                std::size_t count1 = std::distance(first1, last1);
+                typedef typename std::iterator_traits<FwdIter1>::difference_type
+                    difference_type1;
+                difference_type1 count1 = std::distance(first1, last1);
 
                 // The specifcation of std::mismatch(_binary) states that if InIter1
                 // and InIter2 meet the requirements of RandomAccessIterator and
@@ -81,7 +83,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 //
                 // We perform this check for any iterator type better than input
                 // iterators. This could turn into a QoI issue.
-                std::size_t count2 = std::distance(first2, last2);
+                typedef typename std::iterator_traits<FwdIter2>::difference_type
+                    difference_type2;
+                difference_type2 count2 = std::distance(first2, last2);
                 if (count1 != count2)
                 {
                     return detail::algorithm_result<ExPolicy, T>::get(
@@ -108,9 +112,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                         tok.cancel(i);
                                 });
                         },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
+                        [=](std::vector<hpx::future<void> > &&) mutable
+                            -> std::pair<FwdIter1, FwdIter2>
                         {
-                            std::size_t mismatched = tok.get_data();
+                            difference_type1 mismatched =
+                                static_cast<difference_type1>(tok.get_data());
                             if (mismatched != count1) {
                                 std::advance(first1, mismatched);
                                 std::advance(first2, mismatched);
@@ -358,7 +364,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         std::make_pair(first1, first2));
                 }
 
-                std::size_t count = std::distance(first1, last1);
+                typedef typename std::iterator_traits<FwdIter1>::difference_type
+                    difference_type;
+                difference_type count = std::distance(first1, last1);
 
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
                 typedef typename zip_iterator::reference reference;
@@ -382,7 +390,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         },
                         [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
                         {
-                            std::size_t mismatched = tok.get_data();
+                            difference_type mismatched =
+                                static_cast<difference_type>(tok.get_data());
                             if (mismatched != count)
                                 std::advance(first1, mismatched);
                             else

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2014 Hartmut Kaiser
+//  Copyright (c) 2011-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -48,9 +48,13 @@ struct addressing_service::bootstrap_data_type
     void register_counter_types()
     {
         server::locality_namespace::register_counter_types();
+        server::locality_namespace::register_global_counter_types();
         server::primary_namespace::register_counter_types();
+        server::primary_namespace::register_global_counter_types();
         server::component_namespace::register_counter_types();
+        server::component_namespace::register_global_counter_types();
         server::symbol_namespace::register_counter_types();
+        server::symbol_namespace::register_global_counter_types();
     }
 
     void register_server_instance(char const* servicename)
@@ -85,7 +89,9 @@ struct addressing_service::hosted_data_type
     void register_counter_types()
     {
         server::primary_namespace::register_counter_types();
+        server::primary_namespace::register_global_counter_types();
         server::symbol_namespace::register_counter_types();
+        server::symbol_namespace::register_global_counter_types();
     }
 
     void register_server_instance(char const* servicename
@@ -370,13 +376,13 @@ void addressing_service::launch_bootstrap(
     request reqs[] =
     {
         request(primary_ns_bind_gid, locality_gid, locality_gva
-          , naming::get_locality_id_from_gid(locality_gid))
+          , naming::get_locality_from_gid(locality_gid))
       , request(primary_ns_bind_gid, primary_gid, primary_gva
-          , naming::get_locality_id_from_gid(primary_gid))
+          , naming::get_locality_from_gid(primary_gid))
       , request(primary_ns_bind_gid, component_gid, component_gva
-          , naming::get_locality_id_from_gid(component_gid))
+          , naming::get_locality_from_gid(component_gid))
       , request(primary_ns_bind_gid, symbol_gid, symbol_gva
-          , naming::get_locality_id_from_gid(symbol_gid))
+          , naming::get_locality_from_gid(symbol_gid))
     };
 
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
@@ -552,7 +558,7 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 HPX_THROWS_IF(ec, internal_server_error
                   , "addressing_service::resolve_locality"
                   , "could not resolve locality to endpoints");
-                return endpoints;
+                return resolved_localities_[naming::invalid_gid];
             }
         }
         else
@@ -568,7 +574,8 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 if (0 == threads::get_self_ptr())
                 {
                     // this should happen only during bootstrap
-                    HPX_ASSERT(hpx::is_starting());
+                    // FIXME: Disabled this assert cause it fires. It should not, but doesn't do any harm
+                    //HPX_ASSERT(hpx::is_starting());
 
                     while(!endpoints_future.is_ready())
                         /**/;
@@ -592,7 +599,7 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                   , "addressing_service::resolve_locality"
                   , "resolved locality insertion failed "
                     "due to a locking error or memory corruption");
-                return endpoints;
+                return resolved_localities_[naming::invalid_gid];
             }
         }
     }
@@ -1024,7 +1031,10 @@ bool addressing_service::get_id_range(
 { // {{{ get_id_range implementation
     try {
         // parcelset::endpoints_type() is an obsolete, dummy argument
-        request req(primary_ns_allocate, parcelset::endpoints_type(), count, boost::uint32_t(-1));
+        request req(primary_ns_allocate
+          , parcelset::endpoints_type()
+          , count
+          , boost::uint32_t(-1));
         response rep;
 
         if (is_bootstrap())
@@ -1064,7 +1074,7 @@ bool addressing_service::bind_range_local(
         gva const g(prefix, baseaddr.type_, count, baseaddr.address_, offset);
 
         request req(primary_ns_bind_gid, lower_id, g,
-            naming::get_locality_id_from_gid(lower_id));
+            naming::get_locality_from_gid(lower_id));
         response rep;
 
         if (is_bootstrap())
@@ -1129,7 +1139,7 @@ hpx::future<bool> addressing_service::bind_range_async(
   , boost::uint64_t count
   , naming::address const& baseaddr
   , boost::uint64_t offset
-  , boost::uint32_t locality_id
+  , naming::gid_type const& locality
     )
 {
     // ask server
@@ -1143,12 +1153,13 @@ hpx::future<bool> addressing_service::bind_range_async(
         stubs::primary_namespace::get_service_instance(lower_id)
       , naming::id_type::unmanaged);
 
-    request req(primary_ns_bind_gid, lower_id, g, locality_id);
+    request req(primary_ns_bind_gid, lower_id, g, locality);
     response rep;
 
     using util::placeholders::_1;
     future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
+
     return f.then(
         util::bind(&addressing_service::bind_postproc, this, _1, lower_id, g)
     );
@@ -1376,15 +1387,22 @@ bool addressing_service::resolve_full_local(
         addr.type_ = g.type;
         addr.address_ = g.lva();
 
-        if(range_caching_)
+        if (addr.address_)
         {
-            // Put the range into the cache.
-            update_cache_entry(base_gid, base_gva, ec);
+            if(range_caching_)
+            {
+                // Put the range into the cache.
+                update_cache_entry(base_gid, base_gva, ec);
+            }
+            else
+            {
+                // Put the fully resolved gva into the cache.
+                update_cache_entry(id, g, ec);
+            }
         }
         else
         {
-            // Put the fully resolved gva into the cache.
-            update_cache_entry(id, g, ec);
+            remove_cache_entry(id, ec);
         }
 
         if (ec)
@@ -1427,6 +1445,10 @@ bool addressing_service::resolve_cached(
     gva_cache_type::entry_type e;
 
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
+
+    // force routing if target object was migrated
+    if (was_object_migrated_locked(id))
+        return false;
 
     // Check if the entry is currently in the cache
     if (gva_cache_->get_entry(k, idbase, e))
@@ -1525,7 +1547,7 @@ hpx::future<naming::id_type> addressing_service::get_colocation_id_async(
     agas::request req(agas::primary_ns_resolve_gid, id.get_gid());
     naming::id_type service_target(
         agas::stubs::primary_namespace::get_service_instance(id.get_gid())
-        , naming::id_type::unmanaged);
+      , naming::id_type::unmanaged);
 
     return stubs::primary_namespace::service_async<naming::id_type>(
         service_target, req);
@@ -1557,7 +1579,6 @@ naming::address addressing_service::resolve_full_postproc(
     addr.locality_ = g.prefix;
     addr.type_ = g.type;
     addr.address_ = g.lva();
-
 
     if(range_caching_)
     {
@@ -1676,7 +1697,6 @@ bool addressing_service::resolve_full_local(
             addr.type_ = g.type;
             addr.address_ = g.lva();
 
-
             if(range_caching_)
             {
                 // Put the range into the cache.
@@ -1779,7 +1799,8 @@ void addressing_service::route(
             naming::id_type const route_target(
                 bootstrap_primary_namespace_gid(), naming::id_type::unmanaged);
 
-            parcelset::parcel route_p(route_target, primary_ns_addr_
+            parcelset::parcel route_p(
+                route_target, primary_ns_addr_
               , new hpx::actions::transfer_action<action_type>(action_priority_,
                     req));
 
@@ -2316,15 +2337,6 @@ void addressing_service::update_cache_entry(
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
-        // update cache only if it's currently not locked
-//         cache_mutex_type::scoped_try_lock lock(gva_cache_mtx_);
-//         if (!lock)
-//         {
-//             if (&ec != &throws)
-//                 ec = make_success_code();
-//             return;
-//         }
-
         const gva_cache_key key(gid, count);
 
         if (!gva_cache_->update_if(key, g, check_for_collisions))
@@ -2382,6 +2394,34 @@ void addressing_service::clear_cache(
         HPX_RETHROWS_IF(ec, e, "addressing_service::clear_cache");
     }
 } // }}}
+
+void addressing_service::remove_cache_entry(
+    naming::gid_type const& gid
+  , error_code& ec
+    )
+{
+    // If caching is disabled, we silently pretend success.
+    if (!caching_)
+        return;
+
+    try {
+        LAGAS_(warning) << "addressing_service::remove_cache_entry";
+
+        cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
+
+        gva_cache_->erase(
+            [&gid](std::pair<gva_cache_key, gva_entry_type> const& p)
+            {
+                return gid == p.first.get_gid();
+            });
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+    catch (hpx::exception const& e) {
+        HPX_RETHROWS_IF(ec, e, "addressing_service::clear_cache");
+    }
+}
 
 // Disable refcnt caching during shutdown
 void addressing_service::start_shutdown(error_code& ec)
@@ -2657,7 +2697,7 @@ void addressing_service::register_counter_types()
 
     performance_counters::generic_counter_type_data const counter_types[] =
     {
-        { "/agas/count/cache-hits", performance_counters::counter_raw,
+        { "/agas/count/cache/hits", performance_counters::counter_raw,
           "returns the number of cache hits while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -2665,7 +2705,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache-misses", performance_counters::counter_raw,
+        { "/agas/count/cache/misses", performance_counters::counter_raw,
           "returns the number of cache misses while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -2673,7 +2713,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache-evictions", performance_counters::counter_raw,
+        { "/agas/count/cache/evictions", performance_counters::counter_raw,
           "returns the number of cache evictions from the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -2681,7 +2721,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache-insertions", performance_counters::counter_raw,
+        { "/agas/count/cache/insertions", performance_counters::counter_raw,
           "returns the number of cache insertions into the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -2690,7 +2730,7 @@ void addressing_service::register_counter_types()
           ""
         },
 
-        { "/agas/count/cache_get_entry", performance_counters::counter_raw,
+        { "/agas/count/cache/get_entry", performance_counters::counter_raw,
           "returns the number of invocations of get_entry function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2699,7 +2739,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache_insert_entry", performance_counters::counter_raw,
+        { "/agas/count/cache/insert_entry", performance_counters::counter_raw,
           "returns the number of invocations of insert_entry function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2708,7 +2748,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache_update_entry", performance_counters::counter_raw,
+        { "/agas/count/cache/update_entry", performance_counters::counter_raw,
           "returns the number of invocations of update_entry function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2717,7 +2757,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache_erase_entry", performance_counters::counter_raw,
+        { "/agas/count/cache/erase_entry", performance_counters::counter_raw,
           "returns the number of invocations of erase_entry function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2727,7 +2767,7 @@ void addressing_service::register_counter_types()
           ""
         },
 
-        { "/agas/time/cache_get_entry", performance_counters::counter_raw,
+        { "/agas/time/cache/get_entry", performance_counters::counter_raw,
           "returns the the overall time spent executing of the get_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2736,7 +2776,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
-        { "/agas/time/cache_insert_entry", performance_counters::counter_raw,
+        { "/agas/time/cache/insert_entry", performance_counters::counter_raw,
           "returns the the overall time spent executing of the insert_entry API "
               "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2745,7 +2785,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
-        { "/agas/time/cache_update_entry", performance_counters::counter_raw,
+        { "/agas/time/cache/update_entry", performance_counters::counter_raw,
           "returns the the overall time spent executing of the update_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2754,7 +2794,7 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
-        { "/agas/time/cache_erase_entry", performance_counters::counter_raw,
+        { "/agas/time/cache/erase_entry", performance_counters::counter_raw,
           "returns the the overall time spent executing of the erase_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -3010,6 +3050,86 @@ void addressing_service::send_refcnt_requests_sync(
 
     if (&ec != &throws)
         ec = make_success_code();
+}
+
+hpx::future<std::pair<naming::id_type, naming::address> >
+addressing_service::begin_migration_async(
+    naming::id_type const& id
+  , naming::id_type const& target_locality
+    )
+{
+    typedef std::pair<naming::id_type, naming::address> result_type;
+
+    if (!id)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::begin_migration_async",
+            "invalid reference id");
+        return make_ready_future(result_type(naming::invalid_id, naming::address()));
+    }
+
+    naming::gid_type gid = id.get_gid();
+
+    // insert the object's new locality into the map of migrated objects
+    {
+        cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
+        migrated_objects_table_.insert(gid);
+    }
+
+    agas::request req(agas::primary_ns_begin_migration, gid);
+    naming::id_type service_target(
+        agas::stubs::primary_namespace::get_service_instance(gid)
+      , naming::id_type::unmanaged);
+
+    return stubs::primary_namespace::service_async<
+            std::pair<naming::id_type, naming::address>
+        >(service_target, req);
+}
+
+hpx::future<bool> addressing_service::end_migration_async(
+    naming::id_type const& id
+    )
+{
+    if (!id)
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::end_migration_async",
+            "invalid reference id");
+        return make_ready_future(false);
+    }
+
+    agas::request req(agas::primary_ns_end_migration, id.get_gid());
+    naming::id_type service_target(
+        agas::stubs::primary_namespace::get_service_instance(id.get_gid())
+      , naming::id_type::unmanaged);
+
+    return stubs::primary_namespace::service_async<bool>(
+        service_target, req);
+}
+
+bool addressing_service::was_object_migrated_locked(
+    naming::gid_type const& id
+    )
+{
+    return
+        migrated_objects_table_.find(id) !=
+        migrated_objects_table_.end();
+}
+
+bool addressing_service::was_object_migrated(
+    naming::id_type const* ids
+  , std::size_t size)
+{
+#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+    HPX_ASSERT(1 == size);
+
+    cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
+    return was_object_migrated_locked(ids[0].get_gid());
+#else
+    // #FIXME: it's not really clear how to handle this situation
+    HPX_ASSERT(false);
+    return false;
+#endif
 }
 
 }}

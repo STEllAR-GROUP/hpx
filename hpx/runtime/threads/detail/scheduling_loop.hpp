@@ -253,7 +253,8 @@ namespace hpx { namespace threads { namespace detail
         boost::atomic<hpx::state>& global_state, boost::int64_t& executed_threads,
         boost::int64_t& executed_thread_phases, boost::uint64_t& tfunc_time,
         boost::uint64_t& exec_time,
-        util::function_nonser<void()> const& cb = util::function_nonser<void()>())
+        util::function_nonser<void()> const& cb_outer = util::function_nonser<void()>(),
+        util::function_nonser<void()> const& cb_inner = util::function_nonser<void()>())
     {
         util::itt::stack_context ctx;        // helper for itt support
         util::itt::domain domain(get_thread_name().data());
@@ -400,23 +401,31 @@ namespace hpx { namespace threads { namespace detail
                 }
 
                 // do background work in parcel layer and in agas
-                hpx::parcelset::do_background_work(num_thread);
+                if (hpx::parcelset::do_background_work(num_thread))
+                    idle_loop_count = 0;
+
                 if (0 == num_thread)
                 {
                     hpx::agas::garbage_collect_non_blocking();
                 }
 
                 // call back into invoking context
-                if (!cb.empty())
-                    cb();
+                if (!cb_inner.empty())
+                    cb_inner();
             }
+
+            // something went badly wrong, give up
+            if (global_state == terminating)
+                break;
 
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
             {
                 busy_loop_count = 0;
 
                 // do background work in parcel layer and in agas
-                hpx::parcelset::do_background_work(num_thread);
+                if (hpx::parcelset::do_background_work(num_thread))
+                    idle_loop_count = 0;
+
                 if (0 == num_thread)
                 {
                     hpx::agas::garbage_collect_non_blocking();
@@ -425,8 +434,8 @@ namespace hpx { namespace threads { namespace detail
             else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
             {
                 // call back into invoking context
-                if (!cb.empty())
-                    cb();
+                if (!cb_outer.empty())
+                    cb_outer();
 
                 // clean up terminated threads
                 idle_loop_count = 0;

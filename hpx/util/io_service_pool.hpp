@@ -35,7 +35,7 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 2,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread = 
+            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread =
                 util::function_nonser<void(std::size_t, char const*)>(),
             util::function_nonser<void()> const& on_stop_thread = util::function_nonser<void()>(),
             char const* pool_name = "", char const* name_postfix = "");
@@ -63,6 +63,8 @@ namespace hpx { namespace util
         /// \brief Clear all internal data structures
         void clear();
 
+        bool stopped();
+
         /// \brief Get an io_service to use.
         boost::asio::io_service& get_io_service(int index = -1);
 
@@ -76,9 +78,9 @@ namespace hpx { namespace util
         char const* get_name() const { return pool_name_; }
 
         /// \brief return the thread registration functions
-        util::function_nonser<void(std::size_t, char const*)> const& 
+        util::function_nonser<void(std::size_t, char const*)> const&
             get_on_start_thread() const { return on_start_thread_; }
-        util::function_nonser<void()> const& 
+        util::function_nonser<void()> const&
             get_on_stop_thread() const { return on_stop_thread_; }
 
     protected:
