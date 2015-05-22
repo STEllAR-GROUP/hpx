@@ -71,11 +71,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F, typename Shape>
-        static void bulk_execute(F && f, Shape const& shape)
+        static auto bulk_execute(F && f, Shape const& shape)
+            -> decltype(hpx::util::unwrapped(
+                bulk_async_execute(std::forward<F>(f), shape)))
         {
+            return hpx::util::unwrapped(
+                bulk_async_execute(std::forward<F>(f), shape));
+        }
+
+        template <typename F, typename Shape>
+        static auto bulk_async_execute(F && f, Shape const& shape)
+            -> std::vector<decltype(
+                    hpx::async(hpx::launch::sync, f, *std::begin(shape)))>
+        {
+            std::vector<decltype(
+                hpx::async(hpx::launch::sync, f, *std::begin(shape)))> results;
             try {
                 for (auto const& elem: shape)
-                    f(elem);
+                    results.push_back(hpx::async(hpx::launch::sync, f, elem));
             }
             catch (std::bad_alloc const& ba) {
                 boost::throw_exception(ba);
@@ -85,15 +98,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                     exception_list(boost::current_exception())
                 );
             }
-        }
-
-        template <typename F, typename Shape>
-        static hpx::future<void>
-        bulk_async_execute(F && f, Shape const& shape)
-        {
-            return hpx::async(hpx::launch::deferred,
-                &sequential_executor::bulk_execute<F, Shape>,
-                std::forward<F>(f), shape);
+            return std::move(results);
         }
 
         std::size_t os_thread_count()

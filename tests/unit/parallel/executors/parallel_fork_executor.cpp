@@ -72,7 +72,8 @@ void test_bulk_async()
     using hpx::util::placeholders::_1;
 
     executor exec;
-    traits::async_execute(exec, hpx::util::bind(&bulk_test, tid, _1), v).get();
+    hpx::when_all(traits::async_execute(
+        exec, hpx::util::bind(&bulk_test, tid, _1), v)).get();
 }
 
 int hpx_main(int argc, char* argv[])
@@ -98,4 +99,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-

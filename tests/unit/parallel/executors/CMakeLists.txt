@@ -4,6 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    bulk_async
+    created_executor
     minimal_async_executor
     minimal_sync_executor
     parallel_executor

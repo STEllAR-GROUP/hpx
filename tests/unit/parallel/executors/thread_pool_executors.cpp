@@ -66,7 +66,8 @@ void test_bulk_async(Executor& exec)
     std::iota(boost::begin(v), boost::end(v), std::rand());
 
     using hpx::util::placeholders::_1;
-    traits::async_execute(exec, hpx::util::bind(&bulk_test, tid, _1), v).get();
+    hpx::when_all(traits::async_execute(
+        exec, hpx::util::bind(&bulk_test, tid, _1), v)).get();
 }
 
 template <typename Executor>
@@ -117,4 +118,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-
