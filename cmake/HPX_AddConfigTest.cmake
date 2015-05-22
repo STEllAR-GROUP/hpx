@@ -295,10 +295,3 @@ macro(hpx_check_for_cxx14_std_result_of_sfinae)
     SOURCE cmake/tests/cxx14_std_result_of_sfinae.cpp
     FILE ${ARGN})
 endmacro()
-
-###############################################################################
-macro(hpx_check_for_thread_safe_hdf5)
-  add_hpx_config_test(WITH_HDF5_THREAD_SAFE
-    SOURCE cmake/tests/hdf5_thread_safe.cpp
-    FILE ${ARGN})
-endmacro()
