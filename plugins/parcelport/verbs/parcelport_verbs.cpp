@@ -430,20 +430,29 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 // if the lock is not obtained and this thread is waiting, then
                 // zero copy Gets might complete and another thread might receive a zero copy
                 // complete message then delete the current send data whilst we are still waiting
-                scoped_lock lock(SendCompletionMap_mutex);
+                unique_lock lock(SendCompletionMap_mutex);
                 send_wr_map::iterator it = SendCompletionMap.find(wr_id);
                 found_wr_id = (it != SendCompletionMap.end());
                 if (found_wr_id) {
                     current_send = it->second;
                     LOG_DEBUG_MSG("erasing " << hexpointer(wr_id) << "from SendCompletionMap : size before erase " << SendCompletionMap.size());
                     SendCompletionMap.erase(it);
+                    for (auto & pair : SendCompletionMap) {
+//                        std::cout << hexpointer(pair.first) << "\n";
+                    }
                 }
                 else {
+#ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
+                    lock.unlock();
+                    handle_tag_send_completion(wr_id);
+                    return;
+#else
                     LOG_ERROR_MSG("FATAL : SendCompletionMap did not find " << hexpointer(wr_id));
                     for (auto & pair : SendCompletionMap) {
                         std::cout << hexpointer(pair.first) << "\n";
                     }
                     std::terminate();
+#endif
                 }
             }
             if (found_wr_id) {
@@ -595,6 +604,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 #ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
         void handle_tag_send_completion(uint64_t wr_id)
         {
+            LOG_DEBUG_MSG("Handle 4 byte completion (hopefully)" << hexpointer(wr_id));
             RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
             uint32_t tag = *(uint32_t*) (region->getAddress());
             chunk_pool_->deallocate(region);
@@ -602,7 +612,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         }
 #endif
 
-        void handle_tag_recv_completion(uint64_t wr_id, RdmaClient *client)
+        void handle_tag_recv_completion(uint64_t wr_id, const RdmaClient *client)
         {
 #ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
             RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
@@ -725,12 +735,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // the rdmaController calls this callback function and we must clean up all temporary
         // memory etc and signal hpx when sends or receives finish.
         // ----------------------------------------------------------------------------------------------
-        int handle_verbs_completion(struct ibv_wc completion, RdmaClient *client)
+        int handle_verbs_completion(const struct ibv_wc completion, RdmaClient *client)
         {
             uint64_t wr_id = completion.wr_id;
             LOG_DEBUG_MSG("Handle verbs completion " << hexpointer(wr_id) << RdmaCompletionQueue::wc_opcode_str(completion.opcode));
 
-            if (completion.opcode==IBV_WC_SEND && completion.byte_len!=4) {
+            if (completion.opcode==IBV_WC_SEND) {
+                LOG_DEBUG_MSG("Handle general completion " << hexpointer(wr_id) << RdmaCompletionQueue::wc_opcode_str(completion.opcode));
                 handle_send_completion(wr_id);
                 return 0;
             }
@@ -748,12 +759,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             // a zero byte receive indicates we are being informed that remote GET operations are complete
             // we can release any data we were holding onto and signal a send as finished
             //
-#ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
-            else if (completion.opcode==IBV_WC_SEND && completion.byte_len==4) {
-                handle_tag_send_completion(wr_id);
-                return 0;
-            }
-#endif
 
             else if (completion.opcode==IBV_WC_RECV && completion.byte_len<=4) {
                 handle_tag_recv_completion(wr_id, client);
@@ -1098,13 +1103,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     // add wr_id's to completion map
                     scoped_lock lock(SendCompletionMap_mutex);
                     if (SendCompletionMap.find(wr_id) != SendCompletionMap.end()) {
+                        for (auto & pair : SendCompletionMap) {
+                            std::cout << hexpointer(pair.first) << "\n";
+                        }
                         LOG_ERROR_MSG("FATAL : wr_id duplicated " << hexpointer(wr_id));
                         std::terminate();
                         throw std::runtime_error("wr_id duplicated in put_parcel : FATAL");
                     }
                     // put everything into map to be retrieved when send completes
                     SendCompletionMap[wr_id] = current_send;
-                    LOG_DEBUG_MSG("wr_id for send added to WR completion map "
+                    LOG_DEBUG_MSG("wr_id added to SendCompletionMap "
                             << hexpointer(wr_id) << " Entries " << SendCompletionMap.size());
                 }
                 {
