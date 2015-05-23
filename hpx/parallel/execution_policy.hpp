@@ -835,7 +835,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     private:
         /// \cond NOINTERNAL
-        friend parallel_execution_policy;
+        friend struct parallel_execution_policy;
 
         parallel_execution_policy_shim(Executor& exec, std::size_t chunk_size)
           : parallel_execution_policy(chunk_size), exec_(exec)
