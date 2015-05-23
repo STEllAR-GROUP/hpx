@@ -69,7 +69,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         >::type>
         async_execute(F && f)
         {
-            return hpx::async(hpx::launch::sync, std::forward<F>(f));
+            return hpx::async(hpx::launch::deferred, std::forward<F>(f));
         }
 
         template <typename F, typename Shape>
@@ -84,16 +84,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename F, typename Shape>
         static auto bulk_async_execute(F && f, Shape const& shape)
             ->  std::vector<
-                    decltype(hpx::async(launch::sync, f, *boost::begin(shape)))
+                    decltype(hpx::async(launch::deferred, f, *boost::begin(shape)))
                 >
         {
             std::vector<
-                decltype(hpx::async(launch::sync, f, *boost::begin(shape)))
+                decltype(hpx::async(launch::deferred, f, *boost::begin(shape)))
             > results;
 
             try {
                 for (auto const& elem: shape)
-                    results.push_back(hpx::async(launch::sync, f, elem));
+                    results.push_back(hpx::async(launch::deferred, f, elem));
             }
             catch (std::bad_alloc const& ba) {
                 boost::throw_exception(ba);
