@@ -69,7 +69,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         >::type>
         async_execute(F && f)
         {
-            return hpx::async(hpx::launch::deferred, std::forward<F>(f));
+            return hpx::async(hpx::launch::sync, std::forward<F>(f));
         }
 
         template <typename F, typename Shape>

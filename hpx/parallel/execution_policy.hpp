@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename executor_traits<Executor>::execution_category category2;
 
         BOOST_STATIC_ASSERT(
-            parallel::v3::detail::is_not_weaker<category2, category1>::value
+            (parallel::v3::detail::is_not_weaker<category2, category1>::value)
         );
         /// \endcond
 
