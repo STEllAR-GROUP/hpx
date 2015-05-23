@@ -461,7 +461,7 @@ namespace hpx { namespace lcos { namespace local
     template <typename Executor, typename Func, typename ...Ts>
     BOOST_FORCEINLINE
     typename boost::lazy_enable_if<
-        traits::is_executor<
+        traits::is_threads_executor<
             typename util::decay<Executor>::type
         >
       , detail::dataflow_frame<

@@ -6,12 +6,14 @@
 hpx_write_boostbook_catalog("${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml")
 
 file(GLOB base_files "${hpx_SOURCE_DIR}/docs/*.qbk")
-file(GLOB_RECURSE manual_files "${hpx_SOURCE_DIR}/docs/manual/*.qbk")
+file(GLOB manual_files "${hpx_SOURCE_DIR}/docs/manual/*.qbk")
+file(GLOB build_system_files "${hpx_SOURCE_DIR}/docs/manual/build_system/*.qbk")
 file(GLOB_RECURSE tutorial_files "${hpx_SOURCE_DIR}/docs/tutorial/*.qbk")
 file(GLOB_RECURSE index_files "${hpx_SOURCE_DIR}/docs/*.idx")
 
 set(documentation_files
-    ${manual_files} ${tutorial_files} ${base_files} ${index_files})
+    ${manual_files} ${build_system_files} ${tutorial_files}
+    ${base_files} ${index_files})
 
 set(documentation_dependencies
     "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_1.cpp"
@@ -90,6 +92,12 @@ set(doxygen_dependencies
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform_reduce.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_copy.hpp"
     "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/executors/executor_traits.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/executors/sequential_executor.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/executors/parallel_fork_executor.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/executors/service_executors.hpp"
+    "${hpx_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
     "${hpx_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
@@ -130,10 +138,12 @@ set(doxygen_definition_list
     "DOXYGEN:=1"
     "BOOST_SCOPED_ENUM_START(x):=enum x"
     "BOOST_SCOPED_ENUM_END="
+    "BOOST_SCOPED_ENUM(x):=x"
     "BOOST_SYSTEM_NOEXCEPT="
     "HPX_EXCEPTION_EXPORT="
     "HPX_EXPORT="
     "HPX_API_EXPORT="
+    "HPX_ALWAYS_EXPORT="
     "HPX_STD_FUNCTION=std::function"
     "extern="
     "BOOST_NOEXCEPT="
@@ -328,6 +338,7 @@ execute_process(
 
 source_group(Documentation FILES ${base_files})
 source_group("Documentation\\Manual" FILES ${manual_files})
+source_group("Documentation\\Manual\\BuildSystem" FILES ${build_system_files})
 source_group("Documentation\\Tutorial" FILES ${tutorial_files})
 if(BOOSTAUTOINDEX_FOUND)
   source_group("Documentation\\Index" FILES ${index_files})

@@ -48,40 +48,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 errors.add(boost::current_exception());
             }
         }
-
-        BOOST_SCOPED_ENUM(hpx::launch) get_launch_policy(std::true_type)
-        {
-            return hpx::launch::sync;
-        }
-
-        BOOST_SCOPED_ENUM(hpx::launch) get_launch_policy(std::false_type)
-        {
-            return hpx::launch::fork;
-        }
-
-        template <typename ExPolicy>
-        BOOST_SCOPED_ENUM(hpx::launch) get_launch_policy(ExPolicy const&)
-        {
-            typedef std::integral_constant<
-                    bool,
-                    parallel::is_sequential_execution_policy<ExPolicy>::value
-                > is_seq;
-            return get_launch_policy(is_seq());
-        }
-
-        inline BOOST_SCOPED_ENUM(hpx::launch)
-        get_launch_policy(parallel::execution_policy const& policy)
-        {
-            using namespace parallel::v1::detail;
-            int t = which(policy);
-
-            if (t == execution_policy_enum::sequential ||
-                t == execution_policy_enum::sequential_task)
-            {
-                return hpx::launch::sync;
-            }
-            return hpx::launch::fork;
-        }
         /// \endcond
     }
 
@@ -137,6 +103,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     ///         /// ...
     ///     });
     /// \endcode
+    ///
+    /// \tparam ExPolicy The execution policy an instance of a \a task_block
+    ///         was created with. This defaults to \a parallel_execution_policy.
     ///
     template <typename ExPolicy = parallel::parallel_execution_policy>
     class task_block
@@ -281,18 +250,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                     "the task_block is not active");
             }
 
-            hpx::future<void> result;
-            threads::executor exec = policy_.get_executor();
+            typedef typename ExPolicy::executor_type executor_type;
 
-            if (exec)
-            {
-                result = hpx::async(exec, boost::move(f));
-            }
-            else
-            {
-                result = hpx::async(detail::get_launch_policy(policy_),
-                    boost::move(f));
-            }
+            hpx::future<void> result =
+                executor_traits<executor_type>::async_execute(
+                    policy_.executor(), boost::move(f));
 
             mutex_type::scoped_lock l(mtx_);
             tasks_.push_back(std::move(result));
@@ -336,6 +298,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             wait_for_completion();
         }
 
+        /// Returns a reference to the execution policy used to construct this
+        /// object.
+        ///
+        /// Precondition: this shall be the active task_block.
+        ///
+        ExPolicy& policy() { return policy_; }
+
+        /// Returns a reference to the execution policy used to construct this
+        /// object.
+        ///
+        /// Precondition: this shall be the active task_block.
+        ///
+        ExPolicy const& policy() const { return policy_; }
+
     private:
         mutable mutex_type mtx_;
         std::vector<hpx::future<void> > tasks_;
@@ -344,7 +320,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
         ExPolicy policy_;
     };
 
-    /// Constructs a \a task_block, tr, and invokes the expression
+    /// Constructs a \a task_block, \a tr, using the given execution policy
+    /// \a policy,and invokes the expression
     /// \a f(tr) on the user-provided object, \a f.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
@@ -419,43 +396,50 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \cond NOINTERNAL
 #if defined(HPX_HAVE_CXX14_LAMBDAS)
     template <typename F>
-    inline void
-    define_task_block(parallel::execution_policy && policy, F && f)
+    inline void define_task_block(parallel::execution_policy && policy, F && f)
     {
-        switch(parallel::v1::detail::which(policy))
+        // this implementation is not nice, however we don't have variadic
+        // virtual functions accepting template arguments and supporting
+        // perfect forwarding
+        std::type_info const& t = policy.type();
+
+        if (t == typeid(sequential_execution_policy))
         {
-        case parallel::v1::detail::execution_policy_enum::sequential:
             return define_task_block(
                 *policy.get<sequential_execution_policy>(),
                 std::forward<F>(f));
+        }
 
-        case parallel::v1::detail::execution_policy_enum::sequential_task:
+        if (t == typeid(sequential_task_execution_policy))
+        {
             return define_task_block(parallel::seq, std::forward<F>(f));
+        }
 
-        case parallel::v1::detail::execution_policy_enum::parallel:
+        if (t == typeid(parallel_execution_policy))
+        {
             return define_task_block(
                 *policy.get<parallel_execution_policy>(),
                 std::forward<F>(f));
+        }
 
-        case parallel::v1::detail::execution_policy_enum::parallel_task:
-            {
-                parallel_task_execution_policy const& t =
-                    *policy.get<parallel_task_execution_policy>();
-                return define_task_block(
-                    par(t.get_executor(), t.get_chunk_size()),
-                    std::forward<F>(f));
-            }
+        if (t == typeid(parallel_task_execution_policy))
+        {
+            parallel_task_execution_policy const& t =
+                *policy.get<parallel_task_execution_policy>();
+            return define_task_block(
+                par(t.get_chunk_size()), std::forward<F>(f));
+        }
 
-        case parallel::v1::detail::execution_policy_enum::parallel_vector:
+        if (t == typeid(parallel_vector_execution_policy))
+        {
             return define_task_block(
                 *policy.get<parallel_vector_execution_policy>(),
                 std::forward<F>(f));
-
-        default:
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "define_task_block",
-                "The given execution policy is not supported");
         }
+
+        HPX_THROW_EXCEPTION(hpx::bad_parameter,
+            "define_task_block",
+            "The given execution policy is not supported");
     }
 #endif
     /// \endcond

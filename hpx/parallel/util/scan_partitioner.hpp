@@ -13,7 +13,9 @@
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/deferred_call.hpp>
 
+#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -75,30 +77,22 @@ namespace hpx { namespace parallel { namespace util
                     // Schedule first step of scan algorithm, step 2 is
                     // performed as soon as the current partition and the
                     // partition to the left is ready.
-                    threads::executor exec = policy.get_executor();
                     while (count != 0)
                     {
                         std::size_t chunk = (std::min)(chunk_size, count);
                         BOOST_SCOPED_ENUM(hpx::launch) p = (++parts & 0x7) ?
                             hpx::launch::sync : hpx::launch::async;
 
-                        if (exec)
-                        {
-                            workitems.push_back(
-                                lcos::local::dataflow(
-                                    p, f2, workitems.back(),
-                                    hpx::async(exec, f1, first, chunk)
-                                ));
-                        }
-                        else
-                        {
-                            workitems.push_back(
-                                lcos::local::dataflow(
-                                    p, f2, workitems.back(),
-                                    hpx::async(hpx::launch::fork,
-                                        f1, first, chunk)
-                                ));
-                        }
+                        typedef typename ExPolicy::executor_type executor_type;
+                        workitems.push_back(
+                            lcos::local::dataflow(
+                                p, f2, workitems.back(),
+                                executor_traits<executor_type>::async_execute(
+                                    policy.executor(),
+                                    hpx::util::deferred_call(f1, first, chunk)
+                                )
+                            )
+                        );
 
                         chunk_sizes.push_back(chunk);
                         count -= chunk;
@@ -123,10 +117,9 @@ namespace hpx { namespace parallel { namespace util
         template <typename R, typename Result>
         struct static_scan_partitioner<parallel_task_execution_policy, R, Result>
         {
-            template <typename FwdIter, typename T,
+            template <typename ExPolicy, typename FwdIter, typename T,
                 typename F1, typename F2, typename F3>
-            static hpx::future<R> call(
-                parallel_task_execution_policy const& policy,
+            static hpx::future<R> call(ExPolicy const& policy,
                 FwdIter first, std::size_t count_, T && init,
                 F1 && f1, F2 && f2, F3 && f3, std::size_t chunk_size)
             {
@@ -165,30 +158,22 @@ namespace hpx { namespace parallel { namespace util
                     // Schedule first step of scan algorithm, step 2 is
                     // performed as soon as the current partition and the
                     // partition to the left is ready.
-                    threads::executor exec = policy.get_executor();
                     while (count != 0)
                     {
                         std::size_t chunk = (std::min)(chunk_size, count);
                         BOOST_SCOPED_ENUM(hpx::launch) p = (++parts & 0x7) ?
                             hpx::launch::sync : hpx::launch::async;
 
-                        if (exec)
-                        {
-                            workitems.push_back(
-                                lcos::local::dataflow(
-                                    p, f2, workitems.back(),
-                                    hpx::async(exec, f1, first, chunk)
-                                ));
-                        }
-                        else
-                        {
-                            workitems.push_back(
-                                lcos::local::dataflow(
-                                    p, f2, workitems.back(),
-                                    hpx::async(hpx::launch::fork,
-                                        f1, first, chunk)
-                                ));
-                        }
+                        typedef typename ExPolicy::executor_type executor_type;
+                        workitems.push_back(
+                            lcos::local::dataflow(
+                                p, f2, workitems.back(),
+                                executor_traits<executor_type>::async_execute(
+                                    policy.executor(),
+                                    hpx::util::deferred_call(f1, first, chunk)
+                                )
+                            )
+                        );
 
                         chunk_sizes.push_back(chunk);
                         count -= chunk;
@@ -204,17 +189,14 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 typedef typename parallel::util::detail::algorithm_result<
-                        parallel_task_execution_policy, R
-                    >::type result_type;
+                        ExPolicy, R>::type result_type;
 
                 // wait for all tasks to finish
                 return lcos::local::dataflow(
                     [=](std::vector<hpx::shared_future<Result> >&& r) mutable
                       -> result_type
                     {
-                        detail::handle_local_exceptions<
-                                parallel_task_execution_policy
-                            >::call(r, errors);
+                        detail::handle_local_exceptions<ExPolicy>::call(r, errors);
 
                         // Execute step 3 of the scan algorithm
                         return f3(std::move(r), chunk_sizes);
@@ -228,7 +210,7 @@ namespace hpx { namespace parallel { namespace util
         // R:        overall result type
         // Result:   intermediate result type of first step
         // PartTag:  select appropriate partitioner
-        template <typename ExPolicy, typename R, typename Result, typename PartTag>
+        template <typename ExPolicy, typename R, typename Result, typename Tag>
         struct scan_partitioner;
 
         ///////////////////////////////////////////////////////////////////////
@@ -253,20 +235,24 @@ namespace hpx { namespace parallel { namespace util
         struct scan_partitioner<parallel_task_execution_policy, R, Result,
             parallel::traits::static_partitioner_tag>
         {
-            template <typename FwdIter, typename T,
+            template <typename ExPolicy, typename FwdIter, typename T,
                 typename F1, typename F2, typename F3>
-            static hpx::future<R> call(
-                parallel_task_execution_policy const& policy, FwdIter first,
+            static hpx::future<R> call(ExPolicy const& policy, FwdIter first,
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
                 std::size_t chunk_size = 0)
             {
-                return static_scan_partitioner<
-                        parallel_task_execution_policy, R, Result
-                    >::call(policy, first, count, std::forward<T>(init),
-                        std::forward<F1>(f1), std::forward<F2>(f2),
-                        std::forward<F3>(f3), chunk_size);
+                return static_scan_partitioner<ExPolicy, R, Result>::call(
+                    policy, first, count, std::forward<T>(init),
+                    std::forward<F1>(f1), std::forward<F2>(f2),
+                    std::forward<F3>(f3), chunk_size);
             }
         };
+
+        template <typename Executor, typename R, typename Result, typename Tag>
+        struct scan_partitioner<parallel_task_execution_policy_shim<Executor>,
+                R, Result, Tag>
+          : scan_partitioner<parallel_task_execution_policy, R, Result, Tag>
+        {};
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename R, typename Result>

@@ -167,7 +167,7 @@ namespace hpx { namespace threads
     //
     class HPX_EXPORT executor
     {
-        friend std::size_t hpx::get_os_thread_count(threads::executor const& exec);
+        friend std::size_t hpx::get_os_thread_count(threads::executor const&);
 
     protected:
         // generic executors can't be created directly
@@ -190,7 +190,8 @@ namespace hpx { namespace threads
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
-            executor_data_->add(std::move(f), desc, initial_state, run_now, stacksize, ec);
+            executor_data_->add(std::move(f), desc, initial_state, run_now,
+                stacksize, ec);
         }
 
         /// Return an estimate of the number of waiting closures.

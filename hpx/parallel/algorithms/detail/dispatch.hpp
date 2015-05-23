@@ -71,9 +71,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                     >::get(Derived::sequential(policy, std::forward<Args>(args)...));
             }
             catch (...) {
-                parallel::detail::handle_exception<
-                        ExPolicy, local_result_type
-                    >::call();
+                detail::handle_exception<ExPolicy, local_result_type>::call();
             }
         }
 
@@ -90,7 +88,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                     >::get(Derived::sequential(policy, std::forward<Args>(args)...));
             }
             catch (...) {
-                return parallel::detail::handle_exception<
+                return detail::handle_exception<
                         sequential_task_execution_policy, local_result_type
                     >::call();
             }
@@ -112,7 +110,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                     >::get(std::move(result));
             }
             catch (...) {
-                return parallel::detail::handle_exception<
+                return detail::handle_exception<
                         sequential_task_execution_policy, local_result_type
                     >::call();
             }
@@ -132,7 +130,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                         std::forward<Args>(args)...));
             }
             catch (...) {
-                return parallel::detail::handle_exception<
+                return detail::handle_exception<
                         parallel_task_execution_policy, local_result_type
                     >::call();
             }
@@ -153,36 +151,47 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         call(parallel::execution_policy const& policy, boost::mpl::false_,
             Args&&... args) const
         {
-            switch(detail::which(policy))
+            // this implementation is not nice, however we don't have variadic
+            // virtual functions accepting template arguments and supporting
+            // perfect forwarding
+            std::type_info const& t = policy.type();
+
+            if (t == typeid(sequential_execution_policy))
             {
-            case detail::execution_policy_enum::sequential:
                 return call(*policy.get<sequential_execution_policy>(),
                     boost::mpl::true_(), std::forward<Args>(args)...);
+            }
 
-            case detail::execution_policy_enum::sequential_task:
-                return call(seq, boost::mpl::true_(), std::forward<Args>(args)...);
+            if (t == typeid(sequential_task_execution_policy))
+            {
+                return call(seq, boost::mpl::true_(),
+                    std::forward<Args>(args)...);
+            }
 
-            case detail::execution_policy_enum::parallel:
+            if (t == typeid(parallel_execution_policy))
+            {
                 return call(*policy.get<parallel_execution_policy>(),
                     boost::mpl::false_(), std::forward<Args>(args)...);
+            }
 
-            case detail::execution_policy_enum::parallel_task:
-                {
-                    parallel_task_execution_policy const& t =
-                        *policy.get<parallel_task_execution_policy>();
-                    return call(par(t.get_executor(), t.get_chunk_size()),
-                        boost::mpl::false_(), std::forward<Args>(args)...);
-                }
+            if (t == typeid(parallel_task_execution_policy))
+            {
+                parallel_task_execution_policy const& t =
+                    *policy.get<parallel_task_execution_policy>();
 
-            case detail::execution_policy_enum::parallel_vector:
+                return call(par(t.get_chunk_size()),
+                    boost::mpl::false_(), std::forward<Args>(args)...);
+            }
+
+            if (t == typeid(parallel_vector_execution_policy))
+            {
                 return call(*policy.get<parallel_vector_execution_policy>(),
                     boost::mpl::false_(), std::forward<Args>(args)...);
-
-            default:
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    std::string("hpx::parallel::") + name_,
-                    "The given execution policy is not supported");
             }
+
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                std::string("hpx::parallel::") + name_,
+                "The given execution policy is not supported");
         }
 
         template <typename... Args>

@@ -153,6 +153,31 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Executor, typename T>
+    struct algorithm_result_impl<
+            sequential_task_execution_policy_shim<Executor>, T>
+      : algorithm_result_impl<sequential_task_execution_policy, T>
+    {};
+
+    template <typename Executor>
+    struct algorithm_result_impl<
+            sequential_task_execution_policy_shim<Executor>, void>
+      : algorithm_result_impl<sequential_task_execution_policy, void>
+    {};
+
+    template <typename Executor, typename T>
+    struct algorithm_result_impl<
+            parallel_task_execution_policy_shim<Executor>, T>
+      : algorithm_result_impl<parallel_task_execution_policy, T>
+    {};
+
+    template <typename Executor>
+    struct algorithm_result_impl<
+            parallel_task_execution_policy_shim<Executor>, void>
+      : algorithm_result_impl<parallel_task_execution_policy, void>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T = void>
     struct algorithm_result
       : algorithm_result_impl<typename hpx::util::decay<ExPolicy>::type, T>

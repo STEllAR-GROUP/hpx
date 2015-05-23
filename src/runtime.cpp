@@ -1334,9 +1334,12 @@ namespace hpx
         return get_runtime().get_config();
     }
 
-    hpx::util::io_service_pool* get_thread_pool(char const* name)
+    hpx::util::io_service_pool* get_thread_pool(
+        char const* name, char const* name_suffix)
     {
-        return get_runtime().get_thread_pool(name);
+        std::string full_name(name);
+        full_name += name_suffix;
+        return get_runtime().get_thread_pool(full_name.c_str());
     }
 
     ///////////////////////////////////////////////////////////////////////////
