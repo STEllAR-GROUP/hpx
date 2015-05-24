@@ -31,6 +31,7 @@ set(tests
     latch_remote
     local_barrier
     local_dataflow
+    local_dataflow_executor
     local_event
     local_mutex
     packaged_action
