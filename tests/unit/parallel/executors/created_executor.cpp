@@ -166,14 +166,14 @@ int void_parallel_sum(iter first, iter last, int num_parts)
 
     f.get();
 
-    return std::accumulate(begin(temp), end(temp), 0);
+    return std::accumulate(boost::begin(temp), boost::end(temp), 0);
 }
 
 void sum_test()
 {
     std::vector<int> vec(10007);
     auto random_num = [](){ return std::rand() % 50 - 25; };
-    std::generate(begin(vec), end(vec), random_num);
+    std::generate(boost::begin(vec), boost::end(vec), random_num);
 
     int sum = std::accumulate(boost::begin(vec), boost::end(vec), 0);
     int num_parts = std::rand() % 5 + 3;
