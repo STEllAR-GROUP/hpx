@@ -26,6 +26,7 @@ set(tests
     future
     future_ref
     future_then
+    future_then_executor
     future_wait
     latch_local
     latch_remote
@@ -44,12 +45,16 @@ set(tests
    )
 
 set(apply_colocated_PARAMETERS LOCALITIES 2)
+set(apply_local_PARAMETERS THREADS_PER_LOCALITY 4)
+set(apply_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(apply_remote_PARAMETERS LOCALITIES 2)
 set(async_cb_colocated_PARAMETERS LOCALITIES 2)
 
 set(async_continue_PARAMETERS LOCALITIES 2)
 set(async_continue_cb_PARAMETERS LOCALITIES 2)
 set(async_continue_cb_colocated_PARAMETERS LOCALITIES 2)
+set(async_local_PARAMETERS THREADS_PER_LOCALITY 4)
+set(async_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(async_remote_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_PARAMETERS LOCALITIES 2)
 
@@ -57,7 +62,8 @@ set(broadcast_PARAMETERS LOCALITIES 2)
 set(broadcast_apply_PARAMETERS LOCALITIES 2)
 
 set(future_PARAMETERS THREADS_PER_LOCALITY 4)
-
+set(future_then_PARAMETERS THREADS_PER_LOCALITY 4)
+set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
