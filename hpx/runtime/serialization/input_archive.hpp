@@ -9,7 +9,7 @@
 
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/input_container.hpp>
-#include <hpx/runtime/serialization/raw_ptr.hpp>
+#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
 #include <boost/shared_ptr.hpp>
@@ -46,7 +46,7 @@ namespace hpx { namespace serialization
             serialization::binary_filter* filter = 0;
             if (has_filter && enable_compression())
             {
-                *this >> raw_ptr(filter);
+                *this >> detail::raw_ptr(filter);
                 buffer_->set_filter(filter);
             }
         }

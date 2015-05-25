@@ -60,8 +60,8 @@ namespace hpx { namespace serialization
             {
                 static Pointer call(input_archive& ar)
                 {
-                    return polymorphic_nonintrusive_factory::
-                        instance().load<referred_type>(ar);
+                    return Pointer(polymorphic_nonintrusive_factory::
+                        instance().load<referred_type>(ar));
                 }
             };
 
