@@ -94,6 +94,7 @@ endif()
 find_package(Boost 1.49 QUIET COMPONENTS random)
 if(Boost_RANDOM_FOUND)
   hpx_info("  random")
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
 # If the found Boost installation is < 1.57, we need to include extra
