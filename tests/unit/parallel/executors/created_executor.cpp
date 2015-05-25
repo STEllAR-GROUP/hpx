@@ -26,13 +26,11 @@ typedef std::vector<int>::iterator iter;
 ////////////////////////////////////////////////////////////////////////////////
 // A parallel executor that returns void for bulk_execute and hpx::future<void>
 // for bulk_async_execute
-struct void_parallel_executor
-    : public parallel_executor
+struct void_parallel_executor : parallel_executor
 {
-    void_parallel_executor() {}
-
     template <typename F, typename Shape>
-    static hpx::future<void> bulk_async_execute(F && f, Shape const& shape)
+    static std::vector<hpx::future<void> >
+    bulk_async_execute(F && f, Shape const& shape)
     {
         std::vector<hpx::future<void> > results;
         for(auto const& elem: shape)
@@ -41,7 +39,7 @@ struct void_parallel_executor
                 parallel_executor::async_execute(deferred_call(f, elem))
             );
         }
-        return hpx::when_all(results);
+        return results;
     }
 
     template <typename F, typename Shape>
@@ -89,7 +87,9 @@ void test_void_bulk_async()
     using hpx::util::placeholders::_1;
 
     executor exec;
-    traits::async_execute(exec, hpx::util::bind(&bulk_test, tid, _1), v).get();
+    hpx::when_all(
+        traits::async_execute(exec, hpx::util::bind(&bulk_test, tid, _1), v)
+    ).get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +152,7 @@ int void_parallel_sum(iter first, iter last, int num_parts)
 
     std::ptrdiff_t section_size = std::distance(first, last) / num_parts;
 
-    hpx::future<void> f = traits::async_execute(exec,
+    std::vector<hpx::future<void> > f = traits::async_execute(exec,
         [&](const int& i)
         {
             iter b = first + i*section_size;
@@ -164,7 +164,7 @@ int void_parallel_sum(iter first, iter last, int num_parts)
         },
         temp);
 
-    f.get();
+    hpx::when_all(f).get();
 
     return std::accumulate(boost::begin(temp), boost::end(temp), 0);
 }
