@@ -7,14 +7,14 @@
 find_package(PkgConfig)
 pkg_check_modules(PC_ORANGEFS QUIET orangefs)
 
-find_path(ORANGEFS_INCLUDE_DIR NAMES pxfs.h pvfs2-usrint.h pvfs2.h
+find_path(ORANGEFS_INCLUDE_DIR NAMES orange.h pvfs2-usrint.h pvfs2.h
   HINTS
   ${ORANGEFS_ROOT} ENV ORANGEFS_ROOT
   ${PC_ORANGEFS_INCLUDEDIR}
   ${PC_ORANGEFS_INCLUDE_DIRS}
   PATH_SUFFIXES include)
 
-find_library(ORANGEFS_LIBRARY NAMES pvfs2 # orangefs pvfs2 orangefsposix
+find_library(ORANGEFS_LIBRARY NAMES orangefs # orangefs pvfs2 orangefsposix
   HINTS
     ${ORANGEFS_ROOT} ENV ORANGEFS_ROOT
     ${PC_ORANGEFS_LIBDIR}
