@@ -403,7 +403,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             policy,
                             hpx::util::make_zip_iterator(first, flags.get()),
                             count,
-                            [dest](hpx::shared_future<std::size_t>&& pos,
+                            [dest, flags](
+                                hpx::shared_future<std::size_t>&& pos,
                                 zip_iterator part_begin, std::size_t part_count)
                             {
                                 Iter iter = dest;
