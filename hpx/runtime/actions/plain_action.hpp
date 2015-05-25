@@ -127,42 +127,14 @@ namespace hpx { namespace traits {
 /// to avoid defining the action_type in global namespace. Normally, the use of
 /// the macro \a HPX_PLAIN_ACTION is recommend.
 ///
-#define HPX_DEFINE_PLAIN_ACTION(...)                                          \
-    HPX_DEFINE_PLAIN_ACTION_(__VA_ARGS__)                                     \
-    /**/
-
-/// \cond NOINTERNAL
-
-#define HPX_DEFINE_PLAIN_DIRECT_ACTION(...)                                   \
-    HPX_DEFINE_PLAIN_DIRECT_ACTION_(__VA_ARGS__)                              \
-    /**/
-
-#define HPX_DEFINE_PLAIN_ACTION_(...)                                         \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DEFINE_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)               \
-    )(__VA_ARGS__))                                                           \
-    /**/
-
-#define HPX_DEFINE_PLAIN_DIRECT_ACTION_(...)                                  \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_DEFINE_PLAIN_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)        \
-    )(__VA_ARGS__))                                                           \
-    /**/
-
-#define HPX_DEFINE_PLAIN_ACTION_1(func)                                       \
-    HPX_DEFINE_PLAIN_ACTION_2(func, name)                                     \
-    /**/
-
-#define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                 \
+#define HPX_DEFINE_PLAIN_ACTION(func, name)                                   \
     struct name : hpx::actions::make_action<                                  \
         decltype(&func), &func, name>::type {}                                \
     /**/
 
-#define HPX_DEFINE_PLAIN_DIRECT_ACTION_1(func)                                \
-    HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, name)                              \
-    /**/
+/// \cond NOINTERNAL
 
-#define HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, name)                          \
+#define HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name)                            \
     struct name : hpx::actions::make_direct_action<                           \
         decltype(&func), &func, name>::type {}                                \
     /**/
