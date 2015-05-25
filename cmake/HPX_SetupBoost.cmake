@@ -90,6 +90,12 @@ else()
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
+# attempt to load Boost.Random (if available), it's needed for one example only
+find_package(Boost 1.49 QUIET COMPONENTS random)
+if(Boost_RANDOM_FOUND)
+  hpx_info("  random")
+endif()
+
 # If the found Boost installation is < 1.57, we need to include extra
 # serialization headers
 if(Boost_VERSION LESS 105700)
