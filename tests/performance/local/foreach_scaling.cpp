@@ -100,7 +100,7 @@ boost::uint64_t average_out_task(std::size_t vector_size)
         return (hpx::util::high_resolution_clock::now() - start) / test_count;
     }
 
-    std::vector<hpx::future<void> > tests;
+    std::vector<hpx::shared_future<void> > tests;
     tests.resize(num_overlapping_loops);
 
     boost::uint64_t start = hpx::util::high_resolution_clock::now();
@@ -110,7 +110,7 @@ boost::uint64_t average_out_task(std::size_t vector_size)
         hpx::future<void> curr = measure_task_foreach(vector_size);
         if (i >= num_overlapping_loops)
             tests[(i-num_overlapping_loops) % tests.size()].wait();
-        tests[i % tests.size()] = std::move(curr);
+        tests[i % tests.size()] = curr.share();
     }
 
     hpx::wait_all(tests);

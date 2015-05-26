@@ -9,10 +9,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <regex>
 
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/range/functions.hpp>
+#include <boost/regex.hpp>
 
 struct pipeline
 {
@@ -21,8 +21,8 @@ struct pipeline
         // job for first stage
         auto grep = [](std::string const& re, std::string const& item)
         {
-            std::regex regex(re);
-            if (std::regex_match(item, regex))
+            boost::regex regex(re);
+            if (boost::regex_match(item, regex))
             {
                 auto trim = [](std::string const& s)
                 {
