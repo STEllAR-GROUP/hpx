@@ -63,13 +63,12 @@ template lcos::future<std::pair<naming::id_type, naming::address> >
 void primary_namespace::service_non_blocking(
     naming::id_type const& gid
   , request const& req
-  , util::function_nonser<void(boost::system::error_code const&,
-        parcelset::parcel const&)> const& f
+  , parcel_sent_func const& cb
   , threads::thread_priority priority
     )
 {
     typedef server_type::service_action action_type;
-    hpx::apply_p_cb<action_type>(gid, priority, f, req);
+    hpx::apply_p_cb<action_type>(gid, priority, cb, req);
 }
 
 void primary_namespace::service_non_blocking(
@@ -82,28 +81,44 @@ void primary_namespace::service_non_blocking(
     hpx::apply_p<action_type>(gid, priority, req);
 }
 
+std::vector<response> primary_namespace::bulk_service(
+    naming::id_type const& gid
+  , std::vector<request> const& reqs
+  , threads::thread_priority priority
+  , error_code& ec
+    )
+{
+    typedef server_type::bulk_service_action action_type;
+
+    lcos::packaged_action<action_type> p;
+    p.apply_p(launch::async, gid, priority, reqs);
+    return p.get_future().get(ec);
+}
+
 lcos::future<std::vector<response> >
     primary_namespace::bulk_service_async(
         naming::id_type const& gid
       , std::vector<request> const& reqs
+      , parcel_sent_func const& cb
       , threads::thread_priority priority
         )
 {
     typedef server_type::bulk_service_action action_type;
 
     lcos::packaged_action<action_type> p;
-    p.apply_p(launch::async, gid, priority, reqs);
+    p.apply_p_cb(launch::async, gid, priority, cb, reqs);
     return p.get_future();
 }
 
 void primary_namespace::bulk_service_non_blocking(
    naming::id_type const& gid
   , std::vector<request> const& reqs
+  , parcel_sent_func const& cb
   , threads::thread_priority priority
     )
 {
     typedef server_type::bulk_service_action action_type;
-    hpx::apply_p<action_type>(gid, priority, reqs);
+    hpx::apply_p_cb<action_type>(gid, priority, cb, reqs);
 }
 
 }}}
