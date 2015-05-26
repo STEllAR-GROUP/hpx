@@ -22,7 +22,7 @@
 
 namespace hpx { namespace serialization
 {
-    struct HPX_ALWAYS_EXPORT output_archive
+    struct HPX_EXPORT output_archive
       : basic_archive<output_archive>
     {
         typedef basic_archive<output_archive> base_type;
