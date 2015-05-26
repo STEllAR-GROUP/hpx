@@ -48,6 +48,7 @@
 
 #define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
 #define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
+// BlueGene IO nodes do not support immediate data
 #define HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED       1
 
 using namespace hpx::parcelset::policies;
@@ -209,11 +210,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             }
             _rdmaController = std::make_shared<RdmaController>
                 (_ibverbs_device.c_str(), _ibverbs_interface.c_str(), _port);
-
-            LOG_DEBUG_MSG("Disabling array optimization and data chunking for debug purposes");
-            archive_flags_ |= serialization::disable_array_optimization;
-            archive_flags_ |= serialization::disable_data_chunking;
-            LOG_DEBUG_MSG("Disabling array optimization and data chunking for debug purposes");
 
             FUNC_END_DEBUG_MSG;
         }

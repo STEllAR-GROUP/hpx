@@ -50,7 +50,7 @@ namespace hpx { namespace serialization
     inline serialization_chunk create_index_chunk(std::size_t index, std::size_t size)
     {
         serialization_chunk retval = {
-            { 0 }, size, static_cast<std::uint8_t>(chunk_type_index)
+            { 0 }, size, static_cast<std::uint8_t>(chunk_type_index), 0
         };
         retval.data_.index_ = index;
         return retval;
