@@ -1081,10 +1081,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     private:
         boost::shared_ptr<detail::execution_policy_base> inner_;
 
-        execution_policy(execution_policy const& rhs)
-          : inner_(rhs.inner_)
-        {}
-
     public:
         /// Effects: Constructs an execution_policy object with a copy of
         ///          exec's state
@@ -1106,6 +1102,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \param policy Specifies the inner execution policy
         execution_policy(execution_policy && policy)
           : inner_(std::move(policy.inner_))
+        {}
+
+        execution_policy(execution_policy const& rhs)
+          : inner_(rhs.inner_)
         {}
 
         /// Extension: Create a new execution_policy holding the current policy
