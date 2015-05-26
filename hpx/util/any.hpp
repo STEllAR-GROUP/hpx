@@ -25,7 +25,7 @@
 #include <hpx/traits/supports_streaming_with_any.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/raw_ptr.hpp>
+#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 
 #include <boost/config.hpp>
 #include <boost/type_traits/is_reference.hpp>
@@ -662,7 +662,7 @@ namespace hpx { namespace util
             else
             {
                 typename detail::any::fxn_ptr_table<IArchive, OArchive, Char> *p = 0;
-                ar >> hpx::serialization::raw_ptr(p);
+                ar >> hpx::serialization::detail::raw_ptr(p);
                 table = p->get_ptr();
                 delete p;
                 table->load_object(&object, ar, version);
@@ -675,7 +675,7 @@ namespace hpx { namespace util
             ar & is_empty;
             if (!is_empty)
             {
-                ar << hpx::serialization::raw_ptr(table);
+                ar << hpx::serialization::detail::raw_ptr(table);
                 table->save_object(&object, ar, version);
             }
         }
