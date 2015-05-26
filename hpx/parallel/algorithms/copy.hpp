@@ -399,11 +399,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                         typedef util::partitioner<ExPolicy, Iter, void>
                             partitioner_type;
+
+                        // capturing 'flags' below keeps the array alive
                         return partitioner_type::call_with_data(
                             policy,
                             hpx::util::make_zip_iterator(first, flags.get()),
                             count,
-                            [dest](hpx::shared_future<std::size_t>&& pos,
+                            [dest, flags](
+                                hpx::shared_future<std::size_t>&& pos,
                                 zip_iterator part_begin, std::size_t part_count)
                             {
                                 Iter iter = dest;
