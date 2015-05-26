@@ -93,6 +93,21 @@ namespace hpx
               , cb_(cb)
             {}
 
+            static void check_for_zero_copy_serialization(
+                boost::system::error_code const& ec, parcelset::parcel const& p)
+            {
+                if (p.was_zero_copy_serialized())
+                {
+                    boost::exception_ptr exception =
+                        hpx::detail::get_exception(
+                            hpx::exception(hpx::invalid_status),
+                            "put_parcel::check_for_zero_copy_serialization",
+                            __FILE__, __LINE__, parcelset::dump_parcel(p));
+
+                    hpx::report_error(exception);
+                }
+            }
+
             template <typename ...Ts>
             result_type operator()(Ts&&... vs)
             {
@@ -109,7 +124,7 @@ namespace hpx
 
                     // Send the parcel through the parcel handler
                     if (cb_.empty())
-                        ph.put_parcel(p);
+                        ph.put_parcel(p, &put_parcel::check_for_zero_copy_serialization);
                     else
                         ph.put_parcel(p, cb_);
                 }
@@ -119,7 +134,7 @@ namespace hpx
 
                     // Send the parcel through the parcel handler
                     if (cb_.empty())
-                        ph.put_parcel(p);
+                        ph.put_parcel(p, &put_parcel::check_for_zero_copy_serialization);
                     else
                         ph.put_parcel(p, cb_);
                 }
