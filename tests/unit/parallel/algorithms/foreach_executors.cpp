@@ -8,31 +8,6 @@
 
 #include "foreach_tests.hpp"
 
-// template <typename IteratorTag>
-// void test_for_each_exec()
-// {
-//     using namespace hpx::parallel;
-//
-//     {
-//         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_for_each(par(exec), IteratorTag());
-//     }
-//     {
-//         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_for_each(task(exec), IteratorTag());
-//     }
-//
-//     {
-//         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_for_each(execution_policy(par(exec)), IteratorTag());
-//     }
-//     {
-//         hpx::threads::executors::local_priority_queue_executor exec;
-//         test_for_each(execution_policy(task(exec)), IteratorTag());
-//     }
-// }
-
-
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy>
 void test_executors(ExPolicy && policy)
@@ -59,6 +34,7 @@ void test_executors_async(ExPolicy && p)
 void for_each_executors_test()
 {
     using namespace hpx::parallel;
+
     {
         parallel_executor exec;
 
@@ -70,7 +46,6 @@ void for_each_executors_test()
         sequential_executor exec;
 
         test_executors(seq.on(exec));
-//ERROR FROM BELOW, not handline errors correctly
         test_executors_async(seq(task).on(exec));
 
         test_executors(par.on(exec));
