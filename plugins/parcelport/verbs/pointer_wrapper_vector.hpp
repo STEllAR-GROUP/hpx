@@ -80,6 +80,14 @@ class pointer_wrapper_vector
       return iterator(&m_array_[m_size_]);
     }
 
+    const_iterator begin() const {
+      return iterator(&m_array_[0]);
+    }
+
+    const iterator end() const {
+      return iterator(&m_array_[m_size_]);
+    }
+
     reference       operator[](std::size_t index)       { return m_array_[index]; }
     const_reference operator[](std::size_t index) const { return m_array_[index]; }
 
