@@ -31,7 +31,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             pos_piggy_back_flag   = 6 * sizeof(value_type),// + (1 * sizeof(flag_type)),
             pos_chunk_offset      = 7 * sizeof(value_type),// + (2 * sizeof(flag_type)),
             pos_piggy_back_offset = 8 * sizeof(value_type),// + (2 * sizeof(flag_type)) + 1,
-            pos_data_zone         = 8 * sizeof(value_type) + 1,// + (2 * sizeof(flag_type)) + 1
+            pos_data_zone         = 9 * sizeof(value_type),// + (2 * sizeof(flag_type)) + 1
         };
 
         static int const data_size_ = SIZE;
