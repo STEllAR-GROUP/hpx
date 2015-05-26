@@ -38,6 +38,10 @@ namespace hpx { namespace serialization
             , buffer_(new output_container<Container>(buffer, chunks, filter))
             , dest_locality_id_(dest_locality_id)
         {
+            // send flags sent by the other end to make sure both ends have
+            // the same assumptions about the archive format
+            save(flags);
+
             bool has_filter = filter != 0;
             save(has_filter);
 
