@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typename parallel::util::detail::algorithm_result<
             ExPolicy, local_result_type
         >::type
-        call(ExPolicy const& policy, boost::mpl::true_, Args&&... args) const
+        call(ExPolicy policy, boost::mpl::true_, Args&&... args) const
         {
             try {
                 return parallel::util::detail::algorithm_result<
@@ -79,7 +79,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typename parallel::util::detail::algorithm_result<
             sequential_task_execution_policy, local_result_type
         >::type
-        operator()(sequential_task_execution_policy const& policy,
+        operator()(sequential_task_execution_policy policy,
             Args&&... args) const
         {
             try {
@@ -98,7 +98,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typename parallel::util::detail::algorithm_result<
             sequential_task_execution_policy, local_result_type
         >::type
-        call(sequential_task_execution_policy const& policy, boost::mpl::true_,
+        call(sequential_task_execution_policy policy, boost::mpl::true_,
             Args&&... args) const
         {
             try {
@@ -120,7 +120,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typename parallel::util::detail::algorithm_result<
             parallel_task_execution_policy, local_result_type
         >::type
-        call(parallel_task_execution_policy const& policy, boost::mpl::true_,
+        call(parallel_task_execution_policy policy, boost::mpl::true_,
             Args&&... args) const
         {
             try {
@@ -140,7 +140,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         typename parallel::util::detail::algorithm_result<
             ExPolicy, local_result_type
         >::type
-        call(ExPolicy const& policy, boost::mpl::false_, Args&&... args) const
+        call(ExPolicy policy, boost::mpl::false_, Args&&... args) const
         {
             return Derived::parallel(policy, std::forward<Args>(args)...);
         }
@@ -148,7 +148,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         ///////////////////////////////////////////////////////////////////////////
         template <typename... Args>
         local_result_type
-        call(parallel::execution_policy const& policy, boost::mpl::false_,
+        call(parallel::execution_policy policy, boost::mpl::false_,
             Args&&... args) const
         {
             // this implementation is not nice, however we don't have variadic
@@ -196,7 +196,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 
         template <typename... Args>
         local_result_type
-        call(parallel::execution_policy const& policy, boost::mpl::true_,
+        call(parallel::execution_policy policy, boost::mpl::true_,
             Args&&... args) const
         {
             return call(seq, boost::mpl::true_(), std::forward<Args>(args)...);
