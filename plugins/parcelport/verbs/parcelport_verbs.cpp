@@ -64,10 +64,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         return "verbs";
       }
 
-      explicit locality(boost::uint32_t ip, boost::uint32_t port) :
-            ip_(ip), port_(port), qp_(0xFFFF) {}
+      explicit locality(boost::uint32_t ip) :
+            ip_(ip), qp_(0xFFFF) {}
 
-      locality() : ip_(0xFFFF), port_(0), qp_(0xFFFF) {}
+      locality() : ip_(0xFFFF), qp_(0xFFFF) {}
 
       // some condition marking this locality as valid
       operator util::safe_bool<locality>::result_type() const {
@@ -76,15 +76,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
       void save(serialization::output_archive & ar) const {
         ar.save(ip_);
+        ar.save(qp_);
       }
 
       void load(serialization::input_archive & ar) {
         ar.load(ip_);
+        ar.load(qp_);
       }
 
     private:
       friend bool operator==(locality const & lhs, locality const & rhs) {
-        return lhs.ip_ == rhs.ip_;
+        return (lhs.ip_ == rhs.ip_) && (lhs.qp_ == rhs.qp_);
       }
 
       friend bool operator<(locality const & lhs, locality const & rhs) {
@@ -94,12 +96,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
       friend std::ostream & operator<<(std::ostream & os, locality const & loc) {
         boost::io::ios_flags_saver
         ifs(os);
-        os << loc.ip_;
+        os << loc.ip_ << " : " << os << loc.qp_;
         return os;
       }
     public:
       boost::uint32_t ip_;
-      boost::uint32_t port_;
       boost::uint32_t qp_;
     };
 
@@ -112,7 +113,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
     // a counter to generate tags per destination.
     // The tag is send in immediate data so must be 32bits only : Note that the tag only has a
     // lifetime of the unprocessed parcel, so it can be reused as soon as the parcel has been completed
-    // and herefore a 16bit count is sufficient as we only keep a few parcels per locality in flight at a time
+    // and therefore a 16bit count is sufficient as we only keep a few parcels per locality in flight at a time
     // ----------------------------------------------------------------------------------------------
     struct tag_provider {
         tag_provider() : next_tag_(1) {}
@@ -166,7 +167,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 }
             }
             FUNC_END_DEBUG_MSG;
-            return parcelset::locality(locality(_ibv_ip, _ibv_ip));
+            return parcelset::locality(locality(_ibv_ip));
         }
 
     public:
@@ -208,6 +209,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             }
             _rdmaController = std::make_shared<RdmaController>
                 (_ibverbs_device.c_str(), _ibverbs_interface.c_str(), _port);
+
+            LOG_DEBUG_MSG("Disabling array optimization and data chunking for debug purposes");
+            archive_flags_ |= serialization::disable_array_optimization;
+            archive_flags_ |= serialization::disable_data_chunking;
+            LOG_DEBUG_MSG("Disabling array optimization and data chunking for debug purposes");
 
             FUNC_END_DEBUG_MSG;
         }
@@ -257,7 +263,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         verbs::tag_provider       tag_provider_;
 
         // performance_counters::parcels::gatherer& parcels_sent_;
-
 
         // ----------------------------------------------------------------------------------------------
         // struct we use to keep track of all memory regions used during a send, they must
@@ -461,6 +466,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "normal");
                     delete_send_data(current_send);
                 }
+                // if another thread signals to say zero-copy is complete, delete the data
                 else if (current_send->delete_flag.test_and_set(std::memory_order_acquire)) {
                     LOG_DEBUG_MSG("Deleting send data " << hexpointer(&(*current_send)) << "after race detection");
                     delete_send_data(current_send);
@@ -474,7 +480,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // ----------------------------------------------------------------------------------------------
         // When a recv completes, take one of two actions ...
         // if there are no zero copy chunks, we consider the parcel receive complete
-        // so release memory and trigger  (I had contacted them write_handler.
+        // so release memory and trigger write_handler.
         // If there are zero copy chunks to be RDMA GET from the remote end, then
         // we hold onto data until the have completed.
         // ----------------------------------------------------------------------------------------------
@@ -500,6 +506,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             header_type *h = (header_type*)recv_data.header_region->getAddress();
             recv_data.message_region = NULL;
             recv_data.chunk_region   = NULL;
+            // zero copy chunks we have to GET from the source locality
             recv_data.counter        = h->num_chunks().first;
             // each parcel has a unique tag which we use to organize zero-copy data if we need any
             recv_data.tag            = h->tag();
@@ -808,20 +815,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             if (ini.has_section("hpx.agas")) {
                 util::section const* sec = ini.get_section("hpx.agas");
                 if (NULL != sec) {
-                    LOG_DEBUG_MSG("Returning some made up agas locality")
-                            return
-                                    parcelset::locality(
-                                            locality(
-                                                    _ibv_ip
-                                                    , _port
-                                            )
-                                    );
+                    LOG_DEBUG_MSG("Returning some made up agas locality");
+                    return parcelset::locality(locality(_ibv_ip));
                 }
             }
             FUNC_END_DEBUG_MSG;
             // ibverbs can't be used for bootstrapping
             LOG_DEBUG_MSG("Returning NULL agas locality")
-            return parcelset::locality(locality(0xFFFF, 0));
+            return parcelset::locality(locality(0xFFFF));
         }
 
         parcelset::locality create_locality() const {
