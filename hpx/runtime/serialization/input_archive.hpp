@@ -34,12 +34,17 @@ namespace hpx { namespace serialization
 
         template <typename Container>
         input_archive(Container & buffer,
-            boost::uint32_t flags = 0U,
             std::size_t inbound_data_size = 0,
             const std::vector<serialization_chunk>* chunks = 0)
-          : base_type(flags)
+          : base_type(0U)
           , buffer_(new input_container<Container>(buffer, chunks, inbound_data_size))
         {
+            // load flags sent by the other end to make sure both ends have
+            // the same assumptions about the archive format
+            boost::uint32_t flags = 0;
+            load(flags);
+            this->base_type::flags_ = flags;
+
             bool has_filter = false;
             load(has_filter);
 
