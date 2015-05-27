@@ -73,9 +73,9 @@ void test_gather_size(std::size_t data_size, boost::uint32_t out_archive_flags,
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here);
 
-    std::vector<hpx::serialization::serialization_chunk>* chunks = 0;
+    boost::shared_ptr<std::vector<hpx::serialization::serialization_chunk> > chunks;
     if (!(out_archive_flags | hpx::serialization::disable_data_chunking))
-        chunks = new std::vector<hpx::serialization::serialization_chunk>();
+        chunks.reset(new std::vector<hpx::serialization::serialization_chunk>());
 
     boost::uint32_t dest_locality_id = outp.get_destination_locality_id();
 
@@ -86,7 +86,7 @@ void test_gather_size(std::size_t data_size, boost::uint32_t out_archive_flags,
         {
             // gather the required size for the archive
             hpx::serialization::output_archive archive(
-                gather_size, out_archive_flags, dest_locality_id, chunks);
+                gather_size, out_archive_flags, dest_locality_id, chunks.get());
             archive << outp;
             gathered_size = archive.bytes_written();
         }
@@ -102,19 +102,19 @@ void test_gather_size(std::size_t data_size, boost::uint32_t out_archive_flags,
         {
             // create an output archive and serialize the parcel
             hpx::serialization::output_archive archive(
-                out_buffer, out_archive_flags, dest_locality_id, chunks);
+                out_buffer, out_archive_flags, dest_locality_id, chunks.get());
             archive << outp;
             written_size = archive.bytes_written();
         }
 
-        HPX_TEST_LTE(written_size, gathered_size);
+        HPX_TEST_EQ(written_size, gathered_size);
 
         hpx::parcelset::parcel inp;
 
         {
             // create an input archive and deserialize the parcel
             hpx::serialization::input_archive archive(
-                out_buffer, written_size, chunks);
+                out_buffer, written_size, chunks.get());
 
             archive >> inp;
         }
