@@ -203,9 +203,9 @@ namespace hpx { namespace serialization
             if(count == 0) return;
             size_ += count;
             if(disable_data_chunking())
-              buffer_->save_binary(address, count);
+                buffer_->save_binary(address, count);
             else
-              buffer_->save_binary_chunk(address, count);
+                buffer_->save_binary_chunk(address, count);
         }
 
         boost::uint64_t track_pointer(const void * p)

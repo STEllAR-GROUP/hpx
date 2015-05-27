@@ -72,14 +72,15 @@ namespace hpx
 
         inline std::size_t
         get_archive_size(parcel const& p, boost::uint32_t flags,
-            boost::uint32_t dest_locality_id)
+            boost::uint32_t dest_locality_id,
+            std::vector<serialization::serialization_chunk>* chunks)
         {
             // gather the required size for the archive
             hpx::serialization::detail::size_gatherer_container gather_size;
             hpx::serialization::output_archive archive(
-                gather_size, flags, dest_locality_id);
+                gather_size, flags, dest_locality_id, chunks);
             archive << p;
-            return archive.bytes_written();
+            return gather_size.size();
         }
 
         template <typename Buffer>
@@ -119,7 +120,7 @@ namespace hpx
                         if (arg_size >= max_outbound_size)
                             break;
                         arg_size += get_archive_size(ps[parcels_sent],
-                            archive_flags, dest_locality_id);
+                            archive_flags, dest_locality_id, &buffer.chunks_);
                     }
 
                     buffer.data_.reserve((std::max)(chunk_default, arg_size));

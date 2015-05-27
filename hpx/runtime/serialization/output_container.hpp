@@ -79,8 +79,11 @@ namespace hpx { namespace serialization
         {
             if (chunks_)
             {
-                chunks_->clear();
-                chunks_->push_back(create_index_chunk(0, 0));
+                // reuse chunks, if possible
+                if (chunks->empty())
+                    chunks_->push_back(create_index_chunk(0, 0));
+                else
+                    (*chunks_)[0] = create_index_chunk(0, 0);
                 current_chunk_ = 0;
             }
         }
@@ -154,9 +157,20 @@ namespace hpx { namespace serialization
                         if (get_chunk_type(current_chunk_) == chunk_type_pointer ||
                             get_chunk_size(current_chunk_) != 0)
                         {
-                            // add a new serialization_chunk
-                            chunks_->push_back(create_index_chunk(current_, 0));
-                            ++current_chunk_;
+                            // add a new serialization_chunk, reuse chunks,
+                            // if possible
+                            // the chunk size will be set at the end
+                            if (chunks_->size() <= current_chunk_ + 1)
+                            {
+                                chunks_->push_back(
+                                    create_index_chunk(current_, 0));
+                                ++current_chunk_;
+                            }
+                            else
+                            {
+                                (*chunks_)[++current_chunk_] =
+                                    create_index_chunk(current_, 0);
+                            }
                         }
                     }
 
@@ -191,9 +205,18 @@ namespace hpx { namespace serialization
                         current_ - get_chunk_data(current_chunk_).index_);
                 }
 
-                // add a new serialization_chunk referring to the external buffer
-                chunks_->push_back(create_pointer_chunk(address, count));
-                ++current_chunk_;
+                // add a new serialization_chunk referring to the external
+                // buffer, reuse chunks, if possible
+                if (chunks_->size() <= current_chunk_ + 1)
+                {
+                    chunks_->push_back(create_pointer_chunk(address, count));
+                    ++current_chunk_;
+                }
+                else
+                {
+                    (*chunks_)[++current_chunk_] =
+                        create_pointer_chunk(address, count);
+                }
             }
         }
 

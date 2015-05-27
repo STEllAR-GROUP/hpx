@@ -74,7 +74,7 @@ void test_gather_size(std::size_t data_size, boost::uint32_t out_archive_flags,
     outp.set_source(here);
 
     boost::shared_ptr<std::vector<hpx::serialization::serialization_chunk> > chunks;
-    if (!(out_archive_flags | hpx::serialization::disable_data_chunking))
+    if (!(out_archive_flags & hpx::serialization::disable_data_chunking))
         chunks.reset(new std::vector<hpx::serialization::serialization_chunk>());
 
     boost::uint32_t dest_locality_id = outp.get_destination_locality_id();
@@ -88,26 +88,28 @@ void test_gather_size(std::size_t data_size, boost::uint32_t out_archive_flags,
             hpx::serialization::output_archive archive(
                 gather_size, out_archive_flags, dest_locality_id, chunks.get());
             archive << outp;
-            gathered_size = archive.bytes_written();
+            gathered_size = gather_size.size();
         }
 
-        if (chunks)
-            chunks->clear();
+        std::size_t gathered_chunks = chunks.get() ? chunks->size() : 0;
 
         std::vector<char> out_buffer;
         std::size_t written_size = 0;
 
-        out_buffer.resize(gathered_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
+        out_buffer.reserve(gathered_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
         {
             // create an output archive and serialize the parcel
             hpx::serialization::output_archive archive(
                 out_buffer, out_archive_flags, dest_locality_id, chunks.get());
             archive << outp;
-            written_size = archive.bytes_written();
+            written_size = out_buffer.size();
         }
 
-        HPX_TEST_EQ(written_size, gathered_size);
+        std::size_t written_chunks = chunks.get() ? chunks->size() : 0;
+
+        HPX_TEST_EQ(gathered_chunks, written_chunks);
+        HPX_TEST_EQ(gathered_size, written_size);
 
         hpx::parcelset::parcel inp;
 
@@ -118,9 +120,6 @@ void test_gather_size(std::size_t data_size, boost::uint32_t out_archive_flags,
 
             archive >> inp;
         }
-
-        if (chunks)
-            chunks->clear();
     }
 }
 
