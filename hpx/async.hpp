@@ -17,8 +17,9 @@
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
 
-#include <boost/utility/enable_if.hpp>
+#include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_void.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace detail
 {
@@ -148,10 +149,13 @@ namespace hpx
 
     template <typename Executor, typename F, typename ...Ts>
     typename boost::lazy_enable_if_c<
-        traits::is_executor<Executor>::value
-     && traits::detail::is_callable_not_action<
-            typename util::decay<F>::type(typename util::decay<Ts>::type...)
-        >::value
+        boost::mpl::if_c<
+            traits::is_executor<Executor>::value
+          , traits::detail::is_callable_not_action<
+                typename util::decay<F>::type(typename util::decay<Ts>::type...)
+            >
+          , boost::mpl::false_
+        >::type::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(Ts...)>
     >::type

@@ -20,6 +20,7 @@
 #include <hpx/traits/is_executor.hpp>
 
 #include <boost/mpl/identity.hpp>
+#include <boost/mpl/if.hpp>
 #include <boost/utility/enable_if.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,10 +48,13 @@ namespace hpx
 
     template <typename Executor, typename F, typename ...Ts>
     typename boost::enable_if_c<
-        traits::is_executor<Executor>::value
-     && traits::detail::is_callable_not_action<
-            typename util::decay<F>::type(typename util::decay<Ts>::type...)
-        >::value
+        boost::mpl::if_c<
+            traits::is_executor<Executor>::value
+          , traits::detail::is_callable_not_action<
+                typename util::decay<F>::type(typename util::decay<Ts>::type...)
+            >
+          , boost::mpl::false_
+        >::type::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
