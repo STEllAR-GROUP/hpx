@@ -227,10 +227,6 @@ namespace hpx { namespace actions
         /// Return the thread stacksize this action has to be executed with
         virtual threads::thread_stacksize get_thread_stacksize() const = 0;
 
-        /// Return the size of action arguments in bytes
-        /// flags should contain serialization options which affect the space required
-        virtual std::size_t get_type_size(int flags) const = 0;
-
         /// Return whether the embedded action may require id-splitting
         virtual bool may_require_id_splitting() const = 0;
 

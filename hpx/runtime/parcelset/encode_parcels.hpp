@@ -70,6 +70,18 @@ namespace hpx
             }
         }
 
+        inline std::size_t
+        get_archive_size(parcel const& p, boost::uint32_t flags,
+            boost::uint32_t dest_locality_id)
+        {
+            // gather the required size for the archive
+            hpx::serialization::detail::size_gatherer_container gather_size;
+            hpx::serialization::output_archive archive(
+                gather_size, flags, dest_locality_id);
+            archive << p;
+            return archive.bytes_written();
+        }
+
         template <typename Buffer>
         std::size_t
         encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
@@ -89,6 +101,13 @@ namespace hpx
             // guard against serialization errors
             try {
                 try {
+                    std::unique_ptr<serialization::binary_filter> filter(
+                        ps[0].get_serialization_filter());
+
+                    int archive_flags = archive_flags_;
+                    if (filter.get() != 0)
+                        archive_flags |= serialization::enable_compression;
+
                     // Get the chunk size from the allocator if it supports it
                     size_t chunk_default = hpx::traits::default_chunk_size<
                             typename Buffer::allocator_type
@@ -99,7 +118,8 @@ namespace hpx
                     {
                         if (arg_size >= max_outbound_size)
                             break;
-                        arg_size += traits::get_type_size(ps[parcels_sent], archive_flags_);
+                        arg_size += get_archive_size(ps[parcels_sent],
+                            archive_flags, dest_locality_id);
                     }
 
                     buffer.data_.reserve((std::max)(chunk_default, arg_size));
@@ -109,14 +129,8 @@ namespace hpx
 
                     {
                         // Serialize the data
-                        std::unique_ptr<serialization::binary_filter> filter(
-                            ps[0].get_serialization_filter());
-
-                        int archive_flags = archive_flags_;
-                        if (filter.get() != 0) {
+                        if (filter.get() != 0)
                             filter->set_max_length(buffer.data_.capacity());
-                            archive_flags |= serialization::enable_compression;
-                        }
 
                         serialization::output_archive archive(
                             buffer.data_

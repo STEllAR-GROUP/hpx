@@ -19,8 +19,30 @@
 
 namespace hpx { namespace serialization
 {
+    namespace detail
+    {
+        template <typename Container>
+        struct access_data
+        {
+            static void write(Container& cont, std::size_t count,
+                std::size_t current, void const* address)
+            {
+                if (count == 1)
+                    cont[current] = *static_cast<unsigned char const*>(address);
+                else
+                    std::memcpy(&cont[current], address, count);
+            }
+
+            static bool flush(binary_filter* filter, Container& cont,
+                std::size_t current, std::size_t size, std::size_t written)
+            {
+                return filter->flush(&cont[current], size, written);
+            }
+        };
+    }
+
     template <typename Container>
-    struct output_container: erased_output_container
+    struct output_container : erased_output_container
     {
     private:
         std::size_t get_chunk_size(std::size_t chunk) const
@@ -73,8 +95,8 @@ namespace hpx { namespace serialization
                 current_ = start_compressing_at_;
 
                 do {
-                    bool flushed = filter_->flush(&cont_[current_],
-                        cont_.size()-current_, written);
+                    bool flushed = detail::access_data<Container>::flush(
+                        filter_, cont_, current_, cont_.size()-current_, written);
 
                     current_ += written;
                     if (flushed)
@@ -141,10 +163,8 @@ namespace hpx { namespace serialization
                     if (cont_.size() < current_ + count)
                         cont_.resize(cont_.size() + count);
 
-                    if (count == 1)
-                        cont_[current_] = *static_cast<unsigned char const*>(address);
-                    else
-                        std::memcpy(&cont_[current_], address, count);
+                    detail::access_data<Container>::write(
+                        cont_, count, current_, address);
                 }
                 current_ += count;
             }

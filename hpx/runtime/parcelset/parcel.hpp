@@ -19,7 +19,6 @@
 #include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/traits/type_size.hpp>
 #include <hpx/traits/serialize_as_future.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -95,8 +94,6 @@ namespace hpx { namespace parcelset
 
             virtual naming::gid_type get_parcel_id() const = 0;
             virtual void set_parcel_id(naming::gid_type const& id) = 0;
-
-            virtual std::size_t get_type_size(int flags) const = 0;
 
             virtual bool may_require_id_splitting() const = 0;
 
@@ -318,11 +315,6 @@ namespace hpx { namespace parcelset
                 data_.parcel_id_ = id;
             }
 
-            std::size_t get_type_size(int flags) const
-            {
-                return sizeof(parcel_buffer) + this->get_action()->get_type_size(flags);
-            }
-
             bool may_require_id_splitting() const
             {
                 return this->get_action()->may_require_id_splitting();
@@ -506,14 +498,6 @@ namespace hpx { namespace parcelset
             void set_parcel_id(naming::gid_type const& id)
             {
                 data_.parcel_id_ = id;
-            }
-
-            std::size_t get_type_size(int flags) const
-            {
-                return sizeof(parcel_buffer) +
-                    traits::type_size<std::vector<naming::id_type> >::call(dests_, flags) +
-                    traits::type_size<std::vector<naming::address> >::call(addrs_, flags) +
-                    this->get_action()->get_type_size(flags);      // action
             }
 
             void save(serialization::output_archive& ar) const;
@@ -716,11 +700,6 @@ namespace hpx { namespace parcelset
             return data_->get_message_handler(ph, loc, *this);
         }
 
-        std::size_t get_type_size(int flags) const
-        {
-            return data_->get_type_size(flags);
-        }
-
         bool may_require_id_splitting() const
         {
             return data_->may_require_id_splitting();
@@ -763,15 +742,6 @@ namespace hpx { namespace parcelset
 namespace hpx { namespace traits
 {
     template <>
-    struct type_size<hpx::parcelset::parcel>
-    {
-        static std::size_t call(hpx::parcelset::parcel const& p, int flags)
-        {
-            return sizeof(hpx::parcelset::parcel) + p.get_type_size(flags);
-        }
-    };
-
-    template <>
     struct serialize_as_future<hpx::parcelset::parcel>
       : boost::mpl::true_
     {
@@ -803,8 +773,6 @@ namespace hpx { namespace traits
     {};
 #endif
 }}
-
-#include <hpx/traits/type_size.hpp>
 
 #include <hpx/config/warnings_suffix.hpp>
 
