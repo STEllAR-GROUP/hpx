@@ -1,6 +1,6 @@
 //  Copyright (c) 2011-2013 Thomas Heller
 //  Copyright (c) 2011-2013 Hartmut Kaiser
-//  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,8 +9,6 @@
 #define HPX_UTIL_TUPLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -265,6 +263,15 @@ namespace hpx { namespace util
                 return static_cast<tuple_member<
                         I, typename detail::at_index<I, Ts...>::type
                     > const&>(*this).value();
+            }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned int const version)
+            {
+                int const _sequencer[] = {
+                    ((ar & this->get<Is>()), 0)...
+                };
+                (void)_sequencer;
             }
         };
 
@@ -940,34 +947,26 @@ namespace hpx { namespace traits
     {};
 }}
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive, typename ...Ts>
     BOOST_FORCEINLINE
     void serialize(
         Archive& ar
       , ::hpx::util::tuple<Ts...>& t
-      , unsigned int const version
+      , unsigned int const version = 0
     )
     {
-        ::hpx::serialization::serialize_sequence(ar, t);
+        t._impl.serialize(ar, version);
     }
 
-    // These are needed to avoid conflicts with serialize_empty_type
+    template <typename Archive>
     BOOST_FORCEINLINE
     void serialize(
-        serialization::output_archive&
-      , ::hpx::util::tuple<>&
-      , unsigned int const
-    )
-    {}
-
-    BOOST_FORCEINLINE
-    void serialize(
-        serialization::input_archive&
-      , ::hpx::util::tuple<>&
-      , unsigned int const
+        Archive& ar
+      , ::hpx::util::tuple<>& t
+      , unsigned int const version = 0
     )
     {}
 }}
