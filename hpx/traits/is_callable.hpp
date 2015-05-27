@@ -291,4 +291,24 @@ namespace hpx { namespace traits
 
 #endif
 
+#include <hpx/traits/is_action.hpp>
+#include <hpx/util/decay.hpp>
+
+#include <boost/mpl/and.hpp>
+#include <boost/mpl/not.hpp>
+
+namespace hpx { namespace traits { namespace detail
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct is_deferred_callable;
+
+    template <typename F, typename ...Ts>
+    struct is_deferred_callable<F(Ts...)>
+      : is_callable<
+            typename util::decay<F>::type(typename util::decay<Ts>::type...)
+        >
+    {};
+}}}
+
 #endif

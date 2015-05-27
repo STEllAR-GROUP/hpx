@@ -31,9 +31,7 @@ namespace hpx
     // Simply launch the given function or function object asynchronously
     template <typename F, typename ...Ts>
     typename boost::enable_if_c<
-        traits::is_callable<
-            typename util::decay<F>::type(typename util::decay<Ts>::type...)
-        >::value
+        traits::detail::is_deferred_callable<F(Ts...)>::value
       , bool
     >::type
     apply(threads::executor& sched, F&& f, Ts&&... vs)
@@ -48,9 +46,7 @@ namespace hpx
     typename boost::enable_if_c<
         boost::enable_if_c<
             traits::is_executor<typename util::decay<Executor>::type>::value
-          , traits::is_callable<
-                typename util::decay<F>::type(typename util::decay<Ts>::type...)
-            >
+          , traits::detail::is_deferred_callable<F(Ts...)>
         >::type::value
       , bool
     >::type
@@ -67,9 +63,7 @@ namespace hpx
             !traits::is_executor<typename util::decay<F>::type>::value
          && !traits::is_action<typename util::decay<F>::type>::value
          && !traits::is_bound_action<typename util::decay<F>::type>::value
-          , traits::is_callable<
-                typename util::decay<F>::type(typename util::decay<Ts>::type...)
-            >
+          , traits::detail::is_deferred_callable<F(Ts...)>
         >::type::value
       , bool
     >::type

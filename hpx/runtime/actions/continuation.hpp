@@ -55,9 +55,7 @@ namespace hpx
             !traits::is_executor<typename util::decay<F>::type>::value
          && !traits::is_action<typename util::decay<F>::type>::value
          && !traits::is_bound_action<typename util::decay<F>::type>::value
-          , traits::is_callable<
-                typename util::decay<F>::type(typename util::decay<Ts>::type...)
-            >
+          , traits::detail::is_deferred_callable<F(Ts...)>
         >::type::value
       , bool
     >::type
