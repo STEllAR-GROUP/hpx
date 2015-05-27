@@ -38,6 +38,13 @@ namespace hpx { namespace serialization
             , buffer_(new output_container<Container>(buffer, chunks, filter))
             , dest_locality_id_(dest_locality_id)
         {
+            // endianness needs to be saves separately as it is needed to
+            // properly interpret the flags
+
+            // FIXME: make bool once integer compression is implemented
+            boost::uint64_t endianess = this->base_type::endian_big() ? ~0ul : 0ul;
+            save(endianess);
+
             // send flags sent by the other end to make sure both ends have
             // the same assumptions about the archive format
             save(flags);

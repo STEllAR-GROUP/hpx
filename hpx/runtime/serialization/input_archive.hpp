@@ -39,6 +39,15 @@ namespace hpx { namespace serialization
           : base_type(0U)
           , buffer_(new input_container<Container>(buffer, chunks, inbound_data_size))
         {
+            // endianness needs to be saves separately as it is needed to
+            // properly interpret the flags
+
+            // FIXME: make bool once integer compression is implemented
+            boost::uint64_t endianess = 0ul;
+            load(endianess);
+            if (endianess)
+                this->base_type::flags_ = hpx::serialization::endian_big;
+
             // load flags sent by the other end to make sure both ends have
             // the same assumptions about the archive format
             boost::uint32_t flags = 0;
