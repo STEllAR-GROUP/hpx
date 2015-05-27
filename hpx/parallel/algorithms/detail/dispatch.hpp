@@ -15,7 +15,6 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/void_guard.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
