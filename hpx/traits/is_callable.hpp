@@ -291,25 +291,4 @@ namespace hpx { namespace traits
 
 #endif
 
-#include <hpx/traits/is_action.hpp>
-#include <hpx/util/decay.hpp>
-
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/not.hpp>
-
-namespace hpx { namespace traits { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct is_callable_not_action;
-
-    template <typename T, typename ...Ts>
-    struct is_callable_not_action<T(Ts...)>
-      : boost::mpl::and_<
-            is_callable<T(Ts...)>
-          , boost::mpl::not_<traits::is_action<typename util::decay<T>::type> >
-        >
-    {};
-}}}
-
 #endif
