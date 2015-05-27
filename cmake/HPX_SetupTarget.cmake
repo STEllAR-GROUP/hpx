@@ -60,7 +60,7 @@ function(hpx_setup_target target)
   endif()
 
   set(nohpxinit FALSE)
-  if(target_NOHPXINIT)
+  if(target_NOHPX_INIT)
     set(nohpxinit TRUE)
   endif()
 
