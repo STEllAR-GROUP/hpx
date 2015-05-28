@@ -22,6 +22,7 @@
 #include <hpx/traits/serialize_as_future.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/preprocessor/stringize.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #ifndef BOOST_MSVC
 #include <boost/utility/enable_if.hpp>
