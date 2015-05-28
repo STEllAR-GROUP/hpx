@@ -487,6 +487,10 @@ namespace hpx { namespace actions
                                                                               \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
+        struct is_action<action>                                              \
+          : boost::mpl::true_                                                 \
+        {};                                                                   \
+        template <>                                                           \
         struct needs_automatic_registration<action>                           \
           : boost::mpl::false_                                                \
         {};                                                                   \
