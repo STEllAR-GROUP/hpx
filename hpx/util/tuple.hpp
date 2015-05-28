@@ -24,7 +24,6 @@
 #include <boost/type_traits/is_empty.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/utility/swap.hpp>
 
 #include <cstddef> // for size_t
 #include <utility>
@@ -240,8 +239,9 @@ namespace hpx { namespace util
 
             void swap(tuple_impl& other)
             {
+                using std::swap;
                 int const _sequencer[] = {
-                    ((boost::swap(this->get<Is>(), other.template get<Is>())), 0)...
+                    ((swap(this->get<Is>(), other.template get<Is>())), 0)...
                 };
                 (void)_sequencer;
             }
