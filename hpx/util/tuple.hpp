@@ -13,7 +13,6 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/detail/pack.hpp>
-#include <hpx/util/detail/qualify_as.hpp>
 
 #include <boost/array.hpp>
 #include <boost/mpl/bool.hpp>
@@ -680,11 +679,11 @@ namespace hpx { namespace util
           : boost::mpl::size_t<Size>
         {};
 
-        template <std::size_t Size, typename HeadTuple, typename ...TailTuples>
+        template <std::size_t Size, typename Head, typename ...Tail>
         struct tuple_cat_size_impl<
-            Size, detail::pack<HeadTuple, TailTuples...>
+            Size, detail::pack<Head, Tail...>
         > : tuple_cat_size_impl<
-                (Size + tuple_size<HeadTuple>::value), detail::pack<TailTuples...>
+                (Size + tuple_size<Head>::value), detail::pack<Tail...>
             >
         {};
 
@@ -697,51 +696,57 @@ namespace hpx { namespace util
         template <std::size_t I, typename Tuples, typename Enable = void>
         struct tuple_cat_element;
 
-        template <std::size_t I, typename HeadTuple, typename ...TailTuples>
+        template <std::size_t I, typename Head, typename ...Tail>
         struct tuple_cat_element<
-            I, detail::pack<HeadTuple, TailTuples...>
+            I, detail::pack<Head, Tail...>
           , typename boost::enable_if_c<
-                (I < tuple_size<HeadTuple>::value)
+                (I < tuple_size<Head>::value)
             >::type
-        > : tuple_element<I, HeadTuple>
+        > : tuple_element<I, Head>
         {
-            typedef tuple_element<I, HeadTuple> base_type;
+            typedef tuple_element<I, Head> base_type;
 
-            template <typename HeadTuple_, typename ...TailTuples_>
             static BOOST_CONSTEXPR BOOST_FORCEINLINE
-            typename detail::qualify_as<
-                typename base_type::type
-              , HeadTuple_&
-            >::type
-            get(HeadTuple_& head, TailTuples_& ...tail) BOOST_NOEXCEPT
+            typename base_type::type&
+            get(Head& head, Tail& ...tail) BOOST_NOEXCEPT
+            {
+                return base_type::get(head);
+            }
+
+            static BOOST_CONSTEXPR BOOST_FORCEINLINE
+            typename base_type::type const&
+            get(Head const& head, Tail& ...tail) BOOST_NOEXCEPT
             {
                 return base_type::get(head);
             }
         };
 
-        template <std::size_t I, typename HeadTuple, typename ...TailTuples>
+        template <std::size_t I, typename Head, typename ...Tail>
         struct tuple_cat_element<
-            I, detail::pack<HeadTuple, TailTuples...>
+            I, detail::pack<Head, Tail...>
           , typename boost::enable_if_c<
-                (I >= tuple_size<HeadTuple>::value)
+                (I >= tuple_size<Head>::value)
             >::type
         > : tuple_cat_element<
-                I - tuple_size<HeadTuple>::value
-              , detail::pack<TailTuples...>
+                I - tuple_size<Head>::value
+              , detail::pack<Tail...>
             >
         {
             typedef tuple_cat_element<
-                I - tuple_size<HeadTuple>::value
-              , detail::pack<TailTuples...>
+                I - tuple_size<Head>::value
+              , detail::pack<Tail...>
             > base_type;
 
-            template <typename HeadTuple_, typename ...TailTuples_>
             static BOOST_CONSTEXPR BOOST_FORCEINLINE
-            typename detail::qualify_as<
-                typename base_type::type
-              , HeadTuple_&
-            >::type
-            get(HeadTuple_& head, TailTuples_& ...tail) BOOST_NOEXCEPT
+            typename base_type::type&
+            get(Head& head, Tail& ...tail) BOOST_NOEXCEPT
+            {
+                return base_type::get(tail...);
+            }
+
+            static BOOST_CONSTEXPR BOOST_FORCEINLINE
+            typename base_type::type const&
+            get(Head const& head, Tail& ...tail) BOOST_NOEXCEPT
             {
                 return base_type::get(tail...);
             }
