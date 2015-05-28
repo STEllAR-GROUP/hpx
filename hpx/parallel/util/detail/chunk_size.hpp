@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename ExPolicy, typename Future, typename F1,
         typename FwdIter>
         // requires traits::is_future<Future>
-    std::size_t get_static_chunk_size(ExPolicy const& policy,
+    std::size_t get_static_chunk_size(ExPolicy policy,
         std::vector<Future>& workitems,
         F1 && f1, FwdIter& first, std::size_t& count,
         std::size_t chunk_size)
@@ -143,7 +143,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename ExPolicy, typename Future, typename F1,
         typename FwdIter>
         // requires traits::is_future<Future>
-    std::size_t get_static_chunk_size_idx(ExPolicy const& policy,
+    std::size_t get_static_chunk_size_idx(ExPolicy policy,
         std::vector<Future>& workitems,
         F1 && f1, std::size_t& base_idx, FwdIter& first,
         std::size_t& count, std::size_t chunk_size)
