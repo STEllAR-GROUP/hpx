@@ -25,6 +25,7 @@ set(tests
     findif
     findifnot
     foreach
+    foreach_executors
     foreachn
     generate
     generaten
