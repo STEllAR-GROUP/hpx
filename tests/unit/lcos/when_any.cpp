@@ -356,19 +356,19 @@ void test_wait_for_either_of_five_futures_1_from_list()
 
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
     hpx::lcos::future<int> f1(pt1.get_future());
-    futures.push_back(boost::move(f1));
+    futures.push_back(std::move(f1));
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
     hpx::lcos::future<int> f2(pt2.get_future());
-    futures.push_back(boost::move(f2));
+    futures.push_back(std::move(f2));
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
     hpx::lcos::future<int> f3(pt3.get_future());
-    futures.push_back(boost::move(f3));
+    futures.push_back(std::move(f3));
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
     hpx::lcos::future<int> f4(pt4.get_future());
-    futures.push_back(boost::move(f4));
+    futures.push_back(std::move(f4));
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
     hpx::lcos::future<int> f5(pt5.get_future());
-    futures.push_back(boost::move(f5));
+    futures.push_back(std::move(f5));
 
     pt1();
 
@@ -398,19 +398,19 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
 
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
     hpx::lcos::future<int> f1(pt1.get_future());
-    futures.push_back(boost::move(f1));
+    futures.push_back(std::move(f1));
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
     hpx::lcos::future<int> f2(pt2.get_future());
-    futures.push_back(boost::move(f2));
+    futures.push_back(std::move(f2));
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
     hpx::lcos::future<int> f3(pt3.get_future());
-    futures.push_back(boost::move(f3));
+    futures.push_back(std::move(f3));
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
     hpx::lcos::future<int> f4(pt4.get_future());
-    futures.push_back(boost::move(f4));
+    futures.push_back(std::move(f4));
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
     hpx::lcos::future<int> f5(pt5.get_future());
-    futures.push_back(boost::move(f5));
+    futures.push_back(std::move(f5));
 
     pt1();
 
@@ -639,7 +639,7 @@ void test_wait_for_either_of_five_futures_5()
 //     hpx::lcos::future<int> fi2 = pt2.get_future();
 //     pt1.set_wait_callback(wait_callback_for_task);
 //
-//     hpx::thread t(boost::move(pt));
+//     hpx::thread t(std::move(pt));
 //
 //     boost::wait_for_any(fi, fi2);
 //     HPX_TEST_EQ(callback_called, 1U);
@@ -655,10 +655,10 @@ void test_wait_for_either_of_five_futures_5()
 //         hpx::lcos::future<int> futures[count];
 //         for(unsigned j = 0; j < count; ++j)
 //         {
-//             tasks[j] = boost::move(hpx::lcos::local::packaged_task<int()>(make_int_slowly));
+//             tasks[j] = std::move(hpx::lcos::local::packaged_task<int()>(make_int_slowly));
 //             futures[j] = tasks[j].get_future();
 //         }
-//         hpx::thread t(boost::move(tasks[i]));
+//         hpx::thread t(std::move(tasks[i]));
 //
 //         hpx::lcos::wait_any(futures, futures);
 //

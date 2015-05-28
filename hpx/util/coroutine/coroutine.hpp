@@ -205,7 +205,7 @@ namespace hpx { namespace util { namespace coroutines
     {
         HPX_ASSERT(exited());
         impl_type::rebind(m_pimpl.get(), boost::forward<Functor>(f),
-            boost::move(target), id);
+            std::move(target), id);
     }
 
     //void reset()
