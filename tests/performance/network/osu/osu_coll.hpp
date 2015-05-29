@@ -114,7 +114,7 @@ distribute_component(std::vector<hpx::id_type> localities, hpx::components::comp
         {
             hpx::lcos::packaged_action<distribute_component_action, result_type > p;
             hpx::id_type id = locs_first[0];
-            p.apply(hpx::launch::async, id, boost::move(locs_first), type);
+            p.apply(hpx::launch::async, id, std::move(locs_first), type);
             components_futures.push_back(
                 p.get_future()
             );
@@ -124,7 +124,7 @@ distribute_component(std::vector<hpx::id_type> localities, hpx::components::comp
         {
             hpx::lcos::packaged_action<distribute_component_action, result_type > p;
             hpx::id_type id = locs_second[0];
-            p.apply(hpx::launch::async, id, boost::move(locs_second), type);
+            p.apply(hpx::launch::async, id, std::move(locs_second), type);
             components_futures.push_back(
                 p.get_future()
             );
@@ -173,7 +173,7 @@ inline std::vector<hpx::id_type> create_components(params const & p)
     hpx::id_type id = localities[0];
     hpx::future<std::pair<std::size_t, std::vector<hpx::util::remote_locality_result> > >
         async_result = hpx::async<distribute_component_action>(
-            id, boost::move(localities), type);
+            id, std::move(localities), type);
 
     std::vector<hpx::id_type> components;
 
