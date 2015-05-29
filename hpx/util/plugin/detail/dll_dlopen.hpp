@@ -320,16 +320,22 @@ namespace hpx { namespace util { namespace plugin {
             if (ec)
             {
                 // iterate through all images currently in memory
-                for (boost::int32_t i = ::_dyld_image_count(); i >= 0; --i)
+                for (size_t i = 0; i < ::_dyld_image_count(); ++i)
                 {
-                    const char* image_name = ::_dyld_get_image_name(i);
-                    HMODULE probe_handle = ::dlopen(image_name, RTLD_NOW);
-                    ::dlclose(probe_handle);
+                    if (const char* image_name = ::_dyld_get_image_name(i))
+                    {
+                        HMODULE probe_handle = ::dlopen(image_name, RTLD_NOW);
+                        ::dlclose(probe_handle);
 
-                    // If the handle is the same as what was passed in
-                    // (modulo mode bits), return this image name
-                    if (((intptr_t)dll_handle & (-4)) == ((intptr_t)probe_handle & (-4)))
-                        result = path(image_name).parent_path().string();
+                        // If the handle is the same as what was passed in
+                        // (modulo mode bits), return this image name
+                        if (((intptr_t)dll_handle & (-4)) == ((intptr_t)probe_handle & (-4)))
+                        {
+                            result = path(image_name).parent_path().string();
+                            std::cout << "found directory: " << result << std::endl;
+                            break;
+                        }
+                    }
                 }
             }
             ::dlerror();                // Clear the error state.
