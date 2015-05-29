@@ -8,6 +8,7 @@
 #define HPX_UTIL_UNWRAPPED_HPP
 
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
@@ -293,7 +294,11 @@ namespace hpx { namespace util
 
             template <typename This>
             struct result<This()>
-              : util::detail::result_of_or<F(), hpx::util::unused_type>
+              : boost::mpl::eval_if_c<
+                    traits::is_callable<F()>::value
+                  , util::result_of<F()>
+                  , boost::mpl::identity<util::unused_type>
+                >
             {};
 
             BOOST_FORCEINLINE

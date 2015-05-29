@@ -23,6 +23,7 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>
+#include <boost/mpl/eval_if.hpp>
 #include <boost/ref.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -175,6 +176,15 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename F, typename ...Ts>
+        struct bind_result_of_guard
+          : boost::mpl::eval_if_c<
+                traits::is_callable<F(Ts...)>::value
+              , util::result_of<F(Ts...)>
+              , boost::mpl::identity<cannot_be_called>
+            >
+        {};
+
         template <typename F, typename BoundArgs, typename UnboundArgs>
         struct bind_invoke_impl;
 
@@ -183,9 +193,8 @@ namespace hpx { namespace util
             F, util::tuple<Ts...>, UnboundArgs
         >
         {
-            typedef typename util::detail::result_of_or<
-                  F(typename bind_eval_impl<F, Ts, UnboundArgs>::type...)
-                , cannot_be_called
+            typedef typename bind_result_of_guard<
+                F, typename bind_eval_impl<F, Ts, UnboundArgs>::type...
             >::type type;
 
             template <std::size_t ...Is>
@@ -207,9 +216,8 @@ namespace hpx { namespace util
             F, util::tuple<Ts...> const, UnboundArgs
         >
         {
-            typedef typename util::detail::result_of_or<
-                F(typename bind_eval_impl<F, Ts const, UnboundArgs>::type...)
-              , cannot_be_called
+            typedef typename bind_result_of_guard<
+                F, typename bind_eval_impl<F, Ts const, UnboundArgs>::type...
             >::type type;
 
             template <std::size_t ...Is>
@@ -323,7 +331,7 @@ namespace hpx { namespace util
 
             template <typename This, typename ...Ts>
             struct result<This(Ts...)>
-              : util::detail::result_of_or<F(Ts...), cannot_be_called>
+              : bind_result_of_guard<F, Ts...>
             {};
 
             template <typename This, typename ...Ts>

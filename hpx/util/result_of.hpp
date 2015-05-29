@@ -7,7 +7,6 @@
 #define HPX_UTIL_RESULT_OF_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/always_void.hpp>
 
 #include <boost/ref.hpp>
 
@@ -172,24 +171,6 @@ namespace hpx { namespace util
     struct result_of<F(Ts...)>
       : detail::result_of_impl<typename std::decay<F>::type, F(Ts...)>
     {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <typename T, typename Fallback, typename Enable = void>
-        struct result_of_or
-        {
-            typedef Fallback type;
-        };
-
-        template <typename T, typename Fallback>
-        struct result_of_or<T, Fallback,
-            typename always_void<typename result_of<T>::type>::type
-        >
-        {
-            typedef typename result_of<T>::type type;
-        };
-    }
 }}
 
 #endif
