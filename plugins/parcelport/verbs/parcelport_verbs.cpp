@@ -309,6 +309,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         active_recv_list_type active_recvs;
         mutex_type       active_recv_mutex;
 
+        void hpx_background_work_thread()
+        {
+            // repeat until no more parcels are to be sent
+            while (!hpx::is_stopped())
+            {
+                hpx_background_work();
+            }
+            LOG_ERROR_MSG("HPX is now stopped");
+        }
+
         // ----------------------------------------------------------------------------------------------
         // Clean up a completed send and all its regions etc
         // Called when we finish sending a simple message, or when all zero-copy Get operations are done
@@ -879,9 +889,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             auto completion_function = std::bind( &parcelport::handle_verbs_completion, this, std::placeholders::_1, std::placeholders::_2);
             _rdmaController->setCompletionFunction(completion_function);
 
+            error_code ec(lightweight);
+            hpx::applier::register_thread_nullary(
+                    util::bind(&parcelport::hpx_background_work_thread, this),
+                    "hpx_background_work_thread",
+                    threads::pending, true, threads::thread_priority_critical,
+                    std::size_t(-1), threads::thread_stacksize_default, ec);
+
             FUNC_END_DEBUG_MSG;
-            // This should start the receiving side of your PP
-            return true;
+            return ec ? false : true;
+
         }
 
         void stop(bool blocking = true) {
@@ -931,7 +948,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             }
             {   // if we already have a lot of sends in the queue, process them first
                 while (active_send_count_ >= HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE) {
-                    LOG_DEBUG_MSG("Extra HPX Background work");
+//                    LOG_DEBUG_MSG("Extra HPX Background work");
                     hpx_background_work();
                 }
             }
