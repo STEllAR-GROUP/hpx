@@ -317,7 +317,7 @@ namespace hpx { namespace util { namespace plugin {
 #elif defined(__APPLE__)
             // SO staticfloat's solution
             const_cast<dll&>(*this).LoadLibrary(ec);
-            if (!ec)
+            if (ec)
             {
                 // iterate through all images currently in memory
                 for (boost::int32_t i = ::_dyld_image_count(); i >= 0; --i)
