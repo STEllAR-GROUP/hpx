@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename OutIter_>
             static OutIter_
-            sequential(ExPolicy const&, InIter first, InIter last, OutIter_ dest)
+            sequential(ExPolicy, InIter first, InIter last, OutIter_ dest)
             {
                 return std::copy(first, last, dest);
             }
@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter_
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 OutIter_ dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter_> zip_iterator;
@@ -198,7 +198,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter>
             static Iter
-            sequential(ExPolicy const&, InIter first, std::size_t count,
+            sequential(ExPolicy, InIter first, std::size_t count,
                 Iter dest)
             {
                 return std::copy_n(first, count, dest);
@@ -206,7 +206,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter>
             static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy const& policy, FwdIter first, std::size_t count,
+            parallel(ExPolicy policy, FwdIter first, std::size_t count,
                 Iter dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, Iter> zip_iterator;
@@ -334,7 +334,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F>
             static Iter
-            sequential(ExPolicy const&, InIter first, InIter last, Iter dest,
+            sequential(ExPolicy, InIter first, InIter last, Iter dest,
                 F && f)
             {
                 return std::copy_if(first, last, dest, std::forward<F>(f));
@@ -342,7 +342,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename F>
             static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 Iter dest, F && f)
             {
                 typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator;

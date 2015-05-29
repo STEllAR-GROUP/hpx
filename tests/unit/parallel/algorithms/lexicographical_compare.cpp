@@ -14,7 +14,7 @@
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare1(ExPolicy const& policy, IteratorTag)
+void test_lexicographical_compare1(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -36,7 +36,7 @@ void test_lexicographical_compare1(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare1_async(ExPolicy const& p, IteratorTag)
+void test_lexicographical_compare1_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -87,7 +87,7 @@ void lexicographical_compare_test1()
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare2(ExPolicy const& policy, IteratorTag)
+void test_lexicographical_compare2(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -109,7 +109,7 @@ void test_lexicographical_compare2(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare2_async(ExPolicy const& p, IteratorTag)
+void test_lexicographical_compare2_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -158,7 +158,7 @@ void lexicographical_compare_test2()
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare3(ExPolicy const& policy, IteratorTag)
+void test_lexicographical_compare3(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -182,7 +182,7 @@ void test_lexicographical_compare3(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare3_async(ExPolicy const& p, IteratorTag)
+void test_lexicographical_compare3_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -231,7 +231,7 @@ void lexicographical_compare_test3()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare_exception(ExPolicy const& policy, IteratorTag)
+void test_lexicographical_compare_exception(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -269,7 +269,7 @@ void test_lexicographical_compare_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare_async_exception(ExPolicy const& p, IteratorTag)
+void test_lexicographical_compare_async_exception(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -338,7 +338,7 @@ void lexicographical_compare_exception_test()
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare_bad_alloc(ExPolicy const& policy, IteratorTag)
+void test_lexicographical_compare_bad_alloc(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -375,7 +375,7 @@ void test_lexicographical_compare_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare_async_bad_alloc(ExPolicy const& p, IteratorTag)
+void test_lexicographical_compare_async_bad_alloc(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>

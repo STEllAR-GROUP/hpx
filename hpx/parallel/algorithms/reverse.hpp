@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename BidirIter>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, BidirIter first, BidirIter last)
+            sequential(ExPolicy, BidirIter first, BidirIter last)
             {
                 std::reverse(first, last);
                 return hpx::util::unused;
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename BidirIter>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, BidirIter first, BidirIter last)
+            parallel(ExPolicy policy, BidirIter first, BidirIter last)
             {
                 typedef std::reverse_iterator<BidirIter> destination_iterator;
                 typedef hpx::util::zip_iterator<BidirIter, destination_iterator>
@@ -147,7 +147,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename BidirIter>
             static OutputIter
-            sequential(ExPolicy const&, BidirIter first, BidirIter last,
+            sequential(ExPolicy, BidirIter first, BidirIter last,
                 OutputIter dest_first)
             {
                 return std::reverse_copy(first, last, dest_first);
@@ -157,7 +157,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutputIter
             >::type
-            parallel(ExPolicy const& policy, BidirIter first, BidirIter last,
+            parallel(ExPolicy policy, BidirIter first, BidirIter last,
                 OutputIter dest_first)
             {
                 typedef std::reverse_iterator<BidirIter> iterator;
