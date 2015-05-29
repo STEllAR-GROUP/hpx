@@ -20,25 +20,36 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        template <typename T, typename Enable = void>
+        template <typename T, typename R, typename Enable = void>
         struct is_callable_impl
           : boost::false_type
         {};
 
         template <typename T>
-        struct is_callable_impl<T,
+        struct is_callable_impl<T, void,
             typename util::always_void<typename util::result_of<T>::type>::type
         > : boost::true_type
+        {};
+
+        template <typename T, typename R>
+        struct is_callable_impl<T, R,
+            typename util::always_void<typename util::result_of<T>::type>::type
+        > : boost::integral_constant<bool,
+                std::is_convertible<
+                    typename util::result_of<T>::type,
+                    R
+                >::value
+            >
         {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    template <typename T, typename R = void>
     struct is_callable;
 
-    template <typename F, typename ...Ts>
-    struct is_callable<F(Ts...)>
-      : detail::is_callable_impl<F(Ts...)>
+    template <typename F, typename ...Ts, typename R>
+    struct is_callable<F(Ts...), R>
+      : detail::is_callable_impl<F(Ts...), R>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

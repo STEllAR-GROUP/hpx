@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
