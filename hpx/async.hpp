@@ -132,7 +132,7 @@ namespace hpx
     template <typename Executor, typename F, typename ...Ts>
     typename boost::lazy_enable_if_c<
         boost::enable_if_c<
-            traits::is_threads_executor<Executor>::value
+            traits::is_threads_executor<typename util::decay<Executor>::type>::value
           , traits::detail::is_deferred_callable<F(Ts...)>
         >::type::value
       , detail::create_future<F(Ts...)>
@@ -152,7 +152,7 @@ namespace hpx
     template <typename Executor, typename F, typename ...Ts>
     typename boost::lazy_enable_if_c<
         boost::enable_if_c<
-            traits::is_executor<Executor>::value
+            traits::is_executor<typename util::decay<Executor>::type>::value
           , traits::detail::is_deferred_callable<F(Ts...)>
         >::type::value
       , detail::create_future<F(Ts...)>
