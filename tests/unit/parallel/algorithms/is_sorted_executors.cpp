@@ -12,7 +12,7 @@
 template <typename ExPolicy>
 void test_executors(ExPolicy && policy)
 {
-    using iterator_tag = std::random_access_iterator_tag;
+    typedef std::random_access_iterator_tag iterator_tag;
 
     test_sorted2(policy, iterator_tag());
     test_sorted3(policy, iterator_tag());
@@ -24,7 +24,7 @@ void test_executors(ExPolicy && policy)
 template <typename ExPolicy>
 void test_executors_async(ExPolicy && p)
 {
-    using iterator_tag = std::random_access_iterator_tag;
+    typedef std::random_access_iterator_tag iterator_tag;
 
     test_sorted2_async(p, iterator_tag());
     test_sorted3_async(p, iterator_tag());

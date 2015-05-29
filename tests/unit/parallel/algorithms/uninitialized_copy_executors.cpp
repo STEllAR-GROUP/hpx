@@ -1,3 +1,4 @@
+
 //  Copyright (c) 2015 Daniel Bourgeois
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +13,7 @@
 template <typename ExPolicy>
 void test_executors(ExPolicy && policy)
 {
-    using iterator_tag = std::random_access_iterator_tag;
+    typedef std::random_access_iterator_tag iterator_tag;
 
     test_uninitialized_copy(policy, iterator_tag());
     test_uninitialized_copy_exception(policy, iterator_tag());
@@ -24,7 +25,7 @@ void test_executors(ExPolicy && policy)
 template <typename ExPolicy>
 void test_executors_async(ExPolicy && p)
 {
-    using iterator_tag = std::random_access_iterator_tag;
+    typedef std::random_access_iterator_tag iterator_tag;
 
     test_uninitialized_copy_async(p, iterator_tag());
     test_uninitialized_copy_exception_async(p, iterator_tag());
