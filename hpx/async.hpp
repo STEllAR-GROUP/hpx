@@ -17,6 +17,7 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -94,17 +95,21 @@ namespace hpx
 
     // Launch the given function or function object asynchronously and return a
     // future allowing to synchronize with the returned result.
-    template <typename F, typename ...Ts>
+    template <typename Policy, typename F, typename ...Ts>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_deferred_callable<F(Ts...)>::value
+        boost::enable_if_c<
+            traits::is_launch_policy<typename util::decay<Policy>::type>::value
+          , traits::detail::is_deferred_callable<F(Ts...)>
+        >::type::value
       , detail::create_future<F(Ts...)>
     >::type
-    async(BOOST_SCOPED_ENUM(launch) policy, F&& f, Ts&&... vs)
+    async(Policy && pol, F&& f, Ts&&... vs)
     {
         typedef typename util::deferred_call_result_of<
             typename util::decay<F>::type(Ts...)
         >::type result_type;
 
+        BOOST_SCOPED_ENUM(launch) policy = pol;
         if (policy == launch::sync) {
             return detail::call_sync(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...),
@@ -124,12 +129,15 @@ namespace hpx
         return p.get_future();
     }
 
-    template <typename F, typename ...Ts>
+    template <typename Executor, typename F, typename ...Ts>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_deferred_callable<F(Ts...)>::value
+        boost::enable_if_c<
+            traits::is_threads_executor<Executor>::value
+          , traits::detail::is_deferred_callable<F(Ts...)>
+        >::type::value
       , detail::create_future<F(Ts...)>
     >::type
-    async(threads::executor& sched, F&& f, Ts&&... vs)
+    async(Executor& sched, F&& f, Ts&&... vs)
     {
         typedef typename util::deferred_call_result_of<
             typename util::decay<F>::type(Ts...)
@@ -144,7 +152,7 @@ namespace hpx
     template <typename Executor, typename F, typename ...Ts>
     typename boost::lazy_enable_if_c<
         boost::enable_if_c<
-            traits::is_executor<typename util::decay<Executor>::type>::value
+            traits::is_executor<Executor>::value
           , traits::detail::is_deferred_callable<F(Ts...)>
         >::type::value
       , detail::create_future<F(Ts...)>
@@ -159,6 +167,8 @@ namespace hpx
     typename boost::lazy_enable_if_c<
         boost::enable_if_c<
             !traits::is_executor<typename util::decay<F>::type>::value
+         && !traits::is_threads_executor<typename util::decay<F>::type>::value
+         && !traits::is_launch_policy<typename util::decay<F>::type>::value
          && !traits::is_action<typename util::decay<F>::type>::value
          && !traits::is_bound_action<typename util::decay<F>::type>::value
           , traits::detail::is_deferred_callable<F(Ts...)>
