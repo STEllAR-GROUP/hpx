@@ -8,6 +8,7 @@ set(tests
     any_serialization
     boost_any
     bind_action
+    configuration
     function
     parse_slurm_nodelist
     stencil3_iterator
