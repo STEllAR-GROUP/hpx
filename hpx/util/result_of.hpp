@@ -1,4 +1,4 @@
-//  Copyright (c) 2013-2014 Agustin Berge
+//  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,110 +7,188 @@
 #define HPX_UTIL_RESULT_OF_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_callable.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
-#include <hpx/util/detail/qualify_as.hpp>
+#include <hpx/util/always_void.hpp>
 
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/identity.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/or.hpp>
 #include <boost/ref.hpp>
-#include <boost/type_traits/is_function.hpp>
-#include <boost/type_traits/is_member_function_pointer.hpp>
-#include <boost/type_traits/is_member_object_pointer.hpp>
-#include <boost/type_traits/is_pointer.hpp>
-#include <boost/type_traits/remove_pointer.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/utility/result_of.hpp>
+
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace util
 {
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename Q = int, typename Enable = void>
-        struct get_member_pointer_object
-        {
-            typedef
-                typename detail::qualify_as<
-                    typename get_member_pointer_object<T>::type
-                  , typename boost::mpl::if_<
-                        boost::is_pointer<typename util::decay<Q>::type>
-                      , typename boost::remove_pointer<
-                            typename util::decay<Q>::type>::type&
-                      , Q
-                    >::type
-                >::type
-                type;
-        };
-
-        template <typename T, typename Q>
-        struct get_member_pointer_object<T, Q
-          , typename boost::enable_if<
-                boost::is_reference_wrapper<typename util::decay<Q>::type> >::type
-        > : get_member_pointer_object<T
-              , typename util::decay_unwrap<Q>::type&>
+        // f(t0, t1, ..., tN)
+#if HPX_HAS_CXX14_LIB_RESULT_OF_SFINAE
+        template <typename T>
+        struct result_of_function_object
+          : std::result_of<T>
         {};
-
-        template <typename T, typename C>
-        struct get_member_pointer_object<T C::*>
+#else
+        namespace result_of_function_object_impl
         {
-            typedef T type;
-        };
+            struct fallback
+            {
+                template <typename T>
+                fallback(T const&){}
+            };
+
+            template <typename ...Ts>
+            fallback invoke(fallback, Ts&&...);
+
+            template <typename F, typename ...Ts>
+            decltype(std::declval<F>()(std::declval<Ts>()...))
+            invoke(F&&, Ts&&...);
+
+            template <typename T>
+            struct result_of_invoke;
+
+            template <typename F, typename ...Ts>
+            struct result_of_invoke<F(Ts...)>
+            {
+                typedef decltype(result_of_function_object_impl::invoke(
+                    std::declval<F>(), std::declval<Ts>()...)) type;
+            };
+
+            template <typename T, typename R = typename result_of_invoke<T>::type>
+            struct result_of_function_object
+            {
+                typedef R type;
+            };
+
+            template <typename T>
+            struct result_of_function_object<T, fallback>
+            {};
+        }
+        using result_of_function_object_impl::result_of_function_object;
+#endif
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename FD, typename F, typename Enable = void>
-        struct result_of_impl
-          : boost::result_of<F>
+        // t0.*f
+        template <typename T>
+        struct result_of_member_object_pointer
         {};
 
-        template <typename FD, typename F, typename ...Ts>
-        struct result_of_impl<FD, F(Ts...)
-          , typename boost::enable_if<boost::is_reference_wrapper<FD> >::type
-        > : boost::result_of<typename boost::unwrap_reference<FD>::type&(Ts...)>
+        template <typename MP, typename T0>
+        struct result_of_member_object_pointer<MP(T0)>
+        {
+            typedef decltype(std::declval<T0>().*std::declval<MP>()) type;
+        };
+
+        // (t0.*f)(t1, ..., tN)
+        template <typename T>
+        struct result_of_member_pointer_impl
+          : result_of_member_object_pointer<T>
         {};
 
-        /* workaround for tricking result_of into using decltype */
-        template <typename FD, typename F, typename ...Ts>
-        struct result_of_impl<FD, F(Ts...)
-          , typename boost::enable_if<
-                boost::mpl::or_<
-                    boost::is_function<typename boost::remove_pointer<FD>::type>
-                  , boost::is_member_function_pointer<FD>
-                >
+        template <typename R, typename C, typename ...Ps, typename ...Ts>
+        struct result_of_member_pointer_impl<R (C::*(Ts...))(Ps...)>
+          : result_of_function_object<R (*(Ts...))(C&, Ps...)>
+        {};
+
+        template <typename R, typename C, typename ...Ps, typename ...Ts>
+        struct result_of_member_pointer_impl<R (C::*(Ts...))(Ps...) const>
+          : result_of_function_object<R (*(Ts...))(C const&, Ps...)>
+        {};
+
+        namespace has_dereference_impl
+        {
+            struct fallback
+            {
+                template <typename T>
+                fallback(T const&){}
+            };
+
+            fallback operator*(fallback);
+
+            template <typename T>
+            struct has_dereference
+            {
+                static bool const value =
+                    !std::is_same<decltype(*std::declval<T>()), fallback>::value;
+            };
+        }
+        using has_dereference_impl::has_dereference;
+
+        template <typename C, typename T, typename Enable = void>
+        struct result_of_member_pointer
+        {};
+
+        // t0.*f, (t0.*f)(t1, ..., tN)
+        template <typename C, typename F, typename T0, typename ...Ts>
+        struct result_of_member_pointer<C, F(T0, Ts...),
+            typename std::enable_if<
+                std::is_base_of<C, typename std::decay<T0>::type>::value
             >::type
-        > : boost::result_of<FD(Ts...)>
+        > : result_of_member_pointer_impl<F(T0, Ts...)>
         {};
 
-        template <typename FD, typename F, typename Class>
-        struct result_of_impl<FD, F(Class)
-          , typename boost::enable_if<boost::is_member_object_pointer<FD> >::type
-        > : detail::get_member_pointer_object<FD, Class>
+        // (*t0).*f, ((*t0).*f)(t1, ..., tN)
+        template <typename C, typename F, typename T0, typename ...Ts>
+        struct result_of_member_pointer<C, F(T0, Ts...),
+            typename std::enable_if<
+                std::enable_if<
+                    !std::is_base_of<C, typename std::decay<T0>::type>::value
+                  , has_dereference<T0>
+                >::type::value
+            >::type
+        > : result_of_member_pointer_impl<F(decltype(*std::declval<T0>()), Ts...)>
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename FD, typename T>
+        struct result_of_impl
+          : result_of_function_object<T>
+        {};
+
+        template <typename M, typename C, typename F, typename ...Ts>
+        struct result_of_impl<M C::*, F(Ts...)>
+          : result_of_member_pointer<C, M C::*(Ts...)>
+        {};
+
+        template <typename R, typename C, typename ...Ps, typename F, typename ...Ts>
+        struct result_of_impl<R (C::*)(Ps...), F(Ts...)>
+          : result_of_member_pointer<C, R (C::*(Ts...))(Ps...)>
+        {};
+
+        template <typename R, typename C, typename ...Ps, typename F, typename ...Ts>
+        struct result_of_impl<R (C::*)(Ps...) const, F(Ts...)>
+          : result_of_member_pointer<C, R (C::*(Ts...))(Ps...) const>
+        {};
+
+        // support boost::[c]ref, which is not callable as std::[c]ref
+        template <typename X, typename F, typename ...Ts>
+        struct result_of_impl< ::boost::reference_wrapper<X>, F(Ts...)>
+          : result_of_impl<X, X&(Ts...)>
         {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F>
+    template <typename T>
     struct result_of;
 
     template <typename F, typename ...Ts>
     struct result_of<F(Ts...)>
-      : detail::result_of_impl<typename hpx::util::decay<F>::type, F(Ts...)>
+      : detail::result_of_impl<typename std::decay<F>::type, F(Ts...)>
     {};
 
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename Fallback>
+        template <typename T, typename Fallback, typename Enable = void>
         struct result_of_or
-          : boost::mpl::eval_if_c<
-                traits::is_callable<T>::value
-              , hpx::util::result_of<T>
-              , boost::mpl::identity<Fallback>
-            >
-        {};
+        {
+            typedef Fallback type;
+        };
+
+        template <typename T, typename Fallback>
+        struct result_of_or<T, Fallback,
+            typename always_void<typename result_of<T>::type>::type
+        >
+        {
+            typedef typename result_of<T>::type type;
+        };
     }
 }}
 
