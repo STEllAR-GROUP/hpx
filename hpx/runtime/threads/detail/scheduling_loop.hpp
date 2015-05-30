@@ -21,6 +21,11 @@
 
 namespace hpx { namespace threads { namespace detail
 {
+    inline bool is_running_state(hpx::state state)
+    {
+        return state == state_running || state == state_suspended;
+    }
+
     ///////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
@@ -32,9 +37,10 @@ namespace hpx { namespace threads { namespace detail
     inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
         boost::atomic<hpx::state>& global_state, boost::mpl::true_)
     {
-        scheduler.periodic_maintenance(global_state == state_running);
+        bool running = is_running_state(global_state.load());
+        scheduler.periodic_maintenance(running);
 
-        if (global_state.load() == state_running)
+        if (running)
         {
             // create timer firing in correspondence with given time
             typedef boost::asio::basic_deadline_timer<
@@ -64,8 +70,7 @@ namespace hpx { namespace threads { namespace detail
     inline void start_periodic_maintenance(SchedulingPolicy& scheduler,
         boost::atomic<hpx::state>& global_state, boost::mpl::true_)
     {
-        scheduler.periodic_maintenance(global_state == state_running);
-
+        scheduler.periodic_maintenance(is_running_state(global_state.load()));
 
         // create timer firing in correspondence with given time
         typedef boost::asio::basic_deadline_timer<
@@ -274,8 +279,9 @@ namespace hpx { namespace threads { namespace detail
         while (true) {
             // Get the next HPX thread from the queue
             thread_data_base* thrd = NULL;
+
             if (scheduler.SchedulingPolicy::get_next_thread(num_thread,
-                    global_state == state_running, idle_loop_count, thrd))
+                    is_running_state(global_state.load()), idle_loop_count, thrd))
             {
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
@@ -354,7 +360,7 @@ namespace hpx { namespace threads { namespace detail
                     if (state_val == pending) {
                         // schedule other work
                         scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                            global_state == state_running, idle_loop_count);
+                            is_running_state(global_state.load()), idle_loop_count);
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
@@ -396,7 +402,7 @@ namespace hpx { namespace threads { namespace detail
                 ++idle_loop_count;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                        global_state == state_running, idle_loop_count))
+                        is_running_state(global_state.load()), idle_loop_count))
                 {
                     break;
                 }

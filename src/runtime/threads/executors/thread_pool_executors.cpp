@@ -78,6 +78,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 "max_punit shouldn't be smaller than min_punit");
             return;
         }
+        if (max_punits > hpx::get_os_thread_count())
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "thread_pool_executor<Scheduler>::thread_pool_executor",
+                "max_punit shouldn't be larger than number of available "
+                "OS-threads");
+            return;
+        }
 
         states_.resize(max_punits);
         for (std::size_t i = 0; i != max_punits; ++i)
@@ -106,7 +114,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         // if we're still starting up, give this executor a chance of executing
         // its tasks
-        if (starting_up(states_))
+        while (starting_up(states_))
             this_thread::suspend();
 
         // Inform the resource manager that this executor is about to be
@@ -266,10 +274,25 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         lcos::local::counting_semaphore& shutdown_sem_;
     };
 
-    void suspend_back_into_calling_context()
+    template <typename Scheduler>
+    void thread_pool_executor<Scheduler>::suspend_back_into_calling_context(
+        std::size_t virt_core)
     {
-        // give invoking context a chance to catch up with its tasks
-        this_thread::suspend();
+        // give invoking context a chance to catch up with its tasks, but only
+        // if this scheduler is currently in running state
+        state expected = state_running;
+        if (states_[virt_core].compare_exchange_strong(expected, state_suspended))
+        {
+            this_thread::suspend();
+
+            // reset state to running if current state is still suspended
+            expected = state_suspended;
+            states_[virt_core].compare_exchange_strong(expected, state_running);
+        }
+        else
+        {
+            HPX_ASSERT(expected != state_suspended);
+        }
     }
 
     // execute all work
@@ -277,16 +300,19 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     void thread_pool_executor<Scheduler>::run(std::size_t virt_core,
         std::size_t thread_num)
     {
-        // Set the state to 'state_running' only if it's still in 'state_starting' state,
-        // otherwise our destructor is currently being executed, which means
-        // we need to still execute all threads.
+        // Set the state to 'state_running' only if it's still in 'state_starting'
+        // state, otherwise our destructor is currently being executed, which
+        // means we need to still execute all threads.
         state expected = state_starting;
         if (states_[virt_core].compare_exchange_strong(expected, state_running))
         {
             ++max_current_concurrency_;
 
-            scheduler_.add_punit(virt_core, thread_num);
-            scheduler_.on_start_thread(virt_core);
+            {
+                typename mutex_type::scoped_lock l(mtx_);
+                scheduler_.add_punit(virt_core, thread_num);
+                scheduler_.on_start_thread(virt_core);
+            }
 
             on_run_exit on_exit(current_concurrency_, shutdown_sem_);
 
@@ -295,7 +321,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             threads::detail::scheduling_loop(virt_core, scheduler_,
                 states_[virt_core], executed_threads, executed_thread_phases,
                 overall_times, thread_times, util::function_nonser<void()>(),
-                &suspend_back_into_calling_context);
+                util::bind(
+                    &thread_pool_executor::suspend_back_into_calling_context,
+                    this, virt_core));
 
 #ifdef HPX_DEBUG
             // the scheduling_loop is allowed to exit only if no more HPX
@@ -371,7 +399,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::size_t virt_core, error_code& ec)
     {
         // inform the scheduler to stop the virtual core
-        states_[virt_core].store(state_stopping);
+        state oldstate = states_[virt_core].exchange(state_stopping);
+        HPX_ASSERT(oldstate == state_running || oldstate == state_suspended);
     }
 }}}}
 
@@ -381,14 +410,14 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     local_queue_executor::local_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::local_queue_scheduler<lcos::local::spinlock> >(
+            policies::local_queue_scheduler</*lcos::local::spinlock*/> >(
                 get_os_thread_count(), 1))
     {}
 
     local_queue_executor::local_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::local_queue_scheduler<lcos::local::spinlock> >(
+            policies::local_queue_scheduler</*lcos::local::spinlock*/> >(
                 max_punits, min_punits))
     {}
 #endif
@@ -396,14 +425,14 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     local_priority_queue_executor::local_priority_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::local_priority_queue_scheduler<lcos::local::spinlock> >(
+            policies::local_priority_queue_scheduler</*lcos::local::spinlock*/> >(
                 get_os_thread_count(), 1))
     {}
 
     local_priority_queue_executor::local_priority_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::local_priority_queue_scheduler<lcos::local::spinlock> >(
+            policies::local_priority_queue_scheduler</*lcos::local::spinlock*/> >(
                 max_punits, min_punits))
     {}
 
@@ -411,14 +440,14 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     static_priority_queue_executor::static_priority_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::static_priority_queue_scheduler<lcos::local::spinlock> >(
+            policies::static_priority_queue_scheduler</*lcos::local::spinlock*/> >(
                 get_os_thread_count(), 1))
     {}
 
     static_priority_queue_executor::static_priority_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::static_priority_queue_scheduler<lcos::local::spinlock> >(
+            policies::static_priority_queue_scheduler</*lcos::local::spinlock*/> >(
                 max_punits, min_punits))
     {}
 #endif
