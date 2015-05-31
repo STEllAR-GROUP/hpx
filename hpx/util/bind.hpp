@@ -205,7 +205,7 @@ namespace hpx { namespace util
               , UnboundArgs&& unbound_args
             )
             {
-                return util::invoke_r<type>(f, bind_eval<F>(
+                return util::invoke(f, bind_eval<F>(
                     util::get<Is>(bound_args),
                     std::forward<UnboundArgs>(unbound_args))...);
             }
@@ -228,7 +228,7 @@ namespace hpx { namespace util
               , UnboundArgs&& unbound_args
             )
             {
-                return util::invoke_r<type>(f, bind_eval<F>(
+                return util::invoke(f, bind_eval<F>(
                     util::get<Is>(bound_args),
                     std::forward<UnboundArgs>(unbound_args))...);
             }
@@ -349,7 +349,7 @@ namespace hpx { namespace util
                 >::type result_type;
 
                 check_call();
-                return util::invoke_r<result_type>(_f, std::forward<Ts>(vs)...);
+                return util::invoke(_f, std::forward<Ts>(vs)...);
             }
 
         public: // exposition-only

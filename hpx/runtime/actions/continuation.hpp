@@ -197,7 +197,7 @@ namespace hpx { namespace actions
     {
         typedef typename util::result_of<F(Ts...)>::type result_type;
         try {
-            cont.trigger(util::invoke_r<result_type>(std::forward<F>(f),
+            cont.trigger(util::invoke(std::forward<F>(f),
                 std::forward<Ts>(vs)...));
         }
         catch (...) {
@@ -212,7 +212,7 @@ namespace hpx { namespace actions
     >::type trigger(continuation& cont, F&& f, Ts&&... vs)
     {
         try {
-            util::invoke_r<void>(std::forward<F>(f), std::forward<Ts>(vs)...);
+            util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...);
             cont.trigger();
         }
         catch (...) {

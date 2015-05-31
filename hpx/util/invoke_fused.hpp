@@ -10,6 +10,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
@@ -26,7 +27,7 @@ namespace hpx { namespace util
         template <std::size_t ...Is, typename F, typename Tuple>
         struct invoke_fused_result_of_impl<
             detail::pack_c<std::size_t, Is...>, F(Tuple)
-        > : invoke_result_of<
+        > : result_of<
                 F(typename detail::qualify_as<typename util::tuple_element<
                         Is, typename util::decay<Tuple>::type
                     >::type, Tuple>::type...)
@@ -94,10 +95,10 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename ...Ts>
     BOOST_FORCEINLINE
-    typename invoke_result_of<F(typename boost::add_const<Ts>::type...)>::type
+    typename result_of<F(typename boost::add_const<Ts>::type...)>::type
     invoke_fused(F && f, util::tuple<Ts...> const& args)
     {
-        typedef typename invoke_result_of<
+        typedef typename result_of<
             F(typename boost::add_const<Ts>::type...)
         >::type result_type;
 
@@ -108,10 +109,10 @@ namespace hpx { namespace util
 
     template <typename F, typename ...Ts>
     BOOST_FORCEINLINE
-    typename invoke_result_of<F(Ts...)>::type
+    typename result_of<F(Ts...)>::type
     invoke_fused(F && f, util::tuple<Ts...>&& args) //-V659
     {
-        typedef typename invoke_result_of<F(Ts...)>::type result_type;
+        typedef typename result_of<F(Ts...)>::type result_type;
 
         return detail::invoke_fused_impl<result_type>(
             typename detail::make_index_pack<sizeof...(Ts)>::type(),
