@@ -135,15 +135,15 @@ namespace hpx { namespace util
             >::type
         >
         {
-            typedef typename util::invoke_fused_result_of<
+            typedef typename util::detail::fused_result_of<
                 T&(UnboundArgs)
             >::type type;
 
             static BOOST_FORCEINLINE
             type call(T& t, UnboundArgs&& unbound_args)
             {
-                return util::invoke_fused_r<type>
-                    (t, std::forward<UnboundArgs>(unbound_args));
+                return util::invoke_fused(
+                    t, std::forward<UnboundArgs>(unbound_args));
             }
         };
 

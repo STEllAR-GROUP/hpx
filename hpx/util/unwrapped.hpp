@@ -229,7 +229,7 @@ namespace hpx { namespace util
         struct unwrapped_impl_result<
             F, T, TD,
             typename boost::enable_if<traits::is_future<TD> >::type
-        > : util::invoke_fused_result_of<
+        > : util::detail::fused_result_of<
                 F(typename unwrap_impl<util::tuple<TD> >::type)
             >
         {};
@@ -240,10 +240,10 @@ namespace hpx { namespace util
             typename boost::enable_if<traits::is_future_range<TD> >::type
         > : boost::mpl::if_<
                 typename unwrap_impl<TD>::is_void
-              , util::invoke_fused_result_of<
+              , util::detail::fused_result_of<
                     F(util::tuple<>)
                 >
-              , util::invoke_fused_result_of<
+              , util::detail::fused_result_of<
                     F(util::tuple<typename unwrap_impl<TD>::type>)
                 >
             >::type
@@ -253,7 +253,7 @@ namespace hpx { namespace util
         struct unwrapped_impl_result<
             F, T, TD,
             typename boost::enable_if<traits::is_future_tuple<TD> >::type
-        > : util::invoke_fused_result_of<
+        > : util::detail::fused_result_of<
                 F(typename unwrap_impl<TD>::type)
             >
         {};
@@ -307,7 +307,7 @@ namespace hpx { namespace util
             {
                 typedef typename result<unwrapped_impl()>::type result_type;
 
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     util::make_tuple());
             }
 
@@ -335,7 +335,7 @@ namespace hpx { namespace util
                     unwrap_impl<util::tuple<typename decay<T0>::type> >
                     unwrap_impl_t;
 
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     unwrap_impl_t::call(util::forward_as_tuple(t0)));
             }
 
@@ -353,7 +353,7 @@ namespace hpx { namespace util
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
 
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     util::forward_as_tuple(unwrap_impl_t::call(t0)));
             }
 
@@ -371,7 +371,7 @@ namespace hpx { namespace util
                     unwrap_impl_t;
 
                 unwrap_impl_t::call(t0);
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     util::forward_as_tuple());
             }
 
@@ -388,7 +388,7 @@ namespace hpx { namespace util
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
 
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     unwrap_impl_t::call(t0));
             }
 
@@ -405,7 +405,7 @@ namespace hpx { namespace util
                         typename util::decay<Ts>::type...> >
                     unwrap_impl_t;
 
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     unwrap_impl_t::call(util::forward_as_tuple(
                         std::forward<Ts>(vs)...)));
             }

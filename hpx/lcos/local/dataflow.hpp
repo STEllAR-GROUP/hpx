@@ -81,13 +81,13 @@ namespace hpx { namespace lcos { namespace local
         template <typename Policy, typename Func, typename Futures>
         struct dataflow_frame //-V690
           : hpx::lcos::detail::future_data<
-                typename hpx::util::invoke_fused_result_of<
+                typename hpx::util::detail::fused_result_of<
                     Func(Futures &&)
                 >::type
             >
         {
             typedef
-                typename hpx::util::invoke_fused_result_of<
+                typename hpx::util::detail::fused_result_of<
                     Func(Futures &&)
                 >::type
                 result_type;
@@ -130,7 +130,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 try {
                     result_type res =
-                        hpx::util::invoke_fused_r<result_type>(
+                        hpx::util::invoke_fused(
                             func_, std::move(futures_));
 
                     // reset futures
@@ -147,7 +147,7 @@ namespace hpx { namespace lcos { namespace local
             void execute(boost::mpl::true_)
             {
                 try {
-                    hpx::util::invoke_fused_r<result_type>(
+                    hpx::util::invoke_fused(
                         func_, std::move(futures_));
 
                     // reset futures
