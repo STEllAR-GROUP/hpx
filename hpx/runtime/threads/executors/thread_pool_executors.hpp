@@ -108,7 +108,7 @@ namespace hpx { namespace threads { namespace executors
             // resource manager registration
             std::size_t cookie_;
 
-            // store the self reference to the HPX running this scheduler
+            // store the self reference to the HPX thread running this scheduler
             std::vector<threads::thread_self*> self_;
 
             // protect scheduler initialization
