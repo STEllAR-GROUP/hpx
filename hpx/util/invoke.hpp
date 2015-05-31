@@ -137,7 +137,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename F, typename ...Ts>
-    inline R invoke_r(F&& f, Ts&&... vs)
+    inline R invoke(F&& f, Ts&&... vs)
     {
         return detail::invoke_guard<R>()(
             std::forward<F>(f), std::forward<Ts>(vs)...);

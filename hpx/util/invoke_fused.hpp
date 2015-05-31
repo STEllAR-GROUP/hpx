@@ -103,7 +103,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename F, typename Tuple>
-    inline R invoke_fused_r(F&& f, Tuple&& t)
+    inline R invoke_fused(F&& f, Tuple&& t)
     {
         return detail::invoke_fused_guard<R>()(
             std::forward<F>(f), std::forward<Tuple>(t));
@@ -129,7 +129,7 @@ namespace hpx { namespace util
             template <typename F, typename Tuple>
             R operator()(F&& f, Tuple&& args)
             {
-                return util::invoke_fused_r<R>(
+                return util::invoke_fused<R>(
                     std::forward<F>(f),
                     std::forward<Tuple>(args));
             }
