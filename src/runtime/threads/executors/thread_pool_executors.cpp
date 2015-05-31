@@ -346,8 +346,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             on_run_exit on_exit(current_concurrency_, shutdown_sem_,
                 self_[virt_core]);
 
+            // FIXME: turn these values into performance counters
             boost::int64_t executed_threads = 0, executed_thread_phases = 0;
             boost::uint64_t overall_times = 0, thread_times = 0;
+
             threads::detail::scheduling_loop(virt_core, scheduler_,
                 states_[virt_core], executed_threads, executed_thread_phases,
                 overall_times, thread_times, util::function_nonser<void()>(),
@@ -355,12 +357,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                     &thread_pool_executor::suspend_back_into_calling_context,
                     this, virt_core));
 
-#ifdef HPX_DEBUG
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist
             HPX_ASSERT(!scheduler_.get_thread_count(
-                unknown, thread_priority_default, thread_num));
-#endif
+                unknown, thread_priority_default, virt_core) ||
+                states_[virt_core] == state_terminating);
         }
     }
 
