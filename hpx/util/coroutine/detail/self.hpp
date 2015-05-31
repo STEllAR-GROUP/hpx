@@ -122,6 +122,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       HPX_ASSERT(m_pimpl);
 
       this->m_pimpl->bind_result(&arg0);
+
       {
         reset_self_on_exit on_exit(this);
         this->m_pimpl->yield();
