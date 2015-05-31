@@ -280,8 +280,8 @@ namespace hpx { namespace threads { namespace detail
             // Get the next HPX thread from the queue
             thread_data_base* thrd = NULL;
 
-            if (scheduler.SchedulingPolicy::get_next_thread(num_thread,
-                    is_running_state(global_state.load()), idle_loop_count, thrd))
+            if (scheduler.SchedulingPolicy::get_next_thread(
+                    num_thread, idle_loop_count, thrd))
             {
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
@@ -404,6 +404,7 @@ namespace hpx { namespace threads { namespace detail
                 if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
                         is_running_state(global_state.load()), idle_loop_count))
                 {
+                    // clean up terminated threads one more time before existing
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
                         break;
                 }
