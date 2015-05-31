@@ -269,7 +269,7 @@ namespace hpx { namespace util { namespace coroutines
       HPX_ASSERT(m_pimpl);
       HPX_ASSERT(m_pimpl->is_ready());
 
-      result_type* ptr;
+      result_type* ptr = 0;
       m_pimpl->bind_args(&arg0);
       m_pimpl->bind_result_pointer(&ptr);
 

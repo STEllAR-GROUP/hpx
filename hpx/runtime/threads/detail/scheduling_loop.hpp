@@ -404,7 +404,8 @@ namespace hpx { namespace threads { namespace detail
                 if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
                         is_running_state(global_state.load()), idle_loop_count))
                 {
-                    break;
+                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                        break;
                 }
 
                 // do background work in parcel layer and in agas

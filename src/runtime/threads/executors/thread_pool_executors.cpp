@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,8 +15,13 @@
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/util/register_locks.hpp>
-#include <hpx/lcos/local/barrier.hpp>
+
+namespace hpx { namespace threads { namespace detail
+{
+    // The function \a set_self_ptr sets a pointer to the (OS thread
+    // specific) self reference to the current HPX thread.
+    void set_self_ptr(threads::thread_self*);
+}}}
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
@@ -69,7 +74,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         states_(max_punits),
         current_concurrency_(0), max_current_concurrency_(0),
         tasks_scheduled_(0), tasks_completed_(0),
-        max_punits_(max_punits), min_punits_(min_punits), cookie_(0)
+        max_punits_(max_punits), min_punits_(min_punits), cookie_(0),
+        self_(max_punits)
     {
         if (max_punits < min_punits)
         {
@@ -254,24 +260,16 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct on_run_exit
+    struct on_self_reset
     {
-        on_run_exit(boost::atomic<std::size_t>& current_concurrency,
-                lcos::local::counting_semaphore& shutdown_sem)
-          : current_concurrency_(current_concurrency),
-            shutdown_sem_(shutdown_sem)
+        on_self_reset(threads::thread_self* self)
         {
-            ++current_concurrency_;
+            threads::detail::set_self_ptr(self);
         }
-
-        ~on_run_exit()
+        ~on_self_reset()
         {
-            --current_concurrency_;
-            shutdown_sem_.signal();
+            threads::detail::set_self_ptr(0);
         }
-
-        boost::atomic<std::size_t>& current_concurrency_;
-        lcos::local::counting_semaphore& shutdown_sem_;
     };
 
     template <typename Scheduler>
@@ -283,7 +281,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         state expected = state_running;
         if (states_[virt_core].compare_exchange_strong(expected, state_suspended))
         {
-            this_thread::suspend();
+            {
+                on_self_reset on_exit(self_[virt_core]);
+                this_thread::suspend();
+            }
 
             // reset state to running if current state is still suspended
             expected = state_suspended;
@@ -294,6 +295,32 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             HPX_ASSERT(expected != state_suspended);
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct on_run_exit
+    {
+        on_run_exit(boost::atomic<std::size_t>& current_concurrency,
+                lcos::local::counting_semaphore& shutdown_sem,
+                threads::thread_self* self)
+          : current_concurrency_(current_concurrency),
+            shutdown_sem_(shutdown_sem),
+            self_(self)
+        {
+            threads::detail::set_self_ptr(0);
+            ++current_concurrency_;
+        }
+
+        ~on_run_exit()
+        {
+            --current_concurrency_;
+            threads::detail::set_self_ptr(self_);
+            shutdown_sem_.signal();
+        }
+
+        boost::atomic<std::size_t>& current_concurrency_;
+        lcos::local::counting_semaphore& shutdown_sem_;
+        threads::thread_self* self_;
+    };
 
     // execute all work
     template <typename Scheduler>
@@ -314,7 +341,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 scheduler_.on_start_thread(virt_core);
             }
 
-            on_run_exit on_exit(current_concurrency_, shutdown_sem_);
+            self_[virt_core] = threads::get_self_ptr();
+
+            on_run_exit on_exit(current_concurrency_, shutdown_sem_,
+                self_[virt_core]);
 
             boost::int64_t executed_threads = 0, executed_thread_phases = 0;
             boost::uint64_t overall_times = 0, thread_times = 0;
@@ -410,14 +440,14 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     local_queue_executor::local_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::local_queue_scheduler</*lcos::local::spinlock*/> >(
+            policies::local_queue_scheduler<> >(
                 get_os_thread_count(), 1))
     {}
 
     local_queue_executor::local_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::local_queue_scheduler</*lcos::local::spinlock*/> >(
+            policies::local_queue_scheduler<> >(
                 max_punits, min_punits))
     {}
 #endif
@@ -425,14 +455,14 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     local_priority_queue_executor::local_priority_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::local_priority_queue_scheduler</*lcos::local::spinlock*/> >(
+            policies::local_priority_queue_scheduler<> >(
                 get_os_thread_count(), 1))
     {}
 
     local_priority_queue_executor::local_priority_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::local_priority_queue_scheduler</*lcos::local::spinlock*/> >(
+            policies::local_priority_queue_scheduler<> >(
                 max_punits, min_punits))
     {}
 
@@ -440,14 +470,14 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     static_priority_queue_executor::static_priority_queue_executor()
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::static_priority_queue_scheduler</*lcos::local::spinlock*/> >(
+            policies::static_priority_queue_scheduler<> >(
                 get_os_thread_count(), 1))
     {}
 
     static_priority_queue_executor::static_priority_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
       : scheduled_executor(new detail::thread_pool_executor<
-            policies::static_priority_queue_scheduler</*lcos::local::spinlock*/> >(
+            policies::static_priority_queue_scheduler<> >(
                 max_punits, min_punits))
     {}
 #endif

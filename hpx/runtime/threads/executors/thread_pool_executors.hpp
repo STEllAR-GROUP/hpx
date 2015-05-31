@@ -108,6 +108,9 @@ namespace hpx { namespace threads { namespace executors
             // resource manager registration
             std::size_t cookie_;
 
+            // store the self reference to the HPX running this scheduler
+            std::vector<threads::thread_self*> self_;
+
             // protect scheduler initialization
             typedef lcos::local::spinlock mutex_type;
             mutex_type mtx_;

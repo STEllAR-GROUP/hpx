@@ -166,6 +166,14 @@ namespace hpx { namespace threads
         return thread_self::impl_type::get_self();
     }
 
+    namespace detail
+    {
+        void set_self_ptr(thread_self* self)
+        {
+            thread_self::impl_type::set_self(self);
+        }
+    }
+
     thread_self::impl_type* get_ctx_ptr()
     {
         return hpx::util::coroutines::detail::coroutine_accessor::get_impl(get_self());
