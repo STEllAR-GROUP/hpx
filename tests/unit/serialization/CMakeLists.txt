@@ -13,6 +13,7 @@ set(tests
     serialization_vector
     serialization_variant
     serialize_buffer
+    size_gatherer_container
     zero_copy_serialization
 )
 

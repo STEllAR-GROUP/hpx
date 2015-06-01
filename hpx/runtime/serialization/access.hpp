@@ -38,12 +38,14 @@ namespace hpx { namespace serialization
                 // both following template functions are viable
                 // to call right overloaded function according to T constness
                 // and to prevent calling templated version of serialize function
-                static void call(hpx::serialization::input_archive& ar, T& t, unsigned)
+                static void call(hpx::serialization::input_archive& ar, T& t,
+                    unsigned)
                 {
                     t.serialize(ar, 0);
                 }
 
-                static void call(hpx::serialization::output_archive& ar, const T& t, unsigned)
+                static void call(hpx::serialization::output_archive& ar,
+                    const T& t, unsigned)
                 {
                     t.serialize(ar, 0);
                 }
@@ -97,8 +99,6 @@ namespace hpx { namespace serialization
                                     boost::mpl::identity<empty>,
                                     boost::mpl::identity<usual>
                             >
-                                
-
                     >
             >::type type;
         };
@@ -132,7 +132,6 @@ namespace hpx { namespace serialization
             return t->hpx_serialization_get_name();
         }
     };
-
 }}
 
 #endif
