@@ -15,18 +15,42 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/detail/pack.hpp>
 
-#include <boost/mpl/bool.hpp>
+#include <boost/type_traits/integral_constant.hpp>
 #include <boost/ref.hpp>
-#include <boost/type_traits/remove_const.hpp>
-#include <boost/utility/enable_if.hpp>
+
+#include <functional>
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace util
 {
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <std::size_t I>
+        struct placeholder
+        {
+            static std::size_t const value = I;
+        };
+    }
+
+    namespace placeholders
+    {
+        BOOST_STATIC_CONSTEXPR detail::placeholder<1> _1 = {};
+        BOOST_STATIC_CONSTEXPR detail::placeholder<2> _2 = {};
+        BOOST_STATIC_CONSTEXPR detail::placeholder<3> _3 = {};
+        BOOST_STATIC_CONSTEXPR detail::placeholder<4> _4 = {};
+        BOOST_STATIC_CONSTEXPR detail::placeholder<5> _5 = {};
+        BOOST_STATIC_CONSTEXPR detail::placeholder<6> _6 = {};
+        BOOST_STATIC_CONSTEXPR detail::placeholder<7> _7 = {};
+        BOOST_STATIC_CONSTEXPR detail::placeholder<8> _8 = {};
+        BOOST_STATIC_CONSTEXPR detail::placeholder<9> _9 = {};
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -39,9 +63,9 @@ namespace hpx { namespace util
         {
             typedef T& type;
 
-            template <typename UnboundArgs>
+            template <typename Us>
             static BOOST_FORCEINLINE
-            type call(T& t, UnboundArgs&& /*unbound_args*/)
+            type call(T& t, Us&& /*unbound*/)
             {
                 return t;
             }
@@ -52,184 +76,207 @@ namespace hpx { namespace util
         {
             typedef T&& type;
 
-            template <typename UnboundArgs>
+            template <typename Us>
             static BOOST_FORCEINLINE
-            type call(T& t, UnboundArgs&& /*unbound_args*/)
+            type call(T& t, Us&& /*unbound*/)
             {
                 return std::move(t);
             }
         };
 
-        template <
-            typename F
-          , typename T, typename UnboundArgs
-          , typename Enable = void
-        >
+        template <typename F, typename T, typename Us, typename Enable = void>
         struct bind_eval_impl
           : bind_eval_bound_impl<F, T>
         {};
 
-        template <typename F, typename T, typename UnboundArgs>
-        struct bind_eval_impl<
-            F, T, UnboundArgs
-          , typename boost::enable_if_c<
-                traits::is_placeholder<
-                    typename boost::remove_const<T>::type
-                >::value != 0
-             && (traits::is_placeholder<
-                    typename boost::remove_const<T>::type
-                >::value <= util::tuple_size<UnboundArgs>::value)
+        template <typename F, typename T, typename Us>
+        struct bind_eval_impl<F, T, Us,
+            typename std::enable_if<
+                (traits::is_placeholder<
+                    typename std::decay<T>::type
+                >::value != 0 && traits::is_placeholder<
+                    typename std::decay<T>::type
+                >::value <= util::tuple_size<Us>::value)
             >::type
         >
         {
             static const std::size_t index =
-                traits::is_placeholder<
-                    typename boost::remove_const<T>::type
-                >::value - 1;
+                traits::is_placeholder<typename std::decay<T>::type>::value - 1;
 
             typedef typename util::tuple_element<
-                index, typename util::decay<UnboundArgs>::type
+                index, typename util::decay<Us>::type
             >::type&& type;
 
             static BOOST_FORCEINLINE
-            type call(T /*t*/, UnboundArgs&& unbound_args)
+            type call(T /*t*/, Us&& unbound)
             {
-                return util::get<index>(std::forward<UnboundArgs>(unbound_args));
+                return util::get<index>(std::forward<Us>(unbound));
             }
         };
 
-        template <typename F, typename T, typename UnboundArgs>
-        struct bind_eval_impl<
-            F, T, UnboundArgs
-          , typename boost::enable_if_c<
-                traits::is_bind_expression<
-                    typename boost::remove_const<T>::type
-                >::value
+        template <typename F, typename T, typename Us>
+        struct bind_eval_impl<F, T, Us,
+            typename std::enable_if<
+                traits::is_bind_expression<typename std::decay<T>::type>::value
             >::type
         >
         {
             typedef typename util::detail::fused_result_of<
-                T&(UnboundArgs&&)
+                T&(Us&&)
             >::type type;
 
             static BOOST_FORCEINLINE
-            type call(T& t, UnboundArgs&& unbound_args)
+            type call(T& t, Us&& unbound)
             {
                 return util::invoke_fused(
-                    t, std::forward<UnboundArgs>(unbound_args));
+                    t, std::forward<Us>(unbound));
             }
         };
 
-        template <typename F, typename T, typename UnboundArgs>
-        struct bind_eval_impl<
-            F, T, UnboundArgs
-          , typename boost::enable_if_c<
-                boost::is_reference_wrapper<
-                    typename boost::remove_const<T>::type
-                >::value
+        template <typename F, typename T, typename Us>
+        struct bind_eval_impl<F, T, Us,
+            typename std::enable_if<
+                boost::is_reference_wrapper<typename std::decay<T>::type>::value
             >::type
         >
         {
-            typedef typename boost::unwrap_reference<T>::type& type;
+            typedef typename boost::unwrap_reference<
+                typename std::decay<T>::type
+            >::type& type;
 
             static BOOST_FORCEINLINE
-            type call(T& t, UnboundArgs&& /*unbound_args*/)
+            type call(T& t, Us&& /*unbound*/)
             {
                 return t.get();
             }
         };
 
-        template <typename F, typename T, typename UnboundArgs>
+        template <typename F, typename T, typename Us>
         BOOST_FORCEINLINE
-        typename bind_eval_impl<F, T, UnboundArgs>::type
-        bind_eval(T& t, UnboundArgs&& unbound_args)
+        typename bind_eval_impl<F, T, Us>::type
+        bind_eval(T& t, Us&& unbound)
         {
-            return bind_eval_impl<F, T, UnboundArgs>::call(
-                    t, std::forward<UnboundArgs>(unbound_args));
+            return bind_eval_impl<F, T, Us>::call(
+                    t, std::forward<Us>(unbound));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename BoundArgs, typename UnboundArgs>
+        template <typename F, typename Ts, typename Us>
         struct bound_result_of;
 
-        template <typename F, typename ...Ts, typename UnboundArgs>
+        template <typename F, typename ...Ts, typename Us>
         struct bound_result_of<
-            F, util::tuple<Ts...>, UnboundArgs
+            F, util::tuple<Ts...>, Us
         > : util::result_of<
-                F(typename bind_eval_impl<F, Ts, UnboundArgs>::type&&...)
+                F(typename bind_eval_impl<F, Ts, Us>::type&&...)
             >
         {};
 
-        template <typename F, typename ...Ts, typename UnboundArgs>
+        template <typename F, typename ...Ts, typename Us>
         struct bound_result_of<
-            F, util::tuple<Ts...> const, UnboundArgs
+            F, util::tuple<Ts...> const, Us
         > : util::result_of<
-                F(typename bind_eval_impl<F, Ts const, UnboundArgs>::type&&...)
+                F(typename bind_eval_impl<F, Ts const, Us>::type&&...)
             >
         {};
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename BoundArgs, typename UnboundArgs>
-        struct bind_invoke_impl
-        {};
-
-        template <typename F, typename ...Ts, typename UnboundArgs>
-        struct bind_invoke_impl<
-            F, util::tuple<Ts...>, UnboundArgs
-        >
+        template <typename F, typename Ts, typename Us, std::size_t ...Is>
+        typename bound_result_of<F, Ts, Us>::type
+        bound_impl(F& f, Ts& bound, Us&& unbound,
+            pack_c<std::size_t, Is...>)
         {
-            template <std::size_t ...Is>
-            static BOOST_FORCEINLINE
-            typename bound_result_of<F, util::tuple<Ts...>, UnboundArgs>::type
-            call(
-                detail::pack_c<std::size_t, Is...>
-              , F& f, util::tuple<Ts...>& bound_args
-              , UnboundArgs&& unbound_args
-            )
-            {
-                return util::invoke(f, bind_eval<F>(
-                    util::get<Is>(bound_args),
-                    std::forward<UnboundArgs>(unbound_args))...);
-            }
-        };
-
-        template <typename F, typename ...Ts, typename UnboundArgs>
-        struct bind_invoke_impl<
-            F, util::tuple<Ts...> const, UnboundArgs
-        >
-        {
-            template <std::size_t ...Is>
-            static BOOST_FORCEINLINE
-            typename bound_result_of<F, util::tuple<Ts...> const, UnboundArgs>::type
-            call(
-                detail::pack_c<std::size_t, Is...>
-              , F& f, util::tuple<Ts...> const& bound_args
-              , UnboundArgs&& unbound_args
-            )
-            {
-                return util::invoke(f, bind_eval<F>(
-                    util::get<Is>(bound_args),
-                    std::forward<UnboundArgs>(unbound_args))...);
-            }
-        };
-
-        template <typename F, typename BoundArgs, typename UnboundArgs>
-        BOOST_FORCEINLINE
-        typename bound_result_of<F, BoundArgs, UnboundArgs>::type
-        bind_invoke(
-            F& f, BoundArgs& bound_args
-          , UnboundArgs&& unbound_args
-        )
-        {
-            return bind_invoke_impl<F, BoundArgs, UnboundArgs>::call(
-                typename detail::make_index_pack<
-                    util::tuple_size<BoundArgs>::value
-                >::type()
-              , f, bound_args
-              , std::forward<UnboundArgs>(unbound_args));
+            return util::invoke(f, detail::bind_eval<F>(
+                util::get<Is>(bound), std::forward<Us>(unbound))...);
         }
 
-        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        class bound;
+
+        template <typename F, typename ...Ts>
+        class bound<F(Ts...)>
+        {
+        public:
+            bound() {} // needed for serialization
+
+            explicit bound(F&& f, Ts&&... vs)
+              : _f(std::forward<F>(f))
+              , _args(std::forward<Ts>(vs)...)
+            {}
+
+#if defined(HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
+            bound(bound const&) = default;
+            bound(bound&&) = default;
+#else
+            bound(bound const& other)
+              : _f(other._f)
+              , _args(other._args)
+            {}
+
+            bound(bound&& other)
+              : _f(std::move(other._f))
+              , _args(std::move(other._args))
+            {}
+#endif
+
+#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
+            bound& operator=(bound const&) = delete;
+            bound& operator=(bound&&) = delete;
+#endif
+
+            template <typename ...Us>
+            inline typename bound_result_of<
+                typename std::decay<F>::type,
+                util::tuple<typename std::decay<Ts>::type...>,
+                util::tuple<Us&&...>
+            >::type operator()(Us&&... vs)
+            {
+                return detail::bound_impl(_f, _args,
+                    util::forward_as_tuple(std::forward<Us>(vs)...),
+                    typename detail::make_index_pack<sizeof...(Ts)>::type());
+            }
+
+            template <typename ...Us>
+            inline typename bound_result_of<
+                typename std::decay<F>::type,
+                util::tuple<typename std::decay<Ts>::type const...>,
+                util::tuple<Us&&...>
+            >::type operator()(Us&&... vs) const
+            {
+                return detail::bound_impl(_f, _args,
+                    util::forward_as_tuple(std::forward<Us>(vs)...),
+                    typename detail::make_index_pack<sizeof...(Ts)>::type());
+            }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned int const /*version*/)
+            {
+                ar & _f;
+                ar & _args;
+            }
+
+        private:
+        public: // because serialize_as_future
+            typename std::decay<F>::type _f;
+            util::tuple<typename std::decay<Ts>::type...> _args;
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename ...Ts>
+    inline typename std::enable_if<
+        !traits::is_action<typename util::decay<F>::type>::value
+      , detail::bound<F(Ts&&...)>
+    >::type
+    bind(F&& f, Ts&&... vs)
+    {
+        return detail::bound<F(Ts&&...)>(
+            std::forward<F>(f), std::forward<Ts>(vs)...);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
         template <typename F>
         class one_shot_wrapper //-V690
         {
@@ -249,10 +296,6 @@ namespace hpx { namespace util
               , _called(false)
             {}
 
-            one_shot_wrapper(one_shot_wrapper const& other)
-              : _f(other._f)
-              , _called(other._called)
-            {}
             one_shot_wrapper(one_shot_wrapper&& other)
               : _f(std::move(other._f))
               , _called(other._called)
@@ -278,9 +321,6 @@ namespace hpx { namespace util
               : _f(std::move(f))
             {}
 
-            one_shot_wrapper(one_shot_wrapper const& other)
-              : _f(other._f)
-            {}
             one_shot_wrapper(one_shot_wrapper&& other)
               : _f(std::move(other._f))
             {}
@@ -290,12 +330,11 @@ namespace hpx { namespace util
 #           endif
 
             template <typename ...Ts>
-            BOOST_FORCEINLINE
-            typename util::result_of<F&(Ts&&...)>::type
+            inline typename util::result_of<F&&(Ts&&...)>::type
             operator()(Ts&&... vs)
             {
                 check_call();
-                return util::invoke(_f, std::forward<Ts>(vs)...);
+                return util::invoke(std::move(_f), std::forward<Ts>(vs)...);
             }
 
             template <typename Archive>
@@ -310,110 +349,10 @@ namespace hpx { namespace util
             bool _called;
 #           endif
         };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename BoundArgs>
-        class bound //-V690
-        {
-        public:
-            // default constructor is needed for serialization
-            bound()
-            {}
-
-            template <typename F_, typename BoundArgs_>
-            explicit bound(F_&& f, BoundArgs_&& bound_args)
-              : _f(std::forward<F_>(f))
-              , _bound_args(std::forward<BoundArgs_>(bound_args))
-            {}
-
-            bound(bound const& other)
-              : _f(other._f)
-              , _bound_args(other._bound_args)
-            {}
-            bound(bound&& other)
-              : _f(std::move(other._f))
-              , _bound_args(std::move(other._bound_args))
-            {}
-
-            template <typename ...Us>
-            BOOST_FORCEINLINE
-            typename bound_result_of<
-                F, BoundArgs, util::tuple<Us&&...>
-            >::type operator()(Us&&... us)
-            {
-                return detail::bind_invoke(_f, _bound_args,
-                    util::forward_as_tuple(std::forward<Us>(us)...));
-            }
-
-            template <typename ...Us>
-            BOOST_FORCEINLINE
-            typename bound_result_of<
-                F const, BoundArgs const, util::tuple<Us&&...>
-            >::type operator()(Us&&... us) const
-            {
-                return detail::bind_invoke(_f, _bound_args,
-                    util::forward_as_tuple(std::forward<Us>(us)...));
-            }
-
-            template <typename Archive>
-            void serialize(Archive& ar, unsigned int const /*version*/)
-            {
-                ar & _f;
-                ar & _bound_args;
-            }
-
-        public: // exposition-only
-            F _f;
-            BoundArgs _bound_args;
-        };
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <std::size_t I>
-        struct placeholder
-        {
-            static std::size_t const value = I;
-        };
-    }
-
-    namespace placeholders
-    {
-        detail::placeholder<1> const _1 = {};
-        detail::placeholder<2> const _2 = {};
-        detail::placeholder<3> const _3 = {};
-        detail::placeholder<4> const _4 = {};
-        detail::placeholder<5> const _5 = {};
-        detail::placeholder<6> const _6 = {};
-        detail::placeholder<7> const _7 = {};
-        detail::placeholder<8> const _8 = {};
-        detail::placeholder<9> const _9 = {};
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename ...Ts>
-    typename boost::disable_if_c<
-        traits::is_action<typename util::decay<F>::type>::value
-      , detail::bound<
-            typename util::decay<F>::type
-          , util::tuple<typename util::decay<Ts>::type...>
-        >
-    >::type
-    bind(F&& f, Ts&&... vs)
-    {
-        typedef detail::bound<
-            typename util::decay<F>::type,
-            util::tuple<typename util::decay<Ts>::type...>
-        > result_type;
-
-        return result_type(std::forward<F>(f),
-            util::forward_as_tuple(std::forward<Ts>(vs)...));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    detail::one_shot_wrapper<typename util::decay<F>::type>
+    inline detail::one_shot_wrapper<typename util::decay<F>::type>
     one_shot(F&& f)
     {
         typedef
@@ -428,8 +367,8 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename BoundArgs>
-    struct is_bind_expression<util::detail::bound<F, BoundArgs> >
+    template <typename T>
+    struct is_bind_expression<util::detail::bound<T> >
       : boost::true_type
     {};
 
@@ -444,10 +383,10 @@ namespace hpx { namespace traits
 namespace hpx { namespace serialization
 {
     // serialization of the bound object
-    template <typename Archive, typename F, typename BoundArgs>
+    template <typename Archive, typename T>
     void serialize(
         Archive& ar
-      , ::hpx::util::detail::bound<F, BoundArgs>& bound
+      , ::hpx::util::detail::bound<T>& bound
       , unsigned int const version = 0)
     {
         bound.serialize(ar, version);

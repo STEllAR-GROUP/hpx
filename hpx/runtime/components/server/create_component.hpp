@@ -114,11 +114,7 @@ namespace hpx { namespace components { namespace server
         util::detail::bound<
             util::detail::one_shot_wrapper<
                 util::functional::placement_new<typename Component::derived_type>
-            >,
-            util::tuple<
-                util::detail::placeholder<1>,
-                typename util::decay<Ts>::type...
-            >
+            >(util::detail::placeholder<1> const&, Ts&&...)
         > construct_function(Ts&&... vs)
         {
             typedef typename Component::derived_type type;
