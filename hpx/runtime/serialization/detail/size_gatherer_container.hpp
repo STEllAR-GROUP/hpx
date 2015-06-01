@@ -29,7 +29,7 @@ namespace hpx { namespace serialization { namespace detail
     template <>
     struct access_data<size_gatherer_container>
     {
-        static bool is_saving() { return true; }
+        static bool is_saving() { return false; }
 
         static void
         write(size_gatherer_container& cont, std::size_t count,
