@@ -64,33 +64,35 @@ namespace hpx { namespace util
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        // t0.*f
         template <typename T>
-        struct result_of_member_object_pointer
-        {};
+        struct result_of_member_pointer_impl;
 
-        template <typename MP, typename T0>
-        struct result_of_member_object_pointer<MP(T0)>
+        // t0.*f
+        template <typename R, typename C>
+        struct result_of_member_pointer_impl<R C::*>
         {
-            typedef decltype(std::declval<T0>().*std::declval<MP>()) type;
+            R& operator()(C&);
+            R const& operator()(C const&);
+            R&& operator()(C&&);
+            R const&& operator()(C const&&);
         };
 
         // (t0.*f)(t1, ..., tN)
-        template <typename T>
-        struct result_of_member_pointer_impl
-          : result_of_member_object_pointer<T>
-        {};
+        template <typename R, typename C, typename ...Ps>
+        struct result_of_member_pointer_impl<R (C::*)(Ps...)>
+        {
+            R operator()(C&, Ps...);
+            R operator()(C&&, Ps...);
+        };
 
-        template <typename R, typename C, typename ...Ps, typename ...Ts>
-        struct result_of_member_pointer_impl<R (C::*(Ts...))(Ps...)>
-          : result_of_function_object<R (*(Ts...))(C&, Ps...)>
-        {};
+        template <typename R, typename C, typename ...Ps>
+        struct result_of_member_pointer_impl<R (C::*)(Ps...) const>
+        {
+            R operator()(C const&, Ps...);
+            R operator()(C const&&, Ps...);
+        };
 
-        template <typename R, typename C, typename ...Ps, typename ...Ts>
-        struct result_of_member_pointer_impl<R (C::*(Ts...))(Ps...) const>
-          : result_of_function_object<R (*(Ts...))(C const&, Ps...)>
-        {};
-
+        ///////////////////////////////////////////////////////////////////////
         namespace has_dereference_impl
         {
             struct fallback
@@ -120,7 +122,10 @@ namespace hpx { namespace util
             typename std::enable_if<
                 std::is_base_of<C, typename std::decay<T0>::type>::value
             >::type
-        > : result_of_member_pointer_impl<F(T0, Ts...)>
+        > : result_of_function_object<
+                result_of_member_pointer_impl<typename std::decay<F>::type>(
+                    T0, Ts...)
+            >
         {};
 
         // (*t0).*f, ((*t0).*f)(t1, ..., tN)
@@ -132,7 +137,10 @@ namespace hpx { namespace util
                   , has_dereference<T0>
                 >::type::value
             >::type
-        > : result_of_member_pointer_impl<F(decltype(*std::declval<T0>()), Ts...)>
+        > : result_of_function_object<
+                result_of_member_pointer_impl<typename std::decay<F>::type>(
+                    decltype(*std::declval<T0>()), Ts...)
+            >
         {};
 
         ///////////////////////////////////////////////////////////////////////
