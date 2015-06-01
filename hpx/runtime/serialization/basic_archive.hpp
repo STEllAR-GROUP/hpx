@@ -99,6 +99,14 @@ namespace hpx { namespace serialization
             return flags_;
         }
 
+        // Archives can be used to do 'fake' serialization, in which case no
+        // data is being stored/restored and no side effects should be
+        // performed during serialization/de-serialization.
+        bool is_saving() const
+        {
+            return false;
+        }
+
         boost::uint32_t flags_;
         std::size_t size_;
     };

@@ -641,6 +641,17 @@ namespace hpx { namespace util
             ini_config += "hpx.logging.agas.level=5";
         }
 
+        if (vm.count("hpx:debug-parcel-log")) {
+            ini_config += "hpx.logging.console.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.console.parcel.level=5";
+            ini_config += "hpx.logging.parcel.level=5";
+        }
+
         // Set number of cores and OS threads in configuration.
         ini_config += "hpx.os_threads=" +
             boost::lexical_cast<std::string>(num_threads_);

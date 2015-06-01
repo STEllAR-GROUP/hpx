@@ -87,7 +87,7 @@ namespace hpx { namespace parcelset
         // Give up if we're shutting down.
         if (threads::threadmanager_is(state_stopping))
         {
-            LPT_(debug) << "parcel_sink: dropping late parcel";
+//             LPT_(debug) << "parcel_sink: dropping late parcel";
             return;
         }
 
