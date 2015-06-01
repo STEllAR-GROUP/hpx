@@ -38,11 +38,21 @@ namespace hpx { namespace util
             template <typename F, typename T0>
             inline typename std::enable_if<
                 std::is_base_of<C, typename std::decay<T0>::type>::value,
+                typename util::result_of<F&&(T0&)>::type
+            >::type
+            operator()(F f, T0& v0)
+            {
+                return (v0.*f);
+            }
+
+            template <typename F, typename T0>
+            inline typename std::enable_if<
+                std::is_base_of<C, typename std::decay<T0>::type>::value,
                 typename util::result_of<F&&(T0&&)>::type
             >::type
             operator()(F f, T0&& v0)
             {
-                return (std::forward<T0>(v0).*f);
+                return std::move(v0.*f);
             }
 
             // (*t0).*f
@@ -53,7 +63,7 @@ namespace hpx { namespace util
             >::type
             operator()(F f, T0&& v0)
             {
-                return ((*std::forward<T0>(v0)).*f);
+                return (*this)(f, *std::forward<T0>(v0));
             }
         };
 
@@ -79,7 +89,7 @@ namespace hpx { namespace util
             >::type
             operator()(F f, T0&& v0, Ts&&... vs)
             {
-                return ((*std::forward<T0>(v0)).*f)(std::forward<Ts>(vs)...);
+                return (*this)(f, *std::forward<T0>(v0), std::forward<Ts>(vs)...);
             }
         };
 
