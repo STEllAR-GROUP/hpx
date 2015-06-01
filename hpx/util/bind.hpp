@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2012 Thomas Heller
-//  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,7 +7,7 @@
 #ifndef HPX_UTIL_BIND_HPP
 #define HPX_UTIL_BIND_HPP
 
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_callable.hpp>
@@ -348,6 +348,12 @@ namespace hpx { namespace util
                 return util::invoke(_f, std::forward<Ts>(vs)...);
             }
 
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned int const /*version*/)
+            {
+                ar & _f;
+            }
+
         public: // exposition-only
             F _f;
 #           if !defined(HPX_DISABLE_ASSERTS)
@@ -408,6 +414,13 @@ namespace hpx { namespace util
             {
                 return detail::bind_invoke(_f, _bound_args,
                     util::forward_as_tuple(std::forward<Us>(us)...));
+            }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned int const /*version*/)
+            {
+                ar & _f;
+                ar & _bound_args;
             }
 
         public: // exposition-only
@@ -492,60 +505,30 @@ namespace hpx { namespace traits
 namespace hpx { namespace serialization
 {
     // serialization of the bound object
-    template <typename F, typename BoundArgs>
+    template <typename Archive, typename F, typename BoundArgs>
     void serialize(
-        ::hpx::serialization::input_archive& ar
+        Archive& ar
       , ::hpx::util::detail::bound<F, BoundArgs>& bound
-      , unsigned int const /*version*/)
+      , unsigned int const version = 0)
     {
-        ar >> bound._f;
-        ar >> bound._bound_args;
+        bound.serialize(ar, version);
     }
 
-    template <typename F, typename BoundArgs>
+    template <typename Archive, typename F>
     void serialize(
-        ::hpx::serialization::output_archive& ar
-      , ::hpx::util::detail::bound<F, BoundArgs>& bound
-      , unsigned int const /*version*/)
-    {
-        ar << bound._f;
-        ar << bound._bound_args;
-    }
-
-    // serialization of the bound object
-    template <typename F>
-    void serialize(
-        ::hpx::serialization::input_archive& ar
+        Archive& ar
       , ::hpx::util::detail::one_shot_wrapper<F>& one_shot_wrapper
-      , unsigned int const /*version*/)
+      , unsigned int const version = 0)
     {
-        ar >> one_shot_wrapper._f;
-        ar >> one_shot_wrapper._called;
-    }
-
-    template <typename F>
-    void serialize(
-        ::hpx::serialization::output_archive& ar
-      , ::hpx::util::detail::one_shot_wrapper<F>& one_shot_wrapper
-      , unsigned int const /*version*/)
-    {
-        ar << one_shot_wrapper._f;
-        ar << one_shot_wrapper._called;
+        one_shot_wrapper.serialize(ar, version);
     }
 
     // serialization of placeholders is trivial, just provide empty functions
-    template <std::size_t I>
+    template <typename Archive, std::size_t I>
     void serialize(
-        ::hpx::serialization::input_archive& ar
-      , ::hpx::util::detail::placeholder<I>& bound
-      , unsigned int const /*version*/)
-    {}
-
-    template <std::size_t I>
-    void serialize(
-        ::hpx::serialization::output_archive& ar
-      , ::hpx::util::detail::placeholder<I>& bound
-      , unsigned int const /*version*/)
+        Archive& ar
+      , ::hpx::util::detail::placeholder<I>& /*placeholder*/
+      , unsigned int const /*version*/ = 0)
     {}
 }}
 
