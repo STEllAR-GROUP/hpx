@@ -77,26 +77,16 @@ int test_function4(data_buffer<double> const& b)
 HPX_PLAIN_ACTION(test_function4, test_action4)
 
 ///////////////////////////////////////////////////////////////////////////////
-std::size_t
-get_size_type(hpx::parcelset::parcel const& outp, int out_archive_flags)
-{
-    // gather the required size for the archive
-    hpx::serialization::detail::size_gatherer_container gather_size;
-    hpx::serialization::output_archive archive(gather_size, out_archive_flags);
-    archive << outp;
-    return gather_size.size();
-}
-
 void test_parcel_serialization(hpx::parcelset::parcel outp,
     int out_archive_flags, bool zero_copy)
 {
     // serialize data
-    std::size_t arg_size = get_size_type(outp, out_archive_flags);
+    std::size_t arg_size = hpx::traits::get_type_size(outp, out_archive_flags);
     std::vector<char> out_buffer;
     std::vector<hpx::serialization::serialization_chunk> out_chunks;
     boost::uint32_t dest_locality_id = outp.get_destination_locality_id();
 
-    out_buffer.reserve(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
+    out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
     {
         // create an output archive and serialize the parcel

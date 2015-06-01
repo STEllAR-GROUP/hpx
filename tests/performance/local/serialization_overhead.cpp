@@ -23,16 +23,6 @@ int test_function(hpx::serialization::serialize_buffer<double> const& b)
 HPX_PLAIN_ACTION(test_function, test_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-std::size_t
-get_size_type(hpx::parcelset::parcel const& outp, int out_archive_flags)
-{
-    // gather the required size for the archive
-    hpx::serialization::detail::size_gatherer_container gather_size;
-    hpx::serialization::output_archive archive(gather_size, out_archive_flags);
-    archive << outp;
-    return gather_size.size();
-}
-
 double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     bool continuation, bool zerocopy)
 {
@@ -110,10 +100,10 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        std::size_t arg_size = get_size_type(outp, out_archive_flags);
+        std::size_t arg_size = hpx::traits::get_type_size(outp, out_archive_flags);
         std::vector<char> out_buffer;
 
-        out_buffer.reserve(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
+        out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
         {
             // create an output archive and serialize the parcel

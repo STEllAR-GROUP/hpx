@@ -19,30 +19,8 @@
 
 namespace hpx { namespace serialization
 {
-    namespace detail
-    {
-        template <typename Container>
-        struct access_data
-        {
-            static void write(Container& cont, std::size_t count,
-                std::size_t current, void const* address)
-            {
-                if (count == 1)
-                    cont[current] = *static_cast<unsigned char const*>(address);
-                else
-                    std::memcpy(&cont[current], address, count);
-            }
-
-            static bool flush(binary_filter* filter, Container& cont,
-                std::size_t current, std::size_t size, std::size_t written)
-            {
-                return filter->flush(&cont[current], size, written);
-            }
-        };
-    }
-
     template <typename Container>
-    struct output_container : erased_output_container
+    struct output_container: erased_output_container
     {
     private:
         std::size_t get_chunk_size(std::size_t chunk) const
@@ -79,11 +57,8 @@ namespace hpx { namespace serialization
         {
             if (chunks_)
             {
-                // reuse chunks, if possible
-                if (chunks->empty())
-                    chunks_->push_back(create_index_chunk(0, 0));
-                else
-                    (*chunks_)[0] = create_index_chunk(0, 0);
+                chunks_->clear();
+                chunks_->push_back(create_index_chunk(0, 0));
                 current_chunk_ = 0;
             }
         }
@@ -98,8 +73,8 @@ namespace hpx { namespace serialization
                 current_ = start_compressing_at_;
 
                 do {
-                    bool flushed = detail::access_data<Container>::flush(
-                        filter_, cont_, current_, cont_.size()-current_, written);
+                    bool flushed = filter_->flush(&cont_[current_],
+                        cont_.size()-current_, written);
 
                     current_ += written;
                     if (flushed)
@@ -157,28 +132,19 @@ namespace hpx { namespace serialization
                         if (get_chunk_type(current_chunk_) == chunk_type_pointer ||
                             get_chunk_size(current_chunk_) != 0)
                         {
-                            // add a new serialization_chunk, reuse chunks,
-                            // if possible
-                            // the chunk size will be set at the end
-                            if (chunks_->size() <= current_chunk_ + 1)
-                            {
-                                chunks_->push_back(
-                                    create_index_chunk(current_, 0));
-                                ++current_chunk_;
-                            }
-                            else
-                            {
-                                (*chunks_)[++current_chunk_] =
-                                    create_index_chunk(current_, 0);
-                            }
+                            // add a new serialization_chunk
+                            chunks_->push_back(create_index_chunk(current_, 0));
+                            ++current_chunk_;
                         }
                     }
 
                     if (cont_.size() < current_ + count)
                         cont_.resize(cont_.size() + count);
 
-                    detail::access_data<Container>::write(
-                        cont_, count, current_, address);
+                    if (count == 1)
+                        cont_[current_] = *static_cast<unsigned char const*>(address);
+                    else
+                        std::memcpy(&cont_[current_], address, count);
                 }
                 current_ += count;
             }
@@ -205,18 +171,9 @@ namespace hpx { namespace serialization
                         current_ - get_chunk_data(current_chunk_).index_);
                 }
 
-                // add a new serialization_chunk referring to the external
-                // buffer, reuse chunks, if possible
-                if (chunks_->size() <= current_chunk_ + 1)
-                {
-                    chunks_->push_back(create_pointer_chunk(address, count));
-                    ++current_chunk_;
-                }
-                else
-                {
-                    (*chunks_)[++current_chunk_] =
-                        create_pointer_chunk(address, count);
-                }
+                // add a new serialization_chunk referring to the external buffer
+                chunks_->push_back(create_pointer_chunk(address, count));
+                ++current_chunk_;
             }
         }
 
