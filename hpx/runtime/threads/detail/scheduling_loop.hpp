@@ -276,6 +276,9 @@ namespace hpx { namespace threads { namespace detail
         typedef typename SchedulingPolicy::has_periodic_maintenance pred;
         detail::start_periodic_maintenance(scheduler, global_state, pred());
 
+        // spin for some time after queues have become empty
+        bool may_exit = false;
+
         while (true) {
             // Get the next HPX thread from the queue
             thread_data_base* thrd = NULL;
@@ -287,6 +290,7 @@ namespace hpx { namespace threads { namespace detail
 
                 idle_loop_count = 0;
                 ++busy_loop_count;
+                may_exit = false;
 
                 // Only pending HPX threads will be executed.
                 // Any non-pending HPX threads are leftovers from a set_state()
@@ -406,7 +410,12 @@ namespace hpx { namespace threads { namespace detail
                 {
                     // clean up terminated threads one more time before existing
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
-                        break;
+                    {
+                        // keep idling for some time
+                        if (!may_exit)
+                            idle_loop_count = 0;
+                        may_exit = true;
+                    }
                 }
 
                 // do background work in parcel layer and in agas
@@ -448,7 +457,18 @@ namespace hpx { namespace threads { namespace detail
 
                 // clean up terminated threads
                 idle_loop_count = 0;
-                scheduler.SchedulingPolicy::cleanup_terminated(true);
+
+                // break if we were idling after 'may_exit'
+                if (may_exit)
+                {
+                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                        break;
+                    may_exit = false;
+                }
+                else
+                {
+                    scheduler.SchedulingPolicy::cleanup_terminated(true);
+                }
             }
         }
     }
