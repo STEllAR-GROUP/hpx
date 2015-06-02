@@ -67,10 +67,20 @@ bool test_get_ptr2(hpx::id_type id)
     hpx::future<boost::shared_ptr<test_server> > f =
         hpx::get_ptr<test_server>(t.get_gid());
 
+    f.wait();
+    bool has_exception = f.has_exception();
+
     hpx::error_code ec;
     boost::shared_ptr<test_server> ptr = f.get(ec);
-    if (ec) return false;
 
+    // Intel 13 has trouble to generate correct code for if(ec) { ... }
+    if (ec || !ptr.get())
+    {
+        HPX_TEST(has_exception);
+        return false;
+    }
+
+    HPX_TEST(!has_exception);
     HPX_TEST_EQ(reinterpret_cast<test_server*>(t.check_ptr()), ptr.get());
     return true;
 }
