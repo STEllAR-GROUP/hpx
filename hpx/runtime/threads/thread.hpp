@@ -9,6 +9,7 @@
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/thread/locks.hpp>
@@ -102,9 +103,9 @@ namespace hpx
         {
             id_ = threads::invalid_thread_id;
         }
-        void start_thread(util::function_nonser<void()> && func);
+        void start_thread(util::unique_function_nonser<void()> && func);
         static threads::thread_state_enum thread_function_nullary(
-            util::function_nonser<void()> const& func);
+            util::unique_function_nonser<void()> const& func);
 
         mutable mutex_type mtx_;
         threads::thread_id_type id_;
