@@ -11,6 +11,7 @@ endif()
 
 add_hpx_executable(inspect
   AUTOGLOB
+  NOHPX_INIT
   FOLDER "Tools/Inspect")
 
 if(NOT MSVC)

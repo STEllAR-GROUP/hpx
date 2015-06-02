@@ -42,7 +42,7 @@ namespace hpx { namespace serialization
 
             struct intrusive_polymorphic
             {
-                static Pointer call(input_archive& ar, Pointer& ptr)
+                static Pointer call(input_archive& ar)
                 {
                     std::string name;
                     ar >> name;
@@ -58,18 +58,16 @@ namespace hpx { namespace serialization
 
             struct nonintrusive_polymorphic
             {
-                static Pointer call(input_archive& ar, Pointer& ptr)
+                static Pointer call(input_archive& ar)
                 {
-                    Pointer t (
-                        polymorphic_nonintrusive_factory::instance().load<referred_type>(ar)
-                    );
-                    return t;
+                    return Pointer(polymorphic_nonintrusive_factory::
+                        instance().load<referred_type>(ar));
                 }
             };
 
             struct usual
             {
-                static Pointer call(input_archive& ar, Pointer& ptr)
+                static Pointer call(input_archive& ar)
                 {
                     Pointer t(new referred_type);
                     ar >> *t;
@@ -153,7 +151,7 @@ namespace hpx { namespace serialization
                     pos = 0;
                     ar >> pos;
                     Pointer temp = detail::pointer_input_dispatcher<
-                        Pointer>::type::call(ar, ptr);
+                        Pointer>::type::call(ar);
                     register_pointer(ar, pos, ptr_helper_ptr(
                             new detail::erase_ptr_helper<Pointer>(std::move(temp), ptr)));
                 }
@@ -184,7 +182,7 @@ namespace hpx { namespace serialization
             ar >> valid;
             if(valid)
             {
-                ptr = detail::pointer_input_dispatcher<Pointer>::type::call(ar, ptr);
+                ptr = detail::pointer_input_dispatcher<Pointer>::type::call(ar);
             }
         }
 

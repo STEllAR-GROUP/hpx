@@ -40,7 +40,6 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         hpx::get_config_entry("hpx.parcel.endian_out", "little");
 #endif
 
-    unsigned int in_archive_flags = 0U;
     unsigned int out_archive_flags = 0U;
     if (endian_out == "little")
         out_archive_flags |= hpx::serialization::endian_little;
@@ -55,9 +54,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     if (boost::lexical_cast<int>(array_optimization) == 0)
     {
-        in_archive_flags |= hpx::serialization::disable_array_optimization;
         out_archive_flags |= hpx::serialization::disable_array_optimization;
-        in_archive_flags |= hpx::serialization::disable_data_chunking;
         out_archive_flags |= hpx::serialization::disable_data_chunking;
     }
     else
@@ -66,7 +63,6 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
             hpx::get_config_entry("hpx.parcel.zero_copy_optimization", "1");
         if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
         {
-            in_archive_flags |= hpx::serialization::disable_data_chunking;
             out_archive_flags |= hpx::serialization::disable_data_chunking;
         }
     }
@@ -122,7 +118,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         {
             // create an input archive and deserialize the parcel
             hpx::serialization::input_archive archive(
-                out_buffer, in_archive_flags, arg_size, chunks);
+                out_buffer, arg_size, chunks);
 
             archive >> inp;
         }
@@ -158,7 +154,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         overall_time += timings[i].get();
 
     if (print_header)
-        hpx::cout << "datasize,testcount,average_time[ns]\n" << hpx::flush;
+        hpx::cout << "datasize,testcount,average_time[s]\n" << hpx::flush;
 
     hpx::cout << (boost::format("%d,%d,%f\n") %
         data_size % iterations % (overall_time / concurrency)) << hpx::flush;

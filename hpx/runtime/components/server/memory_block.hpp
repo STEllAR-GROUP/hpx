@@ -14,7 +14,7 @@
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
-#include <hpx/runtime/serialization/raw_ptr.hpp>
+#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
@@ -287,7 +287,7 @@ namespace hpx { namespace components
             HPX_ASSERT(act);
 
             ar << size; //-V128
-            ar << hpx::serialization::raw_ptr(act);
+            ar << hpx::serialization::detail::raw_ptr(act);
 
             HPX_ASSERT(act->save());
             if (config) {
@@ -319,7 +319,7 @@ namespace hpx { namespace components
             actions::manage_object_action_base* act = 0;
 
             ar >> size; //-V128
-            ar >> hpx::serialization::raw_ptr(act);
+            ar >> hpx::serialization::detail::raw_ptr(act);
 
             typedef server::detail::memory_block_header alloc_type;
             alloc_type* p =

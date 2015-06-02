@@ -409,6 +409,12 @@ namespace hpx { namespace util
                 if (0 == name.find("lib"))
                     name = name.substr(3);
 #endif
+#if defined(__APPLE__) // shared library version is added berfore extension
+                const std::string version = hpx::full_version_as_string();
+                std::string::size_type i = name.find(version);
+                if (i != std::string::npos)
+                    name.erase(i - 1, version.length() + 1); // - 1 for one more dot
+#endif
                 // ensure base directory, remove symlinks, etc.
                 boost::system::error_code fsec;
                 fs::path canonical_curr = util::canonical_path(curr, fsec);

@@ -38,7 +38,7 @@ namespace hpx { namespace traits
     // new executor framework
     template <typename Executor, typename Enable>
     struct is_executor
-      : parallel::is_executor<Executor>
+      : parallel::v3::is_executor<Executor>
     {};
 }}
 

@@ -21,6 +21,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 
+#include <boost/preprocessor/cat.hpp>
+
 #include <iostream>
 #include <tuple>
 #include <vector>

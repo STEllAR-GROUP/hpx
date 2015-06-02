@@ -506,6 +506,7 @@ namespace hpx { namespace parcelset
         /// Store message handlers for actions
         mutex_type handlers_mtx_;
         message_handler_map handlers_;
+        bool const load_message_handlers_;
 
         /// Count number of (outbound) parcels routed
         boost::atomic<boost::int64_t> count_routed_;

@@ -13,6 +13,7 @@ set(tests
     thread_mf
     thread_stacksize
     thread_suspension_executor
+    thread_yield
    )
 
 if(HPX_HAVE_THREAD_LOCAL_STORAGE)

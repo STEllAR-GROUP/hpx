@@ -145,7 +145,7 @@ namespace hpx { namespace util
             std::size_t num_localities)
         {
             std::size_t batch_localities = env.retrieve_number_of_localities();
-            if (num_localities == 1)
+            if (num_localities == 1 && batch_localities != std::size_t(-1))
             {
                 std::size_t cfg_num_localities = cfgmap.get_value<std::size_t>(
                     "hpx.localities", batch_localities);

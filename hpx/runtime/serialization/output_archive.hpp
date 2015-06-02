@@ -10,7 +10,7 @@
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
-#include <hpx/runtime/serialization/raw_ptr.hpp>
+#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 
 #include <boost/mpl/or.hpp>
 #include <boost/type_traits/is_integral.hpp>
@@ -22,7 +22,7 @@
 
 namespace hpx { namespace serialization
 {
-    struct HPX_ALWAYS_EXPORT output_archive
+    struct HPX_EXPORT output_archive
       : basic_archive<output_archive>
     {
         typedef basic_archive<output_archive> base_type;
@@ -38,12 +38,23 @@ namespace hpx { namespace serialization
             , buffer_(new output_container<Container>(buffer, chunks, filter))
             , dest_locality_id_(dest_locality_id)
         {
+            // endianness needs to be saves separately as it is needed to
+            // properly interpret the flags
+
+            // FIXME: make bool once integer compression is implemented
+            boost::uint64_t endianess = this->base_type::endian_big() ? ~0ul : 0ul;
+            save(endianess);
+
+            // send flags sent by the other end to make sure both ends have
+            // the same assumptions about the archive format
+            save(flags);
+
             bool has_filter = filter != 0;
             save(has_filter);
 
             if (has_filter && enable_compression())
             {
-                *this << raw_ptr(filter);
+                *this << detail::raw_ptr(filter);
                 buffer_->set_filter(filter);
             }
         }

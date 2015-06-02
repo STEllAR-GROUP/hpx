@@ -99,6 +99,48 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    1569] - Changed range for mach-o library lookup
+* [pr    1565] - Dylib support
+* [pr    1561] - Removed all occurrences of boost::move replacing it with
+                 std::move
+* [pr    1558] - Revisit async/apply SFINAE conditions
+* [pr    1556] - Executor algorithms
+* [pr    1555] - Remove the necessity to specify archive flags on the receiving
+                 end
+* [pr    1554] - Removing obsolete Boost.Serialization macros
+* [pr    1553] - Properly fix HPX_DEFINE_*_ACTION macros
+* [pr    1552] - Fixed algorithms relying on copy_if implementation
+* [pr    1551] - Pxfs - Modifying FindOrangeFS.cmake based on OrangeFS 2.9.X
+* [pr    1549] - Fixing intel14/libstdc++4.4
+* [pr    1548] - Moving raw_ptr to detail namespace
+* [pr    1546] - Executor traits result types
+* [pr    1545] - Integrate executors with dataflow
+* [pr    1543] - Fix potential zero-copy for primarynamespace::bulk_service_async
+                 et.al.
+* [pr    1542] - Merging HPX0.9.10 into pxfs branch
+* [pr    1541] - Removed stale cmake tests, unused since the great cmake
+                 refactoring
+* [pr    1540] - Fix idle-rate on platforms without TSC
+* [pr    1539] - Reporting situation if zero-copy-serialization was performed
+                 by a parcel generated from a plain apply/async
+* [pr    1538] - Changed return type of bulk executors and added test
+* [pr    1536] - Changed return type of bulk executors and added test
+* [pr    1535] - Make sure promise::get_gid() can be called more than once
+* [pr    1534] - Fixed async_callback with bound callback
+* [pr    1533] - Updated the link in the documentation to a publically-
+                 accessible URL
+* [pr    1532] - Make sure sync primitives are not copyable nor movable
+* [pr    1531] - Fix unwrapped issue with future ranges of void type
+* [pr    1530] - Serialization complex
+* [pr    1526] - Added support for boost.multi_array serialization
+* [pr    1525] - Properly handle deferred futures, fixes #1506
+* [pr    1524] - Making sure invalid action argument types generate clear error
+                 message
+* [pr    1520] - Fixing UB whil registering polymorphic classes for serialization
+* [pr    1519] - Making detail::condition_variable safe to use
+* [pr    1518] - Fix when_some bug missing indices in its result
+* [pr    1516] - Fixing Posix context
+* [pr    1515] - Fixing Posix context
 * [pr    1514] - Correct problems with loading dynamic components
 * [pr    1513] - Fixing intel glibc4 4
 * [issue 1508] - memory and papi counters do not work
