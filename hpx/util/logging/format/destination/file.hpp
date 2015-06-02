@@ -107,7 +107,7 @@ struct file_t : is_generic, non_const_context<detail::file_info>
         @param file_name name of the file
         @param set [optional] file settings - see file_settings class, and @ref dealing_with_flags
     */
-    file_t(const std::string & file_name, file_settings set = file_settings() ) 
+    file_t(const std::string & file_name, file_settings set = file_settings() )
       : non_const_context_base(file_name,set)
     {}
 

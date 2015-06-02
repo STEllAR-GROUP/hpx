@@ -373,7 +373,7 @@ namespace hpx { namespace performance_counters
     ///        HPX whenever it needs to discover all performance counter
     ///        instances of a particular type.
     typedef hpx::util::function_nonser<
-        bool(counter_info const&, discover_counter_func const&, 
+        bool(counter_info const&, discover_counter_func const&,
             discover_counters_mode, error_code&)>
         discover_counters_func;
 

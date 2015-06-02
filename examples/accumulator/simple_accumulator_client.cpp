@@ -46,7 +46,7 @@ int hpx_main()
                 boost::algorithm::is_any_of(" \t\n"),
                 boost::algorithm::token_compress_on);
 
-            if (!cmd.empty() && !cmd[0].empty()) 
+            if (!cmd.empty() && !cmd[0].empty())
             {
                 // try to interpret the entered command
                 if (cmd[0] == "reset") {
@@ -89,7 +89,7 @@ int hpx_main()
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    // We force this example to use 2 threads by default as one of the threads 
+    // We force this example to use 2 threads by default as one of the threads
     // will be sitting most of the time in the kernel waiting for user input.
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=2");

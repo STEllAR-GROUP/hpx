@@ -75,7 +75,7 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
     */
     high_precision_time_t(const hold_string_type & format) : non_const_context_base(format) {}
 
-    template<class msg_type> 
+    template<class msg_type>
     void write_high_precision_time(msg_type & msg, ::boost::posix_time::ptime val) const {
         char_type buffer[64];
 

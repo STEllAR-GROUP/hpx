@@ -61,7 +61,7 @@ namespace hpx { namespace performance_counters { namespace detail
                     return naming::invalid_gid;
                 }
 
-                hpx::util::function_nonser<boost::int64_t()> f = 
+                hpx::util::function_nonser<boost::int64_t()> f =
                     util::bind(&get_instance_count, type);
                 return create_raw_counter(info, std::move(f), ec);
             }

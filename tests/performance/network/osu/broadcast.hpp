@@ -142,7 +142,7 @@ namespace hpx { namespace lcos
                 {
                     std::size_t next_dist = (ids.size() - fan_out)/fan_out + 1;
                     iterator end
-                        = ((i == fan_out-1) || ((std::distance(ids.cbegin() + 
+                        = ((i == fan_out-1) || ((std::distance(ids.cbegin() +
                             fan_out, begin) + next_dist) >= ids.size()))
                         ? ids.cend()
                         : begin + next_dist;

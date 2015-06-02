@@ -59,8 +59,8 @@ int hpx_main()
         vector<future<int> > iteration;
         iteration.reserve(sizeX*sizeY);
 
-        hpx::cout << "Initial setup completed in " 
-                  << t.elapsed() 
+        hpx::cout << "Initial setup completed in "
+                  << t.elapsed()
                   << "s. Initializing and running futures...\n"
                   << hpx::flush;
         t.restart();
@@ -75,17 +75,17 @@ int hpx_main()
                     float x0 = (float)i * 3.5f / (float)sizeX - 2.5f;
                     float y0 = (float)j * 2.0f / (float)sizeY - 1.0f;
 
-                    iteration.push_back(async(exec, &fractal_pixel_value, 
+                    iteration.push_back(async(exec, &fractal_pixel_value,
                         x0, y0, max_iteration));
                 }
             }
 
-            // the executor's destructor will wait for all spawned tasks to 
+            // the executor's destructor will wait for all spawned tasks to
             // finish executing
         }
 
-        hpx::cout << sizeX*sizeY << " calculations run in " 
-                  << t.elapsed() 
+        hpx::cout << sizeX*sizeY << " calculations run in "
+                  << t.elapsed()
                   << "s. Transferring from futures to general memory...\n"
                   << hpx::flush;
         t.restart();
@@ -104,14 +104,14 @@ int hpx_main()
         }
     }
 
-    hpx::cout << "Transfer process completed in " 
+    hpx::cout << "Transfer process completed in "
               << t.elapsed() << "s. Writing to hard disk...\n"
               << hpx::flush;
     t.restart();
 
     SetImage.WriteToFile("out.bmp");
-    
-    hpx::cout << "Fractal image written to file \"out.bmp\" from memory in " 
+
+    hpx::cout << "Fractal image written to file \"out.bmp\" from memory in "
               << t.elapsed() << "s.\nShutting down process.\n"
               << hpx::flush;
 

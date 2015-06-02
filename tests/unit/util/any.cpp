@@ -68,8 +68,8 @@ int hpx_main(variables_map& vm)
             HPX_TEST_NEQ(any1, any3);
             HPX_TEST_NEQ(any1, any4);
 
-            std::string long_str = 
-                std::string("This is a looooooooooooooooooooooooooong string"); 
+            std::string long_str =
+                std::string("This is a looooooooooooooooooooooooooong string");
             std::string other_str = std::string("a different string");
             any1 = long_str;
             any2 = any1;
@@ -154,8 +154,8 @@ int hpx_main(variables_map& vm)
             HPX_TEST_NEQ(any1_nonser, any3_nonser);
             HPX_TEST_NEQ(any1_nonser, any4_nonser);
 
-            std::string long_str = 
-                std::string("This is a looooooooooooooooooooooooooong string"); 
+            std::string long_str =
+                std::string("This is a looooooooooooooooooooooooooong string");
             std::string other_str = std::string("a different string");
             any1_nonser = long_str;
             any2_nonser = any1_nonser;

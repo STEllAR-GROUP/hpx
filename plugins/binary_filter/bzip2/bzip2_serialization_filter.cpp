@@ -134,7 +134,7 @@ namespace hpx { namespace plugins { namespace compression
     ///////////////////////////////////////////////////////////////////////////
     void bzip2_serialization_filter::load(void* dst, std::size_t dst_count)
     {
-        if (current_+dst_count > buffer_.size()) 
+        if (current_+dst_count > buffer_.size())
         {
             HPX_THROW_EXCEPTION(serialization_error,
                     "bzip2_serialization_filter::load",

@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
-//  Copyright (c) 2012      Bryce Adelstein-Lelbach 
+//  Copyright (c) 2012      Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -37,7 +37,7 @@ int hpx_main()
         test_action do_test;
 
         future<int> f = async(do_test, hpx::find_here());
-        future<int> p = f.then(hpx::util::bind(future_callback, 
+        future<int> p = f.then(hpx::util::bind(future_callback,
             hpx::util::placeholders::_1));
 
         HPX_TEST_EQ(p.get(), 42);

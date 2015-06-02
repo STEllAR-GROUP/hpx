@@ -25,7 +25,7 @@ namespace sheneos
         dimension() : offset_(0), count_(0), size_(0) {}
         dimension(std::size_t size) : offset_(0), count_(0), size_(size) {}
 
-        std::size_t offset_;    ///< Dimension offset. 
+        std::size_t offset_;    ///< Dimension offset.
         std::size_t count_;     ///< Dimension count.
         std::size_t size_;      ///< Overall size of this dimension.
     };
