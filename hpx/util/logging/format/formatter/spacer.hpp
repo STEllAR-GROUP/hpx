@@ -161,7 +161,7 @@ namespace detail {
         typedef spacer_t<convert, original_formatter, false> type;
     };
 
-    template<class original_formatter> 
+    template<class original_formatter>
     struct find_spacer : find_spacer_generic<original_formatter, boost::is_base_of<is_generic,original_formatter>::value> {
     };
 }

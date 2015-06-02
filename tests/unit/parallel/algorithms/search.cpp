@@ -195,10 +195,10 @@ void test_search3(ExPolicy const& policy, IteratorTag)
         boost::begin(h), boost::end(h));
 
     base_iterator test_index = boost::begin(c);
- 
+
     HPX_TEST(index == iterator(test_index));
 }
- 
+
 template <typename ExPolicy, typename IteratorTag>
 void test_search3_async(ExPolicy const& p, IteratorTag)
 {
@@ -270,7 +270,7 @@ void test_search4(ExPolicy const& policy, IteratorTag)
 
     std::size_t h[] = { 1, 2 };
 
-    auto op = 
+    auto op =
         [](std::size_t a, std::size_t b)
         {
             return !(a != b);
@@ -301,11 +301,11 @@ void test_search4_async(ExPolicy const& p, IteratorTag)
 
     std::size_t h[] = { 1, 2 };
 
-    auto op = 
+    auto op =
         [](std::size_t a, std::size_t b)
         {
             return !(a != b);
-        };       
+        };
 
     hpx::future<iterator> f =
         hpx::parallel::search(p,

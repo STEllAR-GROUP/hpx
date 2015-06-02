@@ -815,7 +815,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     bool deprecated_ck = false;
     bool minmax_ck = false;
     bool unnamed_ck = false;
-	bool whitespace_ck = false;
+    bool whitespace_ck = false;
 
     desc_commandline.add_options()
         ("help,h", "print some command line help")
@@ -851,8 +851,8 @@ int cpp_main( int argc_param, char * argv_param[] )
             "check for minmax usage violations (default: off)")
         ("unnamed", value<bool>(&unnamed_ck)->implicit_value(false),
             "check for unnamed namespace usage violations (default: off)")
-		("whitespace", value<bool>(&whitespace_ck)->implicit_value(false),
-			"check for unecessary whitespace violations (default: off)")
+        ("whitespace", value<bool>(&whitespace_ck)->implicit_value(false),
+            "check for endline whitespace violations (default: off)")
 
         ("all,a", "check for all violations (default: no checks are performed)")
         ;
@@ -915,7 +915,7 @@ int cpp_main( int argc_param, char * argv_param[] )
         deprecated_ck = true;
         minmax_ck = true;
         unnamed_ck = true;
-		whitespace_ck = true;
+        whitespace_ck = true;
     }
 
     std::string output_path("-");
@@ -954,7 +954,7 @@ int cpp_main( int argc_param, char * argv_param[] )
   if ( unnamed_ck )
       inspectors.push_back( inspector_element( new boost::inspect::unnamed_namespace_check ) );
   if ( whitespace_ck )
-	  inspectors.push_back( inspector_element( new boost::inspect::whitespace_check) );
+      inspectors.push_back( inspector_element( new boost::inspect::whitespace_check) );
 
   //// perform the actual inspection, using the requested type of iteration
     for(auto const& search_root: search_roots)

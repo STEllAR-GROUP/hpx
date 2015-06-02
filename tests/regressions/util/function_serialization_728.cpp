@@ -28,7 +28,7 @@ struct functor
     }
 };
 
-int pass_functor(hpx::util::function<int()> const& f) 
+int pass_functor(hpx::util::function<int()> const& f)
 {
     return f();
 }

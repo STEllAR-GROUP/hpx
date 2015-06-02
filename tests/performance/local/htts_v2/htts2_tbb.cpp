@@ -109,7 +109,7 @@ struct tbb_driver : htts2::driver
   private:
     typedef double results_type;
 
-    results_type kernel() 
+    results_type kernel()
     {
         ///////////////////////////////////////////////////////////////////////
 
@@ -119,8 +119,8 @@ struct tbb_driver : htts2::driver
 
         {
             tbb::task_scheduler_init init(this->osthreads_);
-   
-            { 
+
+            {
                 stage_tasks_functor<BaseClock>& a =
                     *new (tbb::task::allocate_root())
                         stage_tasks_functor<BaseClock>
@@ -152,12 +152,12 @@ struct tbb_driver : htts2::driver
 
         std::cout
             << ( boost::format("%lu,%lu,%lu,%.14g\n")
-               % this->osthreads_ 
-               % this->tasks_ 
-               % this->payload_duration_ 
-               % results 
+               % this->osthreads_
+               % this->tasks_
+               % this->payload_duration_
+               % results
                )
-            ; 
+            ;
     }
 };
 

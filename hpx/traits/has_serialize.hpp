@@ -16,32 +16,32 @@
 namespace hpx { namespace traits {
 
     namespace has_serialize_detail {
-   
+
         struct helper
         {
             void serialize(...);
         };
-   
+
         template <class T>
         struct helper_composed: T, helper {};
-   
+
         template <void (helper::*) (...)>
         struct member_function_holder {};
-   
+
         template <class T, class Ambiguous =
             member_function_holder<&helper::serialize> >
         struct impl: boost::mpl::true_ {};
-   
+
         template <class T>
-        struct impl<T, 
+        struct impl<T,
             member_function_holder<&helper_composed<T>::serialize> >
         : boost::mpl::false_ {};
-   
+
     } // namespace detail
-   
+
     template <class T, class Enable = void>
     struct has_serialize: boost::mpl::false_ {};
-   
+
     template <class T>
     struct has_serialize<T,
         typename boost::enable_if<boost::is_class<T> >::type>:

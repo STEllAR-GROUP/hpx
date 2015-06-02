@@ -34,7 +34,7 @@
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/preprocessor/tuple/eat.hpp>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
 #define HPX_COROUTINE_DETAIL_TEMPLATE_PARAMETERS(n)                           \
     template<BOOST_PP_ENUM_PARAMS(n, typename T)>                             \

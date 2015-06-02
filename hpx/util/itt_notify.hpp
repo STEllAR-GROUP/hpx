@@ -285,7 +285,7 @@ namespace hpx { namespace util { namespace itt
     {
         template <typename T>
         heap_allocate(heap_function& heap_function, T**& addr, std::size_t size, int init)
-          : heap_function_(heap_function), 
+          : heap_function_(heap_function),
             addr_(reinterpret_cast<void**&>(addr)), size_(size), init_(init)
         {
             HPX_ITT_HEAP_ALLOCATE_BEGIN(heap_function_.heap_function_, size_, init_);
