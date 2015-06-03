@@ -534,8 +534,9 @@ namespace hpx
         destination_hpx = 0,
         destination_timing = 1,
         destination_agas = 2,
-        destination_app = 3,
-        destination_debuglog = 4
+        destination_parcel = 3,
+        destination_app = 4,
+        destination_debuglog = 5
     };
 
     /// \namespace components

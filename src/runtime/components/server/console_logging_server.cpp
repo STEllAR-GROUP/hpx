@@ -73,6 +73,10 @@ namespace hpx { namespace components { namespace server
                 LAGAS_CONSOLE_(level) << s;
                 break;
 
+            case destination_parcel:
+                LPT_CONSOLE_(level) << s;
+                break;
+
             case destination_app:
                 LAPP_CONSOLE_(level) << s;
                 break;
