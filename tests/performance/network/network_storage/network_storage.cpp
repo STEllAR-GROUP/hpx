@@ -81,7 +81,7 @@
 // them from the waiting list. The vars are used for this bookkeeping task.
 //
 // #define USE_CLEANING_THREAD
-#define USE_PARCELPORT_THREAD
+//#define USE_PARCELPORT_THREAD
 #define USE_ASYNC_CB
 
 //----------------------------------------------------------------------------
@@ -276,9 +276,16 @@ alive_map  keep_alive_buffers;
 void async_callback(const uint64_t index, boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
 {
     scoped_lock lock(keep_alive_mutex);
+    DEBUG_OUTPUT(7,
+            "Async callback triggered for index " << index
+    );
     alive_map::iterator it = keep_alive_buffers.find(index);
-    std::cout << "Async callback triggered for index " << index << std::endl;
-    keep_alive_buffers.erase(it);
+    if (it!=keep_alive_buffers.end()) {
+        keep_alive_buffers.erase(it);
+    }
+    else {
+        std::cout << "async_callback failed on index " << index << std::endl;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -521,7 +528,10 @@ void test_write(
                         static_cast<char*>(buffer), options.transfer_size_B, general_buffer_type::reference);
                 using hpx::util::placeholders::_1;
                 using hpx::util::placeholders::_2;
-                keep_alive_buffers[buffer_index] = temp_buffer;
+                {
+                    scoped_lock lock(keep_alive_mutex);
+                    keep_alive_buffers[buffer_index] = temp_buffer;
+                }
                 ActiveFutures[send_rank].push_back(
                     hpx::async_cb(actWrite, locality,
                             hpx::util::bind(&async_callback, buffer_index, _1, _2),
