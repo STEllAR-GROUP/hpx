@@ -1,7 +1,7 @@
-﻿//  extra_whitespace_check implementation  ------------------------------------------------//
+﻿//  extra_whitespace_check implementation  ----------------------------------//
 
 //  Copyright (c) 2015 Brandon Cordes
-//  Based on the apple_macro_check checker by Marshall Clow and deprecated_macro_check by Eric Niebler
+//  Based on the apple_macro_check checker by Marshall Clow
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -38,7 +38,7 @@ namespace boost
 
         void whitespace_check::inspect(
             const string & library_name,
-            const path & full_path,   // example: c:/foo/boost/filesystem/path.hpp
+            const path & full_path,   // ex: c:/foo/boost/filesystem/path.hpp
             const string & contents)     // contents of file to be inspected
         {
             if (contents.find("hpxinspect:" "noascii") != string::npos)
@@ -70,7 +70,8 @@ namespace boost
             while (p < someline.size())
             {
                 currline++;
-                size_t rend = someline[p].find_last_of("\r"), found = someline[p].find_last_not_of(whitespace);
+                size_t rend = someline[p].find_last_of("\r");
+                size_t found = someline[p].find_last_not_of(whitespace);
                 if (rend != string::npos)
                 {
                     extend = 2;
@@ -98,10 +99,10 @@ namespace boost
                 }
                 p++;
             }
-            // Make the 'find' function search forward from the next character onwards
             if (errors > 0)
             {
-                error(library_name, full_path, string("*Endline Whitespace*: ") + total);
+                string errored = "Endline Whitespace*: " + total;
+                error(library_name, full_path, errored);
                 ++m_files_with_errors;
             }
         }

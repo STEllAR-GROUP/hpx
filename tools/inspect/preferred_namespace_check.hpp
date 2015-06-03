@@ -6,22 +6,24 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_EXTRA_WHITESPACE_CHECK_HPP
-#define BOOST_EXTRA_WHITESPACE_CHECK_HPP
+#ifndef BOOST_PREFERRED_NAMESPACE_CHECK_HPP
+#define BOOST_PREFERRED_NAMESPACE_CHECK_HPP
 
 #include "inspector.hpp"
+
 
 namespace boost
 {
     namespace inspect
     {
-        class whitespace_check : public inspector
+        class preferred_namespace_check : public inspector
         {
             long m_files_with_errors;
+            bool m_from_boost_root;
         public:
 
-            whitespace_check();
-            std::string a = "*Endline Whitespace*";
+            preferred_namespace_check();
+            std::string a = "*USE INSTEAD*";
             std::string b = "Unnecessary whitespace at end of file";
             virtual const char * name() const { return a.c_str(); }
             virtual const char * desc() const { return b.c_str(); }
@@ -33,13 +35,13 @@ namespace boost
 
             virtual void print_summary(std::ostream& out)
             {
-                string c = " files with endline whitespace";
+                std::string c = " files with incorrect namespaces";
                 out << "  " << m_files_with_errors << c << line_break();
             }
 
-            virtual ~whitespace_check() {}
+            virtual ~preferred_namespace_check() {}
         };
     }
 }
 
-#endif // BOOST_EXTRA_WHITESPACE_CHECK_HPP
+#endif // BOOST_DEPRECATED_MACRO_CHECK_HPP
