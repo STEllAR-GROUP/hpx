@@ -32,6 +32,8 @@
 #include <windows.h>
 #include <winnt.h>
 
+#include <hpx/config/defines.hpp>
+#include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
@@ -49,7 +51,7 @@
 #include <boost/atomic.hpp>
 
 #if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
-extern "C" void switch_to_fiber(void* lpFiber) throw();
+extern "C" void HPX_EXPORT switch_to_fiber(void* lpFiber) throw();
 #endif
 
 namespace hpx { namespace util { namespace coroutines

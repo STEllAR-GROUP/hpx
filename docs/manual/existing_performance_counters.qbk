@@ -522,9 +522,8 @@ system and application performance.
          for all worker threads (cores) on that locality. If the instance name
          is `worker-thread#*` the counter will return the overall number of
          retired __hpx__-threads for all worker threads separately.
-         This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` is set to `ON`
-         (default: ON).]
+         This counter is available only if the compile time constant
+         `HPX_HAVE_THREAD_CUMULATIVE_COUNTS` was defined.]
     ]
     [   [`/threads/time/average`]
         [`locality#*/total` or[br]
@@ -550,9 +549,8 @@ system and application performance.
          for all worker threads (cores) on that locality. If the instance name
          is `worker-thread#*` the counter will return the average time spent
          executing one __hpx__-thread for all worker threads separately.
-         This counter is available only if the configuration time constants
-         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
+         This counter is available only if the compile time constants
+         `HPX_HAVE_THREAD_CUMULATIVE_COUNTS` was defined.]
     ]
     [   [`/threads/time/average-overhead`]
         [`locality#*/total` or[br]
@@ -578,9 +576,8 @@ system and application performance.
          on that locality. If the instance name is `worker-thread#*` the counter
          will return the average time spent on overhead executing
          one __hpx__-thread for all worker threads separately.
-         This counter is available only if the configuration time constants
-         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
+         This counter is available only if the compile time constants
+         `HPX_HAVE_THREAD_CUMULATIVE_COUNTS` was defined.]
     ]
     [   [`/threads/count/cumulative-phases`]
         [`locality#*/total` or[br]
@@ -607,8 +604,8 @@ system and application performance.
          (cores) on that locality. If the instance name is `worker-thread#*`
          the counter will return the overall number of executed __hpx__-thread
          phases for all worker threads separately.
-         This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` is set to `ON` (default: ON).]
+         This counter is available only if the compile time constant
+         `HPX_HAVE_THREAD_CUMULATIVE_COUNTS` was defined.]
     ]
     [   [`/threads/time/average-phase`]
         [`locality#*/total` or[br]
@@ -635,9 +632,8 @@ system and application performance.
          (cores) on that locality. If the instance name is `worker-thread#*`
          the counter will return the average time spent executing one
          __hpx__-thread phase for all worker threads separately.
-         This counter is available only if the configuration time constants
-         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
+         This counter is available only if the compile time constants
+         `HPX_HAVE_THREAD_CUMULATIVE_COUNTS` was defined.]
     ]
     [   [`/threads/time/average-phase-overhead`]
         [`locality#*/total` or[br]
@@ -666,8 +662,7 @@ system and application performance.
         the average time spent on overhead executing one __hpx__-thread phase
         for all worker threads separately.  This counter is available only
         if the configuration time constants
-        `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` (default: ON) and
-        `HPX_THREAD_MAINTAIN_IDLE_RATES` are set to `ON` (default: OFF).]
+        `HPX_HAVE_THREAD_CUMULATIVE_COUNTS` was defined.]
     ]
     [   [`/threads/count/instantaneous/<thread-state>`
 
@@ -739,7 +734,7 @@ system and application performance.
          worker threads separately.
 
          These counters are available only if the compile time constant
-         `HPX_THREAD_MAINTAIN_QUEUE_WAITTIME` was defined while compiling the
+         `HPX_HAVE_THREAD_QUEUE_WAITTIME` was defined while compiling the
          __hpx__ core library (default: OFF).]
     ]
     [   [`/threads/idle-rate`]
@@ -763,9 +758,7 @@ system and application performance.
         [Returns the average idle rate for the given worker thread(s) on the
          given locality. The idle rate is defined as the ratio of the time
          spent on scheduling and management tasks and the overall time spent
-         executing work since the application started.
-         This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` is set to `ON` (default: OFF)/.]
+         executing work since the application started.]
     ]
     [   [`/threads/creation-idle-rate`]
         [`locality#*/total` or[br]
@@ -790,9 +783,8 @@ system and application performance.
          idle rate is defined as the ratio of the time spent on creating new
          threads and the overall time spent executing work since the
          application started.
-         This counter is available only if the configuration time constants
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` (default: OFF) and
-         `HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES` are set to `ON`.]
+         This counter is available only if the compile time constants
+         `HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES` was defined.]
     ]
     [   [`/threads/cleanup-idle-rate`]
         [`locality#*/total` or[br]
@@ -817,9 +809,8 @@ system and application performance.
          cleanup idle rate is defined as the ratio of the time spent on
          cleaning up terminated thread objects and the overall time spent
          executing work since the application started.
-         This counter is available only if the configuration time constants
-         `HPX_THREAD_MAINTAIN_IDLE_RATES` (default: OFF) and
-         `HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES` are set to `ON`.]
+         This counter is available only if the compile time constants
+         `HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES` was defined.]
     ]
     [   [`/threadqueue/length`]
         [`locality#*/total` or[br]
@@ -877,9 +868,8 @@ system and application performance.
          thread queue by a neighboring thread worker thread (these threads are
          executed by a different worker thread than they were initially
          scheduled on).
-         This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
-         (default: ON).]
+         This counter is available only if the compile time constant
+         `HPX_HAVE_THREAD_STEALING_COUNTS` was defined.]
     ]
     [   [`/threads/count/pending-misses`]
         [`locality#*/total` or[br]
@@ -902,9 +892,8 @@ system and application performance.
         [Returns the total number of times that the referenced worker-thread
          on the referenced locality failed to find pending __hpx__-threads in its
          associated queue.
-         This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
-         (default: ON).]
+         This counter is available only if the compile time constant
+         `HPX_HAVE_THREAD_STEALING_COUNTS` was defined.]
     ]
     [   [`/threads/count/pending-accesses`]
         [`locality#*/total` or[br]
@@ -927,9 +916,8 @@ system and application performance.
         [Returns the total number of times that the referenced worker-thread
          on the referenced locality looked for pending __hpx__-threads in its
          associated queue.
-         This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
-         (default: ON).]
+         This counter is available only if the compile time constant
+         `HPX_HAVE_THREAD_STEALING_COUNTS` was defined.]
     ]
     [   [`/threads/count/stolen-from-staged`]
         [`locality#*/total` or[br]
@@ -953,9 +941,8 @@ system and application performance.
          thread queue by a neighboring worker thread (these threads are
          executed by a different worker thread than they were initially
          scheduled on).
-         This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
-         (default: ON).]
+         This counter is available only if the compile time constant
+         `HPX_HAVE_THREAD_STEALING_COUNTS` was defined.]
     ]
     [   [`/threads/count/stolen-to-pending`]
         [`locality#*/total` or[br]
@@ -979,9 +966,8 @@ system and application performance.
          thread queue of the worker thread (these threads are
          executed by a different worker thread than they were initially
          scheduled on).
-         This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
-         (default: ON).]
+         This counter is available only if the compile time constant
+         `HPX_HAVE_THREAD_STEALING_COUNTS` was defined.]
     ]
     [   [`/threads/count/stolen-to-staged`]
         [`locality#*/total` or[br]
@@ -1006,9 +992,8 @@ system and application performance.
          thread queue of a neighboring worker thread (these threads are
          executed by a different worker thread than they were initially
          scheduled on).
-         This counter is available only if the configuration time constant
-         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`
-         (default: ON).]
+         This counter is available only if the compile time constant
+         `HPX_HAVE_THREAD_STEALING_COUNTS` was defined.]
     ]
     [   [`/threads/count/objects`]
         [`locality#*/total` or[br]
