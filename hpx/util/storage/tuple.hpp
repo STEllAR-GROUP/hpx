@@ -18,7 +18,7 @@ namespace hpx { namespace util { namespace storage
 {
 
     ///////////////////////////////////////////////////////////////////////////
-    /// This class is an implementation of Tuple. 
+    /// This class is an implementation of Tuple.
     class tuple
     {
         public:
@@ -75,9 +75,9 @@ namespace hpx { namespace util { namespace storage
             }
 
             template <typename T>
-            tuple& push_back(const T& field, 
+            tuple& push_back(const T& field,
                     typename boost::disable_if<boost::is_same<
-                        elem_type, 
+                        elem_type,
                         typename util::decay<T>::type
                     > >::type* = 0)
             {

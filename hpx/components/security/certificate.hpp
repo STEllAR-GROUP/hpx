@@ -93,7 +93,7 @@ namespace hpx { namespace components { namespace security
             return reinterpret_cast<unsigned char const*>(this) + size();
         }
 
-        BOOST_CONSTEXPR static std::size_t size() 
+        BOOST_CONSTEXPR static std::size_t size()
         {
             return sizeof(certificate);
         }

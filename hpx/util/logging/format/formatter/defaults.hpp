@@ -58,7 +58,7 @@ This will output something similar to:
 @param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
 For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::prepend> 
+template<class convert = do_convert_format::prepend>
 struct idx_t : is_generic, formatter::non_const_context<boost::uint64_t>, hpx::util::logging::op_equal::always_equal  {
     typedef formatter::non_const_context<boost::uint64_t> non_const_context_base;
     typedef convert convert_type;

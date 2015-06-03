@@ -47,7 +47,7 @@ void isend(hpx::serialization::serialize_buffer<char> const& receive_buffer) {}
 HPX_PLAIN_ACTION(isend);
 
 ///////////////////////////////////////////////////////////////////////////////
-double ireceive(hpx::naming::id_type dest, std::size_t loop, 
+double ireceive(hpx::naming::id_type dest, std::size_t loop,
                 std::size_t size, std::size_t window_size)
 {
     std::size_t skip = SKIP;
@@ -56,7 +56,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop,
         loop *= LOOP_SMALL_MULTIPLIER;
         skip *= LOOP_SMALL_MULTIPLIER;
     }
-    
+
     typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
     // align used buffers on page boundaries

@@ -60,13 +60,13 @@ struct Seventeen
 //#else // BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP
 //namespace boost {
 //# ifndef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
-//    bool 
-//        function_equal(const contain_test::ReturnIntFE& x, 
+//    bool
+//        function_equal(const contain_test::ReturnIntFE& x,
 //        const contain_test::ReturnIntFE& y)
 //    { return x.value == y.value; }
 //# else
-//    bool 
-//        function_equal_impl(const contain_test::ReturnIntFE& x, 
+//    bool
+//        function_equal_impl(const contain_test::ReturnIntFE& x,
 //        const contain_test::ReturnIntFE& y, int)
 //    { return x.value == y.value; }
 //# endif
@@ -181,7 +181,7 @@ static void target_test()
 //#if !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 //        HPX_TEST(ri2 == f);
 //        HPX_TEST(!(ri2 != f));
-//#endif 
+//#endif
 //    }
 //
 //#if !defined(BOOST_FUNCTION_NO_FUNCTION_TYPE_SYNTAX)

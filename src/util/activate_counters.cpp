@@ -225,7 +225,7 @@ namespace hpx { namespace util
             values.push_back(performance_counter::get_value_async(ids_[i], reset));
 
         return values;
-    } 
+    }
 
     std::vector<performance_counters::counter_value>
     activate_counters::evaluate_counters_sync(bool reset, error_code& ec)
@@ -234,8 +234,8 @@ namespace hpx { namespace util
             futures = evaluate_counters_async(reset, ec);
 
         return util::unwrapped(futures);
-        
-    } 
+
+    }
 
 }}
 

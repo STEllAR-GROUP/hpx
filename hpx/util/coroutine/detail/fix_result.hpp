@@ -31,7 +31,7 @@
 
 #include <boost/utility/enable_if.hpp>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
     template <typename Traits>
     inline void fix_result(const typename Traits::as_tuple&,
