@@ -534,8 +534,9 @@ namespace hpx
         destination_hpx = 0,
         destination_timing = 1,
         destination_agas = 2,
-        destination_app = 3,
-        destination_debuglog = 4
+        destination_parcel = 3,
+        destination_app = 4,
+        destination_debuglog = 5
     };
 
     /// \namespace components
@@ -796,7 +797,8 @@ namespace hpx
     HPX_API_EXPORT util::runtime_configuration const& get_config();
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(char const* name);
+    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(
+        char const* name, char const* pool_name_suffix = "");
 
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace
@@ -1377,7 +1379,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently being
     /// started or not, e.g. whether the current state of the runtime system is
-    /// \a hpx::runtime::state_startup
+    /// \a hpx::state_startup
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -1388,7 +1390,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently running
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::runtime::state_running
+    /// \a hpx::state_running
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -1399,7 +1401,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently stopped
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::runtime::state_stopped
+    /// \a hpx::state_stopped
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -1410,7 +1412,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently being
     /// shut down or not, e.g.  whether the current state of the runtime system
-    /// is \a hpx::runtime::state_stopped or \a hpx::runtime::state_shutdown
+    /// is \a hpx::state_stopped or \a hpx::state_shutdown
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.

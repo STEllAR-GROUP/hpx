@@ -325,7 +325,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             rt->register_thread("receive_early_parcel");
             try
             {
-                while(rt->get_state() <= runtime::state_startup)
+                while(rt->get_state() <= state_startup)
                 {
                     do_background_work(0);
                 }

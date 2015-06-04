@@ -42,8 +42,7 @@ namespace hpx { namespace serialization
 
             struct intrusive_polymorphic
             {
-                static void call(input_archive& ar,
-                    Pointer& ptr, boost::uint64_t pos)
+                static Pointer call(input_archive& ar)
                 {
                     std::string name;
                     ar >> name;
@@ -53,49 +52,26 @@ namespace hpx { namespace serialization
                             create<referred_type>(name)
                     );
                     ar >> *t;
-                    register_pointer(
-                          ar
-                        , pos
-                        , ptr_helper_ptr(
-                              new detail::erase_ptr_helper<Pointer>(std::move(t), ptr)
-                          )
-                    );
+                    return t;
                 }
             };
 
             struct nonintrusive_polymorphic
             {
-                static void call(input_archive& ar,
-                    Pointer& ptr, boost::uint64_t pos)
+                static Pointer call(input_archive& ar)
                 {
-                    Pointer t (
-                        polymorphic_nonintrusive_factory::instance().load<referred_type>(ar)
-                    );
-                    register_pointer(
-                        ar
-                      , pos
-                      , ptr_helper_ptr(
-                            new detail::erase_ptr_helper<Pointer>(std::move(t), ptr)
-                        )
-                    );
+                    return Pointer(polymorphic_nonintrusive_factory::
+                        instance().load<referred_type>(ar));
                 }
             };
 
             struct usual
             {
-                static void call(input_archive& ar,
-                    Pointer& ptr, boost::uint64_t pos)
+                static Pointer call(input_archive& ar)
                 {
-                    //referred_type t;
                     Pointer t(new referred_type);
                     ar >> *t;
-                    register_pointer(
-                        ar
-                      , pos
-                      , ptr_helper_ptr(
-                            new detail::erase_ptr_helper<Pointer>(std::move(t), ptr)
-                        )
-                    );
+                    return t;
                 }
             };
 
@@ -118,8 +94,7 @@ namespace hpx { namespace serialization
 
             struct intrusive_polymorphic
             {
-                static void call(output_archive& ar,
-                    Pointer& ptr)
+                static void call(output_archive& ar, const Pointer& ptr)
                 {
                     const std::string name = access::get_name(ptr.get());
                     ar << name;
@@ -129,8 +104,7 @@ namespace hpx { namespace serialization
 
             struct usual
             {
-                static void call(output_archive& ar,
-                    Pointer& ptr)
+                static void call(output_archive& ar, const Pointer& ptr)
                 {
                     ar << *ptr;
                 }
@@ -146,7 +120,7 @@ namespace hpx { namespace serialization
 
         // forwarded serialize pointer functions
         template <typename Pointer> BOOST_FORCEINLINE
-        void serialize_pointer(output_archive & ar, Pointer ptr, unsigned)
+        void serialize_pointer_tracked(output_archive & ar, const Pointer& ptr)
         {
             bool valid = static_cast<bool>(ptr);
             ar << valid;
@@ -164,11 +138,10 @@ namespace hpx { namespace serialization
         }
 
         template <class Pointer> BOOST_FORCEINLINE
-        void serialize_pointer(input_archive& ar, Pointer& ptr, unsigned)
+        void serialize_pointer_tracked(input_archive& ar, Pointer& ptr)
         {
             bool valid = false;
             ar >> valid;
-
             if(valid)
             {
                 boost::uint64_t pos = 0;
@@ -177,7 +150,10 @@ namespace hpx { namespace serialization
                 {
                     pos = 0;
                     ar >> pos;
-                    detail::pointer_input_dispatcher<Pointer>::type::call(ar, ptr, pos);
+                    Pointer temp = detail::pointer_input_dispatcher<
+                        Pointer>::type::call(ar);
+                    register_pointer(ar, pos, ptr_helper_ptr(
+                            new detail::erase_ptr_helper<Pointer>(std::move(temp), ptr)));
                 }
                 else
                 {
@@ -185,6 +161,28 @@ namespace hpx { namespace serialization
                         tracked_pointer<detail::erase_ptr_helper<Pointer> >(ar, pos);
                     ptr = helper.t_;
                 }
+            }
+        }
+
+        template <typename Pointer> BOOST_FORCEINLINE
+        void serialize_pointer_untracked(output_archive & ar, const Pointer& ptr)
+        {
+            bool valid = static_cast<bool>(ptr);
+            ar << valid;
+            if(valid)
+            {
+                detail::pointer_output_dispatcher<Pointer>::type::call(ar, ptr);
+            }
+        }
+
+        template <class Pointer> BOOST_FORCEINLINE
+        void serialize_pointer_untracked(input_archive& ar, Pointer& ptr)
+        {
+            bool valid = false;
+            ar >> valid;
+            if(valid)
+            {
+                ptr = detail::pointer_input_dispatcher<Pointer>::type::call(ar);
             }
         }
 

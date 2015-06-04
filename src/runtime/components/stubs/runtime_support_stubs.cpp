@@ -83,14 +83,14 @@ namespace hpx { namespace components { namespace stubs
         naming::id_type const& id, std::size_t count,
         hpx::actions::manage_object_action<boost::uint8_t, void> const& act);
 
-    lcos::future<bool>
+    lcos::future<int>
     runtime_support::load_components_async(naming::id_type const& gid)
     {
         typedef server::runtime_support::load_components_action action_type;
         return hpx::async<action_type>(gid);
     }
 
-    bool runtime_support::load_components(naming::id_type const& gid)
+    int runtime_support::load_components(naming::id_type const& gid)
     {
         return load_components_async(gid).get();
     }

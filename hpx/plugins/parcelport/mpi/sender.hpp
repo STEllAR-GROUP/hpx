@@ -88,7 +88,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 if(!threads::get_self_ptr()) return;
 
-                mutex_type::scoped_lock l(this_->connections_mtx_);
+                boost::unique_lock<mutex_type> l(this_->connections_mtx_);
                 while(this_->num_connections_ >= this_->max_connections_)
                 {
                     this_->connections_cond_.wait(l);
@@ -101,9 +101,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 if(decrement_)
                 {
-                    mutex_type::scoped_lock l(this_->connections_mtx_);
+                    boost::unique_lock<mutex_type> l(this_->connections_mtx_);
                     --this_->num_connections_;
-                    this_->connections_cond_.notify_all(l);
+                    this_->connections_cond_.notify_all(std::move(l));
                 }
             }
 

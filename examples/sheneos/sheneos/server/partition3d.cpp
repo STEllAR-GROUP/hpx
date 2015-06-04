@@ -367,7 +367,7 @@ namespace sheneos { namespace server
         for (std::vector<sheneos_coord>::const_iterator it = coords.begin();
             it != end; ++it)
         {
-            result.push_back(boost::move(interpolate(*it, eosvalues)));
+            result.push_back(std::move(interpolate(*it, eosvalues)));
         }
 
         return result;

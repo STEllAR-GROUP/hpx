@@ -12,6 +12,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/format.hpp>
 
 #include <iostream>
 #include <fstream>

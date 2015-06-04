@@ -8,8 +8,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 
@@ -63,12 +64,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename RanIter1, typename RanIter2,
         typename OutIter, typename F, typename Combiner, typename SetOp>
-    typename algorithm_result<ExPolicy, OutIter>::type
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     set_operation(ExPolicy const& policy,
         RanIter1 first1, RanIter1 last1, RanIter2 first2, RanIter2 last2,
         OutIter dest, F && f, Combiner && combiner, SetOp && setop)
     {
-        typedef algorithm_result<ExPolicy, OutIter> result;
+        typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
         typedef typename std::iterator_traits<RanIter1>::difference_type
             difference_type1;
         typedef typename std::iterator_traits<RanIter2>::difference_type
@@ -82,7 +83,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         boost::shared_array<buffer_type> buffer(
             new buffer_type[combiner(len1, len2)]);
 
-        std::size_t cores = hpx::get_os_thread_count(policy.get_executor());
+        typedef typename ExPolicy::executor_type executor_type;
+        std::size_t cores = executor_traits<executor_type>::os_thread_count(
+            policy.executor());
         std::size_t step = (len1 + cores - 1) / cores;
         boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
 

@@ -14,6 +14,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/thread/locks.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
@@ -52,7 +53,7 @@ namespace hpx { namespace lcos { namespace local
                 if (event_.load(boost::memory_order_acquire))
                     return;
 
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::unique_lock<mutex_type> l(mtx_);
                 wait_locked(l);
             }
 
@@ -61,8 +62,8 @@ namespace hpx { namespace lcos { namespace local
             {
                 event_.store(true, boost::memory_order_release);
 
-                typename mutex_type::scoped_lock l(mtx_);
-                set_locked(l);
+                boost::unique_lock<mutex_type> l(mtx_);
+                set_locked(std::move(l));
             }
 
             /// \brief Reset the event
@@ -72,7 +73,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
         private:
-            void wait_locked(typename mutex_type::scoped_lock& l)
+            void wait_locked(boost::unique_lock<mutex_type>& l)
             {
                 HPX_ASSERT(l.owns_lock());
 
@@ -82,12 +83,12 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
 
-            void set_locked(typename mutex_type::scoped_lock& l)
+            void set_locked(boost::unique_lock<mutex_type> l)
             {
                 HPX_ASSERT(l.owns_lock());
 
                 // release the threads
-                cond_.notify_all(l);
+                cond_.notify_all(std::move(l));
             }
 
             mutex_type mtx_;      ///< This mutex protects the queue.

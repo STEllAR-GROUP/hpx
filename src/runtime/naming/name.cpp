@@ -160,7 +160,7 @@ namespace hpx { namespace naming
                     if (e.get_error() != invalid_status) {
                         throw;      // rethrow if not invalid_status
                     }
-                    else if (!threads::threadmanager_is(hpx::stopping)) {
+                    else if (!threads::threadmanager_is(hpx::state_stopping)) {
                         throw;      // rethrow if not stopping
                     }
                 }
@@ -210,8 +210,7 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         // prepare the given id, note: this function modifies the passed id
-        naming::gid_type id_type_impl::preprocess_gid(
-            boost::uint32_t dest_locality_id) const
+        naming::gid_type id_type_impl::preprocess_gid() const
         {
             // unmanaged gids do not require any special handling
             if (unmanaged == type_)
@@ -407,15 +406,22 @@ namespace hpx { namespace naming
         // serialization
         void id_type_impl::save(serialization::output_archive& ar) const
         {
-            boost::uint32_t dest_locality_id = ar.get_dest_locality_id();
+            // Avoid performing side effects if the archive is not saving the
+            // data.
+            if (ar.is_saving())
+            {
+                id_type_management type = type_;
+                if (managed_move_credit == type)
+                    type = managed;
 
-            id_type_management type = type_;
-            if (managed_move_credit == type)
-                type = managed;
-
-            gid_serialization_data data{
-                preprocess_gid(dest_locality_id), type};
-            ar << data;
+                gid_serialization_data data { preprocess_gid(), type };
+                ar << data;
+            }
+            else
+            {
+                gid_serialization_data data { *this, type_ };
+                ar << data;
+            }
         }
 
         void id_type_impl::load(serialization::input_archive& ar)
@@ -426,7 +432,8 @@ namespace hpx { namespace naming
             static_cast<gid_type&>(*this) = data.gid_;
             type_ = static_cast<id_type_management>(data.type_);
 
-            if (detail::unmanaged != type_ && detail::managed != type_) {
+            if (detail::unmanaged != type_ && detail::managed != type_)
+            {
                 HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
                     "trying to load id_type with unknown deleter");
             }

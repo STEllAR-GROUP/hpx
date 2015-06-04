@@ -36,6 +36,8 @@ What's so special about HPX?
   synchronization.
 * It implements a rich set of runtime services supporting a broad range of
   use cases.
+* HPX exposes a uniform, flexible, and extendable performance counter 
+  framework which can enable runtime adaptivity
 * It is designed to solve problems conventionally considered to be
   scaling-impaired.
 * HPX has been designed and developed for systems of any scale, from

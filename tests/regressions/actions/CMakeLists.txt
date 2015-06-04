@@ -7,6 +7,7 @@ add_subdirectory(components)
 
 set(tests
     plain_action_1330
+    plain_action_1550
     plain_action_move_semantics
     component_action_move_semantics
    )

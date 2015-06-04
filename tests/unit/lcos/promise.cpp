@@ -201,8 +201,8 @@ int hpx_main(boost::program_options::variables_map&)
         bool caught_exception = false;
 
         try {
+            p.get();      // guarantee for callback to have finished executing
             f.get();      // throws
-            p.get();
             HPX_TEST(false);
         }
         catch (std::exception const& e) {

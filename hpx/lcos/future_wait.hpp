@@ -166,6 +166,7 @@ namespace hpx { namespace lcos
                     shared_state_ptr current =
                         lcos::detail::get_shared_state(lazy_values_[i]);
 
+                    current->execute_deferred();
                     current->set_on_completed(
                         util::bind(&wait_each::on_future_ready, this, i, id));
                 }

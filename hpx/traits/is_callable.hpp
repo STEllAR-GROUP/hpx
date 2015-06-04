@@ -301,13 +301,12 @@ namespace hpx { namespace traits { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct is_callable_not_action;
+    struct is_deferred_callable;
 
-    template <typename T, typename ...Ts>
-    struct is_callable_not_action<T(Ts...)>
-      : boost::mpl::and_<
-            is_callable<T(Ts...)>
-          , boost::mpl::not_<traits::is_action<typename util::decay<T>::type> >
+    template <typename F, typename ...Ts>
+    struct is_deferred_callable<F(Ts...)>
+      : is_callable<
+            typename util::decay<F>::type(typename util::decay<Ts>::type...)
         >
     {};
 }}}

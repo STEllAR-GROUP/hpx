@@ -168,6 +168,37 @@ int hpx_main(
             cb.reset();
             result_counter.store(0);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Async wait, single future, deferred.
+        {
+            wait_each(cb, async(hpx::launch::deferred, &null_thread));
+
+            HPX_TEST_EQ(1U, cb.count());
+            HPX_TEST_EQ(1U, void_counter.load());
+
+            cb.reset();
+            void_counter.store(0);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Async wait, vector of futures, deferred.
+        {
+            std::vector<future<void> > futures;
+            futures.reserve(64);
+
+            for (std::size_t i = 0; i < 64; ++i)
+                futures.push_back(async(
+                    i % 3 ? hpx::launch::async : hpx::launch::deferred, &null_thread));
+
+            wait_each(cb, futures);
+
+            HPX_TEST_EQ(64U, cb.count());
+            HPX_TEST_EQ(64U, void_counter.load());
+
+            cb.reset();
+            void_counter.store(0);
+        }
     }
 
     finalize();

@@ -583,7 +583,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
       wrapper_type* wrapper = static_cast<wrapper_type*>(p);
 
-      wrapper->rebind(boost::forward<Functor>(f), boost::move(target), id);
+      wrapper->rebind(boost::forward<Functor>(f), std::move(target), id);
   }
 
   template<typename Functor, typename CoroutineType, typename ContextImpl,

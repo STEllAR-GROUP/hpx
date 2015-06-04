@@ -13,11 +13,11 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
@@ -49,14 +49,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename BidirIter>
-            static typename detail::algorithm_result<ExPolicy>::type
+            static typename util::detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy const& policy, BidirIter first, BidirIter last)
             {
                 typedef std::reverse_iterator<BidirIter> destination_iterator;
                 typedef hpx::util::zip_iterator<BidirIter, destination_iterator>
                     zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef typename detail::algorithm_result<ExPolicy>::type
+                typedef typename util::detail::algorithm_result<ExPolicy>::type
                     result_type;
 
                 return hpx::util::void_guard<result_type>(),
@@ -114,7 +114,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy>::type
+        typename util::detail::algorithm_result<ExPolicy>::type
     >::type
     reverse(ExPolicy && policy, BidirIter first, BidirIter last)
     {
@@ -154,7 +154,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename BidirIter>
-            static typename detail::algorithm_result<ExPolicy, OutputIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutputIter
+            >::type
             parallel(ExPolicy const& policy, BidirIter first, BidirIter last,
                 OutputIter dest_first)
             {
@@ -221,7 +223,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename BidirIter, typename OutputIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutputIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutputIter>::type
     >::type
     reverse_copy(ExPolicy && policy, BidirIter first, BidirIter last,
         OutputIter dest_first)

@@ -1109,7 +1109,7 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-    bool runtime_support::load_components()
+    int runtime_support::load_components()
     {
         // load components now that AGAS is up
         util::runtime_configuration& ini = get_runtime().get_config();
@@ -1122,22 +1122,24 @@ namespace hpx { namespace components { namespace server
 
         // then dynamic ones
         naming::resolver_client& client = get_runtime().get_agas_client();
-        bool result = load_components(ini, client.get_local_locality(), client);
+        int result = load_components(ini, client.get_local_locality(), client);
+        if (!load_plugins(ini))
+            result = -2;
 
-        return load_plugins(ini) && result;
+        return result;
     }
 
     void runtime_support::call_startup_functions(bool pre_startup)
     {
         if (pre_startup) {
-            get_runtime().set_state(runtime::state_pre_startup);
+            get_runtime().set_state(state_pre_startup);
             for (util::function_nonser<void()> const& f : pre_startup_functions_)
             {
                 f();
             }
         }
         else {
-            get_runtime().set_state(runtime::state_startup);
+            get_runtime().set_state(state_startup);
             for (util::function_nonser<void()> const& f : startup_functions_)
             {
                 f();
@@ -1149,7 +1151,7 @@ namespace hpx { namespace components { namespace server
     {
         runtime& rt = get_runtime();
         if (pre_shutdown) {
-            rt.set_state(runtime::state_pre_shutdown);
+            rt.set_state(state_pre_shutdown);
             for (util::function_nonser<void()> const& f : pre_shutdown_functions_)
             {
                 try {
@@ -1161,7 +1163,7 @@ namespace hpx { namespace components { namespace server
             }
         }
         else {
-            rt.set_state(runtime::state_shutdown);
+            rt.set_state(state_shutdown);
             for (util::function_nonser<void()> const& f : shutdown_functions_)
             {
                 try {
@@ -1430,7 +1432,7 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
-    bool runtime_support::load_components(util::section& ini,
+    int runtime_support::load_components(util::section& ini,
         naming::gid_type const& prefix, naming::resolver_client& agas_client)
     {
         // load all components as described in the configuration information
@@ -1569,7 +1571,7 @@ namespace hpx { namespace components { namespace server
                     throw hpx::detail::command_line_error(
                         "unknown help option: " + help_option);
                 }
-                return false;
+                return 1;
             }
 
             // secondary command line handling, looking for --exit and other
@@ -1594,15 +1596,15 @@ namespace hpx { namespace components { namespace server
                     util::handle_list_parcelports();
 
                 if (vm.count("hpx:exit"))
-                    return false;
+                    return 1;
             }
         }
         catch (std::exception const& e) {
             std::cerr << "runtime_support::load_components: "
                       << "command line processing: " << e.what() << std::endl;
-            return false;
+            return -1;
         }
-        return true;
+        return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////

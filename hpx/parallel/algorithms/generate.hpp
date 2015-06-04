@@ -10,9 +10,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/util/void_guard.hpp>
 
 #include <algorithm>
@@ -44,10 +44,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static typename detail::algorithm_result<ExPolicy>::type
+            static typename util::detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef typename detail::algorithm_result<ExPolicy>::type
+                typedef typename util::detail::algorithm_result<ExPolicy>::type
                     result_type;
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
@@ -114,7 +114,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, void>::type
+        typename util::detail::algorithm_result<ExPolicy, void>::type
     >::type
     generate(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
@@ -153,7 +153,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename F>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutIter
+            >::type
             parallel(ExPolicy const& policy, OutIter first, std::size_t count,
                 F && f)
             {
@@ -222,7 +224,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename OutIter, typename Size, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     generate_n(ExPolicy && policy, OutIter first, Size count, F && f)
     {
@@ -240,7 +242,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         if (detail::is_negative<Size>::call(count))
         {
-            return detail::algorithm_result<ExPolicy, OutIter>::get(
+            return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                 std::move(first));
         }
 

@@ -51,6 +51,14 @@ namespace hpx
         return HPX_VERSION_FULL;
     }
 
+    std::string full_version_as_string()
+    {
+        return boost::str(
+            boost::format("%d.%d.%d") %
+            HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
+            HPX_VERSION_SUBMINOR);
+    }
+
     boost::uint8_t agas_version()
     {
         return HPX_AGAS_VERSION;
@@ -237,7 +245,7 @@ namespace hpx
 #endif
 
         strm << "  HPX_PREFIX (configured)=" << util::hpx_prefix() << "\n";
-#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__) && !defined(__MIC)
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__MIC)
         strm << "  HPX_PREFIX=" << util::find_prefix() << "\n";
 #endif
 
@@ -247,9 +255,8 @@ namespace hpx
     std::string build_string()
     {
         return boost::str(
-            boost::format("V%d.%d.%d%s (AGAS: V%d.%d), Git: %.10s") % //-V609
-                HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
-                HPX_VERSION_SUBMINOR % HPX_VERSION_TAG %
+            boost::format("V%s%s (AGAS: V%d.%d), Git: %.10s") % //-V609
+                full_version_as_string() % HPX_VERSION_TAG %
                 (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10) %
                 HPX_HAVE_GIT_COMMIT);
     }

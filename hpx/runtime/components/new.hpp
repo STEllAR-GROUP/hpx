@@ -173,7 +173,7 @@ namespace hpx
     ///          create, for instance:
     ///          \code
     ///              hpx::future<std::vector<hpx::id_type> > f =
-    ///                 hpx::new_<some_component[]>(hpx::find_here(), 10, ...);
+    ///                 hpx::new_<some_component[]>(hpx::default_layout, 10, ...);
     ///              hpx::id_type id = f.get();
     ///          \endcode
     ///

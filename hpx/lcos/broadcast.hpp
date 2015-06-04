@@ -141,13 +141,13 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/calculate_fanout.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
 
 #include <vector>
 

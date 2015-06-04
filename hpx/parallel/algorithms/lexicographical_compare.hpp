@@ -10,11 +10,11 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename Pred>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static typename util::detail::algorithm_result<ExPolicy, bool>::type
             parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
                 FwdIter2 last2, Pred && pred)
             {
@@ -60,15 +60,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count1 = std::distance(first1, last1);
                 std::size_t count2 = std::distance(first2, last2);
 
-                // An empty range is lexicographically less than any non-empty range
+                // An empty range is lexicographically less than any non-empty
+                // range
                 if (count1 == 0 && count2 != 0)
                 {
-                    return detail::algorithm_result<ExPolicy, bool>::get(true);
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
+                        true);
                 }
 
                 if (count2 == 0 && count1 != 0)
                 {
-                    return detail::algorithm_result<ExPolicy, bool>::get(false);
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
+                        false);
                 }
 
                 std::size_t count = (std::min)(count1, count2);
@@ -176,7 +179,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     lexicographical_compare(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2)
@@ -282,7 +285,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     lexicographical_compare(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, Pred && pred)

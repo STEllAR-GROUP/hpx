@@ -85,12 +85,12 @@ namespace hpx { namespace components
             return this->base_type::create_memory_block_async(gid_, count, act);
         }
 
-        lcos::future<bool> load_components_async()
+        lcos::future<int> load_components_async()
         {
             return this->base_type::load_components_async(gid_);
         }
 
-        bool load_components()
+        int load_components()
         {
             return this->base_type::load_components(gid_);
         }

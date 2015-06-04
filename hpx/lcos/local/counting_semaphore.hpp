@@ -13,6 +13,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/thread/locks.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
@@ -67,7 +68,7 @@ namespace hpx { namespace lcos { namespace local
             ///                 yielded.
             void wait(boost::int64_t count = 1)
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::unique_lock<mutex_type> l(mtx_);
                 wait_locked(count, l);
             }
 
@@ -84,7 +85,7 @@ namespace hpx { namespace lcos { namespace local
             ///                 are available at this point in time.
             bool try_wait(boost::int64_t count = 1)
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::unique_lock<mutex_type> l(mtx_);
                 if (!(value_ < count)) {
                     // enter wait_locked only if there are sufficient credits
                     // available
@@ -99,21 +100,23 @@ namespace hpx { namespace lcos { namespace local
             ///
             void signal(boost::int64_t count = 1)
             {
-                typename mutex_type::scoped_lock l(mtx_);
-                signal_locked(count, l);
+                boost::unique_lock<mutex_type> l(mtx_);
+                signal_locked(count, std::move(l));
             }
 
             boost::int64_t signal_all()
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::unique_lock<mutex_type> l(mtx_);
                 boost::int64_t count = static_cast<boost::int64_t>(cond_.size(l));
-                signal_locked(count, l);
+                signal_locked(count, std::move(l));
                 return count;
             }
 
-            template <typename Lock>
-            void wait_locked(boost::int64_t count, Lock& l)
+            void wait_locked(boost::int64_t count,
+                boost::unique_lock<mutex_type>& l)
             {
+                HPX_ASSERT(l.owns_lock());
+
                 while (value_ < count)
                 {
                     cond_.wait(l, "counting_semaphore::wait_locked");
@@ -122,15 +125,21 @@ namespace hpx { namespace lcos { namespace local
             }
 
         private:
-            template <typename Lock>
-            void signal_locked(boost::int64_t count, Lock& l)
+            void signal_locked(boost::int64_t count,
+                boost::unique_lock<mutex_type> l)
             {
+                HPX_ASSERT(l.owns_lock());
+
+                mutex_type* mtx = l.mutex();
                 // release no more threads than we get resources
                 value_ += count;
                 for (boost::int64_t i = 0; value_ >= 0 && i < count; ++i)
                 {
-                    if (!cond_.notify_one(l))
+                    // notify_one() returns false if no more threads are
+                    // waiting
+                    if (!cond_.notify_one(std::move(l)))
                         break;
+                    l = boost::unique_lock<mutex_type>(*mtx);
                 }
             }
 

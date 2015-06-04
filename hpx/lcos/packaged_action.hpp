@@ -17,6 +17,8 @@
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/protect.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 
 #include <boost/mpl/bool.hpp>
@@ -153,7 +155,7 @@ namespace hpx { namespace lcos
             hpx::apply_c_cb<action_type>(this->get_gid(), gid,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
-                    std::forward<Callback>(cb), this->impl_,
+                    util::protect(std::forward<Callback>(cb)), this->impl_,
                     util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
         }
@@ -169,7 +171,7 @@ namespace hpx { namespace lcos
             hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
-                    std::forward<Callback>(cb), this->impl_,
+                    util::protect(std::forward<Callback>(cb)), this->impl_,
                     util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
         }
@@ -211,7 +213,7 @@ namespace hpx { namespace lcos
             hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
-                    std::forward<Callback>(cb), this->impl_,
+                    util::protect(std::forward<Callback>(cb)), this->impl_,
                     util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
         }
@@ -229,7 +231,7 @@ namespace hpx { namespace lcos
                 gid, priority,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
-                    std::forward<Callback>(cb), this->impl_,
+                    util::protect(std::forward<Callback>(cb)), this->impl_,
                     util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
         }
@@ -414,7 +416,7 @@ namespace hpx { namespace lcos
                     std::move(addr), this->get_gid(), gid,
                     util::bind(
                         &packaged_action::parcel_write_handler_cb<callback_type>,
-                        std::forward<Callback>(cb), this->impl_,
+                        util::protect(std::forward<Callback>(cb)), this->impl_,
                         util::placeholders::_1, util::placeholders::_2),
                     std::forward<Ts>(vs)...);
             }
@@ -445,7 +447,7 @@ namespace hpx { namespace lcos
                     std::move(addr), this->get_gid(), gid,
                     util::bind(
                         &packaged_action::parcel_write_handler_cb<callback_type>,
-                        std::forward<Callback>(cb), this->impl_,
+                        util::protect(std::forward<Callback>(cb)), this->impl_,
                         util::placeholders::_1, util::placeholders::_2),
                     std::forward<Ts>(vs)...);
             }

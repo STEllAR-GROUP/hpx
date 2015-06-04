@@ -94,7 +94,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         auto range = boost::irange(start, num_blocks);
 
-        std::vector<hpx::future<void> > transpose_futures;
+        std::vector<hpx::shared_future<void> > transpose_futures;
         transpose_futures.resize(num_blocks);
 
         for_each(par, boost::begin(range), boost::end(range),
@@ -113,7 +113,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                             transpose(&A[from_block][A_offset], &B[b][B_offset],
                                 block_order, tile_size);
                         }
-                    );
+                    ).share();
             }
         );
 

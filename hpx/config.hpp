@@ -26,10 +26,8 @@
 #include <boost/exception/detail/attribute_noreturn.hpp>
 #endif
 
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/preprocessor/arithmetic/add.hpp>
-#include <boost/preprocessor/selection/min.hpp>
-#include <boost/preprocessor/facilities/expand.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure DEBUG macro is defined consistently across platforms

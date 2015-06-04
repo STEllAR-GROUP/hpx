@@ -74,14 +74,43 @@ migrate_to_storage                    "" "hpx\.components\.migrate_to_s.*"
 # hpx/parallel/execution_policy.hpp
 parallel::execution_policy                 "execution_policy"               "hpx\.parallel\.v1\.execution_policy.*"
 parallel::parallel_execution_policy        "parallel_execution_policy"      "hpx\.parallel\.v1\.parallel_exec.*"
-parallel::parallel_task_execution_policy   "parallel_task_execution_policy" "hpx\.parallel\.v1\.parallel_task_exec.*"
+parallel::parallel_execution_policy_shim   "parallel_execution_policy_shim" "hpx\.parallel\.v1\.parallel_exec.*"
+parallel::parallel_task_execution_policy   "parallel_task_execution_policy" "hpx\.parallel\.v1\.parallel_task_exe_.*"
+parallel::parallel_task_execution_policy_shim "parallel_task_execution_policy_shim" "hpx\.parallel\.v1\.parallel_task_exe_.*"
 parallel::sequential_execution_policy      "sequential_execution_policy"    "hpx\.parallel\.v1\.sequential_exec.*"
-parallel::sequential_task_execution_policy "sequential_task_execution_policy" "hpx\.parallel\.v1\.sequential_task_exec.*"
-parallel::vector_execution_policy          "vector_execution_policy"        "hpx\.parallel\.v1\.vector_exec.*"
-parallel::is_execution_policy              "is_execution_policy"            "hpx\.parallel\.v1\.is_execution_policy.*"
-parallel::is_parallel_execution_policy     "is_parallel_execution_policy"   "hpx\.parallel\.v1\.is_parallel_execution_policy.*"
-parallel::is_sequential_execution_policy   "is_sequential_execution_policy" "hpx\.parallel\.v1\.is_sequential_execution_policy.*"
+parallel::sequential_execution_policy_shim "sequential_execution_policy_shim" "hpx\.parallel\.v1\.sequential_exec.*"
+parallel::sequential_task_execution_policy "sequential_task_execution_policy" "hpx\.parallel\.v1\.sequential_task_e.*"
+parallel::sequential_task_execution_policy_shim "sequential_task_execution_policy_shim" "hpx\.parallel\.v1\.sequential_task_e.*"
+parallel::parallel_vector_execution_policy "parallel_vector_execution_policy"        "hpx\.parallel\.v1\.parallel_vector_e.*"
 
+parallel::is_execution_policy              "is_execution_policy"            "hpx\.parallel\.v1\.is_execution_policy.*"
+parallel::is_parallel_execution_policy     "is_parallel_execution_policy"   "hpx\.parallel\.v1\.is_parallel_execu_.*"
+parallel::is_sequential_execution_policy   "is_sequential_execution_policy" "hpx\.parallel\.v1\.is_sequential_exe_.*"
+parallel::is_async_execution_policy        "is_async_execution_policy"            "hpx\.parallel\.v1\.is_async_execution_policy.*"
+
+# hpx/parallel/executors/execution_traits.hpp
+parallel::executor_traits                  "executor_traits"               "hpx\.parallel\.v3\.executor_traits.*"
+parallel::is_executor                      "is_executor"                   "hpx\.parallel\.v3\.is_executor.*"
+parallel::sequential_execution_tag         "sequential_execution_tag"      "hpx\.parallel\.v3\.sequential_execution_tag.*"
+parallel::parallel_execution_tag           "parallel_execution_tag"        "hpx\.parallel\.v3\.parallel_execution_tag.*"
+parallel::vector_execution_tag             "vector_execution_tag"          "hpx\.parallel\.v3\.vector_execution_tag.*"
+
+# hpx/parallel/executors/sequential_executor.hpp
+parallel::sequential_executor              "sequential_executor"           "hpx\.parallel\.v3\.sequential_executor.*"
+
+# hpx/parallel/executors/parallel_executor.hpp
+parallel::parallel_executor                "parallel_executor"             "hpx\.parallel\.v3\.parallel_executor.*"
+
+# hpx/parallel/executors/service_executors.hpp
+parallel::service_executor                 "service_executor"              "hpx\.parallel\.v3\.service_executor.*"
+
+# hpx/parallel/executors/service_executors.hpp
+parallel::service_executor                 "service_executor"              "hpx\.parallel\.v3\.service_executor.*"
+
+# hpx/parallel/executors/thread_pool_executors.hpp
+parallel::local_queue_executor           "local_queue_executor"             "hpx\.parallel\.v3\.local_queue_executor.*"
+parallel::local_priority_queue_executor  "local_priority_queue_executor"    "hpx\.parallel\.v3\.local_priority_qu_.*"
+parallel::static_priority_queue_executor "static_priority_queue_executor"   "hpx\.parallel\.v3\.static_priority_q_.*"
 
 # hpx/parallel/algorithms/adjacent_find.hpp
 parallel::adjacent_find               "adjacent_find" "hpx\.parallel\.v1\.adjacent_find.*"
@@ -193,9 +222,9 @@ parallel::set_union                   "set_union" "hpx\.parallel\.v1\.set_union.
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"
 
 # hpx/parallel/task_region.hpp
-parallel::task_region                 "task_region" "hpx\.parallel\.v2\.task_region_id.*"
-parallel::task_region_final           "task_region_final" "hpx\.parallel\.v2\.task_region_final.*"
-parallel::task_region_handle          "task_region_handle" "hpx\.parallel\.v2\.task_region_handle.*"
+parallel::define_task_block           "define_task_block" "hpx\.parallel\.v2\.define_task_block.*"
+parallel::define_task_block_restore_thread "define_task_block_restore_thread" "hpx\.parallel\.v2\.define_task_block_.*"
+parallel::task_block                  "task_block" "hpx\.parallel\.v2\.task_block.*"
 parallel::task_canceled_exception     "task_canceled_exception" "hpx\.parallel\.v2\.task_canceled_exception.*"
 
 # hpx/parallel/algorithms/transform.hpp
@@ -404,12 +433,10 @@ install_counter_type                  "" "hpx\.performance_counters\.install_cou
 
 # hpx/runtime/actions/action_support.hpp
 HPX_REGISTER_ACTION_DECLARATION           "" "HPX_REGISTER_ACTION_DECLARATION"
-HPX_REGISTER_ACTION_DECLARATION_TEMPLATE  "" "HPX_REGISTER_ACTION_DECLARATION_TEMPLATE"
 HPX_REGISTER_ACTION                       "" "HPX_REGISTER_ACTION"
 
 # hpx/runtime/actions/component_action.hpp
 HPX_DEFINE_COMPONENT_ACTION               "" "HPX_DEFINE_COMPONENT_ACTION"
-HPX_DEFINE_COMPONENT_CONST_ACTION         "" "HPX_DEFINE_COMPONENT_CONST_ACTION"
 
 # hpx/runtime/actions/plain_action.hpp
 HPX_PLAIN_ACTION                          "" "HPX_PLAIN_ACTION"

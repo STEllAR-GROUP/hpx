@@ -93,7 +93,7 @@ void function_pointers()
     {
         vf.push_back(dataflow(unwrapped(&int_f1), make_ready_future(42)));
     }
-    future<int> f4 = dataflow(unwrapped(&int_f_vector), boost::move(vf));
+    future<int> f4 = dataflow(unwrapped(&int_f_vector), std::move(vf));
 
     future<int>
         f5 = dataflow(
@@ -276,12 +276,44 @@ void plain_arguments()
     }
 }
 
+void plain_deferred_arguments()
+{
+    void_f4_count.store(0);
+    int_f4_count.store(0);
+
+    {
+        future<void> f1 = dataflow(hpx::launch::deferred, &void_f4, 42);
+        future<int> f2 = dataflow(hpx::launch::deferred, &int_f4, 42);
+
+        f1.wait();
+        HPX_TEST_EQ(void_f4_count, 1u);
+
+        HPX_TEST_EQ(f2.get(), 84);
+        HPX_TEST_EQ(int_f4_count, 1u);
+    }
+
+    void_f5_count.store(0);
+    int_f5_count.store(0);
+
+    {
+        future<void> f1 = dataflow(&void_f5, 42, async(hpx::launch::deferred, &int_f));
+        future<int> f2 = dataflow(&int_f5, 42, async(hpx::launch::deferred, &int_f));
+
+        f1.wait();
+        HPX_TEST_EQ(void_f5_count, 1u);
+
+        HPX_TEST_EQ(f2.get(), 126);
+        HPX_TEST_EQ(int_f5_count, 1u);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
     function_pointers();
     future_function_pointers();
     plain_arguments();
+    plain_deferred_arguments();
 
     return hpx::finalize();
 }

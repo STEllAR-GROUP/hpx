@@ -123,8 +123,8 @@ inline void register_counter_types()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Implements second and third stage bootstrapping.
-bool pre_main(runtime_mode mode);
-bool pre_main(runtime_mode mode)
+int pre_main(runtime_mode mode);
+int pre_main(runtime_mode mode)
 {
     // Register pre-shutdown and shutdown functions to flush pending
     // reference counting operations.
@@ -137,7 +137,7 @@ bool pre_main(runtime_mode mode)
     runtime& rt = get_runtime();
     util::runtime_configuration const& cfg = rt.get_config();
 
-    bool exit_requested = false;
+    int exit_code = 0;
     if (runtime_mode_connect == mode)
     {
         LBT_(info) << "(2nd stage) pre_main: locality is in connect mode, "
@@ -145,17 +145,17 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
 
         // Load components, so that we can use the barrier LCO.
-        exit_requested = !runtime_support::load_components(find_here());
+        exit_code = runtime_support::load_components(find_here());
         LBT_(info) << "(2nd stage) pre_main: loaded components"
-            << (exit_requested ? ", application exit has been requested" : "");
+            << (exit_code ? ", application exit has been requested" : "");
 
         register_counter_types();
 
-        rt.set_state(runtime::state_pre_startup);
+        rt.set_state(state_pre_startup);
         runtime_support::call_startup_functions(find_here(), true);
         LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
 
-        rt.set_state(runtime::state_startup);
+        rt.set_state(state_startup);
         runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
     }
@@ -164,9 +164,9 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
 
         // Load components, so that we can use the barrier LCO.
-        exit_requested = !runtime_support::load_components(find_here());
+        exit_code = runtime_support::load_components(find_here());
         LBT_(info) << "(2nd stage) pre_main: loaded components"
-            << (exit_requested ? ", application exit has been requested" : "");
+            << (exit_code ? ", application exit has been requested" : "");
 
         lcos::barrier startup_barrier;
 
@@ -262,20 +262,20 @@ bool pre_main(runtime_mode mode)
 
     // Any error in post-command line handling or any explicit --exit command
     // line option will cause the application to terminate at this point.
-    if (exit_requested)
+    if (exit_code)
     {
         // If load_components returns false, shutdown the system. This
         // essentially only happens if the command line contained --exit.
         runtime_support::shutdown_all(
             naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
-        return false;
+        return exit_code;
     }
 
     // now adjust the number of local AGAS cache entries for the number of
     // connected localities
     agas_client.adjust_local_cache_size();
 
-    return true;
+    return 0;
 }
 
 }

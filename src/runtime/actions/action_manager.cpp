@@ -32,22 +32,22 @@ namespace hpx { namespace actions
         if (!parcel_handler.get_parcel(p, parcel_id))
             return;
 
-        while (threads::threadmanager_is(starting))
+        while (threads::threadmanager_is(state_starting))
         {
             boost::this_thread::sleep(boost::get_system_time() +
                 boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
         // Give up if we're shutting down.
-        if (threads::threadmanager_is(stopping))
+        if (threads::threadmanager_is(state_stopping))
         {
-            LPT_(debug) << "action_manager: fetch_parcel: dropping late "
-                            "parcel " << p;
+//             LPT_(debug) << "action_manager: fetch_parcel: dropping late "
+//                             "parcel " << p;
             return;
         }
 
         // write this parcel to the log
-        LPT_(debug) << "action_manager: fetch_parcel: " << p;
+//         LPT_(debug) << "action_manager: fetch_parcel: " << p;
 
         appl_.schedule_action(p);
     }

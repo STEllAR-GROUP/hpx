@@ -198,7 +198,7 @@ namespace hpx { namespace components { namespace server
             naming::address const&, boost::uint64_t, boost::uint64_t);
 
         /// \brief Load all components on this locality.
-        bool load_components();
+        int load_components();
 
         void call_startup_functions(bool pre_startup);
         void call_shutdown_functions(bool pre_shutdown);
@@ -352,7 +352,7 @@ namespace hpx { namespace components { namespace server
 
     protected:
         // Load all components from the ini files found in the configuration
-        bool load_components(util::section& ini, naming::gid_type const& prefix,
+        int load_components(util::section& ini, naming::gid_type const& prefix,
             naming::resolver_client& agas_client);
 
 #if !defined(HPX_HAVE_STATIC_LINKING)

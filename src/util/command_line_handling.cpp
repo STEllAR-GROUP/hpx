@@ -145,7 +145,7 @@ namespace hpx { namespace util
             std::size_t num_localities)
         {
             std::size_t batch_localities = env.retrieve_number_of_localities();
-            if (num_localities == 1)
+            if (num_localities == 1 && batch_localities != std::size_t(-1))
             {
                 std::size_t cfg_num_localities = cfgmap.get_value<std::size_t>(
                     "hpx.localities", batch_localities);
@@ -641,6 +641,17 @@ namespace hpx { namespace util
             ini_config += "hpx.logging.agas.level=5";
         }
 
+        if (vm.count("hpx:debug-parcel-log")) {
+            ini_config += "hpx.logging.console.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.console.parcel.level=5";
+            ini_config += "hpx.logging.parcel.level=5";
+        }
+
         // Set number of cores and OS threads in configuration.
         ini_config += "hpx.os_threads=" +
             boost::lexical_cast<std::string>(num_threads_);
@@ -954,12 +965,16 @@ namespace hpx { namespace util
         rtcfg_.reconfigure(ini_config_);
 
         // print version/copyright information
-        if (vm_.count("hpx:version"))
+        if (vm_.count("hpx:version")) {
             detail::print_version(std::cout);
+            return 1;
+        }
 
         // print configuration information (static and dynamic)
-        if (vm_.count("hpx:info"))
+        if (vm_.count("hpx:info")) {
             detail::print_info(std::cout, *this);
+            return 1;
+        }
 
         // all is good
         return 0;
