@@ -581,16 +581,6 @@ namespace hpx { namespace util
         }
     };
 
-    template <typename Tuple>
-    struct tuple_decay
-    {};
-
-    template <typename ...Ts>
-    struct tuple_decay<tuple<Ts...> >
-    {
-        typedef tuple<typename std::decay<Ts>::type...> type;
-    };
-
     // 20.4.2.6, element access
 
     // template <size_t I, class... Types>
