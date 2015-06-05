@@ -419,9 +419,9 @@ steps that explain how to use a docker image::
     
     # For example, build the binary "example" from "example.cpp" using
     # the built-in hpx compilation script "hpxcxx". Note that hpx libraries
-    # other than the core library have to be linked explicitely (like iostreams).
+    # other than the core library have to be linked explicitely (like hpx_iostreams).
     docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev \
-        hpxcxx example.cpp --exe=example -liostreams
+        hpxcxx example.cpp --exe=example -lhpx_iostreams
 
     # Now run the resulting program:
     docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev ./example

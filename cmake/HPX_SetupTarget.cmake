@@ -119,6 +119,7 @@ function(hpx_setup_target target)
         VERSION ${HPX_LIBRARY_VERSION}
         SOVERSION ${HPX_SOVERSION})
     endif()
+    hpx_set_lib_name(${target} ${name})
     set_target_properties(${target}
       PROPERTIES
       # create *nix style library versions + symbolic links
@@ -145,6 +146,7 @@ function(hpx_setup_target target)
         VERSION ${HPX_LIBRARY_VERSION}
         SOVERSION ${HPX_SOVERSION})
     endif()
+    hpx_set_lib_name(${target} ${name})
     set_target_properties(${target}
       PROPERTIES
       # create *nix style library versions + symbolic links
@@ -155,8 +157,8 @@ function(hpx_setup_target target)
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
-                 "HPX_COMPONENT_NAME=${name}"
-                 "HPX_COMPONENT_STRING=\"${name}\""
+                 "HPX_COMPONENT_NAME=hpx_${name}"
+                 "HPX_COMPONENT_STRING=\"hpx_${name}\""
                  "HPX_COMPONENT_EXPORTS")
   endif()
 
