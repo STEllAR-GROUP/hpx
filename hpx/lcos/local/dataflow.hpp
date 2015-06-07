@@ -433,165 +433,174 @@ namespace hpx { namespace lcos { namespace local
             Futures futures_;
             bool done_;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Func, typename Enable = void>
+        struct dataflow_dispatch;
+
+        // BOOST_SCOPED_ENUM(launch)
+        template <typename Policy>
+        struct dataflow_dispatch<Policy,
+            typename boost::enable_if_c<
+                traits::is_launch_policy<typename util::decay<Policy>::type>::value
+            >::type>
+        {
+            template <typename F, typename ...Ts>
+            BOOST_FORCEINLINE static
+            typename detail::dataflow_frame<
+                BOOST_SCOPED_ENUM(launch)
+              , typename hpx::util::decay<F>::type
+              , hpx::util::tuple<
+                    typename hpx::traits::acquire_future<Ts>::type...
+                >
+            >::type
+            call(Policy const& policy, F && f, Ts&&... ts)
+            {
+                typedef
+                    detail::dataflow_frame<
+                        BOOST_SCOPED_ENUM(launch)
+                      , typename hpx::util::decay<F>::type
+                      , hpx::util::tuple<
+                            typename hpx::traits::acquire_future<Ts>::type...
+                        >
+                    >
+                    frame_type;
+
+                boost::intrusive_ptr<frame_type> p(new frame_type(
+                        policy
+                      , std::forward<F>(f)
+                      , hpx::util::forward_as_tuple(
+                            hpx::traits::acquire_future_disp()(
+                                std::forward<Ts>(ts)
+                            )...
+                        )
+                    ));
+                p->await();
+
+                using traits::future_access;
+                return future_access<typename frame_type::type>::create(std::move(p));
+            }
+        };
+
+        // plain function or function object
+        template <typename Func, typename Enable>
+        struct dataflow_dispatch
+        {
+            template <typename F, typename ...Ts>
+            BOOST_FORCEINLINE static
+            typename detail::dataflow_frame<
+                BOOST_SCOPED_ENUM(launch)
+              , typename hpx::util::decay<F>::type
+              , hpx::util::tuple<
+                    typename hpx::traits::acquire_future<Ts>::type...
+                >
+            >::type
+            call(F && f, Ts&&... ts)
+            {
+                return dataflow_dispatch<BOOST_SCOPED_ENUM(launch)>::call(
+                    launch::all, std::forward<F>(f), std::forward<Ts>(ts)...);
+            }
+        };
+
+        // threads::executor
+        template <typename Executor>
+        struct dataflow_dispatch<Executor,
+            typename boost::enable_if_c<
+                traits::is_threads_executor<typename util::decay<Executor>::type>::value
+            >::type>
+        {
+            template <typename F, typename ...Ts>
+            BOOST_FORCEINLINE static
+            typename detail::dataflow_frame<
+                threads::executor
+              , typename hpx::util::decay<F>::type
+              , hpx::util::tuple<
+                    typename hpx::traits::acquire_future<Ts>::type...
+                >
+            >::type
+            call(Executor& sched, F && f, Ts&&... ts)
+            {
+                typedef
+                    detail::dataflow_frame<
+                        threads::executor
+                      , typename hpx::util::decay<F>::type
+                      , hpx::util::tuple<
+                            typename hpx::traits::acquire_future<Ts>::type...
+                        >
+                    >
+                    frame_type;
+
+                boost::intrusive_ptr<frame_type> p(new frame_type(
+                        std::forward<Executor>(sched)
+                      , std::forward<F>(f)
+                      , hpx::util::forward_as_tuple(
+                            hpx::traits::acquire_future_disp()(
+                                std::forward<Ts>(ts)
+                            )...
+                        )
+                    ));
+                p->await();
+
+                using traits::future_access;
+                return future_access<typename frame_type::type>::create(std::move(p));
+            }
+        };
+
+        // parallel executor
+        template <typename Executor>
+        struct dataflow_dispatch<Executor,
+            typename boost::enable_if_c<
+                traits::is_executor<typename util::decay<Executor>::type>::value
+            >::type>
+        {
+            template <typename F, typename ...Ts>
+            BOOST_FORCEINLINE static
+            typename detail::dataflow_frame<
+                typename util::decay<Executor>::type
+              , typename hpx::util::decay<F>::type
+              , hpx::util::tuple<
+                    typename hpx::traits::acquire_future<Ts>::type...
+                >
+            >::type
+            call(Executor& exec, F && f, Ts&&... ts)
+            {
+                typedef
+                    detail::dataflow_frame<
+                        typename hpx::util::decay<Executor>::type
+                      , typename hpx::util::decay<F>::type
+                      , hpx::util::tuple<
+                            typename hpx::traits::acquire_future<Ts>::type...
+                        >
+                    >
+                    frame_type;
+
+                boost::intrusive_ptr<frame_type> p(new frame_type(
+                        std::forward<Executor>(exec)
+                      , std::forward<F>(f)
+                      , hpx::util::forward_as_tuple(
+                            hpx::traits::acquire_future_disp()(
+                                std::forward<Ts>(ts)
+                            )...
+                        )
+                    ));
+                p->await();
+
+                using traits::future_access;
+                return future_access<typename frame_type::type>::create(std::move(p));
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Policy, typename Func, typename ...Ts>
+    template <typename F, typename ...Ts>
     BOOST_FORCEINLINE
-    typename boost::lazy_enable_if_c<
-        traits::is_launch_policy<typename util::decay<Policy>::type>::value
-      , detail::dataflow_frame<
-            BOOST_SCOPED_ENUM(launch)
-          , typename hpx::util::decay<Func>::type
-          , hpx::util::tuple<
-                typename hpx::traits::acquire_future<Ts>::type...
-            >
-        >
-    >::type
-    dataflow(
-        Policy && policy
-      , Func && func
-      , Ts&&... vs
-    )
+    auto dataflow(F && f, Ts&&... ts)
+    ->  decltype(detail::dataflow_dispatch<F>::call(
+            std::forward<F>(f), std::forward<Ts>(ts)...
+        ))
     {
-        typedef
-            detail::dataflow_frame<
-                BOOST_SCOPED_ENUM(launch)
-              , typename hpx::util::decay<Func>::type
-              , hpx::util::tuple<
-                    typename hpx::traits::acquire_future<Ts>::type...
-                >
-            >
-            frame_type;
-
-        boost::intrusive_ptr<frame_type> p(new frame_type(
-                std::forward<Policy>(policy)
-              , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(
-                    hpx::traits::acquire_future_disp()(std::forward<Ts>(vs))...)
-            ));
-        p->await();
-
-        using traits::future_access;
-        return future_access<typename frame_type::type>::create(std::move(p));
-    }
-
-    template <typename Executor, typename Func, typename ...Ts>
-    BOOST_FORCEINLINE
-    typename boost::lazy_enable_if_c<
-        traits::is_threads_executor<typename util::decay<Executor>::type>::value
-      , detail::dataflow_frame<
-            threads::executor
-          , typename hpx::util::decay<Func>::type
-          , hpx::util::tuple<
-                typename hpx::traits::acquire_future<Ts>::type...
-            >
-        >
-    >::type
-    dataflow(
-        Executor && sched
-      , Func && func
-      , Ts&&... vs
-    )
-    {
-        typedef
-            detail::dataflow_frame<
-                threads::executor
-              , typename hpx::util::decay<Func>::type
-              , hpx::util::tuple<
-                    typename hpx::traits::acquire_future<Ts>::type...
-                >
-            >
-            frame_type;
-
-        boost::intrusive_ptr<frame_type> p(new frame_type(
-                std::forward<Executor>(sched)
-              , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(
-                    hpx::traits::acquire_future_disp()(std::forward<Ts>(vs))...)
-            ));
-        p->await();
-
-        using traits::future_access;
-        return future_access<typename frame_type::type>::create(std::move(p));
-    }
-
-    template <typename Executor, typename Func, typename ...Ts>
-    BOOST_FORCEINLINE
-    typename boost::lazy_enable_if_c<
-        traits::is_executor<typename util::decay<Executor>::type>::value
-      , detail::dataflow_frame<
-            typename util::decay<Executor>::type
-          , typename hpx::util::decay<Func>::type
-          , hpx::util::tuple<
-                typename hpx::traits::acquire_future<Ts>::type...
-            >
-        >
-    >::type
-    dataflow(
-        Executor && exec
-      , Func && func
-      , Ts&&... vs
-    )
-    {
-        typedef
-            detail::dataflow_frame<
-                typename hpx::util::decay<Executor>::type
-              , typename hpx::util::decay<Func>::type
-              , hpx::util::tuple<
-                    typename hpx::traits::acquire_future<Ts>::type...
-                >
-            >
-            frame_type;
-
-        boost::intrusive_ptr<frame_type> p(new frame_type(
-                std::forward<Executor>(exec)
-              , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(
-                    hpx::traits::acquire_future_disp()(std::forward<Ts>(vs))...)
-            ));
-        p->await();
-
-        using traits::future_access;
-        return future_access<typename frame_type::type>::create(std::move(p));
-    }
-
-    template <typename Func, typename ...Ts>
-    BOOST_FORCEINLINE
-    typename boost::lazy_disable_if_c<
-        traits::is_launch_policy<typename util::decay<Func>::type>::value ||
-        traits::is_threads_executor<typename util::decay<Func>::type>::value ||
-        traits::is_executor<typename util::decay<Func>::type>::value
-      , detail::dataflow_frame<
-            BOOST_SCOPED_ENUM(launch)
-          , typename hpx::util::decay<Func>::type
-          , hpx::util::tuple<
-                typename hpx::traits::acquire_future<Ts>::type...
-            >
-        >
-    >::type
-    dataflow(Func && func, Ts&&... vs)
-    {
-        typedef
-            detail::dataflow_frame<
-                BOOST_SCOPED_ENUM(launch)
-              , typename hpx::util::decay<Func>::type
-              , hpx::util::tuple<
-                    typename hpx::traits::acquire_future<Ts>::type...
-                >
-            >
-            frame_type;
-
-        boost::intrusive_ptr<frame_type> p(new frame_type(
-                launch::all
-              , std::forward<Func>(func)
-              , hpx::util::forward_as_tuple(
-                    hpx::traits::acquire_future_disp()(std::forward<Ts>(vs))...)
-            ));
-        p->await();
-
-        using traits::future_access;
-        return future_access<typename frame_type::type>::create(std::move(p));
+        return detail::dataflow_dispatch<F>::call(
+            std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }}}
 

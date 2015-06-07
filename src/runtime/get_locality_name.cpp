@@ -4,13 +4,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/async.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/lcos/async.hpp>
 
 #include <string>
+
+#include <boost/lexical_cast.hpp>
 
 namespace hpx { namespace detail
 {
