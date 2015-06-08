@@ -16,19 +16,30 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(hpx::components::server::memory,
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
-HPX_REGISTER_ACTION(hpx::components::server::allocate_action, allocate_action);
+HPX_REGISTER_ACTION_ID(hpx::components::server::allocate_action, allocate_action,
+        hpx::actions::allocate_action_id);
 
-HPX_REGISTER_ACTION(hpx::components::server::memory::store8_action, store8_action)
-HPX_REGISTER_ACTION(hpx::components::server::memory::store16_action, store16_action)
-HPX_REGISTER_ACTION(hpx::components::server::memory::store32_action, store32_action)
-HPX_REGISTER_ACTION(hpx::components::server::memory::store64_action, store64_action)
-HPX_REGISTER_ACTION(hpx::components::server::memory::store128_action, store128_action)
+HPX_REGISTER_ACTION_ID(hpx::components::server::memory::store8_action, store8_action,
+        hpx::actions::store8_action_id)
+HPX_REGISTER_ACTION_ID(hpx::components::server::memory::store16_action, store16_action,
+        hpx::actions::store16_action_id)
+HPX_REGISTER_ACTION_ID(hpx::components::server::memory::store32_action, store32_action,
+        hpx::actions::store32_action_id)
+HPX_REGISTER_ACTION_ID(hpx::components::server::memory::store64_action, store64_action,
+        hpx::actions::store64_action_id)
+HPX_REGISTER_ACTION_ID(hpx::components::server::memory::store128_action, store128_action,
+        hpx::actions::store128_action_id)
 
-HPX_REGISTER_ACTION(hpx::components::server::memory::load8_action, load8_action)
-HPX_REGISTER_ACTION(hpx::components::server::memory::load16_action, load16_action)
-HPX_REGISTER_ACTION(hpx::components::server::memory::load32_action, load32_action)
-HPX_REGISTER_ACTION(hpx::components::server::memory::load64_action, load64_action)
-HPX_REGISTER_ACTION(hpx::components::server::memory::load128_action, load128_action)
+HPX_REGISTER_ACTION_ID(hpx::components::server::memory::load8_action, load8_action,
+        hpx::actions::load8_action_id)
+HPX_REGISTER_ACTION_ID(hpx::components::server::memory::load16_action, load16_action,
+        hpx::actions::load16_action_id)
+HPX_REGISTER_ACTION_ID(hpx::components::server::memory::load32_action, load32_action,
+        hpx::actions::load32_action_id)
+HPX_REGISTER_ACTION_ID(hpx::components::server::memory::load64_action, load64_action,
+        hpx::actions::load64_action_id)
+HPX_REGISTER_ACTION_ID(hpx::components::server::memory::load128_action, load128_action,
+        hpx::actions::load128_action_id)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE(
     hpx::components::server::memory::uint128_t

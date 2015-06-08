@@ -245,6 +245,11 @@ namespace hpx { namespace traits {
     HPX_REGISTER_ACTION_DECLARATION(name, name);                              \
     HPX_REGISTER_ACTION(name, name);                                          \
 /**/
+#define HPX_PLAIN_ACTION_ID(func, name, id)                                   \
+    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
+    HPX_REGISTER_ACTION_DECLARATION(name, name);                              \
+    HPX_REGISTER_ACTION_ID(name, name, id);                                   \
+/**/
 
 // same for direct actions
 #define HPX_PLAIN_DIRECT_ACTION_(...)                                         \
@@ -259,6 +264,11 @@ namespace hpx { namespace traits {
     HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                               \
     HPX_REGISTER_ACTION_DECLARATION(name, name);                              \
     HPX_REGISTER_ACTION(name, name);                                          \
+/**/
+#define HPX_PLAIN_DIRECT_ACTION_ID(func, name, id)                            \
+    HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                               \
+    HPX_REGISTER_ACTION_DECLARATION(name, name);                              \
+    HPX_REGISTER_ACTION_ID(name, name, id);                                   \
 /**/
 
 /// \endcond

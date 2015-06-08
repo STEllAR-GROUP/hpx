@@ -19,10 +19,12 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(latch_type, hpx_lcos_server_latch,
     "hpx::lcos::base_lco_with_value", hpx::components::factory_enabled)
 
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     hpx::lcos::server::latch::create_component_action,
-    hpx_lcos_server_latch_create_component_action)
-HPX_REGISTER_ACTION(
+    hpx_lcos_server_latch_create_component_action,
+    hpx::actions::hpx_lcos_server_latch_create_component_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::lcos::server::latch::wait_action,
-    hpx_lcos_server_latch_wait_action)
+    hpx_lcos_server_latch_wait_action,
+    hpx::actions::hpx_lcos_server_latch_wait_action_id)
 

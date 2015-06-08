@@ -9,7 +9,7 @@
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_centralized_factory.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
@@ -64,17 +64,15 @@ namespace hpx { namespace serialization
                 }
             };
 
-            struct centralized_polymorphic
+            struct polymorphic_with_id
             {
                 static void call(input_archive& ar,
                     Pointer& ptr, boost::uint64_t pos)
                 {
-                    boost::uint32_t desc;
-                    ar >> desc;
+                    boost::uint32_t id;
+                    ar >> id;
 
-                    Pointer t(
-                        polymorphic_centralized_factory::create<referred_type>(desc)
-                    );
+                    Pointer t(polymorphic_id_factory::create<referred_type>(id));
                     ar >> *t;
                     register_pointer(
                           ar
@@ -124,8 +122,8 @@ namespace hpx { namespace serialization
 
         public:
             typedef typename boost::mpl::eval_if<
-                hpx::traits::does_require_centralization<referred_type>,
-                    boost::mpl::identity<centralized_polymorphic>,
+                hpx::traits::is_serialized_with_id<referred_type>,
+                    boost::mpl::identity<polymorphic_with_id>,
                     boost::mpl::eval_if<
                         hpx::traits::is_intrusive_polymorphic<referred_type>,
                             boost::mpl::identity<intrusive_polymorphic>,
@@ -154,15 +152,15 @@ namespace hpx { namespace serialization
                 }
             };
 
-            struct centralized_polymorphic
+            struct polymorphic_with_id
             {
                 static void call(output_archive& ar,
                     Pointer& ptr)
                 {
-                    const boost::uint32_t desc =
-                        polymorphic_centralized_factory::get_descriptor_by_typeid(
+                    const boost::uint32_t id =
+                        polymorphic_id_factory::get_id(
                             access::get_name(ptr.get()));
-                    ar << desc;
+                    ar << id;
                     ar << *ptr;
                 }
             };
@@ -178,8 +176,8 @@ namespace hpx { namespace serialization
 
         public:
             typedef typename boost::mpl::if_<
-                hpx::traits::does_require_centralization<referred_type>,
-                    centralized_polymorphic,
+                hpx::traits::is_serialized_with_id<referred_type>,
+                    polymorphic_with_id,
                     typename boost::mpl::if_<
                         hpx::traits::is_intrusive_polymorphic<referred_type>,
                             intrusive_polymorphic,

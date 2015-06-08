@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach & Katelyn Kufahl
 //  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2015 Anton Bikineev
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,7 +28,8 @@
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_centralized_factory.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/certificate.hpp>
@@ -46,6 +48,90 @@ namespace hpx { namespace detail
 {
     std::string get_locality_base_name();
 }}
+
+namespace
+{
+    struct unassigned_typename_sequence
+    {
+        void save(hpx::serialization::output_archive& ar, unsigned) const
+        {
+            // part running on worker node
+            typenames = hpx::serialization::detail::id_registry::
+                instance().get_unassigned_typenames();
+
+            ar << typenames;
+        }
+
+        void load(hpx::serialization::input_archive& ar, unsigned)
+        {
+            // part running on locality 0
+            ar >> typenames;
+        }
+        HPX_SERIALIZATION_SPLIT_MEMBER();
+
+        static std::vector<std::string> typenames;
+    };
+
+    std::vector<std::string> unassigned_typename_sequence::typenames;
+
+    struct assigned_id_sequence
+    {
+        void save(hpx::serialization::output_archive& ar, unsigned) const
+        {
+            // part running on locality 0
+            static boost::uint32_t max_id = initialize_main_locality_registry();
+
+            hpx::serialization::detail::id_registry& registry =
+                hpx::serialization::detail::id_registry::instance();
+
+            for (const std::string& s : unassigned_typename_sequence::typenames)
+            {
+                boost::uint32_t id = registry.get_id(s);
+                if (id == hpx::serialization::detail::id_registry::invalid_id)
+                {
+                    // this id is not registered yet
+                    id = ++max_id;
+                    registry.register_typename(s, id);
+                }
+                ids.push_back(id);
+            }
+            ar << ids;
+        }
+
+        void load(hpx::serialization::input_archive& ar, unsigned)
+        {
+            // part running on worker node
+            ar >> ids;
+            hpx::serialization::detail::id_registry& registry =
+                hpx::serialization::detail::id_registry::instance();
+            const std::vector<std::string>& typenames =
+                unassigned_typename_sequence::typenames;
+
+            HPX_ASSERT(typenames.size() == ids.size());
+
+            for (std::size_t k = 0; k < ids.size(); ++k)
+            {
+                registry.register_typename(typenames[k], ids[k]);
+            }
+        }
+        HPX_SERIALIZATION_SPLIT_MEMBER();
+
+    private:
+        boost::uint32_t initialize_main_locality_registry() const
+        {
+            hpx::serialization::detail::id_registry& registry =
+                hpx::serialization::detail::id_registry::instance();
+
+            // first, register all ids on locality 0
+            boost::uint32_t max_id = registry.get_max_registered_id();
+            for (const std::string& str : registry.get_unassigned_typenames())
+                registry.register_typename(str, ++max_id);
+            return max_id;
+        }
+
+        mutable std::vector<boost::uint32_t> ids;
+    };
+} // namespace
 
 namespace hpx { namespace agas
 {
@@ -103,7 +189,7 @@ struct registration_header
       , boost::uint32_t cores_needed_
       , boost::uint32_t num_threads_
       , std::string const& hostname_
-      , std::vector<std::string> const& typeids_
+      , ::unassigned_typename_sequence const& typenames_
       , naming::gid_type prefix_ = naming::gid_type()
     ) :
         endpoints(endpoints_)
@@ -112,7 +198,7 @@ struct registration_header
       , cores_needed(cores_needed_)
       , num_threads(num_threads_)
       , hostname(hostname_)
-      , typeids(typeids_)
+      , typenames(typenames_)
       , prefix(prefix_)
     {}
 
@@ -122,7 +208,7 @@ struct registration_header
     boost::uint32_t cores_needed;
     boost::uint32_t num_threads;
     std::string hostname;           // hostname of locality
-    std::vector<std::string> typeids;
+    ::unassigned_typename_sequence typenames;
     naming::gid_type prefix;        // suggested prefix (optional)
 
     template <typename Archive>
@@ -134,7 +220,7 @@ struct registration_header
         ar & cores_needed;
         ar & num_threads;
         ar & hostname;
-        ar & typeids;
+        ar & typenames;
         ar & prefix;
     }
 };
@@ -155,7 +241,7 @@ struct notification_header
       , boost::uint32_t num_localities_
       , boost::uint32_t used_cores_
       , parcelset::endpoints_type const & agas_endpoints_
-      , std::map<std::string, boost::uint32_t> const & type_descriptors_
+      , ::assigned_id_sequence const & ids_
     ) :
         prefix(prefix_)
       , agas_locality(agas_locality_)
@@ -166,7 +252,7 @@ struct notification_header
       , num_localities(num_localities_)
       , used_cores(used_cores_)
       , agas_endpoints(agas_endpoints_)
-      , type_descriptors(type_descriptors_)
+      , ids(ids_)
     {}
 
     naming::gid_type prefix;
@@ -178,7 +264,7 @@ struct notification_header
     boost::uint32_t num_localities;
     boost::uint32_t used_cores;
     parcelset::endpoints_type agas_endpoints;
-    std::map<std::string, boost::uint32_t> type_descriptors;
+    ::assigned_id_sequence ids;
 
 #if defined(HPX_HAVE_SECURITY)
     components::security::signed_certificate root_certificate;
@@ -196,7 +282,7 @@ struct notification_header
         ar & num_localities;
         ar & used_cores;
         ar & agas_endpoints;
-        ar & type_descriptors;
+        ar & ids;
 #if defined(HPX_HAVE_SECURITY)
         ar & root_certificate;
 #endif
@@ -298,10 +384,12 @@ using hpx::agas::notify_worker_action;
 HPX_ACTION_HAS_CRITICAL_PRIORITY(register_worker_action);
 HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_worker_action);
 
-HPX_REGISTER_ACTION(register_worker_action,
-    register_worker_action)
-HPX_REGISTER_ACTION(notify_worker_action,
-    notify_worker_action)
+HPX_REGISTER_ACTION_ID(register_worker_action,
+    register_worker_action,
+    hpx::actions::register_worker_action_id)
+HPX_REGISTER_ACTION_ID(notify_worker_action,
+    notify_worker_action,
+    hpx::actions::notify_worker_action_id)
 
 #if defined(HPX_HAVE_SECURITY)
 using hpx::agas::register_worker_security_action;
@@ -310,74 +398,16 @@ using hpx::agas::notify_worker_security_action;
 HPX_ACTION_HAS_CRITICAL_PRIORITY(register_worker_security_action);
 HPX_ACTION_HAS_CRITICAL_PRIORITY(notify_worker_security_action);
 
-HPX_REGISTER_ACTION(register_worker_security_action,
-    register_worker_security_action)
-HPX_REGISTER_ACTION(notify_worker_security_action,
-    notify_worker_security_action)
+HPX_REGISTER_ACTION_ID(register_worker_security_action,
+    register_worker_security_action,
+    hpx::actions::register_worker_security_action_id)
+HPX_REGISTER_ACTION_ID(notify_worker_security_action,
+    notify_worker_security_action,
+    hpx::actions::notify_worker_security_action_id)
 #endif
 
 namespace hpx { namespace agas
 {
-
-struct unique_typeid_registry
-{
-    static boost::uint32_t get_type_descriptor(const std::string& type_id)
-    {
-        unique_typeid_registry& registry = instance();
-        boost::mutex::scoped_lock lock(registry.mutex);
-
-        if (registry.map.count(type_id) > 0)
-            return registry.map.at(type_id);
-
-        registry.map[type_id] = registry.count;
-        serialization::detail::polymorphic_centralized_factory::
-            register_type_descriptor(type_id, registry.count++);
-        return registry.count - 1;
-    }
-
-private:
-    unique_typeid_registry():
-        map(), count(0)
-    {}
-
-    static unique_typeid_registry& instance()
-    {
-        util::static_<unique_typeid_registry> registry;
-        return registry.get();
-    }
-
-    friend struct util::static_<unique_typeid_registry>;
-
-    std::map<std::string, boost::uint32_t> map;
-    boost::uint32_t count;
-    boost::mutex mutex;
-};
-
-struct predefined_actions
-{
-    static void register_new_action(const std::string& type_name)
-    {
-        predefined_actions& inst = instance();
-
-        serialization::detail::polymorphic_centralized_factory
-            ::register_type_descriptor(type_name, inst.count++);
-    }
-
-private:
-    predefined_actions():
-        count(0)
-    {}
-
-    static predefined_actions& instance()
-    {
-        util::static_<predefined_actions> inst;
-        return inst;
-    }
-
-    friend struct util::static_<predefined_actions>;
-
-    boost::atomic_int32_t count;
-};
 
 // remote call to AGAS
 void register_worker(registration_header const& header)
@@ -458,19 +488,11 @@ void register_worker(registration_header const& header)
     boost::uint32_t first_core = rt.assign_cores(header.hostname,
         header.cores_needed);
 
-    std::map<std::string, boost::uint32_t> desc_map;
-    std::for_each(header.typeids.cbegin(), header.typeids.cend(),
-        [&](const std::string& str){
-            desc_map.insert(std::make_pair(
-                str, unique_typeid_registry::get_type_descriptor(str))
-            );
-        });
-
     big_boot_barrier & bbb = get_big_boot_barrier();
 
     notification_header hdr (prefix, bbb.here(), locality_addr, primary_addr
       , component_addr, symbol_addr, rt.get_config().get_num_localities()
-      , first_core, bbb.get_endpoints(), desc_map);
+      , first_core, bbb.get_endpoints(), ::assigned_id_sequence());
 
 #if defined(HPX_HAVE_SECURITY)
     // wait for the root certificate to be available
@@ -568,12 +590,6 @@ void notify_worker(notification_header const& header)
     }
 
     util::runtime_configuration& cfg = rt.get_config();
-
-    std::for_each(header.type_descriptors.cbegin(), header.type_descriptors.cend(),
-            [&](const std::pair<const std::string, boost::uint32_t>& pair){
-                serialization::detail::polymorphic_centralized_factory
-                    ::register_type_descriptor(pair.first, pair.second);
-            });
 
     // set our prefix
     agas_client.set_local_locality(header.prefix);
@@ -802,10 +818,6 @@ big_boot_barrier::big_boot_barrier(
   , connected(get_number_of_bootstrap_connections(ini_))
   , thunks(32)
 {
-    predefined_actions::register_new_action(
-            actions::detail::get_action_name<register_worker_action::derived_type>());
-    predefined_actions::register_new_action(
-            actions::detail::get_action_name<notify_worker_action::derived_type>());
     if(pp_)
         pp_->register_event_handler(&early_parcel_sink);
 }
@@ -893,9 +905,6 @@ void big_boot_barrier::wait_hosted(
             util::safe_lexical_cast<boost::uint32_t>(locality_str, -1));
     }
 
-    std::vector<std::string> typenames =
-        serialization::detail::polymorphic_centralized_factory::get_registered_typenames();
-
     // contact the bootstrap AGAS node
     registration_header hdr(
           rt.endpoints()
@@ -904,7 +913,7 @@ void big_boot_barrier::wait_hosted(
         , cores_needed
         , num_threads
         , locality_name
-        , typenames
+        , ::unassigned_typename_sequence()
         , suggested_prefix);
 
     apply(

@@ -45,7 +45,7 @@ namespace hpx { namespace traits {
 
     } // namespace detail
 
-    BOOST_MPL_HAS_XXX_TRAIT_DEF(requires_centralization);
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(serialized_with_id);
 
     template <class T, class Enable = void>
     struct is_intrusive_polymorphic: boost::mpl::false_ {};
@@ -60,8 +60,8 @@ namespace hpx { namespace traits {
         boost::mpl::false_ {};
 
     template <class T>
-    struct does_require_centralization:
-        has_requires_centralization<T> {};
+    struct is_serialized_with_id:
+        has_serialized_with_id<T> {};
 }}
 
 #define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class)                          \
@@ -80,18 +80,18 @@ namespace hpx { namespace traits {
     }}                                                                      \
 /**/
 
-#define HPX_TRAITS_REQUIRES_CENTRALIZATION(Class)                           \
+#define HPX_TRAITS_SERIALIZED_WITH_ID(Class)                                \
     namespace hpx { namespace traits {                                      \
         template <>                                                         \
-        struct does_require_centralization<Class>:                          \
+        struct is_serialized_with_id<Class>:                                \
             boost::mpl::true_ {};                                           \
     }}                                                                      \
 /**/
 
-#define HPX_TRAITS_REQUIRES_CENTRALIZATION_TEMPLATE(TEMPLATE, ARG_LIST)     \
+#define HPX_TRAITS_SERIALIZED_WITH_ID_TEMPLATE(TEMPLATE, ARG_LIST)          \
     namespace hpx { namespace traits {                                      \
         HPX_UTIL_STRIP(TEMPLATE)                                            \
-        struct does_require_centralization<HPX_UTIL_STRIP(ARG_LIST)>        \
+        struct is_serialized_with_id<HPX_UTIL_STRIP(ARG_LIST)>              \
           : boost::mpl::true_ {};                                           \
     }}                                                                      \
 /**/

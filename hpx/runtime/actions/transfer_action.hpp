@@ -70,7 +70,7 @@ namespace hpx { namespace actions
         enum { stacksize_value = traits::action_stacksize<Action>::value };
 
         typedef typename Action::direct_execution direct_execution;
-        typedef boost::mpl::true_ requires_centralization;
+        typedef boost::mpl::true_ serialized_with_id;
 
         // construct an action from its arguments
         template <typename ...Ts>

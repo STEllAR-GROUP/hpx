@@ -22,13 +22,15 @@ HPX_REGISTER_COMPONENT(
 HPX_DEFINE_GET_COMPONENT_TYPE(ostream_type)
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     ostream_type::write_async_action,
-    output_stream_write_async_action)
+    output_stream_write_async_action,
+    hpx::actions::output_stream_write_async_action_id)
 
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     ostream_type::write_sync_action,
-    output_stream_write_sync_action)
+    output_stream_write_sync_action,
+    hpx::actions::output_stream_write_sync_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register a startup function which will be called as a HPX-thread during

@@ -654,12 +654,14 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(
     agas_response_vector_type)
 
 typedef base_lco_with_value<bool, response> base_lco_bool_response_type;
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     base_lco_bool_response_type::set_value_action,
-    set_value_action_agas_bool_response_type)
+    set_value_action_agas_bool_response_type,
+    hpx::actions::set_value_action_agas_bool_response_type_id)
 
 typedef base_lco_with_value<id_type, response> base_lco_id_type_response_type;
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     base_lco_id_type_response_type::set_value_action,
-    set_value_action_agas_id_type_response_type)
+    set_value_action_agas_id_type_response_type,
+    hpx::actions::set_value_action_agas_id_type_response_type_id)
 

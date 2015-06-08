@@ -347,6 +347,6 @@ namespace hpx { namespace actions
     /// \endcond
 }}
 
-HPX_TRAITS_REQUIRES_CENTRALIZATION(hpx::actions::base_action)
+HPX_TRAITS_SERIALIZED_WITH_ID(hpx::actions::base_action)
 
 #endif

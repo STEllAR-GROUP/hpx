@@ -59,12 +59,12 @@ namespace hpx { namespace detail
     void list_component_type(std::string const&, components::component_type);
 }}
 
-HPX_PLAIN_ACTION(hpx::detail::console_print,
-    console_print_action)
-HPX_PLAIN_ACTION(hpx::detail::list_symbolic_name,
-    list_symbolic_name_action)
-HPX_PLAIN_ACTION(hpx::detail::list_component_type,
-    list_component_type_action)
+HPX_PLAIN_ACTION_ID(hpx::detail::console_print,
+    console_print_action, hpx::actions::console_print_action_id)
+HPX_PLAIN_ACTION_ID(hpx::detail::list_symbolic_name,
+    list_symbolic_name_action, hpx::actions::list_symbolic_name_action_id)
+HPX_PLAIN_ACTION_ID(hpx::detail::list_component_type,
+    list_component_type_action, hpx::actions::list_component_type_action_id)
 
 typedef
     hpx::util::detail::bound_action<

@@ -34,24 +34,30 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initialization support for the performance counter actions
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     hpx::performance_counters::server::base_performance_counter::get_counter_info_action,
-    performance_counter_get_counter_info_action)
-HPX_REGISTER_ACTION(
+    performance_counter_get_counter_info_action,
+    hpx::actions::performance_counter_get_counter_info_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::performance_counters::server::base_performance_counter::get_counter_value_action,
-    performance_counter_get_counter_value_action)
-HPX_REGISTER_ACTION(
+    performance_counter_get_counter_value_action,
+    hpx::actions::performance_counter_get_counter_value_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::performance_counters::server::base_performance_counter::set_counter_value_action,
-    performance_counter_set_counter_value_action)
-HPX_REGISTER_ACTION(
+    performance_counter_set_counter_value_action,
+    hpx::actions::performance_counter_set_counter_value_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::performance_counters::server::base_performance_counter::reset_counter_value_action,
-    performance_counter_reset_counter_value_action)
-HPX_REGISTER_ACTION(
+    performance_counter_reset_counter_value_action,
+    hpx::actions::performance_counter_reset_counter_value_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::performance_counters::server::base_performance_counter::start_action,
-    performance_counter_start_action)
-HPX_REGISTER_ACTION(
+    performance_counter_start_action,
+    hpx::actions::performance_counter_start_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::performance_counters::server::base_performance_counter::stop_action,
-    performance_counter_stop_action)
+    performance_counter_stop_action,
+    hpx::actions::performance_counter_stop_action_id)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE(
     hpx::performance_counters::counter_info,

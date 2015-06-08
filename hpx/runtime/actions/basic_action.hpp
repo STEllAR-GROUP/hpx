@@ -414,6 +414,81 @@ namespace hpx { namespace actions
     /**/
 
     /// \endcond
+
+    enum preassigned_action_id
+    {
+        register_worker_action_id = 0, //*
+        notify_worker_action_id, //*
+        allocate_action_id, //*
+        base_connect_action_id, //*
+        base_disconnect_action_id, //*
+        base_set_event_action_id, //*
+        base_set_exception_action_id, //*
+        broadcast_call_shutdown_functions_action_id, //*
+        broadcast_call_startup_functions_action_id, //*
+        broadcast_symbol_namespace_service_action_id, //*
+        bulk_create_components_action_id, //*
+        call_shutdown_functions_action_id, //*
+        call_startup_functions_action_id, //*
+        component_namespace_bulk_service_action_id, //*
+        component_namespace_service_action_id, //*
+        console_error_sink_action_id, //*
+        console_logging_action_id, //*
+        console_print_action_id, //*
+        create_memory_block_action_id, //*
+        create_performance_counter_action_id, //*
+        dijkstra_termination_action_id, //*
+        free_component_action_id, //*
+        garbage_collect_action_id, //*
+        get_config_action_id, //*
+        get_instance_count_action_id, //*
+        hpx_get_locality_name_action_id, //*
+        hpx_lcos_server_barrier_create_component_action_id, //*
+        hpx_lcos_server_latch_create_component_action_id, //*
+        hpx_lcos_server_latch_wait_action_id, //*
+        list_component_type_action_id, //*
+        list_symbolic_name_action_id, //*
+        load128_action_id, //*
+        load16_action_id, //*
+        load32_action_id, //*
+        load64_action_id, //*
+        load8_action_id, //*
+        load_components_action_id, //*
+        locality_namespace_bulk_service_action_id, //*
+        locality_namespace_service_action_id, //*
+        memory_block_checkin_action_id, //*
+        memory_block_checkout_action_id, //*
+        memory_block_clone_action_id, //*
+        memory_block_get_action_id, //*
+        memory_block_get_config_action_id, //*
+        output_stream_write_async_action_id, //*
+        output_stream_write_sync_action_id, //*
+        performance_counter_get_counter_info_action_id, //*
+        performance_counter_get_counter_value_action_id, //*
+        performance_counter_set_counter_value_action_id, //*
+        performance_counter_reset_counter_value_action_id, //*
+        performance_counter_start_action_id, //*
+        performance_counter_stop_action_id, //*
+        primary_namespace_bulk_service_action_id, //*
+        primary_namespace_service_action_id, //*
+        remove_from_connection_cache_action_id, //*
+        set_value_action_agas_bool_response_type_id, //*
+        set_value_action_agas_id_type_response_type_id, //*
+        shutdown_action_id, //*
+        shutdown_all_action_id, //*
+        store128_action_id, //*
+        store16_action_id, //*
+        store32_action_id, //*
+        store64_action_id, //*
+        store8_action_id, //*
+        symbol_namespace_bulk_service_action_id, //*
+        symbol_namespace_service_action_id, //*
+        terminate_action_id, //*
+        terminate_all_action_id, //*
+        update_agas_cache_entry_action_id, //*
+        register_worker_security_action_id, //*
+        notify_worker_security_action_id, //*
+    };
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
@@ -446,6 +521,10 @@ namespace hpx { namespace actions
 /**/
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
+/**/
+#define HPX_REGISTER_ACTION_ID(action, actionname, actionid)                  \
+    HPX_REGISTER_ACTION_2(action, actionname)                                 \
+    HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(actionname, actionid)                \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
