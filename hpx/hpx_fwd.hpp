@@ -773,6 +773,13 @@ namespace hpx
         return (static_cast<int>(lhs) & static_cast<int>(rhs)) != 0;
     }
 
+    inline BOOST_SCOPED_ENUM(launch)
+    operator|(BOOST_SCOPED_ENUM(launch) lhs, BOOST_SCOPED_ENUM(launch) rhs)
+    {
+        return static_cast<BOOST_SCOPED_ENUM(launch)>(
+            static_cast<int>(lhs) | static_cast<int>(rhs));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current HPX-thread is associated with.
