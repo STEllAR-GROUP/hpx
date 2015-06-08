@@ -58,7 +58,7 @@ namespace hpx { namespace serialization {
                 if (id > max_id) max_id = id;
             }
 
-            boost::uint32_t get_id(const std::string& type_name) const
+            boost::uint32_t try_get_id(const std::string& type_name) const
             {
                 typename_to_id_t::const_iterator it = typename_to_id.find(type_name);
                 if (it == typename_to_id.end())
@@ -101,7 +101,7 @@ namespace hpx { namespace serialization {
             void cache_id(boost::uint32_t id, ctor_t ctor)
             {
                 if (id >= cache.size())
-                    cache.resize(id + 1, NULL); // TODO: or just id is enough?
+                    cache.resize(id + 1, NULL);
                 cache[id] = ctor;
             }
 
@@ -134,19 +134,17 @@ namespace hpx { namespace serialization {
                 return static_cast<T*>(ctor());
             }
 
-            static boost::uint32_t get_id(const std::string& str)
+            static boost::uint32_t get_id(const std::string& type_name)
             {
-                const typename_to_id_t& map =
-                    id_registry::instance().typename_to_id;
+                boost::uint32_t id = id_registry::instance().
+                    try_get_id(type_name);
 
-                auto it = map.find(str);
-                if (it == map.end())
+                if (id == id_registry::invalid_id)
                     HPX_THROW_EXCEPTION(serialization_error
                       , "polymorphic_id_factory::get_id"
-                      , "Unknown typename: " + str);
+                      , "Unknown typename: " + type_name);
 
-                boost::uint32_t value = it->second;
-                return value;
+                return id;
             }
 
         private:

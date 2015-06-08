@@ -86,7 +86,7 @@ namespace
 
             for (const std::string& s : unassigned_typename_sequence::typenames)
             {
-                boost::uint32_t id = registry.get_id(s);
+                boost::uint32_t id = registry.try_get_id(s);
                 if (id == hpx::serialization::detail::id_registry::invalid_id)
                 {
                     // this id is not registered yet
