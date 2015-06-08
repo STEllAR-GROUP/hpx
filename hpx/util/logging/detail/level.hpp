@@ -119,7 +119,7 @@ namespace level {
 
 
 
-#ifndef HPX_LOG_NO_TSS
+#ifndef HPX_HAVE_LOG_NO_TSS
 
     /**
         @brief Filter - holds the level, in a thread-safe way, using TLS.

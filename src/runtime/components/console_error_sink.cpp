@@ -23,7 +23,7 @@ namespace hpx { namespace components
         boost::exception_ptr const& e)
     {
         // Report the error only if the thread-manager is up.
-        if (threads::threadmanager_is(running))
+        if (threads::threadmanager_is(state_running))
         {
             if (threads::get_self_ptr())
             {
@@ -53,7 +53,7 @@ namespace hpx { namespace components
         naming::id_type dst(console_gid, naming::id_type::unmanaged);
 
         // Report the error only if the thread-manager is up.
-        if (threads::threadmanager_is(running))
+        if (threads::threadmanager_is(state_running))
         {
             hpx::async<server::console_error_sink_action>(dst, e).get();
         }

@@ -806,7 +806,7 @@ namespace hpx { namespace naming
         private:
             // credit management (called during serialization), this function
             // has to be 'const' as save() above has to be 'const'.
-            naming::gid_type preprocess_gid(boost::uint32_t dest_locality_id) const;
+            naming::gid_type preprocess_gid() const;
 
             // reference counting
             friend HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);

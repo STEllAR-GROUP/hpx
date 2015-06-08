@@ -52,7 +52,7 @@
 
 #include <boost/exception/all.hpp>
 
-#define HPX_THREAD_MAINTAIN_OPERATIONS_COUNT  0
+#define HPX_HAVE_THREAD_OPERATIONS_COUNT  0
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_COROUTINE_NUM_ALL_HEAPS (HPX_COROUTINE_NUM_HEAPS +                \
@@ -104,14 +104,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         m_state(ctx_ready),
         m_exit_state(ctx_exit_not_requested),
         m_exit_status(ctx_not_exited),
-#if defined(HPX_THREAD_MAINTAIN_OPERATIONS_COUNT)
+#if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
         m_wait_counter(0),
         m_operation_counter(0),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
         m_phase(0),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         m_thread_data(0),
 #endif
         m_type_info(),
@@ -169,16 +169,16 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     void reset()
     {
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
       m_phase = 0;
 #endif
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
       delete_tss_storage(m_thread_data);
 #endif
       m_thread_id = 0;
     }
 
-#if defined(HPX_THREAD_MAINTAIN_OPERATIONS_COUNT)
+#if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
     void count_down() throw()
     {
       HPX_ASSERT(m_operation_counter);
@@ -202,14 +202,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 #endif
 
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
     std::size_t phase() const
     {
         return m_phase;
     }
 #endif
 
-#if defined(HPX_THREAD_MAINTAIN_OPERATIONS_COUNT)
+#if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
     /*
      * A signal may occur only when a context is
      * not running (is delivered synchronously).
@@ -356,7 +356,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       check_exit_state();
     }
 
-#if defined(HPX_THREAD_MAINTAIN_OPERATIONS_COUNT)
+#if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
     //
     // If n > 0, put the coroutine in the wait state
     // then relinquish control to caller.
@@ -449,12 +449,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       catch(...) {
         /**/;
       }
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
       delete_tss_storage(m_thread_data);
 #endif
     }
 
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
     std::size_t get_thread_data() const
     {
         if (!m_thread_data)
@@ -524,7 +524,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     void rebind_base(thread_id_repr_type id)
     {
-#if defined(HPX_THREAD_MAINTAIN_OPERATIONS_COUNT)
+#if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
       HPX_ASSERT(exited() && 0 == m_wait_counter && !pending());
 #else
       HPX_ASSERT(exited() && !pending());
@@ -534,10 +534,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       m_state = ctx_ready;
       m_exit_state = ctx_exit_not_requested;
       m_exit_status = ctx_not_exited;
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
       HPX_ASSERT(m_phase == 0);
 #endif
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
       HPX_ASSERT(m_thread_data == 0);
 #endif
       m_type_info = boost::exception_ptr();
@@ -576,7 +576,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     void do_invoke() throw ()
     {
       HPX_ASSERT(is_ready() || waiting());
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
       ++m_phase;
 #endif
       m_state = ctx_running;
@@ -600,14 +600,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     context_state m_state;
     context_exit_state m_exit_state;
     context_exit_status m_exit_status;
-#if defined(HPX_THREAD_MAINTAIN_OPERATIONS_COUNT)
+#if defined(HPX_HAVE_THREAD_OPERATIONS_COUNT)
     int m_wait_counter;
     int m_operation_counter;
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
     std::size_t m_phase;
 #endif
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
     mutable detail::tss_storage* m_thread_data;
 #endif
 

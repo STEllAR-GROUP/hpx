@@ -12,7 +12,7 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/register_locks.hpp>
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
 
@@ -202,7 +202,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_interruption_requested(id, ec);
     }
 
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
     ///////////////////////////////////////////////////////////////////////////
     std::size_t get_thread_data(thread_id_type const& id, error_code& ec)
     {
@@ -352,7 +352,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
     char const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
 #else
     util::backtrace const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
@@ -373,7 +373,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_backtrace(id);
     }
 
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
     char const* set_thread_backtrace(thread_id_type const& id,
         char const* bt, error_code& ec)
 #else
@@ -435,18 +435,18 @@ namespace hpx { namespace this_thread
             error_code& ec_;
         };
 
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
         struct reset_backtrace
         {
             reset_backtrace(threads::thread_id_type const& id, error_code& ec)
               : id_(id),
                 backtrace_(new hpx::util::backtrace()),
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
                 full_backtrace_(backtrace_->trace()),
 #endif
                 ec_(ec)
             {
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
                 threads::set_thread_backtrace(id_, full_backtrace_.c_str(), ec_);
 #else
                 threads::set_thread_backtrace(id_, backtrace_.get(), ec_);
@@ -459,7 +459,7 @@ namespace hpx { namespace this_thread
 
             threads::thread_id_type id_;
             boost::scoped_ptr<hpx::util::backtrace> backtrace_;
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
             std::string full_backtrace_;
 #endif
             error_code& ec_;
@@ -491,10 +491,10 @@ namespace hpx { namespace this_thread
 #ifdef HPX_HAVE_VERIFY_LOCKS
             util::verify_no_locks();
 #endif
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
             detail::reset_lco_description desc(id, description, ec);
 #endif
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             detail::reset_backtrace bt(id, ec);
 #endif
 
@@ -542,10 +542,10 @@ namespace hpx { namespace this_thread
             // verify that there are no more registered locks for this OS-thread
             util::verify_no_locks();
 #endif
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
             detail::reset_lco_description desc(id, description, ec);
 #endif
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             detail::reset_backtrace bt(id, ec);
 #endif
             threads::set_thread_state(id,

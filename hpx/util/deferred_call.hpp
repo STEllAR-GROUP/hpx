@@ -92,6 +92,14 @@ namespace hpx { namespace util
         return result_type(std::forward<F>(f),
             util::forward_as_tuple(std::forward<Ts>(vs)...));
     }
+
+    // nullary functions do not need to be bound again
+    template <typename F>
+    typename util::decay<F>::type
+    deferred_call(F && f)
+    {
+        return std::forward<F>(f);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

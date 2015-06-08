@@ -38,7 +38,7 @@ struct A
 template <class T>
 std::ostream& operator<<(std::ostream& os, const A<T>& a)
 {
-  return os << a.t_;
+    return os << a.t_;
 }
 
 template <typename T>
@@ -50,7 +50,7 @@ void test(T min, T max)
         std::map<T, A<T> > os;
         for(T c = min; c < max; ++c)
         {
-            os.insert(std::make_pair(c, A<T>{c}));
+            os.insert(std::make_pair(c, A<T>(c)));
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
@@ -59,7 +59,7 @@ void test(T min, T max)
         HPX_TEST_EQ(os.size(), is.size());
         for (const auto& v: os)
         {
-          HPX_TEST_EQ(os[v.first], is[v.first]);
+            HPX_TEST_EQ(os[v.first], is[v.first]);
         }
     }
 }
@@ -73,7 +73,7 @@ void test_fp(T min, T max)
         std::map<T, A<T> > os;
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
-            os.insert(std::make_pair(c, A<T>{c}));
+            os.insert(std::make_pair(c, A<T>(c)));
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
@@ -82,40 +82,41 @@ void test_fp(T min, T max)
         HPX_TEST_EQ(os.size(), is.size());
         for (const auto& v: os)
         {
-          HPX_TEST_EQ(os[v.first], is[v.first]);
+            HPX_TEST_EQ(os[v.first], is[v.first]);
         }
     }
 }
 
 // prohibited, but for adl
-namespace std {
-  std::ostream& operator<<(std::ostream& os, const std::vector<int>& vec)
-  {
-    std::copy(vec.begin(), vec.end(), std::ostream_iterator<int>(os, " "));
-    return os;
-  }
+namespace std
+{
+    std::ostream& operator<<(std::ostream& os, const std::vector<int>& vec)
+    {
+        std::copy(vec.begin(), vec.end(), std::ostream_iterator<int>(os, " "));
+        return os;
+    }
 }
 
 void test_vector_as_value()
 {
-  std::vector<char> buffer;
-  hpx::serialization::output_archive oarchive(buffer);
-  std::map<size_t, std::vector<int> > os;
-  for (size_t k = 0; k < 10; ++k)
-  {
-    std::vector<int> vec(10);
-    std::iota(vec.begin(), vec.end(), k);
-    os.insert({k, vec});
-  }
-  oarchive << os;
-  hpx::serialization::input_archive iarchive(buffer);
-  std::map<size_t, std::vector<int> > is;
-  iarchive >> is;
-  HPX_TEST_EQ(os.size(), is.size());
-  for (const auto& v: os)
-  {
-    HPX_TEST_EQ(os[v.first], is[v.first]);
-  }
+    std::vector<char> buffer;
+    hpx::serialization::output_archive oarchive(buffer);
+    std::map<size_t, std::vector<int> > os;
+    for (size_t k = 0; k < 10; ++k)
+    {
+        std::vector<int> vec(10);
+        std::iota(vec.begin(), vec.end(), k);
+        os.insert(std::make_pair(k, vec));
+    }
+    oarchive << os;
+    hpx::serialization::input_archive iarchive(buffer);
+    std::map<size_t, std::vector<int> > is;
+    iarchive >> is;
+    HPX_TEST_EQ(os.size(), is.size());
+    for (const auto& v: os)
+    {
+        HPX_TEST_EQ(os[v.first], is[v.first]);
+    }
 }
 
 int main()

@@ -57,7 +57,7 @@ void test_by_value()
 
     counter c;
     f(c);
-    f(boost::move(c));
+    f(std::move(c));
 
     HPX_TEST(counter::default_constructions == 1);
     HPX_TEST(counter::copy_constructions <= 1);
@@ -76,7 +76,7 @@ void test_by_lvalue_ref()
 
     counter c;
     f(c);
-    //f(boost::move(c)); // cannot bind rvalue to lvalue-ref (except MSVC)
+    //f(std::move(c)); // cannot bind rvalue to lvalue-ref (except MSVC)
 
     HPX_TEST(counter::default_constructions == 1);
     HPX_TEST(counter::copy_constructions == 0);
@@ -95,7 +95,7 @@ void test_by_const_lvalue_ref()
 
     counter c;
     f(c);
-    f(boost::move(c));
+    f(std::move(c));
 
     HPX_TEST(counter::default_constructions == 1);
     HPX_TEST(counter::copy_constructions == 0);
@@ -114,7 +114,7 @@ void test_by_rvalue_ref()
 
     counter c;
     //f(c); // cannot bind lvalue to rvalue-ref
-    f(boost::move(c));
+    f(std::move(c));
 
     HPX_TEST(counter::default_constructions == 1);
     HPX_TEST(counter::copy_constructions == 0);

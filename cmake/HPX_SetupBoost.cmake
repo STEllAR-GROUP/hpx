@@ -5,7 +5,7 @@
 
 # We first try to find the required minimum set of Boost libraries. This will
 # also give us the version of the found boost installation
-if(HPX_STATIC_LINKING)
+if(HPX_WITH_STATIC_LINKING)
   set(Boost_USE_STATIC_LIBS ON)
 endif()
 
@@ -76,6 +76,13 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
+# attempt to load Boost.Random (if available), it's needed for one example only
+find_package(Boost 1.49 QUIET COMPONENTS random)
+if(Boost_RANDOM_FOUND)
+  hpx_info("  random")
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
+endif()
+
 # If the found Boost installation is < 1.53, we need to include our packaged
 # atomic library
 if(Boost_VERSION LESS 105300)
@@ -109,7 +116,7 @@ endif()
 
 # Boost preprocessor definitions
 hpx_add_config_define(BOOST_PARAMETER_MAX_ARITY 7)
-hpx_add_config_define(HPX_COROUTINE_ARG_MAX 1)
+hpx_add_config_define(HPX_HAVE_COROUTINE_ARG_MAX 1)
 if(MSVC)
   HPX_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL "Add BOOST_ALL_DYN_LINK to compile flags" OFF)
   if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK)
@@ -118,8 +125,8 @@ if(MSVC)
 else()
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
-hpx_add_config_define(HPX_LOG_NO_TSS)
-hpx_add_config_define(HPX_LOG_NO_TS)
+hpx_add_config_define(HPX_HAVE_LOG_NO_TSS)
+hpx_add_config_define(HPX_HAVE_LOG_NO_TS)
 hpx_add_config_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
 # Disable usage of std::atomics in lockfree

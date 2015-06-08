@@ -13,11 +13,11 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename T, typename Reduce, typename Convert>
-        static typename detail::algorithm_result<ExPolicy, T>::type
+        static typename util::detail::algorithm_result<ExPolicy, T>::type
         segmented_transform_reduce(Algo && algo, ExPolicy const& policy,
             SegIter first, SegIter last, T && init,
             Reduce && red_op, Convert && conv_op, boost::mpl::true_)
@@ -46,7 +46,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef detail::algorithm_result<ExPolicy, T> result;
+            typedef util::detail::algorithm_result<ExPolicy, T> result;
 
             using boost::mpl::true_;
 
@@ -126,7 +126,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename T, typename Reduce, typename Convert>
-        static typename detail::algorithm_result<ExPolicy, T>::type
+        static typename util::detail::algorithm_result<ExPolicy, T>::type
         segmented_transform_reduce(Algo && algo, ExPolicy const& policy,
             SegIter first, SegIter last, T && init,
             Reduce && red_op, Convert && conv_op, boost::mpl::false_)
@@ -134,7 +134,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef detail::algorithm_result<ExPolicy, T> result;
+            typedef util::detail::algorithm_result<ExPolicy, T> result;
 
             typedef typename std::iterator_traits<SegIter>::iterator_category
                 iterator_category;
@@ -231,7 +231,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // segmented implementation
         template <typename ExPolicy, typename InIter, typename T, typename Reduce,
             typename Convert>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
@@ -245,7 +245,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             if (first == last)
             {
-                return detail::algorithm_result<
+                return util::detail::algorithm_result<
                         ExPolicy, init_type
                     >::get(std::forward<T>(init));
             }
@@ -261,7 +261,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename T, typename Reduce,
             typename Convert>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,

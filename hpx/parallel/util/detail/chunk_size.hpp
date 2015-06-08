@@ -9,6 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <hpx/parallel/executors/executor_traits.hpp>
+
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,13 +71,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         F1 && f1, FwdIter& first, std::size_t& count,
         std::size_t chunk_size)
     {
-        threads::executor exec = policy.get_executor();
         if (chunk_size == 0)
         {
             chunk_size = policy.get_chunk_size();
             if (chunk_size == 0)
             {
-                std::size_t const cores = hpx::get_os_thread_count(exec);
+                typedef typename ExPolicy::executor_type executor_type;
+                std::size_t const cores = executor_traits<executor_type>::
+                    os_thread_count(policy.executor());
+
                 if (count > 100*cores)
                     chunk_size = auto_chunk_size(workitems, f1, first, count);
 
@@ -144,13 +148,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         F1 && f1, std::size_t& base_idx, FwdIter& first,
         std::size_t& count, std::size_t chunk_size)
     {
-        threads::executor exec = policy.get_executor();
         if (chunk_size == 0)
         {
             chunk_size = policy.get_chunk_size();
             if (chunk_size == 0)
             {
-                std::size_t const cores = hpx::get_os_thread_count(exec);
+                typedef typename ExPolicy::executor_type executor_type;
+                std::size_t const cores = executor_traits<executor_type>::
+                    os_thread_count(policy.executor());
+
                 if (count > 100*cores)
                     chunk_size = auto_chunk_size_idx(workitems, f1,
                         base_idx, first, count);

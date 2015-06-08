@@ -91,9 +91,24 @@ namespace
         void save(hpx::serialization::output_archive& ar, unsigned) const
         {
             // part running on locality 0
+            static bool once = (register_ids_on_main_loc(), true); (void)once;
+            ar << ids;
+        }
+
+        void load(hpx::serialization::input_archive& ar, unsigned)
+        {
+            // part running on worker node
+            ar >> ids;
+            static bool once = (register_ids_on_worker_loc(), true); (void)once;
+        }
+        HPX_SERIALIZATION_SPLIT_MEMBER();
+
+    private:
+        void register_ids_on_main_loc() const
+        {
             hpx::serialization::detail::id_registry& registry =
                 hpx::serialization::detail::id_registry::instance();
-            static boost::uint32_t max_id = registry.get_max_registered_id();
+            boost::uint32_t max_id = registry.get_max_registered_id();
 
             for (const std::string& s : unassigned_typename_sequence::typenames)
             {
@@ -106,13 +121,10 @@ namespace
                 }
                 ids.push_back(id);
             }
-            ar << ids;
         }
 
-        void load(hpx::serialization::input_archive& ar, unsigned)
+        void register_ids_on_worker_loc() const
         {
-            // part running on worker node
-            ar >> ids;
             hpx::serialization::detail::id_registry& registry =
                 hpx::serialization::detail::id_registry::instance();
             const std::vector<std::string>& typenames =
@@ -125,9 +137,7 @@ namespace
                 registry.register_typename(typenames[k], ids[k]);
             }
         }
-        HPX_SERIALIZATION_SPLIT_MEMBER();
 
-    private:
         mutable std::vector<boost::uint32_t> ids;
     };
 } // namespace
@@ -534,7 +544,7 @@ void register_worker(registration_header const& header)
 
     // TODO: Handle cases where localities try to connect to AGAS while it's
     // shutting down.
-    if (agas_client.get_status() != starting)
+    if (agas_client.get_status() != state_starting)
     {
         // We can just send the parcel now, the connecting locality isn't a part
         // of startup synchronization.
@@ -579,7 +589,7 @@ void notify_worker(notification_header const& header)
     runtime& rt = get_runtime();
     naming::resolver_client& agas_client = rt.get_agas_client();
 
-    if (HPX_UNLIKELY(agas_client.get_status() != starting))
+    if (HPX_UNLIKELY(agas_client.get_status() != state_starting))
     {
         std::ostringstream strm;
         strm << "locality " << rt.here() << " has launched early";

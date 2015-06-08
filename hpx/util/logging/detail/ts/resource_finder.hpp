@@ -52,7 +52,7 @@ namespace hpx { namespace util { namespace logging {
             };
     };
 
-#if !defined( HPX_LOG_NO_TSS)
+#if !defined( HPX_HAVE_LOG_NO_TSS)
     /**
         @brief Caches the resource on each thread, and refreshes it at @c refresh_secs period
     */

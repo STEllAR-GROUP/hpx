@@ -145,7 +145,7 @@ namespace hpx { namespace util
             std::size_t num_localities)
         {
             std::size_t batch_localities = env.retrieve_number_of_localities();
-            if (num_localities == 1)
+            if (num_localities == 1 && batch_localities != std::size_t(-1))
             {
                 std::size_t cfg_num_localities = cfgmap.get_value<std::size_t>(
                     "hpx.localities", batch_localities);
@@ -230,12 +230,12 @@ namespace hpx { namespace util
                         "must be greater than 0");
                 }
 
-#if defined(HPX_MAX_CPU_COUNT)
-                if (threads > HPX_MAX_CPU_COUNT) {
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
+                if (threads > HPX_HAVE_MAX_CPU_COUNT) {
                     throw hpx::detail::command_line_error("Requested more than "
-                        BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" --hpx:threads "
+                        BOOST_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
-                        "-DHPX_MAX_CPU_COUNT=<N> when configuring HPX.");
+                        "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
                 }
 #endif
             }
@@ -447,7 +447,7 @@ namespace hpx { namespace util
             if (vm.count("hpx:worker")) {
                 mode_ = hpx::runtime_mode_worker;
 
-#if !defined(HPX_RUN_MAIN_EVERYWHERE)
+#if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
                 // otherwise
                 if (!vm.count("hpx:run-hpx-main") &&
@@ -468,7 +468,7 @@ namespace hpx { namespace util
             // when connecting we need to select a unique port
             hpx_port = HPX_CONNECTING_IP_PORT;
 
-#if !defined(HPX_RUN_MAIN_EVERYWHERE)
+#if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
             // otherwise
             if (!vm.count("hpx:run-hpx-main") &&
@@ -500,7 +500,7 @@ namespace hpx { namespace util
                     hpx_port = static_cast<boost::uint16_t>(hpx_port + node);
                     mode_ = hpx::runtime_mode_worker;
 
-#if !defined(HPX_RUN_MAIN_EVERYWHERE)
+#if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                     // do not execute any explicit hpx_main except if asked
                     // otherwise
                     if (!vm.count("hpx:run-hpx-main") &&
@@ -570,7 +570,7 @@ namespace hpx { namespace util
             // should not run the AGAS server we assume to be in worker mode
             mode_ = hpx::runtime_mode_worker;
 
-#if !defined(HPX_RUN_MAIN_EVERYWHERE)
+#if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
             // otherwise
             if (!vm.count("hpx:run-hpx-main") &&
@@ -639,6 +639,17 @@ namespace hpx { namespace util
                     vm["hpx:debug-agas-log"].as<std::string>());
             ini_config += "hpx.logging.console.agas.level=5";
             ini_config += "hpx.logging.agas.level=5";
+        }
+
+        if (vm.count("hpx:debug-parcel-log")) {
+            ini_config += "hpx.logging.console.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.console.parcel.level=5";
+            ini_config += "hpx.logging.parcel.level=5";
         }
 
         // Set number of cores and OS threads in configuration.
@@ -954,12 +965,16 @@ namespace hpx { namespace util
         rtcfg_.reconfigure(ini_config_);
 
         // print version/copyright information
-        if (vm_.count("hpx:version"))
+        if (vm_.count("hpx:version")) {
             detail::print_version(std::cout);
+            return 1;
+        }
 
         // print configuration information (static and dynamic)
-        if (vm_.count("hpx:info"))
+        if (vm_.count("hpx:info")) {
             detail::print_info(std::cout, *this);
+            return 1;
+        }
 
         // all is good
         return 0;

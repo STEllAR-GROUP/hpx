@@ -14,9 +14,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -49,12 +49,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, bool
+            >::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 F && op)
             {
                 if (first == last)
-                    return detail::algorithm_result<ExPolicy, bool>::get(true);
+                {
+                    return util::detail::algorithm_result<
+                            ExPolicy, bool
+                        >::get(true);
+                }
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
@@ -145,7 +151,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     none_of(ExPolicy && policy, InIter first, InIter last, F && f)
     {
@@ -185,12 +191,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, bool
+            >::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 F && op)
             {
                 if (first == last)
-                    return detail::algorithm_result<ExPolicy, bool>::get(false);
+                {
+                    return util::detail::algorithm_result<
+                            ExPolicy, bool
+                        >::get(false);
+                }
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
@@ -281,7 +293,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     any_of(ExPolicy && policy, InIter first, InIter last, F && f)
     {
@@ -321,12 +333,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, bool
+            >::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 F && op)
             {
                 if (first == last)
-                    return detail::algorithm_result<ExPolicy, bool>::get(true);
+                {
+                    return util::detail::algorithm_result<
+                            ExPolicy, bool
+                        >::get(true);
+                }
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
@@ -417,7 +435,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     all_of(ExPolicy && policy, InIter first, InIter last, F && f)
     {

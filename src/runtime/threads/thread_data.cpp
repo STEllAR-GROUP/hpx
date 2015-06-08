@@ -166,6 +166,14 @@ namespace hpx { namespace threads
         return thread_self::impl_type::get_self();
     }
 
+    namespace detail
+    {
+        void set_self_ptr(thread_self* self)
+        {
+            thread_self::impl_type::set_self(self);
+        }
+    }
+
     thread_self::impl_type* get_ctx_ptr()
     {
         return hpx::util::coroutines::detail::coroutine_accessor::get_impl(get_self());
@@ -199,7 +207,7 @@ namespace hpx { namespace threads
             );
     }
 
-#ifndef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
     thread_id_repr_type get_parent_id()
     {
         return threads::invalid_thread_id_repr;
@@ -242,7 +250,7 @@ namespace hpx { namespace threads
 
     naming::address::address_type get_self_component_id()
     {
-#ifndef HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
         return 0;
 #else
         thread_self* self = get_self_ptr();

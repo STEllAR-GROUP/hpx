@@ -196,6 +196,7 @@ namespace hpx { namespace lcos
                     // handle future only if not enough futures are ready yet
                     // also, do not touch any futures which are already ready
 
+                    shared_state->execute_deferred();
                     shared_state->set_on_completed(Callback(callback_));
                 }
                 else {

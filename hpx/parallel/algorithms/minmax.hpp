@@ -14,8 +14,8 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
@@ -83,13 +83,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename F>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 F && f)
             {
                 if (first == last)
                 {
-                    return detail::algorithm_result<ExPolicy, FwdIter>::
+                    return util::detail::algorithm_result<ExPolicy, FwdIter>::
                         get(std::move(first));
                 }
 
@@ -173,7 +175,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     min_element(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
@@ -237,7 +239,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     min_element(ExPolicy && policy, FwdIter first, FwdIter last)
     {
@@ -313,13 +315,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename F>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 F && f)
             {
                 if (first == last)
                 {
-                    return detail::algorithm_result<ExPolicy, FwdIter>::
+                    return util::detail::algorithm_result<ExPolicy, FwdIter>::
                         get(std::move(first));
                 }
 
@@ -403,7 +407,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     max_element(ExPolicy && policy, FwdIter first, FwdIter last, F && f)
     {
@@ -467,7 +471,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     max_element(ExPolicy && policy, FwdIter first, FwdIter last)
     {
@@ -551,7 +555,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename F>
-            static typename detail::algorithm_result<
+            static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, FwdIter>
             >::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
@@ -562,8 +566,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 result_type result(first, first);
                 if (first == last || ++first == last)
                 {
-                    return detail::algorithm_result<ExPolicy, result_type>::
-                        get(std::move(result));
+                    return util::detail::algorithm_result<
+                            ExPolicy, result_type
+                        >::get(std::move(result));
                 }
 
                 return util::partitioner<ExPolicy, result_type, result_type>::
@@ -649,7 +654,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy,
+        typename util::detail::algorithm_result<ExPolicy,
             std::pair<FwdIter, FwdIter>
         >::type
     >::type
@@ -718,7 +723,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, std::pair<FwdIter, FwdIter>
         >::type
     >::type

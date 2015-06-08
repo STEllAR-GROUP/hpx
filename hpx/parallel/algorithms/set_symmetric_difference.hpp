@@ -16,11 +16,11 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/detail/set_operation.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
@@ -61,7 +61,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename RanIter1, typename RanIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutIter
+            >::type
             parallel(ExPolicy const& policy, RanIter1 first1, RanIter1 last1,
                 RanIter2 first2, RanIter2 last2, OutIter dest, F && f)
             {
@@ -191,7 +193,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename OutIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     set_symmetric_difference(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, OutIter dest, F && f)
@@ -307,7 +309,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename OutIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     set_symmetric_difference(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, OutIter dest)

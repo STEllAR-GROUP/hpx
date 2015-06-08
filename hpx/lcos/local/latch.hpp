@@ -11,6 +11,8 @@
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/thread/locks.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
@@ -76,7 +78,7 @@ namespace hpx { namespace lcos { namespace local
         ///       destructor. This may require additional coordination.
         ~latch ()
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(counter_ == 0);
         }
 
@@ -92,11 +94,11 @@ namespace hpx { namespace lcos { namespace local
         ///
         void count_down_and_wait()
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(counter_ > 0);
 
             if (--counter_ == 0)
-                cond_.notify_all(l);    // release the threads
+                cond_.notify_all(std::move(l));    // release the threads
             else
                 cond_.wait(l, "hpx::local::latch::count_down_and_wait");
         }
@@ -114,11 +116,11 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ASSERT(n >= 0);
 
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT(counter_ >= n);
 
             if ((counter_ -= n) == 0)
-                cond_.notify_all(l);    // release the threads
+                cond_.notify_all(std::move(l));    // release the threads
         }
 
         /// Returns: counter_ == 0. Does not block.
@@ -127,7 +129,7 @@ namespace hpx { namespace lcos { namespace local
         ///
         bool is_ready() const BOOST_NOEXCEPT
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return counter_ == 0;
         }
 
@@ -139,15 +141,15 @@ namespace hpx { namespace lcos { namespace local
         ///
         void wait() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             if (counter_ > 0)
                 cond_.wait(l, "hpx::local::latch::wait");
         }
 
         void abort_all()
         {
-            mutex_type::scoped_lock l(mtx_);
-            cond_.abort_all(l);
+            boost::unique_lock<mutex_type> l(mtx_);
+            cond_.abort_all(std::move(l));
         }
 
     private:

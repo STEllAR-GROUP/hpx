@@ -134,8 +134,10 @@
 [def __cpp11_n3634__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3857.pdf N3857]]
 [def __cpp11_n3562__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf N3562]]
 [def __cpp11_n4088__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4411.pdf N4411]]
-[def __cpp11_n4104__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4354.pdf N4354]]
+[def __cpp11_n4104__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4409.pdf N4409]]
 [def __cpp11_n4107__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4313.html N4313]]
+[def __cpp11_n4406__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4406.pdf N4406]]
+[def __cpp17_n4399__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html N4399]]
 
 
 [def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]
@@ -217,7 +219,8 @@
 [template hpx_link[url txt]     '''<ulink url="'''__hpx_source_dir__'''/'''[url]'''">'''[txt]'''</ulink>''']
 
 [template git_commit_link[commit] '''<ulink url="https://github.com/STEllAR-GROUP/hpx/commit/'''[commit]'''">'''[commit]'''</ulink>''']
-[template issue[num]            '''<ulink url="http://github.com/STEllAR-GROUP/hpx/issues/'''[num]'''">'''#[num]'''</ulink>''']
+[template issue[num]            '''<ulink url="http://github.com/STEllAR-GROUP/hpx/issues/'''[num]'''">'''`IS#`[num]'''</ulink>''']
+[template pr[num]               '''<ulink url="http://github.com/STEllAR-GROUP/hpx/issues/'''[num]'''">'''`PR#`[num]'''</ulink>''']
 
 [/  fig[ref title label]
     Image element with a title.

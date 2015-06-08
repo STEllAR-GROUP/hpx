@@ -157,19 +157,28 @@ namespace hpx { namespace lcos { namespace detail
         // retrieve the gid of this promise
         naming::id_type get_gid() const
         {
-            naming::gid_type::mutex_type::scoped_lock l(gid_.get_mutex());
-            return get_gid_locked();
+            boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
+            return get_gid_locked(std::move(l));
         }
 
-        naming::id_type get_gid_locked() const
+        naming::id_type get_gid_locked(
+            boost::unique_lock<naming::gid_type> l) const
         {
-            // take all credits to avoid a self reference
             naming::gid_type gid = gid_;
-            naming::detail::strip_credits_from_gid(
-                const_cast<naming::gid_type&>(gid_));
+            if (naming::detail::has_credits(gid))
+            {
+                // first invocation: take all credits to avoid a self reference
+                naming::detail::strip_credits_from_gid(
+                    const_cast<naming::gid_type&>(gid_));
 
-            // we request the id of a future only once
-            HPX_ASSERT(naming::detail::has_credits(gid));
+                l.unlock();
+                return naming::id_type(gid, naming::id_type::managed);
+            }
+
+            l.unlock();
+
+            // any (subsequent) invocation causes the credits to be replenished
+            naming::detail::replenish_credits(gid);
             return naming::id_type(gid, naming::id_type::managed);
         }
 
@@ -269,7 +278,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         bool requires_delete()
         {
-            naming::gid_type::mutex_type::scoped_lock l(this->gid_.get_mutex());
+            boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
             long counter = --this->count_;
 
             // if this promise was never asked for its id we need to take
@@ -277,9 +286,7 @@ namespace hpx { namespace lcos { namespace detail
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
                 // this will trigger normal destruction
-                naming::id_type id = this->get_gid_locked();
-
-                l.unlock();
+                naming::id_type id = this->get_gid_locked(std::move(l));
                 return false;
             }
             else if (0 == counter)
@@ -382,7 +389,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         bool requires_delete()
         {
-            naming::gid_type::mutex_type::scoped_lock l(this->gid_.get_mutex());
+            boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
             long counter = --this->count_;
 
             // if this promise was never asked for its id we need to take
@@ -390,14 +397,11 @@ namespace hpx { namespace lcos { namespace detail
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
                 // this will trigger normal destruction
-                naming::id_type id = this->get_gid_locked();
-
-                l.unlock();
+                naming::id_type id = this->get_gid_locked(std::move(l));
                 return false;
             }
             else if (0 == counter)
             {
-                //HPX_ASSERT(naming::detail::has_credits(this->gid_));
                 return true;
             }
             return false;
@@ -680,7 +684,7 @@ namespace hpx { namespace lcos
 
         typedef util::unused_type result_type;
 
-        ~promise()
+        virtual ~promise()
         {}
 
         lcos::future<void> get_future(error_code& ec = throws)

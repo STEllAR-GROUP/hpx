@@ -239,7 +239,10 @@ namespace hpx
 
     private:
         typedef hpx::components::client_base<
-                unordered_map, server::unordered_map_config_data
+                unordered_map,
+                hpx::components::server::distributed_metadata_base<
+                    server::unordered_map_config_data
+                >
             > base_type;
         typedef detail::unordered_base<Hash, KeyEqual> hash_base_type;
 

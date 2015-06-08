@@ -11,10 +11,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -51,15 +51,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename OutIter_>
-            static typename detail::algorithm_result<ExPolicy, OutIter_>::type
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutIter_
+            >::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 OutIter_ dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter_> zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef
-                    typename detail::algorithm_result<ExPolicy, OutIter_>::type
-                result_type;
+                typedef typename util::detail::algorithm_result<
+                        ExPolicy, OutIter_
+                    >::type result_type;
 
                 return get_iter<1, result_type>(
                     for_each_n<zip_iterator>().call(
@@ -75,7 +77,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         template <typename ExPolicy, typename InIter, typename OutIter>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
             std::false_type)
         {
@@ -97,7 +99,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename OutIter>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         copy_(ExPolicy && policy, InIter first, InIter last, OutIter dest,
             std::true_type);
 
@@ -151,7 +153,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     copy(ExPolicy && policy, InIter first, InIter last, OutIter dest)
     {
@@ -203,15 +205,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter>
-            static typename detail::algorithm_result<ExPolicy, Iter>::type
+            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
             parallel(ExPolicy const& policy, FwdIter first, std::size_t count,
                 Iter dest)
             {
                 typedef hpx::util::zip_iterator<FwdIter, Iter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef
-                    typename detail::algorithm_result<ExPolicy, Iter>::type
-                result_type;
+                typedef typename util::detail::algorithm_result<
+                        ExPolicy, Iter
+                    >::type result_type;
 
                 return get_iter<1, result_type>(
                     for_each_n<zip_iterator>().call(
@@ -277,7 +279,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename Size, typename OutIter>
     typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     copy_n(ExPolicy && policy, InIter first, Size count, OutIter dest)
     {
@@ -303,7 +305,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // if count is representing a negative value, we do nothing
         if (detail::is_negative<Size>::call(count))
         {
-            return detail::algorithm_result<ExPolicy, OutIter>::get(
+            return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                 std::move(dest));
         }
 
@@ -339,16 +341,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, Iter>::type
+            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 Iter dest, F && f)
             {
                 typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator;
-                typedef detail::algorithm_result<ExPolicy, Iter> result;
+                typedef util::detail::algorithm_result<ExPolicy, Iter> result;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
-                typedef typename detail::algorithm_result<ExPolicy, Iter>::type
-                    result_type;
+                typedef typename util::detail::algorithm_result<
+                        ExPolicy, Iter
+                    >::type result_type;
 
                 if (first == last)
                     return result::get(std::move(dest));
@@ -396,11 +399,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                         typedef util::partitioner<ExPolicy, Iter, void>
                             partitioner_type;
+
+                        // capturing 'flags' below keeps the array alive
                         return partitioner_type::call_with_data(
                             policy,
                             hpx::util::make_zip_iterator(first, flags.get()),
                             count,
-                            [dest](hpx::shared_future<std::size_t>&& pos,
+                            [dest, flags](
+                                hpx::shared_future<std::size_t>&& pos,
                                 zip_iterator part_begin, std::size_t part_count)
                             {
                                 Iter iter = dest;
@@ -499,7 +505,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     copy_if(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f)
     {

@@ -48,6 +48,10 @@ namespace hpx { namespace components
                 LAGAS_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
                 break;
 
+            case destination_parcel:
+                LPT_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
+                break;
+
             case destination_app:
                 LAPP_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
                 break;
@@ -90,7 +94,7 @@ namespace hpx { namespace components
 
     bool pending_logs::is_active()
     {
-        return threads::threadmanager_is(running) && threads::get_self_ptr() &&
+        return threads::threadmanager_is(state_running) && threads::get_self_ptr() &&
             activated_.load();
     }
 
@@ -154,7 +158,7 @@ namespace hpx { namespace components
 
     void pending_logs::cleanup()
     {
-        if (threads::threadmanager_is(running) && threads::get_self_ptr())
+        if (threads::threadmanager_is(state_running) && threads::get_self_ptr())
         {
             send();
         }

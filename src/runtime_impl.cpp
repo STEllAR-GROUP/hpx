@@ -50,7 +50,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_pre_startup) {
+            if (rt->get_state() > state_pre_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_startup_function",
                     "Too late to register a new pre-startup function.");
@@ -67,7 +67,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_startup) {
+            if (rt->get_state() > state_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_startup_function",
                     "Too late to register a new startup function.");
@@ -84,7 +84,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_pre_shutdown) {
+            if (rt->get_state() > state_pre_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_shutdown_function",
                     "Too late to register a new pre-shutdown function.");
@@ -101,7 +101,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_shutdown) {
+            if (rt->get_state() > state_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_shutdown_function",
                     "Too late to register a new shutdown function.");
@@ -218,7 +218,7 @@ namespace hpx {
         LRT_(debug) << "~runtime_impl(finished)";
     }
 
-    bool pre_main(hpx::runtime_mode);
+    int pre_main(hpx::runtime_mode);
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     threads::thread_state
@@ -231,7 +231,8 @@ namespace hpx {
         threads::set_thread_description(threads::get_self_id(), "pre_main");
 
         // Finish the bootstrap
-        if (!hpx::pre_main(mode_)) {
+        result = hpx::pre_main(mode_);
+        if (result) {
             LBT_(info) << "runtime_impl::run_helper: bootstrap "
                           "aborted, bailing out";
             return threads::thread_state(threads::terminated);
@@ -250,7 +251,6 @@ namespace hpx {
             // Call hpx_main
             result = func();
         }
-
         return threads::thread_state(threads::terminated);
     }
 
@@ -447,7 +447,7 @@ namespace hpx {
         std::size_t num_thread, boost::exception_ptr const& e)
     {
         // Early and late exceptions, errors outside of HPX-threads
-        if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
+        if (!threads::get_self_ptr() || !threads::threadmanager_is(state_running))
         {
             // report the error to the local console
             detail::report_exception_and_continue(e);
@@ -498,7 +498,7 @@ namespace hpx {
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::rethrow_exception()
     {
-        if (state_.load() > running)
+        if (state_.load() > state_running)
         {
             boost::mutex::scoped_lock l(mtx_);
             if (exception_)
@@ -723,14 +723,14 @@ namespace hpx {
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice
-#if defined(HPX_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::local_queue_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 #endif
 
-#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::static_priority_queue_scheduler<>,
@@ -742,20 +742,20 @@ template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::local_priority_queue_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 
-#if defined(HPX_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::abp_fifo_priority_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif
 
-#if defined(HPX_HIERARCHY_SCHEDULER)
+#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
 #include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::hierarchy_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 #endif
 
-#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/periodic_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::periodic_priority_queue_scheduler<>,

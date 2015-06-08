@@ -29,6 +29,7 @@ endforeach()
 
 set(tests
     commandline_options_1437
+    dynamic_counters_loaded_1508
     id_type_ref_counting_1032
     multiple_init
     unhandled_exception_582

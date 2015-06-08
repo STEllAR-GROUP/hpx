@@ -9,7 +9,7 @@
 #include <string>
 #include <hpx/config.hpp>
 
-#if defined(HPX_WITH_LOGGING)
+#if defined(HPX_HAVE_LOGGING)
 
 #include <hpx/util/logging/format/named_write.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
@@ -38,6 +38,20 @@ namespace hpx { namespace util
 
     #define LAGAS_ENABLED(lvl)                                                \
         hpx::util::agas_level()->is_enabled(::hpx::util::logging::level::lvl) \
+    /**/
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(parcel_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(parcel_logger, logger_type)
+
+    #define LPT_(lvl)                                                         \
+        HPX_LOG_USE_LOG_IF_LEVEL(hpx::util::parcel_logger(),                  \
+            hpx::util::parcel_level(), lvl)                                   \
+        << hpx::util::levelname(::hpx::util::logging::level::lvl) << " "      \
+    /**/
+
+    #define LPT_ENABLED(lvl)                                                  \
+        hpx::util::parcel_level()->is_enabled(::hpx::util::logging::level::lvl)\
     /**/
 
     ///////////////////////////////////////////////////////////////////////////
@@ -129,6 +143,10 @@ namespace hpx { namespace util
     HPX_EXPORT HPX_DECLARE_LOG(agas_console_logger, logger_type)
 
     ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(parcel_console_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(parcel_console_logger, logger_type)
+
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT HPX_DECLARE_LOG_FILTER(timing_console_level, filter_type)
     HPX_EXPORT HPX_DECLARE_LOG(timing_console_logger, logger_type)
 
@@ -151,6 +169,13 @@ namespace hpx { namespace util
     HPX_LOG_USE_LOG(hpx::util::agas_console_logger(),                         \
         read_msg().gather().out(),                                            \
         hpx::util::agas_console_level()->is_enabled(                          \
+            static_cast<hpx::util::logging::level::type>(lvl)))               \
+/**/
+
+#define LPT_CONSOLE_(lvl)                                                     \
+    HPX_LOG_USE_LOG(hpx::util::parcel_console_logger(),                       \
+        read_msg().gather().out(),                                            \
+        hpx::util::parcel_console_level()->is_enabled(                        \
             static_cast<hpx::util::logging::level::type>(lvl)))               \
 /**/
 
@@ -185,6 +210,8 @@ namespace hpx { namespace util
 #else
 // logging is disabled all together
 
+#include <vector>
+
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -199,6 +226,7 @@ namespace hpx { namespace util { namespace detail
     inline dummy_log_impl& operator<<(dummy_log_impl& l, T) { return l; }
 
     #define LAGAS_(lvl)           if(true) {} else hpx::util::detail::dummy_log
+    #define LPT_(lvl)             if(true) {} else hpx::util::detail::dummy_log
     #define LTIM_(lvl)            if(true) {} else hpx::util::detail::dummy_log
     #define LHPX_(lvl, cat)       if(true) {} else hpx::util::detail::dummy_log
     #define LAPP_(lvl)            if(true) {} else hpx::util::detail::dummy_log
@@ -207,12 +235,14 @@ namespace hpx { namespace util { namespace detail
     #define LFATAL_               if(true) {} else hpx::util::detail::dummy_log
 
     #define LAGAS_CONSOLE_(lvl)   if(true) {} else hpx::util::detail::dummy_log
+    #define LPT_CONSOLE_(lvl)     if(true) {} else hpx::util::detail::dummy_log
     #define LTIM_CONSOLE_(lvl)    if(true) {} else hpx::util::detail::dummy_log
     #define LHPX_CONSOLE_(lvl)    if(true) {} else hpx::util::detail::dummy_log
     #define LAPP_CONSOLE_(lvl)    if(true) {} else hpx::util::detail::dummy_log
     #define LDEB_CONSOLE_         if(true) {} else hpx::util::detail::dummy_log
 
     #define LAGAS_ENABLED(lvl)    (false)
+    #define LPT_ENABLED(lvl)      (false)
     #define LTIM_ENABLED(lvl)     (false)
     #define LHPX_ENABLED(lvl)     (false)
     #define LAPP_ENABLED(lvl)     (false)
@@ -227,7 +257,6 @@ namespace hpx { namespace util { namespace detail
 #define LRT_(lvl)   LHPX_(lvl, "  [RT] ")   /* runtime support */
 #define LOSH_(lvl)  LHPX_(lvl, " [OSH] ")   /* one size heap */
 #define LERR_(lvl)  LHPX_(lvl, " [ERR] ")   /* exceptions */
-#define LPT_(lvl)   LHPX_(lvl, "  [PT] ")   /* parcel transport */
 #define LLCO_(lvl)  LHPX_(lvl, " [LCO] ")   /* lcos */
 #define LPCS_(lvl)  LHPX_(lvl, " [PCS] ")   /* performance counters */
 #define LAS_(lvl)   LHPX_(lvl, "  [AS] ")   /* addressing service */

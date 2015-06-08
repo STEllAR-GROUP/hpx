@@ -10,6 +10,7 @@ hpx_include(
   Option
   AppendProperty
   AddCompileFlag
+  AddCompileTest
   AddLinkFlag
   AddComponent
   AddLibrary
@@ -24,6 +25,7 @@ hpx_include(
   IsTarget
   HandleComponentDependencies
   ForceOutOfTreeBuild
+  SetLibName
   SetupTarget
 )
 

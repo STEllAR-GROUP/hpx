@@ -132,7 +132,7 @@ namespace hpx { namespace components
             std::vector<performance_counter> counters;
             counters.reserve(localities.size());
 
-            if (counter_name.back() == '@')
+            if (counter_name[counter_name.size()-1] == '@')
             {
                 std::string name(counter_name + component_name);
                 for (hpx::id_type const& id: localities)

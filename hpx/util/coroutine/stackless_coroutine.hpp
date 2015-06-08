@@ -79,10 +79,10 @@ namespace hpx { namespace util { namespace coroutines
           : f_(std::forward<Functor>(f))
           , state_(ctx_ready)
           , id_(id)
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
           , phase_(0)
 #endif
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
           , thread_data_(0)
 #endif
           , target_(std::move(target))
@@ -92,20 +92,20 @@ namespace hpx { namespace util { namespace coroutines
           : f_(std::move(rhs.f_))
           , state_(rhs.state_)
           , id_(rhs.id_)
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
           , phase_(rhs.phase_)
 #endif
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
           , thread_data_(rhs.thread_data_)
 #endif
           , target_(std::move(rhs.target_))
         {
             rhs.id_ = 0;
             rhs.state_ = ctx_ready;
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             rhs.phase_ = 0;
 #endif
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             rhs.thread_data_ = 0;
 #endif
         }
@@ -121,10 +121,10 @@ namespace hpx { namespace util { namespace coroutines
             std::swap(f_, rhs.f_);
             std::swap(state_, rhs.state_);
             std::swap(id_, rhs.id_);
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             std::swap(phase_, rhs.phase_);
 #endif
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             std::swap(thread_data_, rhs.thread_data_);
 #endif
             std::swap(target_, rhs.target_);
@@ -141,14 +141,14 @@ namespace hpx { namespace util { namespace coroutines
             return id_;
         }
 
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
         std::size_t get_thread_phase() const
         {
             return phase_;
         }
 #endif
 
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t get_thread_data() const
         {
             return thread_data_;
@@ -169,7 +169,7 @@ namespace hpx { namespace util { namespace coroutines
 
             f_ = std::forward<Functor>(f);
             id_ = id;
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             phase_ = 0;
 #endif
             target_ = std::move(target);
@@ -245,10 +245,10 @@ namespace hpx { namespace util { namespace coroutines
         context_state state_;
         thread_id_repr_type id_;
 
-#ifdef HPX_THREAD_MAINTAIN_PHASE_INFORMATION
+#ifdef HPX_HAVE_THREAD_PHASE_INFORMATION
         std::size_t phase_;
 #endif
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         std::size_t thread_data_;
 #endif
 

@@ -14,6 +14,7 @@
 #include <hpx/util/date_time_chrono.hpp>
 
 #include <boost/detail/scoped_enum_emulation.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -32,21 +33,21 @@ namespace hpx { namespace lcos { namespace local
     public:
         void notify_one(error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
-            cond_.notify_one(l, ec);
+            boost::unique_lock<mutex_type> l(mtx_);
+            cond_.notify_one(std::move(l), ec);
         }
 
         void notify_all(error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
-            cond_.notify_all(l, ec);
+            boost::unique_lock<mutex_type> l(mtx_);
+            cond_.notify_all(std::move(l), ec);
         }
 
         template <class Lock>
         void wait(Lock& lock, error_code& ec = throws)
         {
-            util::ignore_while_checking<Lock> ignore_lock(&lock);
-            mutex_type::scoped_lock l(mtx_);
+            util::ignore_all_while_checking ignore_lock;
+            boost::unique_lock<mutex_type> l(mtx_);
             util::scoped_unlock<Lock> unlock(lock);
 
             cond_.wait(l, ec);
@@ -68,8 +69,8 @@ namespace hpx { namespace lcos { namespace local
         wait_until(Lock& lock, util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
-            util::ignore_while_checking<Lock> ignore_lock(&lock);
-            mutex_type::scoped_lock l(mtx_);
+            util::ignore_all_while_checking ignore_lock;
+            boost::unique_lock<mutex_type> l(mtx_);
             util::scoped_unlock<Lock> unlock(lock);
 
             threads::thread_state_ex_enum const reason =

@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # If build of external build tests is disabled, exit now
-if(NOT HPX_BUILD_TESTS_EXTERNAL_BUILD)
+if(NOT HPX_WITH_TESTS_EXTERNAL_BUILD)
   return()
 endif()
 
@@ -35,7 +35,7 @@ macro(create_cmake_test name hpx_dir)
       -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=$<CONFIGURATION> VERBATIM)
   add_dependencies(${name}.make_configure ${name}.make_build_dir hpx iostreams_component)
-  if(NOT HPX_STATIC_LINKING)
+  if(NOT HPX_WITH_STATIC_LINKING)
     add_dependencies(${name}.make_configure hpx_init)
   endif()
   add_custom_target(${name}.make_compile
@@ -75,7 +75,7 @@ macro(create_pkgconfig_test name hpx_dir)
       PKG_CONFIG=${PKG_CONFIG_EXECUTABLE}
       BUILD_TYPE=$<CONFIGURATION> VERBATIM)
   add_dependencies(${name}.make_compile ${name}.make_build_dir hpx iostreams_component)
-  if(NOT HPX_STATIC_LINKING)
+  if(NOT HPX_WITH_STATIC_LINKING)
     add_dependencies(${name}.make_compile hpx_init)
   endif()
   add_hpx_pseudo_target(${name})
@@ -113,7 +113,7 @@ set(tests
 
 set(build_systems cmake)
 if(NOT CMAKE_TOOLCHAIN_FILE)
-  set(build_systems ${build_sytems} pkgconfig)
+  set(build_systems ${build_systems} pkgconfig)
 endif()
 
 foreach(system ${build_systems})

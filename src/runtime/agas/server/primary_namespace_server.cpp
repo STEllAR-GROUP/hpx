@@ -861,7 +861,7 @@ response primary_namespace::allocate(
       , naming::get_locality_id_from_gid(next_id_), success);
 } // }}}
 
-#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+#if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     void primary_namespace::dump_refcnt_matches(
         refcnt_table_type::iterator lower_it
       , refcnt_table_type::iterator upper_it
@@ -907,7 +907,7 @@ void primary_namespace::increment(
 { // {{{ increment implementation
     mutex_type::scoped_lock l(mutex_);
 
-#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+#if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     if (LAGAS_ENABLED(debug))
     {
         typedef refcnt_table_type::iterator iterator;
@@ -1084,7 +1084,7 @@ void primary_namespace::decrement_sweep(
     {
         mutex_type::scoped_lock l(mutex_);
 
-#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+#if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
         if (LAGAS_ENABLED(debug))
         {
             typedef refcnt_table_type::iterator iterator;
@@ -1192,7 +1192,7 @@ void primary_namespace::free_components_sync(
     for (free_entry const& e : free_list)
     {
         // Bail if we're in late shutdown and non-local.
-        if (HPX_UNLIKELY(!threads::threadmanager_is(running)) &&
+        if (HPX_UNLIKELY(!threads::threadmanager_is(state_running)) &&
             e.locality_ != locality_)
         {
             LAGAS_(info) << (boost::format(

@@ -11,6 +11,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 int test_count = 100;
@@ -281,7 +282,7 @@ namespace hpx { namespace experimental
 boost::uint64_t bench_stencil3_iterator_full()
 {
     std::vector<int> values(partition_size);
-    std::iota(std::begin(values), std::end(values), 0);
+    std::iota(boost::begin(values), boost::end(values), 0);
 
     boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
@@ -360,7 +361,7 @@ namespace hpx { namespace experimental
 boost::uint64_t bench_stencil3_iterator_v1()
 {
     std::vector<int> values(partition_size);
-    std::iota(std::begin(values), std::end(values), 0);
+    std::iota(boost::begin(values), boost::end(values), 0);
 
     boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
@@ -483,7 +484,7 @@ namespace hpx { namespace experimental
 boost::uint64_t bench_stencil3_iterator_v2()
 {
     std::vector<int> values(partition_size);
-    std::iota(std::begin(values), std::end(values), 0);
+    std::iota(boost::begin(values), boost::end(values), 0);
 
     boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
@@ -511,7 +512,7 @@ boost::uint64_t bench_stencil3_iterator_v2()
 boost::uint64_t bench_stencil3_iterator_explicit()
 {
     std::vector<int> values(partition_size);
-    std::iota(std::begin(values), std::end(values), 0);
+    std::iota(boost::begin(values), boost::end(values), 0);
 
     boost::uint64_t start = hpx::util::high_resolution_clock::now();
 

@@ -113,7 +113,7 @@ namespace hpx { namespace threads { namespace policies
             steals_in_numa_domain_(init.num_queues_),
             steals_outside_numa_domain_(init.num_queues_),
 #endif
-#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || defined(HPX_MAX_CPU_COUNT)
+#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || defined(HPX_HAVE_MAX_CPU_COUNT)
             numa_domain_masks_(init.num_queues_),
             outside_numa_domain_masks_(init.num_queues_)
 #else
@@ -146,7 +146,7 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
-#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         boost::uint64_t get_creation_time(bool reset)
         {
             boost::uint64_t time = 0;
@@ -179,7 +179,7 @@ namespace hpx { namespace threads { namespace policies
         }
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
         boost::uint64_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
             boost::uint64_t num_pending_misses = 0;
@@ -427,7 +427,7 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
-#ifdef HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
             // try to figure out the NUMA node where the data lives
             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
                 mask_cref_type mask =
@@ -474,7 +474,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread, bool running,
+        virtual bool get_next_thread(std::size_t num_thread,
             boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
         {
             std::size_t queues_size = queues_.size();
@@ -780,7 +780,7 @@ namespace hpx { namespace threads { namespace policies
             return count;
         }
 
-#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         ///////////////////////////////////////////////////////////////////////
         // Queries the current average thread wait time of the queues.
         boost::int64_t get_average_thread_wait_time(

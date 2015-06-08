@@ -15,9 +15,11 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/acquire_future.hpp>
 
 #include <boost/fusion/include/begin.hpp>
@@ -197,6 +199,24 @@ namespace hpx { namespace lcos { namespace local
                 hpx::apply(sched, f, this_, is_void());
             }
 
+            // handle executors through their executor_traits
+            template <typename Executor>
+            BOOST_FORCEINLINE
+            void finalize(Executor& exec)
+            {
+                done_ = false;      // avoid finalizing more than once
+
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+
+                execute_function_type f = &dataflow_frame::execute;
+                boost::intrusive_ptr<dataflow_frame> this_(this);
+
+                parallel::executor_traits<Executor>::apply_execute(exec,
+                    hpx::util::deferred_call(f, this_, is_void()));
+            }
+
             ///////////////////////////////////////////////////////////////////
             template <typename Policy_, typename Iter>
             BOOST_FORCEINLINE
@@ -269,6 +289,7 @@ namespace hpx { namespace lcos { namespace local
                             = lcos::detail::get_shared_state(*next);
 
                         boost::intrusive_ptr<dataflow_frame> this_(this);
+                        next_future_data->execute_deferred();
                         next_future_data->set_on_completed(
                             boost::bind(
                                 f
@@ -342,6 +363,7 @@ namespace hpx { namespace lcos { namespace local
                         = lcos::detail::get_shared_state(f_);
 
                     boost::intrusive_ptr<dataflow_frame> this_(this);
+                    next_future_data->execute_deferred();
                     next_future_data->set_on_completed(
                         hpx::util::bind(
                             f
@@ -416,10 +438,8 @@ namespace hpx { namespace lcos { namespace local
     ///////////////////////////////////////////////////////////////////////////
     template <typename Policy, typename Func, typename ...Ts>
     BOOST_FORCEINLINE
-    typename boost::lazy_enable_if<
-        traits::is_launch_policy<
-            typename util::decay<Policy>::type
-        >
+    typename boost::lazy_enable_if_c<
+        traits::is_launch_policy<typename util::decay<Policy>::type>::value
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type
@@ -458,10 +478,8 @@ namespace hpx { namespace lcos { namespace local
 
     template <typename Executor, typename Func, typename ...Ts>
     BOOST_FORCEINLINE
-    typename boost::lazy_enable_if<
-        traits::is_executor<
-            typename util::decay<Executor>::type
-        >
+    typename boost::lazy_enable_if_c<
+        traits::is_threads_executor<typename util::decay<Executor>::type>::value
       , detail::dataflow_frame<
             threads::executor
           , typename hpx::util::decay<Func>::type
@@ -498,12 +516,52 @@ namespace hpx { namespace lcos { namespace local
         return future_access<typename frame_type::type>::create(std::move(p));
     }
 
+    template <typename Executor, typename Func, typename ...Ts>
+    BOOST_FORCEINLINE
+    typename boost::lazy_enable_if_c<
+        traits::is_executor<typename util::decay<Executor>::type>::value
+      , detail::dataflow_frame<
+            typename util::decay<Executor>::type
+          , typename hpx::util::decay<Func>::type
+          , hpx::util::tuple<
+                typename hpx::traits::acquire_future<Ts>::type...
+            >
+        >
+    >::type
+    dataflow(
+        Executor && exec
+      , Func && func
+      , Ts&&... vs
+    )
+    {
+        typedef
+            detail::dataflow_frame<
+                typename hpx::util::decay<Executor>::type
+              , typename hpx::util::decay<Func>::type
+              , hpx::util::tuple<
+                    typename hpx::traits::acquire_future<Ts>::type...
+                >
+            >
+            frame_type;
+
+        boost::intrusive_ptr<frame_type> p(new frame_type(
+                std::forward<Executor>(exec)
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(
+                    hpx::traits::acquire_future_disp()(std::forward<Ts>(vs))...)
+            ));
+        p->await();
+
+        using traits::future_access;
+        return future_access<typename frame_type::type>::create(std::move(p));
+    }
+
     template <typename Func, typename ...Ts>
     BOOST_FORCEINLINE
-    typename boost::lazy_disable_if<
-        traits::is_launch_policy_or_executor<
-            typename util::decay<Func>::type
-        >
+    typename boost::lazy_disable_if_c<
+        traits::is_launch_policy<typename util::decay<Func>::type>::value ||
+        traits::is_threads_executor<typename util::decay<Func>::type>::value ||
+        traits::is_executor<typename util::decay<Func>::type>::value
       , detail::dataflow_frame<
             BOOST_SCOPED_ENUM(launch)
           , typename hpx::util::decay<Func>::type

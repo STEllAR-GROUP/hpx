@@ -63,13 +63,13 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     set(CMAKE_CXX_COMPILER g++)
     set(CMAKE_C_COMPILER gcc)
     #set(CMAKE_Fortran_COMPILER)
-    # Add flags we need for BGAS compilation 
-    set(CMAKE_CXX_FLAGS_INIT 
+    # Add flags we need for BGAS compilation
+    set(CMAKE_CXX_FLAGS_INIT
       "-D__powerpc__ -D__bgion__ -I/gpfs/bbp.cscs.ch/home/biddisco/src/bgas/rdmahelper "
       CACHE STRING "Initial compiler flags used to compile for BGAS"
     )
     # the V1R2M2 includes are necessary for some hardware specific features
-    #-DHPX_SMALL_STACK_SIZE=0x200000 -DHPX_MEDIUM_STACK_SIZE=0x200000 -DHPX_LARGE_STACK_SIZE=0x200000 -DHPX_HUGE_STACK_SIZE=0x200000 
+    #-DHPX_SMALL_STACK_SIZE=0x200000 -DHPX_MEDIUM_STACK_SIZE=0x200000 -DHPX_LARGE_STACK_SIZE=0x200000 -DHPX_HUGE_STACK_SIZE=0x200000
     set(CMAKE_EXE_LINKER_FLAGS_INIT "-L/gpfs/bbp.cscs.ch/apps/bgas/tools/gcc/gcc-4.8.2/install/lib64 -latomic -lrt" CACHE STRING "BGAS flags")
     set(CMAKE_C_FLAGS_INIT "-D__powerpc__ -I/gpfs/bbp.cscs.ch/home/biddisco/src/bgas/rdmahelper" CACHE STRING "BGAS flags")
     # We do not perform cross compilation here ...
@@ -79,16 +79,16 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     # Disable generic coroutines (and use posix version)
     set(HPX_WITH_GENERIC_CONTEXT_COROUTINES OFF CACHE BOOL "diable generic coroutines")
     # BGAS nodes support ibverbs
-    set(HPX_PARCELPORT_IBVERBS ON CACHE BOOL "")
+    set(HPX_WITH_PARCELPORT_IBVERBS ON CACHE BOOL "")
     # Always disable the tcp parcelport as it is nonfunctional on the BGQ.
-    set(HPX_PARCELPORT_TCP ON CACHE BOOL "")
+    set(HPX_WITH_PARCELPORT_TCP ON CACHE BOOL "")
     # Always enable the tcp parcelport as it is currently the only way to communicate on the BGQ.
-    set(HPX_PARCELPORT_MPI ON CACHE BOOL "")
+    set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "")
     # We have a bunch of cores on the A2 processor ...
-    set(HPX_MAX_CPU_COUNT "64" CACHE STRING "")
+    set(HPX_WITH_MAX_CPU_COUNT "64" CACHE STRING "")
     # We have no custom malloc yet
-    if(NOT DEFINED HPX_MALLOC)
-      set(HPX_MALLOC "system" CACHE STRING "")
+    if(NOT DEFINED HPX_WITH_MALLOC)
+      set(HPX_WITH_MALLOC "system" CACHE STRING "")
     endif()
     set(HPX_HIDDEN_VISIBILITY OFF CACHE BOOL "")
     #
@@ -102,13 +102,13 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     # Testing flags
     #
     set(BUILD_TESTING                  ON  CACHE BOOL "Testing enabled by default")
-    set(HPX_BUILD_TESTS                ON  CACHE BOOL "Testing enabled by default")
-    set(HPX_BUILD_TESTS_BENCHMARKS     ON  CACHE BOOL "Testing enabled by default")
-    set(HPX_BUILD_TESTS_REGRESSIONS    ON  CACHE BOOL "Testing enabled by default")
-    set(HPX_BUILD_TESTS_UNIT           ON  CACHE BOOL "Testing enabled by default")
-    set(HPX_BUILD_TESTS_EXTERNAL_BUILD OFF CACHE BOOL "Turn off build of cmake build tests")
+    set(HPX_WITH_TESTS                ON  CACHE BOOL "Testing enabled by default")
+    set(HPX_WITH_TESTS_BENCHMARKS     ON  CACHE BOOL "Testing enabled by default")
+    set(HPX_WITH_TESTS_REGRESSIONS    ON  CACHE BOOL "Testing enabled by default")
+    set(HPX_WITH_TESTS_UNIT           ON  CACHE BOOL "Testing enabled by default")
+    set(HPX_WITH_TESTS_EXTERNAL_BUILD OFF CACHE BOOL "Turn off build of cmake build tests")
     set(DART_TESTING_TIMEOUT           45  CACHE STRING "Life is too short")
-    #HPX_STATIC_LINKING
+    # HPX_WITH_STATIC_LINKING
 ``
 
 [heading:BGQ BGQ]
@@ -155,16 +155,16 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     # Set our platform name
     set(HPX_PLATFORM "BlueGeneQ")
     # Always disable the ibverbs parcelport as it is nonfunctional on the BGQ.
-    set(HPX_IBVERBS_PARCELPORT OFF)
+    set(HPX_WITH_IBVERBS_PARCELPORT OFF)
     # Always disable the tcp parcelport as it is nonfunctional on the BGQ.
-    set(HPX_TCP_PARCELPORT OFF)
+    set(HPX_WITH_TCP_PARCELPORT OFF)
     # Always enable the tcp parcelport as it is currently the only way to communicate on the BGQ.
-    set(HPX_MPI_PARCELPORT ON)
+    set(HPX_WITH_MPI_PARCELPORT ON)
     # We have a bunch of cores on the BGQ ...
-    set(HPX_MAX_CPU_COUNT "64")
+    set(HPX_WITH_MAX_CPU_COUNT "64")
     # We default to tbbmalloc as our allocator on the MIC
-    if(NOT DEFINED HPX_MALLOC)
-      set(HPX_MALLOC "system")
+    if(NOT DEFINED HPX_WITH_MALLOC)
+      set(HPX_WITH_MALLOC "system" CACHE STRING "")
     endif()
 ``
 
@@ -215,12 +215,12 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
     set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
     set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
-    set(HPX_PARCELPORT_TCP OFF CACHE BOOL "")
-    set(HPX_PARCELPORT_MPI ON CACHE BOOL "")
-    set(HPX_PARCELPORT_MPI_MULTITHREADED OFF CACHE BOOL "")
+    set(HPX_WITH_PARCELPORT_TCP OFF CACHE BOOL "")
+    set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "")
+    set(HPX_WITH_PARCELPORT_MPI_MULTITHREADED OFF CACHE BOOL "")
     # We default to system as our allocator on the BGQ
-    if(NOT DEFINED HPX_MALLOC)
-      set(HPX_MALLOC "system" CACHE STRING "")
+    if(NOT DEFINED HPX_WITH_MALLOC)
+      set(HPX_WITH_MALLOC "system" CACHE STRING "")
     endif()
     # We do a cross compilation here ...
     set(CMAKE_CROSSCOMPILING ON CACHE BOOL "")
@@ -260,12 +260,12 @@ To use them pass the `-DCMAKE_TOOLCHAIN_FILE=<toolchain>` argument to the cmake 
     # Set our platform name
     set(HPX_PLATFORM "XeonPhi")
     # Always disable the ibverbs parcelport as it is nonfunctional on the BGQ.
-    set(HPX_PARCELPORT_IBVERBS OFF CACHE BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature")
+    set(HPX_WITH_PARCELPORT_IBVERBS OFF CACHE BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature")
     # We have a bunch of cores on the MIC ... increase the default
-    set(HPX_MAX_CPU_COUNT "256" CACHE STRING "")
+    set(HPX_WITH_MAX_CPU_COUNT "256" CACHE STRING "")
     # We default to tbbmalloc as our allocator on the MIC
-    if(NOT DEFINED HPX_MALLOC)
-      set(HPX_MALLOC "tbbmalloc" CACHE STRING "")
+    if(NOT DEFINED HPX_WITH_MALLOC)
+      set(HPX_WITH_MALLOC "tbbmalloc" CACHE STRING "")
     endif()
     # Set the TBBMALLOC_PLATFORM correctly so that find_package(TBBMalloc) sets the
     # right hints

@@ -80,6 +80,9 @@ namespace hpx { namespace threads { namespace executors
             // Remove the given processing unit from the scheduler.
             void remove_processing_unit(std::size_t thread_num, error_code& ec);
 
+            // give invoking context a chance to catch up with its tasks
+            void suspend_back_into_calling_context(std::size_t virt_core);
+
         private:
             // internal run method
             void run(std::size_t virt_core, std::size_t num_thread);
@@ -104,11 +107,18 @@ namespace hpx { namespace threads { namespace executors
 
             // resource manager registration
             std::size_t cookie_;
+
+            // store the self reference to the HPX thread running this scheduler
+            std::vector<threads::thread_self*> self_;
+
+            // protect scheduler initialization
+            typedef lcos::local::spinlock mutex_type;
+            mutex_type mtx_;
         };
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
     struct HPX_EXPORT local_queue_executor : public scheduled_executor
     {
         local_queue_executor();
@@ -126,7 +136,7 @@ namespace hpx { namespace threads { namespace executors
             std::size_t min_punits = 1);
     };
 
-#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     struct HPX_EXPORT static_priority_queue_executor : public scheduled_executor
     {
         static_priority_queue_executor();

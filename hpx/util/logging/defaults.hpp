@@ -106,7 +106,7 @@ Example:
 
         struct lock_resource {
             template<class lock_type> struct finder {
-//#if !defined( HPX_LOG_NO_TSS) && defined(BOOST_WINDOWS)
+//#if !defined( HPX_HAVE_LOG_NO_TSS) && defined(BOOST_WINDOWS)
                 // on Windows, I've tested the threading
 //                typedef typename locker::tss_resource_with_cache<lock_type, 5, hpx::util::logging::threading::mutex > type;
 //#else

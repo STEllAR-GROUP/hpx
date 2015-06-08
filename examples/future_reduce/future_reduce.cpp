@@ -10,6 +10,10 @@
 //
 #include <random>
 
+#include  <boost/nondet_random.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+
 //
 // This is a simple example which generates random numbers and returns
 // pass or fail from a routine.
@@ -18,7 +22,7 @@
 // any fail = !pass rule, then this example shows how to do it.
 // The user can experiment with the failure rate to see if the statistics match
 // their expectations.
-// Also. Routine can use either a lamda, or a function under control of USE_LAMBDA
+// Also. Routine can use either a lambda, or a function under control of USE_LAMBDA
 
 #define TEST_SUCCESS 1
 #define TEST_FAIL    0
@@ -27,9 +31,9 @@
 #define SAMPLES_PER_LOOP     10
 #define TEST_LOOPS           1000
 //
-std::random_device rseed;
-std::mt19937 gen(rseed());
-std::uniform_int_distribution<int> dist(0,99); // interval [0,100)
+boost::random::random_device rseed;
+boost::random::mt19937 gen(rseed());
+boost::random::uniform_int_distribution<int> dist(0,99); // interval [0,100)
 
 #define USE_LAMBDA
 

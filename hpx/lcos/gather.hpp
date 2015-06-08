@@ -31,6 +31,8 @@ namespace hpx { namespace lcos
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <boost/preprocessor/cat.hpp>
+
 #include <vector>
 
 namespace hpx { namespace lcos

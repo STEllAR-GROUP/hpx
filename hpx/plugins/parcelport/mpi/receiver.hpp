@@ -34,13 +34,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         struct handle_header
         {
-            handle_header(header_list::iterator it, receiver &receiver, mutex_type::scoped_lock * l)
+            handle_header(header_list::iterator it, receiver &receiver,
+                    mutex_type::scoped_lock * l)
               : receiver_(receiver)
               , handles_(false)
               , l_(l)
             {
-                // as handle_header tries to acquire a mutex as well, we need to
-                // ignore the headers_mtx_ here
+                // as handle_header tries to acquire a mutex as well, we need
+                // to ignore the headers_mtx_ here
                 util::ignore_while_checking<mutex_type::scoped_lock> il(l_);
                 mutex_type::scoped_lock lk(receiver_.handles_header_mtx_);
                 std::pair<int, int> p(it->first, it->second.tag());
@@ -67,8 +68,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             ~handle_header()
             {
-                // as handle_header tries to acquire a mutex as well, we need to
-                // ignore the headers_mtx_ here
+                // as handle_header tries to acquire a mutex as well, we need
+                // to ignore the headers_mtx_ here
                 util::ignore_while_checking<mutex_type::scoped_lock> il(l_);
                 mutex_type::scoped_lock lk(receiver_.handles_header_mtx_);
                 if(handles_)
@@ -77,7 +78,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
                     receiver_.handles_header_.erase(header_handle_);
                 }
-#ifdef HPX_DEBUG
+#if defined(HPX_DEBUG) && !defined(BOOST_MSVC)
                 else
                 {
                     HPX_ASSERT(header_handle_ != receiver_.handles_header_.end());

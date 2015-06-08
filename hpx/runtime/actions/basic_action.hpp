@@ -32,6 +32,9 @@
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/stringize.hpp>
+#include <boost/type_traits/is_array.hpp>
+#include <boost/type_traits/is_pointer.hpp>
 
 #include <sstream>
 
@@ -86,6 +89,15 @@ namespace hpx { namespace actions
               , util::tuple<typename util::decay_unwrap<Ts>::type...>
             > f_;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct is_non_const_reference
+          : std::integral_constant<bool,
+                std::is_lvalue_reference<T>::value &&
+               !std::is_const<typename std::remove_reference<T>::type>::value
+            >
+        {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -98,6 +110,25 @@ namespace hpx { namespace actions
     template <typename Component, typename R, typename ...Args, typename Derived>
     struct basic_action<Component, R(Args...), Derived>
     {
+        // Flag the use of raw pointer types as action arguments
+        BOOST_STATIC_ASSERT_MSG(
+            !util::detail::any_of<std::is_pointer<Args>...>::value,
+            "Using raw pointers as arguments for actions is not supported.");
+
+        // Flag the use of array types as action arguments
+        BOOST_STATIC_ASSERT_MSG(
+            !util::detail::any_of<
+                std::is_array<typename std::remove_reference<Args>::type>...
+            >::value,
+            "Using arrays as arguments for actions is not supported.");
+
+        // Flag the use of non-const reference types as action arguments
+        BOOST_STATIC_ASSERT_MSG(
+            !util::detail::any_of<
+                detail::is_non_const_reference<Args>...
+            >::value,
+            "Using non-const references as arguments for actions is not supported.");
+
         typedef Component component_type;
         typedef Derived derived_type;
 
@@ -536,6 +567,10 @@ namespace hpx { namespace actions
                                                                               \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
+        struct is_action<action>                                              \
+          : boost::mpl::true_                                                 \
+        {};                                                                   \
+        template <>                                                           \
         struct needs_automatic_registration<action>                           \
           : boost::mpl::false_                                                \
         {};                                                                   \
@@ -629,23 +664,23 @@ namespace hpx { namespace actions
 /// \code
 ///      namespace app
 ///      {
-///          // Define a simple component exposing one action 'print_greating'
+///          // Define a simple component exposing one action 'print_greeting'
 ///          class HPX_COMPONENT_EXPORT server
 ///            : public hpx::components::simple_component_base<server>
 ///          {
-///              void print_greating ()
+///              void print_greeting ()
 ///              {
 ///                  hpx::cout << "Hey, how are you?\n" << hpx::flush;
 ///              }
 ///
 ///              // Component actions need to be declared, this also defines the
-///              // type 'print_greating_action' representing the action.
-///              HPX_DEFINE_COMPONENT_ACTION(server, print_greating, print_greating_action);
+///              // type 'print_greeting_action' representing the action.
+///              HPX_DEFINE_COMPONENT_ACTION(server, print_greeting, print_greeting_action);
 ///          };
 ///      }
 ///
 ///      // Declare boilerplate code required for each of the component actions.
-///      HPX_REGISTER_ACTION_DECLARATION(app::server::print_greating_action);
+///      HPX_REGISTER_ACTION_DECLARATION(app::server::print_greeting_action);
 /// \endcode
 ///
 /// \note This macro has to be used once for each of the component actions

@@ -165,10 +165,9 @@ namespace hpx { namespace serialization {
         {
             register_class_name()
             {
-                T* t = 0; // TODO:change this UB after merging
                 id_registry::instance().register_factory_function(
-                        t->T::hpx_serialization_get_name(), //non-virtual call
-                        &factory_function);
+                    T::hpx_serialization_get_name_impl(),
+                    &factory_function);
             }
 
             static void* factory_function()

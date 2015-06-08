@@ -92,7 +92,7 @@ namespace detail
                                 << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
                                 << ")"
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
                                 << " P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
 #endif
@@ -110,7 +110,7 @@ namespace detail
                                 << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
                                 << ")"
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
                                 << " P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
 #endif

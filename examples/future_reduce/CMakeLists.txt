@@ -6,7 +6,7 @@
 set(example_programs
    )
 
-if(HPX_WITH_CXX11_LAMBDAS)
+if(Boost_RANDOM_FOUND AND HPX_WITH_CXX11_LAMBDAS)
   set(example_programs
       ${example_programs}
       future_reduce)

@@ -8,6 +8,7 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -55,7 +56,7 @@ namespace hpx
         class registry;
     }
 
-    bool pre_main(runtime_mode);
+    int pre_main(runtime_mode);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -71,20 +72,7 @@ namespace hpx
     class HPX_EXPORT runtime
     {
     public:
-        enum state
-        {
-            state_invalid = -1,
-            state_initialized = 0,
-            state_pre_startup = 1,
-            state_startup = 2,
-            state_pre_main = 3,
-            state_running = 4,
-            state_pre_shutdown = 5,
-            state_shutdown = 6,
-            state_stopped = 7,
-            state_last = state_stopped
-        };
-
+      
         state get_state() const { return state_.load(); }
 
         /// The \a hpx_main_function_type is the default function type usable
