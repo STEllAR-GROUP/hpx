@@ -51,6 +51,18 @@ namespace hpx { namespace detail
 
 namespace
 {
+    void register_unassigned_typenames()
+    {
+        // supposed to be run on locality 0 before
+        // before locality communication
+        hpx::serialization::detail::id_registry& registry =
+            hpx::serialization::detail::id_registry::instance();
+
+        boost::uint32_t max_id = registry.get_max_registered_id();
+        for (const std::string& str : registry.get_unassigned_typenames())
+            registry.register_typename(str, ++max_id);
+    }
+
     struct unassigned_typename_sequence
     {
         void save(hpx::serialization::output_archive& ar, unsigned) const
@@ -79,10 +91,9 @@ namespace
         void save(hpx::serialization::output_archive& ar, unsigned) const
         {
             // part running on locality 0
-            static boost::uint32_t max_id = initialize_main_locality_registry();
-
             hpx::serialization::detail::id_registry& registry =
                 hpx::serialization::detail::id_registry::instance();
+            static boost::uint32_t max_id = registry.get_max_registered_id();
 
             for (const std::string& s : unassigned_typename_sequence::typenames)
             {
@@ -117,18 +128,6 @@ namespace
         HPX_SERIALIZATION_SPLIT_MEMBER();
 
     private:
-        boost::uint32_t initialize_main_locality_registry() const
-        {
-            hpx::serialization::detail::id_registry& registry =
-                hpx::serialization::detail::id_registry::instance();
-
-            // first, register all ids on locality 0
-            boost::uint32_t max_id = registry.get_max_registered_id();
-            for (const std::string& str : registry.get_unassigned_typenames())
-                registry.register_typename(str, ++max_id);
-            return max_id;
-        }
-
         mutable std::vector<boost::uint32_t> ids;
     };
 } // namespace
@@ -818,6 +817,10 @@ big_boot_barrier::big_boot_barrier(
   , connected(get_number_of_bootstrap_connections(ini_))
   , thunks(32)
 {
+    // register all not registered typenames
+    if (service_type == service_mode_bootstrap)
+        ::register_unassigned_typenames();
+
     if(pp_)
         pp_->register_event_handler(&early_parcel_sink);
 }
