@@ -48,8 +48,9 @@
 
 #define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
 #define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
+
 // BlueGene IO nodes do not support immediate data
-#define HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED       1
+// #define HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED 1
 
 using namespace hpx::parcelset::policies;
 

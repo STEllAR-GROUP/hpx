@@ -65,6 +65,11 @@ hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING
   hpx_add_config_define(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE "${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE}")
   hpx_add_config_define(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS "${HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS}")
 
+  if(HPX_PARCELPORT_VERBS_INTERFACE MATCHES "roq")
+    message(WARNING "The roq interface on BGQ IO nodes does not support immediate data, disabling it")
+    hpx_add_config_define(HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED 1)
+  endif()
+  
   message("Adding subproject")
   set(rdmahelper_EXPORTED_TARGETS HPXTargets)
  
@@ -74,7 +79,7 @@ hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING
       PROPERTIES COMPILE_DEFINITIONS "RDMAHELPER_HAVE_LOGGING"
     )
   endif()
-  
+
   # build rdma helperlibrary with HPX support
   add_definitions(-DRDMAHELPER_HAVE_HPX)
   
