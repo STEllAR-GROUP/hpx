@@ -359,9 +359,9 @@ namespace hpx { namespace util
                 // Update LRU meta data.
                 key_tracker_.splice(
                     key_tracker_.end()
-                    , key_tracker_
-                    , lru_reference(ct->second)
-                    );
+                  , key_tracker_
+                  , lru_reference(ct->second)
+                );
 
                 // Return the connection back to the cache only if the number
                 // of connections does not need to be shrunk.
@@ -394,11 +394,11 @@ namespace hpx { namespace util
                 // as invariants could be invalidated here due to caller error.
                 check_invariants();
             }
-            else {
-                // Key should already exist in the cache. FIXME: This should
-                // probably throw as could easily be triggered by caller error.
-                HPX_ASSERT(shutting_down_);
-            }
+//             else {
+//                 // Key should already exist in the cache. FIXME: This should
+//                 // probably throw as could easily be triggered by caller error.
+//                 HPX_ASSERT(shutting_down_);
+//             }
         }
 
         /// Returns true if the overall connection count is equal to or larger
@@ -465,8 +465,9 @@ namespace hpx { namespace util
                 key_tracker_.erase(lru_reference(it->second));
 
                 // correct counter to avoid assertions later on
-                connections_ -= num_existing_connections(it->second);
-                evictions_ += num_existing_connections(it->second);
+                std::size_t num_existing = num_existing_connections(it->second);
+                connections_ -= num_existing;
+                evictions_ += num_existing;
 
                 // Erase entry if key exists in the cache.
                 cache_.erase(it);
@@ -479,10 +480,6 @@ namespace hpx { namespace util
 
         /// Destroys all connections for the given locality in the cache, reset
         /// all associated counts.
-        ///
-        /// \note Calling this function while connections are still checked out
-        ///       of the cache is a bad idea, and will violate this classes
-        ///       invariants.
         void clear(key_type const& l, connection_type const& conn)
         {
             mutex_type::scoped_lock lock(mtx_);
@@ -550,14 +547,17 @@ namespace hpx { namespace util
             {
                 cache_value_type const& val = ct->second;
 
+                std::size_t num_connections = cached_connections(val).size();
+                std::size_t num_existing = num_existing_connections(val);
+
                 // The separate item counter has to properly count all the
                 // existing elements, not only those in the cache entry.
-                HPX_ASSERT(cached_connections(val).size() <= num_existing_connections(val));
+                HPX_ASSERT(num_connections <= num_existing);
 
                 // Count all connections (both those in the cache and those
                 // checked out of the cache).
-                in_cache_count += cached_connections(val).size();
-                total_count += num_existing_connections(val);
+                in_cache_count += num_connections;
+                total_count += num_existing;
             }
 
             // Overall connection count should be larger than or equal to the
