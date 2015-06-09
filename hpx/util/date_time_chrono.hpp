@@ -14,7 +14,7 @@
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/thread/thread_time.hpp>
 
-#if defined(HPX_WITH_CXX11_CHRONO)
+#if defined(HPX_HAVE_CXX11_STD_CHRONO)
 #include <chrono>
 #endif
 
@@ -108,7 +108,7 @@ namespace hpx { namespace util
               + (posix_clock::from_ptime(abs_time) - posix_clock::now()))
         {}
 
-#if defined(HPX_WITH_CXX11_CHRONO)
+#if defined(HPX_HAVE_CXX11_STD_CHRONO)
         template <typename Clock, typename Duration>
         steady_time_point(std::chrono::time_point<Clock, Duration> const& std_abs_time)
         {
@@ -150,7 +150,7 @@ namespace hpx { namespace util
           : _rel_time(rel_time.total_nanoseconds())
         {}
 
-#if defined(HPX_WITH_CXX11_CHRONO)
+#if defined(HPX_HAVE_CXX11_STD_CHRONO)
         template <typename Rep, typename Period>
         steady_duration(std::chrono::duration<Rep, Period> const& std_rel_time)
         {
