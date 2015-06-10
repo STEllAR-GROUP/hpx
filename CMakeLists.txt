@@ -795,7 +795,7 @@ hpx_check_for_cxx11_std_unique_ptr(
   REQUIRED "HPX needs support for C++11 std::unique_ptr")
 
 hpx_check_for_cxx11_std_type_traits(
-  DEFINITIONS HPX_HAVE_CXX11_STD_TYPE_TRAITS)
+  REQUIRED "HPX needs support for C++11 basic type traits")
 
 # Check the availability of certain C++14 language features
 hpx_check_for_cxx14_constexpr(
