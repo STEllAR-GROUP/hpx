@@ -13,6 +13,7 @@
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/exception.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
@@ -28,7 +29,7 @@ namespace hpx { namespace serialization {
 
     namespace detail
     {
-        class HPX_EXPORT id_registry: boost::noncopyable
+        class HPX_EXPORT id_registry : boost::noncopyable
         {
         public:
             typedef void* (*ctor_t) ();
@@ -38,20 +39,36 @@ namespace hpx { namespace serialization {
 
             BOOST_STATIC_CONSTEXPR boost::uint32_t invalid_id = ~0u;
 
-            void register_factory_function(const std::string& type_name, ctor_t ctor)
+            void register_factory_function(const std::string& type_name,
+                ctor_t ctor)
             {
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                 typename_to_ctor.emplace(type_name, ctor);
+#else
+                typename_to_ctor.insert(
+                    typename_to_ctor_t::value_type(type_name, ctor)
+                );
+#endif
                 // populate cache
-                typename_to_id_t::const_iterator it = typename_to_id.find(type_name);
+                typename_to_id_t::const_iterator it =
+                    typename_to_id.find(type_name);
                 if (it != typename_to_id.end())
                     cache_id(it->second, ctor);
             }
 
-            void register_typename(const std::string& type_name, boost::uint32_t id)
+            void register_typename(const std::string& type_name,
+                boost::uint32_t id)
             {
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                 typename_to_id.emplace(type_name, id);
+#else
+                typename_to_id.insert(
+                    typename_to_id_t::value_type(type_name, id)
+                );
+#endif
                 // populate cache
-                typename_to_ctor_t::const_iterator it = typename_to_ctor.find(type_name);
+                typename_to_ctor_t::const_iterator it =
+                    typename_to_ctor.find(type_name);
                 if (it != typename_to_ctor.end())
                     cache_id(id, it->second);
 
@@ -60,7 +77,8 @@ namespace hpx { namespace serialization {
 
             boost::uint32_t try_get_id(const std::string& type_name) const
             {
-                typename_to_id_t::const_iterator it = typename_to_id.find(type_name);
+                typename_to_id_t::const_iterator it =
+                    typename_to_id.find(type_name);
                 if (it == typename_to_id.end())
                     return invalid_id;
 
@@ -111,7 +129,7 @@ namespace hpx { namespace serialization {
             cache_t cache;
         };
 
-        class HPX_EXPORT polymorphic_id_factory: boost::noncopyable
+        class HPX_EXPORT polymorphic_id_factory : boost::noncopyable
         {
             typedef id_registry::ctor_t ctor_t;
             typedef id_registry::typename_to_ctor_t typename_to_ctor_t;
@@ -127,7 +145,8 @@ namespace hpx { namespace serialization {
                 if (id > vec.size())
                     HPX_THROW_EXCEPTION(serialization_error
                       , "polymorphic_id_factory::create"
-                      , "Unknown type descriptor " + util::safe_lexical_cast<std::string>(id));
+                      , "Unknown type descriptor " +
+                            util::safe_lexical_cast<std::string>(id));
 
                 ctor_t ctor = vec[id];
                 HPX_ASSERT(ctor != NULL);
@@ -211,15 +230,15 @@ namespace hpx { namespace serialization {
 
 }}
 
-#define HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(String, Id)                               \
-    namespace hpx { namespace serialization { namespace detail {                       \
-        template <> std::string get_constant_entry_name<Id>()                          \
-        {                                                                              \
-            return BOOST_PP_STRINGIZE(String);                                         \
-        }                                                                              \
-        template add_constant_entry<Id>                                                \
-            add_constant_entry<Id>::instance;                                          \
-    }}}                                                                                \
+#define HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(String, Id)                       \
+    namespace hpx { namespace serialization { namespace detail {               \
+        template <> std::string get_constant_entry_name<Id>()                  \
+        {                                                                      \
+            return BOOST_PP_STRINGIZE(String);                                 \
+        }                                                                      \
+        template add_constant_entry<Id>                                        \
+            add_constant_entry<Id>::instance;                                  \
+    }}}                                                                        \
 /**/
 
 #endif

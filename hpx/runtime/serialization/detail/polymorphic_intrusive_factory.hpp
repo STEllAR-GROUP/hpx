@@ -48,7 +48,11 @@ namespace hpx { namespace serialization { namespace detail
             auto it = map_.find(name);
             if(it == map_.end())
             {
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                 map_.emplace(name, fun);
+#else
+                map_.insert(ctor_map_type::value_type(name, fun));
+#endif
             }
         }
 

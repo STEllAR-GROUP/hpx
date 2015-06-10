@@ -49,7 +49,7 @@ namespace hpx { namespace detail
     std::string get_locality_base_name();
 }}
 
-namespace
+namespace hpx { namespace agas { namespace detail
 {
     void register_unassigned_typenames()
     {
@@ -63,14 +63,20 @@ namespace
             registry.register_typename(str, ++max_id);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     struct unassigned_typename_sequence
     {
+        unassigned_typename_sequence() {}
+
+        unassigned_typename_sequence(bool /*dummy*/)
+          : typenames(hpx::serialization::detail::id_registry::
+                instance().get_unassigned_typenames())
+        {}
+
         void save(hpx::serialization::output_archive& ar, unsigned) const
         {
             // part running on worker node
-            typenames = hpx::serialization::detail::id_registry::
-                instance().get_unassigned_typenames();
-
+            HPX_ASSERT(!typenames.empty());
             ar << typenames;
         }
 
@@ -81,36 +87,40 @@ namespace
         }
         HPX_SERIALIZATION_SPLIT_MEMBER();
 
-        static std::vector<std::string> typenames;
+        std::vector<std::string> typenames;
     };
 
-    std::vector<std::string> unassigned_typename_sequence::typenames;
-
+    ///////////////////////////////////////////////////////////////////////////
     struct assigned_id_sequence
     {
+        assigned_id_sequence() {}
+
+        assigned_id_sequence(unassigned_typename_sequence const& typenames)
+        {
+            register_ids_on_main_loc(typenames);
+        }
+
         void save(hpx::serialization::output_archive& ar, unsigned) const
         {
-            // part running on locality 0
-            static bool once = (register_ids_on_main_loc(), true); (void)once;
-            ar << ids;
+            HPX_ASSERT(!ids.empty());
+            ar << ids;      // part running on locality 0
         }
 
         void load(hpx::serialization::input_archive& ar, unsigned)
         {
-            // part running on worker node
-            ar >> ids;
-            static bool once = (register_ids_on_worker_loc(), true); (void)once;
+            ar >> ids;      // part running on worker node
         }
         HPX_SERIALIZATION_SPLIT_MEMBER();
 
     private:
-        void register_ids_on_main_loc() const
+        void register_ids_on_main_loc(
+            unassigned_typename_sequence const& unassigned_ids) const
         {
             hpx::serialization::detail::id_registry& registry =
                 hpx::serialization::detail::id_registry::instance();
             boost::uint32_t max_id = registry.get_max_registered_id();
 
-            for (const std::string& s : unassigned_typename_sequence::typenames)
+            for (const std::string& s : unassigned_ids.typenames)
             {
                 boost::uint32_t id = registry.try_get_id(s);
                 if (id == hpx::serialization::detail::id_registry::invalid_id)
@@ -123,13 +133,19 @@ namespace
             }
         }
 
+    public:
         void register_ids_on_worker_loc() const
         {
             hpx::serialization::detail::id_registry& registry =
                 hpx::serialization::detail::id_registry::instance();
-            const std::vector<std::string>& typenames =
-                unassigned_typename_sequence::typenames;
 
+            // Yes, we look up the unassigned typenames twice, but this allows
+            // to avoid using globals and protects from race conditions during
+            // de-serialization.
+            std::vector<std::string> typenames =
+                registry.get_unassigned_typenames();
+
+            // we should have received as many ids as we have unassigned names
             HPX_ASSERT(typenames.size() == ids.size());
 
             for (std::size_t k = 0; k < ids.size(); ++k)
@@ -140,7 +156,7 @@ namespace
 
         mutable std::vector<boost::uint32_t> ids;
     };
-} // namespace
+}}} // namespace hpx::agas::detail
 
 namespace hpx { namespace agas
 {
@@ -198,7 +214,7 @@ struct registration_header
       , boost::uint32_t cores_needed_
       , boost::uint32_t num_threads_
       , std::string const& hostname_
-      , ::unassigned_typename_sequence const& typenames_
+      , detail::unassigned_typename_sequence const& typenames_
       , naming::gid_type prefix_ = naming::gid_type()
     ) :
         endpoints(endpoints_)
@@ -217,7 +233,7 @@ struct registration_header
     boost::uint32_t cores_needed;
     boost::uint32_t num_threads;
     std::string hostname;           // hostname of locality
-    ::unassigned_typename_sequence typenames;
+    detail::unassigned_typename_sequence typenames;
     naming::gid_type prefix;        // suggested prefix (optional)
 
     template <typename Archive>
@@ -250,7 +266,7 @@ struct notification_header
       , boost::uint32_t num_localities_
       , boost::uint32_t used_cores_
       , parcelset::endpoints_type const & agas_endpoints_
-      , ::assigned_id_sequence const & ids_
+      , detail::assigned_id_sequence const & ids_
     ) :
         prefix(prefix_)
       , agas_locality(agas_locality_)
@@ -273,7 +289,7 @@ struct notification_header
     boost::uint32_t num_localities;
     boost::uint32_t used_cores;
     parcelset::endpoints_type agas_endpoints;
-    ::assigned_id_sequence ids;
+    detail::assigned_id_sequence ids;
 
 #if defined(HPX_HAVE_SECURITY)
     components::security::signed_certificate root_certificate;
@@ -499,9 +515,12 @@ void register_worker(registration_header const& header)
 
     big_boot_barrier & bbb = get_big_boot_barrier();
 
+    // register all ids
+    detail::assigned_id_sequence assigned_ids(header.typenames);
+
     notification_header hdr (prefix, bbb.here(), locality_addr, primary_addr
       , component_addr, symbol_addr, rt.get_config().get_num_localities()
-      , first_core, bbb.get_endpoints(), ::assigned_id_sequence());
+      , first_core, bbb.get_endpoints(), assigned_ids);
 
 #if defined(HPX_HAVE_SECURITY)
     // wait for the root certificate to be available
@@ -585,6 +604,9 @@ void notify_worker(notification_header const& header)
     // This lock acquires the bbb mutex on creation. When it goes out of scope,
     // it's dtor calls big_boot_barrier::notify().
     big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
+
+    // register all ids with this locality
+    header.ids.register_ids_on_worker_loc();
 
     runtime& rt = get_runtime();
     naming::resolver_client& agas_client = rt.get_agas_client();
@@ -829,7 +851,7 @@ big_boot_barrier::big_boot_barrier(
 {
     // register all not registered typenames
     if (service_type == service_mode_bootstrap)
-        ::register_unassigned_typenames();
+        detail::register_unassigned_typenames();
 
     if(pp_)
         pp_->register_event_handler(&early_parcel_sink);
@@ -918,6 +940,9 @@ void big_boot_barrier::wait_hosted(
             util::safe_lexical_cast<boost::uint32_t>(locality_str, -1));
     }
 
+    // pre-load all unassigned ids
+    detail::unassigned_typename_sequence unassigned(true);
+
     // contact the bootstrap AGAS node
     registration_header hdr(
           rt.endpoints()
@@ -926,7 +951,7 @@ void big_boot_barrier::wait_hosted(
         , cores_needed
         , num_threads
         , locality_name
-        , ::unassigned_typename_sequence()
+        , unassigned
         , suggested_prefix);
 
     apply(
