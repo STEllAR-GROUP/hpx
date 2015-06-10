@@ -28,3 +28,10 @@ HPX_REGISTER_ACTION_ID(
     hpx_lcos_server_latch_wait_action,
     hpx::actions::hpx_lcos_server_latch_wait_action_id)
 
+HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(
+    set_value_action_bool_ptrdiff,
+    hpx::actions::base_lco_with_value_std_bool_ptrdiff_set)
+HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(
+    get_value_action_bool_ptrdiff,
+    hpx::actions::base_lco_with_value_std_bool_ptrdiff_get)
+

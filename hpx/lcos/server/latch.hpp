@@ -103,7 +103,7 @@ namespace hpx { namespace lcos { namespace server
         }
 
         typedef hpx::components::server::create_component_action<
-                latch, std::size_t
+                latch, std::ptrdiff_t
             > create_component_action;
 
         // additional functionality

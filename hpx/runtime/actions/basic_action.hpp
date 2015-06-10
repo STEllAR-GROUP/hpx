@@ -444,82 +444,135 @@ namespace hpx { namespace actions
         hpx::actions::make_direct_action<decltype(&func), &func> /**/         \
     /**/
 
-    /// \endcond
-
     enum preassigned_action_id
     {
-        register_worker_action_id = 0, //*
-        notify_worker_action_id, //*
-        allocate_action_id, //*
-        base_connect_action_id, //*
-        base_disconnect_action_id, //*
-        base_set_event_action_id, //*
-        base_set_exception_action_id, //*
-        broadcast_call_shutdown_functions_action_id, //*
-        broadcast_call_startup_functions_action_id, //*
-        broadcast_symbol_namespace_service_action_id, //*
-        bulk_create_components_action_id, //*
-        call_shutdown_functions_action_id, //*
-        call_startup_functions_action_id, //*
-        component_namespace_bulk_service_action_id, //*
-        component_namespace_service_action_id, //*
-        console_error_sink_action_id, //*
-        console_logging_action_id, //*
-        console_print_action_id, //*
-        create_memory_block_action_id, //*
-        create_performance_counter_action_id, //*
-        dijkstra_termination_action_id, //*
-        free_component_action_id, //*
-        garbage_collect_action_id, //*
-        get_config_action_id, //*
-        get_instance_count_action_id, //*
-        hpx_get_locality_name_action_id, //*
-        hpx_lcos_server_barrier_create_component_action_id, //*
-        hpx_lcos_server_latch_create_component_action_id, //*
-        hpx_lcos_server_latch_wait_action_id, //*
-        list_component_type_action_id, //*
-        list_symbolic_name_action_id, //*
-        load128_action_id, //*
-        load16_action_id, //*
-        load32_action_id, //*
-        load64_action_id, //*
-        load8_action_id, //*
-        load_components_action_id, //*
-        locality_namespace_bulk_service_action_id, //*
-        locality_namespace_service_action_id, //*
-        memory_block_checkin_action_id, //*
-        memory_block_checkout_action_id, //*
-        memory_block_clone_action_id, //*
-        memory_block_get_action_id, //*
-        memory_block_get_config_action_id, //*
-        output_stream_write_async_action_id, //*
-        output_stream_write_sync_action_id, //*
-        performance_counter_get_counter_info_action_id, //*
-        performance_counter_get_counter_value_action_id, //*
-        performance_counter_set_counter_value_action_id, //*
-        performance_counter_reset_counter_value_action_id, //*
-        performance_counter_start_action_id, //*
-        performance_counter_stop_action_id, //*
-        primary_namespace_bulk_service_action_id, //*
-        primary_namespace_service_action_id, //*
-        remove_from_connection_cache_action_id, //*
-        set_value_action_agas_bool_response_type_id, //*
-        set_value_action_agas_id_type_response_type_id, //*
-        shutdown_action_id, //*
-        shutdown_all_action_id, //*
-        store128_action_id, //*
-        store16_action_id, //*
-        store32_action_id, //*
-        store64_action_id, //*
-        store8_action_id, //*
-        symbol_namespace_bulk_service_action_id, //*
-        symbol_namespace_service_action_id, //*
-        terminate_action_id, //*
-        terminate_all_action_id, //*
-        update_agas_cache_entry_action_id, //*
-        register_worker_security_action_id, //*
-        notify_worker_security_action_id, //*
+        register_worker_action_id = 0,
+        notify_worker_action_id,
+        allocate_action_id,
+        base_connect_action_id,
+        base_disconnect_action_id,
+        base_set_event_action_id,
+        base_set_exception_action_id,
+        broadcast_call_shutdown_functions_action_id,
+        broadcast_call_startup_functions_action_id,
+        broadcast_symbol_namespace_service_action_id,
+        bulk_create_components_action_id,
+        call_shutdown_functions_action_id,
+        call_startup_functions_action_id,
+        component_namespace_bulk_service_action_id,
+        component_namespace_service_action_id,
+        console_error_sink_action_id,
+        console_logging_action_id,
+        console_print_action_id,
+        create_memory_block_action_id,
+        create_performance_counter_action_id,
+        dijkstra_termination_action_id,
+        free_component_action_id,
+        garbage_collect_action_id,
+        get_config_action_id,
+        get_instance_count_action_id,
+        hpx_get_locality_name_action_id,
+        hpx_lcos_server_barrier_create_component_action_id,
+        hpx_lcos_server_latch_create_component_action_id,
+        hpx_lcos_server_latch_wait_action_id,
+        list_component_type_action_id,
+        list_symbolic_name_action_id,
+        load128_action_id,
+        load16_action_id,
+        load32_action_id,
+        load64_action_id,
+        load8_action_id,
+        load_components_action_id,
+        locality_namespace_bulk_service_action_id,
+        locality_namespace_service_action_id,
+        memory_block_checkin_action_id,
+        memory_block_checkout_action_id,
+        memory_block_clone_action_id,
+        memory_block_get_action_id,
+        memory_block_get_config_action_id,
+        output_stream_write_async_action_id,
+        output_stream_write_sync_action_id,
+        performance_counter_get_counter_info_action_id,
+        performance_counter_get_counter_value_action_id,
+        performance_counter_set_counter_value_action_id,
+        performance_counter_reset_counter_value_action_id,
+        performance_counter_start_action_id,
+        performance_counter_stop_action_id,
+        primary_namespace_bulk_service_action_id,
+        primary_namespace_service_action_id,
+        remove_from_connection_cache_action_id,
+        set_value_action_agas_bool_response_type_id,
+        set_value_action_agas_id_type_response_type_id,
+        shutdown_action_id,
+        shutdown_all_action_id,
+        store128_action_id,
+        store16_action_id,
+        store32_action_id,
+        store64_action_id,
+        store8_action_id,
+        symbol_namespace_bulk_service_action_id,
+        symbol_namespace_service_action_id,
+        terminate_action_id,
+        terminate_all_action_id,
+        update_agas_cache_entry_action_id,
+        register_worker_security_action_id,
+        notify_worker_security_action_id,
+
+        base_lco_with_value_gid_get,
+        base_lco_with_value_gid_set,
+        base_lco_with_value_vector_gid_get,
+        base_lco_with_value_vector_gid_set,
+        base_lco_with_value_id_get,
+        base_lco_with_value_id_set,
+        base_lco_with_value_vector_id_get,
+        base_lco_with_value_vector_id_set,
+        base_lco_with_value_unused_get,
+        base_lco_with_value_unused_set,
+        base_lco_with_value_float_get,
+        base_lco_with_value_float_set,
+        base_lco_with_value_double_get,
+        base_lco_with_value_double_set,
+        base_lco_with_value_int8_get,
+        base_lco_with_value_int8_set,
+        base_lco_with_value_uint8_get,
+        base_lco_with_value_uint8_set,
+        base_lco_with_value_int16_get,
+        base_lco_with_value_int16_set,
+        base_lco_with_value_uint16_get,
+        base_lco_with_value_uint16_set,
+        base_lco_with_value_int32_get,
+        base_lco_with_value_int32_set,
+        base_lco_with_value_uint32_get,
+        base_lco_with_value_uint32_set,
+        base_lco_with_value_int64_get,
+        base_lco_with_value_int64_set,
+        base_lco_with_value_uint64_get,
+        base_lco_with_value_uint64_set,
+        base_lco_with_value_uint128_get,
+        base_lco_with_value_uint128_set,
+        base_lco_with_value_bool_get,
+        base_lco_with_value_bool_set,
+        base_lco_with_value_hpx_section_get,
+        base_lco_with_value_hpx_section_set,
+        base_lco_with_value_hpx_counter_info_get,
+        base_lco_with_value_hpx_counter_info_set,
+        base_lco_with_value_hpx_counter_value_get,
+        base_lco_with_value_hpx_counter_value_set,
+        base_lco_with_value_hpx_agas_response_get,
+        base_lco_with_value_hpx_agas_response_set,
+        base_lco_with_value_hpx_agas_response_vector_get,
+        base_lco_with_value_hpx_agas_response_vector_set,
+        base_lco_with_value_hpx_memory_data_get,
+        base_lco_with_value_hpx_memory_data_set,
+        base_lco_with_value_std_string_get,
+        base_lco_with_value_std_string_set,
+        base_lco_with_value_std_bool_ptrdiff_get,
+        base_lco_with_value_std_bool_ptrdiff_set,
+
+        last_action_id
     };
+
+    /// \endcond
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
@@ -553,11 +606,6 @@ namespace hpx { namespace actions
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
 /**/
-#define HPX_REGISTER_ACTION_ID(action, actionname, actionid)                  \
-    HPX_REGISTER_ACTION_2(action, actionname)                                 \
-    HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(actionname, actionid)                \
-/**/
-
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
     namespace hpx { namespace actions { namespace detail {                    \
@@ -714,8 +762,49 @@ namespace hpx { namespace actions
 /// \a HPX_DEFINE_PLAIN_ACTION macros. It has to occur exactly once for each of
 /// the actions, thus it is recommended to place it into the source file defining
 /// the component.
+///
+/// \note Only one of the forms of this macro \a HPX_REGISTER_ACTION or
+///       \a HPX_REGISTER_ACTION_ID should be used for a particular action,
+///       never both.
+///
 #define HPX_REGISTER_ACTION(...)                                              \
     HPX_REGISTER_ACTION_(__VA_ARGS__)                                         \
+/**/
+
+/// \def HPX_REGISTER_ACTION_ID(action, actionname, actionid)
+///
+/// \brief Define the necessary component action boilerplate code and assign a
+///        predefined unique id to the action.
+///
+/// The macro \a HPX_REGISTER_ACTION can be used to define all the
+/// boilerplate code which is required for proper functioning of component
+/// actions in the context of HPX.
+///
+/// The parameter \a action is the type of the action to define the
+/// boilerplate for.
+///
+/// The parameter \a actionname specifies an unique name of the action to be
+/// used for serialization purposes.
+/// The second parameter has to be usable as a plain (non-qualified) C++
+/// identifier, it should not contain special characters which cannot be part
+/// of a C++ identifier, such as '<', '>', or ':'.
+///
+/// The parameter \a actionid specifies an unique integer value which will be
+/// used to represent the action during serialization.
+///
+/// \note This macro has to be used once for each of the component actions
+/// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION or global actions
+/// \a HPX_DEFINE_PLAIN_ACTION macros. It has to occur exactly once for each of
+/// the actions, thus it is recommended to place it into the source file defining
+/// the component.
+///
+/// \note Only one of the forms of this macro \a HPX_REGISTER_ACTION or
+///       \a HPX_REGISTER_ACTION_ID should be used for a particular action,
+///       never both.
+///
+#define HPX_REGISTER_ACTION_ID(action, actionname, actionid)                  \
+    HPX_REGISTER_ACTION_2(action, actionname)                                 \
+    HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(actionname, actionid)                \
 /**/
 
 #endif

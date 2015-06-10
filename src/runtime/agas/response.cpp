@@ -645,13 +645,14 @@ using hpx::agas::response;
 
 using hpx::naming::id_type;
 
-HPX_REGISTER_BASE_LCO_WITH_VALUE(
-    hpx::agas::response,
-    agas_response_type)
-
-HPX_REGISTER_BASE_LCO_WITH_VALUE(
-    std::vector<hpx::agas::response>,
-    agas_response_vector_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    hpx::agas::response, hpx_agas_response_type,
+    hpx::actions::base_lco_with_value_hpx_agas_response_get,
+    hpx::actions::base_lco_with_value_hpx_agas_response_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std::vector<hpx::agas::response>, hpx_agas_response_vector_type,
+    hpx::actions::base_lco_with_value_hpx_agas_response_vector_get,
+    hpx::actions::base_lco_with_value_hpx_agas_response_vector_set)
 
 typedef base_lco_with_value<bool, response> base_lco_bool_response_type;
 HPX_REGISTER_ACTION_ID(
