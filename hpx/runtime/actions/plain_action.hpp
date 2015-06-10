@@ -244,6 +244,11 @@ namespace hpx { namespace traits {
 #define HPX_PLAIN_ACTION_1(func)                                              \
     HPX_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action));                    \
 /**/
+#define HPX_PLAIN_ACTION_ID(func, name, id)                                   \
+    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
+    HPX_REGISTER_ACTION_DECLARATION(name, name);                              \
+    HPX_REGISTER_ACTION_ID(name, name, id);                                   \
+/**/
 
 // same for direct actions
 #define HPX_PLAIN_DIRECT_ACTION_(...)                                         \
@@ -258,6 +263,11 @@ namespace hpx { namespace traits {
 /**/
 #define HPX_PLAIN_DIRECT_ACTION_1(func)                                       \
     HPX_PLAIN_DIRECT_ACTION_2(func, BOOST_PP_CAT(func, _action));             \
+/**/
+#define HPX_PLAIN_DIRECT_ACTION_ID(func, name, id)                            \
+    HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                               \
+    HPX_REGISTER_ACTION_DECLARATION(name, name);                              \
+    HPX_REGISTER_ACTION_ID(name, name, id);                                   \
 /**/
 
 /// \endcond

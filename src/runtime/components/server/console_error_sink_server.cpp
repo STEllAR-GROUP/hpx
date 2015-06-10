@@ -32,7 +32,8 @@ namespace hpx { namespace components { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // This must be in global namespace
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::console_error_sink_action,
-    console_error_sink_action)
+    console_error_sink_action,
+    hpx::actions::console_error_sink_action_id)
 

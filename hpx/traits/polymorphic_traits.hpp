@@ -10,6 +10,8 @@
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/or.hpp>
+#include <boost/mpl/has_xxx.hpp>
 #include <boost/type_traits/is_class.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -43,6 +45,8 @@ namespace hpx { namespace traits {
 
     } // namespace detail
 
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(serialized_with_id);
+
     template <class T, class Enable = void>
     struct is_intrusive_polymorphic: boost::mpl::false_ {};
 
@@ -55,6 +59,9 @@ namespace hpx { namespace traits {
     struct is_nonintrusive_polymorphic:
         boost::mpl::false_ {};
 
+    template <class T>
+    struct is_serialized_with_id:
+        has_serialized_with_id<T> {};
 }}
 
 #define HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class)                          \
@@ -69,6 +76,22 @@ namespace hpx { namespace traits {
     namespace hpx { namespace traits {                                      \
         HPX_UTIL_STRIP(TEMPLATE)                                            \
         struct is_nonintrusive_polymorphic<HPX_UTIL_STRIP(ARG_LIST)>        \
+          : boost::mpl::true_ {};                                           \
+    }}                                                                      \
+/**/
+
+#define HPX_TRAITS_SERIALIZED_WITH_ID(Class)                                \
+    namespace hpx { namespace traits {                                      \
+        template <>                                                         \
+        struct is_serialized_with_id<Class>:                                \
+            boost::mpl::true_ {};                                           \
+    }}                                                                      \
+/**/
+
+#define HPX_TRAITS_SERIALIZED_WITH_ID_TEMPLATE(TEMPLATE, ARG_LIST)          \
+    namespace hpx { namespace traits {                                      \
+        HPX_UTIL_STRIP(TEMPLATE)                                            \
+        struct is_serialized_with_id<HPX_UTIL_STRIP(ARG_LIST)>              \
           : boost::mpl::true_ {};                                           \
     }}                                                                      \
 /**/

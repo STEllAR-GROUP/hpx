@@ -2199,8 +2199,11 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
 typedef hpx::agas::server::symbol_namespace::service_action
     symbol_namespace_service_action;
 
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_service_action)
-HPX_REGISTER_BROADCAST_ACTION(symbol_namespace_service_action)
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_service_action,
+        symbol_namespace_service_action)
+HPX_REGISTER_BROADCAST_ACTION_ID(symbol_namespace_service_action,
+        symbol_namespace_service_action,
+        hpx::actions::broadcast_symbol_namespace_service_action_id)
 
 namespace hpx { namespace agas
 {

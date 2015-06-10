@@ -58,57 +58,74 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::bulk_create_components_action,
-    bulk_create_components_action)
-HPX_REGISTER_ACTION(
+    bulk_create_components_action,
+    hpx::actions::bulk_create_components_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::create_memory_block_action,
-    create_memory_block_action)
-HPX_REGISTER_ACTION(
+    create_memory_block_action,
+    hpx::actions::create_memory_block_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::load_components_action,
-    load_components_action)
-HPX_REGISTER_ACTION(
+    load_components_action,
+    hpx::actions::load_components_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::call_startup_functions_action,
-    call_startup_functions_action)
-HPX_REGISTER_ACTION(
+    call_startup_functions_action,
+    hpx::actions::call_startup_functions_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::call_shutdown_functions_action,
-    call_shutdown_functions_action)
-HPX_REGISTER_ACTION(
+    call_shutdown_functions_action,
+    hpx::actions::call_shutdown_functions_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::free_component_action,
-    free_component_action)
-HPX_REGISTER_ACTION(
+    free_component_action,
+    hpx::actions::free_component_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::shutdown_action,
-    shutdown_action)
-HPX_REGISTER_ACTION(
+    shutdown_action,
+    hpx::actions::shutdown_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::shutdown_all_action,
-    shutdown_all_action)
-HPX_REGISTER_ACTION(
+    shutdown_all_action,
+    hpx::actions::shutdown_all_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::terminate_action,
-    terminate_action)
-HPX_REGISTER_ACTION(
+    terminate_action,
+    hpx::actions::terminate_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::terminate_all_action,
-    terminate_all_action)
-HPX_REGISTER_ACTION(
+    terminate_all_action,
+    hpx::actions::terminate_all_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::get_config_action,
-    get_config_action)
-HPX_REGISTER_ACTION(
+    get_config_action,
+    hpx::actions::get_config_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::update_agas_cache_entry_action,
-    update_agas_cache_entry_action)
-HPX_REGISTER_ACTION(
+    update_agas_cache_entry_action,
+    hpx::actions::update_agas_cache_entry_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::garbage_collect_action,
-    garbage_collect_action)
-HPX_REGISTER_ACTION(
+    garbage_collect_action,
+    hpx::actions::garbage_collect_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::create_performance_counter_action,
-    create_performance_counter_action)
-HPX_REGISTER_ACTION(
+    create_performance_counter_action,
+    hpx::actions::create_performance_counter_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::get_instance_count_action,
-    get_instance_count_action)
-HPX_REGISTER_ACTION(
+    get_instance_count_action,
+    hpx::actions::get_instance_count_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
-    remove_from_connection_cache_action)
-HPX_REGISTER_ACTION(
+    remove_from_connection_cache_action,
+    hpx::actions::remove_from_connection_cache_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::dijkstra_termination_action,
-    dijkstra_termination_action)
+    dijkstra_termination_action,
+    hpx::actions::dijkstra_termination_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
@@ -509,8 +526,11 @@ namespace hpx { namespace components { namespace server
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
     call_shutdown_functions_action;
 
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action)
-HPX_REGISTER_BROADCAST_ACTION(call_shutdown_functions_action)
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action,
+        call_shutdown_functions_action)
+HPX_REGISTER_BROADCAST_ACTION_ID(call_shutdown_functions_action,
+        call_shutdown_functions_action,
+        hpx::actions::broadcast_call_shutdown_functions_action_id)
 
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 

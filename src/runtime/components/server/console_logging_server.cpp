@@ -28,9 +28,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // This must be in global namespace
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::console_logging_action<>,
-    console_logging_action)
+    console_logging_action,
+    hpx::actions::console_logging_action_id)
 
 namespace hpx { namespace util { namespace detail
 {
