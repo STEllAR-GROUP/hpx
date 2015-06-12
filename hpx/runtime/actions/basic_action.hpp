@@ -281,25 +281,26 @@ namespace hpx { namespace actions
         template <typename LocalResult>
         struct sync_invoke
         {
-            template <typename ...Ts>
+            template <typename IdOrPolicy, typename ...Ts>
             BOOST_FORCEINLINE static LocalResult call(
                 boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
-                naming::id_type const& id, error_code& ec, Ts&&... vs)
+                IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
             {
-                return hpx::async<basic_action>(policy, id,
+                return hpx::async<basic_action>(policy, id_or_policy,
                     std::forward<Ts>(vs)...).get(ec);
             }
 
-            template <typename ...Ts>
+            template <typename IdOrPolicy, typename ...Ts>
             BOOST_FORCEINLINE static LocalResult call(
                 boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
-                naming::id_type const& id, error_code& /*ec*/, Ts&&... vs)
+                IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
             {
-                return hpx::async<basic_action>(policy, id,
+                return hpx::async<basic_action>(policy, id_or_policy,
                     std::forward<Ts>(vs)...);
             }
         };
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename ...Ts>
         BOOST_FORCEINLINE local_result_type operator()(
             BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
@@ -332,6 +333,62 @@ namespace hpx { namespace actions
             return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        template <typename DistPolicy, typename ...Ts>
+        BOOST_FORCEINLINE
+        typename boost::enable_if_c<
+            traits::is_distribution_policy<DistPolicy>::value,
+            local_result_type
+        >::type
+        operator()(BOOST_SCOPED_ENUM(launch) policy,
+            DistPolicy const& dist_policy, error_code& ec, Ts&&... vs) const
+        {
+            return util::void_guard<local_result_type>(),
+                sync_invoke<local_result_type>::call(
+                    is_future_pred(), policy, dist_policy, ec,
+                    std::forward<Ts>(vs)...
+                );
+        }
+
+        template <typename DistPolicy, typename ...Ts>
+        BOOST_FORCEINLINE
+        typename boost::enable_if_c<
+            traits::is_distribution_policy<DistPolicy>::value,
+            local_result_type
+        >::type
+        operator()(DistPolicy const& dist_policy, error_code& ec,
+            Ts&&... vs) const
+        {
+            return (*this)(launch::all, dist_policy, ec,
+                std::forward<Ts>(vs)...);
+        }
+
+        template <typename DistPolicy, typename ...Ts>
+        BOOST_FORCEINLINE
+        typename boost::enable_if_c<
+            traits::is_distribution_policy<DistPolicy>::value,
+            local_result_type
+        >::type
+        operator()(BOOST_SCOPED_ENUM(launch) policy,
+            DistPolicy const& dist_policy, Ts&&... vs) const
+        {
+            return (*this)(launch::all, dist_policy, throws,
+                std::forward<Ts>(vs)...);
+        }
+
+        template <typename DistPolicy, typename ...Ts>
+        BOOST_FORCEINLINE
+        typename boost::enable_if_c<
+            traits::is_distribution_policy<DistPolicy>::value,
+            local_result_type
+        >::type
+        operator()(DistPolicy const& dist_policy, Ts&&... vs) const
+        {
+            return (*this)(launch::all, dist_policy, throws,
+                std::forward<Ts>(vs)...);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         /// retrieve component type
         static int get_component_type()
         {
