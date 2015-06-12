@@ -253,9 +253,7 @@ namespace hpx
         class HPX_EXPORT thread_data_base;
         class HPX_EXPORT thread_data;
 
-        template <
-            typename SchedulingPolicy,
-            typename NotificationPolicy = threads::policies::callback_notifier>
+        template <typename SchedulingPolicy>
         class HPX_EXPORT threadmanager_impl;
 
         ///////////////////////////////////////////////////////////////////////
@@ -504,9 +502,7 @@ namespace hpx
         std::size_t dflt);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename SchedulingPolicy,
-        typename NotificationPolicy = threads::policies::callback_notifier>
+    template <typename SchedulingPolicy>
     class HPX_API_EXPORT runtime_impl;
 
     /// The function \a get_runtime returns a reference to the (thread

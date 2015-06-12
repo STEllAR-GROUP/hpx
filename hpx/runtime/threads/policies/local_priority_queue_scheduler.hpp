@@ -180,9 +180,9 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        boost::uint64_t get_num_pending_misses(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
-            boost::uint64_t num_pending_misses = 0;
+            boost::int64_t num_pending_misses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
@@ -215,9 +215,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_misses;
         }
 
-        boost::uint64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
         {
-            boost::uint64_t num_pending_accesses = 0;
+            boost::int64_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
@@ -250,9 +250,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_accesses;
         }
 
-        boost::uint64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
         {
-            boost::uint64_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
@@ -285,9 +285,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        boost::uint64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
         {
-            boost::uint64_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
@@ -320,9 +320,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        boost::uint64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
         {
-            boost::uint64_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
@@ -355,9 +355,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        boost::uint64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
         {
-            boost::uint64_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
