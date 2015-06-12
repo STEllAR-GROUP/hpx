@@ -87,14 +87,12 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Func, typename Enable = void>
-    struct async_dispatch;
-
     // BOOST_SCOPED_ENUM(launch)
     template <typename Policy>
     struct async_dispatch<Policy,
         typename boost::enable_if_c<
-            traits::is_launch_policy<typename util::decay<Policy>::type>::value
+            traits::is_launch_policy<Policy>::value
+         && !traits::is_action<Policy>::value
         >::type>
     {
         template <typename F, typename ...Ts>
@@ -103,23 +101,23 @@ namespace hpx { namespace detail
             traits::detail::is_deferred_callable<F(Ts...)>::value,
             hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
         >::type
-        call(Policy const& policy, F&& f, Ts&&... ts)
+        call(BOOST_SCOPED_ENUM(launch) const& launch_policy, F&& f, Ts&&... ts)
         {
             typedef typename util::deferred_call_result_of<
                 F(Ts...)
             >::type result_type;
 
-            if (policy == launch::sync) {
+            if (launch_policy == launch::sync) {
                 return detail::call_sync(
                     util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
                     typename boost::is_void<result_type>::type());
             }
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
-            if (hpx::detail::has_async_policy(policy))
+            if (hpx::detail::has_async_policy(launch_policy))
             {
-                p.apply(policy);
-                if (policy == launch::fork)
+                p.apply(launch_policy);
+                if (launch_policy == launch::fork)
                 {
                     // make sure this thread is executed last
                     hpx::this_thread::yield();
@@ -151,7 +149,7 @@ namespace hpx { namespace detail
     template <typename Executor>
     struct async_dispatch<Executor,
         typename boost::enable_if_c<
-            traits::is_threads_executor<typename util::decay<Executor>::type>::value
+            traits::is_threads_executor<Executor>::value
         >::type>
     {
         template <typename F, typename ...Ts>
@@ -177,7 +175,7 @@ namespace hpx { namespace detail
     template <typename Executor>
     struct async_dispatch<Executor,
         typename boost::enable_if_c<
-            traits::is_executor<typename util::decay<Executor>::type>::value
+            traits::is_executor<Executor>::value
         >::type>
     {
         template <typename F, typename ...Ts>
@@ -197,7 +195,7 @@ namespace hpx { namespace detail
     template <typename Bound>
     struct async_dispatch<Bound,
         typename boost::enable_if_c<
-            traits::is_bound_action<typename util::decay<Bound>::type>::value
+            traits::is_bound_action<Bound>::value
         >::type>
     {
         template <typename Action, typename BoundArgs, typename ...Ts>
@@ -217,11 +215,11 @@ namespace hpx
 {
     template <typename F, typename ...Ts>
     BOOST_FORCEINLINE auto async(F&& f, Ts&&... ts)
-    ->  decltype(detail::async_dispatch<F>::call(
+    ->  decltype(detail::async_dispatch<typename util::decay<F>::type>::call(
             std::forward<F>(f), std::forward<Ts>(ts)...
         ))
     {
-        return detail::async_dispatch<F>::call(
+        return detail::async_dispatch<typename util::decay<F>::type>::call(
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }
