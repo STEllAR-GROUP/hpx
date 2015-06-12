@@ -48,7 +48,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if non is
         /// available
-        bool get_next_thread(std::size_t num_thread, bool running,
+        bool get_next_thread(std::size_t num_thread,
             boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
         {
             std::size_t queues_size = this->queues_.size();

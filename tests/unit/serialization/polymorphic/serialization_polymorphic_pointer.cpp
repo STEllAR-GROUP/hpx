@@ -6,7 +6,7 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/raw_ptr.hpp>
+#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -72,19 +72,19 @@ int main()
     oarchive << A();
 
     B * const b1 = new D;
-    oarchive << hpx::serialization::raw_ptr(b1);
-    oarchive << hpx::serialization::raw_ptr(b1);
+    oarchive << hpx::serialization::detail::raw_ptr(b1);
+    oarchive << hpx::serialization::detail::raw_ptr(b1);
 
     hpx::serialization::input_archive iarchive(buffer);
     A a;
     iarchive >> a;
     B *b2 = 0, *b3 = 0;
-    iarchive >> hpx::serialization::raw_ptr(b2);
-    iarchive >> hpx::serialization::raw_ptr(b3);
+    iarchive >> hpx::serialization::detail::raw_ptr(b2);
+    iarchive >> hpx::serialization::detail::raw_ptr(b3);
 
     HPX_TEST_EQ(a.a, 8);
     HPX_TEST_NEQ(b2, b1);
-    HPX_TEST_EQ(b2, b3); //trackable
+    HPX_TEST_NEQ(b2, b3); //untracked
     HPX_TEST_EQ(b2->b, b1->b);
 
     delete b2;

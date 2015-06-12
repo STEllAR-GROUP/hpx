@@ -488,13 +488,15 @@ namespace hpx { namespace threads { namespace policies
                 return thread_map_count_ == 0;
 
             if (delete_all) {
+                // do not lock mutex while deleting all threads, do it piece-wise
                 bool thread_map_is_empty = false;
                 while (true)
                 {
                     typename mutex_type::scoped_lock lk(mtx_);
                     if (cleanup_terminated_locked_helper(false))
                     {
-                        thread_map_is_empty = thread_map_.empty();
+                        thread_map_is_empty =
+                            (thread_map_count_ == 0) && (new_tasks_count_ == 0);
                         break;
                     }
                 }
@@ -502,7 +504,8 @@ namespace hpx { namespace threads { namespace policies
             }
 
             typename mutex_type::scoped_lock lk(mtx_);
-            return cleanup_terminated_locked_helper(false) && thread_map_.empty();
+            return cleanup_terminated_locked_helper(false) &&
+                (thread_map_count_ == 0) && (new_tasks_count_ == 0);
         }
 
         // The maximum number of active threads this thread manager should

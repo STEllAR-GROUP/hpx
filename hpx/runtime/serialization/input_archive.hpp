@@ -9,7 +9,7 @@
 
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/input_container.hpp>
-#include <hpx/runtime/serialization/raw_ptr.hpp>
+#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
 #include <boost/shared_ptr.hpp>
@@ -23,7 +23,7 @@
 
 namespace hpx { namespace serialization
 {
-    struct HPX_ALWAYS_EXPORT input_archive
+    struct HPX_EXPORT input_archive
       : basic_archive<input_archive>
     {
         typedef basic_archive<input_archive> base_type;
@@ -34,19 +34,33 @@ namespace hpx { namespace serialization
 
         template <typename Container>
         input_archive(Container & buffer,
-            boost::uint32_t flags = 0U,
             std::size_t inbound_data_size = 0,
             const std::vector<serialization_chunk>* chunks = 0)
-          : base_type(flags)
+          : base_type(0U)
           , buffer_(new input_container<Container>(buffer, chunks, inbound_data_size))
         {
+            // endianness needs to be saves separately as it is needed to
+            // properly interpret the flags
+
+            // FIXME: make bool once integer compression is implemented
+            boost::uint64_t endianess = 0ul;
+            load(endianess);
+            if (endianess)
+                this->base_type::flags_ = hpx::serialization::endian_big;
+
+            // load flags sent by the other end to make sure both ends have
+            // the same assumptions about the archive format
+            boost::uint32_t flags = 0;
+            load(flags);
+            this->base_type::flags_ = flags;
+
             bool has_filter = false;
             load(has_filter);
 
             serialization::binary_filter* filter = 0;
             if (has_filter && enable_compression())
             {
-                *this >> raw_ptr(filter);
+                *this >> detail::raw_ptr(filter);
                 buffer_->set_filter(filter);
             }
         }

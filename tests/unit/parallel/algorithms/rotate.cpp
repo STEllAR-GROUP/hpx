@@ -124,7 +124,10 @@ void test_rotate_exception(ExPolicy policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size()); //-V104
+
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
+    std::advance(mid, delta);
 
     bool caught_exception = false;
     try {
@@ -158,7 +161,10 @@ void test_rotate_exception_async(ExPolicy p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size()); //-V104
+
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
+    std::advance(mid, delta);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -228,7 +234,10 @@ void test_rotate_bad_alloc(ExPolicy policy, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size()); //-V104
+
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
+    std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
     try {
@@ -261,7 +270,10 @@ void test_rotate_bad_alloc_async(ExPolicy p, IteratorTag)
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
     base_iterator mid = boost::begin(c);
-    std::advance(mid, std::rand() % c.size()); //-V104
+
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
+    std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;

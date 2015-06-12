@@ -264,7 +264,7 @@ namespace hpx { namespace detail
 
         return construct_exception(e, func, file, line, back_trace, node,
             hostname, pid, shepherd, reinterpret_cast<std::size_t>(thread_id.get()),
-            thread_name, env, config, state_name);
+            thread_name, env, config, state_name, auxinfo);
     }
 
     template <typename Exception>
