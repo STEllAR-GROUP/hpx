@@ -9,6 +9,7 @@ set(tests
     async_callback_with_bound_callback
     async_callback_non_deduced_context
     async_unwrap_1037
+    call_promise_get_gid_more_than_once
     dataflow_launch_775
     future_790
     future_hang_on_get_629

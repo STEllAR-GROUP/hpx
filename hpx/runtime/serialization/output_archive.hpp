@@ -59,6 +59,11 @@ namespace hpx { namespace serialization
             }
         }
 
+        bool is_saving() const
+        {
+            return buffer_->is_saving();
+        }
+
         template <typename T>
         void invoke_impl(T const & t)
         {

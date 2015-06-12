@@ -21,6 +21,11 @@
 
 namespace hpx { namespace threads { namespace detail
 {
+    inline bool is_running_state(hpx::state state)
+    {
+        return state == state_running || state == state_suspended;
+    }
+
     ///////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
@@ -32,9 +37,10 @@ namespace hpx { namespace threads { namespace detail
     inline void periodic_maintenance_handler(SchedulingPolicy& scheduler,
         boost::atomic<hpx::state>& global_state, boost::mpl::true_)
     {
-        scheduler.periodic_maintenance(global_state == state_running);
+        bool running = is_running_state(global_state.load());
+        scheduler.periodic_maintenance(running);
 
-        if (global_state.load() == state_running)
+        if (running)
         {
             // create timer firing in correspondence with given time
             typedef boost::asio::basic_deadline_timer<
@@ -64,8 +70,7 @@ namespace hpx { namespace threads { namespace detail
     inline void start_periodic_maintenance(SchedulingPolicy& scheduler,
         boost::atomic<hpx::state>& global_state, boost::mpl::true_)
     {
-        scheduler.periodic_maintenance(global_state == state_running);
-
+        scheduler.periodic_maintenance(is_running_state(global_state.load()));
 
         // create timer firing in correspondence with given time
         typedef boost::asio::basic_deadline_timer<
@@ -271,16 +276,21 @@ namespace hpx { namespace threads { namespace detail
         typedef typename SchedulingPolicy::has_periodic_maintenance pred;
         detail::start_periodic_maintenance(scheduler, global_state, pred());
 
+        // spin for some time after queues have become empty
+        bool may_exit = false;
+
         while (true) {
             // Get the next HPX thread from the queue
             thread_data_base* thrd = NULL;
-            if (scheduler.SchedulingPolicy::get_next_thread(num_thread,
-                    global_state == state_running, idle_loop_count, thrd))
+
+            if (scheduler.SchedulingPolicy::get_next_thread(
+                    num_thread, idle_loop_count, thrd))
             {
                 tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
                 idle_loop_count = 0;
                 ++busy_loop_count;
+                may_exit = false;
 
                 // Only pending HPX threads will be executed.
                 // Any non-pending HPX threads are leftovers from a set_state()
@@ -354,7 +364,7 @@ namespace hpx { namespace threads { namespace detail
                     if (state_val == pending) {
                         // schedule other work
                         scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                            global_state == state_running, idle_loop_count);
+                            is_running_state(global_state.load()), idle_loop_count);
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
@@ -396,9 +406,16 @@ namespace hpx { namespace threads { namespace detail
                 ++idle_loop_count;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                        global_state == state_running, idle_loop_count))
+                        is_running_state(global_state.load()), idle_loop_count))
                 {
-                    break;
+                    // clean up terminated threads one more time before existing
+                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                    {
+                        // keep idling for some time
+                        if (!may_exit)
+                            idle_loop_count = 0;
+                        may_exit = true;
+                    }
                 }
 
                 // do background work in parcel layer and in agas
@@ -440,7 +457,18 @@ namespace hpx { namespace threads { namespace detail
 
                 // clean up terminated threads
                 idle_loop_count = 0;
-                scheduler.SchedulingPolicy::cleanup_terminated(true);
+
+                // break if we were idling after 'may_exit'
+                if (may_exit)
+                {
+                    if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                        break;
+                    may_exit = false;
+                }
+                else
+                {
+                    scheduler.SchedulingPolicy::cleanup_terminated(true);
+                }
             }
         }
     }

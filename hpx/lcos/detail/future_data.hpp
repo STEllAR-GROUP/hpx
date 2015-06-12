@@ -317,10 +317,11 @@ namespace detail
             boost::unique_lock<mutex_type> l(this->mtx_);
 
             if (is_ready_locked()) {
-                // invoke the callback (continuation) function right away
-                l.unlock();
 
                 HPX_ASSERT(!on_completed_);
+
+                // invoke the callback (continuation) function right away
+                l.unlock();
 
                 data_sink();
             }

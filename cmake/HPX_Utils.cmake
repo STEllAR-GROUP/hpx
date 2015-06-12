@@ -25,6 +25,7 @@ hpx_include(
   IsTarget
   HandleComponentDependencies
   ForceOutOfTreeBuild
+  SetLibName
   SetupTarget
 )
 

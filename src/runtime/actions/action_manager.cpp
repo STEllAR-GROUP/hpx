@@ -41,13 +41,13 @@ namespace hpx { namespace actions
         // Give up if we're shutting down.
         if (threads::threadmanager_is(state_stopping))
         {
-            LPT_(debug) << "action_manager: fetch_parcel: dropping late "
-                            "parcel " << p;
+//             LPT_(debug) << "action_manager: fetch_parcel: dropping late "
+//                             "parcel " << p;
             return;
         }
 
         // write this parcel to the log
-        LPT_(debug) << "action_manager: fetch_parcel: " << p;
+//         LPT_(debug) << "action_manager: fetch_parcel: " << p;
 
         appl_.schedule_action(p);
     }

@@ -145,7 +145,7 @@ namespace hpx { namespace util
             std::size_t num_localities)
         {
             std::size_t batch_localities = env.retrieve_number_of_localities();
-            if (num_localities == 1)
+            if (num_localities == 1 && batch_localities != std::size_t(-1))
             {
                 std::size_t cfg_num_localities = cfgmap.get_value<std::size_t>(
                     "hpx.localities", batch_localities);
@@ -639,6 +639,17 @@ namespace hpx { namespace util
                     vm["hpx:debug-agas-log"].as<std::string>());
             ini_config += "hpx.logging.console.agas.level=5";
             ini_config += "hpx.logging.agas.level=5";
+        }
+
+        if (vm.count("hpx:debug-parcel-log")) {
+            ini_config += "hpx.logging.console.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.console.parcel.level=5";
+            ini_config += "hpx.logging.parcel.level=5";
         }
 
         // Set number of cores and OS threads in configuration.

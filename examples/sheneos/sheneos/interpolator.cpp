@@ -387,7 +387,7 @@ namespace sheneos
                 context_data& d = p.second;
                 lazy_results.push_back(
                     hpx::async<action_type>(
-                        p.first, boost::move(d.coords_), eosvalue
+                        p.first, std::move(d.coords_), eosvalue
                     ).then(
                         on_completed_bulk_one(partitions, d, overall_result)
                     )
@@ -505,7 +505,7 @@ namespace sheneos
                 context_data& d = p.second;
                 lazy_results.push_back(
                     hpx::async<action_type>(
-                        p.first, boost::move(d.coords_), eosvalues
+                        p.first, std::move(d.coords_), eosvalues
                     ).then(
                         on_completed_bulk(partitions, d, overall_results)
                     )

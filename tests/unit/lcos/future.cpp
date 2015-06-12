@@ -468,7 +468,7 @@ void test_packaged_task_can_be_moved()
     hpx::lcos::future<int> fi = pt.get_future();
     HPX_TEST(!fi.is_ready());
 
-    hpx::lcos::local::packaged_task<int()> pt2(boost::move(pt));
+    hpx::lcos::local::packaged_task<int()> pt2(std::move(pt));
     HPX_TEST(!fi.is_ready());
 
     try {

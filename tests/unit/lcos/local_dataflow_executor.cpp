@@ -96,7 +96,7 @@ void function_pointers(Executor& exec)
     {
         vf.push_back(dataflow(exec, unwrapped(&int_f1), make_ready_future(42)));
     }
-    future<int> f4 = dataflow(exec, unwrapped(&int_f_vector), boost::move(vf));
+    future<int> f4 = dataflow(exec, unwrapped(&int_f_vector), std::move(vf));
 
     future<int>
         f5 = dataflow(exec,
