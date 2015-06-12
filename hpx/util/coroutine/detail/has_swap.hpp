@@ -38,7 +38,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/detail/workaround.hpp>
 
-namespace hpx { namespace util { namespace coroutines 
+namespace hpx { namespace util { namespace coroutines
 {
 namespace has_swap_
 {

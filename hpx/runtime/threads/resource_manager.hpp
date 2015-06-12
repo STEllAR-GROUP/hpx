@@ -32,9 +32,9 @@ namespace hpx { namespace  threads
 
     /// In short, there are two main responsibilities of the Resource Manager:
     ///
-    /// * Initial Allocation: Allocating resources to executors when executors 
+    /// * Initial Allocation: Allocating resources to executors when executors
     ///   are created.
-    /// * Dynamic Migration: Constantly monitoring utilization of resources 
+    /// * Dynamic Migration: Constantly monitoring utilization of resources
     ///   by executors, and dynamically migrating resources between them
     ///   (not implemented yet).
     ///
@@ -43,7 +43,7 @@ namespace hpx { namespace  threads
         typedef lcos::local::spinlock mutex_type;
         struct tag {};
 
-        // mapping of physical core to virtual core 
+        // mapping of physical core to virtual core
         typedef std::pair<std::size_t, std::size_t>  coreids_type;
 
     public:
@@ -64,7 +64,7 @@ namespace hpx { namespace  threads
 
     protected:
         std::vector<coreids_type> allocate_virt_cores(
-            detail::manage_executor* proxy, std::size_t min_punits, 
+            detail::manage_executor* proxy, std::size_t min_punits,
             std::size_t max_punits, error_code& ec);
 
         std::size_t reserve_processing_units(
@@ -76,7 +76,7 @@ namespace hpx { namespace  threads
         boost::atomic<std::size_t> next_cookie_;
 
         ///////////////////////////////////////////////////////////////////////
-        // Store information about the physical processing units available to 
+        // Store information about the physical processing units available to
         // this resource manager.
         struct punit_data
         {
@@ -89,12 +89,12 @@ namespace hpx { namespace  threads
         punit_array_type punits_;
 
         ///////////////////////////////////////////////////////////////////////
-        // Store information about the virtual processing unit allocation for 
+        // Store information about the virtual processing unit allocation for
         // each of the scheduler proxies attached to this resource manager.
         struct proxy_data
         {
         public:
-            proxy_data(detail::manage_executor* proxy, 
+            proxy_data(detail::manage_executor* proxy,
                     std::vector<coreids_type> && core_ids)
               : proxy_(proxy), core_ids_(std::move(core_ids))
             {}

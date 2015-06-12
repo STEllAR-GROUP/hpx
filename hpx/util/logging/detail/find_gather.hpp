@@ -54,7 +54,7 @@ namespace hpx { namespace util { namespace logging {
     }
 
     namespace detail {
-        template <class stream, class param> 
+        template <class stream, class param>
         struct find_gather {};
 
         template <class stream>

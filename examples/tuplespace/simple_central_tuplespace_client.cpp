@@ -46,7 +46,7 @@ void simple_central_tuplespace_test(const std::string& tuplespace_symbol_name, c
 
    if(!central_tuplespace.connect(tuplespace_symbol_name))
    {
-       hpx::cerr << "locality " << hpx::get_locality_id() << ": " 
+       hpx::cerr << "locality " << hpx::get_locality_id() << ": "
            << "FAIL to connect " << tuplespace_symbol_name << hpx::endl;
        return;
    }
@@ -104,7 +104,7 @@ int hpx_main()
 
         if(!central_tuplespace.create(tuplespace_symbol_name, localities.back()))
         {
-            hpx::cerr << "locality " << hpx::get_locality_id() << ": " 
+            hpx::cerr << "locality " << hpx::get_locality_id() << ": "
                 << "FAIL to create " << tuplespace_symbol_name << hpx::endl;
 
             return hpx::finalize();

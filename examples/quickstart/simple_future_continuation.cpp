@@ -28,7 +28,7 @@ int cont1(hpx::future<int> f)
     return 1;
 }
 
-// this continuation function will be executed by the UI (main) thread, which is 
+// this continuation function will be executed by the UI (main) thread, which is
 // not an HPX thread
 int cont2(hpx::future<int> f)
 {

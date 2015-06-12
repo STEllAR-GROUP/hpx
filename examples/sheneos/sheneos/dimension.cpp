@@ -11,13 +11,13 @@ namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // Implementation of the serialization function.
-    void serialize(input_archive& ar, 
+    void serialize(input_archive& ar,
         sheneos::dimension& dim, unsigned int const)
     {
         ar & dim.offset_ & dim.count_ & dim.size_;
     }
 
-    void serialize(output_archive& ar, 
+    void serialize(output_archive& ar,
         sheneos::dimension& dim, unsigned int const)
     {
         ar & dim.offset_ & dim.count_ & dim.size_;

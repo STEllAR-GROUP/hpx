@@ -115,7 +115,7 @@ void run_benchmark(boost::program_options::variables_map & vm)
     {
         std::vector<hpx::future<double> > benchmarks;
 
-        for (boost::uint32_t locality_id = 0; locality_id != localities.size(); ++locality_id) 
+        for (boost::uint32_t locality_id = 0; locality_id != localities.size(); ++locality_id)
         {
             ireceive_action receive;
 
