@@ -17,7 +17,7 @@
 * The compiler configuration subsystem has been reimplemented. Instead of using
   Boost.Config we now use our own lightweight set of cmake scripts to determine
   the available language and library features supported by the used compiler.
-* The API for creating instance of components has been consolidated. All
+* The API for creating instances of components has been consolidated. All
   component instances should be created using the [funcref hpx::new_ `hpx::new_<>()`]
   only. It allows to instantiate both, single component instances and multiple
   component instances. The placement of the created components can be controlled
@@ -26,7 +26,6 @@
 * Introduced four new distribution policies which can be used with many API
   functions which traditionally expected to be used with a locality id. The
   new distribution policies are:
-
   * [classref hpx::components::default_distribution_policy `hpx::default_distribution_policy`]
     which tries to place multiple component instances as evenly as possible.
   * [classref hpx::components::colocating_distribution_policy `hpx::colocating_distribution_policy`]
@@ -99,11 +98,51 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    1608] - Fixed running multiple localities without localities parameter
+* [issue 1606] - Running without localities parameter binds to bogus port range
+* [issue 1605] - Too many serializations
+* [pr    1604] - Changes the HPX image into a hyperlink
+* [pr    1599] - Duplicate binding of global ids should fail
+* [pr    1598] - Fixing array access
+* [pr    1597] - Improved the reliability of connecting/disconnecting localities
+* [issue 1596] - Duplicate id binding should fail
+* [pr    1595] - Fixing more cmake config constants
+* [pr    1594] - Fixing preprocessor constant used to enable C++11 chrono
+* [pr    1593] - Adding operator|() for hpx::launch
+* [issue 1592] - Error (typo) in the docs
+* [issue 1589] - Disconnecting a locality results in segfault using heartbeat
+                 example
+* [pr    1588] - Fix doc string for config option HPX_WITH_EXAMPLES
+* [pr    1586] - Fixing 1493
+* [pr    1585] - Additional Check for Inspect Tool to detect Endline Whitespace
+* [pr    1583] - Adding a check for end line whitespace
+* [pr    1582] - Attempt to fix assert firing after scheduling loop was exited
+* [pr    1581] - Fixed adjacentfind_binary test
+* [pr    1580] - Prevent some of the internal cmake lists from growing
+                 indefinitely
+* [pr    1579] - Removing type_size trait, replacing it with special archive
+                 type
+* [issue 1578] - Remove demangle_helper
+* [pr    1577] - Get ptr problems
+* [pr    1575] - Fixing tests for parallel rotate
+* [pr    1574] - Cleaning up schedulers
+* [pr    1573] - Fixing thread pool executor
+* [pr    1572] - Fixing number of configured localities
+* [pr    1571] - Reimplement decay
 * [pr    1569] - Changed range for mach-o library lookup
+* [pr    1568] - Mark decltype support as required
+* [issue 1566] - CMAKE Configuration Test Failures for clang 3.5 on debian
 * [pr    1565] - Dylib support
+* [pr    1564] - Converted partitioners and some algorithms to use executors
+* [pr    1563] - Fix several #includes for Boost.Preprocessor
+* [pr    1562] - Adding configuration option disabling/enabling all message
+                 handlers
 * [pr    1561] - Removed all occurrences of boost::move replacing it with
                  std::move
+* [issue 1560] - Leftover HPX_REGISTER_ACTION_DECLARATION_2
 * [pr    1558] - Revisit async/apply SFINAE conditions
+* [pr    1557] - Removing type_size trait, replacing it with special archive
+                 type
 * [pr    1556] - Executor algorithms
 * [pr    1555] - Remove the necessity to specify archive flags on the receiving
                  end
@@ -111,6 +150,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1553] - Properly fix HPX_DEFINE_*_ACTION macros
 * [pr    1552] - Fixed algorithms relying on copy_if implementation
 * [pr    1551] - Pxfs - Modifying FindOrangeFS.cmake based on OrangeFS 2.9.X
+* [issue 1550] - Passing plain identifier inside HPX_DEFINE_PLAIN_ACTION_1
 * [pr    1549] - Fixing intel14/libstdc++4.4
 * [pr    1548] - Moving raw_ptr to detail namespace
 * [pr    1546] - Executor traits result types
@@ -124,6 +164,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1539] - Reporting situation if zero-copy-serialization was performed
                  by a parcel generated from a plain apply/async
 * [pr    1538] - Changed return type of bulk executors and added test
+* [issue 1537] - Incorrect cpuid config tests
 * [pr    1536] - Changed return type of bulk executors and added test
 * [pr    1535] - Make sure promise::get_gid() can be called more than once
 * [pr    1534] - Fixed async_callback with bound callback
@@ -132,13 +173,19 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1532] - Make sure sync primitives are not copyable nor movable
 * [pr    1531] - Fix unwrapped issue with future ranges of void type
 * [pr    1530] - Serialization complex
+* [issue 1528] - Unwrapped issue with future<void>
+* [issue 1527] - HPX does not build with Boost 1.58.0
 * [pr    1526] - Added support for boost.multi_array serialization
 * [pr    1525] - Properly handle deferred futures, fixes #1506
 * [pr    1524] - Making sure invalid action argument types generate clear error
                  message
+* [issue 1522] - Need serialization support for boost multi array
+* [issue 1521] - Remote async and zero-copy serialization optimizations don't
+                 play well together
 * [pr    1520] - Fixing UB whil registering polymorphic classes for serialization
 * [pr    1519] - Making detail::condition_variable safe to use
 * [pr    1518] - Fix when_some bug missing indices in its result
+* [issue 1517] - Typo may affect CMake build system tests
 * [pr    1516] - Fixing Posix context
 * [pr    1515] - Fixing Posix context
 * [pr    1514] - Correct problems with loading dynamic components
@@ -154,6 +201,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1495] - Switching circleci build type to debug
 * [issue 1494] - `--hpx:version`/`-v` does not exit after printing version
                  information
+* [pr    1489] - Enable idle rate counter on demand
 * [pr    1488] - Made sure `detail::condition_variable` can be safely destroyed
 * [pr    1487] - Introduced default (main) template implementation for
                  `ignore_while_checking`
@@ -161,6 +209,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1485] - `ignore_while_locked` doesn't support all Lockable types
 * [pr    1484] - Docker image generation
 * [pr    1483] - Move external endian library into HPX
+* [pr    1482] - Actions with integer type ids
 * [issue 1481] - Sync primitives safe destruction
 * [issue 1480] - Move external/boost/endian into hpx/util
 * [issue 1478] - Boost inspect violations
