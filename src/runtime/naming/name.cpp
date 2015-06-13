@@ -109,14 +109,19 @@ namespace hpx { namespace naming
     {
         void decrement_refcnt(detail::id_type_impl* p)
         {
+            // do nothing if it's too late in the game
+            if (!get_runtime_ptr())
+            {
+                delete p;   // delete local gid representation in any case
+                return;
+            }
+
             // Talk to AGAS only if this gid was split at some time in the past,
             // i.e. if a reference actually left the original locality.
             // Alternatively we need to go this way if the id has never been
             // resolved, which means we don't know anything about the component
             // type.
             naming::address addr;
-
-
             if ((gid_was_split(*p) ||
                 !naming::get_agas_client().resolve_cached(*p, addr)))
             {
