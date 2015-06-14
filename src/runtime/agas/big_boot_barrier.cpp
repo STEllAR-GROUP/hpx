@@ -114,7 +114,7 @@ namespace hpx { namespace agas { namespace detail
 
     private:
         void register_ids_on_main_loc(
-            unassigned_typename_sequence const& unassigned_ids) const
+            unassigned_typename_sequence const& unassigned_ids)
         {
             hpx::serialization::detail::id_registry& registry =
                 hpx::serialization::detail::id_registry::instance();
@@ -154,7 +154,7 @@ namespace hpx { namespace agas { namespace detail
             }
         }
 
-        mutable std::vector<boost::uint32_t> ids;
+        std::vector<boost::uint32_t> ids;
     };
 }}} // namespace hpx::agas::detail
 
