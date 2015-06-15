@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename T, typename OutIter, typename Op>
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        scan_copy_helper(ExPolicy const& policy,
+        scan_copy_helper(ExPolicy policy,
             std::vector<hpx::shared_future<T> >&& r,
             boost::shared_array<T> data, std::size_t count,
             OutIter dest, Op && op, std::vector<std::size_t> const& chunk_sizes)
@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename T, typename Op>
             static OutIter
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 OutIter dest, T && init, Op && op)
             {
                 return sequential_inclusive_scan(first, last, dest,
@@ -123,7 +123,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                  OutIter dest, T && init, Op && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, OutIter> result;

@@ -47,7 +47,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename T>
             static difference_type
-            sequential(ExPolicy const&, Iter first, Iter last, T const& value)
+            sequential(ExPolicy, Iter first, Iter last, T const& value)
             {
                 return std::count(first, last, value);
             }
@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, difference_type
             >::type
-            parallel(ExPolicy const& policy, Iter first, Iter last,
+            parallel(ExPolicy policy, Iter first, Iter last,
                 T const& value)
             {
                 if (first == last)
@@ -206,7 +206,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename Pred>
             static difference_type
-            sequential(ExPolicy const&, Iter first, Iter last, Pred && op)
+            sequential(ExPolicy, Iter first, Iter last, Pred && op)
             {
                 return std::count_if(first, last, std::forward<Pred>(op));
             }
@@ -215,7 +215,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, difference_type
             >::type
-            parallel(ExPolicy const& policy, Iter first, Iter last, Pred && op)
+            parallel(ExPolicy policy, Iter first, Iter last, Pred && op)
             {
                 if (first == last)
                 {

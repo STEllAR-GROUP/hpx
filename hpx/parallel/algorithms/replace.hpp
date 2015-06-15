@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, FwdIter first, FwdIter last,
+            sequential(ExPolicy, FwdIter first, FwdIter last,
                 T const& old_value, T const& new_value)
             {
                 std::replace(first, last, old_value, new_value);
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 T const& old_value, T const& new_value)
             {
                 typedef typename util::detail::algorithm_result<ExPolicy>::type
@@ -146,7 +146,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename F, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, FwdIter first, FwdIter last, F && f,
+            sequential(ExPolicy, FwdIter first, FwdIter last, F && f,
                 T const& new_value)
             {
                 std::replace_if(first, last, std::forward<F>(f), new_value);
@@ -155,7 +155,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename F, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 F && f, T const& new_value)
             {
                 typedef typename util::detail::algorithm_result<ExPolicy>::type
@@ -272,7 +272,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename T>
             static OutIter
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 OutIter dest, T const& old_value, T const& new_value)
             {
                 return std::replace_copy(first, last, dest, old_value, new_value);
@@ -282,7 +282,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 OutIter dest, T const& old_value, T const& new_value)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
@@ -411,7 +411,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F, typename T>
             static OutIter
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 OutIter dest, F && f, T const& new_value)
             {
                 return std::replace_copy_if(first, last, dest,
@@ -422,7 +422,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 OutIter dest, F && f, T const& new_value)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;

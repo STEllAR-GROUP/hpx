@@ -43,7 +43,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F>
             static bool
-            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 return std::none_of(first, last, std::forward<F>(f));
             }
@@ -52,7 +52,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, bool
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 F && op)
             {
                 if (first == last)
@@ -185,7 +185,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F>
             static bool
-            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 return std::any_of(first, last, std::forward<F>(f));
             }
@@ -194,7 +194,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, bool
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 F && op)
             {
                 if (first == last)
@@ -327,7 +327,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F>
             static bool
-            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 return std::all_of(first, last, std::forward<F>(f));
             }
@@ -336,7 +336,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, bool
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 F && op)
             {
                 if (first == last)

@@ -52,7 +52,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static OutIter
-            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, OutIter dest, F && f)
             {
                 return std::set_intersection(first1, last1, first2, last2, dest,
@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy const& policy, RanIter1 first1, RanIter1 last1,
+            parallel(ExPolicy policy, RanIter1 first1, RanIter1 last1,
                 RanIter2 first2, RanIter2 last2, OutIter dest, F && f)
             {
                 typedef typename std::iterator_traits<RanIter1>::difference_type

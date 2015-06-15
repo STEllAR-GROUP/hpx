@@ -62,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter, typename Conv,
                 typename T, typename Op>
             static OutIter
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 OutIter dest, Conv && conv, T && init, Op && op)
             {
                 return sequential_transform_exclusive_scan(first, last, dest,
@@ -75,7 +75,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                  OutIter dest, Conv && conv, T && init, Op && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, OutIter> result;

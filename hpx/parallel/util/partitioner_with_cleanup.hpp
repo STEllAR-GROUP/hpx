@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { namespace util
         struct static_partitioner_with_cleanup
         {
             template <typename FwdIter, typename F1, typename F2, typename F3>
-            static R call(ExPolicy const& policy, FwdIter first,
+            static R call(ExPolicy policy, FwdIter first,
                 std::size_t count, F1 && f1, F2 && f2, F3 && f3,
                 std::size_t chunk_size)
             {
@@ -82,7 +82,7 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename FwdIter, typename F1, typename F2, typename F3>
-            static R call_with_index(ExPolicy const& policy, FwdIter first,
+            static R call_with_index(ExPolicy policy, FwdIter first,
                 std::size_t count, F1 && f1, F2 && f2, F3 && f3,
                 std::size_t chunk_size)
             {
@@ -134,7 +134,7 @@ namespace hpx { namespace parallel { namespace util
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
                 typename F2, typename F3>
-            static hpx::future<R> call(ExPolicy const& policy,
+            static hpx::future<R> call(ExPolicy policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2, F3 && f3,
                 std::size_t chunk_size)
             {
@@ -186,7 +186,7 @@ namespace hpx { namespace parallel { namespace util
 
             template <typename ExPolicy, typename FwdIter, typename F1,
                 typename F2, typename F3>
-            static hpx::future<R> call_with_index(ExPolicy const& policy,
+            static hpx::future<R> call_with_index(ExPolicy policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2, F3 && f3,
                 std::size_t chunk_size)
             {
@@ -239,6 +239,13 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
+        template <typename Executor, typename R, typename Result>
+        struct static_partitioner_with_cleanup<
+                parallel_task_execution_policy_shim<Executor>, R, Result>
+          : static_partitioner_with_cleanup<
+              parallel_task_execution_policy, R, Result>
+        {};
+
         ///////////////////////////////////////////////////////////////////////
         // ExPolicy: execution policy
         // R:        overall result type
@@ -253,7 +260,7 @@ namespace hpx { namespace parallel { namespace util
             parallel::traits::static_partitioner_tag>
         {
             template <typename FwdIter, typename F1, typename F2, typename F3>
-            static R call(ExPolicy const& policy, FwdIter first,
+            static R call(ExPolicy policy, FwdIter first,
                 std::size_t count, F1 && f1, F2 && f2, F3 && f3)
             {
                 return static_partitioner_with_cleanup<ExPolicy, R, Result>::
@@ -264,7 +271,7 @@ namespace hpx { namespace parallel { namespace util
             }
 
             template <typename FwdIter, typename F1, typename F2, typename F3>
-            static R call_with_index(ExPolicy const& policy, FwdIter first,
+            static R call_with_index(ExPolicy policy, FwdIter first,
                 std::size_t count, F1 && f1, F2 && f2, F3 && f3)
             {
                 return static_partitioner_with_cleanup<ExPolicy, R, Result>::
@@ -281,7 +288,7 @@ namespace hpx { namespace parallel { namespace util
         {
             template <typename ExPolicy, typename FwdIter, typename F1,
                 typename F2, typename F3>
-            static hpx::future<R> call(ExPolicy const& policy,
+            static hpx::future<R> call(ExPolicy policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2, F3 && f3)
             {
                 return static_partitioner_with_cleanup<ExPolicy, R, Result>::
@@ -292,7 +299,7 @@ namespace hpx { namespace parallel { namespace util
 
             template <typename ExPolicy, typename FwdIter, typename F1,
                 typename F2, typename F3>
-            static hpx::future<R> call_with_index(ExPolicy const& policy,
+            static hpx::future<R> call_with_index(ExPolicy policy,
                 FwdIter first, std::size_t count, F1 && f1, F2 && f2, F3 && f3)
             {
                 return static_partitioner_with_cleanup<ExPolicy, R, Result>::
@@ -302,11 +309,30 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-        template <typename Executor, typename R, typename Result, typename Tag>
+        template <typename Executor, typename R, typename Result>
         struct partitioner_with_cleanup<
-                parallel_task_execution_policy_shim<Executor>, R, Result, Tag>
-          :  partitioner_with_cleanup<parallel_task_execution_policy, R, Result, Tag>
+                parallel_task_execution_policy_shim<Executor>, R, Result,
+                parallel::traits::static_partitioner_tag>
+          : partitioner_with_cleanup<parallel_task_execution_policy, R, Result,
+                parallel::traits::static_partitioner_tag>
         {};
+
+        template <typename Executor, typename R, typename Result>
+        struct partitioner_with_cleanup<
+                parallel_task_execution_policy_shim<Executor>, R, Result,
+                parallel::traits::auto_partitioner_tag>
+          : partitioner_with_cleanup<parallel_task_execution_policy, R, Result,
+                parallel::traits::auto_partitioner_tag>
+        {};
+
+        template <typename Executor, typename R, typename Result>
+        struct partitioner_with_cleanup<
+                parallel_task_execution_policy_shim<Executor>, R, Result,
+                parallel::traits::default_partitioner_tag>
+          : partitioner_with_cleanup<parallel_task_execution_policy, R, Result,
+                parallel::traits::static_partitioner_tag>
+        {};
+
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename R, typename Result>

@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename FwdIter>
         typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        parallel_sequential_uninitialized_copy_n(ExPolicy const& policy,
+        parallel_sequential_uninitialized_copy_n(ExPolicy policy,
             Iter first, std::size_t count, FwdIter dest)
         {
             if (count == 0)
@@ -116,7 +116,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter>
             static FwdIter
-            sequential(ExPolicy const&, Iter first, Iter last, FwdIter dest)
+            sequential(ExPolicy, Iter first, Iter last, FwdIter dest)
             {
                 return std::uninitialized_copy(first, last, dest);
             }
@@ -125,7 +125,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy const& policy, Iter first, Iter last,
+            parallel(ExPolicy policy, Iter first, Iter last,
                 FwdIter dest)
             {
                 return parallel_sequential_uninitialized_copy_n(policy, first,
@@ -228,7 +228,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter>
             static FwdIter
-            sequential(ExPolicy const&, Iter first, std::size_t count,
+            sequential(ExPolicy, Iter first, std::size_t count,
                 FwdIter dest)
             {
                 return std::uninitialized_copy_n(first, count, dest);
@@ -238,7 +238,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy const& policy, Iter first, std::size_t count,
+            parallel(ExPolicy policy, Iter first, std::size_t count,
                 FwdIter dest)
             {
                 return parallel_sequential_uninitialized_copy_n(policy, first,
