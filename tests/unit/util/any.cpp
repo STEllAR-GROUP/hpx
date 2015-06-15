@@ -124,7 +124,7 @@ int hpx_main(variables_map& vm)
         {
             any any1(5);
             HPX_TEST(!any1.empty());
-            any any2(boost::move(any1));
+            any any2(std::move(any1));
             HPX_TEST(!any2.empty());
             HPX_TEST(any1.empty());
         }
@@ -135,7 +135,7 @@ int hpx_main(variables_map& vm)
             any any2;
             HPX_TEST(any2.empty());
 
-            any2 = boost::move(any1);
+            any2 = std::move(any1);
             HPX_TEST(!any2.empty());
             HPX_TEST(any1.empty());
         }
@@ -210,7 +210,7 @@ int hpx_main(variables_map& vm)
         {
             any_nonser any1(5);
             HPX_TEST(!any1.empty());
-            any_nonser any2(boost::move(any1));
+            any_nonser any2(std::move(any1));
             HPX_TEST(!any2.empty());
             HPX_TEST(any1.empty());
         }
@@ -221,7 +221,7 @@ int hpx_main(variables_map& vm)
             any_nonser any2;
             HPX_TEST(any2.empty());
 
-            any2 = boost::move(any1);
+            any2 = std::move(any1);
             HPX_TEST(!any2.empty());
             HPX_TEST(any1.empty());
         }

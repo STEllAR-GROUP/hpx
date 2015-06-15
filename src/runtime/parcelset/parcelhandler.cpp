@@ -87,7 +87,7 @@ namespace hpx { namespace parcelset
         // Give up if we're shutting down.
         if (threads::threadmanager_is(state_stopping))
         {
-            LPT_(debug) << "parcel_sink: dropping late parcel";
+//             LPT_(debug) << "parcel_sink: dropping late parcel";
             return;
         }
 
@@ -103,6 +103,9 @@ namespace hpx { namespace parcelset
         parcels_(policy),
         use_alternative_parcelports_(false),
         enable_parcel_handling_(true),
+        load_message_handlers_(
+            util::get_entry_as<int>(cfg, "hpx.parcel.message_handlers", "0") != 0
+        ),
         count_routed_(0),
         write_handler_(&parcelhandler::default_write_handler)
     {
@@ -424,8 +427,8 @@ namespace hpx { namespace parcelset
 
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.
-        if (resolved_locally) {
-
+        if (resolved_locally)
+        {
             // re-wrap the given parcel-sent handler
             using util::placeholders::_1;
             write_handler_type wrapped_f =
@@ -435,12 +438,16 @@ namespace hpx { namespace parcelset
             // encapsulated action
             typedef std::pair<boost::shared_ptr<parcelport>, locality> destination_pair;
             destination_pair dest = find_appropriate_destination(addrs[0].locality_);
-            policies::message_handler* mh =
-                p.get_message_handler(this, dest.second);
 
-            if (mh) {
-                mh->put_parcel(dest.second, p, wrapped_f);
-                return;
+            if (load_message_handlers_)
+            {
+                policies::message_handler* mh =
+                    p.get_message_handler(this, dest.second);
+
+                if (mh) {
+                    mh->put_parcel(dest.second, p, wrapped_f);
+                    return;
+                }
             }
 
             dest.first->put_parcel(dest.second, p, wrapped_f);
@@ -1183,7 +1190,8 @@ namespace hpx { namespace parcelset
             "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
                 "$[hpx.parcel.array_optimization]}",
             "enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}",
-            "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}"
+            "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}",
+            "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:0}"
             ;
 
         for (plugins::parcelport_factory_base* factory : get_parcelport_factories())

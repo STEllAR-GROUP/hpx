@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 T const& val)
             {
                 std::fill(first, last, val);
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                  T const& val)
             {
                 typedef typename util::detail::algorithm_result<ExPolicy>::type
@@ -145,7 +145,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename T>
             static OutIter
-            sequential(ExPolicy const&, OutIter first, std::size_t count,
+            sequential(ExPolicy, OutIter first, std::size_t count,
                 T const& val)
             {
                 return std::fill_n(first, count, val);
@@ -155,7 +155,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy const& policy, OutIter first, std::size_t count,
+            parallel(ExPolicy policy, OutIter first, std::size_t count,
                 T const& val)
             {
                 typedef typename std::iterator_traits<OutIter>::value_type type;

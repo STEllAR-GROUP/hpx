@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename F>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, FwdIter first, FwdIter last, F && f)
+            sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
             {
                 std::generate(first, last, std::forward<F>(f));
                 return hpx::util::unused;
@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename F>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
+            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef typename util::detail::algorithm_result<ExPolicy>::type
                     result_type;
@@ -147,7 +147,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename F>
             static OutIter
-            sequential(ExPolicy const&, OutIter first, std::size_t count, F && f)
+            sequential(ExPolicy, OutIter first, std::size_t count, F && f)
             {
                 return std::generate_n(first, count, f);
             }
@@ -156,7 +156,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, OutIter
             >::type
-            parallel(ExPolicy const& policy, OutIter first, std::size_t count,
+            parallel(ExPolicy policy, OutIter first, std::size_t count,
                 F && f)
             {
                 typedef typename std::iterator_traits<OutIter>::value_type type;

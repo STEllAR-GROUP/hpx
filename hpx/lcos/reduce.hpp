@@ -83,6 +83,7 @@ namespace hpx { namespace lcos
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/calculate_fanout.hpp>
@@ -91,7 +92,6 @@ namespace hpx { namespace lcos
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
 
 #include <vector>
 

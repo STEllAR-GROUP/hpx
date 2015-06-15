@@ -88,7 +88,7 @@ namespace jacobi_smp {
                 }
 
                 (*deps_dst)[block]
-                    = hpx::when_all(boost::move(trigger)).then(
+                    = hpx::when_all(std::move(trigger)).then(
                         hpx::launch::async,
                         hpx::util::bind(
                             jacobi_kernel_wrap

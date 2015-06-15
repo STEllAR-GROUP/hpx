@@ -38,7 +38,7 @@ $(MY_HPX_LIBS)/hello_world.ini:
 
 # Compile the client
 hello_world_client: hello_world_client.cpp $(MY_HPX_LIBS)/libhello_world.so
-	c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -liostreams -lhello_world -L $(MY_HPX_LIBS)
+	c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -lhpx_iostreams -lhello_world -L $(MY_HPX_LIBS)
 
 # Run the client, first add our directory to the LD_LIBRARY_PATH
 run: hello_world_client $(HOME)/.hpx.ini $(MY_HPX_LIBS)/hello_world.ini

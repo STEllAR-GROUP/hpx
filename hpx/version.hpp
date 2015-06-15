@@ -77,6 +77,9 @@ namespace hpx
     // Returns the full HPX version.
     HPX_EXPORT boost::uint32_t full_version();
 
+    // Returns the full HPX version.
+    HPX_EXPORT std::string full_version_as_string();
+
     // Returns the AGAS subsystem version.
     HPX_EXPORT boost::uint8_t agas_version();
 

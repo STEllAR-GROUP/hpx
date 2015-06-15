@@ -15,8 +15,14 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // forward declarations, see execution_policy.hpp
     struct sequential_task_execution_policy;
+    template <typename Executor> struct sequential_task_execution_policy_shim;
+
     struct parallel_task_execution_policy;
+    template <typename Executor> struct parallel_task_execution_policy_shim;
+
     struct parallel_vector_execution_policy;
 
     namespace detail
@@ -25,6 +31,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy, typename Result = void>
         struct handle_exception
         {
+            typedef void type;
+
             HPX_ATTRIBUTE_NORETURN static void call()
             {
                 try {
@@ -44,6 +52,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename Result>
         struct handle_exception<sequential_task_execution_policy, Result>
         {
+            typedef future<Result> type;
+
             static future<Result> call()
             {
                 try {
@@ -60,14 +70,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     }
                 }
                 catch (...) {
-                    return hpx::make_exceptional_future<Result>(boost::current_exception());
+                    return hpx::make_exceptional_future<Result>(
+                        boost::current_exception());
                 }
             }
         };
 
+        template <typename Executor, typename Result>
+        struct handle_exception<
+                sequential_task_execution_policy_shim<Executor>, Result>
+          : handle_exception<sequential_task_execution_policy, Result>
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct handle_exception<parallel_task_execution_policy, Result>
         {
+            typedef future<Result> type;
+
             static future<Result> call()
             {
                 try {
@@ -84,14 +104,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     }
                 }
                 catch (...) {
-                    return hpx::make_exceptional_future<Result>(boost::current_exception());
+                    return hpx::make_exceptional_future<Result>(
+                        boost::current_exception());
                 }
             }
         };
 
+        template <typename Executor, typename Result>
+        struct handle_exception<
+                parallel_task_execution_policy_shim<Executor>, Result>
+          : handle_exception<parallel_task_execution_policy, Result>
+        {};
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct handle_exception<parallel_vector_execution_policy, Result>
         {
+            typedef void type;
+
             HPX_ATTRIBUTE_NORETURN static void call()
             {
                 // any exceptions thrown by algorithms executed with the

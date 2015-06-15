@@ -77,7 +77,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename F>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first, FwdIter last, F && f)
+            sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
             {
                 return std::min_element(first, last, std::forward<F>(f));
             }
@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 F && f)
             {
                 if (first == last)
@@ -309,7 +309,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename F>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first, FwdIter last, F && f)
+            sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
             {
                 return std::max_element(first, last, std::forward<F>(f));
             }
@@ -318,7 +318,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 F && f)
             {
                 if (first == last)
@@ -549,7 +549,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename F>
             static std::pair<FwdIter, FwdIter>
-            sequential(ExPolicy const&, FwdIter first, FwdIter last, F && f)
+            sequential(ExPolicy, FwdIter first, FwdIter last, F && f)
             {
                 return std::minmax_element(first, last, std::forward<F>(f));
             }
@@ -558,7 +558,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, std::pair<FwdIter, FwdIter>
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 F && f)
             {
                 typedef std::pair<FwdIter, FwdIter> result_type;

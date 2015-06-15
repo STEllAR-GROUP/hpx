@@ -1026,7 +1026,10 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       // we should not use a table, of course [gps]
       "<table>\n"
       "<tr>\n"
-      "<td><img src=\"http://stellar.cct.lsu.edu/files/stellar100.png\" alt=\"STE||AR logo\" />"
+      "<td>"
+      "<a href = \"https://github.com/STEllAR-GROUP/hpx\">"
+      "<img src=\"http://stellar.cct.lsu.edu/files/stellar100.png\" alt=\"STE||AR logo\" />"
+      "</a>\n"
       "</td>\n"
       "<td>\n"
       "<h1>HPX Inspection Report</h1>\n"

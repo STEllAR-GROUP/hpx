@@ -53,7 +53,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static T
-            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, F && f)
             {
                 return sequential_mismatch_binary(first1, last1, first2, last2,
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, F && f)
             {
                 if (first1 == last1 || first2 == last2)
@@ -346,7 +346,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static T
-            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, F && f)
             {
                 return std::mismatch(first1, last1, first2, std::forward<F>(f));
@@ -355,7 +355,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, F && f)
             {
                 if (first1 == last1)

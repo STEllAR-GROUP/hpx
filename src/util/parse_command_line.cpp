@@ -482,6 +482,9 @@ namespace hpx { namespace util
                 ("hpx:debug-agas-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the AGAS log channel and send all "
                   "AGAS logs to the target destination")
+                ("hpx:debug-parcel-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the parcel transport log channel and send all "
+                  "parcel transport logs to the target destination")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
 #if defined(_POSIX_VERSION) || defined(BOOST_WINDOWS)

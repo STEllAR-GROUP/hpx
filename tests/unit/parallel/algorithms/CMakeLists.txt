@@ -25,13 +25,16 @@ set(tests
     findif
     findifnot
     foreach
+    foreach_executors
     foreachn
     generate
     generaten
     includes
     inclusive_scan
+    inclusive_scan_executors
     is_partitioned
     is_sorted
+    is_sorted_executors
     is_sorted_until
     lexicographical_compare
     max_element
@@ -65,6 +68,7 @@ set(tests
     transform_inclusive_scan
     transform_reduce
     uninitialized_copy
+    uninitialized_copy_executors
     uninitialized_copyn
     uninitialized_fill
     uninitialized_filln

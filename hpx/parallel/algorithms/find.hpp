@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename T>
             static InIter
-            sequential(ExPolicy const&, InIter first, InIter last, const T& val)
+            sequential(ExPolicy, InIter first, InIter last, const T& val)
             {
                 return std::find(first, last, val);
             }
@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, InIter
             >::type
-            parallel(ExPolicy const& policy, InIter first, InIter last,
+            parallel(ExPolicy policy, InIter first, InIter last,
                 T const& val)
             {
                 typedef util::detail::algorithm_result<ExPolicy, InIter> result;
@@ -176,7 +176,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename F>
             static InIter
-            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 return std::find_if(first, last, f);
             }
@@ -185,7 +185,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
+            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
@@ -326,7 +326,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename F>
             static InIter
-            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 for (; first != last; ++first) {
                     if (!f(*first)) {
@@ -340,7 +340,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
+            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
@@ -482,7 +482,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first1, FwdIter last1,
+            sequential(ExPolicy, FwdIter first1, FwdIter last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
                 return std::find_end(first1, last1, first2, last2, op);
@@ -492,7 +492,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first1, FwdIter last1,
+            parallel(ExPolicy policy, FwdIter first1, FwdIter last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
@@ -763,7 +763,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename Pred>
             static InIter
-            sequential(ExPolicy const&, InIter first, InIter last, FwdIter s_first,
+            sequential(ExPolicy, InIter first, InIter last, FwdIter s_first,
                 FwdIter s_last, Pred && op)
             {
                 if(first == last)
@@ -781,7 +781,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, InIter
             >::type
-            parallel(ExPolicy const& policy, InIter first, InIter last,
+            parallel(ExPolicy policy, InIter first, InIter last,
                 FwdIter s_first, FwdIter s_last, Pred && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, InIter> result;

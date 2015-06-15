@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter, typename T_,
                 typename Reduce>
             static T
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 T_ && init, Reduce && r)
             {
                 return std::accumulate(first, last, std::forward<T_>(init),
@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter, typename T_,
                 typename Reduce>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 T_ && init, Reduce && r)
             {
                 if (first == last)

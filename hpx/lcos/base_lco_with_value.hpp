@@ -19,6 +19,7 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/preprocessor/cat.hpp>
 #include <boost/type_traits/is_same.hpp>
 
 namespace hpx { namespace lcos

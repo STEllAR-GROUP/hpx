@@ -14,7 +14,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_set_intersection1(ExPolicy const& policy, IteratorTag)
+void test_set_intersection1(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -41,7 +41,7 @@ void test_set_intersection1(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_intersection1_async(ExPolicy const& p, IteratorTag)
+void test_set_intersection1_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -96,7 +96,7 @@ void set_intersection_test1()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_set_intersection2(ExPolicy const& policy, IteratorTag)
+void test_set_intersection2(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -125,7 +125,7 @@ void test_set_intersection2(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_intersection2_async(ExPolicy const& p, IteratorTag)
+void test_set_intersection2_async(ExPolicy p, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -184,7 +184,7 @@ void set_intersection_test2()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_set_intersection_exception(ExPolicy const& policy, IteratorTag)
+void test_set_intersection_exception(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -224,7 +224,7 @@ void test_set_intersection_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_intersection_exception_async(ExPolicy const& p, IteratorTag)
+void test_set_intersection_exception_async(ExPolicy p, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -299,7 +299,7 @@ void set_intersection_exception_test()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_set_intersection_bad_alloc(ExPolicy const& policy, IteratorTag)
+void test_set_intersection_bad_alloc(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -338,7 +338,7 @@ void test_set_intersection_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_intersection_bad_alloc_async(ExPolicy const& p, IteratorTag)
+void test_set_intersection_bad_alloc_async(ExPolicy p, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 

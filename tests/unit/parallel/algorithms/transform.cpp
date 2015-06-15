@@ -14,7 +14,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_transform(ExPolicy const& policy, IteratorTag)
+void test_transform(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -43,7 +43,7 @@ void test_transform(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_async(ExPolicy const& p, IteratorTag)
+void test_transform_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -100,7 +100,7 @@ void transform_test()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_exception(ExPolicy const& policy, IteratorTag)
+void test_transform_exception(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -133,7 +133,7 @@ void test_transform_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_exception_async(ExPolicy const& p, IteratorTag)
+void test_transform_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -199,7 +199,7 @@ void transform_exception_test()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_bad_alloc(ExPolicy const& policy, IteratorTag)
+void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -231,7 +231,7 @@ void test_transform_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_bad_alloc_async(ExPolicy const& p, IteratorTag)
+void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;

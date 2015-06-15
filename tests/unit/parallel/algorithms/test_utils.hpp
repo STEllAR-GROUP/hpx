@@ -111,7 +111,7 @@ namespace test
     template <typename ExPolicy, typename IteratorTag>
     struct test_num_exceptions
     {
-        static void call(ExPolicy const&, hpx::exception_list const& e)
+        static void call(ExPolicy, hpx::exception_list const& e)
         {
             // The static partitioner uses the number of threads/cores for the
             // number chunks to create.
@@ -133,7 +133,7 @@ namespace test
     template <typename ExPolicy>
     struct test_num_exceptions<ExPolicy, std::input_iterator_tag>
     {
-        static void call(ExPolicy const&, hpx::exception_list const& e)
+        static void call(ExPolicy, hpx::exception_list const& e)
         {
             HPX_TEST_EQ(e.size(), 1u);
         }

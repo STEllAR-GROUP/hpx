@@ -108,7 +108,7 @@ int main()
 
         hpx::serialization::output_archive oarchive(buffer);
         oarchive << b;
-        oarchive << hpx::serialization::raw_ptr(b_ptr);
+        oarchive << hpx::serialization::detail::raw_ptr(b_ptr);
     }
 
     {
@@ -119,7 +119,7 @@ int main()
 
         hpx::serialization::input_archive iarchive(buffer);
         iarchive >> b1;
-        iarchive >> hpx::serialization::raw_ptr(b2);
+        iarchive >> hpx::serialization::detail::raw_ptr(b2);
 
         HPX_TEST(b2 != 0);
 

@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template<typename ExPolicy, typename Pred>
             static bool
-            sequential(ExPolicy const&, Iter first, Iter last,
+            sequential(ExPolicy, Iter first, Iter last,
                 Pred && pred)
             {
                 return std::is_partitioned(first,
@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Pred>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, Iter first, Iter last,
+            parallel(ExPolicy policy, Iter first, Iter last,
                 Pred && pred)
             {
                 typedef typename std::iterator_traits<Iter>::reference

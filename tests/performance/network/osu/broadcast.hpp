@@ -153,10 +153,10 @@ namespace hpx { namespace lcos
                         hpx::id_type dst = hpx::naming::get_locality_from_id(next[0]);
 
                         broadcast_futures.push_back(
-                            hpx::async<broadcast_impl_action>(dst, boost::move(next), fun, fan_out)
+                            hpx::async<broadcast_impl_action>(dst, std::move(next), fun, fan_out)
                         );
                         /*
-                        hpx::apply<broadcast_impl_action>(dst, boost::move(next), fun, fan_out);
+                        hpx::apply<broadcast_impl_action>(dst, std::move(next), fun, fan_out);
                         */
                     }
 
