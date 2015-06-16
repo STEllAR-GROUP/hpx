@@ -13,7 +13,10 @@
 #include <functional>
 #include <vector>
 #include <array>
+#include <string>
 #include <boost/regex.hpp>
+#include <boost/foreach.hpp>
+#include <boost/tokenizer.hpp>
 #include "boost/lexical_cast.hpp"
 #include "boost/filesystem/operations.hpp"
 
@@ -32,7 +35,7 @@ namespace
     floo const named[] = {
         {"boost\\s*::\\s*move\\s*", "boost::move", "std::move"},
         {"std\\s*::\\s*begin\\s*", "std::begin", "boost::begin"},
-        {"std\\s*::\\s*end\\s[^l]*","std::end", "boost::end"},
+        {"std\\s*::\\s*end\\s*[^l]","std::end", "boost::end"},
         {"include\\s*<regex>\\s*","include <regex>", "include <boost/regex.hpp>"},
         {NULL, NULL, NULL}
     };
@@ -66,10 +69,34 @@ namespace boost
                 return;
             //Place characters needed to be detected but not written here
             std::vector<boost::regex> check;
-            std::vector<std::string> replace_with, preferred;
-            std::size_t p = 0, foundn, foundp;
+            std::vector<std::string> replace_with, preferred, file;
+            std::vector<long> linenumb;
+            std::size_t p = 0, q = 0;
             const floo *ptr;
-            long errors = 0;
+            long errors = 0, currline = 0;
+            //For line number
+            char_separator<char> sep("\n");
+            tokenizer<char_separator<char>> tokens(contents, sep);
+            for (const auto& t : tokens) {
+                size_t rend = t.find_first_of("\r"), size = t.size();
+                if (rend == size - 1)
+                {
+                    file.push_back(t);
+                    currline++;
+                    linenumb.push_back(currline);
+
+                }
+                else
+                {
+                    char_separator<char> sep2("\r");
+                    tokenizer<char_separator<char>> tokens2(t, sep2);
+                    for (const auto& u : tokens2) {
+                        file.push_back(u);
+                        currline++;
+                        linenumb.push_back(currline);
+                    }
+                }
+            }
             for (ptr = named; ptr->a != NULL; ++ptr)
             {
                 std::string b, c;
@@ -83,13 +110,19 @@ namespace boost
             }
             while (p < check.size())
             {
-                if (regex_search(contents, check[p])) {
-                    ++errors;
-                    std::string replaced = "Replace \"" + replace_with[p];
-                    std::string with = replaced + "\" with \"";
-                    std::string correct = with + preferred[p] + "\"";
-                    error(library_name, full_path, correct);
+                while (q < file.size())
+                {
+                    if (regex_search(file[q], check[p])) {
+                        ++errors;
+                        std::string replaced = "Replace \"" + replace_with[p];
+                        std::string with = replaced + "\" in line ";
+                        std::string the = with + std::to_string(linenumb[q]) + " with \"";
+                        std::string correct = the + preferred[p] + "\"";
+                        error(library_name, full_path, correct);
+                    }
+                    q++;
                 }
+                q = 0;
                 p++;
             }
 

@@ -10,8 +10,7 @@
 
 #include <cmath>
 #include <memory>
-
-#include <boost/move/move.hpp>
+#include <utility>
 
 #include "partition3d.hpp"
 #include "../read_values.hpp"

@@ -16,6 +16,8 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/config/compiler_specific.hpp>
 
+#include <utility>
+
 #include <tests/regressions/actions/components/movable_objects.hpp>
 
 using boost::program_options::variables_map;

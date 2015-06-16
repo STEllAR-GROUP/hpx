@@ -13,6 +13,8 @@
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <utility>
+
 #include <benchmarks/network/osu_coll.hpp>
 
 void scatter(std::vector<hpx::id_type> const & localities, hpx::serialization::serialize_buffer<char> buffer, std::size_t chunk_size);

@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <utility>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
@@ -14,7 +15,6 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/make_shared.hpp>
-#include <boost/move/move.hpp>
 
 #include "read_values.hpp"
 #include "partition3d.hpp"

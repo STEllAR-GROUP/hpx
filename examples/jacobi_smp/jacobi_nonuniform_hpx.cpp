@@ -6,6 +6,7 @@
 
 #include "jacobi_nonuniform.hpp"
 
+#include <utility>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
