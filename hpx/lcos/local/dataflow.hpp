@@ -39,12 +39,6 @@
 
 #include <algorithm>
 
-// This limits how deep the internal recursion inside dataflow will go before
-// a new operation is re-spawned.
-#if !defined(HPX_DATAFLOW_MAX_RECURSION_DEPTH)
-#define HPX_DATAFLOW_MAX_RECURSION_DEPTH 50
-#endif
-
 namespace hpx { namespace lcos { namespace local
 {
     namespace detail
@@ -270,10 +264,10 @@ namespace hpx { namespace lcos { namespace local
             // plain value.
             template <typename Iter, typename IsFuture, typename IsRange>
             BOOST_FORCEINLINE
-            void await_next_respawn(Iter iter, IsFuture is_future,
-                IsRange is_range)
+            void await_next_respawn(std::size_t depth, Iter iter,
+                IsFuture is_future, IsRange is_range)
             {
-                await_next(0, iter, is_future, is_range);
+                await_next(depth, iter, is_future, is_range);
 
                 // avoid finalizing more than once
                 bool expected = true;
@@ -294,7 +288,7 @@ namespace hpx { namespace lcos { namespace local
                     > is_at_end;
 
                 // re-spawn on a new thread to avoid stack overflows
-                if (depth >= HPX_DATAFLOW_MAX_RECURSION_DEPTH)
+                if (depth >= HPX_CONTINUATION_MAX_RECURSION_DEPTH)
                 {
                     respawn_await(boost::fusion::next(iter), is_at_end());
                     return;
@@ -304,9 +298,10 @@ namespace hpx { namespace lcos { namespace local
             }
 
             template <typename TupleIter, typename Iter>
-            void await_range_respawn(TupleIter iter, Iter next, Iter end)
+            void await_range_respawn(std::size_t depth, TupleIter iter,
+                Iter next, Iter end)
             {
-                await_range(0, iter, next, end);
+                await_range(depth, iter, next, end);
 
                 // avoid finalizing more than once
                 bool expected = true;
@@ -322,8 +317,9 @@ namespace hpx { namespace lcos { namespace local
                 {
                     if (!next->is_ready())
                     {
-                        void (dataflow_frame::*f)(TupleIter, Iter, Iter)
-                            = &dataflow_frame::await_range_respawn;
+                        void (dataflow_frame::*f)(
+                                std::size_t, TupleIter, Iter, Iter
+                            ) = &dataflow_frame::await_range_respawn;
 
                         typedef
                             typename std::iterator_traits<
@@ -348,6 +344,7 @@ namespace hpx { namespace lcos { namespace local
                             boost::bind(
                                 f
                               , std::move(this_)
+                              , ++depth
                               , std::move(iter)
                               , std::move(next)
                               , std::move(end)
@@ -365,7 +362,7 @@ namespace hpx { namespace lcos { namespace local
                     > is_at_end;
 
                 // re-spawn on a new thread to avoid stack overflows
-                if (depth >= HPX_DATAFLOW_MAX_RECURSION_DEPTH)
+                if (depth >= HPX_CONTINUATION_MAX_RECURSION_DEPTH)
                 {
                     respawn_await(boost::fusion::next(iter), is_at_end());
                     return;
@@ -409,7 +406,8 @@ namespace hpx { namespace lcos { namespace local
                 if(!f_.is_ready())
                 {
                     void (dataflow_frame::*f)(
-                            Iter, boost::mpl::true_, boost::mpl::false_
+                            std::size_t, Iter,
+                            boost::mpl::true_, boost::mpl::false_
                         ) = &dataflow_frame::await_next_respawn;
 
                     typedef
@@ -430,6 +428,7 @@ namespace hpx { namespace lcos { namespace local
                         hpx::util::bind(
                             f
                           , std::move(this_)
+                          , ++depth
                           , std::move(iter)
                           , boost::mpl::true_()
                           , boost::mpl::false_()
@@ -443,7 +442,7 @@ namespace hpx { namespace lcos { namespace local
                     > is_at_end;
 
                 // re-spawn on a new thread to avoid stack overflows
-                if (depth >= HPX_DATAFLOW_MAX_RECURSION_DEPTH)
+                if (depth >= HPX_CONTINUATION_MAX_RECURSION_DEPTH)
                 {
                     respawn_await(boost::fusion::next(iter), is_at_end());
                     return;
