@@ -44,7 +44,7 @@ void p3(hpx::lcos::future<int> f)
 
 hpx::lcos::future<int> p4(hpx::lcos::future<int> f)
 {
-    return hpx::async(p2, boost::move(f));
+    return hpx::async(p2, std::move(f));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

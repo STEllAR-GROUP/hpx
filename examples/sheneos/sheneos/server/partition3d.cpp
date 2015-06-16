@@ -10,8 +10,7 @@
 
 #include <cmath>
 #include <memory>
-
-#include <boost/move/move.hpp>
+#include <utility>
 
 #include "partition3d.hpp"
 #include "../read_values.hpp"
@@ -367,7 +366,7 @@ namespace sheneos { namespace server
         for (std::vector<sheneos_coord>::const_iterator it = coords.begin();
             it != end; ++it)
         {
-            result.push_back(boost::move(interpolate(*it, eosvalues)));
+            result.push_back(std::move(interpolate(*it, eosvalues)));
         }
 
         return result;

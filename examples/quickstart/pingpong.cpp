@@ -12,6 +12,7 @@
 #include <hpx/include/serialization.hpp>
 
 #include <vector>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 const std::size_t vsize_default = 1024*1024;
@@ -33,7 +34,7 @@ void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
     std::vector<double> data(in);
 
     on_recv_action act;
-    act(to, hpx::find_here(), boost::move(data), counter);
+    act(to, hpx::find_here(), std::move(data), counter);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

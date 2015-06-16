@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/util/bind_action.hpp>
+#include <utility>
 
 #define HPX_DEFINE_COMPONENT_BROADCAST(NAME, TYPE)                              \
     void BOOST_PP_CAT(NAME, _)(TYPE const & value)                              \
@@ -142,7 +143,7 @@ namespace hpx { namespace lcos
                 {
                     std::size_t next_dist = (ids.size() - fan_out)/fan_out + 1;
                     iterator end
-                        = ((i == fan_out-1) || ((std::distance(ids.cbegin() + 
+                        = ((i == fan_out-1) || ((std::distance(ids.cbegin() +
                             fan_out, begin) + next_dist) >= ids.size()))
                         ? ids.cend()
                         : begin + next_dist;
@@ -153,10 +154,10 @@ namespace hpx { namespace lcos
                         hpx::id_type dst = hpx::naming::get_locality_from_id(next[0]);
 
                         broadcast_futures.push_back(
-                            hpx::async<broadcast_impl_action>(dst, boost::move(next), fun, fan_out)
+                            hpx::async<broadcast_impl_action>(dst, std::move(next), fun, fan_out)
                         );
                         /*
-                        hpx::apply<broadcast_impl_action>(dst, boost::move(next), fun, fan_out);
+                        hpx::apply<broadcast_impl_action>(dst, std::move(next), fun, fan_out);
                         */
                     }
 

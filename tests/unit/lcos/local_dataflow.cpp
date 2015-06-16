@@ -10,6 +10,8 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <utility>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -93,7 +95,7 @@ void function_pointers()
     {
         vf.push_back(dataflow(unwrapped(&int_f1), make_ready_future(42)));
     }
-    future<int> f4 = dataflow(unwrapped(&int_f_vector), boost::move(vf));
+    future<int> f4 = dataflow(unwrapped(&int_f_vector), std::move(vf));
 
     future<int>
         f5 = dataflow(

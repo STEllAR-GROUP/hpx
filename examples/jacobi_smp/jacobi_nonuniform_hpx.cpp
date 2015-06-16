@@ -6,6 +6,7 @@
 
 #include "jacobi_nonuniform.hpp"
 
+#include <utility>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -51,7 +52,7 @@ namespace jacobi_smp {
             {
                 std::size_t begin = A.row_begin(i);
                 std::size_t end = A.row_end(i);
-                
+
                 for(std::size_t ii = begin; ii < end; ++ii)
                 {
                     std::size_t idx = A.indices[ii];
@@ -85,10 +86,10 @@ namespace jacobi_smp {
                 for (std::size_t dep : deps)
                 {
                     trigger.push_back((*deps_src)[dep]);
-                }                                                                                                                           
-                
+                }
+
                 (*deps_dst)[block]
-                    = hpx::when_all(boost::move(trigger)).then(
+                    = hpx::when_all(std::move(trigger)).then(
                         hpx::launch::async,
                         hpx::util::bind(
                             jacobi_kernel_wrap
@@ -109,7 +110,7 @@ namespace jacobi_smp {
 
         double time_elapsed = t.elapsed();
         std::cout << dst->size() << " "
-            << ((double(dst->size() * iterations)/1e6)/time_elapsed) << " MLUPS/s\n" 
+            << ((double(dst->size() * iterations)/1e6)/time_elapsed) << " MLUPS/s\n"
             << std::flush;
     }
 }

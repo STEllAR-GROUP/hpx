@@ -17,6 +17,7 @@
 #include <hpx/util/unwrapped.hpp>
 
 #include <iostream>
+#include <utility>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
@@ -48,7 +49,7 @@ hpx::future<boost::uint64_t> fibonacci(boost::uint64_t n)
             {
                 return lhs + rhs;
             })
-          , boost::move(lhs_future), boost::move(rhs_future)
+          , std::move(lhs_future), std::move(rhs_future)
         );
 }
 

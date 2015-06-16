@@ -14,6 +14,7 @@
 #include <hpx/include/lcos.hpp>
 
 #include <iostream>
+#include <utility>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
@@ -144,7 +145,7 @@ hpx::future<boost::uint64_t> fibonacci(boost::uint64_t n)
 
     _fibonacci(frame);
 
-    return boost::move(frame->result_);
+    return std::move(frame->result_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

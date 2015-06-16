@@ -13,6 +13,8 @@
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <utility>
+
 #include <benchmarks/network/osu_coll.hpp>
 
 void scatter(std::vector<hpx::id_type> const & localities, hpx::serialization::serialize_buffer<char> buffer, std::size_t chunk_size);
@@ -41,7 +43,7 @@ void scatter(std::vector<hpx::id_type> const & localities, hpx::serialization::s
                 hpx::id_type dst = locs[0];
 
                 scatter_futures.push_back(
-                    hpx::async<scatter_action>(dst, boost::move(locs), buffer, chunk_size)
+                    hpx::async<scatter_action>(dst, std::move(locs), buffer, chunk_size)
                 );
             }
 

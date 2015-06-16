@@ -254,7 +254,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
             hpx::future<void> result =
                 executor_traits<executor_type>::async_execute(
-                    policy_.executor(), boost::move(f));
+                    policy_.executor(), std::move(f));
 
             mutex_type::scoped_lock l(mtx_);
             tasks_.push_back(std::move(result));
