@@ -247,6 +247,36 @@ namespace detail
             }
         }
 
+        // make sure continuation invocation does not recurse deeper than
+        // allowed
+        void handle_on_completed(completed_callback_type && on_completed)
+        {
+            handle_continuation_recursion_count cnt;
+
+            if (cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+            {
+                // re-spawn continuation on a new thread
+                boost::intrusive_ptr<future_data> this_(this);
+
+                error_code ec;
+                threads::register_thread_nullary(
+                    util::deferred_call(&future_data::run_on_completed,
+                        std::move(this_), std::move(on_completed)),
+                    "future_data<Result>::set_result", threads::pending,
+                    true, threads::thread_priority_normal, std::size_t(-1),
+                    threads::thread_stacksize_default, ec);
+
+                if (ec) {
+                    // thread creation failed, report error to the future
+                    this->set_exception(hpx::detail::access_exception(ec));
+                }
+                return;
+            }
+
+            // directly execute continuation on this thread
+            on_completed();
+        }
+
         /// Set the result of the requested action.
         template <typename Target>
         void set_result(Target && data, error_code& ec = throws)
@@ -277,32 +307,7 @@ namespace detail
 
             // invoke the callback (continuation) function
             if (on_completed)
-            {
-                handle_continuation_recursion_count cnt;
-
-                if (cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH)
-                {
-                    // re-spawn continuation on a new thread
-                    boost::intrusive_ptr<future_data> this_(this);
-
-                    error_code ec;
-                    threads::register_thread_nullary(
-                        util::deferred_call(&future_data::run_on_completed,
-                            std::move(this_), std::move(on_completed)),
-                        "future_data<Result>::set_result", threads::pending,
-                        true, threads::thread_priority_normal, std::size_t(-1),
-                        threads::thread_stacksize_default, ec);
-
-                    if (ec) {
-                        // thread creation failed, report error to the future
-                        this->set_exception(hpx::detail::access_exception(ec));
-                    }
-                    return;
-                }
-
-                // directly execute continuation on this thread
-                on_completed();
-            }
+                handle_on_completed(std::move(on_completed));
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -376,7 +381,7 @@ namespace detail
                 // invoke the callback (continuation) function right away
                 l.unlock();
 
-                data_sink();
+                handle_on_completed(std::move(data_sink));
             }
             else {
                 // store a combined callback wrapping the old and the new one
