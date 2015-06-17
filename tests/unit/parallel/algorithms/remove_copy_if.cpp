@@ -23,7 +23,8 @@ void test_remove_copy_if(ExPolicy const& policy, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = boost::begin(c) + std::rand() % (c.size()/2);
+    std::size_t middle_idx = std::rand() % (c.size()/2);
+    auto middle = boost::begin(c) + middle_idx;
     std::iota(boost::begin(c), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, boost::end(c), -1);
 
@@ -40,11 +41,11 @@ void test_remove_copy_if(ExPolicy const& policy, IteratorTag)
         }));
 
     HPX_TEST(std::equal(middle, boost::end(c),
-        boost::begin(d) + d.size()/2,
+        boost::begin(d) + middle_idx,
         [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
-            return v1!=v2;
+            return v1 != v2;
     }));
 
     HPX_TEST_EQ(count, d.size());
@@ -58,7 +59,8 @@ void test_remove_copy_if_async(ExPolicy const& p, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = boost::begin(c) + std::rand() % (c.size()/2);
+    std::size_t middle_idx = std::rand() % (c.size()/2);
+    auto middle = boost::begin(c) + middle_idx;
     std::iota(boost::begin(c), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, boost::end(c), -1);
 
@@ -77,7 +79,7 @@ void test_remove_copy_if_async(ExPolicy const& p, IteratorTag)
         }));
 
     HPX_TEST(std::equal(middle, boost::end(c),
-        boost::begin(d) + d.size()/2,
+        boost::begin(d) + middle_idx,
         [&count](int v1, int v2) -> bool {
             HPX_TEST_NEQ(v1, v2);
             ++count;
@@ -97,7 +99,8 @@ void test_remove_copy_if_outiter(ExPolicy const& policy, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
-    auto middle = boost::begin(c) + std::rand() % (c.size()/2);
+    std::size_t middle_idx = std::rand() % (c.size()/2);
+    auto middle = boost::begin(c) + middle_idx;
     std::iota(boost::begin(c), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, boost::end(c), -1);
 
@@ -111,8 +114,7 @@ void test_remove_copy_if_outiter(ExPolicy const& policy, IteratorTag)
             return v1 == v2;
         }));
 
-    // assure D is half the size of C
-    HPX_TEST_EQ(c.size()/2, d.size());
+    HPX_TEST_EQ(middle_idx, d.size());
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -123,7 +125,8 @@ void test_remove_copy_if_outiter_async(ExPolicy const& p, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
-    auto middle = boost::begin(c) + std::rand() % (c.size()/2);
+    std::size_t middle_idx = std::rand() % (c.size()/2);
+    auto middle = boost::begin(c) + middle_idx;
     std::iota(boost::begin(c), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, boost::end(c), -1);
 
@@ -139,7 +142,7 @@ void test_remove_copy_if_outiter_async(ExPolicy const& p, IteratorTag)
             return v1 == v2;
         }));
 
-    HPX_TEST_EQ(c.size()/2, d.size());
+    HPX_TEST_EQ(middle_idx, d.size());
 }
 
 template <typename IteratorTag>
