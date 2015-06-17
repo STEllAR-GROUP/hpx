@@ -23,8 +23,8 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = boost::begin(c) + c.size()/2;
-    std::iota(boost::begin(c), middle, std::rand());
+    auto middle = boost::begin(c) + std::rand() % (c.size()/2);
+    std::iota(boost::begin(c), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, boost::end(c), -1);
 
     hpx::parallel::remove_copy_if(policy,
@@ -58,8 +58,8 @@ void test_remove_copy_if_async(ExPolicy p, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = boost::begin(c) + c.size()/2;
-    std::iota(boost::begin(c), middle, std::rand());
+    auto middle = boost::begin(c) + std::rand() % (c.size()/2);
+    std::iota(boost::begin(c), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, boost::end(c), -1);
 
     hpx::future<base_iterator> f =
@@ -97,8 +97,8 @@ void test_remove_copy_if_outiter(ExPolicy policy, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
-    auto middle = boost::begin(c) + c.size()/2;
-    std::iota(boost::begin(c), middle, std::rand());
+    auto middle = boost::begin(c) + std::rand() % (c.size()/2);
+    std::iota(boost::begin(c), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, boost::end(c), -1);
 
     hpx::parallel::remove_copy_if(policy,
@@ -123,8 +123,8 @@ void test_remove_copy_if_outiter_async(ExPolicy p, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
-    auto middle = boost::begin(c) + c.size()/2;
-    std::iota(boost::begin(c), middle, std::rand());
+    auto middle = boost::begin(c) + std::rand() % (c.size()/2);
+    std::iota(boost::begin(c), middle, static_cast<int>(std::rand() % c.size()));
     std::fill(middle, boost::end(c), -1);
 
     auto f =

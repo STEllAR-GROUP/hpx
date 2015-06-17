@@ -23,11 +23,11 @@ void test_remove_copy(ExPolicy policy, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size()/2);
-    auto middle = boost::begin(c) + c.size()/2;
+    auto middle = boost::begin(c) + std::rand() % (c.size()/2);
     std::fill(boost::begin(c), middle, 1);
     std::fill(middle, boost::end(c), 2);
     hpx::parallel::remove_copy(policy, iterator(boost::begin(c)),
-        iterator(boost::end(c)), boost::begin(d) , 2);
+        iterator(boost::end(c)), boost::begin(d), 2);
 
     std::size_t count = 0;
     HPX_TEST(std::equal(boost::begin(c), middle, boost::begin(d),
@@ -47,12 +47,12 @@ void test_remove_copy_async(ExPolicy p, IteratorTag)
 
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size()/2);
-    auto middle = boost::begin(c) + c.size()/2;
+    auto middle = boost::begin(c) + std::rand() % (c.size()/2);
     std::fill(boost::begin(c), middle, 1);
     std::fill(middle, boost::end(c), 2);
     hpx::future<base_iterator> f =
         hpx::parallel::remove_copy(p, iterator(boost::begin(c)),
-            iterator(boost::end(c)), boost::begin(d) , 2);
+            iterator(boost::end(c)), boost::begin(d), 2);
 
     f.wait();
 
