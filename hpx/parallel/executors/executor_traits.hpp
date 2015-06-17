@@ -102,7 +102,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename Executor>
         struct execution_category<Executor,
-            typename util::always_void<
+            typename hpx::util::always_void<
                 typename Executor::execution_category
             >::type>
         {
@@ -118,7 +118,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
         template <typename Executor, typename T>
         struct future_type<Executor, T,
-            typename util::always_void<typename Executor::future_type>::type>
+            typename hpx::util::always_void<
+                typename Executor::future_type>::type
+            >
         {
             typedef typename Executor::future_type type;
         };
@@ -167,7 +169,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         template <typename Executor, typename F>
-        typename hpx::util::result_of<typename hpx::util::decay<F>::type()>::type
+        typename hpx::util::result_of<
+            typename hpx::util::decay<F>::type()
+        >::type
         call_execute(Executor& exec, F && f)
         {
             return execute_helper::call(0, exec, std::forward<F>(f));
@@ -204,7 +208,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 for (auto const& elem: shape)
                 {
                     results.push_back(
-                        exec.async_execute(util::deferred_call(f, elem))
+                        exec.async_execute(hpx::util::deferred_call(f, elem))
                     );
                 }
 
@@ -264,7 +268,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 for (auto const& elem: shape)
                 {
                     results.push_back(
-                        exec.async_execute(util::deferred_call(f, elem))
+                        exec.async_execute(hpx::util::deferred_call(f, elem))
                     );
                 }
 

@@ -49,13 +49,13 @@ namespace hpx { namespace parallel { namespace util
                 std::list<boost::exception_ptr> errors;
 
                 try {
-                    std::vector<std::pair<FwdIter, std::size_t> > shape;
+                    // estimates a chunk size based on number of cores used
                     std::vector<hpx::future<Result> > inititems;
-                    // estimates a chunk size base on number of cores used
-                    shape = get_static_shape(policy, inititems, f1,
-                        first, count, chunk_size);
+                    std::vector<std::pair<FwdIter, std::size_t> > shape =
+                        get_static_shape(policy, inititems, f1,
+                            first, count, chunk_size);
 
-                    auto f = [f1](std::pair<FwdIter, std::size_t> elem)
+                    auto f = [f1](std::pair<FwdIter, std::size_t> const& elem)
                     {
                         return f1(elem.first, elem.second);
                     };
@@ -100,13 +100,13 @@ namespace hpx { namespace parallel { namespace util
                 std::list<boost::exception_ptr> errors;
 
                 try {
-                    std::vector<std::pair<FwdIter, std::size_t> > shape;
+                    // estimates a chunk size based on number of cores used
                     std::vector<hpx::future<Result> > inititems;
-                    // estimates a chunk size base on number of cores used
-                    shape = get_static_shape(policy, inititems, f1,
-                        first, count, chunk_size);
+                    std::vector<std::pair<FwdIter, std::size_t> > shape =
+                        get_static_shape(policy, inititems, f1,
+                            first, count, chunk_size);
 
-                    auto f = [f1](std::pair<FwdIter, std::size_t> elem)
+                    auto f = [f1](std::pair<FwdIter, std::size_t> const& elem)
                     {
                         return f1(elem.first, elem.second);
                     };
