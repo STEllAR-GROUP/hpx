@@ -67,7 +67,7 @@ namespace hpx { namespace serialization
         // normal load ... no chance of doing bitwise here ...
         for(size_type i = 0; i != size; ++i)
         {
-            bool b = v[i];
+            bool b = false;
             ar >> b;
             v.push_back(b);
         }

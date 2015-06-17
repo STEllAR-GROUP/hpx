@@ -32,14 +32,14 @@ struct omp_driver : htts2::driver
   private:
     typedef double results_type;
 
-    results_type kernel() 
+    results_type kernel()
     {
         ///////////////////////////////////////////////////////////////////////
 
         results_type results;
 
         htts2::timer<BaseClock> t;
-    
+
         #pragma omp parallel
         #pragma omp single
         {
@@ -79,12 +79,12 @@ struct omp_driver : htts2::driver
 
         std::cout
             << ( boost::format("%lu,%lu,%lu,%.14g\n")
-               % this->osthreads_ 
-               % this->tasks_ 
-               % this->payload_duration_ 
+               % this->osthreads_
+               % this->tasks_
+               % this->payload_duration_
                % results
                )
-            ; 
+            ;
     }
 };
 

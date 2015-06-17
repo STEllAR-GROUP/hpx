@@ -61,6 +61,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "deprecated_macro_check.hpp"
 #include "minmax_check.hpp"
 #include "unnamed_namespace_check.hpp"
+#include "endline_whitespace_check.hpp"
 
 //#include "cvs_iterator.hpp"
 
@@ -814,6 +815,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     bool deprecated_ck = false;
     bool minmax_ck = false;
     bool unnamed_ck = false;
+    bool whitespace_ck = false;
 
     desc_commandline.add_options()
         ("help,h", "print some command line help")
@@ -849,6 +851,8 @@ int cpp_main( int argc_param, char * argv_param[] )
             "check for minmax usage violations (default: off)")
         ("unnamed", value<bool>(&unnamed_ck)->implicit_value(false),
             "check for unnamed namespace usage violations (default: off)")
+        ("whitespace", value<bool>(&whitespace_ck)->implicit_value(false),
+            "check for endline whitespace violations (default: off)")
 
         ("all,a", "check for all violations (default: no checks are performed)")
         ;
@@ -911,6 +915,7 @@ int cpp_main( int argc_param, char * argv_param[] )
         deprecated_ck = true;
         minmax_ck = true;
         unnamed_ck = true;
+        whitespace_ck = true;
     }
 
     std::string output_path("-");
@@ -948,6 +953,8 @@ int cpp_main( int argc_param, char * argv_param[] )
       inspectors.push_back( inspector_element( new boost::inspect::minmax_check ) );
   if ( unnamed_ck )
       inspectors.push_back( inspector_element( new boost::inspect::unnamed_namespace_check ) );
+  if ( whitespace_ck )
+      inspectors.push_back( inspector_element( new boost::inspect::whitespace_check) );
 
   //// perform the actual inspection, using the requested type of iteration
     for(auto const& search_root: search_roots)
@@ -1019,7 +1026,10 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       // we should not use a table, of course [gps]
       "<table>\n"
       "<tr>\n"
-      "<td><img src=\"http://stellar.cct.lsu.edu/files/stellar100.png\" alt=\"STE||AR logo\" />"
+      "<td>"
+      "<a href = \"https://github.com/STEllAR-GROUP/hpx\">"
+      "<img src=\"http://stellar.cct.lsu.edu/files/stellar100.png\" alt=\"STE||AR logo\" />"
+      "</a>\n"
       "</td>\n"
       "<td>\n"
       "<h1>HPX Inspection Report</h1>\n"

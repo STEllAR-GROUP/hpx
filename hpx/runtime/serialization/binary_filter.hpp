@@ -20,7 +20,7 @@ namespace hpx { namespace serialization
         // compression API
         virtual void set_max_length(std::size_t size) = 0;
         virtual void save(void const* src, std::size_t src_count) = 0;
-        virtual bool flush(void* dst, std::size_t dst_count, 
+        virtual bool flush(void* dst, std::size_t dst_count,
             std::size_t& written) = 0;
 
         // decompression API

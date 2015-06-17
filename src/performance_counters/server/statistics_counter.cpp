@@ -316,7 +316,7 @@ namespace hpx { namespace performance_counters { namespace detail
                             qi::int_ % ',', parameters))
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
-                            "statistics_counter_creator", 
+                            "statistics_counter_creator",
                             "invalid parameter specification for counter: " +
                                 paths.parameters_);
                         return naming::invalid_gid;

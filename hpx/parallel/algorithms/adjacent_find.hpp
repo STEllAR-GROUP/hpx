@@ -40,7 +40,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first, FwdIter last, Pred && op)
+            sequential(ExPolicy, FwdIter first, FwdIter last, Pred && op)
             {
                 return std::adjacent_find(first, last, op);
             }
@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 Pred && op)
             {
                 typedef hpx::util::zip_iterator<FwdIter, FwdIter> zip_iterator;

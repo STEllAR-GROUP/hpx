@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template<typename ExPolicy, typename Pred>
             static bool
-            sequential(ExPolicy const&,FwdIter first, FwdIter last,
+            sequential(ExPolicy, FwdIter first, FwdIter last,
                 Pred && pred)
             {
                 return std::is_sorted(first, last, std::forward<Pred>(pred));
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Pred>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 Pred && pred)
             {
                 typedef typename std::iterator_traits<FwdIter>::reference
@@ -257,7 +257,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template<typename ExPolicy, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&,FwdIter first, FwdIter last,
+            sequential(ExPolicy, FwdIter first, FwdIter last,
                 Pred && pred)
             {
                 return std::is_sorted_until(first, last,
@@ -268,7 +268,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 Pred && pred)
             {
                 typedef typename std::iterator_traits<FwdIter>::reference

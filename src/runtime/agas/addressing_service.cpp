@@ -2040,7 +2040,7 @@ static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
     boost::int64_t mutable_gid_credit, boost::int64_t new_gid_credit)
 {
     // Return the credit to the GID if the operation failed
-    if (f.has_exception() && mutable_gid_credit != 0)
+    if ((f.has_exception() && mutable_gid_credit != 0) || !f.get())
     {
         naming::detail::add_credit_to_gid(id.get_gid(), new_gid_credit);
         return false;

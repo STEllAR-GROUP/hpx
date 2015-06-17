@@ -32,11 +32,11 @@ int async_io(char const* string_to_write)
         hpx::threads::executors::io_pool_executor scheduler;
 
         // ... and schedule the handler to run on one of its OS-threads.
-        scheduler.add(hpx::util::bind(&do_async_io, 
+        scheduler.add(hpx::util::bind(&do_async_io,
             string_to_write, boost::ref(result)));
 
     // Note that the destructor of the scheduler object will wait for
-    // the scheduled task to finish executing. This might be 
+    // the scheduled task to finish executing. This might be
     // undesireable, in which case the technique demonstrated in
     // the example async_io_low_level.cpp is preferrable.
     }

@@ -141,7 +141,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
         mutex_type& get_global_mtx()
         {
-            return base_mtx_; 
+            return base_mtx_;
         }
     };
 
@@ -186,7 +186,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // various reset flavors
         virtual void reset();
         virtual void reset_counter_value() {reset();}
-    
+
         // get the current value of this performance counter
         hpx::performance_counters::counter_value get_counter_value(bool reset=false);
 

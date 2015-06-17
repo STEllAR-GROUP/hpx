@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename T>
         typename util::detail::algorithm_result<ExPolicy>::type
-        parallel_sequential_uninitialized_fill_n(ExPolicy const& policy,
+        parallel_sequential_uninitialized_fill_n(ExPolicy policy,
             Iter first, std::size_t count, T const& value)
         {
             if (count == 0)
@@ -104,7 +104,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, Iter first, Iter last, T const& value)
+            sequential(ExPolicy, Iter first, Iter last, T const& value)
             {
                 std::uninitialized_fill(first, last, value);
                 return hpx::util::unused;
@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, Iter first, Iter last,
+            parallel(ExPolicy policy, Iter first, Iter last,
                 T const& value)
             {
                 if (first == last)
@@ -205,7 +205,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, FwdIter first, std::size_t count,
+            sequential(ExPolicy, FwdIter first, std::size_t count,
                 T const& value)
             {
                 std::uninitialized_fill_n(first, count, value);
@@ -214,7 +214,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, FwdIter first, std::size_t count,
+            parallel(ExPolicy policy, FwdIter first, std::size_t count,
                 T const& value)
             {
                 return parallel_sequential_uninitialized_fill_n(policy, first,

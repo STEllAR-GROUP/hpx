@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { namespace util
         {
             template <typename FwdIter, typename T,
                 typename F1, typename F2, typename F3>
-            static R call(ExPolicy const& policy, FwdIter first,
+            static R call(ExPolicy policy, FwdIter first,
                 std::size_t count_, T && init, F1 && f1, F2 && f2, F3 && f3,
                 std::size_t chunk_size)
             {
@@ -119,7 +119,7 @@ namespace hpx { namespace parallel { namespace util
         {
             template <typename ExPolicy, typename FwdIter, typename T,
                 typename F1, typename F2, typename F3>
-            static hpx::future<R> call(ExPolicy const& policy,
+            static hpx::future<R> call(ExPolicy policy,
                 FwdIter first, std::size_t count_, T && init,
                 F1 && f1, F2 && f2, F3 && f3, std::size_t chunk_size)
             {
@@ -205,6 +205,12 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
+        template <typename Executor, typename R, typename Result>
+        struct static_scan_partitioner<
+                parallel_task_execution_policy_shim<Executor>, R, Result>
+          : static_scan_partitioner<parallel_task_execution_policy, R, Result>
+        {};
+
         ///////////////////////////////////////////////////////////////////////
         // ExPolicy: execution policy
         // R:        overall result type
@@ -220,7 +226,7 @@ namespace hpx { namespace parallel { namespace util
         {
             template <typename FwdIter, typename T,
                 typename F1, typename F2, typename F3>
-            static R call(ExPolicy const& policy, FwdIter first,
+            static R call(ExPolicy policy, FwdIter first,
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
                 std::size_t chunk_size = 0)
             {
@@ -237,7 +243,7 @@ namespace hpx { namespace parallel { namespace util
         {
             template <typename ExPolicy, typename FwdIter, typename T,
                 typename F1, typename F2, typename F3>
-            static hpx::future<R> call(ExPolicy const& policy, FwdIter first,
+            static hpx::future<R> call(ExPolicy policy, FwdIter first,
                 std::size_t count, T && init, F1 && f1, F2 && f2, F3 && f3,
                 std::size_t chunk_size = 0)
             {
@@ -248,10 +254,28 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-        template <typename Executor, typename R, typename Result, typename Tag>
-        struct scan_partitioner<parallel_task_execution_policy_shim<Executor>,
-                R, Result, Tag>
-          : scan_partitioner<parallel_task_execution_policy, R, Result, Tag>
+        template <typename Executor, typename R, typename Result>
+        struct scan_partitioner<
+                parallel_task_execution_policy_shim<Executor>, R, Result,
+                parallel::traits::static_partitioner_tag>
+          : scan_partitioner<parallel_task_execution_policy, R, Result,
+                parallel::traits::static_partitioner_tag>
+        {};
+
+        template <typename Executor, typename R, typename Result>
+        struct scan_partitioner<
+                parallel_task_execution_policy_shim<Executor>, R, Result,
+                parallel::traits::auto_partitioner_tag>
+          : scan_partitioner<parallel_task_execution_policy, R, Result,
+                parallel::traits::auto_partitioner_tag>
+        {};
+
+        template <typename Executor, typename R, typename Result>
+        struct scan_partitioner<
+                parallel_task_execution_policy_shim<Executor>, R, Result,
+                parallel::traits::default_partitioner_tag>
+          : scan_partitioner<parallel_task_execution_policy, R, Result,
+                parallel::traits::static_partitioner_tag>
         {};
 
         ///////////////////////////////////////////////////////////////////////

@@ -13,7 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_find(ExPolicy const& policy, IteratorTag)
+void test_adjacent_find(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -24,7 +24,7 @@ void test_adjacent_find(ExPolicy const& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), (std::rand() % 100) + 2);
 
-    std::size_t random_pos = (std::rand() % 10005) + 2; //-V101
+    std::size_t random_pos = (std::rand() % 10004) + 2; //-V101
 
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
@@ -38,7 +38,7 @@ void test_adjacent_find(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_find_async(ExPolicy const& p, IteratorTag)
+void test_adjacent_find_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -47,7 +47,7 @@ void test_adjacent_find_async(ExPolicy const& p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), (std::rand() % 100) + 2);
 
-    std::size_t random_pos = (std::rand() % 10005) + 2; //-V101
+    std::size_t random_pos = (std::rand() % 10004) + 2; //-V101
 
     c[random_pos] = 1;
     c[random_pos + 1] = 1;
@@ -90,7 +90,7 @@ void adjacent_find_test()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_find_exception(ExPolicy const& policy, IteratorTag)
+void test_adjacent_find_exception(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -121,7 +121,7 @@ void test_adjacent_find_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_find_exception_async(ExPolicy const& p, IteratorTag)
+void test_adjacent_find_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator <base_iterator, IteratorTag>
@@ -188,7 +188,7 @@ void adjacent_find_exception_test()
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_find_bad_alloc(ExPolicy const& policy, IteratorTag)
+void test_adjacent_find_bad_alloc(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -219,7 +219,7 @@ void test_adjacent_find_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_find_bad_alloc_async(ExPolicy const& p, IteratorTag)
+void test_adjacent_find_bad_alloc_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator <base_iterator, IteratorTag>

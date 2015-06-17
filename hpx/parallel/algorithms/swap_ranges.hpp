@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename ForwardIter1>
             static ForwardIter2
-            sequential(ExPolicy const&, ForwardIter1 first1, ForwardIter1 last1,
+            sequential(ExPolicy, ForwardIter1 first1, ForwardIter1 last1,
                 ForwardIter2 first2)
             {
                 return std::swap_ranges(first1, last1, first2);
@@ -52,7 +52,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, ForwardIter2
             >::type
-            parallel(ExPolicy const& policy, ForwardIter1 first1,
+            parallel(ExPolicy policy, ForwardIter1 first1,
                 ForwardIter1 last1, ForwardIter2 first2)
             {
                 typedef hpx::util::zip_iterator<ForwardIter1, ForwardIter2>

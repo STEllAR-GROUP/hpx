@@ -374,7 +374,7 @@ namespace hpx { namespace threads { namespace detail
         util::steady_duration const& rel_time, thread_id_type const& thrd,
         error_code& ec)
     {
-        return set_thread_state_timed(scheduler, rel_time.from_now(), thrd, 
+        return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
             pending, wait_timeout, thread_priority_normal, std::size_t(-1), ec);
     }
 }}}

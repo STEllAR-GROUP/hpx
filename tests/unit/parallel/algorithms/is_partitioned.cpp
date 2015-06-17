@@ -16,7 +16,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_partitioned1(ExPolicy const& policy, IteratorTag)
+void test_partitioned1(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -39,7 +39,7 @@ void test_partitioned1(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_partitioned1_async(ExPolicy const& p, IteratorTag)
+void test_partitioned1_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -89,7 +89,7 @@ void partitioned_test1()
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_partitioned2(ExPolicy const& policy, IteratorTag)
+void test_partitioned2(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -117,7 +117,7 @@ void test_partitioned2(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_partitioned2_async(ExPolicy const& p, IteratorTag)
+void test_partitioned2_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -172,7 +172,7 @@ void partitioned_test2()
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_partitioned3(ExPolicy const& policy, IteratorTag)
+void test_partitioned3(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -204,7 +204,7 @@ void test_partitioned3(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_partitioned3_async(ExPolicy const& p, IteratorTag)
+void test_partitioned3_async(ExPolicy p, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -268,7 +268,7 @@ void partitioned_test3()
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_partitioned_exception(ExPolicy const& policy, IteratorTag)
+void test_partitioned_exception(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -307,7 +307,7 @@ void test_partitioned_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_partitioned_async_exception(ExPolicy const& p, IteratorTag)
+void test_partitioned_async_exception(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -375,7 +375,7 @@ void partitioned_exception_test()
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_partitioned_bad_alloc(ExPolicy const& policy, IteratorTag)
+void test_partitioned_bad_alloc(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -414,7 +414,7 @@ void test_partitioned_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_partitioned_async_bad_alloc(ExPolicy const& p, IteratorTag)
+void test_partitioned_async_bad_alloc(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
