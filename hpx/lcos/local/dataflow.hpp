@@ -313,44 +313,48 @@ namespace hpx { namespace lcos { namespace local
             void await_range(std::size_t depth, TupleIter iter,
                 Iter next, Iter end)
             {
+                void (dataflow_frame::*f)(
+                        std::size_t, TupleIter, Iter, Iter
+                    ) = &dataflow_frame::await_range_respawn;
+
                 for (/**/; next != end; ++next)
                 {
-                    if (!next->is_ready())
+                    typedef
+                        typename std::iterator_traits<
+                            Iter
+                        >::value_type
+                        future_type;
+                    typedef
+                        typename traits::future_traits<
+                            future_type
+                        >::type
+                        future_result_type;
+
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data<future_result_type>
+                    > next_future_data
+                        = lcos::detail::get_shared_state(*next);
+
+                    if (!next_future_data->is_ready())
                     {
-                        void (dataflow_frame::*f)(
-                                std::size_t, TupleIter, Iter, Iter
-                            ) = &dataflow_frame::await_range_respawn;
-
-                        typedef
-                            typename std::iterator_traits<
-                                Iter
-                            >::value_type
-                            future_type;
-                        typedef
-                            typename traits::future_traits<
-                                future_type
-                            >::type
-                            future_result_type;
-
-                        boost::intrusive_ptr<
-                            lcos::detail::future_data<future_result_type>
-                        > next_future_data
-                            = lcos::detail::get_shared_state(*next);
-
-                        boost::intrusive_ptr<dataflow_frame> this_(this);
-
                         next_future_data->execute_deferred();
-                        next_future_data->set_on_completed(
-                            boost::bind(
-                                f
-                              , std::move(this_)
-                              , ++depth
-                              , std::move(iter)
-                              , std::move(next)
-                              , std::move(end)
-                            )
-                        );
-                        return;
+
+                        // execute_deferred might have made the future ready
+                        if (!next_future_data->is_ready())
+                        {
+                            boost::intrusive_ptr<dataflow_frame> this_(this);
+                            next_future_data->set_on_completed(
+                                boost::bind(
+                                    f
+                                  , std::move(this_)
+                                  , ++depth
+                                  , std::move(iter)
+                                  , std::move(next)
+                                  , std::move(end)
+                                )
+                            );
+                            return;
+                        }
                     }
                 }
 
@@ -403,38 +407,42 @@ namespace hpx { namespace lcos { namespace local
                 future_type &  f_ =
                     boost::fusion::deref(iter);
 
-                if(!f_.is_ready())
+                typedef
+                    typename traits::future_traits<
+                        future_type
+                    >::type
+                    future_result_type;
+
+                boost::intrusive_ptr<
+                    lcos::detail::future_data<future_result_type>
+                > next_future_data
+                    = lcos::detail::get_shared_state(f_);
+
+                if(!next_future_data->is_ready())
                 {
-                    void (dataflow_frame::*f)(
-                            std::size_t, Iter,
-                            boost::mpl::true_, boost::mpl::false_
-                        ) = &dataflow_frame::await_next_respawn;
-
-                    typedef
-                        typename traits::future_traits<
-                            future_type
-                        >::type
-                        future_result_type;
-
-                    boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
-                    > next_future_data
-                        = lcos::detail::get_shared_state(f_);
-
-                    boost::intrusive_ptr<dataflow_frame> this_(this);
-
                     next_future_data->execute_deferred();
-                    next_future_data->set_on_completed(
-                        hpx::util::bind(
-                            f
-                          , std::move(this_)
-                          , ++depth
-                          , std::move(iter)
-                          , boost::mpl::true_()
-                          , boost::mpl::false_()
-                        )
-                    );
-                    return;
+
+                    // execute_deferred might have made the future ready
+                    if (!next_future_data->is_ready())
+                    {
+                        void (dataflow_frame::*f)(
+                                std::size_t, Iter,
+                                boost::mpl::true_, boost::mpl::false_
+                            ) = &dataflow_frame::await_next_respawn;
+
+                        boost::intrusive_ptr<dataflow_frame> this_(this);
+                        next_future_data->set_on_completed(
+                            hpx::util::bind(
+                                f
+                              , std::move(this_)
+                              , ++depth
+                              , std::move(iter)
+                              , boost::mpl::true_()
+                              , boost::mpl::false_()
+                            )
+                        );
+                        return;
+                    }
                 }
 
                 typedef boost::mpl::bool_<
