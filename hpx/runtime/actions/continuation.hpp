@@ -17,6 +17,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
@@ -255,7 +256,7 @@ namespace hpx { namespace actions
         template <typename F, typename T1, typename T2>
         struct result<F(T1, T2)>
         {
-            typedef T2 type;
+            typedef typename util::result_of<cont_type(T1, T2)>::type type;
         };
 
         continuation_impl() {}
@@ -268,13 +269,16 @@ namespace hpx { namespace actions
         virtual ~continuation_impl() {}
 
         template <typename T>
-        T operator()(hpx::id_type const& lco, T && t) const
+        typename result<continuation_impl(hpx::id_type, T)>::type
+        operator()(hpx::id_type const& lco, T && t) const
         {
             hpx::apply_c(cont_, lco, target_, std::forward<T>(t));
 
-            // Yep, 't' is a zombie, however we don't use the returned value
-            // anyways. We need it for result type calculation, though.
-            return std::move(t);
+            // Unfortunately we need to default construct the return value,
+            // this possibly imposes an additional restriction of return types.
+            typedef typename result<continuation_impl(hpx::id_type, T)>::type
+                result_type;
+            return result_type();
         }
 
         virtual bool has_to_wait_for_futures()
@@ -316,7 +320,12 @@ namespace hpx { namespace actions
         template <typename This, typename T1, typename T2>
         struct result<This(T1, T2)>
         {
-            typedef T2 type;
+            typedef typename util::result_of<
+                    cont_type(T1, T2)
+                >::type result_type;
+            typedef typename util::result_of<
+                    function_type(hpx::id_type, result_type)
+                >::type type;
         };
 
         continuation2_impl() {}
@@ -332,15 +341,18 @@ namespace hpx { namespace actions
         virtual ~continuation2_impl() {}
 
         template <typename T>
-        T operator()(hpx::id_type const& lco, T && t) const
+        typename result<continuation2_impl(hpx::id_type, T)>::type
+        operator()(hpx::id_type const& lco, T && t) const
         {
             using hpx::util::placeholders::_2;
             hpx::apply_continue(cont_, hpx::util::bind(f_, lco, _2),
                 target_, std::forward<T>(t));
 
-            // Yep, 't' is a zombie, however we don't use the returned value
-            // anyways. We need it for result type calculation, though.
-            return std::move(t);
+            // Unfortunately we need to default construct the return value,
+            // this possibly imposes an additional restriction of return types.
+            typedef typename result<continuation2_impl(hpx::id_type, T)>::type
+                result_type;
+            return result_type();
         }
 
         virtual bool has_to_wait_for_futures()
