@@ -12,6 +12,7 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/always_void.hpp>
@@ -432,6 +433,12 @@ namespace hpx { namespace lcos { namespace detail
     >::type
     make_continuation(Future const& future, threads::executor& sched,
         F && f);
+    template <typename ContResult, typename Future, typename Executor,
+        typename F>
+    inline typename shared_state_ptr<
+        typename continuation_result<ContResult>::type
+    >::type
+    make_continuation_exec(Future const& future, Executor& exec, F && f);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
@@ -583,10 +590,10 @@ namespace hpx { namespace lcos { namespace detail
         //   - valid() == false on original future object immediately after it
         //     returns.
         template <typename F>
-        typename boost::lazy_disable_if<
-            traits::is_launch_policy_or_executor<
-                typename util::decay<F>::type
-            >
+        typename boost::lazy_disable_if_c<
+            traits::is_launch_policy<typename util::decay<F>::type>::value ||
+            traits::is_threads_executor<typename util::decay<F>::type>::value ||
+            traits::is_executor<typename util::decay<F>::type>::value
           , future_then_result<Derived, F>
         >::type
         then(F && f, error_code& ec = throws) const
@@ -650,6 +657,40 @@ namespace hpx { namespace lcos { namespace detail
                 detail::make_continuation<continuation_result_type>(
                     *static_cast<Derived const*>(this), sched, std::forward<F>(f));
             return traits::future_access<future<result_type> >::create(std::move(p));
+        }
+
+        template <typename Executor, typename F>
+        typename boost::lazy_enable_if_c<
+            traits::is_executor<Executor>::value
+          , future_then_result<Derived, F>
+        >::type
+        then(Executor& exec, F && f, error_code& ec = throws) const
+        {
+            typedef
+                typename future_then_result<Derived, F>::result_type
+                result_type;
+
+            if (!shared_state_)
+            {
+                HPX_THROWS_IF(ec, no_state,
+                    "future_base<R>::then",
+                    "this future has no valid shared state");
+                return future<result_type>();
+            }
+
+            typedef
+                typename util::result_of<F(Derived)>::type
+                continuation_result_type;
+            typedef
+                typename shared_state_ptr<result_type>::type
+                shared_state_ptr;
+
+            shared_state_ptr p =
+                detail::make_continuation_exec<continuation_result_type>(
+                    *static_cast<Derived const*>(this), exec,
+                    std::forward<F>(f));
+            return traits::future_access<future<result_type> >::
+                create(std::move(p));
         }
 
         // Effects: blocks until the shared state is ready.
@@ -916,10 +957,10 @@ namespace hpx { namespace lcos
         using base_type::has_exception;
 
         template <typename F>
-        typename boost::lazy_disable_if<
-            traits::is_launch_policy_or_executor<
-                typename util::decay<F>::type
-            >
+        typename boost::lazy_disable_if_c<
+            traits::is_launch_policy<typename util::decay<F>::type>::value ||
+            traits::is_threads_executor<typename util::decay<F>::type>::value ||
+            traits::is_executor<typename util::decay<F>::type>::value
           , detail::future_then_result<future, F>
         >::type
         then(F && f, error_code& ec = throws)
@@ -942,6 +983,17 @@ namespace hpx { namespace lcos
         {
             invalidate on_exit(*this);
             return base_type::then(sched, std::forward<F>(f), ec);
+        }
+
+        template <typename Executor, typename F>
+        typename boost::lazy_enable_if_c<
+            traits::is_executor<Executor>::value
+          , detail::future_then_result<future, F>
+        >::type
+        then(Executor& exec, F && f, error_code& ec = throws)
+        {
+            invalidate on_exit(*this);
+            return base_type::then(exec, std::forward<F>(f), ec);
         }
 
         using base_type::wait;
