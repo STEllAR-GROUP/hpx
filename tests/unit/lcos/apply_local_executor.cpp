@@ -61,6 +61,8 @@ auto increment_lambda = [](boost::int32_t i){ accumulator += i; };
 template <typename Executor>
 void test_apply_with_executor(Executor& exec)
 {
+    accumulator.store(0);
+
     {
         using hpx::util::placeholders::_1;
 
@@ -147,8 +149,6 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    accumulator.store(0);
-
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
