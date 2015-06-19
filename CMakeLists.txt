@@ -24,13 +24,13 @@ endif()
 # C++ overrides
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
-    "${CMAKE_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
 
 ################################################################################
 # Fortran overrides
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
-    "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
 
 ################################################################################
 # Build type (needs to be handled before project command below)
@@ -1355,7 +1355,7 @@ install( # Install HPX Python scripts
   PATTERN ".git" EXCLUDE)
 
 #   if(UNIX)
-#     file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py")
+#     file(GLOB scripts "${PROJECT_SOURCE_DIR}/python/scripts/*.py")
 #     execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory
 #       "${CMAKE_BINARY_DIR}/python/scripts" )
 #     foreach(script ${scripts})
@@ -1384,7 +1384,7 @@ install( # Install HPX Python scripts
 #
 #   execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/python" )
 #   #make symlink, so that we have intact hpx symlink in CMAKE_BINARY_DIR
-#   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "${CMAKE_SOURCE_DIR}/python/hpx"
+#   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/python/hpx"
 #     "hpx-${HPX_VERSION}" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
 #   # create a symlink in share pointing to the latest HPX installation
 #   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
