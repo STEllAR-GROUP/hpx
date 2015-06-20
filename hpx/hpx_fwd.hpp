@@ -197,6 +197,15 @@ namespace hpx
                      >
             class HPX_EXPORT local_queue_scheduler;
 
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+            template <typename Mutex = boost::mutex
+                    , typename PendingQueuing = lockfree_fifo
+                    , typename StagedQueuing = lockfree_fifo
+                    , typename TerminatedQueuing = lockfree_lifo
+                     >
+            class HPX_EXPORT throttle_queue_scheduler;
+#endif
+
 #if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo

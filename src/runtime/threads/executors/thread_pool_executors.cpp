@@ -6,9 +6,16 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#endif
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
+#endif
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
+#endif
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
@@ -450,6 +457,15 @@ namespace hpx { namespace threads { namespace executors
       : scheduled_executor(new detail::thread_pool_executor<
             policies::local_queue_scheduler<> >(
                 max_punits, min_punits))
+    {}
+#endif
+
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+    ///////////////////////////////////////////////////////////////////////////
+    throttle_queue_executor::throttle_queue_executor()
+      : scheduled_executor(new detail::thread_pool_executor<
+            policies::throttle_queue_scheduler<> >(
+                get_os_thread_count(), 1))
     {}
 #endif
 

@@ -17,6 +17,12 @@ set(example_programs
     1d_stencil_7
     1d_stencil_8)
 
+if(HPX_WITH_APEX)
+  set(example_programs ${example_programs}
+      1d_stencil_4_repart
+     )
+endif()
+
 if(OPENMP_FOUND)
   set(example_programs ${example_programs}
       1d_stencil_1_omp
