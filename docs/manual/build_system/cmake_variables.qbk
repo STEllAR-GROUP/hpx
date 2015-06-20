@@ -69,6 +69,7 @@ The options are split into these categories:
 ] [/ Generic Options]
 
 [#build_system.cmake_variables.Build_Targets][h3 Build Targets Options]
+* [link build_system.cmake_variables.HPX_WITH_COMPILE_ONLY_TESTS HPX_WITH_COMPILE_ONLY_TESTS]
 * [link build_system.cmake_variables.HPX_WITH_DEFAULT_TARGETS HPX_WITH_DEFAULT_TARGETS]
 * [link build_system.cmake_variables.HPX_WITH_DOCUMENTATION HPX_WITH_DOCUMENTATION]
 * [link build_system.cmake_variables.HPX_WITH_DOCUMENTATION_SINGLEPAGE HPX_WITH_DOCUMENTATION_SINGLEPAGE]
@@ -82,10 +83,11 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_TOOLS HPX_WITH_TOOLS]
 
 [variablelist
+        [[[#build_system.cmake_variables.HPX_WITH_COMPILE_ONLY_TESTS] `HPX_WITH_COMPILE_ONLY_TESTS:BOOL`][Create build system support for compile time only HPX tests (default ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_DEFAULT_TARGETS] `HPX_WITH_DEFAULT_TARGETS:BOOL`][Associate the core HPX library with the default build target (default: ON).]]
         [[[#build_system.cmake_variables.HPX_WITH_DOCUMENTATION] `HPX_WITH_DOCUMENTATION:BOOL`][Build the HPX documentation (default OFF).]]
         [[[#build_system.cmake_variables.HPX_WITH_DOCUMENTATION_SINGLEPAGE] `HPX_WITH_DOCUMENTATION_SINGLEPAGE:BOOL`][The HPX documentation should be build as a single page HTML (default OFF).]]
-        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES] `HPX_WITH_EXAMPLES:BOOL`][Build the HPX examples (default OFF)]]
+        [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES] `HPX_WITH_EXAMPLES:BOOL`][Build the HPX examples (default ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_RUNTIME] `HPX_WITH_RUNTIME:BOOL`][Build HPX runtime (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_TESTS] `HPX_WITH_TESTS:BOOL`][Build the HPX tests (default ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_TESTS_BENCHMARKS] `HPX_WITH_TESTS_BENCHMARKS:BOOL`][Build HPX benchmark tests (default: ON)]]
