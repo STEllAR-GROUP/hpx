@@ -8,6 +8,7 @@
 
 #include <hpx/traits.hpp>
 #include <hpx/config/inline_namespace.hpp>
+#include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>

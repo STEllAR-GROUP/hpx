@@ -9,17 +9,18 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
-#include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
+
+#include <type_traits>
 
 namespace hpx { namespace detail
 {
@@ -84,103 +85,142 @@ namespace hpx { namespace detail
             return lcos::make_exceptional_future<void>(boost::current_exception());
         }
     }
-}}
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
     ///////////////////////////////////////////////////////////////////////////
-    // Define async() overloads for plain local functions and function objects.
+    // BOOST_SCOPED_ENUM(launch)
+    template <typename Policy>
+    struct async_dispatch<Policy,
+        typename boost::enable_if_c<
+            traits::is_launch_policy<Policy>::value
+         && !traits::is_action<Policy>::value
+        >::type>
+    {
+        template <typename F, typename ...Ts>
+        BOOST_FORCEINLINE static
+        typename boost::enable_if_c<
+            traits::detail::is_deferred_callable<F(Ts...)>::value,
+            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+        >::type
+        call(BOOST_SCOPED_ENUM(launch) const& launch_policy, F&& f, Ts&&... ts)
+        {
+            typedef typename util::deferred_call_result_of<
+                F(Ts...)
+            >::type result_type;
+
+            if (launch_policy == launch::sync) {
+                return detail::call_sync(
+                    util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
+                    typename boost::is_void<result_type>::type());
+            }
+            lcos::local::futures_factory<result_type()> p(
+                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
+            if (hpx::detail::has_async_policy(launch_policy))
+            {
+                p.apply(launch_policy);
+                if (launch_policy == launch::fork)
+                {
+                    // make sure this thread is executed last
+                    hpx::this_thread::yield();
+                }
+            }
+            return p.get_future();
+        }
+    };
 
     // Launch the given function or function object asynchronously and return a
     // future allowing to synchronize with the returned result.
-    template <typename F, typename ...Ts>
-    typename boost::lazy_enable_if_c<
-        traits::detail::is_deferred_callable<F(Ts...)>::value
-      , detail::create_future<F(Ts...)>
-    >::type
-    async(BOOST_SCOPED_ENUM(launch) policy, F&& f, Ts&&... vs)
+    template <typename Func, typename Enable>
+    struct async_dispatch
     {
-        typedef typename util::deferred_call_result_of<
-            typename util::decay<F>::type(Ts...)
-        >::type result_type;
-
-        if (policy == launch::sync) {
-            return detail::call_sync(
-                util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...),
-                typename boost::is_void<result_type>::type());
-        }
-        lcos::local::futures_factory<result_type()> p(
-            util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...));
-        if (hpx::detail::has_async_policy(policy))
+        template <typename F, typename ...Ts>
+        BOOST_FORCEINLINE static
+        typename boost::enable_if_c<
+            traits::detail::is_deferred_callable<F(Ts...)>::value,
+            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+        >::type
+        call(F&& f, Ts&&... ts)
         {
-            p.apply(policy);
-            if (policy == launch::fork)
-            {
-                // make sure this thread is executed last
-                hpx::this_thread::yield();
-            }
+            return async_dispatch<BOOST_SCOPED_ENUM(launch)>::call(
+                launch::all, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
-        return p.get_future();
-    }
+    };
 
-    template <typename F, typename ...Ts>
-    typename boost::lazy_enable_if_c<
-        traits::detail::is_deferred_callable<F(Ts...)>::value
-      , detail::create_future<F(Ts...)>
-    >::type
-    async(threads::executor& sched, F&& f, Ts&&... vs)
+    // threads::executor
+    template <typename Executor>
+    struct async_dispatch<Executor,
+        typename boost::enable_if_c<
+            traits::is_threads_executor<Executor>::value
+        >::type>
     {
-        typedef typename util::deferred_call_result_of<
-            typename util::decay<F>::type(Ts...)
-        >::type result_type;
+        template <typename F, typename ...Ts>
+        BOOST_FORCEINLINE static
+        typename boost::enable_if_c<
+            traits::detail::is_deferred_callable<F(Ts...)>::value,
+            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+        >::type
+        call(Executor& sched, F&& f, Ts&&... ts)
+        {
+            typedef typename util::deferred_call_result_of<
+                    F(Ts...)
+                >::type result_type;
 
-        lcos::local::futures_factory<result_type()> p(sched,
-            util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...));
-        p.apply();
-        return p.get_future();
-    }
+            lcos::local::futures_factory<result_type()> p(sched,
+                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
+            p.apply();
+            return p.get_future();
+        }
+    };
 
-    template <typename Executor, typename F, typename ...Ts>
-    typename boost::lazy_enable_if_c<
-        boost::enable_if_c<
-            traits::is_executor<typename util::decay<Executor>::type>::value
-          , traits::detail::is_deferred_callable<F(Ts...)>
-        >::type::value
-      , detail::create_future<F(Ts...)>
-    >::type
-    async(Executor& exec, F&& f, Ts&&... vs)
+    // parallel::executor
+    template <typename Executor>
+    struct async_dispatch<Executor,
+        typename boost::enable_if_c<
+            traits::is_executor<Executor>::value
+        >::type>
     {
-        return parallel::executor_traits<Executor>::async_execute(exec,
-            util::deferred_call(std::forward<F>(f), std::forward<Ts>(vs)...));
-    }
+        template <typename F, typename ...Ts>
+        BOOST_FORCEINLINE static
+        typename boost::enable_if_c<
+            traits::detail::is_deferred_callable<F(Ts...)>::value,
+            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+        >::type
+        call(Executor& exec, F&& f, Ts&&... ts)
+        {
+            return parallel::executor_traits<Executor>::async_execute(exec,
+                util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
+        }
+    };
 
-    template <typename F, typename ...Ts>
-    typename boost::lazy_enable_if_c<
-        boost::enable_if_c<
-            !traits::is_executor<typename util::decay<F>::type>::value
-         && !traits::is_action<typename util::decay<F>::type>::value
-         && !traits::is_bound_action<typename util::decay<F>::type>::value
-          , traits::detail::is_deferred_callable<F(Ts...)>
-        >::type::value
-      , detail::create_future<F(Ts...)>
-    >::type
-    async(F&& f, Ts&&... vs)
+    // bound action
+    template <typename Bound>
+    struct async_dispatch<Bound,
+        typename boost::enable_if_c<
+            traits::is_bound_action<Bound>::value
+        >::type>
     {
-        return async(launch::all, std::forward<F>(f), std::forward<Ts>(vs)...);
-    }
-
-    // define async() overloads for bound actions
-    template <typename Action, typename BoundArgs, typename ...Ts>
-    lcos::future<
-        typename hpx::util::detail::bound_action<
+        template <typename Action, typename BoundArgs, typename ...Ts>
+        BOOST_FORCEINLINE
+        static hpx::future<typename hpx::util::detail::bound_action<
             Action, BoundArgs
-        >::result_type
-    >
-    async(hpx::util::detail::bound_action<Action, BoundArgs> const& bound,
-        Ts&&... vs)
+        >::result_type>
+        call(hpx::util::detail::bound_action<Action, BoundArgs> const& bound,
+            Ts&&... ts)
+        {
+            return bound.async(std::forward<Ts>(ts)...);
+        }
+    };
+}}
+
+namespace hpx
+{
+    template <typename F, typename ...Ts>
+    BOOST_FORCEINLINE auto async(F&& f, Ts&&... ts)
+    ->  decltype(detail::async_dispatch<typename util::decay<F>::type>::call(
+            std::forward<F>(f), std::forward<Ts>(ts)...
+        ))
     {
-        return bound.async(std::forward<Ts>(vs)...);
+        return detail::async_dispatch<typename util::decay<F>::type>::call(
+            std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }
 
