@@ -195,7 +195,11 @@ else()
 endif()
 
 target_link_libraries(hpx
-  ${HPX_LIBRARIES})
+  PUBLIC ${HPX_LIBRARIES})
+if(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES)
+  target_link_libraries(hpx
+    PRIVATE ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES})
+endif()
 
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS

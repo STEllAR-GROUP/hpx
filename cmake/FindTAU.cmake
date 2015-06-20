@@ -17,17 +17,22 @@ endif()
 
 find_path(TAU_INCLUDE_DIR TAU.h
   HINTS
-    ${TAU_ROOT} ENV TAU_ROOT
+    ${TAU_ROOT}/include ENV TAU_ROOT
     ${PC_TAU_INCLUDEDIR}
     ${PC_TAU_INCLUDE_DIRS}
   PATH_SUFFIXES include)
 
-find_library(TAU_LIBRARY NAMES TAU libTAU
-  HINTS
-    ${TAU_ROOT} ENV TAU_ROOT
-    ${PC_TAU_LIBDIR}
-    ${PC_TAU_LIBRARY_DIRS}
-  PATH_SUFFIXES lib lib64)
+if (${APPLE})
+  find_library(TAU_LIBRARY NAMES TAU
+             HINTS ${TAU_ROOT}/apple/lib)
+  find_path(TAU_LIBRARY_DIR NAMES libTAU.dylib
+             HINTS ${TAU_ROOT}/apple/lib)
+else()
+  find_library(TAU_LIBRARY NAMES TAU
+             HINTS ${TAU_ROOT}/${CMAKE_SYSTEM_PROCESSOR}/lib  ${TAU_ROOT}/*/lib )
+  find_path(TAU_LIBRARY_DIR NAMES libTAU.so libTAU.a libTAU.dylib
+             HINTS ${TAU_ROOT}/${CMAKE_SYSTEM_PROCESSOR}/lib  ${TAU_ROOT}/*/lib )
+endif()
 
 set(TAU_LIBRARIES ${TAU_LIBRARY} m)
 set(TAU_INCLUDE_DIRS ${TAU_INCLUDE_DIR})
