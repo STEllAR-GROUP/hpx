@@ -16,6 +16,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/detail/thread_pool.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/spinlock.hpp>
@@ -31,23 +32,22 @@
 #include <memory>
 #include <numeric>
 
-// TODO: add branch prediction and function heat
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a threadmanager class is the central instance of management for
     /// all (non-depleted) threads
-    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename SchedulingPolicy>
     class HPX_EXPORT threadmanager_impl : public threadmanager_base
     {
     private:
         // we use a simple mutex to protect the data members of the
-        // threadmanager for now
+        // thread manager for now
         typedef boost::mutex mutex_type;
 
     public:
         typedef SchedulingPolicy scheduling_policy_type;
-        typedef NotificationPolicy notification_policy_type;
+        typedef threads::policies::callback_notifier notification_policy_type;
 
 
         ///
@@ -224,14 +224,15 @@ namespace hpx { namespace threads
         /// \brief Return whether the thread manager is still running
         state status() const
         {
-            return state_.load();
+            return pool_.get_state();
         }
 
         /// \brief return the number of HPX-threads with the given state
         ///
         /// \note This function lock the internal OS lock in the thread manager
         boost::int64_t get_thread_count(thread_state_enum state = unknown,
-            thread_priority priority = thread_priority_default) const;
+            thread_priority priority = thread_priority_default,
+            std::size_t num_thread = std::size_t(-1), bool reset = false) const;
 
         // \brief Abort all threads which are in suspended state. This will set
         //        the state of all suspended threads to \a pending while
@@ -251,15 +252,13 @@ namespace hpx { namespace threads
         std::size_t get_os_thread_count() const
         {
             mutex_type::scoped_lock lk(mtx_);
-            return threads_.size();
+            return pool_.get_os_thread_count();
         }
 
-        boost::thread & get_os_thread_handle(std::size_t num_thread)
+        boost::thread& get_os_thread_handle(std::size_t num_thread)
         {
             mutex_type::scoped_lock lk(mtx_);
-
-            HPX_ASSERT(num_thread < threads_.size());
-            return threads_[threads_.size() - num_thread - 1];
+            return pool_.get_os_thread_handle(num_thread);
         }
 
         /// The set_state function is part of the thread related API and allows
@@ -432,7 +431,8 @@ namespace hpx { namespace threads
         char const* set_backtrace(thread_id_type const& id, char const* bt = 0);
 #else
         util::backtrace const* get_backtrace(thread_id_type const& id) const;
-        util::backtrace const* set_backtrace(thread_id_type const& id, util::backtrace const* bt = 0);
+        util::backtrace const* set_backtrace(thread_id_type const& id,
+            util::backtrace const* bt = 0);
 #endif
 
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
@@ -469,27 +469,25 @@ namespace hpx { namespace threads
         boost::int64_t avg_cleanup_idle_rate(bool reset);
 #endif
 
-    protected:
-        // this is the thread function executing the work items in the queue
-        void tfunc(std::size_t num_thread, topology const& topology_);
-        void tfunc_impl(std::size_t num_thread);
-
-        void idle_callback(std::size_t num_thread);
-
     public:
         /// this notifies the thread manager that there is some more work
         /// available
         void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
-            scheduler_.do_some_work(num_thread);
+            pool_.do_some_work(num_thread);
         }
 
         /// API functions forwarding to notification policy
         void report_error(std::size_t num_thread, boost::exception_ptr const& e)
         {
-            state_.store(state_terminating);
-            notifier_.on_error(num_thread, e);
-            scheduler_.on_error(num_thread, e);
+            pool_.report_error(num_thread, e);
+        }
+
+        std::size_t get_worker_thread_num(bool* numa_sensitive = 0)
+        {
+            if (get_self_ptr() == 0)
+                return std::size_t(-1);
+            return pool_.get_worker_thread_num();
         }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
@@ -534,21 +532,22 @@ namespace hpx { namespace threads
         /// is allowed to run on
         std::size_t get_pu_num(std::size_t num_thread) const
         {
-            return scheduler_.get_pu_num(num_thread);
+            return pool_.get_pu_num(num_thread);
         }
 
         /// Return the mask for processing units the given thread is allowed
         /// to run on.
-        mask_cref_type get_pu_mask(topology const& topology, std::size_t num_thread) const
+        mask_cref_type get_pu_mask(topology const& topology,
+            std::size_t num_thread) const
         {
-            return scheduler_.get_pu_mask(topology, num_thread);
+            return pool_.get_pu_mask(topology, num_thread);
         }
 
         // Returns the mask identifying all processing units used by this
         // thread manager.
         mask_cref_type get_used_processing_units() const
         {
-            return used_processing_units_;
+            return pool_.get_used_processing_units();
         }
 
         // Return the executor associated with the given thread
@@ -572,38 +571,17 @@ namespace hpx { namespace threads
 #endif
 
     private:
-        /// this thread manager has exactly as much threads as requested
-        mutable mutex_type mtx_;                    ///< mutex protecting the members
-        boost::barrier* startup_;                   ///< startup synchronization
+        mutable mutex_type mtx_;   // mutex protecting the members
 
         std::size_t num_threads_;
-        boost::ptr_vector<boost::thread> threads_;
-
-        // count number of executed HPX-threads and thread phases (invocations)
-        std::vector<boost::int64_t> executed_threads_;
-        std::vector<boost::int64_t> executed_thread_phases_;
-        boost::atomic<long> thread_count_;
-
-#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
-        double timestamp_scale_;            ///< scale timestamps to nanoseconds
-#endif
-
-        boost::atomic<hpx::state> state_;   ///< thread manager state
-        util::io_service_pool& timer_pool_; ///< used for timed set_state
+        util::io_service_pool& timer_pool_;     // used for timed set_state
 
         util::block_profiler<register_thread_tag> thread_logger_;
         util::block_profiler<register_work_tag> work_logger_;
         util::block_profiler<set_state_tag> set_state_logger_;
 
-        scheduling_policy_type& scheduler_;
+        detail::thread_pool<scheduling_policy_type> pool_;
         notification_policy_type& notifier_;
-
-        // tfunc_impl timers
-        std::vector<boost::uint64_t> exec_times, tfunc_times;
-
-        // Stores the mask identifying all processing units used by this
-        // thread manager.
-        threads::mask_type used_processing_units_;
     };
 }}
 

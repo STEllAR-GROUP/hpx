@@ -9,6 +9,7 @@
 #define HPX_THREADMANAGER_SCHEDULING_PERIODIC_PRIORITY_QUEUE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/detail/periodic_maintenance.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,6 +35,13 @@ namespace hpx { namespace threads { namespace policies
     {
     public:
         typedef boost::mpl::true_ has_periodic_maintenance;
+
+        void start_periodic_maintenance(
+            boost::atomic<hpx::state>& global_state)
+        {
+            threads::detail::start_periodic_maintenance(*this, global_state,
+                has_periodic_maintenance());
+        }
 
         typedef local_priority_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing

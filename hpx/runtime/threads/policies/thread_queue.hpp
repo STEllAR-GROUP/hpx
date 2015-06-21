@@ -612,7 +612,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        boost::uint64_t get_num_pending_misses(bool reset)
+        boost::int64_t get_num_pending_misses(bool reset)
         {
             return util::get_and_reset_value(pending_misses_, reset);
         }
@@ -622,7 +622,7 @@ namespace hpx { namespace threads { namespace policies
             pending_misses_ += num;
         }
 
-        boost::uint64_t get_num_pending_accesses(bool reset)
+        boost::int64_t get_num_pending_accesses(bool reset)
         {
             return util::get_and_reset_value(pending_accesses_, reset);
         }
@@ -632,7 +632,7 @@ namespace hpx { namespace threads { namespace policies
             pending_accesses_ += num;
         }
 
-        boost::uint64_t get_num_stolen_from_pending(bool reset)
+        boost::int64_t get_num_stolen_from_pending(bool reset)
         {
             return util::get_and_reset_value(stolen_from_pending_, reset);
         }
@@ -642,7 +642,7 @@ namespace hpx { namespace threads { namespace policies
             stolen_from_pending_ += num;
         }
 
-        boost::uint64_t get_num_stolen_from_staged(bool reset)
+        boost::int64_t get_num_stolen_from_staged(bool reset)
         {
             return util::get_and_reset_value(stolen_from_staged_, reset);
         }
@@ -652,7 +652,7 @@ namespace hpx { namespace threads { namespace policies
             stolen_from_staged_ += num;
         }
 
-        boost::uint64_t get_num_stolen_to_pending(bool reset)
+        boost::int64_t get_num_stolen_to_pending(bool reset)
         {
             return util::get_and_reset_value(stolen_to_pending_, reset);
         }
@@ -662,7 +662,7 @@ namespace hpx { namespace threads { namespace policies
             stolen_to_pending_ += num;
         }
 
-        boost::uint64_t get_num_stolen_to_staged(bool reset)
+        boost::int64_t get_num_stolen_to_staged(bool reset)
         {
             return util::get_and_reset_value(stolen_to_staged_, reset);
         }
