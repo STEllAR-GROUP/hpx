@@ -80,26 +80,46 @@ namespace hpx
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
     template <typename T>
-    void set_lco_value(naming::id_type const& id, T && t)
+    void set_lco_value(naming::id_type const& id, T && t, bool move_credits)
     {
         typename lcos::base_lco_with_value<
             typename boost::remove_reference<T>::type
         >::set_value_action set;
-        apply(set, id, util::detail::make_temporary<T>(t));
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply(set, target, util::detail::make_temporary<T>(t));
+        }
+        else
+        {
+            apply(set, id, util::detail::make_temporary<T>(t));
+        }
     }
 
     template <typename T>
     void set_lco_value(naming::id_type const& id, T && t,
-        naming::id_type const& cont)
+        naming::id_type const& cont, bool move_credits)
     {
         typename lcos::base_lco_with_value<
             typename boost::remove_reference<T>::type
         >::set_value_action set;
-        apply_c(set, cont, id, util::detail::make_temporary<T>(t));
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply_c(set, cont, target, util::detail::make_temporary<T>(t));
+        }
+        else
+        {
+            apply_c(set, cont, id, util::detail::make_temporary<T>(t));
+        }
     }
 
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr const& e);
+        boost::exception_ptr const& e, bool move_credits);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
