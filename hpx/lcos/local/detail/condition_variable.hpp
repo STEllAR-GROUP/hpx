@@ -175,29 +175,42 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             while (!queue.empty())
             {
-                threads::thread_id_type id(
-                    reinterpret_cast<threads::thread_data_base*>(queue_.front().id_));
+                threads::thread_id_repr_type id = queue.front().id_;
                 queue.front().id_ = threads::invalid_thread_id_repr;
                 queue.pop_front();
 
+                if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
+                {
+                    LERR_(fatal)
+                        << "condition_variable::abort_all:"
+                        << " NULL thread id encountered";
+                    continue;
+                }
+
                 // we know that the id is actually the pointer to the thread
+                threads::thread_id_type tid(
+                    reinterpret_cast<threads::thread_data_base*>(id));
+
                 LERR_(fatal)
                         << "condition_variable::abort_all:"
                         << " pending thread: "
-                        << get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id << "): " << threads::get_thread_description(id);
+                        << get_thread_state_name(threads::get_thread_state(tid))
+                        << "(" << tid << "): "
+                        << threads::get_thread_description(tid);
 
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
-                threads::set_thread_state(id, threads::pending,
-                    threads::wait_abort, threads::thread_priority_default, ec);
+                threads::set_thread_state(tid,
+                    threads::pending, threads::wait_abort,
+                    threads::thread_priority_default, ec);
                 if (ec)
                 {
                     LERR_(fatal)
                         << "condition_variable::abort_all:"
                         << " could not abort thread: "
-                        << get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id << "): " << threads::get_thread_description(id);
+                        << get_thread_state_name(threads::get_thread_state(tid))
+                        << "(" << tid << "): "
+                        << threads::get_thread_description(tid);
                 }
             }
         }

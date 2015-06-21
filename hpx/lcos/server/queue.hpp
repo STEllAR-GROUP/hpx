@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,17 +15,15 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 
-#include <boost/intrusive/slist.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <memory>
+#include <queue>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
 {
     /// A queue can be used to 'collect' (queue) a number of incoming values
-    /// for consumption of an internal thread, which will invoke a given action
-    /// for each of the values.
     template <typename ValueType, typename RemoteType = ValueType>
     class queue;
 
@@ -42,31 +40,7 @@ namespace hpx { namespace lcos { namespace server
         typedef lcos::local::spinlock mutex_type;
         typedef components::managed_component_base<queue> base_type;
 
-        // queue holding the values to process
-        struct queue_entry
-        {
-            typedef boost::intrusive::slist_member_hook<
-                boost::intrusive::link_mode<boost::intrusive::normal_link>
-            > hook_type;
-
-            queue_entry(ValueType const& val)
-              : val_(val)
-            {}
-
-            ValueType val_;
-            hook_type slist_hook_;
-        };
-
-        typedef boost::intrusive::member_hook<
-            queue_entry, typename queue_entry::hook_type,
-            &queue_entry::slist_hook_
-        > slist_option_type;
-
-        typedef boost::intrusive::slist<
-            queue_entry, slist_option_type,
-            boost::intrusive::cache_last<true>,
-            boost::intrusive::constant_time_size<false>
-        > queue_type;
+        typedef std::queue<ValueType> queue_type;
 
     public:
         // This is the component id. Every component needs to have an embedded
@@ -99,14 +73,10 @@ namespace hpx { namespace lcos { namespace server
         void set_value (RemoteType && result)
         {
             // push back the new value onto the queue
-            std::unique_ptr<queue_entry> node(
-                new queue_entry(
-                    traits::get_remote_result<ValueType, RemoteType>::call(result)));
-
             boost::unique_lock<mutex_type> l(mtx_);
-            queue_.push_back(*node);
-
-            node.release();
+            queue_.push(
+                traits::get_remote_result<ValueType, RemoteType>::call(
+                    std::move(result)));
 
             // resume the first thread waiting to pick up that value
             cond_.notify_one(std::move(l));
@@ -127,17 +97,23 @@ namespace hpx { namespace lcos { namespace server
         // queue). This method blocks if the value queue is empty. Waiting
         // threads are resumed automatically as soon as new values are placed
         // into the value queue.
-        ValueType get_value()
+        ValueType get_value(error_code& ec = throws)
         {
             boost::unique_lock<mutex_type> l(mtx_);
-            if (queue_.empty()) {
-                cond_.wait(l, "queue::get_value");
+            if (queue_.empty())
+            {
+                cond_.wait(l, "queue::get_value", ec);
+                if (ec) return ValueType();
             }
+            HPX_ASSERT(!queue_.empty());
 
             // get the first value from the value queue and return it to the
             // caller
-            ValueType value = queue_.front().val_;
-            queue_.pop_front();
+            ValueType value = std::move(queue_.front());
+            queue_.pop();
+
+            if (&ec != &throws)
+                ec = make_success_code();
 
             return value;
         }
