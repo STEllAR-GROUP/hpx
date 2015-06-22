@@ -842,7 +842,7 @@ namespace hpx { namespace threads
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
-            std::size_t(paths.instanceindex_) < threads_.size())
+            std::size_t(paths.instanceindex_) < pool_.get_os_thread_count())
         {
             // specific counter
             using performance_counters::detail::create_raw_counter;
@@ -1459,62 +1459,31 @@ namespace hpx { namespace threads
     boost::int64_t threadmanager_impl<SchedulingPolicy>::
         avg_idle_rate(bool reset)
     {
-        double const exec_total =
-            std::accumulate(exec_times.begin(), exec_times.end(), 0.);
-        double const tfunc_total =
-            std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
-
-        if (reset) {
-            std::fill(tfunc_times.begin(), tfunc_times.end(),
-                boost::uint64_t(-1));
-        }
-
-        if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
-            return 10000LL;
-
-        HPX_ASSERT(tfunc_total > exec_total);
-
-        double const percent = 1. - (exec_total / tfunc_total);
-        return boost::int64_t(10000. * percent);    // 0.01 percent
+        return pool_.avg_idle_rate(reset);
     }
 
     template <typename SchedulingPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy>::
         avg_idle_rate(std::size_t num_thread, bool reset)
     {
-        double const exec_time = static_cast<double>(exec_times[num_thread]);
-        double const tfunc_time = static_cast<double>(tfunc_times[num_thread]);
-
-        if (reset) {
-            tfunc_times[num_thread] = boost::uint64_t(-1);
-        }
-
-        if (std::abs(tfunc_time) < 1e-16)   // avoid division by zero
-            return 10000LL;
-
-        HPX_ASSERT(tfunc_time > exec_time);
-
-        double const percent = 1. - (exec_time / tfunc_time);
-        return boost::int64_t(10000. * percent);   // 0.01 percent
+        return pool_.avg_idle_rate(num_thread, reset);
     }
-#endif
 
-#if defined(HPX_HAVE_THREAD_IDLE_RATES) && \
-    defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
-
+#if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
     template <typename SchedulingPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy>::
         avg_creation_idle_rate(bool reset)
     {
-        return avg_creation_idle_rate(reset);
+        return pool_.avg_creation_idle_rate(reset);
     }
 
     template <typename SchedulingPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy>::
         avg_cleanup_idle_rate(bool reset)
     {
-        return avg_creation_idle_rate(reset);
+        return pool_.avg_cleanup_idle_rate(reset);
     }
+#endif
 #endif
 }}
 
