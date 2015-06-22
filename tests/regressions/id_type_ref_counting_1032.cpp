@@ -76,7 +76,7 @@ struct test_server2
     hpx::id_type create_test_server1()
     {
         return hpx::new_<test_server1<ComponentBase> >(
-            hpx::find_here(), this->get_gid()).get();
+            hpx::find_here(), this->get_id()).get();
     }
 
     HPX_DEFINE_COMPONENT_ACTION(test_server2, create_test_server1,

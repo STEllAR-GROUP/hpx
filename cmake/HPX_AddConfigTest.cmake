@@ -289,6 +289,13 @@ macro(hpx_check_for_cxx11_std_unique_ptr)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_extended_friend_declarations)
+  add_hpx_config_test(HPX_WITH_CXX11_EXTENDED_FRIEND_DECLARATIONS
+    SOURCE cmake/tests/cxx11_extended_friend_declarations.cpp
+    FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx14_constexpr)
   add_hpx_config_test(HPX_WITH_CXX14_CONSTEXPR
     SOURCE cmake/tests/cxx14_constexpr.cpp
