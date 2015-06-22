@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -34,34 +34,8 @@ namespace hpx
 {
     //////////////////////////////////////////////////////////////////////////
     // forward declare the required overload of apply.
-    template <typename Component, typename Signature, typename Derived,
-        typename ...Ts>
-    inline bool
-    apply(hpx::actions::basic_action<Component, Signature, Derived>,
-        naming::id_type const&, Ts&&... vs);
-
-    template <typename Component, typename Signature, typename Derived,
-        typename ...Ts>
-    inline bool
-    apply(hpx::actions::continuation_type const& c,
-        hpx::actions::basic_action<Component, Signature, Derived>,
-        naming::id_type const& contgid, naming::id_type const& gid,
-        Ts&&... vs);
-
-    // MSVC complains about ambiguities if it sees this forward declaration
-#ifndef BOOST_MSVC
-    template <typename F, typename ...Ts>
-    typename boost::enable_if_c<
-        boost::enable_if_c<
-            !traits::is_executor<typename util::decay<F>::type>::value
-         && !traits::is_action<typename util::decay<F>::type>::value
-         && !traits::is_bound_action<typename util::decay<F>::type>::value
-          , traits::detail::is_deferred_callable<F(Ts...)>
-        >::type::value
-      , bool
-    >::type
-    apply(F&& f, Ts&&... vs);
-#endif
+    template <typename Action, typename ...Ts>
+    bool apply(naming::id_type const& gid, Ts&&... vs);
 
     template <
         typename Component, typename Signature, typename Derived,
@@ -82,7 +56,7 @@ namespace hpx
     template <typename T>
     void set_lco_value(naming::id_type const& id, T && t, bool move_credits)
     {
-        typename lcos::base_lco_with_value<
+        typedef typename lcos::base_lco_with_value<
             typename boost::remove_reference<T>::type
         >::set_value_action set;
         if (move_credits)

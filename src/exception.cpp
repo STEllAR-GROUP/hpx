@@ -253,7 +253,7 @@ namespace hpx { namespace detail
         if (NULL != self)
         {
             if (threads::threadmanager_is(state_running))
-                shepherd = threads::threadmanager_base::get_worker_thread_num();
+                shepherd = hpx::get_worker_thread_num();
 
             thread_id = threads::get_self_id();
             thread_name = threads::get_thread_description(thread_id);

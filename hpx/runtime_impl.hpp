@@ -38,7 +38,7 @@ namespace hpx
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized.
-    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename SchedulingPolicy>
     class HPX_EXPORT runtime_impl : public runtime
     {
     private:
@@ -58,7 +58,7 @@ namespace hpx
 
     public:
         typedef SchedulingPolicy scheduling_policy_type;
-        typedef NotificationPolicy notification_policy_type;
+        typedef threads::policies::callback_notifier notification_policy_type;
 
         typedef typename scheduling_policy_type::init_parameter_type
             init_scheduler_type;

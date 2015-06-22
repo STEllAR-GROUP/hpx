@@ -59,7 +59,7 @@ namespace hpx
     int pre_main(runtime_mode);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename SchedulingPolicy>
     class HPX_EXPORT runtime_impl;
 
 #if defined(HPX_HAVE_SECURITY)
@@ -72,7 +72,7 @@ namespace hpx
     class HPX_EXPORT runtime
     {
     public:
-      
+
         state get_state() const { return state_.load(); }
 
         /// The \a hpx_main_function_type is the default function type usable
