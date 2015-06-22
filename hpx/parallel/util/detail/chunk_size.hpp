@@ -102,6 +102,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             std::forward<F1>(f1), first, count, chunk_size);
 
         std::vector<std::pair<FwdIter, std::size_t> > shape;
+        shape.reserve(count);
 
         while (count != 0)
         {

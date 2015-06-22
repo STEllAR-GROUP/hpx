@@ -45,12 +45,11 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter last = first;
                 std::advance(last, count);
 
-                std::vector<hpx::future<Result> > workitems;
+                std::vector<hpx::future<Result> > inititems, workitems;
                 std::list<boost::exception_ptr> errors;
 
                 try {
                     // estimates a chunk size based on number of cores used
-                    std::vector<hpx::future<Result> > inititems;
                     std::vector<std::pair<FwdIter, std::size_t> > shape =
                         get_static_shape(policy, inititems, f1,
                             first, count, chunk_size);
@@ -60,11 +59,9 @@ namespace hpx { namespace parallel { namespace util
                         return f1(elem.first, elem.second);
                     };
 
+                    workitems.reserve(shape.size());
                     workitems = executor_traits::async_execute(
                         policy.executor(), f, shape);
-
-                    std::move(inititems.begin(), inititems.end(),
-                        std::back_inserter(workitems));
                 }
                 catch (...) {
                     detail::handle_local_exceptions<ExPolicy>::call(
@@ -72,6 +69,7 @@ namespace hpx { namespace parallel { namespace util
                 }
 
                 // wait for all tasks to finish
+                hpx::wait_all(inititems);
                 hpx::wait_all(workitems);
                 detail::handle_local_exceptions<ExPolicy>::call(
                     workitems, errors);
@@ -96,12 +94,11 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter last = first;
                 std::advance(last, count);
 
-                std::vector<hpx::future<Result> > workitems;
+                std::vector<hpx::future<Result> > inititems, workitems;
                 std::list<boost::exception_ptr> errors;
 
                 try {
                     // estimates a chunk size based on number of cores used
-                    std::vector<hpx::future<Result> > inititems;
                     std::vector<std::pair<FwdIter, std::size_t> > shape =
                         get_static_shape(policy, inititems, f1,
                             first, count, chunk_size);
@@ -111,11 +108,9 @@ namespace hpx { namespace parallel { namespace util
                         return f1(elem.first, elem.second);
                     };
 
+                    workitems.reserve(shape.size());
                     workitems = executor_traits::async_execute(
                         policy.executor(), f, shape);
-
-                    std::move(inititems.begin(), inititems.end(),
-                        std::back_inserter(workitems));
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<FwdIter>(
@@ -127,13 +122,15 @@ namespace hpx { namespace parallel { namespace util
 
                 // wait for all tasks to finish
                 return hpx::lcos::local::dataflow(
-                    [last, errors](std::vector<hpx::future<Result> > && r)
+                    [last, errors](std::vector<hpx::future<Result> > && r1,
+                            std::vector<hpx::future<Result> > && r2)
                         mutable -> FwdIter
                     {
-                        detail::handle_local_exceptions<ExPolicy>::call(r, errors);
+                        detail::handle_local_exceptions<ExPolicy>::call(r1, errors);
+                        detail::handle_local_exceptions<ExPolicy>::call(r2, errors);
                         return last;
                     },
-                    std::move(workitems));
+                    std::move(inititems), std::move(workitems));
             }
         };
 
