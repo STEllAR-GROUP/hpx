@@ -57,14 +57,14 @@ macro(add_hpx_config_test variable)
             "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
           RUN_OUTPUT_VARIABLE ${variable}_OUTPUT
           ARGS ${${variable}_ARGS})
-          if(${variable}_COMPILE_RESULT AND NOT ${variable}_RUN_RESULT)
-            set(${variable}_RESULT TRUE)
-          else()
-            set(${variable}_RESULT FALSE)
-          endif()
+        if(${variable}_COMPILE_RESULT AND NOT ${variable}_RUN_RESULT)
+          set(${variable}_RESULT TRUE)
         else()
           set(${variable}_RESULT FALSE)
         endif()
+      else()
+        set(${variable}_RESULT FALSE)
+      endif()
     else()
       try_compile(${variable}_RESULT
         ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
@@ -78,21 +78,23 @@ macro(add_hpx_config_test variable)
         COPY_FILE ${test_binary})
     endif()
 
-    string(TOUPPER "${variable}" variable_uc)
-    set(_msg "Performing Test ${variable_uc}")
-
-    if(${variable}_RESULT)
-      set(_run_msg "Success")
-      set(_msg "${_msg} - ${_run_msg}")
-    else()
-      set(_msg "${_msg} - Failed")
-    endif()
-
-    set(${variable} ${${variable}_RESULT} CACHE INTERNAL "")
-    hpx_info(${_msg})
+    set(_run_msg "Success")
   else()
     set(${variable}_RESULT ${${variable}})
+    set(_run_msg "pre-set to ${${variable}}")
   endif()
+
+  string(TOUPPER "${variable}" variable_uc)
+  set(_msg "Performing Test ${variable_uc}")
+
+  if(${variable}_RESULT)
+    set(_msg "${_msg} - ${_run_msg}")
+  else()
+    set(_msg "${_msg} - Failed")
+  endif()
+
+  set(${variable} ${${variable}_RESULT} CACHE INTERNAL "")
+  hpx_info(${_msg})
 
   if(${variable}_RESULT)
     foreach(definition ${${variable}_DEFINITIONS})
