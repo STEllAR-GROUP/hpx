@@ -842,7 +842,7 @@ namespace hpx { namespace threads
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
-            std::size_t(paths.instanceindex_) < threads_.size())
+            std::size_t(paths.instanceindex_) < pool_.get_os_thread_count())
         {
             // specific counter
             using performance_counters::detail::create_raw_counter;
