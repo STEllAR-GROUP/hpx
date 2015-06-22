@@ -7,6 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
@@ -28,7 +29,6 @@
 #include <hpx/runtime/components/component_commandline_base.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/lcos/wait_all.hpp>
