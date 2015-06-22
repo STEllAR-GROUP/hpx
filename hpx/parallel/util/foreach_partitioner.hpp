@@ -38,31 +38,33 @@ namespace hpx { namespace parallel { namespace util
             static FwdIter call(ExPolicy policy, FwdIter first,
                 std::size_t count, F1 && f1, std::size_t chunk_size)
             {
+                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::parallel::executor_traits<executor_type>
+                    executor_traits;
+
+                FwdIter last = first;
+                std::advance(last, count);
+
                 std::vector<hpx::future<Result> > workitems;
                 std::list<boost::exception_ptr> errors;
 
                 try {
-                    // estimate a chunk size based on number of cores used
-                    chunk_size = get_static_chunk_size(policy, workitems, f1,
+                    std::vector<std::pair<FwdIter, std::size_t> > shape;
+                    std::vector<hpx::future<Result> > inititems;
+                    // estimates a chunk size base on number of cores used
+                    shape = get_static_shape(policy, inititems, f1,
                         first, count, chunk_size);
 
-                    // schedule every chunk on a separate thread
-                    workitems.reserve(count / chunk_size + 1);
-                    while (count != 0)
+                    auto f = [f1](std::pair<FwdIter, std::size_t> elem)
                     {
-                        std::size_t chunk = (std::min)(chunk_size, count);
+                        return f1(elem.first, elem.second);
+                    };
 
-                        typedef typename ExPolicy::executor_type executor_type;
-                        workitems.push_back(
-                            executor_traits<executor_type>::async_execute(
-                                policy.executor(),
-                                hpx::util::deferred_call(f1, first, chunk)
-                            )
-                        );
+                    workitems = executor_traits::async_execute(
+                        policy.executor(), f, shape);
 
-                        count -= chunk;
-                        std::advance(first, chunk);
-                    }
+                    std::move(inititems.begin(), inititems.end(),
+                        std::back_inserter(workitems));
                 }
                 catch (...) {
                     detail::handle_local_exceptions<ExPolicy>::call(
@@ -74,7 +76,7 @@ namespace hpx { namespace parallel { namespace util
                 detail::handle_local_exceptions<ExPolicy>::call(
                     workitems, errors);
 
-                return first;
+                return last;
             }
         };
 
@@ -87,31 +89,33 @@ namespace hpx { namespace parallel { namespace util
                 FwdIter first, std::size_t count, F1 && f1,
                 std::size_t chunk_size)
             {
+                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::parallel::executor_traits<executor_type>
+                    executor_traits;
+
+                FwdIter last = first;
+                std::advance(last, count);
+
                 std::vector<hpx::future<Result> > workitems;
                 std::list<boost::exception_ptr> errors;
 
                 try {
-                    // estimate a chunk size based on number of cores used
-                    chunk_size = get_static_chunk_size(policy, workitems, f1,
+                    std::vector<std::pair<FwdIter, std::size_t> > shape;
+                    std::vector<hpx::future<Result> > inititems;
+                    // estimates a chunk size base on number of cores used
+                    shape = get_static_shape(policy, inititems, f1,
                         first, count, chunk_size);
 
-                    // schedule every chunk on a separate thread
-                    workitems.reserve(count / chunk_size + 1);
-                    while (count != 0)
+                    auto f = [f1](std::pair<FwdIter, std::size_t> elem)
                     {
-                        std::size_t chunk = (std::min)(chunk_size, count);
+                        return f1(elem.first, elem.second);
+                    };
 
-                        typedef typename ExPolicy::executor_type executor_type;
-                        workitems.push_back(
-                            executor_traits<executor_type>::async_execute(
-                                policy.executor(),
-                                hpx::util::deferred_call(f1, first, chunk)
-                            )
-                        );
+                    workitems = executor_traits::async_execute(
+                        policy.executor(), f, shape);
 
-                        count -= chunk;
-                        std::advance(first, chunk);
-                    }
+                    std::move(inititems.begin(), inititems.end(),
+                        std::back_inserter(workitems));
                 }
                 catch (std::bad_alloc const&) {
                     return hpx::make_exceptional_future<FwdIter>(
@@ -123,11 +127,11 @@ namespace hpx { namespace parallel { namespace util
 
                 // wait for all tasks to finish
                 return hpx::lcos::local::dataflow(
-                    [first, errors](std::vector<hpx::future<Result> > && r)
+                    [last, errors](std::vector<hpx::future<Result> > && r)
                         mutable -> FwdIter
                     {
                         detail::handle_local_exceptions<ExPolicy>::call(r, errors);
-                        return first;
+                        return last;
                     },
                     std::move(workitems));
             }
