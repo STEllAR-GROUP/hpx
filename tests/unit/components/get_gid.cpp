@@ -43,14 +43,14 @@ struct test_client : client_base<test_client, stub_base<test_server> >
 
     test_client(hpx::future<hpx::id_type>&& id) : base_type(std::move(id)) {}
 
-    void check_gid() { async<check_gid_action>(this->get_gid()).get(); }
+    void check_gid() { async<check_gid_action>(this->get_id()).get(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     test_client t = test_client::create(find_here());
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_gid());
+    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
 
     t.check_gid();
 

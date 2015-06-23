@@ -36,22 +36,22 @@ namespace hpx { namespace lcos
 
         lcos::future<void> wait_async()
         {
-            return this->base_type::wait_async(get_gid());
+            return this->base_type::wait_async(get_id());
         }
 
         void wait()
         {
-            this->lcos::stubs::barrier::wait(get_gid());
+            this->lcos::stubs::barrier::wait(get_id());
         }
 
         lcos::future<void> set_exception_async(boost::exception_ptr const& e)
         {
-            return this->base_type::set_exception_async(get_gid(), e);
+            return this->base_type::set_exception_async(get_id(), e);
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            this->base_type::set_exception(get_gid(), e);
+            this->base_type::set_exception(get_id(), e);
         }
     };
 }}

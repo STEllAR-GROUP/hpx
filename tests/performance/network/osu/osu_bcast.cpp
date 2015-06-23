@@ -30,7 +30,7 @@ struct broadcast_component
 
     void init(std::vector<hpx::id_type> const & id, std::size_t max_msg_size, std::size_t fan_out)
     {
-        bcast.this_id = this->get_gid();
+        bcast.this_id = this->get_id();
         bcast.fan_out = fan_out;
         ids = id;
         send_buffer = std::vector<char>(max_msg_size);

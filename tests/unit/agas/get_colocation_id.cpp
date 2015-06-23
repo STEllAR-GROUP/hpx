@@ -42,26 +42,26 @@ struct test_client
     test_client() {}
     test_client(hpx::shared_future<hpx::id_type> const& id) : base_type(id) {}
 
-    hpx::id_type call() const { return call_action()(this->get_gid()); }
+    hpx::id_type call() const { return call_action()(this->get_id()); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 void test(hpx::id_type there)
 {
     test_client t1 = test_client::create(there);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_gid());
+    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), there);
 
     // verify for remote component
-    HPX_TEST_EQ(hpx::get_colocation_id_sync(t1.get_gid()), there);
+    HPX_TEST_EQ(hpx::get_colocation_id_sync(t1.get_id()), there);
 
     HPX_TEST_EQ(hpx::async<test_colocation_action>(
-        hpx::colocated(t1.get_gid())).get(), there);
+        hpx::colocated(t1.get_id())).get(), there);
 
     test_colocation_action act;
-    HPX_TEST_EQ(hpx::async(act, hpx::colocated(t1.get_gid())).get(), there);
+    HPX_TEST_EQ(hpx::async(act, hpx::colocated(t1.get_id())).get(), there);
 
     // verify for remote locality
     HPX_TEST_EQ(hpx::get_colocation_id_sync(there), there);

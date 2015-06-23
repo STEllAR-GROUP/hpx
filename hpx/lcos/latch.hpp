@@ -107,31 +107,31 @@ namespace hpx { namespace lcos
         hpx::future<void> count_down_and_wait_async()
         {
             lcos::server::latch::set_event_action act;
-            return hpx::async(act, get_gid());
+            return hpx::async(act, get_id());
         }
 
         hpx::future<void> count_down_async(std::ptrdiff_t n)
         {
             lcos::server::latch::set_value_action act;
-            return hpx::async(act, get_gid(), std::move(n));
+            return hpx::async(act, get_id(), std::move(n));
         }
 
         hpx::future<bool> is_ready_async() const
         {
             lcos::server::latch::get_value_action act;
-            return hpx::async(act, get_gid());
+            return hpx::async(act, get_id());
         }
 
         hpx::future<void> wait_async() const
         {
             lcos::server::latch::wait_action act;
-            return hpx::async(act, get_gid());
+            return hpx::async(act, get_id());
         }
 
         hpx::future<void> set_exception_async(boost::exception_ptr const& e)
         {
             lcos::server::latch::set_exception_action act;
-             return hpx::async(act, get_gid(), e);
+             return hpx::async(act, get_id(), e);
         }
         void set_exception(boost::exception_ptr const& e)
         {

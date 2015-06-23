@@ -103,14 +103,14 @@ namespace hpx { namespace components
         /// Get the \a memory_block_data maintained by this memory_block
         memory_block_data get()
         {
-            return this->base_type::get(get_gid());
+            return this->base_type::get(get_id());
         }
 
         /// Asynchronously get the \a memory_block_data maintained by this
         /// memory_block
         lcos::future<memory_block_data> get_async()
         {
-            return this->base_type::get_async(get_gid());
+            return this->base_type::get_async(get_id());
         }
 
         /// Get the \a memory_block_data maintained by this memory_block, use
@@ -119,7 +119,7 @@ namespace hpx { namespace components
         /// return value of this get())
         memory_block_data get(memory_block_data const& config)
         {
-            return this->base_type::get(get_gid(), config);
+            return this->base_type::get(get_id(), config);
         }
 
         /// Asynchronously get the \a memory_block_data maintained by this
@@ -129,21 +129,21 @@ namespace hpx { namespace components
         lcos::future<memory_block_data> get_async(
             memory_block_data const& config)
         {
-            return this->base_type::get_async(get_gid(), config);
+            return this->base_type::get_async(get_id(), config);
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// Clone the \a memory_block_data maintained by this memory_block
         naming::id_type clone()
         {
-            return this->base_type::clone(get_gid());
+            return this->base_type::clone(get_id());
         }
 
         /// Asynchronously clone the \a memory_block_data maintained by this
         /// memory_block
         lcos::future<naming::id_type> clone_async()
         {
-            return this->base_type::clone_async(get_gid());
+            return this->base_type::clone_async(get_id());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ namespace hpx { namespace components
         template <typename T>
         void checkin(components::access_memory_block<T> const& data)
         {
-            this->base_type::checkin(get_gid(), data);
+            this->base_type::checkin(get_id(), data);
         }
 
         /// Asynchronously clone the \a memory_block_data maintained by this
@@ -160,7 +160,7 @@ namespace hpx { namespace components
         lcos::future<void> checkin_async(
             components::access_memory_block<T> const& data)
         {
-            return this->base_type::checkin_async(get_gid(), data);
+            return this->base_type::checkin_async(get_id(), data);
         }
     };
 

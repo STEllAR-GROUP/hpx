@@ -117,7 +117,7 @@ namespace hpx { namespace components
             component_type;
         typedef server::copy_component_action<component_type> action_type;
 
-        id_type id = to_copy.get_gid();
+        id_type id = to_copy.get_id();
         return Derived(hpx::detail::async_colocated<action_type>(
             to_copy, to_copy, target_locality));
     }

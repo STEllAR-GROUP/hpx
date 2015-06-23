@@ -375,7 +375,7 @@ hpx::lcos::barrier create_barrier(std::size_t num_localities, char const* symnam
     );
 
     hpx::lcos::barrier b = hpx::lcos::barrier::create(hpx::find_here(), num_localities);
-    hpx::agas::register_name_sync(symname, b.get_gid());
+    hpx::agas::register_name_sync(symname, b.get_id());
     return b;
 }
 

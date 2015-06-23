@@ -75,7 +75,7 @@ struct clientA : hpx::components::client_base<clientA, A>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -91,13 +91,13 @@ struct clientB : hpx::components::client_base<clientB, B>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test1()
     {
         test1_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -116,10 +116,10 @@ int main()
 
     { // Client to A, instance of B
         clientA obj(hpx::components::new_<B>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "B");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
 
@@ -129,10 +129,10 @@ int main()
 
     { // Client to B, instance of B
         clientB obj(hpx::components::new_<B>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "B");
         HPX_TEST_EQ(obj.test1(), "B");
-    
+
     }
 
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);

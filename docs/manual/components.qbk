@@ -117,14 +117,14 @@ described in the previous section could look like:
             hpx::future<int> some_member_function(std::string const& s)
             {
                 some_component::some_member_action act;
-                return hpx::async(act, get_gid(), s);
+                return hpx::async(act, get_id(), s);
             }
         };
     }
 
 A client side object stores the global id of the component instance it
 represents. This global id is accessible by calling the function
-`client_base<>::get_gid()`. The special constructor which is provided in the
+`client_base<>::get_id()`. The special constructor which is provided in the
 example allows to create this client side object directly using the API
 function [funcref hpx::new_ `hpx::new_<>()`].
 

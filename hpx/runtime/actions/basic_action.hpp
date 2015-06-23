@@ -75,7 +75,7 @@ namespace hpx { namespace actions
             BOOST_FORCEINLINE result_type operator()(threads::thread_state_ex_enum)
             {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
-                    << " with continuation(" << cont_->get_gid() << ")";
+                    << " with continuation(" << cont_->get_id() << ")";
 
                 actions::trigger(*cont_, f_);
                 return threads::terminated;

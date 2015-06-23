@@ -113,7 +113,7 @@ struct clientA : hpx::components::client_base<clientA, A>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -129,13 +129,13 @@ struct clientB : hpx::components::client_base<clientB, B>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test1()
     {
         test1_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -151,19 +151,19 @@ struct clientC : hpx::components::client_base<clientC, C>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test1()
     {
         test1_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test2()
     {
         test2_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -184,7 +184,7 @@ int main()
 
     { // Client to A, instance of B
         clientA obj(hpx::components::new_<B>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "B");
     }
 
@@ -198,11 +198,11 @@ int main()
 
     { // Client to B, instance of B
         clientB obj(hpx::components::new_<B>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "B");
         HPX_TEST_EQ(obj.test1(), "B");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
@@ -213,10 +213,10 @@ int main()
 
     { // Client to A, instance of C
         clientA obj(hpx::components::new_<C>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "C");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(c_ctor); HPX_TEST(c_dtor);
@@ -227,11 +227,11 @@ int main()
 
     { // Client to B, instance of C
         clientB obj(hpx::components::new_<C>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "C");
         HPX_TEST_EQ(obj.test1(), "C");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(c_ctor); HPX_TEST(c_dtor);
@@ -242,12 +242,12 @@ int main()
 
     { // Client to C, instance of C
         clientC obj(hpx::components::new_<C>(hpx::find_here()));
-    
+
         HPX_TEST_EQ(obj.test0(), "C");
         HPX_TEST_EQ(obj.test1(), "C");
         HPX_TEST_EQ(obj.test2(), "C");
     }
-    
+
     HPX_TEST(a_ctor); HPX_TEST(a_dtor);
     HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     HPX_TEST(c_ctor); HPX_TEST(c_dtor);

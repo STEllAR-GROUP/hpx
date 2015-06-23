@@ -142,19 +142,19 @@ struct block
     block(boost::uint64_t id, const char * base_name)
       : base_type(hpx::find_id_from_basename(base_name, id))
     {
-        get_gid();
+        get_id();
     }
 
     block(boost::uint64_t id, boost::uint64_t size, const char * base_name)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size))
     {
-        hpx::register_id_with_basename(base_name, get_gid(), id);
+        hpx::register_id_with_basename(base_name, get_id(), id);
     }
 
     hpx::future<sub_block> get_sub_block(boost::uint64_t offset, boost::uint64_t size)
     {
         block_component::get_sub_block_action act;
-        return hpx::async(act, get_gid(), offset, size);
+        return hpx::async(act, get_id(), offset, size);
     }
 };
 
@@ -255,9 +255,9 @@ int hpx_main(boost::program_options::variables_map& vm)
             [&](boost::uint64_t b)
             {
                 boost::shared_ptr<block_component> A_ptr =
-                    hpx::get_ptr<block_component>(A[b].get_gid()).get();
+                    hpx::get_ptr<block_component>(A[b].get_id()).get();
                 boost::shared_ptr<block_component> B_ptr =
-                    hpx::get_ptr<block_component>(B[b].get_gid()).get();
+                    hpx::get_ptr<block_component>(B[b].get_id()).get();
 
                 for(boost::uint64_t i = 0; i < order; ++i)
                 {

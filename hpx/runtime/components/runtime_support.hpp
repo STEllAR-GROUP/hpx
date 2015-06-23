@@ -168,7 +168,7 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
-        naming::id_type const& get_gid() const
+        naming::id_type const& get_id() const
         {
             return gid_;
         }

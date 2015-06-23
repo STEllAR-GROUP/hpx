@@ -89,7 +89,7 @@ namespace interpolate1d
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::naming::id_type interpolate1d::get_gid(double value)
+    hpx::naming::id_type interpolate1d::get_id(double value)
     {
         std::size_t partition_size = num_elements_ / partitions_.size();
         std::size_t index = static_cast<std::size_t>(
