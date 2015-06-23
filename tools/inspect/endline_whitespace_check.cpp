@@ -29,11 +29,14 @@ namespace boost
         {
             register_signature(".c");
             register_signature(".cpp");
+            register_signature(".css");
             register_signature(".cxx");
             register_signature(".h");
             register_signature(".hpp");
             register_signature(".hxx");
+            register_signature(".inc");
             register_signature(".ipp");
+            register_signature(".txt");
         }
 
         void whitespace_check::inspect(
@@ -81,7 +84,7 @@ namespace boost
                     extend = 1;
                 }
                 size_t size = someline[p].size();
-                if (found < size - extend)
+                if (found < size - extend || found == someline[p].npos)
                 {
                     errors++;
                     linenum = to_string(currline);
