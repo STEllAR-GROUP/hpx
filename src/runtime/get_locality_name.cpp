@@ -37,7 +37,8 @@ namespace hpx { namespace detail
     }
 }}
 
-HPX_PLAIN_ACTION(hpx::detail::get_locality_name, hpx_get_locality_name_action);
+HPX_PLAIN_ACTION_ID(hpx::detail::get_locality_name, hpx_get_locality_name_action,
+        hpx::actions::hpx_get_locality_name_action_id)
 
 namespace hpx
 {
