@@ -71,6 +71,10 @@ namespace hpx { namespace parallel { namespace util
                 // wait for all tasks to finish
                 hpx::wait_all(inititems);
                 hpx::wait_all(workitems);
+
+                // handle exceptions
+                detail::handle_local_exceptions<ExPolicy>::call(
+                    inititems, errors);
                 detail::handle_local_exceptions<ExPolicy>::call(
                     workitems, errors);
 
