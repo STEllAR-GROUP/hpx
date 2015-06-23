@@ -153,7 +153,7 @@ namespace hpx { namespace components { namespace server
                     // retrieve the data from the given storage
                     typedef typename server::component_storage::migrate_from_here_action
                         action_type;
-                    return async<action_type>(r.first, to_resurrect.get_gid())
+                    return async<action_type>(r.first, to_resurrect.get_id())
                         .then(util::bind(
                             &detail::migrate_from_storage_here<Component>,
                             util::placeholders::_1, to_resurrect,
