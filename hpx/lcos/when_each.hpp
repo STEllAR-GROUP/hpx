@@ -105,6 +105,7 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -171,7 +172,8 @@ namespace hpx { namespace lcos
 
                         boost::intrusive_ptr<
                             lcos::detail::future_data<future_result_type>
-                        > next_future_data = lcos::detail::get_shared_state(*next);
+                        > next_future_data =
+                            traits::get_shared_state(*next);
 
                         boost::intrusive_ptr<when_each_frame> this_(this);
                         next_future_data->execute_deferred();
@@ -233,7 +235,8 @@ namespace hpx { namespace lcos
 
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
-                    > next_future_data = lcos::detail::get_shared_state(fut);
+                    > next_future_data =
+                        traits::get_shared_state(fut);
 
                     boost::intrusive_ptr<when_each_frame> this_(this);
                     next_future_data->execute_deferred();

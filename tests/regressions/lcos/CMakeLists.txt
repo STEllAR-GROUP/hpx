@@ -24,6 +24,7 @@ set(tests
     safely_destroy_promise_1481
     set_hpx_limit_798
     shared_stated_leaked_1211
+    when_all_vectors_1623
    )
 
 

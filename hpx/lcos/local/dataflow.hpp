@@ -286,7 +286,7 @@ namespace hpx { namespace lcos { namespace local
                         boost::intrusive_ptr<
                             lcos::detail::future_data<future_result_type>
                         > next_future_data
-                            = lcos::detail::get_shared_state(*next);
+                            = traits::get_shared_state(*next);
 
                         boost::intrusive_ptr<dataflow_frame> this_(this);
                         next_future_data->execute_deferred();
@@ -360,7 +360,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = lcos::detail::get_shared_state(f_);
+                        = traits::get_shared_state(f_);
 
                     boost::intrusive_ptr<dataflow_frame> this_(this);
                     next_future_data->execute_deferred();

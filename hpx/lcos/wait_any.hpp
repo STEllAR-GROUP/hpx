@@ -181,9 +181,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    typename util::always_void<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    >::type
+    typename lcos::detail::future_iterator_traits<Iterator>::type
     wait_any(Iterator begin, Iterator end, error_code& ec = throws)
     {
         return lcos::wait_some(1, begin, end, ec);

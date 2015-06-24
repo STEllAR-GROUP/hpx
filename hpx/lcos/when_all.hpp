@@ -140,6 +140,7 @@ namespace hpx
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/traits/acquire_future.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/fusion/include/begin.hpp>
@@ -234,7 +235,8 @@ namespace hpx { namespace lcos
 
                         boost::intrusive_ptr<
                             lcos::detail::future_data<future_result_type>
-                        > next_future_data = lcos::detail::get_shared_state(*next);
+                        > next_future_data =
+                            traits::get_shared_state(*next);
 
                         boost::intrusive_ptr<when_all_frame> this_(this);
                         next_future_data->execute_deferred();
@@ -287,7 +289,8 @@ namespace hpx { namespace lcos
 
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
-                    > next_future_data = lcos::detail::get_shared_state(f_);
+                    > next_future_data =
+                        traits::get_shared_state(f_);
 
                     boost::intrusive_ptr<when_all_frame> this_(this);
                     next_future_data->execute_deferred();
