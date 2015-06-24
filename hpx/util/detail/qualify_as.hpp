@@ -25,7 +25,7 @@ namespace hpx { namespace util { namespace detail
     {
         typedef T type;
     };
-    
+
     template <typename T, typename U>
     struct qualify_as_impl<T, U const>
       : boost::add_const<typename qualify_as_impl<T, U>::type >
@@ -52,7 +52,7 @@ namespace hpx { namespace util { namespace detail
     {
         typedef typename qualify_as_impl<T, U>::type&& type;
     };
-    
+
     ///////////////////////////////////////////////////////////////////////////
     /// creates a type `T` with the (cv-ref)qualifiers of `U`
     template <typename T, typename U, typename Enable = void>

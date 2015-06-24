@@ -35,7 +35,7 @@ foreach(subdir ${subdirs})
                               ${subdir}_client_exe)
 endforeach()
 
-add_hpx_executable(spin 
+add_hpx_executable(spin
   SOURCES spin.cpp
   FOLDER "Examples/Throttle")
 
