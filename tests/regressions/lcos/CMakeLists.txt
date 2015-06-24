@@ -38,6 +38,7 @@ if(HPX_WITH_CXX11_LAMBDAS)
   set(tests ${tests}
       dataflow_const_functor_773
       dataflow_future_swap2
+      dataflow_recursion_1613
       dataflow_using_774
      )
 endif()

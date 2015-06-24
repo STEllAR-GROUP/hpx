@@ -435,6 +435,13 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// This limits how deep the internal recursion of future continuations will go
+// before a new operation is re-spawned.
+#if !defined(HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+#define HPX_CONTINUATION_MAX_RECURSION_DEPTH 20
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // Older Boost versions do not have BOOST_NOEXCEPT defined
 #if !defined(BOOST_NOEXCEPT)
 #  define BOOST_NOEXCEPT
