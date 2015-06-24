@@ -221,12 +221,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 #endif
 
-    std::size_t& get_continuation_recursion_count()
-    {
-        HPX_ASSERT(m_pimpl);
-        return m_pimpl->get_continuation_recursion_count();
-    }
-
 #if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
     yield_result_type yield_impl(

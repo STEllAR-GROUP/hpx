@@ -309,40 +309,30 @@ namespace hpx { namespace lcos
             template <typename Future>
             void operator()(Future& future) const
             {
-                std::size_t counter =
-                    when_.count_.load(boost::memory_order_seq_cst);
+                std::size_t counter = when_.count_.load(boost::memory_order_seq_cst);
                 if (counter < when_.needed_count_) {
                     if (!future.is_ready()) {
-                        // handle future only if not enough futures are ready
-                        // yet also, do not touch any futures which are already
-                        // ready
+                        // handle future only if not enough futures are ready yet
+                        // also, do not touch any futures which are already ready
 
-                        typedef typename lcos::detail::shared_state_ptr_for<
-                                Future
-                            >::type shared_state_ptr;
+                        typedef
+                            typename lcos::detail::shared_state_ptr_for<Future>::type
+                            shared_state_ptr;
 
                         shared_state_ptr const& shared_state =
                             lcos::detail::get_shared_state(future);
 
                         shared_state->execute_deferred();
-
-                        // execute_deferred might have made the future ready
-                        if (!shared_state->is_ready())
-                        {
-                            shared_state->set_on_completed(
-                                util::bind(
-                                    &when_some<Sequence>::on_future_ready,
-                                    when_.shared_from_this(),
-                                    idx_, threads::get_self_id()));
-                            ++idx_;
-                            return;
-                        }
+                        shared_state->set_on_completed(util::bind(
+                            &when_some<Sequence>::on_future_ready, when_.shared_from_this(),
+                            idx_, threads::get_self_id()));
                     }
-
-                    when_.lazy_values_.indices.push_back(idx_);
-                    if (when_.count_.fetch_add(1) + 1 == when_.needed_count_)
-                    {
-                        when_.goal_reached_on_calling_thread_ = true;
+                    else {
+                        when_.lazy_values_.indices.push_back(idx_);
+                        if (when_.count_.fetch_add(1) + 1 == when_.needed_count_)
+                        {
+                            when_.goal_reached_on_calling_thread_ = true;
+                        }
                     }
                 }
                 ++idx_;

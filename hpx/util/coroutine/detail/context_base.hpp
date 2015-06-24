@@ -115,8 +115,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         m_thread_data(0),
 #endif
         m_type_info(),
-        m_thread_id(id),
-        continuation_recursion_count_(0)
+        m_thread_id(id)
     {}
 
     friend void intrusive_ptr_add_ref(type * ctx)
@@ -475,11 +474,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 #endif
 
-    std::size_t& get_continuation_recursion_count()
-    {
-        return continuation_recursion_count_;
-    }
-
     static boost::uint64_t get_allocation_count_all(bool reset)
     {
         boost::uint64_t count = 0;
@@ -620,8 +614,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // This is used to generate a meaningful exception trace.
     boost::exception_ptr m_type_info;
     thread_id_repr_type m_thread_id;
-
-    std::size_t continuation_recursion_count_;
   };
 
   // initialize static allocation counter
