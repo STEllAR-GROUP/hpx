@@ -52,11 +52,11 @@ namespace hpx { namespace util
             std::string const& uom);
 
         template <typename Stream>
-        void query_counters::print_name_csv(Stream& out,
+        void print_name_csv(Stream& out,
             std::string const& name);
 
         template <typename Stream>
-        void query_counters::print_value_csv(Stream& out,
+        void print_value_csv(Stream& out,
             performance_counters::counter_value const& value);
 
     private:

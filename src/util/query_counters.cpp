@@ -371,11 +371,15 @@ namespace hpx { namespace util
             for (std::size_t i = 0; i < names_.size(); ++i)
             {
                 print_name_csv(output, names_[i]);
+                output << ",";
             }
+            output << "\n";
             for (std i = 0; i < values.size(); ++i)
             {
                 print_value_csv(output,values[i].get());
+                output << ",";
             }
+            output << "\n";
         }
         else {
             for (std::size_t i = 0; i < values.size(); ++i)
