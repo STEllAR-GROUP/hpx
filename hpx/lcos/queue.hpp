@@ -90,7 +90,7 @@ namespace hpx { namespace lcos
         }
         void set_value(RemoteType && val) //-V659
         {
-            this->base_type::set_value(this->get_gid(), val);
+            this->base_type::set_value(this->get_gid(), std::forward(val));
         }
 
         void abort_pending()

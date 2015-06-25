@@ -71,7 +71,7 @@ namespace hpx { namespace lcos { namespace stubs
             typedef typename
                 lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action
             action_type;
-            hpx::apply<action_type>(gid, val);
+            hpx::apply<action_type>(gid, std::forward<RemoteType>(val));
         }
 
         static void abort_pending(naming::id_type const& gid,
