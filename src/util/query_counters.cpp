@@ -369,13 +369,13 @@ namespace hpx { namespace util
 
         // Output the performance counter value.
         if(format_is_csv) {
-            for (std::size_t i = 0; i < values.size(); ++i)
+            for (std::size_t i = 0; i < names_.size(); ++i)
             {
                 print_name_csv(output, names_[i]);
                 output << ",";
             }
             output << "\n";
-            for (std i = 0; i < values.size(); ++i)
+            for (std::size_t = 0; i < values.size(); ++i)
             {
                 print_value_csv(output,values[i].get());
                 output << ",";
