@@ -358,7 +358,7 @@ namespace hpx
                 if (vm.count("hpx:print-counter-interval"))
                     interval = vm["hpx:print-counter-interval"].as<std::size_t>();
 
-                std::vector<std::string> counters =
+                std::vector<std::string> counters
                     vm["hpx:print-counter"].as<std::vector<std::string> >();
 
                 std::string format("csv");
