@@ -368,7 +368,7 @@ namespace hpx { namespace util
 
         // Output the performance counter value.
         if(format_is_csv) {
-            for (std::size_t i = 0; i < names_.size(); ++i)
+            for (std::size_t i = 0; i < values.size(); ++i)
             {
                 print_name_csv(output, names_[i]);
                 output << ",";
