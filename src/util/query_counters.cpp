@@ -219,9 +219,7 @@ namespace hpx { namespace util
                     ec = make_error_code(f.get_exception_ptr());
                 }
             }
-
-                return;
-            }
+            return;
         }
     }
 
