@@ -24,8 +24,8 @@
 namespace hpx { namespace util
 {
     query_counters::query_counters(std::vector<std::string> const& names,
-            boost::int64_t interval, std::string const& dest)
-      : names_(names), destination_(dest),
+            boost::int64_t interval, std::string const& dest, std::string const& form)
+      : names_(names), destination_(dest), format_(form),
         timer_(boost::bind(&query_counters::evaluate, this_()),
             boost::bind(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)
@@ -142,6 +142,26 @@ namespace hpx { namespace util
         }
     }
 
+    template <typename Stream>
+    void query_counters::print_name_csv(Stream& out, std::string const& name)
+    {
+        out << performance_counters::remove_counter_prefix(name);
+    }
+
+    template <typename Stream>
+    void query_counters::print_value_csv(Stream& out,
+        performance_counters::counter_value const& value)
+    {
+        error_code ec(lightweight);
+        double val = value.get_value<double>(ec);
+        if(!ec) {
+            out << val;
+        }
+        else {
+            out << "invalid";
+        }
+    }
+
     bool query_counters::evaluate()
     {
         return evaluate_counters();
@@ -195,7 +215,7 @@ namespace hpx { namespace util
                     f.get();
                 }
                 else
-                {
+                {                                                                                                                                                                                                                                                                                                                                       =        {
                     ec = make_error_code(f.get_exception_ptr());
                 }
                 return;
@@ -305,10 +325,12 @@ namespace hpx { namespace util
 
         bool has_been_started = false;
         bool destination_is_cout = false;
+        bool format_is_csv = false;
         {
             mutex_type::scoped_lock l(mtx_);
             has_been_started = !ids_.empty();
             destination_is_cout = destination_ == "cout";
+            format_is_csv = format_ == "csv";
         }
 
         if (!has_been_started)
@@ -345,8 +367,20 @@ namespace hpx { namespace util
 //         wait_all(values);
 
         // Output the performance counter value.
-        for (std::size_t i = 0; i < values.size(); ++i)
-            print_value(output, names_[i], values[i].get(), uoms_[i]);
+        if(format_is_csv) {
+            for (std::size_t i = 0; i < names_.size(); ++i)
+            {
+                print_name_csv(output, names_[i]);
+            }
+            for (std i = 0; i < values.size(); ++i)
+            {
+                print_value_csv(output,values[i].get());
+            }
+        }
+        else {
+            for (std::size_t i = 0; i < values.size(); ++i)
+                print_value(output, names_[i], values[i].get(), uoms_[i]);
+        }
 
         if (destination_is_cout) {
             std::cout << output.str() << std::flush;
