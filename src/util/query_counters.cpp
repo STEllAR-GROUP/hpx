@@ -375,7 +375,7 @@ namespace hpx { namespace util
                 output << ",";
             }
             output << "\n";
-            for (std::size_t = 0; i < values.size(); ++i)
+            for (std::size_t i = 0; i < values.size(); ++i)
             {
                 print_value_csv(output,values[i].get());
                 output << ",";
