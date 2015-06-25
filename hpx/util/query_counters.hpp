@@ -70,6 +70,7 @@ namespace hpx { namespace util
         std::vector<std::string> uoms_;       // units of measure
 
         std::string destination_;
+        std::string format_;
 
         interval_timer timer_;
     };
