@@ -100,7 +100,11 @@ namespace hpx { namespace lcos { namespace server
         ValueType get_value(error_code& ec = throws)
         {
             boost::unique_lock<mutex_type> l(mtx_);
-            if (queue_.empty())
+
+            // cond_.wait() unlocks the lock before suspension and re-locks it
+            // afterwards. During this time span another thread may retrieve
+            // the next items from the queue for which the thread was resumed.
+            while (queue_.empty())
             {
                 cond_.wait(l, "queue::get_value", ec);
                 if (ec) return ValueType();
