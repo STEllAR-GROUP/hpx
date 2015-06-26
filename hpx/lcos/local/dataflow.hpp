@@ -228,9 +228,13 @@ namespace hpx { namespace lcos { namespace local
             template <typename Iter>
             void respawn_await(Iter && iter, boost::mpl::false_)
             {
+// VS2013 has issues figuring out the correct overload for the function
                 void (dataflow_frame::*f)(Iter &&)
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+                    = &dataflow_frame::template await_respawn<Iter>;
+#else
                     = &dataflow_frame::await_respawn;
-
+#endif
                 boost::intrusive_ptr<dataflow_frame> this_(this);
                 threads::register_thread_nullary(
                     util::deferred_call(f, std::move(this_), std::move(iter))
