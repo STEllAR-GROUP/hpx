@@ -26,13 +26,17 @@
 
 namespace hpx { namespace util
 {
-    batch_environment::batch_environment(std::vector<std::string> & nodelist, bool debug)
+    batch_environment::batch_environment(std::vector<std::string> & nodelist,
+            bool debug, bool enable)
       : agas_node_num_(0)
       , node_num_(-1)
       , num_threads_(-1)
       , num_localities_(-1)
       , debug_(debug)
     {
+        if (!enable)
+            return;
+
         batch_environments::alps_environment alps_env(nodelist, debug);
         if(alps_env.valid())
         {
