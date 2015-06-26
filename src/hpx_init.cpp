@@ -395,6 +395,11 @@ namespace hpx
                     "--hpx:print-counter-destination, valid in conjunction with "
                     "--hpx:print-counter only");
             }
+            else if (vm.count("hpx:print-counter-format")) {
+                throw detail::command_line_error("Invalid command line option "
+                    "--hpx:print-counter-format, valid in conjunction with "
+                    "--hpx:print-counter only");
+            }
         }
 
         void add_startup_functions(hpx::runtime& rt,
