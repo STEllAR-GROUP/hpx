@@ -83,6 +83,9 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct is_action;
 
+    template <typename Action, typename Component, typename Enable = void>
+    struct is_valid_action;
+
     template <typename Action, typename Enable = void>
     struct is_continuation;
 

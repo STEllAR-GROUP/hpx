@@ -22,6 +22,7 @@
 #include <hpx/runtime/actions/invocation_count_registry.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
+#include <hpx/traits/is_valid_action.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -515,14 +516,35 @@ namespace hpx { namespace actions
       : make_action<TF, F, Derived, boost::mpl::true_>
     {};
 
+    ///////////////////////////////////////////////////////////////////////////
     // Macros usable to refer to an action given the function to expose
-    #define HPX_MAKE_ACTION(func)                                             \
-        hpx::actions::make_action<decltype(&func), &func>        /**/         \
-    /**/
-    #define HPX_MAKE_DIRECT_ACTION(func)                                      \
-        hpx::actions::make_direct_action<decltype(&func), &func> /**/         \
+    #define HPX_MAKE_ACTION(...) HPX_MAKE_ACTION_(__VA_ARGS__)
+
+    #define HPX_MAKE_ACTION_(...)                                             \
+        HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                        \
+            HPX_MAKE_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                   \
+        )(__VA_ARGS__))                                                       \
     /**/
 
+    #define HPX_MAKE_ACTION_1(func) HPX_MAKE_ACTION_2(func, func)
+    #define HPX_MAKE_ACTION_2(func, name)                                     \
+        hpx::actions::make_action<decltype(&func), &func, name>               \
+    /**/
+
+    #define HPX_MAKE_DIRECT_ACTION(...) HPX_MAKE_DIRECT_ACTION_(__VA_ARGS__)
+
+    #define HPX_MAKE_DIRECT_ACTION_(...)                                      \
+        HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                        \
+            HPX_MAKE_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)            \
+        )(__VA_ARGS__))                                                       \
+    /**/
+
+    #define HPX_MAKE_DIRECT_ACTION_1(func) HPX_MAKE_DIRECT_ACTION_2(func, func)
+    #define HPX_MAKE_DIRECT_ACTION_2(func, name)                              \
+        hpx::actions::make_direct_action<decltype(&func), &func>              \
+    /**/
+
+    ///////////////////////////////////////////////////////////////////////////
     enum preassigned_action_id
     {
         register_worker_action_id = 0,
