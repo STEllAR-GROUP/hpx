@@ -19,11 +19,11 @@ int hpx_main()
         hpx::lcos::promise<void> promise;
         hpx::future<void> future = promise.get_future();
 
-        hpx::id_type id1 = promise.get_gid();
+        hpx::id_type id1 = promise.get_id();
 
         auto future_data = hpx::lcos::detail::get_shared_state(future);
         auto shared_state = boost::static_pointer_cast<shared_state_type>(future_data);
-        hpx::id_type id2 = shared_state->get_gid();
+        hpx::id_type id2 = shared_state->get_id();
 
         HPX_TEST_EQ(id1, id2);
 

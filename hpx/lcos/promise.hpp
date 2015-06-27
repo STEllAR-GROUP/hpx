@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -100,7 +100,8 @@ namespace hpx { namespace components
             static util::one_size_heap_list_base& get_heap()
             {
                 // ensure thread-safe initialization
-                // FIXME: The heap may be initialized during startup in a non-HPX thread
+                // FIXME: The heap may be initialized during startup in a
+                //        non-HPX thread
                 // Bootstrapping should happen in HPX threads ...
                 boost::call_once(constructed_,
                     &promise_heap_factory::create_heap);
@@ -149,18 +150,35 @@ namespace hpx { namespace lcos { namespace detail
     class promise_base
       : public lcos::base_lco_with_value<Result, RemoteResult>
     {
+        template <typename Result_, typename RemoteResult_>
+        friend class lcos::promise;
+
     public:
         virtual void add_ref() = 0;
         virtual void release() = 0;
         virtual long count() const = 0;
 
         // retrieve the gid of this promise
-        naming::id_type get_gid() const
+        naming::id_type get_id() const
         {
             boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
             return get_gid_locked(std::move(l));
         }
 
+        naming::id_type get_unmanaged_id() const
+        {
+            boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
+            return naming::id_type(gid_, id_type::unmanaged);
+        }
+
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_id();
+        }
+#endif
+
+    protected:
         naming::id_type get_gid_locked(
             boost::unique_lock<naming::gid_type> l) const
         {
@@ -182,13 +200,13 @@ namespace hpx { namespace lcos { namespace detail
             return naming::id_type(gid, naming::id_type::managed);
         }
 
+    protected:
         naming::gid_type get_base_gid() const
         {
             HPX_ASSERT(gid_ != naming::invalid_gid);
             return gid_;
         }
 
-    protected:
         naming::gid_type gid_;
     };
 
@@ -224,7 +242,8 @@ namespace hpx { namespace lcos { namespace detail
         // actual managed component object
         ~promise()
         {
-            // This lock is needed to not interfere with the intrusive pointer deletion
+            // This lock is needed to not interfere with the intrusive pointer
+            // deletion
             this->finalize();
         }
 
@@ -338,7 +357,8 @@ namespace hpx { namespace lcos { namespace detail
         // actual managed component object
         ~promise()
         {
-            // This lock is needed to not interfere with the intrusive pointer deletion
+            // This lock is needed to not interfere with the intrusive pointer
+            // deletion
             this->finalize();
         }
 
@@ -492,7 +512,7 @@ namespace hpx { namespace lcos
     ///
     ///     // initiate the action supplying the promise as a
     ///     // continuation
-    ///     apply<some_action>(new continuation(f.get_gid()), ...);
+    ///     apply<some_action>(new continuation(f.get_id()), ...);
     ///
     ///     // Wait for the result to be returned, yielding control
     ///     // in the meantime.
@@ -527,15 +547,17 @@ namespace hpx { namespace lcos
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
         ///               \a base_lco#set_value action. Any error has to be
-        ///               reported using a \a base_lco::set_exception action. The
-        ///               target for either of these actions has to be this
+        ///               reported using a \a base_lco::set_exception action.
+        ///               The target for either of these actions has to be this
         ///               future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         promise()
           : impl_(new wrapping_type(new wrapped_type())),
             future_obtained_(false)
         {
-            LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
+            LLCO_(info)
+                << "promise::promise("
+                << impl_->get_unmanaged_id() << ")";
         }
 
     protected:
@@ -554,17 +576,24 @@ namespace hpx { namespace lcos
         }
 
         /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid() const
+        naming::id_type get_id() const
         {
-            return (*impl_)->get_gid();
+            return (*impl_)->get_id();
         }
 
-        /// \brief Return the global id of this \a future instance
+        naming::id_type get_unmanaged_id() const
+        {
+            return (*impl_)->get_unmanaged_id();
+        }
+
+    private:
+        // Return the global id of this \a future instance
         naming::gid_type get_base_gid() const
         {
             return (*impl_)->get_base_gid();
         }
 
+    public:
         /// Return whether or not the data is available for this
         /// \a promise.
         bool is_ready() const
@@ -637,15 +666,17 @@ namespace hpx { namespace lcos
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
         ///               \a base_lco#set_value action. Any error has to be
-        ///               reported using a \a base_lco::set_exception action. The
-        ///               target for either of these actions has to be this
+        ///               reported using a \a base_lco::set_exception action.
+        ///               The target for either of these actions has to be this
         ///               future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         promise()
           : impl_(new wrapping_type(new wrapped_type())),
             future_obtained_(false)
         {
-            LLCO_(info) << "promise<void>::promise(" << impl_->get_gid() << ")";
+            LLCO_(info)
+                << "promise<void>::promise("
+                << impl_->get_unmanaged_id() << ")";
         }
 
     protected:
@@ -664,17 +695,24 @@ namespace hpx { namespace lcos
         }
 
         /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid() const
+        naming::id_type get_id() const
         {
-            return (*impl_)->get_gid();
+            return (*impl_)->get_id();
         }
 
+        naming::id_type get_unmanaged_id() const
+        {
+            return (*impl_)->get_unmanaged_id();
+        }
+
+    private:
         /// \brief Return the global id of this \a future instance
         naming::gid_type get_base_gid() const
         {
             return (*impl_)->get_base_gid();
         }
 
+    public:
         /// Return whether or not the data is available for this
         /// \a promise.
         bool is_ready() const

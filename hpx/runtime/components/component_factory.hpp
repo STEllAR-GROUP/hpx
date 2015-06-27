@@ -218,7 +218,8 @@ namespace hpx { namespace components
         {
             if (isenabled_)
             {
-                naming::gid_type id = server::create<Component>(assign_gid, ctor);
+                naming::gid_type id =
+                    server::create<Component>(assign_gid, ctor);
                 if (id)
                     ++refcnt_;
                 return id;

@@ -7,11 +7,12 @@
 #if !defined(HPX_COMPONENTS_MANAGED_COMPONENT_BASE_JUN_04_2008_0902PM)
 #define HPX_COMPONENTS_MANAGED_COMPONENT_BASE_JUN_04_2008_0902PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
+#include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/throw_exception.hpp>
@@ -233,10 +234,20 @@ namespace hpx { namespace components
             components::set_component_type<Component>(type);
         }
 
-        naming::id_type get_gid() const;
+        naming::id_type get_unmanaged_id() const;
+        naming::id_type get_id() const;
 
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_unmanaged_id();
+        }
+#endif
+
+    protected:
         naming::gid_type get_base_gid() const;
 
+    public:
         /// This is the default hook implementation for decorate_action which
         template <typename F>
         static threads::thread_function_type
@@ -585,7 +596,6 @@ namespace hpx { namespace components
 #endif
 
     public:
-
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object
         Component* operator-> ()
@@ -611,10 +621,39 @@ namespace hpx { namespace components
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid() const
+        naming::id_type get_unmanaged_id() const
         {
             return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
         }
+
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_unmanaged_id();
+        }
+#endif
+
+#if defined(HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
+    private:
+        // declare friends which are allowed to access get_base_gid()
+        friend Component;
+
+        template <typename Component_, typename Wrapper_,
+            typename CtorPolicy, typename DtorPolicy>
+        friend class managed_component_base;
+
+        template <typename Component_>
+        friend naming::gid_type server::create(std::size_t count);
+
+        template <typename Component_>
+        friend naming::gid_type server::create(
+            util::function_nonser<void(void*)> const& ctor);
+
+        template <typename Component_>
+        friend naming::gid_type server::create(naming::gid_type const& gid,
+            util::function_nonser<void(void*)> const& ctor);
+#endif
+
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
@@ -644,16 +683,37 @@ namespace hpx { namespace components
     template <typename Component, typename Wrapper,
         typename CtorPolicy, typename DtorPolicy>
     inline naming::id_type
-    managed_component_base<Component, Wrapper, CtorPolicy, DtorPolicy>::get_gid() const
+    managed_component_base<Component, Wrapper, CtorPolicy, DtorPolicy>::
+        get_unmanaged_id() const
     {
         HPX_ASSERT(back_ptr_);
-        return back_ptr_->get_gid();
+        return back_ptr_->get_unmanaged_id();
+    }
+
+    template <typename Component, typename Wrapper,
+        typename CtorPolicy, typename DtorPolicy>
+    inline naming::id_type
+    managed_component_base<Component, Wrapper, CtorPolicy, DtorPolicy>::
+        get_id() const
+    {
+        // all credits should have been taken already
+        naming::gid_type gid = get_base_gid();
+
+        // The underlying heap will always give us a full set of credits, but
+        // those are valid for the first invocation of get_base_gid() only.
+        // We have to get rid of those credits and properly replenish those.
+        naming::detail::strip_credits_from_gid(gid);
+
+        // any invocation causes the credits to be replenished
+        naming::detail::replenish_credits(gid);
+        return naming::id_type(gid, naming::id_type::managed);
     }
 
     template <typename Component, typename Wrapper,
         typename CtorPolicy, typename DtorPolicy>
     inline naming::gid_type
-    managed_component_base<Component, Wrapper, CtorPolicy, DtorPolicy>::get_base_gid() const
+    managed_component_base<Component, Wrapper, CtorPolicy, DtorPolicy>::
+        get_base_gid() const
     {
         HPX_ASSERT(back_ptr_);
         return back_ptr_->get_base_gid();

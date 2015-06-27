@@ -259,7 +259,7 @@ void locality_namespace::register_server_instance(
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name_sync(instance_name_, get_gid().get_gid(), ec);
+    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
 }
 
 void locality_namespace::unregister_server_instance(
