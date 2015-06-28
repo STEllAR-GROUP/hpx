@@ -10,12 +10,14 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/traits/is_action.hpp>
@@ -25,7 +27,6 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -55,26 +56,48 @@ namespace hpx
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
     template <typename T>
-    void set_lco_value(naming::id_type const& id, T && t)
+    void set_lco_value(naming::id_type const& id, T && t, bool move_credits)
     {
         typedef typename lcos::base_lco_with_value<
-            typename boost::remove_reference<T>::type
-        >::set_value_action action_type;
-        apply<action_type>(id, util::detail::make_temporary<T>(t));
+            typename util::decay<T>::type
+        >::set_value_action set_value_action;
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply<set_value_action>(target, util::detail::make_temporary<T>(t));
+        }
+        else
+        {
+            apply<set_value_action>(id, util::detail::make_temporary<T>(t));
+        }
     }
 
     template <typename T>
     void set_lco_value(naming::id_type const& id, T && t,
-        naming::id_type const& cont)
+        naming::id_type const& cont, bool move_credits)
     {
-        typename lcos::base_lco_with_value<
-            typename boost::remove_reference<T>::type
-        >::set_value_action set;
-        apply_c(set, cont, id, util::detail::make_temporary<T>(t));
+        typedef typename lcos::base_lco_with_value<
+            typename util::decay<T>::type
+        >::set_value_action set_value_action;
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply_c<set_value_action>(cont, target,
+                util::detail::make_temporary<T>(t));
+        }
+        else
+        {
+            apply_c<set_value_action>(cont, id,
+                util::detail::make_temporary<T>(t));
+        }
     }
 
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr const& e);
+        boost::exception_ptr const& e, bool move_credits);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -284,8 +307,8 @@ namespace hpx { namespace actions
     struct continuation2_impl
     {
     private:
-        typedef typename boost::remove_reference<Cont>::type cont_type;
-        typedef typename boost::remove_reference<F>::type function_type;
+        typedef typename util::decay<Cont>::type cont_type;
+        typedef typename util::decay<F>::type function_type;
 
     public:
         template <typename T>
