@@ -195,23 +195,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         return m_pimpl->get_continuation_recursion_count();
     }
 
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-
-    yield_result_type yield_impl(
-        typename coroutine_type::result_slot_type result_)
-    {
-      HPX_ASSERT(m_pimpl);
-
-      this->m_pimpl->bind_result(&result_);
-      {
-        reset_self_on_exit on_exit(this);
-        this->m_pimpl->yield();
-      }
-
-      typedef typename coroutine_type::arg_slot_traits traits_type;
-      return detail::fix_result<traits_type>(*m_pimpl->args());
-    }
-
   private:
     yield_decorator_type yield_decorator_;
 
