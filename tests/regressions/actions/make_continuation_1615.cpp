@@ -19,16 +19,16 @@ boost::int32_t times2(boost::int32_t i)
 }
 HPX_PLAIN_ACTION(times2);           // defines times2_action
 
-std::string my_to_string(boost::int32_t i)
+std::string to_string(boost::int32_t i)
 {
     return boost::lexical_cast<std::string>(i);
 }
-HPX_PLAIN_ACTION(my_to_string);    // defines to_string_action
+HPX_PLAIN_ACTION(to_string);    // defines to_string_action
 
 int hpx_main(int argc, char* argv[])
 {
     std::string result = hpx::async_continue(
-        times2_action(), hpx::make_continuation(my_to_string_action()),
+        times2_action(), hpx::make_continuation(to_string_action()),
         hpx::find_here(), 42).get();
 
     HPX_TEST_EQ(result, std::string("84"));
