@@ -101,7 +101,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             return queue_.size();
         }
 
-        // Return false if no more threads are waiting.
+        // Return false if no more threads are waiting (returns true if queue
+        // is non-empty).
         template <typename Mutex>
         bool notify_one(boost::unique_lock<Mutex> lock, error_code& ec = throws)
         {
@@ -110,6 +111,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             if (!queue_.empty())
             {
                 threads::thread_id_repr_type id = queue_.front().id_;
+
+                // remove item from queue before error handling
+                queue_.front().id_ = threads::invalid_thread_id_repr;
+                queue_.pop_front();
+
                 if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
                 {
                     HPX_THROWS_IF(ec, null_thread_id,
@@ -117,17 +123,15 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         "NULL thread id encountered");
                     return false;
                 }
-                queue_.front().id_ = threads::invalid_thread_id_repr;
-                queue_.pop_front();
 
-                bool empty = queue_.empty();
+                bool not_empty = !queue_.empty();
                 lock.unlock();
 
                 threads::set_thread_state(threads::thread_id_type(
                     reinterpret_cast<threads::thread_data_base*>(id)),
                     threads::pending, threads::wait_timeout,
                     threads::thread_priority_default, ec);
-                if (!ec) return empty;
+                if (!ec) return not_empty;
             }
             return false;
         }
@@ -145,6 +149,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             while (!queue.empty())
             {
                 threads::thread_id_repr_type id = queue.front().id_;
+
+                // remove item from queue before error handling
+                queue.front().id_ = threads::invalid_thread_id_repr;
+                queue.pop_front();
+
                 if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
                 {
                     HPX_THROWS_IF(ec, null_thread_id,
@@ -152,8 +161,6 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         "NULL thread id encountered");
                     return;
                 }
-                queue.front().id_ = threads::invalid_thread_id_repr;
-                queue.pop_front();
 
                 threads::set_thread_state(threads::thread_id_type(
                     reinterpret_cast<threads::thread_data_base*>(id)),
@@ -175,29 +182,42 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             while (!queue.empty())
             {
-                threads::thread_id_type id(
-                    reinterpret_cast<threads::thread_data_base*>(queue_.front().id_));
+                threads::thread_id_repr_type id = queue.front().id_;
                 queue.front().id_ = threads::invalid_thread_id_repr;
                 queue.pop_front();
 
+                if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
+                {
+                    LERR_(fatal)
+                        << "condition_variable::abort_all:"
+                        << " NULL thread id encountered";
+                    continue;
+                }
+
                 // we know that the id is actually the pointer to the thread
+                threads::thread_id_type tid(
+                    reinterpret_cast<threads::thread_data_base*>(id));
+
                 LERR_(fatal)
                         << "condition_variable::abort_all:"
                         << " pending thread: "
-                        << get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id << "): " << threads::get_thread_description(id);
+                        << get_thread_state_name(threads::get_thread_state(tid))
+                        << "(" << tid << "): "
+                        << threads::get_thread_description(tid);
 
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
-                threads::set_thread_state(id, threads::pending,
-                    threads::wait_abort, threads::thread_priority_default, ec);
+                threads::set_thread_state(tid,
+                    threads::pending, threads::wait_abort,
+                    threads::thread_priority_default, ec);
                 if (ec)
                 {
                     LERR_(fatal)
                         << "condition_variable::abort_all:"
                         << " could not abort thread: "
-                        << get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id << "): " << threads::get_thread_description(id);
+                        << get_thread_state_name(threads::get_thread_state(tid))
+                        << "(" << tid << "): "
+                        << threads::get_thread_description(tid);
                 }
             }
         }
