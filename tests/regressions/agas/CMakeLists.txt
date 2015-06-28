@@ -7,6 +7,7 @@
 set(tests
     duplicate_id_registration_1596
     pass_by_value_id_type_action
+    send_gid_keep_component_1624
    )
 
 foreach(test ${tests})

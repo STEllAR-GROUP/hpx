@@ -50,7 +50,7 @@ int main()
         for (hpx::id_type const& id: localities)
         {
             hpx::lcos::promise<void> p;
-            hpx::apply<test_action>(id, p.get_gid());
+            hpx::apply<test_action>(id, p.get_id());
             wait_for.push_back(p.get_future());
         }
 
@@ -67,7 +67,7 @@ int main()
         for (hpx::id_type const& id: localities)
         {
             hpx::lcos::promise<void> p;
-            hpx::apply<test_action>(id, p.get_gid());
+            hpx::apply<test_action>(id, p.get_id());
             wait_for.push_back(p.get_future());
         }
 

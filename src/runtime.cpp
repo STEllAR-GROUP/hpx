@@ -838,7 +838,7 @@ namespace hpx
             return;
         }
 
-        std::size_t num_thread = hpx::threads::threadmanager_base::get_worker_thread_num();
+        std::size_t num_thread = hpx::get_worker_thread_num();
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 

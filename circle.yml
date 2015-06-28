@@ -36,7 +36,8 @@ dependencies:
         # image, expanding it by about 500 MB.
         # docker-compile.pl is a dirty workaround, and shall be removed ASAP.
         - cp tools/docker/Dockerfile tools/docker/.dockerignore .
-        - ./tools/docker/docker-compile.pl ${TARGET_IMAGE_NAME}
+        - ./tools/docker/docker-compile.pl ${TARGET_IMAGE_NAME}:
+            timeout: 1200   # increase timeout to avoid failure
 
 test:
     override:

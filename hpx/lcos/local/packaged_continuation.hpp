@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
@@ -87,7 +89,9 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Func, typename Future, typename Continuation>
     typename boost::disable_if<
-        traits::detail::is_unique_future<typename util::result_of<Func(Future)>::type>
+        traits::detail::is_unique_future<
+            typename util::result_of<Func(Future)>::type
+        >
     >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
         typedef typename boost::is_void<
@@ -99,7 +103,9 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Func, typename Future, typename Continuation>
     typename boost::enable_if<
-        traits::detail::is_unique_future<typename util::result_of<Func(Future)>::type>
+        traits::detail::is_unique_future<
+            typename util::result_of<Func(Future)>::type
+        >
     >::type invoke_continuation(Func& func, Future& future, Continuation& cont)
     {
         try {
@@ -286,6 +292,34 @@ namespace hpx { namespace lcos { namespace detail
                 ec = make_success_code();
         }
 
+        template <typename Executor>
+        void async_exec(typename shared_state_ptr_for<Future>::type const& f,
+            Executor& exec, error_code& ec)
+        {
+            {
+                typename mutex_type::scoped_lock l(this->mtx_);
+                if (started_) {
+                    HPX_THROWS_IF(ec, task_already_started,
+                        "continuation::async_exec",
+                        "this task has already been started");
+                    return;
+                }
+                started_ = true;
+            }
+
+            boost::intrusive_ptr<continuation> this_(this);
+            threads::thread_state_enum (continuation::*async_impl_ptr)(
+                typename shared_state_ptr_for<Future>::type const&
+            ) = &continuation::async_impl;
+
+            parallel::executor_traits<Executor>::apply_execute(
+                exec, util::bind(async_impl_ptr, std::move(this_), f)
+            );
+
+            if (&ec != &throws)
+                ec = make_success_code();
+        }
+
         void async(typename shared_state_ptr_for<Future>::type const& f)
         {
             async(f, throws);
@@ -295,6 +329,13 @@ namespace hpx { namespace lcos { namespace detail
             threads::executor& sched)
         {
             async(f, sched, throws);
+        }
+
+        template <typename Executor>
+        void async_exec(typename shared_state_ptr_for<Future>::type const& f,
+            Executor& exec)
+        {
+            async_exec(f, exec, throws);
         }
 
         // cancellation support
@@ -368,13 +409,35 @@ namespace hpx { namespace lcos { namespace detail
             // bind an on_completed handler to this future which will invoke
             // the continuation
             boost::intrusive_ptr<continuation> this_(this);
-            void (continuation::*cb)(shared_state_ptr const&, threads::executor&) =
-                &continuation::async;
+            void (continuation::*cb)(
+                    shared_state_ptr const&, threads::executor&
+                ) = &continuation::async;
 
             shared_state_ptr const& state =
                 lcos::detail::get_shared_state(future);
             state->execute_deferred();
-            state->set_on_completed(util::bind(cb, std::move(this_), state, boost::ref(sched)));
+            state->set_on_completed(util::bind(cb, std::move(this_),
+                state, boost::ref(sched)));
+        }
+
+        template <typename Executor>
+        void attach_exec(Future const& future, Executor& exec)
+        {
+            typedef
+                typename shared_state_ptr_for<Future>::type
+                shared_state_ptr;
+
+            // bind an on_completed handler to this future which will invoke
+            // the continuation
+            boost::intrusive_ptr<continuation> this_(this);
+            void (continuation::*cb)(shared_state_ptr const&, Executor&) =
+                &continuation::async_exec<Executor>;
+
+            shared_state_ptr const& state =
+                lcos::detail::get_shared_state(future);
+            state->execute_deferred();
+            state->set_on_completed(util::bind(cb, std::move(this_),
+                state, boost::ref(exec)));
         }
 
     protected:
@@ -415,6 +478,23 @@ namespace hpx { namespace lcos { namespace detail
         typename shared_state_ptr<result_type>::type p(
             new shared_state(std::forward<F>(f)));
         static_cast<shared_state*>(p.get())->attach(future, sched);
+        return p;
+    }
+
+    template <typename ContResult, typename Future, typename Executor,
+        typename F>
+    inline typename shared_state_ptr<
+        typename continuation_result<ContResult>::type
+    >::type
+    make_continuation_exec(Future const& future, Executor& exec, F && f)
+    {
+        typedef detail::continuation<Future, F, ContResult> shared_state;
+        typedef typename continuation_result<ContResult>::type result_type;
+
+        // create a continuation
+        typename shared_state_ptr<result_type>::type p(
+            new shared_state(std::forward<F>(f)));
+        static_cast<shared_state*>(p.get())->attach_exec(future, exec);
         return p;
     }
 }}}

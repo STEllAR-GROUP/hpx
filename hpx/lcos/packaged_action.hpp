@@ -126,7 +126,7 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_cb<action_type>(this->get_gid(), gid,
+            hpx::apply_c_cb<action_type>(this->get_id(), gid,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
@@ -138,7 +138,7 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
+            hpx::apply_c_cb<action_type>(this->get_id(), std::move(addr), gid,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
@@ -152,7 +152,7 @@ namespace hpx { namespace lcos
 
             typedef typename util::decay<Callback>::type callback_type;
 
-            hpx::apply_c_cb<action_type>(this->get_gid(), gid,
+            hpx::apply_c_cb<action_type>(this->get_id(), gid,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
                     util::protect(std::forward<Callback>(cb)), this->impl_,
@@ -168,7 +168,7 @@ namespace hpx { namespace lcos
 
             typedef typename util::decay<Callback>::type callback_type;
 
-            hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
+            hpx::apply_c_cb<action_type>(this->get_id(), std::move(addr), gid,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
                     util::protect(std::forward<Callback>(cb)), this->impl_,
@@ -182,7 +182,7 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
+            hpx::apply_c_p_cb<action_type>(this->get_id(), gid, priority,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
@@ -195,7 +195,7 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            hpx::apply_c_p_cb<action_type>(this->get_id(), std::move(addr),
                 gid, priority,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
@@ -210,7 +210,7 @@ namespace hpx { namespace lcos
 
             typedef typename util::decay<Callback>::type callback_type;
 
-            hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
+            hpx::apply_c_p_cb<action_type>(this->get_id(), gid, priority,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
                     util::protect(std::forward<Callback>(cb)), this->impl_,
@@ -227,7 +227,7 @@ namespace hpx { namespace lcos
 
             typedef typename util::decay<Callback>::type callback_type;
 
-            hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            hpx::apply_c_p_cb<action_type>(this->get_id(), std::move(addr),
                 gid, priority,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
@@ -359,7 +359,7 @@ namespace hpx { namespace lcos
             else {
                 // remote execution
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    std::move(addr), this->get_gid(), gid,
+                    std::move(addr), this->get_id(), gid,
                     util::bind(&packaged_action::parcel_write_handler,
                         this->impl_, util::placeholders::_1, util::placeholders::_2),
                     std::forward<Ts>(vs)...);
@@ -383,7 +383,7 @@ namespace hpx { namespace lcos
             else {
                 // remote execution
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    std::move(addr), this->get_gid(), gid,
+                    std::move(addr), this->get_id(), gid,
                     util::bind(&packaged_action::parcel_write_handler,
                         this->impl_, util::placeholders::_1, util::placeholders::_2),
                     std::forward<Ts>(vs)...);
@@ -413,7 +413,7 @@ namespace hpx { namespace lcos
                 typedef typename util::decay<Callback>::type callback_type;
 
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    std::move(addr), this->get_gid(), gid,
+                    std::move(addr), this->get_id(), gid,
                     util::bind(
                         &packaged_action::parcel_write_handler_cb<callback_type>,
                         util::protect(std::forward<Callback>(cb)), this->impl_,
@@ -444,7 +444,7 @@ namespace hpx { namespace lcos
                 typedef typename util::decay<Callback>::type callback_type;
 
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    std::move(addr), this->get_gid(), gid,
+                    std::move(addr), this->get_id(), gid,
                     util::bind(
                         &packaged_action::parcel_write_handler_cb<callback_type>,
                         util::protect(std::forward<Callback>(cb)), this->impl_,

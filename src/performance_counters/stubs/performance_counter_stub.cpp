@@ -4,7 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/include/async.hpp>
+#include <hpx/async.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 

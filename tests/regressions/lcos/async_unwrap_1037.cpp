@@ -64,16 +64,19 @@ int main()
         hpx::future<int> fut = hpx::async(g);
         HPX_TEST_EQ(fut.get(), 1);
     }
-    HPX_TEST_EQ(hpx::async(g_action(), hpx::find_here()).get(), 1);
+    hpx::future<int> f1 = hpx::async(g_action(), hpx::find_here());
+    HPX_TEST_EQ(f1.get(), 1);
     {
         hpx::future<int> fut = hpx::async(h);
         HPX_TEST_EQ(fut.get(), 1);
     }
-    HPX_TEST_EQ(hpx::async(h_action(), hpx::find_here()).get(), 1);
+    hpx::future<int> f2 = hpx::async(h_action(), hpx::find_here());
+    HPX_TEST_EQ(f2.get(), 1);
     {
         hpx::future<int> fut = hpx::async(i);
         HPX_TEST_EQ(fut.get(), 1);
     }
-    HPX_TEST_EQ(hpx::async(i_action(), hpx::find_here()).get(), 1);
+    hpx::future<int> f3 = hpx::async(i_action(), hpx::find_here());
+    HPX_TEST_EQ(f3.get(), 1);
     return hpx::util::report_errors();
 }

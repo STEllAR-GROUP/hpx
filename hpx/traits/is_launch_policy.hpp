@@ -10,7 +10,7 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 
 #include <boost/type_traits/is_same.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
+#include <boost/type_traits/is_base_of.hpp>
 #include <boost/mpl/or.hpp>
 
 namespace hpx { namespace traits
@@ -22,7 +22,7 @@ namespace hpx { namespace traits
 
     template <typename Policy>
     struct is_threads_executor
-      : boost::is_base_and_derived<threads::executor, Policy>
+      : boost::is_base_of<threads::executor, Policy>
     {};
 
     template <typename Policy>
