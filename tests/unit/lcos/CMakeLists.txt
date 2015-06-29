@@ -9,6 +9,7 @@ set(tests
     apply_local
     apply_local_executor
     apply_remote
+    apply_remote_client
     async_cb_colocated
     async_cb_remote
     async_cb_remote_client

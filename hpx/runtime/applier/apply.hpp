@@ -19,6 +19,7 @@
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/is_action.hpp>
@@ -319,10 +320,21 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename ...Ts>
     inline bool
-    apply_p(naming::id_type const& gid, threads::thread_priority priority,
+    apply_p(naming::id_type const& id, threads::thread_priority priority,
         Ts&&... vs)
     {
         return hpx::detail::apply_impl<Action>(gid, priority,
+            std::forward<Ts>(vs)...);
+    }
+
+    template <typename Action, typename Client, typename Stub,
+        typename ...Ts>
+    inline bool
+    apply_p(components::client_base<Client, Stub> const& c,
+        threads::thread_priority priority, Ts&&... vs)
+    {
+        return hpx::detail::apply_impl<Action>(
+            actions::continuation_type(), c.get_id(), priority,
             std::forward<Ts>(vs)...);
     }
 
@@ -354,7 +366,19 @@ namespace hpx
             call(hpx::actions::basic_action<Component, Signature, Derived>,
                 naming::id_type const& id, Ts&&... ts)
             {
-                return apply_p<Derived>(id, actions::action_priority<Derived>(),
+                return apply_p<Derived>(id,
+                    actions::action_priority<Derived>(),
+                    std::forward<Ts>(ts)...);
+            }
+
+            template <typename Component, typename Signature, typename Derived,
+                typename Client, typename Stub, typename ...Ts>
+            BOOST_FORCEINLINE static bool
+            call(hpx::actions::basic_action<Component, Signature, Derived>,
+                components::client_base<Client, Stub> const& c, Ts&&... ts)
+            {
+                return apply_p<Derived>(c.get_id(),
+                    actions::action_priority<Derived>(),
                     std::forward<Ts>(ts)...);
             }
 
@@ -375,10 +399,19 @@ namespace hpx
 
     template <typename Action, typename ...Ts>
     inline bool
-    apply(naming::id_type const& gid, Ts&&... vs)
+    apply(naming::id_type const& id, Ts&&... vs)
     {
-        return apply_p<Action>(gid, actions::action_priority<Action>(),
+        return apply_p<Action>(id, actions::action_priority<Action>(),
             std::forward<Ts>(vs)...);
+    }
+
+    template <typename Action, typename Client, typename Stub,
+        typename ...Ts>
+    inline bool
+    apply(components::client_base<Client, Stub> const& c, Ts&&... vs)
+    {
+        return apply_p<Action>(c.get_id(),
+            actions::action_priority<Action>(), std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename DistPolicy, typename ...Ts>
@@ -553,8 +586,18 @@ namespace hpx
             std::forward<Continuation>(c), gid, priority, std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename Continuation, typename DistPolicy,
+    template <typename Action, typename Client, typename Stub,
         typename ...Ts>
+    inline bool
+    apply_p(actions::continuation_type const& cont,
+        components::client_base<Client, Stub> const& c,
+        threads::thread_priority priority, Ts&&... vs)
+    {
+        return hpx::detail::apply_impl<Action>(
+            cont, c.get_id(), priority, std::forward<Ts>(vs)...);
+    }
+
+    template <typename Action, typename DistPolicy, typename ...Ts>
     inline typename boost::enable_if_c<
         traits::is_continuation<Continuation>::value &&
         traits::is_distribution_policy<DistPolicy>::value, bool
@@ -587,6 +630,18 @@ namespace hpx
             }
 
             template <typename Component, typename Signature, typename Derived,
+                typename Client, typename Stub, typename ...Ts>
+            HPX_FORCEINLINE static bool
+            call(actions::continuation_type const& cont,
+                hpx::actions::basic_action<Component, Signature, Derived>,
+                components::client_base<Client, Stub> const& c, Ts&&... ts)
+            {
+                return apply_p<Derived>(cont, c.get_id(),
+                    actions::action_priority<Derived>(),
+                    std::forward<Ts>(ts)...);
+            }
+
+            template <typename Component, typename Signature, typename Derived,
                 typename DistPolicy, typename ...Ts>
             HPX_FORCEINLINE static typename boost::enable_if_c<
                 traits::is_distribution_policy<DistPolicy>::value, bool
@@ -614,8 +669,17 @@ namespace hpx
             std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename Continuation, typename DistPolicy,
+    template <typename Action, typename Client, typename Stub,
         typename ...Ts>
+    inline bool
+    apply(actions::continuation_type const& cont,
+        components::client_base<Client, Stub> const& c, Ts&&... vs)
+    {
+        return apply_p<Action>(cont, c.get_id(),
+            actions::action_priority<Action>(), std::forward<Ts>(vs)...);
+    }
+
+    template <typename Action, typename DistPolicy, typename ...Ts>
     inline typename boost::enable_if_c<
         traits::is_distribution_policy<DistPolicy>::value
      && traits::is_continuation<Continuation>::value
