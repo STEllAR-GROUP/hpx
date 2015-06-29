@@ -240,12 +240,6 @@ namespace hpx { namespace threads
     }
 #endif
 
-    ////////////////////////////////////////////////////////////////////////////
-    std::size_t& get_continuation_recursion_count()
-    {
-        return get_self().get_continuation_recursion_count();
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     void run_thread_exit_callbacks(thread_id_type const& id, error_code& ec)
     {
