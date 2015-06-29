@@ -60,10 +60,10 @@ namespace hpx { namespace lcos
     template <typename Action, typename Result>
     class packaged_action<Action, Result, boost::mpl::false_>
       : public promise<Result,
-            typename hpx::actions::extract_action<Action>::remote_result_type>
+            typename traits::extract_action<Action>::remote_result_type>
     {
     protected:
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename traits::extract_action<Action>::type action_type;
         typedef promise<Result, typename action_type::remote_result_type> base_type;
 
         static void parcel_write_handler(

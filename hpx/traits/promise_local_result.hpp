@@ -6,6 +6,7 @@
 #if !defined(HPX_TRAITS_PROMISE_LOCAL_RESULT_OCT_27_2011_0416PM)
 #define HPX_TRAITS_PROMISE_LOCAL_RESULT_OCT_27_2011_0416PM
 
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/util/unused.hpp>
 

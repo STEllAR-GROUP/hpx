@@ -526,7 +526,9 @@ namespace hpx { namespace actions
         )(__VA_ARGS__))                                                       \
     /**/
 
-    #define HPX_MAKE_ACTION_1(func) HPX_MAKE_ACTION_2(func, func)
+    #define HPX_MAKE_ACTION_1(func)                                           \
+        hpx::actions::make_action<decltype(&func), &func>                     \
+    /**/
     #define HPX_MAKE_ACTION_2(func, name)                                     \
         hpx::actions::make_action<decltype(&func), &func, name>               \
     /**/

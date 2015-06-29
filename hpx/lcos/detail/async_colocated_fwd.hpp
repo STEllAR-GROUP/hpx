@@ -20,20 +20,20 @@ namespace hpx { namespace detail
     template <typename Action, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename traits::extract_action<Action>::remote_result_type
         >::type>
-    async_colocated(naming::id_type const& gid, Ts&&... vs);
+    async_colocated(naming::id_type const& id, Ts&&... vs);
 
     template <
         typename Component, typename Signature, typename Derived,
         typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Derived>::remote_result_type
+            typename traits::extract_action<Derived>::remote_result_type
         >::type>
     async_colocated(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-      , naming::id_type const& gid, Ts&&... vs);
+      , naming::id_type const& id, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     // MSVC complains about ambiguities if it sees this forward declaration
@@ -48,7 +48,7 @@ namespace hpx { namespace detail
         >
     >::type
     async_colocated(Continuation && cont,
-        naming::id_type const& gid, Ts&&... vs);
+        naming::id_type const& id, Ts&&... vs);
 
     template <
         typename Continuation,
@@ -65,7 +65,7 @@ namespace hpx { namespace detail
     async_colocated(
         Continuation && cont
       , hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-      , naming::id_type const& gid, Ts&&... vs);
+      , naming::id_type const& id, Ts&&... vs);
 #endif
 }}
 

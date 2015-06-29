@@ -12,9 +12,15 @@
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/decay.hpp>
 
+#include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/mpl/or.hpp>
+
+namespace hpx { namespace threads
+{
+    class executor;
+}}
 
 namespace hpx { namespace traits
 {

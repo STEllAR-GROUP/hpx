@@ -6,6 +6,7 @@
 #if !defined(HPX_LCOS_ASYNC_COLOCATED_CALLBACK_FWD_MAR_30_2015_1145PM)
 #define HPX_LCOS_ASYNC_COLOCATED_CALLBACK_FWD_MAR_30_2015_1145PM
 
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
 
 namespace hpx { namespace detail
@@ -14,7 +15,7 @@ namespace hpx { namespace detail
     template <typename Action, typename Callback, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename traits::extract_action<Action>::remote_result_type
         >::type>
     async_colocated_cb(naming::id_type const& gid, Callback&& cb, Ts&&... vs);
 
@@ -23,7 +24,7 @@ namespace hpx { namespace detail
         typename Callback, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Derived>::remote_result_type
+            typename traits::extract_action<Derived>::remote_result_type
         >::type>
     async_colocated_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
@@ -33,7 +34,7 @@ namespace hpx { namespace detail
     template <typename Action, typename Continuation, typename Callback, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename traits::extract_action<Action>::remote_result_type
         >::type>
     async_colocated_cb(Continuation && cont,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs);
@@ -44,7 +45,7 @@ namespace hpx { namespace detail
         typename Callback, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Derived>::remote_result_type
+            typename traits::extract_action<Derived>::remote_result_type
         >::type>
     async_colocated_cb(
         Continuation && cont

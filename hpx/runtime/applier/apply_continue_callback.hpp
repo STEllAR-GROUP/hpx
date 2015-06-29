@@ -8,7 +8,7 @@
 #define HPX_RUNTIME_APPLIER_APPLY_CONTINUE_CALLBACK_MAR_09_2014_1207PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
@@ -21,7 +21,7 @@ namespace hpx
     bool apply_continue_cb(Cont&& cont, naming::id_type const& gid,
         Callback && cb, Ts&&... vs)
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename traits::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
 
         return apply_cb<Action>(
@@ -44,7 +44,7 @@ namespace hpx
     bool apply_continue_cb(naming::id_type const& cont,
         naming::id_type const& gid, Callback && cb, Ts&&... vs)
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename traits::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
 
         return apply_cb<Action>(

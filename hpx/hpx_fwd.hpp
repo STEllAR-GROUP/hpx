@@ -719,6 +719,7 @@ namespace hpx
 }
 
 // Including declarations of various API function declarations
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/get_locality_name.hpp>

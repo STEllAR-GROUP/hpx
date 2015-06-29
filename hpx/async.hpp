@@ -130,6 +130,31 @@ namespace hpx { namespace detail
         }
     };
 
+    // BOOST_SCOPED_ENUM(launch) requires one more level of dispatch
+    template <typename Policy>
+    struct async_dispatch<Policy,
+        typename boost::enable_if_c<
+            traits::is_launch_policy<Policy>::value
+        >::type>
+    {
+        template <typename F, typename ...Ts>
+        BOOST_FORCEINLINE static
+        auto call(BOOST_SCOPED_ENUM(launch) const& launch_policy, F && f,
+                Ts&&... ts)
+         -> decltype(
+                async_policy_dispatch<
+                    typename util::decay<F>::type
+                >::call(launch_policy, std::forward<F>(f),
+                    std::forward<Ts>(ts)...)
+            )
+        {
+            return async_policy_dispatch<
+                    typename util::decay<F>::type
+                >::call(launch_policy, std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
+        }
+    };
+
     // Launch the given function or function object asynchronously and return a
     // future allowing to synchronize with the returned result.
     template <typename Func, typename Enable>
@@ -222,8 +247,9 @@ namespace hpx
             std::forward<F>(f), std::forward<Ts>(ts)...
         ))
     {
-        return detail::async_dispatch<typename util::decay<F>::type>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+        return detail::async_dispatch<
+                typename util::decay<F>::type
+            >::call(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }
 

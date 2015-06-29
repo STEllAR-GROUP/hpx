@@ -174,10 +174,10 @@ namespace hpx { namespace components
           : gid_(gid.share())
         {}
 
-        explicit client_base(client_base const& rhs)
+        client_base(client_base const& rhs)
           : gid_(rhs.gid_)
         {}
-        explicit client_base(client_base && rhs)
+        client_base(client_base && rhs)
           : registered_name_(std::move(rhs.registered_name_)),
             gid_(std::move(rhs.gid_))
         {}

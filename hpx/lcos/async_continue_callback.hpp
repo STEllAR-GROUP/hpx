@@ -9,6 +9,7 @@
 #define HPX_LCOS_ASYNC_CONTINUE_CALLBACK_MAR_30_2015_1132AM
 
 #include <hpx/lcos/async_continue.hpp>
+#include <hpx/traits/extract_action.hpp>
 
 namespace hpx
 {
@@ -33,7 +34,7 @@ namespace hpx
             result_type;
 
             typedef
-                typename hpx::actions::extract_action<
+                typename traits::extract_action<
                     Action
                 >::result_type
             continuation_result_type;

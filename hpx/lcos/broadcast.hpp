@@ -135,6 +135,7 @@ namespace hpx { namespace lcos
 #define HPX_LCOS_BROADCAST_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>
@@ -172,7 +173,7 @@ namespace hpx { namespace lcos
         {
             typedef
                 typename traits::promise_local_result<
-                    typename hpx::actions::extract_action<
+                    typename traits::extract_action<
                         Action
                     >::remote_result_type
                 >::type

@@ -9,7 +9,7 @@
 #define HPX_LCOS_ASYNC_FWD_SEP_28_2011_0840AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -38,6 +38,11 @@ namespace hpx
         template <typename Func, typename Enable = void>
         struct async_dispatch;
 
+        // dispatch point used for async implementations where the first
+        // argument is a launch policy
+        template <typename Func, typename Enable = void>
+        struct async_policy_dispatch;
+
         // dispatch point used for async<Action> implementations
         template <typename Action, typename Func, typename Enable = void>
         struct async_action_dispatch;
@@ -50,9 +55,9 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename F, typename ...Ts>
     HPX_FORCEINLINE
-    auto async(F&& f, Ts&&... ts)
+    auto async(F && f, Ts &&... ts)
     ->  decltype(detail::async_action_dispatch<
-                    Action, typename util::decay<F>::type
+                Action, typename util::decay<F>::type
             >::call(std::forward<F>(f), std::forward<Ts>(ts)...
         ));
 

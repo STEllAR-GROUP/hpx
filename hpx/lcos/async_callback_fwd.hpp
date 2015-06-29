@@ -29,12 +29,10 @@ namespace hpx
     async_cb(launch policy, naming::id_type const& gid,
         Callback&& cb, Ts&&... vs);
 
-    template <typename Action, typename Callback, typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
-        >::type>
-    async_cb(naming::id_type const& gid, Callback&& cb, Ts&&... vs);
+        // dispatch point used for async_cb<Action> implementations
+        template <typename Action, typename Func, typename Enable = void>
+        struct async_cb_action_dispatch;
+    }
 
     template <
         typename Component, typename Signature, typename Derived,

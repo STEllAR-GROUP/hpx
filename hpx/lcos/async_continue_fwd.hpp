@@ -9,7 +9,7 @@
 #define HPX_LCOS_ASYNC_CONTINUE_FWD_JAN_25_2013_0828AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/result_of.hpp>
@@ -36,7 +36,7 @@ namespace hpx
             : actions::detail::remote_action_result<
                 typename util::result_of<typename util::decay<Cont>::type(
                     naming::id_type,
-                    typename hpx::actions::extract_action<
+                    typename traits::extract_action<
                         Action
                     >::remote_result_type
                 )>::type

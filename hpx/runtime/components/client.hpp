@@ -14,9 +14,9 @@
 namespace hpx { namespace components
 {
     template <typename Component>
-    class client : client<client<Component>, Component>
+    class client : public client_base<client<Component>, Component>
     {
-        typedef client<client<Component>, Component> base_type;
+        typedef client_base<client<Component>, Component> base_type;
         typedef typename base_type::future_type future_type;
 
     public:
@@ -40,10 +40,10 @@ namespace hpx { namespace components
           : base_type(gid.share())
         {}
 
-        explicit client(client const& rhs)
+        client(client const& rhs)
           : base_type(rhs.gid_)
         {}
-        explicit client(client && rhs)
+        client(client && rhs)
           : base_type(std::move(rhs.gid_))
         {}
 

@@ -163,12 +163,12 @@ namespace hpx { namespace detail
     template <typename Action, typename ...Ts>
     hpx::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename traits::extract_action<Action>::remote_result_type
         >::type>
     async_impl(launch policy, hpx::id_type const& id,
         Ts&&... vs)
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename traits::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
             typename action_type::remote_result_type
         >::type result_type;
@@ -248,12 +248,12 @@ namespace hpx { namespace detail
     template <typename Action, typename Callback, typename ...Ts>
     hpx::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename traits::extract_action<Action>::remote_result_type
         >::type>
     async_cb_impl(launch policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename traits::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
             typename action_type::remote_result_type
         >::type result_type;
@@ -332,6 +332,5 @@ namespace hpx { namespace detail
     }
     /// \endcond
 }}
-
 
 #endif

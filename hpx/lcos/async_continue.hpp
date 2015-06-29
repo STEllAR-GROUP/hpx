@@ -12,6 +12,7 @@
 #include <hpx/traits.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
@@ -40,7 +41,7 @@ namespace hpx
             result_type;
 
             typedef
-                typename hpx::actions::extract_action<
+                typename traits::extract_action<
                     Action
                 >::result_type
             continuation_result_type;

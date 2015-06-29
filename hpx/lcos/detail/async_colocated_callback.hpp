@@ -6,6 +6,7 @@
 #if !defined(HPX_LCOS_ASYNC_COLOCATED_CALLBACK_MAR_30_2015_1146AM)
 #define HPX_LCOS_ASYNC_COLOCATED_CALLBACK_MAR_30_2015_1146AM
 
+#include <hpx/traits/extract_action.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/detail/async_colocated_callback_fwd.hpp>
 
@@ -15,7 +16,7 @@ namespace hpx { namespace detail
     template <typename Action, typename Callback, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename traits::extract_action<Action>::remote_result_type
         >::type>
     async_colocated_cb(naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
@@ -27,7 +28,7 @@ namespace hpx { namespace detail
           , naming::id_type::unmanaged);
 
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename traits::extract_action<Action>::remote_result_type
         remote_result_type;
         typedef agas::server::primary_namespace::service_action action_type;
 
@@ -46,7 +47,7 @@ namespace hpx { namespace detail
         typename Callback, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Derived>::remote_result_type
+            typename traits::extract_action<Derived>::remote_result_type
         >::type>
     async_colocated_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
@@ -60,7 +61,7 @@ namespace hpx { namespace detail
     template <typename Action, typename Continuation, typename Callback, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename traits::extract_action<Action>::remote_result_type
         >::type>
     async_colocated_cb(Continuation && cont,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
@@ -73,7 +74,7 @@ namespace hpx { namespace detail
           , naming::id_type::unmanaged);
 
         typedef
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename traits::extract_action<Action>::remote_result_type
         remote_result_type;
         typedef agas::server::primary_namespace::service_action action_type;
 
@@ -93,7 +94,7 @@ namespace hpx { namespace detail
         typename Callback, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Derived>::remote_result_type
+            typename traits::extract_action<Derived>::remote_result_type
         >::type>
     async_colocated_cb(
         Continuation && cont
