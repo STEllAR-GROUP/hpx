@@ -27,6 +27,10 @@ namespace hpx { namespace util
     resolve_hostname(std::string const& hostname, boost::uint16_t port,
         boost::asio::io_service& io_service);
 
+    ///////////////////////////////////////////////////////////////////////////
+    // return the public IP address of the local node
+    HPX_API_EXPORT std::string resolve_public_ip_address();
+
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
     HPX_API_EXPORT bool split_ip_address(std::string const& v,
