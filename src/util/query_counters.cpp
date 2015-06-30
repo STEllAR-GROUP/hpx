@@ -326,12 +326,10 @@ namespace hpx { namespace util
 
         bool has_been_started = false;
         bool destination_is_cout = false;
-        bool format_is_csv = false;
         {
             mutex_type::scoped_lock l(mtx_);
             has_been_started = !ids_.empty();
             destination_is_cout = destination_ == "cout";
-            format_is_csv = format_ == "csv";
         }
 
         if (!has_been_started)
@@ -368,7 +366,7 @@ namespace hpx { namespace util
 //         wait_all(values);
 
         // Output the performance counter value.
-        if(format_is_csv) {
+        if(format_ == "csv") {
             for (std::size_t i = 0; i < names_.size(); ++i)
             {
                 print_name_csv(output, names_[i]);
