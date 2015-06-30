@@ -216,28 +216,41 @@ namespace hpx { namespace lcos
             template <typename Future>
             void operator()(Future& future) const
             {
-                std::size_t index = when_.index_.load(boost::memory_order_seq_cst);
-                if (index == when_any_result<Sequence>::index_error()) {
-                    if (!future.is_ready()) {
-                        // handle future only if not enough futures are ready yet
-                        // also, do not touch any futures which are already ready
+                std::size_t index =
+                    when_.index_.load(boost::memory_order_seq_cst);
+                if (index == when_any_result<Sequence>::index_error())
+                {
+                    typedef typename lcos::detail::shared_state_ptr_for<
+                            Future
+                        >::type shared_state_ptr;
 
-                        typedef
-                            typename lcos::detail::shared_state_ptr_for<Future>::type
-                            shared_state_ptr;
+                    shared_state_ptr const& shared_state =
+                        lcos::detail::get_shared_state(future);
 
-                        shared_state_ptr const& shared_state =
-                            lcos::detail::get_shared_state(future);
+                    if (!shared_state->is_ready())
+                    {
+                        // handle future only if not enough futures are ready
+                        // yet also, do not touch any futures which are already
+                        // ready
+
                         shared_state->execute_deferred();
-                        shared_state->set_on_completed(util::bind(
-                            &when_any<Sequence>::on_future_ready, when_.shared_from_this(),
-                            idx_, threads::get_self_id()));
-                    }
-                    else {
-                        if (when_.index_.compare_exchange_strong(index, idx_))
+
+                        // execute_deferred might have made the future ready
+                        if (!shared_state->is_ready())
                         {
-                            when_.goal_reached_on_calling_thread_ = true;
+                            shared_state->set_on_completed(
+                                util::bind(
+                                    &when_any<Sequence>::on_future_ready,
+                                    when_.shared_from_this(),
+                                    idx_, threads::get_self_id()));
+                            ++idx_;
+                            return;
                         }
+                    }
+
+                    if (when_.index_.compare_exchange_strong(index, idx_))
+                    {
+                        when_.goal_reached_on_calling_thread_ = true;
                     }
                 }
                 ++idx_;
