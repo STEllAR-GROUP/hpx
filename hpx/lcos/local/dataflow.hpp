@@ -297,7 +297,7 @@ namespace hpx { namespace lcos { namespace local
                         {
                             boost::intrusive_ptr<dataflow_frame> this_(this);
                             next_future_data->set_on_completed(
-                                boost::bind(
+                                hpx::util::bind(
                                     f
                                   , std::move(this_)
                                   , std::move(iter)
