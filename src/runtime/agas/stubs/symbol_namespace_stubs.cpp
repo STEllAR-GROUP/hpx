@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
 
 namespace hpx { namespace agas { namespace stubs

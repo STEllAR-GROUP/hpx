@@ -16,7 +16,7 @@
 
 #include <utility>
 
-#if defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
+#if !defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
 #define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
     private:                                                                  \
         TYPE(TYPE const &);                                                   \

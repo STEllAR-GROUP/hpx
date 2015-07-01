@@ -13,9 +13,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
@@ -126,7 +126,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static bool
-            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, F && f)
             {
                 return std::includes(first1, last1, first2, last2,
@@ -135,15 +135,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+            static typename util::detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, F && f)
             {
                 if (first1 == last1)
-                    return algorithm_result<ExPolicy, bool>::get(false);
+                {
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
+                        false);
+                }
 
                 if (first2 == last2)
-                    return algorithm_result<ExPolicy, bool>::get(true);
+                {
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
+                        true);
+                }
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(policy,
@@ -260,7 +266,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     includes(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2)
@@ -361,7 +367,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     includes(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, F && f)

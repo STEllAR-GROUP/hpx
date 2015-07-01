@@ -253,9 +253,7 @@ namespace hpx
         class HPX_EXPORT thread_data_base;
         class HPX_EXPORT thread_data;
 
-        template <
-            typename SchedulingPolicy,
-            typename NotificationPolicy = threads::policies::callback_notifier>
+        template <typename SchedulingPolicy>
         class HPX_EXPORT threadmanager_impl;
 
         ///////////////////////////////////////////////////////////////////////
@@ -504,9 +502,7 @@ namespace hpx
         std::size_t dflt);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename SchedulingPolicy,
-        typename NotificationPolicy = threads::policies::callback_notifier>
+    template <typename SchedulingPolicy>
     class HPX_API_EXPORT runtime_impl;
 
     /// The function \a get_runtime returns a reference to the (thread
@@ -534,8 +530,9 @@ namespace hpx
         destination_hpx = 0,
         destination_timing = 1,
         destination_agas = 2,
-        destination_app = 3,
-        destination_debuglog = 4
+        destination_parcel = 3,
+        destination_app = 4,
+        destination_debuglog = 5
     };
 
     /// \namespace components
@@ -772,6 +769,13 @@ namespace hpx
         return (static_cast<int>(lhs) & static_cast<int>(rhs)) != 0;
     }
 
+    inline BOOST_SCOPED_ENUM(launch)
+    operator|(BOOST_SCOPED_ENUM(launch) lhs, BOOST_SCOPED_ENUM(launch) rhs)
+    {
+        return static_cast<BOOST_SCOPED_ENUM(launch)>(
+            static_cast<int>(lhs) | static_cast<int>(rhs));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current HPX-thread is associated with.
@@ -796,7 +800,8 @@ namespace hpx
     HPX_API_EXPORT util::runtime_configuration const& get_config();
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(char const* name);
+    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(
+        char const* name, char const* pool_name_suffix = "");
 
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace
@@ -1377,7 +1382,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently being
     /// started or not, e.g. whether the current state of the runtime system is
-    /// \a hpx::runtime::state_startup
+    /// \a hpx::state_startup
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -1388,7 +1393,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently running
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::runtime::state_running
+    /// \a hpx::state_running
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -1399,7 +1404,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently stopped
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::runtime::state_stopped
+    /// \a hpx::state_stopped
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -1410,7 +1415,7 @@ namespace hpx
     ///
     /// This function returns whether the runtime system is currently being
     /// shut down or not, e.g.  whether the current state of the runtime system
-    /// is \a hpx::runtime::state_stopped or \a hpx::runtime::state_shutdown
+    /// is \a hpx::state_stopped or \a hpx::state_shutdown
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -1468,66 +1473,6 @@ namespace hpx
     /// \see    \a hpx::get_colocation_id_sync()
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id(
         naming::id_type const& id);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Trigger the LCO referenced by the given id
-    ///
-    /// \param id [in] This represents the id of the LCO which should be
-    ///                triggered.
-    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id);
-
-    /// \brief Trigger the LCO referenced by the given id
-    ///
-    /// \param id   [in] This represents the id of the LCO which should be
-    ///                  triggered.
-    /// \param cont [in] This represents the LCO to trigger after completion.
-    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id,
-        naming::id_type const& cont);
-
-    /// \brief Set the result value for the LCO referenced by the given id
-    ///
-    /// \param id [in] This represents the id of the LCO which should
-    ///                receive the given value.
-    /// \param t  [in] This is the value which should be sent to the LCO.
-    template <typename T>
-    void set_lco_value(naming::id_type const& id, T && t);
-
-    /// \brief Set the result value for the LCO referenced by the given id
-    ///
-    /// \param id   [in] This represents the id of the LCO which should
-    ///                  receive the given value.
-    /// \param t    [in] This is the value which should be sent to the LCO.
-    /// \param cont [in] This represents the LCO to trigger after completion.
-    template <typename T>
-    void set_lco_value(naming::id_type const& id, T && t,
-        naming::id_type const& cont);
-
-    /// \brief Set the error state for the LCO referenced by the given id
-    ///
-    /// \param id [in] This represents the id of the LCO which should
-    ///                receive the error value.
-    /// \param e  [in] This is the error value which should be sent to
-    ///                the LCO.
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr const& e);
-
-    /// \copydoc hpx::set_lco_error(naming::id_type const& id, boost::exception_ptr const& e)
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr && e);
-
-    /// \brief Set the error state for the LCO referenced by the given id
-    ///
-    /// \param id   [in] This represents the id of the LCO which should
-    ///                  receive the error value.
-    /// \param e    [in] This is the error value which should be sent to
-    ///                  the LCO.
-    /// \param cont [in] This represents the LCO to trigger after completion.
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr const& e, naming::id_type const& cont);
-
-    /// \copydoc hpx::set_lco_error(naming::id_type const& id, boost::exception_ptr const& e, naming::id_type const& cont)
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr && e, naming::id_type const& cont);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Start all active performance counters, optionally naming the
@@ -1688,6 +1633,7 @@ namespace hpx
 }
 
 // Including declarations of various API function declarations
+#include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 

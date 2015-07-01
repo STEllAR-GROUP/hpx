@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
-#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -83,14 +83,14 @@ namespace hpx { namespace components { namespace stubs
         naming::id_type const& id, std::size_t count,
         hpx::actions::manage_object_action<boost::uint8_t, void> const& act);
 
-    lcos::future<bool>
+    lcos::future<int>
     runtime_support::load_components_async(naming::id_type const& gid)
     {
         typedef server::runtime_support::load_components_action action_type;
         return hpx::async<action_type>(gid);
     }
 
-    bool runtime_support::load_components(naming::id_type const& gid)
+    int runtime_support::load_components(naming::id_type const& gid)
     {
         return load_components_async(gid).get();
     }
@@ -170,7 +170,7 @@ namespace hpx { namespace components { namespace stubs
 
         lcos::promise<void> value;
         // We need to make it unmanaged to avoid late refcnt requests
-        id_type gid(value.get_gid().get_gid(), id_type::unmanaged);
+        id_type gid(value.get_id().get_gid(), id_type::unmanaged);
         hpx::apply<action_type>(targetgid, timeout, gid);
         return value.get_future();
     }
@@ -211,7 +211,7 @@ namespace hpx { namespace components { namespace stubs
         typedef server::runtime_support::terminate_action action_type;
 
         lcos::promise<void> value;
-        hpx::apply<action_type>(targetgid, value.get_gid());
+        hpx::apply<action_type>(targetgid, value.get_id());
         return value.get_future();
     }
 

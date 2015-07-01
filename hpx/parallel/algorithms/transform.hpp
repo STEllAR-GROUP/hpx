@@ -13,9 +13,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
@@ -41,22 +41,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F>
             static OutIter
-            sequential(ExPolicy const&, InIter first, InIter last, OutIter dest,
+            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
                 F && f)
             {
                 return std::transform(first, last, dest, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutIter
+            >::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 OutIter dest, F && f)
             {
                 typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef
-                    typename detail::algorithm_result<ExPolicy, OutIter>::type
-                result_type;
+                typedef typename util::detail::algorithm_result<
+                        ExPolicy, OutIter
+                    >::type result_type;
 
                 return get_iter<1, result_type>(
                     for_each_n<zip_iterator>().call(
@@ -136,7 +138,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     transform(ExPolicy&& policy, InIter first, InIter last, OutIter dest, F && f)
     {
@@ -173,7 +175,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static OutIter
-            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, OutIter dest, F && f)
             {
                 return std::transform(first1, last1, first2, dest,
@@ -182,15 +184,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
-            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutIter
+            >::type
+            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, OutIter dest, F && f)
             {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2, OutIter> zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef
-                    typename detail::algorithm_result<ExPolicy, OutIter>::type
-                result_type;
+                typedef typename util::detail::algorithm_result<
+                        ExPolicy, OutIter
+                    >::type result_type;
 
                 return get_iter<2, result_type>(
                     for_each_n<zip_iterator>().call(
@@ -280,7 +284,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename OutIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     transform(ExPolicy && policy, InIter1 first1, InIter1 last1, InIter2 first2,
         OutIter dest, F && f)

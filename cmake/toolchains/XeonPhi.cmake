@@ -51,3 +51,7 @@ endif()
 set(TBBMALLOC_PLATFORM "mic" CACHE STRING "")
 
 set(HPX_HIDDEN_VISIBILITY OFF CACHE BOOL "Use -fvisibility=hidden for builds on platforms which support it")
+
+# RDTSC is available on Xeon/Phis
+set(HPX_WITH_RDTSC ON CACHE BOOL "")
+

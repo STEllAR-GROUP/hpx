@@ -129,10 +129,10 @@ namespace hpx { namespace lcos { namespace local
                     return;
                 }
 
+                has_result_ = true;
+
                 shared_state_->set_result(std::forward<T>(value), ec);
                 if (ec) return;
-
-                has_result_ = true;
             }
 
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS

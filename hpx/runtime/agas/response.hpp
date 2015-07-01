@@ -412,12 +412,10 @@ struct get_remote_result<parcelset::endpoints_type, agas::response>
 }}
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::agas::response,
-    agas_response_type)
+    hpx::agas::response, hpx_agas_response_type)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    std::vector<hpx::agas::response>,
-    agas_response_vector_type)
+    std::vector<hpx::agas::response>, hpx_agas_response_vector_type)
 
 namespace hpx { namespace agas { namespace create_result_ns {
     typedef

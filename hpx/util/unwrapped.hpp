@@ -237,9 +237,15 @@ namespace hpx { namespace util
         struct unwrapped_impl_result<
             F, T, TD,
             typename boost::enable_if<traits::is_future_range<TD> >::type
-        > : util::invoke_fused_result_of<
-                F(util::tuple<typename unwrap_impl<TD>::type>)
-            >
+        > : boost::mpl::if_<
+                typename unwrap_impl<TD>::is_void
+              , util::invoke_fused_result_of<
+                    F(util::tuple<>)
+                >
+              , util::invoke_fused_result_of<
+                    F(util::tuple<typename unwrap_impl<TD>::type>)
+                >
+            >::type
         {};
 
         template <typename F, typename T, typename TD>

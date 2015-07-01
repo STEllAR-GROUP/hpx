@@ -19,7 +19,7 @@ typedef boost::chrono::steady_clock BaseClock;
 extern "C" void stage_tasks(
     size_t start,
     size_t stop,
-    void* payload_duration_ 
+    void* payload_duration_
     )
 {
     htts2::payload<BaseClock>(reinterpret_cast<boost::uint64_t>
@@ -38,7 +38,7 @@ struct qthreads_driver : htts2::driver
             boost::lexical_cast<std::string>(this->osthreads_).c_str(), 1);
         setenv("QT_NUM_WORKERS_PER_SHEPHERD", "1", 1);
 
-        qthread_initialize(); 
+        qthread_initialize();
 
         // Cold run
         //kernel();
@@ -51,7 +51,7 @@ struct qthreads_driver : htts2::driver
   private:
     typedef double results_type;
 
-    results_type kernel() 
+    results_type kernel()
     {
         ///////////////////////////////////////////////////////////////////////
 
@@ -82,12 +82,12 @@ struct qthreads_driver : htts2::driver
 
         std::cout
             << ( boost::format("%lu,%lu,%lu,%.14g\n")
-               % this->osthreads_ 
-               % this->tasks_ 
-               % this->payload_duration_ 
-               % results 
+               % this->osthreads_
+               % this->tasks_
+               % this->payload_duration_
+               % results
                )
-            ; 
+            ;
     }
 };
 

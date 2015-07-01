@@ -15,9 +15,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -46,7 +46,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename F>
             static Iter
-            sequential(ExPolicy const&, Iter first, std::size_t count, F && f)
+            sequential(ExPolicy, Iter first, std::size_t count, F && f)
             {
                 return util::loop_n(first, count,
                     [f](Iter const& curr)
@@ -56,8 +56,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename F>
-            static typename detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy const& policy, Iter first, std::size_t count,
+            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
+            parallel(ExPolicy policy, Iter first, std::size_t count,
                 F && f)
             {
                 if (count != 0)
@@ -74,7 +74,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         });
                 }
 
-                return detail::algorithm_result<ExPolicy, Iter>::get(
+                return util::detail::algorithm_result<ExPolicy, Iter>::get(
                     std::move(first));
             }
         };
@@ -154,7 +154,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename Size, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, InIter>::type
+        typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     for_each_n(ExPolicy && policy, InIter first, Size count, F && f)
     {
@@ -168,7 +168,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // if count is representing a negative value, we do nothing
         if (detail::is_negative<Size>::call(count))
         {
-            return detail::algorithm_result<ExPolicy, InIter>::get(
+            return util::detail::algorithm_result<ExPolicy, InIter>::get(
                 std::move(first));
         }
 
@@ -195,18 +195,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename F>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 std::for_each(first, last, std::forward<F>(f));
                 return hpx::util::unused;
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static typename detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
+            static typename util::detail::algorithm_result<ExPolicy>::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
             {
                 typedef
-                    typename detail::algorithm_result<ExPolicy>::type
+                    typename util::detail::algorithm_result<ExPolicy>::type
                 result_type;
 
                 return hpx::util::void_guard<result_type>(),
@@ -219,7 +219,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         // non-segmented implementation
         template <typename ExPolicy, typename InIter, typename F>
-        inline typename detail::algorithm_result<ExPolicy>::type
+        inline typename util::detail::algorithm_result<ExPolicy>::type
         for_each_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::false_type)
         {
@@ -232,7 +232,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             >::type is_seq;
 
             if (first == last)
-                return detail::algorithm_result<ExPolicy>::get();
+                return util::detail::algorithm_result<ExPolicy>::get();
 
             return for_each().call(
                 std::forward<ExPolicy>(policy), is_seq(),
@@ -241,7 +241,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename SegIter, typename F>
-        inline typename detail::algorithm_result<ExPolicy>::type
+        inline typename util::detail::algorithm_result<ExPolicy>::type
         for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             std::true_type);
 
@@ -315,7 +315,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, void>::type
+        typename util::detail::algorithm_result<ExPolicy, void>::type
     >::type
     for_each(ExPolicy && policy, InIter first, InIter last, F && f)
     {

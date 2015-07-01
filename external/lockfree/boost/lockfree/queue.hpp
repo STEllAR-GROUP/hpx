@@ -220,7 +220,7 @@ public:
             node * next_ptr = next.get_ptr();
 
 //             tagged_node_ptr head2 = head_.load(memory_order_acquire);
-//             if (likely(head == head2)) 
+//             if (likely(head == head2))
             {
                 if (head.get_ptr() == tail.get_ptr()) {
                     if (next_ptr == 0)

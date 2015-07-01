@@ -187,6 +187,9 @@ namespace hpx { namespace lcos
                         future_type
                     >::type future_result_type;
 
+                void (wait_all_frame::*f)(TupleIter, Iter, Iter) =
+                    &wait_all_frame::await_range;
+
                 for (/**/; next != end; ++next)
                 {
                     boost::intrusive_ptr<
@@ -195,17 +198,20 @@ namespace hpx { namespace lcos
 
                     if (!next_future_data->is_ready())
                     {
-                        // Attach a continuation to this future which will
-                        // re-evaluate it and continue to the next element
-                        // in the sequence (if any).
-                        void (wait_all_frame::*f)(TupleIter, Iter, Iter) =
-                            &wait_all_frame::await_range;
-
                         next_future_data->execute_deferred();
-                        next_future_data->set_on_completed(util::bind(
-                            f, this, std::move(iter),
-                            std::move(next), std::move(end)));
-                        return;
+
+                        // execute_deferred might have made the future ready
+                        if (!next_future_data->is_ready())
+                        {
+                            // Attach a continuation to this future which will
+                            // re-evaluate it and continue to the next element
+                            // in the sequence (if any).
+                            next_future_data->set_on_completed(
+                                util::bind(
+                                    f, this, std::move(iter),
+                                    std::move(next), std::move(end)));
+                            return;
+                        }
                     }
                 }
 
@@ -250,15 +256,20 @@ namespace hpx { namespace lcos
 
                 if (!next_future_data->is_ready())
                 {
-                    // Attach a continuation to this future which will
-                    // re-evaluate it and continue to the next argument
-                    // (if any).
-                    void (wait_all_frame::*f)(TupleIter, true_, false_) =
-                        &wait_all_frame::await_next;
-
                     next_future_data->execute_deferred();
-                    next_future_data->set_on_completed(hpx::util::bind(
-                        f, this, std::move(iter), true_(), false_()));
+
+                    // execute_deferred might have made the future ready
+                    if (!next_future_data->is_ready())
+                    {
+                        // Attach a continuation to this future which will
+                        // re-evaluate it and continue to the next argument
+                        // (if any).
+                        void (wait_all_frame::*f)(TupleIter, true_, false_) =
+                            &wait_all_frame::await_next;
+
+                        next_future_data->set_on_completed(hpx::util::bind(
+                            f, this, std::move(iter), true_(), false_()));
+                    }
                 }
                 else
                 {

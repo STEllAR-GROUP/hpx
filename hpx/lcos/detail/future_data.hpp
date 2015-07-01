@@ -22,6 +22,7 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -224,7 +225,7 @@ namespace detail
         {
             completed_callback_type on_completed;
             {
-                typename mutex_type::scoped_lock l(this->mtx_);
+                boost::unique_lock<mutex_type> l(this->mtx_);
 
                 // check whether the data already has been set
                 if (is_ready_locked()) {
@@ -243,7 +244,7 @@ namespace detail
                 state_ = full;
 
                 // handle all threads waiting for the block to become full
-                cond_.notify_all(l, ec);
+                cond_.notify_all(std::move(l), ec);
             }
 
             // invoke the callback (continuation) function
@@ -258,7 +259,7 @@ namespace detail
         {
             // set the received result, reset error status
             try {
-               typedef typename util::decay<T>::type naked_type;
+                typedef typename util::decay<T>::type naked_type;
 
                 typedef traits::get_remote_result<
                     result_type, naked_type
@@ -296,7 +297,7 @@ namespace detail
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset(error_code& /*ec*/ = throws)
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::unique_lock<mutex_type> l(this->mtx_);
             state_ = empty;
 
             // release any stored data and callback functions
@@ -313,13 +314,14 @@ namespace detail
         {
             if (!data_sink) return;
 
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::unique_lock<mutex_type> l(this->mtx_);
 
             if (is_ready_locked()) {
-                // invoke the callback (continuation) function right away
-                l.unlock();
 
                 HPX_ASSERT(!on_completed_);
+
+                // invoke the callback (continuation) function right away
+                l.unlock();
 
                 data_sink();
             }
@@ -332,7 +334,7 @@ namespace detail
 
         virtual void wait(error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -350,7 +352,7 @@ namespace detail
         wait_until(boost::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -375,7 +377,7 @@ namespace detail
         /// \a future.
         bool is_ready() const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return is_ready_locked();
         }
 
@@ -386,13 +388,13 @@ namespace detail
 
         bool has_value() const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return state_ != empty && data_.stores_value();
         }
 
         bool has_exception() const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return state_ != empty && data_.stores_error();
         }
 
@@ -429,7 +431,7 @@ namespace detail
             error_code ec;
             threads::thread_id_type id = threads::register_thread_nullary(
                 util::bind(util::one_shot(&timed_future_data::set_data),
-                    this_, std::forward<Result_>(init)),
+                    std::move(this_), std::forward<Result_>(init)),
                 "timed_future_data<Result>::timed_future_data",
                 threads::suspended, true, threads::thread_priority_normal,
                 std::size_t(-1), threads::thread_stacksize_default, ec);
@@ -569,20 +571,20 @@ namespace detail
                 hpx::threads::get_self_id());
 
             if (sched_) {
-                sched_->add(util::bind(&task_base::run_impl, this_),
+                sched_->add(util::bind(&task_base::run_impl, std::move(this_)),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     stacksize, ec);
             }
             else if (policy == launch::fork) {
                 threads::register_thread_plain(
-                    util::bind(&task_base::run_impl, this_),
+                    util::bind(&task_base::run_impl, std::move(this_)),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     threads::thread_priority_boost, get_worker_thread_num(),
                     stacksize, ec);
             }
             else {
                 threads::register_thread_plain(
-                    util::bind(&task_base::run_impl, this_),
+                    util::bind(&task_base::run_impl, std::move(this_)),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     priority, std::size_t(-1), stacksize, ec);
             }

@@ -23,7 +23,7 @@ struct test_server : managed_component_base<test_server>
 {
     void check_gid() const
     {
-        hpx::id_type id = get_gid();
+        hpx::id_type id = get_unmanaged_id();
         HPX_TEST_NEQ(hpx::invalid_id, id);
     }
 

@@ -14,9 +14,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter, typename T_,
                 typename Reduce, typename Convert>
             static T
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 T_ && init, Reduce && r, Convert && conv)
             {
                 typedef typename std::iterator_traits<InIter>::value_type
@@ -63,14 +63,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T_,
                 typename Reduce, typename Convert>
-            static typename detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<ExPolicy, T>::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 T_ && init, Reduce && r, Convert && conv)
             {
                 if (first == last)
                 {
                     T init_ = init;
-                    return detail::algorithm_result<ExPolicy, T>::get(
+                    return util::detail::algorithm_result<ExPolicy, T>::get(
                         std::move(init_));
                 }
 
@@ -99,7 +99,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         template <typename ExPolicy, typename InIter, typename T,
             typename Reduce, typename Convert>
-        inline typename detail::algorithm_result<
+        inline typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
@@ -128,7 +128,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename T,
             typename Reduce, typename Convert>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
@@ -232,7 +232,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Convert>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, T>::type
+        typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     transform_reduce(ExPolicy&& policy, InIter first, InIter last,
         Convert && conv_op, T init, Reduce && red_op)

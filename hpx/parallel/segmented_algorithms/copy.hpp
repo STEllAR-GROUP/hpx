@@ -13,11 +13,11 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
@@ -38,7 +38,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename SegOutIter>
-        static typename detail::algorithm_result<ExPolicy, SegOutIter>::type
+        static typename util::detail::algorithm_result<
+            ExPolicy, SegOutIter
+        >::type
         segmented_copy(Algo && algo, ExPolicy const& policy, boost::mpl::true_,
             SegIter first, SegIter last, SegOutIter dest)
         {
@@ -117,14 +119,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 dest = output_traits::compose(sdest, out);
             }
 
-            return detail::algorithm_result<ExPolicy, SegOutIter>::get(
+            return util::detail::algorithm_result<ExPolicy, SegOutIter>::get(
                 std::move(dest));
         }
 
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename SegOutIter>
-        static typename detail::algorithm_result<ExPolicy, SegOutIter>::type
+        static typename util::detail::algorithm_result<
+            ExPolicy, SegOutIter
+        >::type
         segmented_copy(Algo && algo, ExPolicy const& policy, boost::mpl::false_,
             SegIter first, SegIter last, SegOutIter dest)
         {
@@ -207,7 +211,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
             HPX_ASSERT(!segments.empty());
 
-            return detail::algorithm_result<ExPolicy, SegOutIter>::get(
+            return util::detail::algorithm_result<ExPolicy, SegOutIter>::get(
                 lcos::local::dataflow(
                     [=](std::vector<shared_future<local_output_iterator_type> > && r)
                     {
@@ -219,13 +223,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
         template <typename ExPolicy, typename InIter, typename OutIter>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         copy_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
             std::true_type)
         {
             if (first == last)
             {
-                return detail::algorithm_result<ExPolicy, OutIter>::get(
+                return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::move(dest));
             }
 
@@ -243,7 +247,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename OutIter>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         copy_(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
             std::false_type);
 

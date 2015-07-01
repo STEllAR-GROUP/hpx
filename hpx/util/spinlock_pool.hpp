@@ -18,13 +18,14 @@
 # pragma once
 #endif
 
+#include <hpx/config/emulate_deleted.hpp>
+#include <hpx/util/itt_notify.hpp>
+#include <hpx/util/register_locks.hpp>
+
 #include <boost/config.hpp>
 #include <boost/version.hpp>
 #include <boost/smart_ptr/detail/spinlock.hpp>
 #include <cstddef>
-
-#include <hpx/util/itt_notify.hpp>
-#include <hpx/util/register_locks.hpp>
 
 namespace hpx { namespace util
 {
@@ -62,9 +63,9 @@ namespace hpx { namespace util
         private:
             boost::detail::spinlock & sp_;
 
-            HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_lock);
-        public:
+            HPX_NON_COPYABLE(scoped_lock);
 
+        public:
             explicit scoped_lock( void const * pv ): sp_( spinlock_for( pv ) )
             {
                 lock();

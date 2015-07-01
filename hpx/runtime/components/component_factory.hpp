@@ -218,7 +218,8 @@ namespace hpx { namespace components
         {
             if (isenabled_)
             {
-                naming::gid_type id = server::create<Component>(assign_gid, ctor);
+                naming::gid_type id =
+                    server::create<Component>(assign_gid, ctor);
                 if (id)
                     ++refcnt_;
                 return id;
@@ -335,6 +336,11 @@ namespace hpx { namespace components
 /**/
 
 // same as above, just a better name
+
+/// This macro is used create and to register a minimal component factory for
+/// a component type which allows it to be remotely created using the
+/// hpx::new_<> function.
+/// This macro can be invoked with one, two or three arguments
 #define HPX_REGISTER_COMPONENT_DYNAMIC(...)                                   \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_(__VA_ARGS__)              \
 /**/

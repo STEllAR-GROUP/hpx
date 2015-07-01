@@ -113,7 +113,7 @@ set(tests
 
 set(build_systems cmake)
 if(NOT CMAKE_TOOLCHAIN_FILE)
-  set(build_systems ${build_sytems} pkgconfig)
+  set(build_systems ${build_systems} pkgconfig)
 endif()
 
 foreach(system ${build_systems})

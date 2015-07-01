@@ -121,19 +121,18 @@ namespace hpx { namespace traits {
 ///           // represents the function 'app::some_global_function'.
 ///           HPX_DEFINE_PLAIN_ACTION(some_global_function, some_global_action);
 ///       }
-///
-///       // The following macro expands to a series of definitions of global objects
-///       // which are needed for proper serialization and initialization support
-///       // enabling the remote invocation of the function `app::some_global_function`.
-///       //
-///       // The second argument used has to be the same as used for the
-///       // HPX_DEFINE_PLAIN_ACTION above.
-///       HPX_REGISTER_PLAIN_ACTION(app::some_global_action, some_global_action);
 /// \endcode
 ///
 /// \note Usually this macro will not be used in user code unless the intend is
 /// to avoid defining the action_type in global namespace. Normally, the use of
 /// the macro \a HPX_PLAIN_ACTION is recommend.
+///
+/// \note The macro \a HPX_DEFINE_PLAIN_ACTION can be used with 1 or 2
+/// arguments. The second argument is optional. The default value for the
+/// second argument (the typename of the defined action) is derived from the
+/// name of the function (as passed as the first argument) by appending '_action'.
+/// The second argument can be omitted only if the first argument with an
+/// appended suffix '_action' resolves to a valid, unqualified C++ type name.
 ///
 #define HPX_DEFINE_PLAIN_ACTION(...)                                          \
     HPX_DEFINE_PLAIN_ACTION_(__VA_ARGS__)                                     \
@@ -158,7 +157,7 @@ namespace hpx { namespace traits {
     /**/
 
 #define HPX_DEFINE_PLAIN_ACTION_1(func)                                       \
-    HPX_DEFINE_PLAIN_ACTION_2(func, name)                                     \
+    HPX_DEFINE_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action))              \
     /**/
 
 #define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                 \
@@ -167,7 +166,7 @@ namespace hpx { namespace traits {
     /**/
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION_1(func)                                \
-    HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, name)                              \
+    HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, BOOST_PP_CAT(func, _action))       \
     /**/
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, name)                          \
@@ -178,6 +177,7 @@ namespace hpx { namespace traits {
 /// \endcond
 
 /// \def HPX_PLAIN_ACTION(func, name)
+///
 /// \brief Defines a plain action type based on the given function \a func and registers it with HPX.
 ///
 /// The macro \a HPX_PLAIN_ACTION can be used to define a plain action (e.g. an
@@ -209,7 +209,7 @@ namespace hpx { namespace traits {
 /// if the wrapped function is located in some other namespace. The newly
 /// defined action type is placed into the global namespace as well.
 ///
-/// \note The macro \a HPX_PLAIN_ACTION can be used with 1, 2, or 3 arguments.
+/// \note The macro \a HPX_PLAIN_ACTION_ID can be used with 1, 2, or 3 arguments.
 /// The second and third arguments are optional. The default value for the
 /// second argument (the typename of the defined action) is derived from the
 /// name of the function (as passed as the first argument) by appending '_action'.
@@ -217,8 +217,62 @@ namespace hpx { namespace traits {
 /// appended suffix '_action' resolves to a valid, unqualified C++ type name.
 /// The default value for the third argument is \a hpx::components::factory_check.
 ///
+/// \note Only one of the forms of this macro \a HPX_PLAIN_ACTION or
+///       \a HPX_PLAIN_ACTION_ID should be used for a particular action,
+///       never both.
+///
 #define HPX_PLAIN_ACTION(...)                                                 \
     HPX_PLAIN_ACTION_(__VA_ARGS__)                                            \
+/**/
+
+/// \def HPX_PLAIN_ACTION_ID(func, actionname, actionid)
+///
+/// \brief Defines a plain action type based on the given function \a func and registers it with HPX.
+///
+/// The macro \a HPX_PLAIN_ACTION_ID can be used to define a plain action (e.g. an
+/// action encapsulating a global or free function) based on the given function
+/// \a func. It defines the action type \a actionname representing the given function.
+/// The parameter \a actionid
+///
+/// The parameter \a actionid specifies an unique integer value which will be
+/// used to represent the action during serialization.
+///
+/// The parameter \p func is a global or free (non-member) function which
+/// should be encapsulated into a plain action. The parameter \p name is the
+/// name of the action type defined by this macro.
+///
+/// The second parameter has to be usable as a plain (non-qualified) C++
+/// identifier, it should not contain special characters which cannot be part
+/// of a C++ identifier, such as '<', '>', or ':'.
+///
+/// \par Example:
+///
+/// \code
+///     namespace app
+///     {
+///         void some_global_function(double d)
+///         {
+///             cout << d;
+///         }
+///     }
+///
+///     // This will define the action type 'some_global_action' which represents
+///     // the function 'app::some_global_function'.
+///     HPX_PLAIN_ACTION_ID(app::some_global_function, some_global_action, some_unique_id);
+/// \endcode
+///
+/// \note The macro \a HPX_PLAIN_ACTION_ID has to be used at global namespace even
+/// if the wrapped function is located in some other namespace. The newly
+/// defined action type is placed into the global namespace as well.
+///
+/// \note Only one of the forms of this macro \a HPX_PLAIN_ACTION or
+///       \a HPX_PLAIN_ACTION_ID should be used for a particular action,
+///       never both.
+///
+#define HPX_PLAIN_ACTION_ID(func, name, id)                                   \
+    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
+    HPX_REGISTER_ACTION_DECLARATION(name, name);                              \
+    HPX_REGISTER_ACTION_ID(name, name, id);                                   \
 /**/
 
 /// \cond NOINTERNAL
@@ -237,13 +291,13 @@ namespace hpx { namespace traits {
         HPX_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                      \
     )(__VA_ARGS__))                                                           \
 /**/
-#define HPX_PLAIN_ACTION_1(func)                                              \
-    HPX_DEFINE_PLAIN_ACTION(func, BOOST_PP_CAT(func, _action));               \
-/**/
 #define HPX_PLAIN_ACTION_2(func, name)                                        \
     HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
     HPX_REGISTER_ACTION_DECLARATION(name, name);                              \
     HPX_REGISTER_ACTION(name, name);                                          \
+/**/
+#define HPX_PLAIN_ACTION_1(func)                                              \
+    HPX_PLAIN_ACTION_2(func, BOOST_PP_CAT(func, _action));                    \
 /**/
 
 // same for direct actions
@@ -252,13 +306,18 @@ namespace hpx { namespace traits {
         HPX_PLAIN_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)               \
     )(__VA_ARGS__))                                                           \
 /**/
-#define HPX_PLAIN_DIRECT_ACTION_1(func)                                       \
-    HPX_DEFINE_PLAIN_DIRECT_ACTION(func, BOOST_PP_CAT(func, _action));        \
-/**/
 #define HPX_PLAIN_DIRECT_ACTION_2(func, name)                                 \
     HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                               \
     HPX_REGISTER_ACTION_DECLARATION(name, name);                              \
     HPX_REGISTER_ACTION(name, name);                                          \
+/**/
+#define HPX_PLAIN_DIRECT_ACTION_1(func)                                       \
+    HPX_PLAIN_DIRECT_ACTION_2(func, BOOST_PP_CAT(func, _action));             \
+/**/
+#define HPX_PLAIN_DIRECT_ACTION_ID(func, name, id)                            \
+    HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                               \
+    HPX_REGISTER_ACTION_DECLARATION(name, name);                              \
+    HPX_REGISTER_ACTION_ID(name, name, id);                                   \
 /**/
 
 /// \endcond

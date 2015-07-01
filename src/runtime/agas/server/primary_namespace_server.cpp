@@ -287,7 +287,7 @@ void primary_namespace::register_server_instance(
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name_sync(instance_name_, get_gid().get_gid(), ec);
+    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
 }
 
 void primary_namespace::unregister_server_instance(
@@ -1192,7 +1192,7 @@ void primary_namespace::free_components_sync(
     for (free_entry const& e : free_list)
     {
         // Bail if we're in late shutdown and non-local.
-        if (HPX_UNLIKELY(!threads::threadmanager_is(running)) &&
+        if (HPX_UNLIKELY(!threads::threadmanager_is(state_running)) &&
             e.locality_ != locality_)
         {
             LAGAS_(info) << (boost::format(

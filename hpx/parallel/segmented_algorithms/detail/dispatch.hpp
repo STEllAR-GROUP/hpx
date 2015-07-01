@@ -13,8 +13,8 @@
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <boost/utility/enable_if.hpp>
@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     struct dispatcher_helper<void, Algo, ExPolicy, Args...>
     {
         static BOOST_FORCEINLINE
-        typename parallel::detail::algorithm_result<ExPolicy>::type
+        typename parallel::util::detail::algorithm_result<ExPolicy>::type
         sequential(Algo const& algo, ExPolicy const& policy, Args const&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
@@ -122,7 +122,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         }
 
         static BOOST_FORCEINLINE
-        typename parallel::detail::algorithm_result<ExPolicy>::type
+        typename parallel::util::detail::algorithm_result<ExPolicy>::type
         parallel(Algo const& algo, ExPolicy const& policy, Args const&... args)
         {
             using hpx::traits::segmented_local_iterator_traits;
@@ -136,9 +136,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename Algo, typename ExPolicy, typename... Args>
     struct dispatcher
     {
-        typedef typename parallel::detail::algorithm_result<
-                ExPolicy,
-                typename hpx::util::decay<Algo>::type::result_type
+        typedef typename parallel::util::detail::algorithm_result<
+                ExPolicy, typename hpx::util::decay<Algo>::type::result_type
             >::type result_type;
 
         typedef dispatcher_helper<
@@ -194,7 +193,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         IsSeq, Args&&... args)
     {
         typedef typename hpx::util::decay<Algo>::type algo_type;
-        typedef typename parallel::detail::algorithm_result<
+        typedef typename parallel::util::detail::algorithm_result<
                 ExPolicy, typename algo_type::result_type
             >::type result_type;
 

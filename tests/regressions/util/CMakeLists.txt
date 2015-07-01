@@ -12,6 +12,7 @@ set(tests
     protect_with_nullary_pfo
     serialize_buffer_1069
     tuple_serialization_803
+    unwrapped_1528
     zero_copy_parcels_1001
    )
 

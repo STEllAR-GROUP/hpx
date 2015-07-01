@@ -37,5 +37,5 @@ namespace hpx { namespace plugins
     }}                                                                        \
 /**/
 
-#endif 
+#endif
 

@@ -7,9 +7,10 @@
 #if !defined(HPX_COMPONENTS_SIMPLE_COMPONENT_BASE_JUL_18_2008_0948PM)
 #define HPX_COMPONENTS_SIMPLE_COMPONENT_BASE_JUL_18_2008_0948PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -94,12 +95,24 @@ namespace hpx { namespace components
                 boost::uint64_t(static_cast<this_component_type const*>(this)));
         }
 
-        /// \brief Create a new GID (if called for the first time), assign this
-        ///        GID to this instance of a component and register this gid
-        ///        with the AGAS service
-        ///
-        /// \returns      The global id (GID) assigned to this instance of a
-        ///               component
+    protected:
+        // declare friends which are allowed to access get_base_gid()
+        template <typename Component_>
+        friend naming::gid_type server::create(std::size_t count);
+
+        template <typename Component_>
+        friend naming::gid_type server::create(
+            util::function_nonser<void(void*)> const& ctor);
+
+        template <typename Component_>
+        friend naming::gid_type server::create(naming::gid_type const& gid,
+            util::function_nonser<void(void*)> const& ctor);
+
+        // Create a new GID (if called for the first time), assign this
+        // GID to this instance of a component and register this gid
+        // with the AGAS service
+        //
+        // Returns he global id (GID) assigned to this instance of a component
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
@@ -166,7 +179,8 @@ namespace hpx { namespace components
             return gid;
         }
 
-        naming::id_type get_gid() const
+    public:
+        naming::id_type get_id() const
         {
             // all credits should have been taken already
             naming::gid_type gid = get_base_gid();
@@ -176,6 +190,18 @@ namespace hpx { namespace components
             naming::detail::replenish_credits(gid);
             return naming::id_type(gid, naming::id_type::managed);
         }
+
+        naming::id_type get_unmanaged_id() const
+        {
+            return naming::id_type(get_base_gid(), naming::id_type::managed);
+        }
+
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_id();
+        }
+#endif
 
         /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.

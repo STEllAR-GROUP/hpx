@@ -41,7 +41,7 @@ void scatter(std::vector<hpx::id_type> const & localities, hpx::serialization::s
                 hpx::id_type dst = locs[0];
 
                 scatter_futures.push_back(
-                    hpx::async<scatter_action>(dst, boost::move(locs), buffer, chunk_size)
+                    hpx::async<scatter_action>(dst, std::move(locs), buffer, chunk_size)
                 );
             }
 

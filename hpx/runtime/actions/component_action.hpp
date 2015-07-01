@@ -122,18 +122,18 @@ namespace hpx { namespace actions
 /// \code
 ///       namespace app
 ///       {
-///           // Define a simple component exposing one action 'print_greating'
+///           // Define a simple component exposing one action 'print_greeting'
 ///           class HPX_COMPONENT_EXPORT server
 ///             : public hpx::components::simple_component_base<server>
 ///           {
-///               void print_greating() const
+///               void print_greeting() const
 ///               {
 ///                   hpx::cout << "Hey, how are you?\n" << hpx::flush;
 ///               }
 ///
 ///               // Component actions need to be declared, this also defines the
-///               // type 'print_greating_action' representing the action.
-///               HPX_DEFINE_COMPONENT_ACTION(server, print_greating, print_greating_action);
+///               // type 'print_greeting_action' representing the action.
+///               HPX_DEFINE_COMPONENT_ACTION(server, print_greeting, print_greeting_action);
 ///           };
 ///       }
 /// \endcode

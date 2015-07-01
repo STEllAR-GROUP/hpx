@@ -8,18 +8,18 @@
 #if !defined(HPX_DF595582_FEBC_4EE0_A606_A1EEB171D770)
 #define HPX_DF595582_FEBC_4EE0_A606_A1EEB171D770
 
-#include <boost/noncopyable.hpp>
-#include <boost/thread/locks.hpp>
-#include <boost/smart_ptr/detail/spinlock.hpp>
-
+#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
+
+#include <boost/thread/locks.hpp>
+#include <boost/smart_ptr/detail/spinlock.hpp>
 
 namespace hpx { namespace util
 {
 
 /// boost::mutex-compatible spinlock class
-struct spinlock : boost::noncopyable
+struct spinlock
 {
   private:
     boost::detail::spinlock m;
@@ -32,6 +32,8 @@ struct spinlock : boost::noncopyable
         boost::detail::spinlock l = BOOST_DETAIL_SPINLOCK_INIT;
         m = l;
     }
+
+    HPX_NON_COPYABLE(spinlock);
 
     ~spinlock()
     {

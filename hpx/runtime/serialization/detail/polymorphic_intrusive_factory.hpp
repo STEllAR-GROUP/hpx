@@ -48,7 +48,11 @@ namespace hpx { namespace serialization { namespace detail
             auto it = map_.find(name);
             if(it == map_.end())
             {
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
                 map_.emplace(name, fun);
+#else
+                map_.insert(ctor_map_type::value_type(name, fun));
+#endif
             }
         }
 
@@ -63,15 +67,14 @@ namespace hpx { namespace serialization { namespace detail
         ctor_map_type map_;
     };
 
-    template <class T>
+    template <class T, typename = void>
     struct register_class_name
     {
         register_class_name()
         {
-            T* t = 0; //dirty
             polymorphic_intrusive_factory::instance().
               register_class(
-                t->T::hpx_serialization_get_name(), //non-virtual call
+                T::hpx_serialization_get_name_impl(),
                 &factory_function
               );
         }
@@ -89,20 +92,24 @@ namespace hpx { namespace serialization { namespace detail
         static register_class_name instance;
     };
 
-    template <class T>
-    register_class_name<T> register_class_name<T>::instance;
+    template <class T, class Enable>
+    register_class_name<T, Enable> register_class_name<T, Enable>::instance;
 
 }}}
 
 #define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name)        \
-  template <class> friend                                                     \
+  template <class, class> friend                                              \
   struct ::hpx::serialization::detail::register_class_name;                   \
                                                                               \
-  virtual std::string hpx_serialization_get_name() const                      \
+  static std::string hpx_serialization_get_name_impl()                        \
   {                                                                           \
       hpx::serialization::detail::register_class_name<                        \
           Class>::instance.instantiate();                                     \
       return Name;                                                            \
+  }                                                                           \
+  virtual std::string hpx_serialization_get_name() const                      \
+  {                                                                           \
+      return Class ::hpx_serialization_get_name_impl();                       \
   }                                                                           \
 /**/
 

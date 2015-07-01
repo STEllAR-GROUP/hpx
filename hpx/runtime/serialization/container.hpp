@@ -17,6 +17,7 @@ namespace hpx { namespace serialization
     {
         virtual ~erased_output_container() {}
 
+        virtual bool is_saving() const { return false; }
         virtual void set_filter(binary_filter* filter) = 0;
         virtual void save_binary(void const* address, std::size_t count) = 0;
         virtual void save_binary_chunk(void const* address, std::size_t count) = 0;
@@ -26,6 +27,7 @@ namespace hpx { namespace serialization
     {
         virtual ~erased_input_container() {}
 
+        virtual bool is_saving() const { return false; }
         virtual void set_filter(binary_filter* filter) = 0;
         virtual void load_binary(void * address, std::size_t count) = 0;
         virtual void load_binary_chunk(void * address, std::size_t count) = 0;

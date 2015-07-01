@@ -13,11 +13,11 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
@@ -38,14 +38,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter, typename F>
-        static typename detail::algorithm_result<ExPolicy>::type
+        static typename util::detail::algorithm_result<ExPolicy>::type
         segmented_for_each(Algo && algo, ExPolicy const& policy,
             SegIter first, SegIter last, F && f, boost::mpl::true_)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef detail::algorithm_result<ExPolicy> result;
+            typedef util::detail::algorithm_result<ExPolicy> result;
 
             using boost::mpl::true_;
 
@@ -104,14 +104,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter, typename F>
-        static typename detail::algorithm_result<ExPolicy>::type
+        static typename util::detail::algorithm_result<ExPolicy>::type
         segmented_for_each(Algo && algo, ExPolicy const& policy,
             SegIter first, SegIter last, F && f, boost::mpl::false_)
         {
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef detail::algorithm_result<ExPolicy> result;
+            typedef util::detail::algorithm_result<ExPolicy> result;
 
             typedef typename std::iterator_traits<SegIter>::iterator_category
                 iterator_category;
@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
         template <typename ExPolicy, typename SegIter, typename F>
-        inline typename detail::algorithm_result<ExPolicy>::type
+        inline typename util::detail::algorithm_result<ExPolicy>::type
         for_each_(ExPolicy && policy, SegIter first, SegIter last, F && f,
             std::true_type)
         {
@@ -201,7 +201,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 >::type is_seq;
 
             if (first == last)
-                return detail::algorithm_result<ExPolicy>::get();
+                return util::detail::algorithm_result<ExPolicy>::get();
 
             return segmented_for_each(
                 for_each(), std::forward<ExPolicy>(policy),
@@ -210,7 +210,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename F>
-        inline typename detail::algorithm_result<ExPolicy>::type
+        inline typename util::detail::algorithm_result<ExPolicy>::type
         for_each_(ExPolicy && policy, InIter first, InIter last, F && f,
             std::false_type);
 

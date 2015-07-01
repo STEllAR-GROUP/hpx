@@ -10,9 +10,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template<typename ExPolicy, typename Pred>
             static bool
-            sequential(ExPolicy const&, Iter first, Iter last,
+            sequential(ExPolicy, Iter first, Iter last,
                 Pred && pred)
             {
                 return std::is_partitioned(first,
@@ -72,15 +72,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, Iter first, Iter last,
+            static typename util::detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy policy, Iter first, Iter last,
                 Pred && pred)
             {
                 typedef typename std::iterator_traits<Iter>::reference
                     reference;
                 typedef typename std::iterator_traits<Iter>::difference_type
                     difference_type;
-                typedef typename detail::algorithm_result<ExPolicy, bool>
+                typedef typename util::detail::algorithm_result<ExPolicy, bool>
                     result;
 
                 difference_type count = std::distance(first, last);
@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     is_partitioned(ExPolicy && policy, InIter first, InIter last, Pred && pred)
     {

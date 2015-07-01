@@ -10,9 +10,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -40,14 +40,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first, FwdIter last, Pred && op)
+            sequential(ExPolicy, FwdIter first, FwdIter last, Pred && op)
             {
                 return std::adjacent_find(first, last, op);
             }
 
             template <typename ExPolicy, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 Pred && op)
             {
                 typedef hpx::util::zip_iterator<FwdIter, FwdIter> zip_iterator;
@@ -57,8 +59,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 if(first == last)
                 {
-                    return detail::algorithm_result<ExPolicy, FwdIter>::get(
-                        std::move(last));
+                    return util::detail::algorithm_result<
+                            ExPolicy, FwdIter
+                        >::get(std::move(last));
                 }
 
                 FwdIter next = first;
@@ -142,7 +145,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last)
     {
@@ -227,7 +230,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     adjacent_find(ExPolicy && policy, FwdIter first, FwdIter last, Pred && op)
     {

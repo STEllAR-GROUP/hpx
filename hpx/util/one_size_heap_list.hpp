@@ -257,7 +257,7 @@ namespace hpx { namespace util
         {
             unique_lock_type ul(mtx_);
 
-            if (NULL == p || !threads::threadmanager_is(running))
+            if (NULL == p || !threads::threadmanager_is(state_running))
                 return;
 
             // if this is called from outside a HPX thread we need to

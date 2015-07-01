@@ -39,6 +39,7 @@
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/mpl/bool.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -69,6 +70,7 @@ namespace hpx { namespace actions
         enum { stacksize_value = traits::action_stacksize<Action>::value };
 
         typedef typename Action::direct_execution direct_execution;
+        typedef boost::mpl::true_ serialized_with_id;
 
         // construct an action from its arguments
         template <typename ...Ts>

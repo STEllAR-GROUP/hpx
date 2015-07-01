@@ -112,18 +112,18 @@ void test_one(std::vector<int> a)
         transform_exclusive_scan(par, a.begin(), a.end(), g.begin(),
         fun_conv, 10, fun_add);
 
-    detail::sequential_inclusive_scan(a.begin(), a.end(), b_ans.begin(), 10,
-        fun_add);
-    detail::sequential_inclusive_scan(a.begin(), a.end(), c_ans.begin(), 10,
-        fun_mult);
-    detail::sequential_exclusive_scan(a.begin(), a.end(), d_ans.begin(), 10,
-        fun_add);
-    detail::sequential_exclusive_scan(a.begin(), a.end(), e_ans.begin(), 10,
-        fun_mult);
-    detail::sequential_transform_inclusive_scan(a.begin(), a.end(),
-        f_ans.begin(), fun_conv, 10, fun_add);
-    detail::sequential_transform_exclusive_scan(a.begin(), a.end(),
-        g_ans.begin(), fun_conv, 10, fun_add);
+    hpx::parallel::v1::detail::sequential_inclusive_scan(
+        a.begin(), a.end(), b_ans.begin(), 10, fun_add);
+    hpx::parallel::v1::detail::sequential_inclusive_scan(
+        a.begin(), a.end(), c_ans.begin(), 10, fun_mult);
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
+        a.begin(), a.end(), d_ans.begin(), 10, fun_add);
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
+        a.begin(), a.end(), e_ans.begin(), 10, fun_mult);
+    hpx::parallel::v1::detail::sequential_transform_inclusive_scan(
+        a.begin(), a.end(), f_ans.begin(), fun_conv, 10, fun_add);
+    hpx::parallel::v1::detail::sequential_transform_exclusive_scan(
+        a.begin(), a.end(), g_ans.begin(), fun_conv, 10, fun_add);
 
     HPX_TEST(std::equal(b.begin(), b.end(), b_ans.begin()));
     HPX_TEST(std::equal(c.begin(), c.end(), c_ans.begin()));
@@ -163,18 +163,18 @@ void test_async_one(std::vector<int> a)
         transform_exclusive_scan(par(task), a.begin(), a.end(), g.begin(),
         fun_conv, 10, fun_add);
 
-    detail::sequential_inclusive_scan(a.begin(), a.end(), b_ans.begin(), 10,
-        fun_add);
-    detail::sequential_inclusive_scan(a.begin(), a.end(), c_ans.begin(), 10,
-        fun_mult);
-    detail::sequential_exclusive_scan(a.begin(), a.end(), d_ans.begin(), 10,
-        fun_add);
-    detail::sequential_exclusive_scan(a.begin(), a.end(), e_ans.begin(), 10,
-        fun_mult);
-    detail::sequential_transform_inclusive_scan(a.begin(), a.end(),
-        f_ans.begin(), fun_conv, 10, fun_add);
-    detail::sequential_transform_exclusive_scan(a.begin(), a.end(),
-        g_ans.begin(), fun_conv, 10, fun_add);
+    hpx::parallel::v1::detail::sequential_inclusive_scan(
+        a.begin(), a.end(), b_ans.begin(), 10, fun_add);
+    hpx::parallel::v1::detail::sequential_inclusive_scan(
+        a.begin(), a.end(), c_ans.begin(), 10, fun_mult);
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
+        a.begin(), a.end(), d_ans.begin(), 10, fun_add);
+    hpx::parallel::v1::detail::sequential_exclusive_scan(
+        a.begin(), a.end(), e_ans.begin(), 10, fun_mult);
+    hpx::parallel::v1::detail::sequential_transform_inclusive_scan(
+        a.begin(), a.end(), f_ans.begin(), fun_conv, 10, fun_add);
+    hpx::parallel::v1::detail::sequential_transform_exclusive_scan(
+        a.begin(), a.end(), g_ans.begin(), fun_conv, 10, fun_add);
 
     f_inc_add.wait();
     f_inc_mult.wait();

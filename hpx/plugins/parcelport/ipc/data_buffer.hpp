@@ -275,7 +275,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             {
                 return buffer_->size();
             }
-            
+
             std::size_t capacity() const
             {
                 return buffer_->capacity();
@@ -350,7 +350,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         {
             return data_->size();
         }
-        
+
         std::size_t capacity() const
         {
             return data_->capacity();
@@ -360,7 +360,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         {
             data_->resize(size);
         }
-        
+
         void reserve(std::size_t size) const
         {
             if(data_)

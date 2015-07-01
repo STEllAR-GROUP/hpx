@@ -25,8 +25,8 @@ namespace examples { namespace server
     ///     * Exposes methods that can be called asynchronously and/or remotely.
     ///       These constructs are known as HPX actions.
     ///
-    /// By deriving this component from \a locking_hook the runtime system 
-    /// ensures that all action invocations are serialized. That means that 
+    /// By deriving this component from \a locking_hook the runtime system
+    /// ensures that all action invocations are serialized. That means that
     /// the system ensures that no two actions are invoked at the same time on
     /// a given component instance. This makes the component thread safe and no
     /// additional locking has to be implemented by the user.
@@ -44,7 +44,7 @@ namespace examples { namespace server
     //[managed_accumulator_server_inherit
     class managed_accumulator
       : public hpx::components::locking_hook<
-            hpx::components::managed_component_base<managed_accumulator> 
+            hpx::components::managed_component_base<managed_accumulator>
         >
     //]
     {

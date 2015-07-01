@@ -235,6 +235,7 @@ sections, one for each component.
     zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
     async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}
     enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}
+    message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:0}
 ``
 [c++]
 
@@ -287,6 +288,9 @@ sections, one for each component.
       default is `1`.]]
     [[`hpx.parcel.enable_security`]
      [This property defines whether this locality is encrypting parcels. The
+      default is `0`.]]
+    [[`hpx.parcel.message_handlers`]
+     [This property defines whether message handlers are loaded. The
       default is `0`.]]
 ]
 

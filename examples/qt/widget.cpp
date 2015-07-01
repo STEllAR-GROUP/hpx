@@ -57,7 +57,7 @@ void widget::add_label(std::size_t i, double t)
 void widget::run_finished()
 {
   bool value = true;
-  QGenericArgument arg("bool",&value);  
+  QGenericArgument arg("bool",&value);
   QMetaObject::invokeMethod(run_button, "setEnabled", arg);
 }
 
@@ -70,5 +70,5 @@ void widget::run_clicked(bool)
 {
     run_button->setEnabled(false);
     list->clear();
-    hpx::apply(callback_, this, no_threads);   
+    hpx::apply(callback_, this, no_threads);
 }
