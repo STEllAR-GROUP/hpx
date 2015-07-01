@@ -49,7 +49,7 @@ namespace hpx { namespace test
         void serialize(Archive& ar, const unsigned int);
 
     private:
-        
+
     };
 
     ///////////////////////////////////////////////////////////////////////////

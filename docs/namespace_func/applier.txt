@@ -5,7 +5,7 @@
 
 Namespce Applier
 
-API Component:				File:			
+API Component:				File:
 
 *functions
 action_priority				hpx/runtime/applier/apply.hpp

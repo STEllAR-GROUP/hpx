@@ -107,7 +107,7 @@ hpx::agas::addressing_service
     lcos::future<naming::id_type, response> resolve_name_async(std::string const& name)
     void update_cache(naming::gid_type const&,gva const&,**throws)
     bool route_parcel(parcelset::parcel const&,**throws)
-    
+
 
 hpx::agas::big_boot_barrier
     big_boot_barrier(parcelset::parcelport&,util::runtime_configuration const&,runtime_mode)
@@ -166,7 +166,7 @@ hpx::agas
     void garbage_collect[_non_blocking](**throws)
     void garbage_collect[_non_blocking](naming::id_type const&,**throws)
     naming::id_type get_console_locality(**throws)
-    
+
 hpx::agas::namespace_action_code => big enum
 
 hpx::agas::primary_namespace
