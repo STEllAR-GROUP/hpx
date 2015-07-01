@@ -160,7 +160,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     if (vm.count("no-header"))
         header = false;
-    
+
     // Create the stepper object
     stepper step;
 

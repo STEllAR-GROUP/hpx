@@ -259,7 +259,7 @@ namespace detail
         {
             // set the received result, reset error status
             try {
-               typedef typename util::decay<T>::type naked_type;
+                typedef typename util::decay<T>::type naked_type;
 
                 typedef traits::get_remote_result<
                     result_type, naked_type
@@ -431,7 +431,7 @@ namespace detail
             error_code ec;
             threads::thread_id_type id = threads::register_thread_nullary(
                 util::bind(util::one_shot(&timed_future_data::set_data),
-                    this_, std::forward<Result_>(init)),
+                    std::move(this_), std::forward<Result_>(init)),
                 "timed_future_data<Result>::timed_future_data",
                 threads::suspended, true, threads::thread_priority_normal,
                 std::size_t(-1), threads::thread_stacksize_default, ec);
@@ -571,20 +571,20 @@ namespace detail
                 hpx::threads::get_self_id());
 
             if (sched_) {
-                sched_->add(util::bind(&task_base::run_impl, this_),
+                sched_->add(util::bind(&task_base::run_impl, std::move(this_)),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     stacksize, ec);
             }
             else if (policy == launch::fork) {
                 threads::register_thread_plain(
-                    util::bind(&task_base::run_impl, this_),
+                    util::bind(&task_base::run_impl, std::move(this_)),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     threads::thread_priority_boost, get_worker_thread_num(),
                     stacksize, ec);
             }
             else {
                 threads::register_thread_plain(
-                    util::bind(&task_base::run_impl, this_),
+                    util::bind(&task_base::run_impl, std::move(this_)),
                     desc ? desc : "task_base::apply", threads::pending, false,
                     priority, std::size_t(-1), stacksize, ec);
             }

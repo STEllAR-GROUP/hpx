@@ -97,7 +97,7 @@ namespace hpx { namespace serialization
                                     boost::mpl::identity<empty>,
                                     boost::mpl::identity<usual>
                             >
-                                
+
 
                     >
             >::type type;

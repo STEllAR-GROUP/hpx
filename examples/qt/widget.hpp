@@ -26,7 +26,7 @@ class widget
         void add_label(std::size_t i, double t);
 
         void run_finished();
-    
+
     public slots:
         void set_threads(int no);
 

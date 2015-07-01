@@ -30,8 +30,11 @@
 typedef hpx::components::server::runtime_support::call_startup_functions_action
     call_startup_functions_action;
 
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_startup_functions_action)
-HPX_REGISTER_BROADCAST_ACTION(call_startup_functions_action)
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_startup_functions_action,
+        call_startup_functions_action)
+HPX_REGISTER_BROADCAST_ACTION_ID(call_startup_functions_action,
+        call_startup_functions_action,
+        hpx::actions::broadcast_call_startup_functions_action_id)
 
 #endif
 

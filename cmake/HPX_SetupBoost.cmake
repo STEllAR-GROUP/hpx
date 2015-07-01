@@ -116,7 +116,6 @@ endif()
 
 # Boost preprocessor definitions
 hpx_add_config_define(BOOST_PARAMETER_MAX_ARITY 7)
-hpx_add_config_define(HPX_HAVE_COROUTINE_ARG_MAX 1)
 if(MSVC)
   HPX_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL "Add BOOST_ALL_DYN_LINK to compile flags" OFF)
   if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK)

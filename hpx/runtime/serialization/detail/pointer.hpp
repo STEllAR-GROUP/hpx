@@ -9,6 +9,7 @@
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
@@ -47,10 +48,21 @@ namespace hpx { namespace serialization
                     std::string name;
                     ar >> name;
 
-                    Pointer t(
-                        polymorphic_intrusive_factory::instance().
-                            create<referred_type>(name)
-                    );
+                    Pointer t(polymorphic_intrusive_factory::instance().
+                        create<referred_type>(name));
+                    ar >> *t;
+                    return t;
+                }
+            };
+
+            struct polymorphic_with_id
+            {
+                static Pointer call(input_archive& ar)
+                {
+                    boost::uint32_t id;
+                    ar >> id;
+
+                    Pointer t(polymorphic_id_factory::create<referred_type>(id));
                     ar >> *t;
                     return t;
                 }
@@ -77,14 +89,18 @@ namespace hpx { namespace serialization
 
         public:
             typedef typename boost::mpl::eval_if<
-                hpx::traits::is_intrusive_polymorphic<referred_type>,
-                    boost::mpl::identity<intrusive_polymorphic>,
+                hpx::traits::is_serialized_with_id<referred_type>,
+                    boost::mpl::identity<polymorphic_with_id>,
                     boost::mpl::eval_if<
-                        hpx::traits::is_nonintrusive_polymorphic<referred_type>,
-                            boost::mpl::identity<nonintrusive_polymorphic>,
-                            boost::mpl::identity<usual>
-                  >
-            >::type type;
+                        hpx::traits::is_intrusive_polymorphic<referred_type>,
+                            boost::mpl::identity<intrusive_polymorphic>,
+                            boost::mpl::eval_if<
+                                hpx::traits::is_nonintrusive_polymorphic<referred_type>,
+                                    boost::mpl::identity<nonintrusive_polymorphic>,
+                                    boost::mpl::identity<usual>
+                        >
+                    >
+                >::type type;
         };
 
         template <class Pointer>
@@ -102,6 +118,18 @@ namespace hpx { namespace serialization
                 }
             };
 
+            struct polymorphic_with_id
+            {
+                static void call(output_archive& ar, const Pointer& ptr)
+                {
+                    const boost::uint32_t id =
+                        polymorphic_id_factory::get_id(
+                            access::get_name(ptr.get()));
+                    ar << id;
+                    ar << *ptr;
+                }
+            };
+
             struct usual
             {
                 static void call(output_archive& ar, const Pointer& ptr)
@@ -112,9 +140,13 @@ namespace hpx { namespace serialization
 
         public:
             typedef typename boost::mpl::if_<
-                hpx::traits::is_intrusive_polymorphic<referred_type>,
-                    intrusive_polymorphic,
-                    usual
+                hpx::traits::is_serialized_with_id<referred_type>,
+                    polymorphic_with_id,
+                    typename boost::mpl::if_<
+                        hpx::traits::is_intrusive_polymorphic<referred_type>,
+                            intrusive_polymorphic,
+                            usual
+                    >::type
                 >::type type;
         };
 

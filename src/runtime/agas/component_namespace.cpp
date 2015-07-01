@@ -23,11 +23,13 @@ HPX_REGISTER_COMPONENT(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     component_namespace, component_agas_component_namespace)
 
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     component_namespace::service_action,
-    component_namespace_service_action)
+    component_namespace_service_action,
+    hpx::actions::component_namespace_service_action_id)
 
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     component_namespace::bulk_service_action,
-    component_namespace_bulk_service_action)
+    component_namespace_bulk_service_action,
+    hpx::actions::component_namespace_bulk_service_action_id)
 
