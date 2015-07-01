@@ -492,16 +492,16 @@ namespace hpx { namespace lcos
 
 namespace hpx { namespace lcos
 {
-    // Allow for using __await with and expression which evaluates to
+    // Allow for using __await with an expression which evaluates to
     // hpx::future<T>.
     template <typename T>
-    bool await_ready(future<T> const& f)
+    BOOST_FORCEINLINE bool await_ready(future<T> const& f)
     {
         return f.is_ready();
     }
 
     template <typename T, typename Promise>
-    void await_suspend(future<T>& f,
+    BOOST_FORCEINLINE void await_suspend(future<T>& f,
         std::experimental::coroutine_handle<Promise> rh)
     {
         // f.then([=](future<T> result) mutable
@@ -509,34 +509,34 @@ namespace hpx { namespace lcos
     }
 
     template <typename T>
-    T await_resume(future<T>& f)
+    BOOST_FORCEINLINE T await_resume(future<T>& f)
     {
         return f.get();
     }
 
     // allow for wrapped futures to be unwrapped, if possible
     template <typename T>
-    T await_resume(future<future<T> >& f)
+    BOOST_FORCEINLINE T await_resume(future<future<T> >& f)
     {
         return f.get().get();
     }
 
     template <typename T>
-    T await_resume(future<shared_future<T> >& f)
+    BOOST_FORCEINLINE T await_resume(future<shared_future<T> >& f)
     {
         return f.get().get();
     }
 
-    // Allow for using __await with and expression which evaluates to
+    // Allow for using __await with an expression which evaluates to
     // hpx::shared_future<T>.
     template <typename T>
-    bool await_ready(shared_future<T> const& f)
+    BOOST_FORCEINLINE bool await_ready(shared_future<T> const& f)
     {
         return f.is_ready();
     }
 
     template <typename T, typename Promise>
-    void await_suspend(shared_future<T>& f,
+    BOOST_FORCEINLINE void await_suspend(shared_future<T>& f,
         std::experimental::coroutine_handle<Promise> rh)
     {
         // f.then([=](shared_future<T> result) mutable
@@ -544,179 +544,15 @@ namespace hpx { namespace lcos
     }
 
     template <typename T>
-    T await_resume(shared_future<T>& f)
+    BOOST_FORCEINLINE T await_resume(shared_future<T>& f)
     {
         return f.get();
-    }
-
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////////
-        // special allocator for combined shared state and stack frame for future
-        // instances returned from resumable functions
-        template <typename Value, typename T = char>
-        struct shared_state_allocator
-        {
-            typedef T value_type;
-            typedef T* pointer;
-            typedef T const* const_pointer;
-            typedef T& reference;
-            typedef T const& const_reference;
-            typedef std::size_t size_type;
-            typedef std::ptrdiff_t difference_type;
-
-            template <typename U>
-            struct rebind
-            {
-                typedef shared_state_allocator<Value, U> other;
-            };
-
-            pointer allocate(size_type n, void const* hint = 0)
-            {
-                HPX_ASSERT(sizeof(future_data<Value>) <= n);
-                return new char[n];
-            }
-
-            void deallocate(pointer p, size_type n)
-            {
-                // deallocation will be performed through reference counting
-            }
-        };
     }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace std { namespace experimental
 {
-    // Please note that the variable naming conventions are deliberately kept
-    // in sync with those used by the VS2015rc headers.
-    // This specialization will go away once the changes introduced by this
-    // specialization have made it into Visual Studio.
-    template<typename _Traits>
-    struct _Construct_promise {
-        template <typename _Uty, typename _Prom>
-        static auto _Fn(int,
-            _Identity<decltype(_Uty::construct_promise(declval<_Prom*>()))>*,
-            _Prom* p)
-        {
-            return _Traits::construct_promise(p);
-        }
-        template <typename _Uty, typename _Prom>
-        static auto _Fn(_Wrap_int, void*, _Prom* p) {
-            return ::new (static_cast<void*>(p)) _Prom();
-        }
-        template <typename _Prom>
-        static auto _Call(_Prom* p) {
-            return _Fn<_Traits>(0, nullptr, p);
-        }
-    };
-
-    template<typename _Traits>
-    struct _Destruct_promise {
-        template <typename _Uty, typename _Prom>
-        static void _Fn(int,
-            _Identity<decltype(_Uty::destruct_promise(declval<_Prom*>()))>*,
-            _Prom* p)
-        {
-            _Traits::destruct_promise(p);
-        }
-        template <typename _Uty, typename _Prom>
-        static void _Fn(_Wrap_int, void*, _Prom* p) {
-            p->~_Prom();
-        }
-        template <typename _Prom>
-        static void _Call(_Prom* p) {
-            _Fn<_Traits>(0, nullptr, p);
-        }
-    };
-
-    template <typename _Ret, typename... _Ts>
-    struct _Resumable_helper_traits<hpx::lcos::future<_Ret>, _Ts...>
-    {
-        using _Traits = coroutine_traits<hpx::lcos::future<_Ret>, _Ts...>;
-        using _PromiseT = typename _Traits::promise_type;
-        using _Handle_type = coroutine_handle<_PromiseT>;
-
-        using _Alloc_type =
-            decltype(_Get_coroutine_allocator<_Traits>::_Get(declval<_Ts>()...));
-        using _Alloc_traits = allocator_traits<_Alloc_type>;
-        using _Alloc_of_char_type =
-            typename _Alloc_traits::template rebind_alloc<char>;
-        using _Alloc_char_traits = allocator_traits<_Alloc_of_char_type>;
-
-        static const size_t _ALIGN_REQ = sizeof(void*) * 2;
-
-        static const size_t _ALIGNED_ALLOCATOR_SIZE =
-            is_empty<_Alloc_type>::value
-            ? 0
-            : ((sizeof(_Alloc_type) + _ALIGN_REQ - 1) & ~(_ALIGN_REQ - 1));
-
-        static const size_t _EXTRA_SIZE =
-            _ALIGNED_ALLOCATOR_SIZE + _Handle_type::_ALIGNED_SIZE;
-
-        static _PromiseT * _Promise_from_frame(void* _Addr) noexcept
-        {
-            return reinterpret_cast<_PromiseT*>(
-                reinterpret_cast<char*>(_Addr) - _Handle_type::_ALIGNED_SIZE);
-        }
-
-        static _Handle_type _Handle_from_frame(void* _Addr) noexcept
-        {
-            return _Handle_type::from_promise(_Promise_from_frame(_Addr));
-        }
-
-        static void _Set_exception(void* _Addr) {
-            _Promise_from_frame(_Addr)->set_exception(_STD current_exception());
-        }
-
-        static decltype(auto) _Initial_suspend(void* _Addr)
-        {
-            return _Promise_from_frame(_Addr)->initial_suspend();
-        }
-
-        static decltype(auto) _Final_suspend(void* _Addr)
-        {
-            return _Promise_from_frame(_Addr)->final_suspend();
-        }
-
-        template <typename... _Us>
-        static void * _Alloc(size_t _Size, _Us&&... _Args)
-        {
-            _Alloc_type _Al = _Get_coroutine_allocator<_Traits>::
-                _Get(_STD forward<_Us>(_Args)...);
-            _Alloc_of_char_type _RealAlloc(_Al);
-
-            _Size += _EXTRA_SIZE;
-
-            auto _Ptr = _RealAlloc.allocate(_Size);
-            ::new (static_cast<void*>(_Ptr))
-                _Alloc_of_char_type(_STD move(_RealAlloc));
-
-            _Ptr += _EXTRA_SIZE;
-            return _Ptr;
-        }
-
-        static void _Free(size_t _Size, void* _FramePointer) {
-            auto _Ptr = reinterpret_cast<char*>(_FramePointer);
-            _Ptr -= _EXTRA_SIZE;
-            _Size += _EXTRA_SIZE;
-            auto _AlPtr = reinterpret_cast<_Alloc_of_char_type*>(_Ptr);
-            _Alloc_of_char_type _Allocator(_STD move(*_AlPtr));
-            _Allocator.deallocate(_Ptr, _Size);
-        }
-
-        static void _ConstructPromise(void* _Addr, void* resume_addr) {
-            *reinterpret_cast<void**>(_Addr) = resume_addr;
-            *reinterpret_cast<uintptr_t*>(
-                reinterpret_cast<uintptr_t>(_Addr) + sizeof(void*)) = 2;
-            _Construct_promise<_Traits>::_Call(_Promise_from_frame(_Addr));
-        }
-
-        static void _DestructPromise(void* _Addr) {
-            _Destruct_promise<_Traits>::_Call(_Promise_from_frame(_Addr));
-        }
-    };
-
     // Allow for functions which use __await to return an hpx::future<T>
     template <typename T, typename ...Ts>
     struct coroutine_traits<hpx::lcos::future<T>, Ts...>
@@ -727,6 +563,12 @@ namespace std { namespace experimental
         {
             typedef hpx::lcos::detail::future_data<T> base_type;
 
+            promise_type()
+            {
+                // the shared state is held alive by the coroutine
+                hpx::lcos::detail::intrusive_ptr_add_ref(this);
+            }
+
             hpx::lcos::future<T> get_return_object()
             {
                 boost::intrusive_ptr<base_type> shared_state(this);
@@ -735,7 +577,14 @@ namespace std { namespace experimental
             }
 
             bool initial_suspend() { return false; }
-            bool final_suspend() { return false; }
+
+            bool final_suspend()
+            {
+                // This gives up the coroutine's reference count on the shared
+                // state. If this was the last reference count, the coroutine
+                // should not suspend before exiting.
+                return !this->requires_delete();
+            }
 
             template <typename U, typename U2 = T,
                 typename = std::enable_if<!std::is_void<U2>::value>::type>
@@ -760,26 +609,12 @@ namespace std { namespace experimental
                     this->base_type::set_exception(boost::current_exception());
                 }
             }
+
+            void destroy()
+            {
+                coroutine_handle<promise_type>::from_promise(this).destroy();
+            }
         };
-
-        template <typename... Us>
-        static hpx::lcos::detail::shared_state_allocator<T>
-        get_allocator(Us&&...)
-        {
-            return hpx::lcos::detail::shared_state_allocator<T>();
-        }
-
-        static promise_type* construct_promise(promise_type* p)
-        {
-            ::new (static_cast<void*>(p)) promise_type();
-            hpx::lcos::detail::intrusive_ptr_add_ref(p);
-            return p;
-        }
-
-        static void destruct_promise(promise_type* p)
-        {
-            hpx::lcos::detail::intrusive_ptr_release(p);
-        }
     };
 }}
 
