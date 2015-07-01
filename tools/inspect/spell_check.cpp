@@ -25,7 +25,7 @@ bool check_word(const string& str)
     for (std::size_t i = 0; i < str.size(); ++i)
         if (!((str[i] >= 'a' && str[i] <= 'z') ||
             (str[i] >= 'A' && str[i] <= 'Z') ||
-            str[i] == ' ' || str[i] == '-'))
+            str[i] == ' '))
         return false;
     return true;
 }
@@ -92,8 +92,8 @@ namespace boost
             if (is_file)
             {
                 int currline = 0;
-                char_separator<char> sep("\n");
-                tokenizer<char_separator<char>> tokens(contents, sep);
+                char_separator<char> sep("\n", "", boost::keep_empty_tokens);
+                tokenizer<char_separator<char> > tokens(contents, sep);
                 for (const auto& t : tokens) {
                     checking.push_back(t);
                     currline++;
@@ -124,7 +124,7 @@ namespace boost
                                 line_start = it + 1; // could be end()
                             }
                         }
-                        checking.push_back(std::string((*cur)[0].first, (*cur)[0].second - 1));
+                        checking.push_back(std::string((*cur)[0].first, (*cur)[0].second));
                         linenumb.push_back(line_number);
                     }
                 }
@@ -134,25 +134,28 @@ namespace boost
             while (p < checking.size())
             {
                 char_separator<char> sep(" \n\t\v");
-                tokenizer<char_separator<char>> tokens(checking[p], sep);
+                tokenizer<char_separator<char> > tokens(checking[p], sep);
                 for (const auto& t : tokens)
                 {
                      string hold = t, finald;
                      string::size_type begin, end;
-                     transform(hold.begin(), hold.end(), hold.begin(), ::tolower);
-                     begin = hold.find_first_of("abcdefghijklmnopqrstuvwxyz");
-                     end = hold.find_last_of("abcdefghijklmnopqrstuvwxyz");
+                      transform(hold.begin(), hold.end(), hold.begin(), ::tolower);
+                     begin = 0;
+                     end = hold.find_last_of("abcdefghijklmnopqrstuvwxyz") + 1;
                      //Will use the size to change finald into only the word itself.
-                     for (string::size_type j = begin; j <= end && j != hold.npos; j++)
+                     if (end < hold.npos)
                      {
-                         finald.push_back(hold[j]);
-                     }
-                     bool is_word;
-                     is_word = check_word(finald);
-                     if (is_word)
-                     {
-                         strs.push_back(finald);
-                         wordline.push_back(linenumb[p]);
+                         finald = hold.substr(begin, end - begin);
+                         bool is_word;
+                         is_word = check_word(finald);
+                         if (is_word)
+                         {
+                             if (finald.size() > 1)
+                             {
+                                 strs.push_back(finald);
+                                 wordline.push_back(linenumb[p]);
+                             }
+                         }
                      }
                 }
                 p++;
