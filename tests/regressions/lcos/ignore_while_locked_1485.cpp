@@ -26,17 +26,19 @@ struct wait_for_flag
         bool first = true;
         while (!flag)
         {
-            boost::unique_lock<hpx::lcos::local::spinlock> lk(mutex);
-
             // signal successful initialization
             if (first)
             {
-                boost::lock_guard<hpx::lcos::local::spinlock> lk(local_mutex);
-                running = true;
+                {
+                    boost::lock_guard<hpx::lcos::local::spinlock> lk(local_mutex);
+                    running = true;
+                }
+
                 first = false;
                 local_cond_var.notify_all();
             }
 
+            boost::unique_lock<hpx::lcos::local::spinlock> lk(mutex);
             cond_var.wait(mutex);
         }
         ++woken;
