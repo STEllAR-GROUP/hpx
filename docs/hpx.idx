@@ -434,12 +434,14 @@ install_counter_type                  "" "hpx\.performance_counters\.install_cou
 # hpx/runtime/actions/action_support.hpp
 HPX_REGISTER_ACTION_DECLARATION           "" "HPX_REGISTER_ACTION_DECLARATION"
 HPX_REGISTER_ACTION                       "" "HPX_REGISTER_ACTION"
+HPX_REGISTER_ACTION_ID                    "" "HPX_REGISTER_ACTION_ID"
 
 # hpx/runtime/actions/component_action.hpp
 HPX_DEFINE_COMPONENT_ACTION               "" "HPX_DEFINE_COMPONENT_ACTION"
 
 # hpx/runtime/actions/plain_action.hpp
 HPX_PLAIN_ACTION                          "" "HPX_PLAIN_ACTION"
+HPX_PLAIN_ACTION_ID                       "" "HPX_PLAIN_ACTION_ID"
 
 # hpx/runtime/components/component_factory.hpp
 HPX_REGISTER_COMPONENT                    "" "HPX_REGISTER_COMPONENT"

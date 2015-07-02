@@ -512,12 +512,21 @@ hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel da
 
 ################################################################################
 # Backwards compatibility options (edit for each release)
+
 # HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
 hpx_option(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
     "Enable backwards compatibility for apply_colocated, async_colocated and friends"
     ON ADVANCED)
 if(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
+endif()
+
+# HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY: introduced in V0.9.11
+hpx_option(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY BOOL
+    "Enable backwards compatibility for component::get_gid() functions"
+    ON ADVANCED)
+if(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
 endif()
 
 ################################################################################
@@ -777,6 +786,9 @@ hpx_check_for_cxx11_variadic_macros(
 
 hpx_check_for_cxx11_variadic_templates(
   REQUIRED "HPX needs support for C++11 variadic templates")
+
+hpx_check_for_cxx11_extended_friend_declarations(
+  DEFINITIONS HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
 
 # Check the availability of certain C++11 library features
 hpx_check_for_cxx11_std_chrono(

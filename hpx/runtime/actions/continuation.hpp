@@ -10,13 +10,16 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
@@ -24,7 +27,6 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -54,26 +56,48 @@ namespace hpx
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
     template <typename T>
-    void set_lco_value(naming::id_type const& id, T && t)
+    void set_lco_value(naming::id_type const& id, T && t, bool move_credits)
     {
         typedef typename lcos::base_lco_with_value<
-            typename boost::remove_reference<T>::type
-        >::set_value_action action_type;
-        apply<action_type>(id, util::detail::make_temporary<T>(t));
+            typename util::decay<T>::type
+        >::set_value_action set_value_action;
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply<set_value_action>(target, util::detail::make_temporary<T>(t));
+        }
+        else
+        {
+            apply<set_value_action>(id, util::detail::make_temporary<T>(t));
+        }
     }
 
     template <typename T>
     void set_lco_value(naming::id_type const& id, T && t,
-        naming::id_type const& cont)
+        naming::id_type const& cont, bool move_credits)
     {
-        typename lcos::base_lco_with_value<
-            typename boost::remove_reference<T>::type
-        >::set_value_action set;
-        apply_c(set, cont, id, util::detail::make_temporary<T>(t));
+        typedef typename lcos::base_lco_with_value<
+            typename util::decay<T>::type
+        >::set_value_action set_value_action;
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply_c<set_value_action>(cont, target,
+                util::detail::make_temporary<T>(t));
+        }
+        else
+        {
+            apply_c<set_value_action>(cont, id,
+                util::detail::make_temporary<T>(t));
+        }
     }
 
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr const& e);
+        boost::exception_ptr const& e, bool move_credits);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -229,7 +253,7 @@ namespace hpx { namespace actions
         template <typename F, typename T1, typename T2>
         struct result<F(T1, T2)>
         {
-            typedef T2 type;
+            typedef typename util::result_of<cont_type(T1, T2)>::type type;
         };
 
         continuation_impl() {}
@@ -242,13 +266,16 @@ namespace hpx { namespace actions
         virtual ~continuation_impl() {}
 
         template <typename T>
-        T operator()(hpx::id_type const& lco, T && t) const
+        typename result<continuation_impl(hpx::id_type, T)>::type
+        operator()(hpx::id_type const& lco, T && t) const
         {
             hpx::apply_c(cont_, lco, target_, std::forward<T>(t));
 
-            // Yep, 't' is a zombie, however we don't use the returned value
-            // anyways. We need it for result type calculation, though.
-            return std::move(t);
+            // Unfortunately we need to default construct the return value,
+            // this possibly imposes an additional restriction of return types.
+            typedef typename result<continuation_impl(hpx::id_type, T)>::type
+                result_type;
+            return result_type();
         }
 
         virtual bool has_to_wait_for_futures()
@@ -280,8 +307,8 @@ namespace hpx { namespace actions
     struct continuation2_impl
     {
     private:
-        typedef typename boost::remove_reference<Cont>::type cont_type;
-        typedef typename boost::remove_reference<F>::type function_type;
+        typedef typename util::decay<Cont>::type cont_type;
+        typedef typename util::decay<F>::type function_type;
 
     public:
         template <typename T>
@@ -290,7 +317,12 @@ namespace hpx { namespace actions
         template <typename This, typename T1, typename T2>
         struct result<This(T1, T2)>
         {
-            typedef T2 type;
+            typedef typename util::result_of<
+                    cont_type(T1, T2)
+                >::type result_type;
+            typedef typename util::result_of<
+                    function_type(hpx::id_type, result_type)
+                >::type type;
         };
 
         continuation2_impl() {}
@@ -306,15 +338,18 @@ namespace hpx { namespace actions
         virtual ~continuation2_impl() {}
 
         template <typename T>
-        T operator()(hpx::id_type const& lco, T && t) const
+        typename result<continuation2_impl(hpx::id_type, T)>::type
+        operator()(hpx::id_type const& lco, T && t) const
         {
             using hpx::util::placeholders::_2;
             hpx::apply_continue(cont_, hpx::util::bind(f_, lco, _2),
                 target_, std::forward<T>(t));
 
-            // Yep, 't' is a zombie, however we don't use the returned value
-            // anyways. We need it for result type calculation, though.
-            return std::move(t);
+            // Unfortunately we need to default construct the return value,
+            // this possibly imposes an additional restriction of return types.
+            typedef typename result<continuation2_impl(hpx::id_type, T)>::type
+                result_type;
+            return result_type();
         }
 
         virtual bool has_to_wait_for_futures()

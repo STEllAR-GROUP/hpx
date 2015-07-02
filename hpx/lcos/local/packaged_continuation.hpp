@@ -438,8 +438,9 @@ namespace hpx { namespace lcos { namespace detail
             // bind an on_completed handler to this future which will invoke
             // the continuation
             boost::intrusive_ptr<continuation> this_(this);
-            void (continuation::*cb)(shared_state_ptr const&, threads::executor&) =
-                &continuation::async;
+            void (continuation::*cb)(
+                    shared_state_ptr const&, threads::executor&
+                ) = &continuation::async;
 
             shared_state_ptr const& state =
                 traits::get_shared_state(future);

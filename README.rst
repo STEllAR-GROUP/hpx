@@ -21,7 +21,10 @@ to drive the development of the runtime system, coining out required
 functionalities and converging onto a stable API which will provide a
 smooth migration path for developers. The API exposed by HPX is modelled
 after the interfaces defined by the C++11/14 ISO standard and adheres to the
-programming guidelines used by the Boost collection of C++ libraries.
+programming guidelines used by the Boost collection of C++ libraries. We
+aim improve the scalability of today's applications and to expose new 
+levels of parallelism which are necessary to take advantage
+of the exascale systems of the future.
 
 ****************************
 What's so special about HPX?
