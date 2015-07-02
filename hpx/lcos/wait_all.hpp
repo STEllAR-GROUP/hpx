@@ -196,7 +196,7 @@ namespace hpx { namespace lcos
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data =
-                        traits::get_shared_state(*next);
+                        traits::detail::get_shared_state(*next);
 
                     if (!next_future_data->is_ready())
                     {
@@ -253,7 +253,7 @@ namespace hpx { namespace lcos
 
                 boost::intrusive_ptr<
                     lcos::detail::future_data<future_result_type>
-                > next_future_data = traits::get_shared_state(
+                > next_future_data = traits::detail::get_shared_state(
                     boost::fusion::deref(iter));
 
                 if (!next_future_data->is_ready())
@@ -344,7 +344,9 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    typename lcos::detail::future_iterator_traits<Iterator>::type
+    typename util::always_void<
+        typename lcos::detail::future_iterator_traits<Iterator>::type
+    >::type
     wait_all(Iterator begin, Iterator end)
     {
         typedef typename lcos::detail::future_iterator_traits<Iterator>::type
@@ -394,7 +396,8 @@ namespace hpx { namespace lcos
             > result_type;
         typedef detail::wait_all_frame<result_type> frame_type;
 
-        result_type values = result_type(traits::get_shared_state(ts)...);
+        result_type values =
+            result_type(traits::detail::get_shared_state(ts)...);
 
         frame_type frame(values);
         frame.wait_all();

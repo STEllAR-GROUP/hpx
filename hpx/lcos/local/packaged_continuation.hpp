@@ -119,7 +119,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // take by value, as the future may go away immediately
             inner_shared_state_ptr inner_state =
-                traits::get_shared_state(func(std::move(future)));
+                traits::detail::get_shared_state(func(std::move(future)));
 
             if (inner_state.get() == 0)
             {
@@ -424,7 +424,7 @@ namespace hpx { namespace lcos { namespace detail
                 cb = &continuation::async;
 
             shared_state_ptr const& state =
-                traits::get_shared_state(future);
+                traits::detail::get_shared_state(future);
             state->execute_deferred();
             state->set_on_completed(util::bind(cb, std::move(this_), state));
         }
@@ -443,7 +443,7 @@ namespace hpx { namespace lcos { namespace detail
                 ) = &continuation::async;
 
             shared_state_ptr const& state =
-                traits::get_shared_state(future);
+                traits::detail::get_shared_state(future);
             state->execute_deferred();
             state->set_on_completed(util::bind(cb, std::move(this_),
                 state, boost::ref(sched)));
@@ -463,7 +463,7 @@ namespace hpx { namespace lcos { namespace detail
                 &continuation::async_exec<Executor>;
 
             shared_state_ptr const& state =
-                traits::get_shared_state(future);
+                traits::detail::get_shared_state(future);
             state->execute_deferred();
             state->set_on_completed(util::bind(cb, std::move(this_),
                 state, boost::ref(exec)));
@@ -575,7 +575,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 // take by value, as the future will go away immediately
                 inner_shared_state_ptr inner_state =
-                    traits::get_shared_state(outer.get());
+                    traits::detail::get_shared_state(outer.get());
 
                 if (inner_state.get() == 0)
                 {
@@ -609,7 +609,7 @@ namespace hpx { namespace lcos { namespace detail
                     &unwrap_continuation::on_outer_ready<Future>;
 
             outer_shared_state_ptr const& outer_state =
-                traits::get_shared_state(future);
+                traits::detail::get_shared_state(future);
             outer_state->execute_deferred();
             outer_state->set_on_completed(
                 util::bind(outer_ready, std::move(this_), outer_state));
@@ -667,8 +667,8 @@ namespace hpx { namespace lcos { namespace detail
             void (void_continuation::*ready)(shared_state_ptr const&) =
                 &void_continuation::on_ready<Future>;
 
-            shared_state_ptr const& state = traits::get_shared_state(future);
-
+            shared_state_ptr const& state =
+                traits::detail::get_shared_state(future);
             state->execute_deferred();
             state->set_on_completed(util::bind(ready, std::move(this_), state));
         }

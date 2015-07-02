@@ -954,7 +954,7 @@ namespace hpx { namespace lcos
         {}
 
         shared_future(future<R> && other) BOOST_NOEXCEPT
-          : base_type(traits::get_shared_state(other))
+          : base_type(traits::detail::get_shared_state(other))
         {
             other = future<R>();
         }

@@ -153,7 +153,7 @@ namespace hpx { namespace detail
                 future<result_type>
             >::type shared_state_ptr;
 
-            shared_state_ptr const& state = traits::get_shared_state(f);
+            shared_state_ptr const& state = traits::detail::get_shared_state(f);
             state->set_on_completed(hpx::detail::keep_id_alive(id));
         }
 
@@ -215,7 +215,7 @@ namespace hpx { namespace detail
                 future<result_type>
             >::type shared_state_ptr;
 
-            shared_state_ptr const& state = traits::get_shared_state(f);
+            shared_state_ptr const& state = traits::detail::get_shared_state(f);
             state->set_on_completed(detail::keep_id_alive(id));
         }
 

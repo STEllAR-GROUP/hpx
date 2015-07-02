@@ -327,7 +327,7 @@ namespace hpx { namespace lcos
                             shared_state_ptr;
 
                         shared_state_ptr const& shared_state =
-                            traits::get_shared_state(future);
+                            traits::detail::get_shared_state(future);
 
                         shared_state->execute_deferred();
 

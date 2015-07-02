@@ -165,7 +165,7 @@ namespace hpx { namespace lcos
                         typename traits::detail::shared_state_ptr_for<Future>::type
                         shared_state_ptr;
                     shared_state_ptr current =
-                        traits::get_shared_state(lazy_values_[i]);
+                        traits::detail::get_shared_state(lazy_values_[i]);
 
                     current->execute_deferred();
                     current->set_on_completed(

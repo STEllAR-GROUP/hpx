@@ -44,19 +44,23 @@ namespace hpx { namespace traits
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    BOOST_FORCEINLINE typename acquire_shared_state<T>::type
-    get_shared_state(T && t)
+    namespace detail
     {
-        return acquire_shared_state<T>()(std::forward<T>(t));
-    }
+        template <typename T>
+        BOOST_FORCEINLINE typename acquire_shared_state<T>::type
+        get_shared_state(T && t)
+        {
+            return acquire_shared_state<T>()(std::forward<T>(t));
+        }
 
-    template <typename R>
-    BOOST_FORCEINLINE
-    boost::intrusive_ptr<lcos::detail::future_data<R> > const&
-    get_shared_state(boost::intrusive_ptr<lcos::detail::future_data<R> > const& t)
-    {
-        return t;
+        template <typename R>
+        BOOST_FORCEINLINE
+        boost::intrusive_ptr<lcos::detail::future_data<R> > const&
+        get_shared_state(
+            boost::intrusive_ptr<lcos::detail::future_data<R> > const& t)
+        {
+            return t;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

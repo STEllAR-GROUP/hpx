@@ -331,7 +331,7 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE result_type
             operator()(Future const& f) const
             {
-                return traits::get_shared_state(f);
+                return traits::detail::get_shared_state(f);
             }
         };
     }
@@ -394,7 +394,9 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    typename lcos::detail::future_iterator_traits<Iterator>::type
+    typename util::always_void<
+        typename lcos::detail::future_iterator_traits<Iterator>::type
+    >::type
     wait_some(std::size_t n, Iterator begin, Iterator end,
         error_code& ec = throws)
     {
@@ -494,7 +496,7 @@ namespace hpx { namespace lcos
             > result_type;
 
         result_type lazy_values_ =
-            result_type(traits::get_shared_state(ts)...);
+            result_type(traits::detail::get_shared_state(ts)...);
 
         if (n == 0)
         {
@@ -524,7 +526,7 @@ namespace hpx { namespace lcos
             > result_type;
 
         result_type lazy_values_ =
-            result_type(traits::get_shared_state(ts)...);
+            result_type(traits::detail::get_shared_state(ts)...);
 
         if (n == 0)
         {
