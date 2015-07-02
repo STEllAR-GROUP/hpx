@@ -329,6 +329,9 @@ namespace detail
             // handle all threads waiting for the future to become ready
             cond_.notify_all(std::move(l), ec);
 
+            // Note: cv.notify_all() above 'consumes' the lock 'l' and leaves
+            //       it unlocked when returning.
+
             // invoke the callback (continuation) function
             if (on_completed)
                 handle_on_completed(std::move(on_completed));

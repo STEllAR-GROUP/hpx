@@ -47,12 +47,12 @@ if(HPX_WITH_CXX11_LAMBDAS)
       dataflow_future_swap2
       dataflow_recursion_1613
       dataflow_using_774
-      exception_from_continuation
+      exception_from_continuation_1613
       future_hang_on_wait_with_callback_629
      )
   set(dataflow_future_swap2_FLAGS DEPENDENCIES iostreams_component)
   set(dataflow_recursion_1613_PARAMETERS THREADS_PER_LOCALITY 2)
-  set(exception_from_continuation_PARAMETERS THREADS_PER_LOCALITY 2)
+  set(exception_from_continuation_1613_PARAMETERS THREADS_PER_LOCALITY 2)
   set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
 endif()
 
