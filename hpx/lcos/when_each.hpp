@@ -120,9 +120,8 @@ namespace hpx { namespace lcos
 {
     namespace detail
     {
-
         template <typename Tuple, typename F>
-        struct when_each_frame
+        struct when_each_frame //-V690
           : lcos::detail::future_data<void>
         {
             typedef lcos::future<void> type;

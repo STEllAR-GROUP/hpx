@@ -334,15 +334,15 @@ namespace hpx { namespace components
             typedef server::detail::memory_block_header alloc_type;
             alloc_type* p =
                 new (server::detail::allocate_block<alloc_type>(size))
-                    alloc_type(size, act->get_instance());
+                    alloc_type(size, act->get_instance()); //-V522
 
-            HPX_ASSERT(act->load());
+            HPX_ASSERT(act->load()); //-V522
             if (config) {
-                act->load()(p->get_ptr(), size, ar, version,
+                act->load()(p->get_ptr(), size, ar, version, //-V522
                     config->get_ptr());
             }
             else {
-                act->load()(p->get_ptr(), size, ar, version, 0);
+                act->load()(p->get_ptr(), size, ar, version, 0); //-V522
             }
 
             delete act;
@@ -699,7 +699,7 @@ namespace hpx { namespace components { namespace server
             return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
         }
 
-        inline naming::id_type memory_block_header::get_unmanaged_id() const
+        inline naming::id_type memory_block_header::get_unmanaged_id() const //-V524
         {
             return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
         }

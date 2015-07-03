@@ -54,7 +54,7 @@ namespace hpx
     std::string full_version_as_string()
     {
         return boost::str(
-            boost::format("%d.%d.%d") %
+            boost::format("%d.%d.%d") % //-V609
             HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
             HPX_VERSION_SUBMINOR);
     }

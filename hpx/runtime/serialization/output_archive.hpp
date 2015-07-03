@@ -168,7 +168,7 @@ namespace hpx { namespace serialization
         void save_integral_impl(boost::int64_t l)
         {
             const std::size_t size = sizeof(boost::int64_t);
-            char* cptr = reinterpret_cast<char *>(&l);
+            char* cptr = reinterpret_cast<char *>(&l); //-V206
 #ifdef BOOST_BIG_ENDIAN
             if(endian_little())
                 reverse_bytes(size, cptr);
@@ -183,7 +183,7 @@ namespace hpx { namespace serialization
         void save_integral_impl(boost::uint64_t ul)
         {
             const std::size_t size = sizeof(boost::uint64_t);
-            char* cptr = reinterpret_cast<char*>(&ul);
+            char* cptr = reinterpret_cast<char*>(&ul); //-V206
 
 #ifdef BOOST_BIG_ENDIAN
             if(endian_little())

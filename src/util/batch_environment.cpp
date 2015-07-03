@@ -64,7 +64,7 @@ namespace hpx { namespace util
     // This function returns true if a batch environment was found.
     bool batch_environment::found_batch_environment() const
     {
-        return batch_name_ != "";
+        return !batch_name_.empty();
     }
 
     // this function initializes the map of nodes from the given a list of nodes

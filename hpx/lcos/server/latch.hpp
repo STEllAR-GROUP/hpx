@@ -71,7 +71,7 @@ namespace hpx { namespace lcos { namespace server
         }
 
         /// This is invoked whenever the count_down() function is called
-        void set_value(std::ptrdiff_t && n)
+        void set_value(std::ptrdiff_t && n) //-V669
         {
             latch_.count_down(n);
         }

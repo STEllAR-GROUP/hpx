@@ -609,7 +609,7 @@ namespace hpx { namespace threads
             // specific counter
             using performance_counters::detail::create_raw_counter;
             util::function_nonser<boost::int64_t()> f =
-                util::bind(&spt::get_queue_length, &pool_,
+                util::bind(&spt::get_queue_length, &pool_, //-V107
                     static_cast<std::size_t>(paths.instanceindex_));
             return create_raw_counter(info, std::move(f), ec);
         }

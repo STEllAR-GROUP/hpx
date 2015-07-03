@@ -212,14 +212,14 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, no_success, "hwloc_topology::hwloc_get_nobjs_by_type",
                 "Failed to get number of cores");
         }
-        num_core %= num_cores; // -V101 // -V104 // -V107
+        num_core %= num_cores; //-V101 //-V104 //-V107
 
         hwloc_obj_t core_obj;
 
         core_obj = hwloc_get_obj_by_type(topo,
             HWLOC_OBJ_CORE, static_cast<unsigned>(num_core));
 
-        num_pu %= core_obj->arity; // -V101 // -V104
+        num_pu %= core_obj->arity; //-V101 //-V104
 
         return std::size_t(core_obj->children[num_pu]->logical_index);
     } // }}}
@@ -936,7 +936,7 @@ namespace hpx { namespace threads
         if (!obj)
             return empty_mask;//get_core_affinity_mask(num_thread, false);
 
-        num_pu %= obj->arity; // -V101 // -V104
+        num_pu %= obj->arity; //-V101 //-V104
 
         mask_type mask = mask_type();
         resize(mask, get_number_of_pus());

@@ -824,7 +824,7 @@ namespace hpx { namespace util
 
                 if (!threads::any(pu_mask))
                 {
-                    strm << std::setw(4) << i << ": thread binding disabled"
+                    strm << std::setw(4) << i << ": thread binding disabled" //-V112
                          << std::endl;
                 }
                 else

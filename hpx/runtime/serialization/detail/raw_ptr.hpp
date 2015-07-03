@@ -94,14 +94,14 @@ namespace hpx { namespace serialization
         }
 
         template <class T> BOOST_FORCEINLINE
-        output_archive & operator&(output_archive & ar, raw_ptr_proxy<T> t)
+        output_archive & operator&(output_archive & ar, raw_ptr_proxy<T> t) //-V524
         {
             t.serialize(ar);
             return ar;
         }
 
         template <class T> BOOST_FORCEINLINE
-        input_archive & operator&(input_archive & ar, raw_ptr_proxy<T> t)
+        input_archive & operator&(input_archive & ar, raw_ptr_proxy<T> t) //-V524
         {
             t.serialize(ar);
             return ar;

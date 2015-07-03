@@ -1459,7 +1459,7 @@ namespace hpx { namespace components { namespace server
         if (!ini.has_section("hpx.components")) {
             LRT_(info) << "No components found/loaded, HPX will be mostly "
                           "non-functional (no section [hpx.components] found).";
-            return true;     // no components to load
+            return 0;     // no components to load
         }
 
         // each shared library containing components may have an ini section
@@ -1479,7 +1479,7 @@ namespace hpx { namespace components { namespace server
         if (NULL == sec)
         {
             LRT_(error) << "NULL section found";
-            return false;     // something bad happened
+            return 0;     // something bad happened
         }
 
         // make sure every component module gets asked for startup/shutdown

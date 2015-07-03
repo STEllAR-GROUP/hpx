@@ -171,7 +171,7 @@ namespace hpx { namespace serialization
         void load_integral_impl(boost::int64_t & l)
         {
             const std::size_t size = sizeof(boost::int64_t);
-            char* cptr = reinterpret_cast<char *>(&l);
+            char* cptr = reinterpret_cast<char *>(&l); //-V206
             load_binary(cptr, static_cast<std::size_t>(size));
 
 #ifdef BOOST_BIG_ENDIAN
@@ -186,7 +186,7 @@ namespace hpx { namespace serialization
         void load_integral_impl(boost::uint64_t & ul)
         {
             const std::size_t size = sizeof(boost::uint64_t);
-            char* cptr = reinterpret_cast<char *>(&ul);
+            char* cptr = reinterpret_cast<char *>(&ul); //-V206
             load_binary(cptr, static_cast<std::size_t>(size));
 
 #ifdef BOOST_BIG_ENDIAN
