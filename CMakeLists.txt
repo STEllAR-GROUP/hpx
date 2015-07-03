@@ -150,6 +150,16 @@ hpx_option(HPX_WITH_DOCUMENTATION_SINGLEPAGE BOOL
   "The HPX documentation should be build as a single page HTML (default OFF)."
   OFF CATEGORY "Build Targets")
 
+if(WIN32)
+  hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
+    "Force creating pseudo targets and pseudo dependencies (default OFF)."
+    OFF CATEGORY "Build Targets")
+else()
+  hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
+    "Force creating pseudo targets and pseudo dependencies (default ON)."
+    ON CATEGORY "Build Targets")
+endif()
+
 ################################################################################
 # Some platforms do not support dynamic linking. Enable this to link all
 # libraries statically. This also changes some of the internals of HPX related

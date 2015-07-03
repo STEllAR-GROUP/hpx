@@ -112,7 +112,7 @@ set(tests
   install_dir)
 
 set(build_systems cmake)
-if(NOT CMAKE_TOOLCHAIN_FILE)
+if(NOT CMAKE_TOOLCHAIN_FILE AND PKGCONFIG_FOUND AND NOT MSVC)
   set(build_systems ${build_systems} pkgconfig)
 endif()
 
