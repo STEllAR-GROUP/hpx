@@ -7,7 +7,7 @@ set(HPX_ADDPSEUDOTARGET_LOADED TRUE)
 
 macro(add_hpx_pseudo_target)
   hpx_debug("add_hpx_pseudo_target" "adding pseudo target: ${ARGV}")
-  if(NOT WIN32)
+  if(HPX_WITH_PSEUDO_DEPENDENCIES)
     add_custom_target(${ARGV})
   endif()
 endmacro()
