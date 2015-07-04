@@ -361,7 +361,7 @@ namespace hpx
                 std::vector<std::string> counters =
                     vm["hpx:print-counter"].as<std::vector<std::string> >();
 
-                std::string counter_format("csv");
+                std::string counter_format("normal");
                 if (vm.count("hpx:print-counter-format"))
                     counter_format = vm["hpx:print-counter-format"].as<std::string>();
 

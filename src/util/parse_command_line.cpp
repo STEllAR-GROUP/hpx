@@ -519,10 +519,9 @@ namespace hpx { namespace util
                   "possible values:\n"
                   "   'minimal' (prints infos for counter name skeletons)\n"
                   "   'full' (prints all available counter infos)")
-// TO-DO add parseline description
-//                ("hpx:print-counter-format", value<std::string>(),
-//                  "print the performance counter(s) specified with --hpx:print-counter "
-//                  "in a given format (default: normal)")
+                ("hpx:print-counter-format", value<std::string>(),
+                  "print the performance counter(s) specified with --hpx:print-counter "
+                  "in a given format (default: normal)")
             ;
 
             hidden_options.add_options()
