@@ -114,6 +114,9 @@ namespace hpx { namespace traits
     template <typename Future, typename Enable = void>
     struct future_traits;
 
+    template <typename Future, typename Enable = void>
+    struct future_access;
+
     template <typename Range, typename Enable = void>
     struct is_future_range;
 
@@ -128,6 +131,12 @@ namespace hpx { namespace traits
 
     template <typename Future, typename Enable = void>
     struct acquire_future;
+
+    template <typename Future, typename Enable = void>
+    struct acquire_shared_state;
+
+    template <typename T, typename Enable = void>
+    struct is_shared_state;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Plugin, typename Enable = void>
