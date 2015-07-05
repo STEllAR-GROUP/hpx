@@ -24,14 +24,14 @@ foreach(subdir ${subdirs})
     FOLDER "Examples/RandomMemoryAccess/random_mem_access")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(examples.random_mem_access.${subdir})
+  add_hpx_pseudo_target(examples.random_mem_access.${subdir}_dir)
 
   # make pseudo-targets depend on master pseudo-target
   add_hpx_pseudo_dependencies(examples.random_mem_access
-                              examples.random_mem_access.${subdir})
+                              examples.random_mem_access.${subdir}_dir)
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.random_mem_access.${subdir}
+  add_hpx_pseudo_dependencies(examples.random_mem_access.${subdir}_dir
                               ${subdir}_client_exe)
 endforeach()
 

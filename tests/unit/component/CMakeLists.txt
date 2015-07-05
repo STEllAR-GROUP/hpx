@@ -22,9 +22,9 @@ set(tests
     vector_copy
     vector_for_each
     vector_handle_values
+    vector_iter
     vector_move
     vector_transform_reduce
-    vector
    )
 
 
@@ -74,7 +74,7 @@ set(new__PARAMETERS LOCALITIES 2)
 set(new_binpacking_PARAMETERS LOCALITIES 2)
 set(new_colocated_PARAMETERS LOCALITIES 2)
 
-set(vector_FLAGS DEPENDENCIES vector_component)
+set(vector_iter_FLAGS DEPENDENCIES vector_component)
 set(vector_algorithms_FLAGS DEPENDENCIES vector_component)
 set(vector_copy_FLAGS DEPENDENCIES vector_component)
 set(vector_handle_values_FLAGS DEPENDENCIES vector_component)
@@ -96,14 +96,14 @@ foreach(test ${tests})
   add_hpx_unit_test("components" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.components.${test})
+  add_hpx_pseudo_target(tests.unit.component.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.components
-                              tests.unit.components.${test})
+  add_hpx_pseudo_dependencies(tests.unit.component
+                              tests.unit.component.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.components.${test}
+  add_hpx_pseudo_dependencies(tests.unit.component.${test}
                               ${test}_test_exe)
 
 endforeach()

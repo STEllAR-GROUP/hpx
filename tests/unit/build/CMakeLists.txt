@@ -43,7 +43,7 @@ macro(create_cmake_test name hpx_dir)
   )
   add_dependencies(${name}.make_compile ${name}.make_configure)
   add_hpx_pseudo_target(${name})
-  add_hpx_pseudo_dependencies(${name} ${name}.make_compile)
+  add_hpx_pseudo_dependencies_no_shortening(${name} ${name}.make_compile)
 
   if(MSVC)
     set_target_properties(${name}.make_build_dir PROPERTIES

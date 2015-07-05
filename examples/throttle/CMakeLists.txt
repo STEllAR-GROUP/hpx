@@ -24,14 +24,14 @@ foreach(subdir ${subdirs})
     FOLDER "Examples/Throttle")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(examples.throttle.${subdir})
+  add_hpx_pseudo_target(examples.throttle.${subdir}_dir)
 
   # make pseudo-targets depend on master pseudo-target
   add_hpx_pseudo_dependencies(examples.throttle
-                              examples.throttle.${subdir})
+                              examples.throttle.${subdir}_dir)
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.throttle.${subdir}
+  add_hpx_pseudo_dependencies(examples.throttle.${subdir}_dir
                               ${subdir}_client_exe)
 endforeach()
 
