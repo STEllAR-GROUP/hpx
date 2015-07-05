@@ -238,11 +238,11 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Iterator>
     struct future_iterator_traits<Iterator,
         typename util::always_void<
-            typename boost::detail::iterator_traits<Iterator>::value_type
+            typename Iterator::iterator_category
         >::type>
     {
         typedef
-            typename boost::detail::iterator_traits<Iterator>::value_type
+            typename std::iterator_traits<Iterator>::value_type
             type;
 
         typedef traits::future_traits<type> traits_type;
