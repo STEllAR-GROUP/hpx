@@ -361,6 +361,10 @@ namespace hpx
                 std::vector<std::string> counters =
                     vm["hpx:print-counter"].as<std::vector<std::string> >();
 
+                std::string counter_format("normal");
+                if (vm.count("hpx:print-counter-format"))
+                    counter_format = vm["hpx:print-counter-format"].as<std::string>();
+
                 std::string destination("cout");
                 if (vm.count("hpx:print-counter-destination"))
                     destination = vm["hpx:print-counter-destination"].as<std::string>();
@@ -369,7 +373,7 @@ namespace hpx
                 // itself to run after the given interval
                 boost::shared_ptr<util::query_counters> qc =
                     boost::make_shared<util::query_counters>(
-                        boost::ref(counters), interval, destination);
+                        boost::ref(counters), interval, destination, counter_format);
 
                 // schedule to run at shutdown
                 rt.add_pre_shutdown_function(
@@ -389,6 +393,11 @@ namespace hpx
             else if (vm.count("hpx:print-counter-destination")) {
                 throw detail::command_line_error("Invalid command line option "
                     "--hpx:print-counter-destination, valid in conjunction with "
+                    "--hpx:print-counter only");
+            }
+            else if (vm.count("hpx:print-counter-format")) {
+                throw detail::command_line_error("Invalid command line option "
+                    "--hpx:print-counter-format, valid in conjunction with "
                     "--hpx:print-counter only");
             }
         }

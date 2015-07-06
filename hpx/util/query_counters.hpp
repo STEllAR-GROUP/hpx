@@ -28,7 +28,8 @@ namespace hpx { namespace util
 
     public:
         query_counters(std::vector<std::string> const& names,
-            boost::int64_t interval, std::string const& dest);
+            boost::int64_t interval, std::string const& dest,
+            std::string const& form);
 
         void start();
         void stop_evaluating_counters();
@@ -51,6 +52,14 @@ namespace hpx { namespace util
             performance_counters::counter_value const& value,
             std::string const& uom);
 
+        template <typename Stream>
+        void print_name_csv(Stream& out,
+            std::string const& name);
+
+        template <typename Stream>
+        void print_value_csv(Stream& out,
+            performance_counters::counter_value const& value);
+
     private:
         typedef lcos::local::mutex mutex_type;
 
@@ -61,6 +70,7 @@ namespace hpx { namespace util
         std::vector<std::string> uoms_;       // units of measure
 
         std::string destination_;
+        std::string format_;
 
         interval_timer timer_;
     };
