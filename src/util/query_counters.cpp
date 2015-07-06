@@ -16,6 +16,7 @@
 #include <hpx/lcos/wait_all.hpp>
 
 #include <boost/format.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -31,8 +32,25 @@ namespace hpx { namespace util
             interval*1000, "query_counters", true)
     {
         // add counter prefix, if necessary
-        for (std::string& name : names_)
-            performance_counters::ensure_counter_prefix(name);
+        if(format_ == "csv-short"){
+            for (std::string& name : names_) {
+                std::vector<std::string> entry;
+                boost::algorithm::split(entry, name,
+                boost::algorithm::is_any_of(","),
+                boost::algorithm::token_compress_on);
+
+                HPX_ASSERT(entry.size() == 2);
+
+                counter_shortnames.push_back(entry[0]);
+                performance_counters::ensure_counter_prefix(entry[1]);
+            }
+        }
+
+        else {
+            for (std::string& name : names_) {
+                performance_counters::ensure_counter_prefix(name);
+            }
+        }
     }
 
     bool query_counters::find_counter(
@@ -160,6 +178,12 @@ namespace hpx { namespace util
         else {
             out << "invalid";
         }
+    }
+
+    template <typename Stream>
+    void query_counters::print_name_csv_short(Stream& out, std::string const& name)
+    {
+        out << name;
     }
 
     bool query_counters::evaluate()
@@ -374,6 +398,19 @@ namespace hpx { namespace util
                     output << ",";
             }
             output << "\n";
+        }
+
+        if(format_ == "csv-short") {
+            for (std::size_t i = 0; i < counter_shortnames.size(); ++i)
+            {
+                print_name_csv_short(output, counter_shortnames[i]);
+                if (i != counter_shortnames.size()-1)
+                    output << ",";
+            }
+            output << "\n";
+        }
+
+        if (format_ == "csv" || format_ == "csv-short") {
             for (std::size_t i = 0; i < values.size(); ++i)
             {
                 print_value_csv(output, values[i].get());

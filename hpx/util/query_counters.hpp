@@ -60,6 +60,10 @@ namespace hpx { namespace util
         void print_value_csv(Stream& out,
             performance_counters::counter_value const& value);
 
+        template <typename Stream>
+        void print_name_csv_short(Stream& out,
+            std::string const& name);
+
     private:
         typedef lcos::local::mutex mutex_type;
 
@@ -71,6 +75,7 @@ namespace hpx { namespace util
 
         std::string destination_;
         std::string format_;
+        std::vector<std::string> counter_shortnames;
 
         interval_timer timer_;
     };
