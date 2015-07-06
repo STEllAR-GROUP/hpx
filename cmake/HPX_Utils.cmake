@@ -18,6 +18,7 @@ hpx_include(
   AddTest
   AddPseudoDependencies
   AddPseudoTarget
+  ShortenPseudoTarget
   AddLibrarySources
   AddLibraryHeaders
   AddSourceGroup

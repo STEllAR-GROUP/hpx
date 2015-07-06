@@ -75,14 +75,14 @@ foreach(test ${tests})
   add_hpx_regression_test("lcos" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.lcos.${test})
+  add_hpx_pseudo_target(tests.regressions.lcos_dir.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.lcos
-                              tests.regressions.lcos.${test})
+  add_hpx_pseudo_dependencies(tests.regressions.lcos_dir
+                              tests.regressions.lcos_dir.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.lcos.${test}
+  add_hpx_pseudo_dependencies(tests.regressions.lcos_dir.${test}
                               ${test}_test_exe)
 endforeach()
 
