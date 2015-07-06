@@ -10,6 +10,8 @@ set(tests
     async_callback_non_deduced_context
     async_unwrap_1037
     call_promise_get_gid_more_than_once
+    dataflow_791
+    dataflow_future_swap
     dataflow_launch_775
     future_790
     future_hang_on_get_629
@@ -27,45 +29,33 @@ set(tests
     when_all_vectors_1623
    )
 
-
 set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
-set(dataflow_future_swap2_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
-set(tests ${tests}
-    dataflow_future_swap
-    dataflow_791
-   )
+set(after_588_PARAMETERS LOCALITIES 2)
+set(async_callback_with_bound_callback_PARAMETERS LOCALITIES 2)
+set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
+set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
+set(ignore_while_locked_1485_PARAMETERS THREADS_PER_LOCALITY 2)
+set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
+set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
+
 if(HPX_WITH_CXX11_LAMBDAS)
   set(tests ${tests}
       dataflow_const_functor_773
       dataflow_future_swap2
+      dataflow_recursion_1613
       dataflow_using_774
+      exception_from_continuation_1613
+      future_hang_on_wait_with_callback_629
      )
-endif()
-
-set(after_588_PARAMETERS LOCALITIES 2)
-
-set(async_callback_with_bound_callback_PARAMETERS LOCALITIES 2)
-
-set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
-set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
-set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
-
-set(ignore_while_locked_1485_PARAMETERS THREADS_PER_LOCALITY 2)
-
-set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
-set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
-
-set(set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
-
-if(HPX_WITH_CXX11_LAMBDAS)
+  set(dataflow_future_swap2_FLAGS DEPENDENCIES iostreams_component)
+  set(dataflow_recursion_1613_PARAMETERS THREADS_PER_LOCALITY 2)
+  set(exception_from_continuation_1613_PARAMETERS THREADS_PER_LOCALITY 2)
   set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
-  set(tests
-    ${tests}
-    future_hang_on_wait_with_callback_629)
 endif()
-
-set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 
 # Create test cases
 foreach(test ${tests})
