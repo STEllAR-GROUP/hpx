@@ -13,7 +13,7 @@ macro(add_hpx_config_test variable)
   cmake_parse_arguments(${variable} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT DEFINED ${variable})
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests")
+    file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests")
 
     string(TOUPPER "${variable}" variable_lc)
     if(${variable}_FILE)
@@ -24,11 +24,11 @@ macro(add_hpx_config_test variable)
       endif()
     else()
       set(test_source
-          "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}.cpp")
+          "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc}.cpp")
       file(WRITE "${test_source}"
            "${${variable}_SOURCE}\n")
     endif()
-    set(test_binary ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc})
+    set(test_binary ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${variable_lc})
 
     get_directory_property(CONFIG_TEST_INCLUDE_DIRS INCLUDE_DIRECTORIES)
     get_directory_property(CONFIG_TEST_LINK_DIRS LINK_DIRECTORIES)
@@ -48,7 +48,7 @@ macro(add_hpx_config_test variable)
     if(${variable}_EXECUTE)
       if(NOT CMAKE_CROSSCOMPILING)
         try_run(${variable}_RUN_RESULT ${variable}_COMPILE_RESULT
-          ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
+          ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
           ${test_source}
           CMAKE_FLAGS
             "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
@@ -67,7 +67,7 @@ macro(add_hpx_config_test variable)
       endif()
     else()
       try_compile(${variable}_RESULT
-        ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
+        ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests
         ${test_source}
         CMAKE_FLAGS
           "-DINCLUDE_DIRECTORIES=${CONFIG_TEST_INCLUDE_DIRS}"
