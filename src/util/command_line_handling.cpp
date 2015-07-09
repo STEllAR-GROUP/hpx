@@ -537,6 +537,10 @@ namespace hpx { namespace util
             }
         }
 
+        if (vm.count("hpx:connect") && hpx_host==std::string("127.0.0.1")) {
+            hpx_host = hpx::util::resolve_public_ip_address();
+        }
+
         queuing_ = "local-priority";
         if (vm.count("hpx:queuing"))
             queuing_ = vm["hpx:queuing"].as<std::string>();
@@ -985,4 +989,3 @@ namespace hpx { namespace util
         return 0;
     }
 }}
-
