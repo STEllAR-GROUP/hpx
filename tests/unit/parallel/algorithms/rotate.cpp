@@ -125,7 +125,8 @@ void test_rotate_exception(ExPolicy policy, IteratorTag)
 
     base_iterator mid = boost::begin(c);
 
-    std::size_t delta = (std::size_t)(std::rand() % c.size()); //-V104
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -134,8 +135,7 @@ void test_rotate_exception(ExPolicy policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::runtime_error("test"); }),
-            decorated_iterator(mid,
-                [](){ throw std::runtime_error("test"); }),
+            decorated_iterator(mid),
             decorated_iterator(boost::end(c)));
         HPX_TEST(false);
     }
@@ -162,7 +162,8 @@ void test_rotate_exception_async(ExPolicy p, IteratorTag)
 
     base_iterator mid = boost::begin(c);
 
-    std::size_t delta = (std::size_t)(std::rand() % c.size()); //-V104
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -173,8 +174,7 @@ void test_rotate_exception_async(ExPolicy p, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::runtime_error("test"); }),
-                decorated_iterator(mid,
-                    [](){ throw std::runtime_error("test"); }),
+                decorated_iterator(mid),
                 decorated_iterator(boost::end(c)));
         returned_from_algorithm = true;
         f.get();
@@ -235,7 +235,8 @@ void test_rotate_bad_alloc(ExPolicy policy, IteratorTag)
 
     base_iterator mid = boost::begin(c);
 
-    std::size_t delta = (std::size_t)(std::rand() % c.size()); //-V104
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -244,8 +245,7 @@ void test_rotate_bad_alloc(ExPolicy policy, IteratorTag)
             decorated_iterator(
                 boost::begin(c),
                 [](){ throw std::bad_alloc(); }),
-            decorated_iterator(mid,
-                [](){ throw std::bad_alloc(); }),
+            decorated_iterator(mid),
             decorated_iterator(boost::end(c)));
         HPX_TEST(false);
     }
@@ -271,7 +271,8 @@ void test_rotate_bad_alloc_async(ExPolicy p, IteratorTag)
 
     base_iterator mid = boost::begin(c);
 
-    std::size_t delta = (std::size_t)(std::rand() % c.size()); //-V104
+    // move at least one element to guarantee an exception to be thrown
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -282,8 +283,7 @@ void test_rotate_bad_alloc_async(ExPolicy p, IteratorTag)
                 decorated_iterator(
                     boost::begin(c),
                     [](){ throw std::bad_alloc(); }),
-                decorated_iterator(mid,
-                    [](){ throw std::bad_alloc(); }),
+                decorated_iterator(mid),
                 decorated_iterator(boost::end(c)));
         returned_from_algorithm = true;
         f.get();
