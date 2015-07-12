@@ -368,16 +368,16 @@ namespace hpx
                 if (vm.count("hpx:print-counter-format")) {
                     counter_format = vm["hpx:print-counter-format"].as<std::string>();
                     if (counter_format == "csv-short"){
-                        for (std::string& counter : counters) {
+                        for (std::size_t i=0; i< counters.size() ; ++i) {
                             std::vector<std::string> entry;
-                            boost::algorithm::split(entry, counter,
+                            boost::algorithm::split(entry, counters[i],
                             boost::algorithm::is_any_of(","),
                             boost::algorithm::token_compress_on);
 
                             HPX_ASSERT(entry.size() == 2);
 
                             counter_shortnames.push_back(entry[0]);
-                            counters.pushback(entry[1]);
+                            counters[i] = entry[1];
                         }
                     }
                 }
