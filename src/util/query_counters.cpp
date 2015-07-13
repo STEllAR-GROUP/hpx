@@ -25,8 +25,8 @@ namespace hpx { namespace util
 {
     query_counters::query_counters(std::vector<std::string> const& names,
             boost::int64_t interval, std::string const& dest, std::string const& form,
-            std::vector<std::string> const& shortnames)
-      : names_(names), destination_(dest), format_(form), counter_shortnames_(shortnames),
+            std::vector<std::string> const& shortnames, bool csv_header)
+      : names_(names), destination_(dest), format_(form), counter_shortnames_(shortnames), csv_header_(csv_header)
         timer_(boost::bind(&query_counters::evaluate, this_()),
             boost::bind(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)
@@ -374,24 +374,26 @@ namespace hpx { namespace util
 //         wait_all(values);
 
         // Output the performance counter value.
-        if(format_ == "csv") {
-            for (std::size_t i = 0; i < names_.size(); ++i)
-            {
-                print_name_csv(output, names_[i]);
-                if (i != names_.size()-1)
-                    output << ",";
+        if (csv_header_ == true) {
+            if(format_ == "csv") {
+                for (std::size_t i = 0; i < names_.size(); ++i)
+                {
+                    print_name_csv(output, names_[i]);
+                    if (i != names_.size()-1)
+                        output << ",";
+                }
+                output << "\n";
             }
-            output << "\n";
-        }
 
-        if(format_ == "csv-short") {
-            for (std::size_t i = 0; i < counter_shortnames_.size(); ++i)
-            {
-                print_name_csv_short(output, counter_shortnames_[i]);
-                if (i != counter_shortnames_.size()-1)
-                    output << ",";
+            if(format_ == "csv-short") {
+                for (std::size_t i = 0; i < counter_shortnames_.size(); ++i)
+                {
+                    print_name_csv_short(output, counter_shortnames_[i]);
+                    if (i != counter_shortnames_.size()-1)
+                        output << ",";
+                }
+                output << "\n";
             }
-            output << "\n";
         }
 
         if (format_ == "csv" || format_ == "csv-short") {

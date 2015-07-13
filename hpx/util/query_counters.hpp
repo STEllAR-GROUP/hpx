@@ -76,6 +76,7 @@ namespace hpx { namespace util
         std::string destination_;
         std::string format_;
         std::vector<std::string> counter_shortnames_;
+        bool csv_header_;
 
         interval_timer timer_;
     };

@@ -523,6 +523,14 @@ namespace hpx { namespace util
                 ("hpx:print-counter-format", value<std::string>(),
                   "print the performance counter(s) specified with --hpx:print-counter "
                   "in a given format (default: normal)")
+                ("hpx:csv-header",
+                  "print the performance counter(s) specified with --hpx:print-counter"
+                  "with header when format specified with --hpx:print-counter-format"
+                  "is csv or csv-short")
+                ("hpx:no-csv-header",
+                  "print the performance counter(s) specified with --hpx:print-counter"
+                  "without header when format specified with --hpx:print-counter-format"
+                  "is csv or csv-short")
             ;
 
             hidden_options.add_options()

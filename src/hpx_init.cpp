@@ -382,6 +382,10 @@ namespace hpx
                     }
                 }
 
+                bool csv_header = true;
+                if(vm.count("hpx:no-csv-header"))
+                    csv_header = false;
+
                 std::string destination("cout");
                 if (vm.count("hpx:print-counter-destination"))
                     destination = vm["hpx:print-counter-destination"].as<std::string>();
@@ -390,7 +394,8 @@ namespace hpx
                 // itself to run after the given interval
                 boost::shared_ptr<util::query_counters> qc =
                     boost::make_shared<util::query_counters>(
-                        boost::ref(counters), interval, destination, counter_format, counter_shortnames);
+                        boost::ref(counters), interval, destination, counter_format, 
+                        counter_shortnames, csv_header);
 
                 // schedule to run at shutdown
                 rt.add_pre_shutdown_function(
