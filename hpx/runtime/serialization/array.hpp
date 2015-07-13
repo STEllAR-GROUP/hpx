@@ -150,28 +150,32 @@ namespace hpx { namespace serialization
     template <typename T, std::size_t N> BOOST_FORCEINLINE
     output_archive & operator<<(output_archive & ar, T (&t)[N])
     {
-        ar.invoke(make_array(t, N));
+        array<T> array = make_array(t, N);
+        ar.invoke(array);
         return ar;
     }
 
     template <typename T, std::size_t N> BOOST_FORCEINLINE
     input_archive & operator>>(input_archive & ar, T (&t)[N])
     {
-        ar.invoke(make_array(t, N));
+        array<T> array = make_array(t, N);
+        ar.invoke(array);
         return ar;
     }
 
     template <typename T, std::size_t N> BOOST_FORCEINLINE
     output_archive & operator&(output_archive & ar, T (&t)[N]) //-V524
     {
-        ar.invoke(make_array(t, N));
+        array<T> array = make_array(t, N);
+        ar.invoke(array);
         return ar;
     }
 
     template <typename T, std::size_t N> BOOST_FORCEINLINE
     input_archive & operator&(input_archive & ar, T (&t)[N]) //-V524
     {
-        ar.invoke(make_array(t, N));
+        array<T> array = make_array(t, N);
+        ar.invoke(array);
         return ar;
     }
 }}
