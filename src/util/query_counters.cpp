@@ -394,6 +394,7 @@ namespace hpx { namespace util
                 }
                 output << "\n";
             }
+            csv_header_ = false;
         }
 
         if (format_ == "csv" || format_ == "csv-short") {
