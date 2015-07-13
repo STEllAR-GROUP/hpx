@@ -262,9 +262,40 @@ namespace hpx { namespace parcelset
         }
 
         /// Cache specific functionality
+        void remove_from_connection_cache_delayed(locality const& loc)
+        {
+            if (operations_in_flight_ != 0)
+            {
+                error_code ec(lightweight);
+                hpx::applier::register_thread_nullary(
+                    util::bind(
+                        &parcelport_impl::remove_from_connection_cache,
+                        this, loc),
+                    "remove_from_connection_cache",
+                    threads::pending, true, threads::thread_priority_normal,
+                    std::size_t(-1), threads::thread_stacksize_default, ec);
+                if (!ec) return;
+            }
+
+            connection_cache_.clear(loc);
+        }
+
         void remove_from_connection_cache(locality const& loc)
         {
-            connection_cache_.clear(loc);
+            error_code ec(lightweight);
+            threads::thread_id_type id =
+                hpx::applier::register_thread_nullary(
+                    util::bind(
+                        &parcelport_impl::remove_from_connection_cache_delayed,
+                        this, loc),
+                    "remove_from_connection_cache",
+                    threads::suspended, true, threads::thread_priority_normal,
+                    std::size_t(-1), threads::thread_stacksize_default, ec);
+            if (ec) return;
+
+            threads::set_thread_state(id,
+                boost::chrono::milliseconds(100), threads::pending,
+                threads::wait_signaled, threads::thread_priority_boost, ec);
         }
 
         /// Temporarily enable/disable all parcel handling activities in the

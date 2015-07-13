@@ -76,6 +76,13 @@ if(HPX_WITH_COMPRESSION_BZIP2 OR HPX_WITH_COMPRESSION_ZLIB)
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
+# attempt to load Boost.Random (if available), it's needed for one example only
+find_package(Boost 1.49 QUIET COMPONENTS random)
+if(Boost_RANDOM_FOUND)
+  hpx_info("  random")
+  set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
+endif()
+
 # If the found Boost installation is < 1.53, we need to include our packaged
 # atomic library
 if(Boost_VERSION LESS 105300)
@@ -109,7 +116,6 @@ endif()
 
 # Boost preprocessor definitions
 hpx_add_config_define(BOOST_PARAMETER_MAX_ARITY 7)
-hpx_add_config_define(HPX_HAVE_COROUTINE_ARG_MAX 1)
 if(MSVC)
   HPX_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL "Add BOOST_ALL_DYN_LINK to compile flags" OFF)
   if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK)

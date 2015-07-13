@@ -488,13 +488,15 @@ namespace hpx { namespace threads { namespace policies
                 return thread_map_count_ == 0;
 
             if (delete_all) {
+                // do not lock mutex while deleting all threads, do it piece-wise
                 bool thread_map_is_empty = false;
                 while (true)
                 {
                     typename mutex_type::scoped_lock lk(mtx_);
                     if (cleanup_terminated_locked_helper(false))
                     {
-                        thread_map_is_empty = thread_map_.empty();
+                        thread_map_is_empty =
+                            (thread_map_count_ == 0) && (new_tasks_count_ == 0);
                         break;
                     }
                 }
@@ -502,7 +504,8 @@ namespace hpx { namespace threads { namespace policies
             }
 
             typename mutex_type::scoped_lock lk(mtx_);
-            return cleanup_terminated_locked_helper(false) && thread_map_.empty();
+            return cleanup_terminated_locked_helper(false) &&
+                (thread_map_count_ == 0) && (new_tasks_count_ == 0);
         }
 
         // The maximum number of active threads this thread manager should
@@ -609,7 +612,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        boost::uint64_t get_num_pending_misses(bool reset)
+        boost::int64_t get_num_pending_misses(bool reset)
         {
             return util::get_and_reset_value(pending_misses_, reset);
         }
@@ -619,7 +622,7 @@ namespace hpx { namespace threads { namespace policies
             pending_misses_ += num;
         }
 
-        boost::uint64_t get_num_pending_accesses(bool reset)
+        boost::int64_t get_num_pending_accesses(bool reset)
         {
             return util::get_and_reset_value(pending_accesses_, reset);
         }
@@ -629,7 +632,7 @@ namespace hpx { namespace threads { namespace policies
             pending_accesses_ += num;
         }
 
-        boost::uint64_t get_num_stolen_from_pending(bool reset)
+        boost::int64_t get_num_stolen_from_pending(bool reset)
         {
             return util::get_and_reset_value(stolen_from_pending_, reset);
         }
@@ -639,7 +642,7 @@ namespace hpx { namespace threads { namespace policies
             stolen_from_pending_ += num;
         }
 
-        boost::uint64_t get_num_stolen_from_staged(bool reset)
+        boost::int64_t get_num_stolen_from_staged(bool reset)
         {
             return util::get_and_reset_value(stolen_from_staged_, reset);
         }
@@ -649,7 +652,7 @@ namespace hpx { namespace threads { namespace policies
             stolen_from_staged_ += num;
         }
 
-        boost::uint64_t get_num_stolen_to_pending(bool reset)
+        boost::int64_t get_num_stolen_to_pending(bool reset)
         {
             return util::get_and_reset_value(stolen_to_pending_, reset);
         }
@@ -659,7 +662,7 @@ namespace hpx { namespace threads { namespace policies
             stolen_to_pending_ += num;
         }
 
-        boost::uint64_t get_num_stolen_to_staged(bool reset)
+        boost::int64_t get_num_stolen_to_staged(bool reset)
         {
             return util::get_and_reset_value(stolen_to_staged_, reset);
         }

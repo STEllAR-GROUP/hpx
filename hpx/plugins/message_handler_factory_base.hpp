@@ -25,7 +25,7 @@ namespace hpx { namespace plugins
 
         /// Create a new instance of a message handler
         ///
-        /// return Returns the newly created instance of the message handler 
+        /// return Returns the newly created instance of the message handler
         ///        supported by this factory
         virtual parcelset::policies::message_handler* create(
             char const* action, parcelset::parcelport* pp,

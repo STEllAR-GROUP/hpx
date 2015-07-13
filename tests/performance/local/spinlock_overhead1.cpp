@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/wait_each.hpp>
@@ -53,8 +54,10 @@ std::size_t k2 = 0;
 
 namespace test
 {
-    struct local_spinlock : boost::noncopyable
+    struct local_spinlock
     {
+        HPX_NON_COPYABLE(local_spinlock);
+
     private:
         boost::uint64_t v_;
 

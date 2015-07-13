@@ -35,7 +35,8 @@ namespace hpx { namespace util
     {
         try {
             namespace fs = boost::filesystem;
-            if (!fs::exists(loc))
+            boost::system::error_code ec;
+            if (!fs::exists(loc, ec) || ec)
                 return false;       // avoid exception on missing file
             ini.read (loc);
         }
@@ -130,7 +131,8 @@ namespace hpx { namespace util
 
         if (!hpx_ini_file.empty()) {
             namespace fs = boost::filesystem;
-            if (!fs::exists(hpx_ini_file)) {
+            boost::system::error_code ec;
+            if (!fs::exists(hpx_ini_file, ec) || ec) {
                 std::cerr << "hpx::init: command line warning: file specified using "
                              "--hpx::config does not exist ("
                     << hpx_ini_file << ")." << std::endl;
@@ -176,7 +178,8 @@ namespace hpx { namespace util
                 fs::directory_iterator nodir;
                 fs::path this_path (hpx::util::create_path(*it));
 
-                if (!fs::exists(this_path))
+                boost::system::error_code ec;
+                if (!fs::exists(this_path, ec) || ec)
                     continue;
 
                 for (fs::directory_iterator dir(this_path); dir != nodir; ++dir)
@@ -377,7 +380,8 @@ namespace hpx { namespace util
             fs::directory_iterator nodir;
             fs::path libs_path (hpx::util::create_path(libs));
 
-            if (!fs::exists(libs_path))
+            boost::system::error_code ec;
+            if (!fs::exists(libs_path, ec) || ec)
                 return plugin_registries;     // given directory doesn't exist
 
             // retrieve/create section [hpx.components]
@@ -404,6 +408,12 @@ namespace hpx { namespace util
 #if !defined(BOOST_WINDOWS)
                 if (0 == name.find("lib"))
                     name = name.substr(3);
+#endif
+#if defined(__APPLE__) // shared library version is added berfore extension
+                const std::string version = hpx::full_version_as_string();
+                std::string::size_type i = name.find(version);
+                if (i != std::string::npos)
+                    name.erase(i - 1, version.length() + 1); // - 1 for one more dot
 #endif
                 // ensure base directory, remove symlinks, etc.
                 boost::system::error_code fsec;

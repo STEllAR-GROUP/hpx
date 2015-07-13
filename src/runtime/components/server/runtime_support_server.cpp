@@ -7,6 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
@@ -28,7 +29,6 @@
 #include <hpx/runtime/components/component_commandline_base.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -58,57 +58,74 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::bulk_create_components_action,
-    bulk_create_components_action)
-HPX_REGISTER_ACTION(
+    bulk_create_components_action,
+    hpx::actions::bulk_create_components_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::create_memory_block_action,
-    create_memory_block_action)
-HPX_REGISTER_ACTION(
+    create_memory_block_action,
+    hpx::actions::create_memory_block_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::load_components_action,
-    load_components_action)
-HPX_REGISTER_ACTION(
+    load_components_action,
+    hpx::actions::load_components_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::call_startup_functions_action,
-    call_startup_functions_action)
-HPX_REGISTER_ACTION(
+    call_startup_functions_action,
+    hpx::actions::call_startup_functions_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::call_shutdown_functions_action,
-    call_shutdown_functions_action)
-HPX_REGISTER_ACTION(
+    call_shutdown_functions_action,
+    hpx::actions::call_shutdown_functions_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::free_component_action,
-    free_component_action)
-HPX_REGISTER_ACTION(
+    free_component_action,
+    hpx::actions::free_component_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::shutdown_action,
-    shutdown_action)
-HPX_REGISTER_ACTION(
+    shutdown_action,
+    hpx::actions::shutdown_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::shutdown_all_action,
-    shutdown_all_action)
-HPX_REGISTER_ACTION(
+    shutdown_all_action,
+    hpx::actions::shutdown_all_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::terminate_action,
-    terminate_action)
-HPX_REGISTER_ACTION(
+    terminate_action,
+    hpx::actions::terminate_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::terminate_all_action,
-    terminate_all_action)
-HPX_REGISTER_ACTION(
+    terminate_all_action,
+    hpx::actions::terminate_all_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::get_config_action,
-    get_config_action)
-HPX_REGISTER_ACTION(
+    get_config_action,
+    hpx::actions::get_config_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::update_agas_cache_entry_action,
-    update_agas_cache_entry_action)
-HPX_REGISTER_ACTION(
+    update_agas_cache_entry_action,
+    hpx::actions::update_agas_cache_entry_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::garbage_collect_action,
-    garbage_collect_action)
-HPX_REGISTER_ACTION(
+    garbage_collect_action,
+    hpx::actions::garbage_collect_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::create_performance_counter_action,
-    create_performance_counter_action)
-HPX_REGISTER_ACTION(
+    create_performance_counter_action,
+    hpx::actions::create_performance_counter_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::get_instance_count_action,
-    get_instance_count_action)
-HPX_REGISTER_ACTION(
+    get_instance_count_action,
+    hpx::actions::get_instance_count_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
-    remove_from_connection_cache_action)
-HPX_REGISTER_ACTION(
+    remove_from_connection_cache_action,
+    hpx::actions::remove_from_connection_cache_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::dijkstra_termination_action,
-    dijkstra_termination_action)
+    dijkstra_termination_action,
+    hpx::actions::dijkstra_termination_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
@@ -509,8 +526,11 @@ namespace hpx { namespace components { namespace server
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
     call_shutdown_functions_action;
 
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action)
-HPX_REGISTER_BROADCAST_ACTION(call_shutdown_functions_action)
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action,
+        call_shutdown_functions_action)
+HPX_REGISTER_BROADCAST_ACTION_ID(call_shutdown_functions_action,
+        call_shutdown_functions_action,
+        hpx::actions::broadcast_call_shutdown_functions_action_id)
 
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 
@@ -1109,7 +1129,7 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-    bool runtime_support::load_components()
+    int runtime_support::load_components()
     {
         // load components now that AGAS is up
         util::runtime_configuration& ini = get_runtime().get_config();
@@ -1122,22 +1142,24 @@ namespace hpx { namespace components { namespace server
 
         // then dynamic ones
         naming::resolver_client& client = get_runtime().get_agas_client();
-        bool result = load_components(ini, client.get_local_locality(), client);
+        int result = load_components(ini, client.get_local_locality(), client);
+        if (!load_plugins(ini))
+            result = -2;
 
-        return load_plugins(ini) && result;
+        return result;
     }
 
     void runtime_support::call_startup_functions(bool pre_startup)
     {
         if (pre_startup) {
-            get_runtime().set_state(runtime::state_pre_startup);
+            get_runtime().set_state(state_pre_startup);
             for (util::function_nonser<void()> const& f : pre_startup_functions_)
             {
                 f();
             }
         }
         else {
-            get_runtime().set_state(runtime::state_startup);
+            get_runtime().set_state(state_startup);
             for (util::function_nonser<void()> const& f : startup_functions_)
             {
                 f();
@@ -1149,7 +1171,7 @@ namespace hpx { namespace components { namespace server
     {
         runtime& rt = get_runtime();
         if (pre_shutdown) {
-            rt.set_state(runtime::state_pre_shutdown);
+            rt.set_state(state_pre_shutdown);
             for (util::function_nonser<void()> const& f : pre_shutdown_functions_)
             {
                 try {
@@ -1161,7 +1183,7 @@ namespace hpx { namespace components { namespace server
             }
         }
         else {
-            rt.set_state(runtime::state_shutdown);
+            rt.set_state(state_shutdown);
             for (util::function_nonser<void()> const& f : shutdown_functions_)
             {
                 try {
@@ -1430,14 +1452,14 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
-    bool runtime_support::load_components(util::section& ini,
+    int runtime_support::load_components(util::section& ini,
         naming::gid_type const& prefix, naming::resolver_client& agas_client)
     {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.components")) {
             LRT_(info) << "No components found/loaded, HPX will be mostly "
                           "non-functional (no section [hpx.components] found).";
-            return true;     // no components to load
+            return 0;     // no components to load
         }
 
         // each shared library containing components may have an ini section
@@ -1457,7 +1479,7 @@ namespace hpx { namespace components { namespace server
         if (NULL == sec)
         {
             LRT_(error) << "NULL section found";
-            return false;     // something bad happened
+            return 0;     // something bad happened
         }
 
         // make sure every component module gets asked for startup/shutdown
@@ -1569,7 +1591,7 @@ namespace hpx { namespace components { namespace server
                     throw hpx::detail::command_line_error(
                         "unknown help option: " + help_option);
                 }
-                return false;
+                return 1;
             }
 
             // secondary command line handling, looking for --exit and other
@@ -1594,15 +1616,15 @@ namespace hpx { namespace components { namespace server
                     util::handle_list_parcelports();
 
                 if (vm.count("hpx:exit"))
-                    return false;
+                    return 1;
             }
         }
         catch (std::exception const& e) {
             std::cerr << "runtime_support::load_components: "
                       << "command line processing: " << e.what() << std::endl;
-            return false;
+            return -1;
         }
-        return true;
+        return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////

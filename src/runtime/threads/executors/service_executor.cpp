@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/threads/executors/service_executor.hpp>
+#include <hpx/runtime/threads/executors/service_executors.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <boost/asio/basic_deadline_timer.hpp>
@@ -15,8 +15,10 @@
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    service_executor::service_executor(char const* pool_name)
-      : pool_(get_thread_pool(pool_name)), task_count_(0), shutdown_sem_(0)
+    service_executor::service_executor(
+            char const* pool_name, char const* pool_name_suffix)
+      : pool_(get_thread_pool(pool_name, pool_name_suffix)),
+        task_count_(0), shutdown_sem_(0)
     {
         if (!pool_) {
             HPX_THROW_EXCEPTION(bad_parameter,

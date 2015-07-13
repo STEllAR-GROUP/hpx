@@ -57,7 +57,7 @@ namespace hpx { namespace threads
                 return get_locked();
             }
 
-            CoroutineImpl* try_get()
+            CoroutineImpl* try_get() //-V524
             {
                 return get_locked();
             }
@@ -689,8 +689,8 @@ namespace hpx { namespace threads
 
             this->thread_data_base::rebind_base(init_data, newstate);
 
-            coroutine_.rebind(boost::move(init_data.func),
-                boost::move(init_data.target), this_());
+            coroutine_.rebind(std::move(init_data.func),
+                std::move(init_data.target), this_());
 
             HPX_ASSERT(init_data.stacksize != 0);
             HPX_ASSERT(coroutine_.is_ready());
@@ -803,8 +803,8 @@ namespace hpx { namespace threads
 
             this->thread_data_base::rebind_base(init_data, newstate);
 
-            coroutine_.rebind(boost::move(init_data.func),
-                boost::move(init_data.target), this_());
+            coroutine_.rebind(std::move(init_data.func),
+                std::move(init_data.target), this_());
 
             HPX_ASSERT(init_data.stacksize == 0);
         }

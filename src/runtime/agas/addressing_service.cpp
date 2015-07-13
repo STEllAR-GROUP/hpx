@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -216,7 +217,7 @@ addressing_service::addressing_service(
         threads::thread_priority_normal : threads::thread_priority_boost)
   , rts_lva_(0)
   , mem_lva_(0)
-  , state_(starting)
+  , state_(state_starting)
   , locality_()
 { // {{{
     boost::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
@@ -254,7 +255,7 @@ void addressing_service::initialize(parcelset::parcelhandler& ph,
             &hosted->primary_ns_server_, &hosted->symbol_ns_server_);
     }
 
-    set_status(running);
+    set_status(state_running);
 } // }}}
 
 void* addressing_service::get_hosted_primary_ns_ptr() const
@@ -299,7 +300,7 @@ namespace detail
 }
 
 void addressing_service::launch_bootstrap(
-    boost::shared_ptr<parcelset::parcelport> pp
+    boost::shared_ptr<parcelset::parcelport> const& pp
   , parcelset::endpoints_type const & endpoints
   , util::runtime_configuration const& ini_
     )
@@ -653,7 +654,7 @@ bool addressing_service::get_console_locality(
     )
 { // {{{
     try {
-        if (get_status() != running)
+        if (get_status() != state_running)
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -2040,7 +2041,7 @@ static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
     boost::int64_t mutable_gid_credit, boost::int64_t new_gid_credit)
 {
     // Return the credit to the GID if the operation failed
-    if (f.has_exception() && mutable_gid_credit != 0)
+    if ((f.has_exception() && mutable_gid_credit != 0) || !f.get())
     {
         naming::detail::add_credit_to_gid(id.get_gid(), new_gid_credit);
         return false;
@@ -2185,7 +2186,7 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     }
 
     lcos::promise<naming::id_type, naming::gid_type> p;
-    request req(symbol_ns_on_event, name, evt, call_for_past_events, p.get_gid());
+    request req(symbol_ns_on_event, name, evt, call_for_past_events, p.get_id());
     hpx::future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
 
@@ -2199,8 +2200,11 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
 typedef hpx::agas::server::symbol_namespace::service_action
     symbol_namespace_service_action;
 
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_service_action)
-HPX_REGISTER_BROADCAST_ACTION(symbol_namespace_service_action)
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_service_action,
+        symbol_namespace_service_action)
+HPX_REGISTER_BROADCAST_ACTION_ID(symbol_namespace_service_action,
+        symbol_namespace_service_action,
+        hpx::actions::broadcast_symbol_namespace_service_action_id)
 
 namespace hpx { namespace agas
 {

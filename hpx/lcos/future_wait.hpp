@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
@@ -161,11 +162,12 @@ namespace hpx { namespace lcos
                 for (std::size_t i = 0; i != size; ++i)
                 {
                     typedef
-                        typename lcos::detail::shared_state_ptr_for<Future>::type
+                        typename traits::detail::shared_state_ptr_for<Future>::type
                         shared_state_ptr;
                     shared_state_ptr current =
-                        lcos::detail::get_shared_state(lazy_values_[i]);
+                        traits::detail::get_shared_state(lazy_values_[i]);
 
+                    current->execute_deferred();
                     current->set_on_completed(
                         util::bind(&wait_each::on_future_ready, this, i, id));
                 }

@@ -7,7 +7,7 @@
 
 #include <initializer_list>
 #include <vector>
- 
+
 template <typename T>
 struct A
 {
@@ -15,7 +15,7 @@ struct A
 
     A(std::initializer_list<T> v) : v_(v) {}
 };
- 
+
 int main()
 {
     A<int> a = {1, 2, 3, 4, 5};

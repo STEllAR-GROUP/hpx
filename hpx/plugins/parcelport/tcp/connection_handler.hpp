@@ -43,7 +43,7 @@ namespace hpx { namespace parcelset
 
         static const char * pool_name()
         {
-            return "parcel_pool_tcp";
+            return "parcel-pool-tcp";
         }
 
         static const char * pool_name_postfix()

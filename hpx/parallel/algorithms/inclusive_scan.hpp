@@ -15,8 +15,8 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -66,8 +66,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename T, typename OutIter, typename Op>
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
-        scan_copy_helper(ExPolicy const& policy,
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        scan_copy_helper(ExPolicy policy,
             std::vector<hpx::shared_future<T> >&& r,
             boost::shared_array<T> data, std::size_t count,
             OutIter dest, Op && op, std::vector<std::size_t> const& chunk_sizes)
@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename T, typename Op>
             static OutIter
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 OutIter dest, T && init, Op && op)
             {
                 return sequential_inclusive_scan(first, last, dest,
@@ -120,11 +120,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename T, typename Op>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutIter
+            >::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                  OutIter dest, T && init, Op && op)
             {
-                typedef detail::algorithm_result<ExPolicy, OutIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
                 typedef hpx::util::zip_iterator<FwdIter, T*> zip_iterator;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
@@ -257,7 +259,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Op>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     inclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
         T init, Op && op)
@@ -352,7 +354,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     inclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
         T init)
@@ -444,7 +446,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename OutIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     inclusive_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest)
     {

@@ -55,7 +55,7 @@ std::size_t fractals(boost::shared_ptr<FracInfo> Info)
         iteration++;
     }
 
-    return iteration; 
+    return iteration;
 }
 
 int hpx_main()

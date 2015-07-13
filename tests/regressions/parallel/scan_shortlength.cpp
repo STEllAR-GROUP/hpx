@@ -113,10 +113,10 @@ void test_async_one(std::vector<int> const& a)
 
     Fut_Iter f_copy_if =
         copy_if(par(task), a.begin(), a.end(), b.begin(),
-        [](int bar){ return bar % 2 == 1; });
+            [](int bar){ return bar % 2 == 1; });
     Fut_Iter f_remove_copy_if =
         remove_copy_if(par(task), a.begin(), a.end(), c.begin(),
-        [](int bar){ return bar % 2 != 1; });
+            [](int bar){ return bar % 2 != 1; });
     Fut_Iter f_remove_copy =
         remove_copy(par(task), a.begin(), a.end(), d.begin(), 0);
 

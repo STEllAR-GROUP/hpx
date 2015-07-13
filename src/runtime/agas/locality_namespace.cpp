@@ -23,10 +23,12 @@ HPX_REGISTER_COMPONENT(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     locality_namespace, component_agas_locality_namespace)
 
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     locality_namespace::service_action,
-    locality_namespace_service_action)
+    locality_namespace_service_action,
+    hpx::actions::locality_namespace_service_action_id)
 
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     locality_namespace::bulk_service_action,
-    locality_namespace_bulk_service_action)
+    locality_namespace_bulk_service_action,
+    hpx::actions::locality_namespace_bulk_service_action_id)

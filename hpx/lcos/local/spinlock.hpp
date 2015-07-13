@@ -13,7 +13,7 @@
 #define HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
 
 #include <hpx/config.hpp>
-
+#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
@@ -44,8 +44,6 @@ namespace hpx { namespace lcos { namespace local
 #else
         boost::uint64_t v_;
 #endif
-
-        HPX_MOVABLE_BUT_NOT_COPYABLE(spinlock)
 
     public:
         ///////////////////////////////////////////////////////////////////////
@@ -112,30 +110,11 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_CREATE(this, desc, "");
         }
 
-        spinlock(spinlock && rhs)
-#if defined(BOOST_WINDOWS)
-          : v_(BOOST_INTERLOCKED_EXCHANGE(&rhs.v_, 0))
-#else
-          : v_(__sync_lock_test_and_set(&rhs.v_, 0))
-#endif
-        {}
+        HPX_NON_COPYABLE(spinlock);
 
         ~spinlock()
         {
             HPX_ITT_SYNC_DESTROY(this);
-        }
-
-        spinlock& operator=(spinlock && rhs)
-        {
-            if (this != &rhs) {
-                unlock();
-#if defined(BOOST_WINDOWS)
-                v_ = BOOST_INTERLOCKED_EXCHANGE(&rhs.v_, 0);
-#else
-                v_ = __sync_lock_test_and_set(&rhs.v_, 0);
-#endif
-            }
-            return *this;
         }
 
         void lock()

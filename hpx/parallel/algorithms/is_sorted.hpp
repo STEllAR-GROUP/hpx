@@ -10,9 +10,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -42,22 +42,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template<typename ExPolicy, typename Pred>
             static bool
-            sequential(ExPolicy const&,FwdIter first, FwdIter last,
+            sequential(ExPolicy, FwdIter first, FwdIter last,
                 Pred && pred)
             {
                 return std::is_sorted(first, last, std::forward<Pred>(pred));
             }
 
             template <typename ExPolicy, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 Pred && pred)
             {
                 typedef typename std::iterator_traits<FwdIter>::reference
                     reference;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
-                typedef typename detail::algorithm_result<ExPolicy, bool>
+                typedef typename util::detail::algorithm_result<ExPolicy, bool>
                     result;
 
                 difference_type count = std::distance(first, last);
@@ -158,7 +158,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     is_sorted(ExPolicy && policy, FwdIter first, FwdIter last, Pred && pred)
     {
@@ -220,7 +220,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     is_sorted(ExPolicy && policy, FwdIter first, FwdIter last)
     {
@@ -257,7 +257,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template<typename ExPolicy, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&,FwdIter first, FwdIter last,
+            sequential(ExPolicy, FwdIter first, FwdIter last,
                 Pred && pred)
             {
                 return std::is_sorted_until(first, last,
@@ -265,16 +265,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 Pred && pred)
             {
                 typedef typename std::iterator_traits<FwdIter>::reference
                     reference;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                         difference_type;
-                typedef typename detail::algorithm_result<ExPolicy, FwdIter>
-                    result;
+                typedef typename util::detail::algorithm_result<
+                        ExPolicy, FwdIter
+                    > result;
 
                 difference_type count = std::distance(first, last);
                 if (count <= 1)
@@ -378,7 +381,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     is_sorted_until(ExPolicy && policy, FwdIter first, FwdIter last, Pred && pred)
     {
@@ -438,7 +441,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     is_sorted_until(ExPolicy && policy, FwdIter first, FwdIter last)
     {

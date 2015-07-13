@@ -439,7 +439,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename ...Ts>
     typename boost::disable_if_c<
-        traits::is_action<typename boost::remove_reference<F>::type>::value
+        traits::is_action<typename util::decay<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<Ts>::type...>

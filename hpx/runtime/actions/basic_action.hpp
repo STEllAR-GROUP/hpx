@@ -32,6 +32,9 @@
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/stringize.hpp>
+#include <boost/type_traits/is_array.hpp>
+#include <boost/type_traits/is_pointer.hpp>
 
 #include <sstream>
 
@@ -86,6 +89,15 @@ namespace hpx { namespace actions
               , util::tuple<typename util::decay_unwrap<Ts>::type...>
             > f_;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct is_non_const_reference
+          : std::integral_constant<bool,
+                std::is_lvalue_reference<T>::value &&
+               !std::is_const<typename std::remove_reference<T>::type>::value
+            >
+        {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -98,6 +110,25 @@ namespace hpx { namespace actions
     template <typename Component, typename R, typename ...Args, typename Derived>
     struct basic_action<Component, R(Args...), Derived>
     {
+        // Flag the use of raw pointer types as action arguments
+        BOOST_STATIC_ASSERT_MSG(
+            !util::detail::any_of<std::is_pointer<Args>...>::value,
+            "Using raw pointers as arguments for actions is not supported.");
+
+        // Flag the use of array types as action arguments
+        BOOST_STATIC_ASSERT_MSG(
+            !util::detail::any_of<
+                std::is_array<typename std::remove_reference<Args>::type>...
+            >::value,
+            "Using arrays as arguments for actions is not supported.");
+
+        // Flag the use of non-const reference types as action arguments
+        BOOST_STATIC_ASSERT_MSG(
+            !util::detail::any_of<
+                detail::is_non_const_reference<Args>...
+            >::value,
+            "Using non-const references as arguments for actions is not supported.");
+
         typedef Component component_type;
         typedef Derived derived_type;
 
@@ -250,25 +281,26 @@ namespace hpx { namespace actions
         template <typename LocalResult>
         struct sync_invoke
         {
-            template <typename ...Ts>
+            template <typename IdOrPolicy, typename ...Ts>
             BOOST_FORCEINLINE static LocalResult call(
                 boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
-                naming::id_type const& id, error_code& ec, Ts&&... vs)
+                IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
             {
-                return hpx::async<basic_action>(policy, id,
+                return hpx::async<basic_action>(policy, id_or_policy,
                     std::forward<Ts>(vs)...).get(ec);
             }
 
-            template <typename ...Ts>
+            template <typename IdOrPolicy, typename ...Ts>
             BOOST_FORCEINLINE static LocalResult call(
                 boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
-                naming::id_type const& id, error_code& /*ec*/, Ts&&... vs)
+                IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
             {
-                return hpx::async<basic_action>(policy, id,
+                return hpx::async<basic_action>(policy, id_or_policy,
                     std::forward<Ts>(vs)...);
             }
         };
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename ...Ts>
         BOOST_FORCEINLINE local_result_type operator()(
             BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
@@ -301,6 +333,62 @@ namespace hpx { namespace actions
             return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        template <typename DistPolicy, typename ...Ts>
+        BOOST_FORCEINLINE
+        typename boost::enable_if_c<
+            traits::is_distribution_policy<DistPolicy>::value,
+            local_result_type
+        >::type
+        operator()(BOOST_SCOPED_ENUM(launch) policy,
+            DistPolicy const& dist_policy, error_code& ec, Ts&&... vs) const
+        {
+            return util::void_guard<local_result_type>(),
+                sync_invoke<local_result_type>::call(
+                    is_future_pred(), policy, dist_policy, ec,
+                    std::forward<Ts>(vs)...
+                );
+        }
+
+        template <typename DistPolicy, typename ...Ts>
+        BOOST_FORCEINLINE
+        typename boost::enable_if_c<
+            traits::is_distribution_policy<DistPolicy>::value,
+            local_result_type
+        >::type
+        operator()(DistPolicy const& dist_policy, error_code& ec,
+            Ts&&... vs) const
+        {
+            return (*this)(launch::all, dist_policy, ec,
+                std::forward<Ts>(vs)...);
+        }
+
+        template <typename DistPolicy, typename ...Ts>
+        BOOST_FORCEINLINE
+        typename boost::enable_if_c<
+            traits::is_distribution_policy<DistPolicy>::value,
+            local_result_type
+        >::type
+        operator()(BOOST_SCOPED_ENUM(launch) policy,
+            DistPolicy const& dist_policy, Ts&&... vs) const
+        {
+            return (*this)(launch::all, dist_policy, throws,
+                std::forward<Ts>(vs)...);
+        }
+
+        template <typename DistPolicy, typename ...Ts>
+        BOOST_FORCEINLINE
+        typename boost::enable_if_c<
+            traits::is_distribution_policy<DistPolicy>::value,
+            local_result_type
+        >::type
+        operator()(DistPolicy const& dist_policy, Ts&&... vs) const
+        {
+            return (*this)(launch::all, dist_policy, throws,
+                std::forward<Ts>(vs)...);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         /// retrieve component type
         static int get_component_type()
         {
@@ -413,6 +501,134 @@ namespace hpx { namespace actions
         hpx::actions::make_direct_action<decltype(&func), &func> /**/         \
     /**/
 
+    enum preassigned_action_id
+    {
+        register_worker_action_id = 0,
+        notify_worker_action_id,
+        allocate_action_id,
+        base_connect_action_id,
+        base_disconnect_action_id,
+        base_set_event_action_id,
+        base_set_exception_action_id,
+        broadcast_call_shutdown_functions_action_id,
+        broadcast_call_startup_functions_action_id,
+        broadcast_symbol_namespace_service_action_id,
+        bulk_create_components_action_id,
+        call_shutdown_functions_action_id,
+        call_startup_functions_action_id,
+        component_namespace_bulk_service_action_id,
+        component_namespace_service_action_id,
+        console_error_sink_action_id,
+        console_logging_action_id,
+        console_print_action_id,
+        create_memory_block_action_id,
+        create_performance_counter_action_id,
+        dijkstra_termination_action_id,
+        free_component_action_id,
+        garbage_collect_action_id,
+        get_config_action_id,
+        get_instance_count_action_id,
+        hpx_get_locality_name_action_id,
+        hpx_lcos_server_barrier_create_component_action_id,
+        hpx_lcos_server_latch_create_component_action_id,
+        hpx_lcos_server_latch_wait_action_id,
+        list_component_type_action_id,
+        list_symbolic_name_action_id,
+        load128_action_id,
+        load16_action_id,
+        load32_action_id,
+        load64_action_id,
+        load8_action_id,
+        load_components_action_id,
+        locality_namespace_bulk_service_action_id,
+        locality_namespace_service_action_id,
+        memory_block_checkin_action_id,
+        memory_block_checkout_action_id,
+        memory_block_clone_action_id,
+        memory_block_get_action_id,
+        memory_block_get_config_action_id,
+        output_stream_write_async_action_id,
+        output_stream_write_sync_action_id,
+        performance_counter_get_counter_info_action_id,
+        performance_counter_get_counter_value_action_id,
+        performance_counter_set_counter_value_action_id,
+        performance_counter_reset_counter_value_action_id,
+        performance_counter_start_action_id,
+        performance_counter_stop_action_id,
+        primary_namespace_bulk_service_action_id,
+        primary_namespace_service_action_id,
+        remove_from_connection_cache_action_id,
+        set_value_action_agas_bool_response_type_id,
+        set_value_action_agas_id_type_response_type_id,
+        shutdown_action_id,
+        shutdown_all_action_id,
+        store128_action_id,
+        store16_action_id,
+        store32_action_id,
+        store64_action_id,
+        store8_action_id,
+        symbol_namespace_bulk_service_action_id,
+        symbol_namespace_service_action_id,
+        terminate_action_id,
+        terminate_all_action_id,
+        update_agas_cache_entry_action_id,
+        register_worker_security_action_id,
+        notify_worker_security_action_id,
+
+        base_lco_with_value_gid_get,
+        base_lco_with_value_gid_set,
+        base_lco_with_value_vector_gid_get,
+        base_lco_with_value_vector_gid_set,
+        base_lco_with_value_id_get,
+        base_lco_with_value_id_set,
+        base_lco_with_value_vector_id_get,
+        base_lco_with_value_vector_id_set,
+        base_lco_with_value_unused_get,
+        base_lco_with_value_unused_set,
+        base_lco_with_value_float_get,
+        base_lco_with_value_float_set,
+        base_lco_with_value_double_get,
+        base_lco_with_value_double_set,
+        base_lco_with_value_int8_get,
+        base_lco_with_value_int8_set,
+        base_lco_with_value_uint8_get,
+        base_lco_with_value_uint8_set,
+        base_lco_with_value_int16_get,
+        base_lco_with_value_int16_set,
+        base_lco_with_value_uint16_get,
+        base_lco_with_value_uint16_set,
+        base_lco_with_value_int32_get,
+        base_lco_with_value_int32_set,
+        base_lco_with_value_uint32_get,
+        base_lco_with_value_uint32_set,
+        base_lco_with_value_int64_get,
+        base_lco_with_value_int64_set,
+        base_lco_with_value_uint64_get,
+        base_lco_with_value_uint64_set,
+        base_lco_with_value_uint128_get,
+        base_lco_with_value_uint128_set,
+        base_lco_with_value_bool_get,
+        base_lco_with_value_bool_set,
+        base_lco_with_value_hpx_section_get,
+        base_lco_with_value_hpx_section_set,
+        base_lco_with_value_hpx_counter_info_get,
+        base_lco_with_value_hpx_counter_info_set,
+        base_lco_with_value_hpx_counter_value_get,
+        base_lco_with_value_hpx_counter_value_set,
+        base_lco_with_value_hpx_agas_response_get,
+        base_lco_with_value_hpx_agas_response_set,
+        base_lco_with_value_hpx_agas_response_vector_get,
+        base_lco_with_value_hpx_agas_response_vector_set,
+        base_lco_with_value_hpx_memory_data_get,
+        base_lco_with_value_hpx_memory_data_set,
+        base_lco_with_value_std_string_get,
+        base_lco_with_value_std_string_set,
+        base_lco_with_value_std_bool_ptrdiff_get,
+        base_lco_with_value_std_bool_ptrdiff_set,
+
+        last_action_id
+    };
+
     /// \endcond
 }}
 
@@ -447,7 +663,6 @@ namespace hpx { namespace actions
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
 /**/
-
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
     namespace hpx { namespace actions { namespace detail {                    \
@@ -456,6 +671,10 @@ namespace hpx { namespace actions
     }}}                                                                       \
                                                                               \
     namespace hpx { namespace traits {                                        \
+        template <>                                                           \
+        struct is_action<action>                                              \
+          : boost::mpl::true_                                                 \
+        {};                                                                   \
         template <>                                                           \
         struct needs_automatic_registration<action>                           \
           : boost::mpl::false_                                                \
@@ -550,23 +769,23 @@ namespace hpx { namespace actions
 /// \code
 ///      namespace app
 ///      {
-///          // Define a simple component exposing one action 'print_greating'
+///          // Define a simple component exposing one action 'print_greeting'
 ///          class HPX_COMPONENT_EXPORT server
 ///            : public hpx::components::simple_component_base<server>
 ///          {
-///              void print_greating ()
+///              void print_greeting ()
 ///              {
 ///                  hpx::cout << "Hey, how are you?\n" << hpx::flush;
 ///              }
 ///
 ///              // Component actions need to be declared, this also defines the
-///              // type 'print_greating_action' representing the action.
-///              HPX_DEFINE_COMPONENT_ACTION(server, print_greating, print_greating_action);
+///              // type 'print_greeting_action' representing the action.
+///              HPX_DEFINE_COMPONENT_ACTION(server, print_greeting, print_greeting_action);
 ///          };
 ///      }
 ///
 ///      // Declare boilerplate code required for each of the component actions.
-///      HPX_REGISTER_ACTION_DECLARATION(app::server::print_greating_action);
+///      HPX_REGISTER_ACTION_DECLARATION(app::server::print_greeting_action);
 /// \endcode
 ///
 /// \note This macro has to be used once for each of the component actions
@@ -600,8 +819,49 @@ namespace hpx { namespace actions
 /// \a HPX_DEFINE_PLAIN_ACTION macros. It has to occur exactly once for each of
 /// the actions, thus it is recommended to place it into the source file defining
 /// the component.
+///
+/// \note Only one of the forms of this macro \a HPX_REGISTER_ACTION or
+///       \a HPX_REGISTER_ACTION_ID should be used for a particular action,
+///       never both.
+///
 #define HPX_REGISTER_ACTION(...)                                              \
     HPX_REGISTER_ACTION_(__VA_ARGS__)                                         \
+/**/
+
+/// \def HPX_REGISTER_ACTION_ID(action, actionname, actionid)
+///
+/// \brief Define the necessary component action boilerplate code and assign a
+///        predefined unique id to the action.
+///
+/// The macro \a HPX_REGISTER_ACTION can be used to define all the
+/// boilerplate code which is required for proper functioning of component
+/// actions in the context of HPX.
+///
+/// The parameter \a action is the type of the action to define the
+/// boilerplate for.
+///
+/// The parameter \a actionname specifies an unique name of the action to be
+/// used for serialization purposes.
+/// The second parameter has to be usable as a plain (non-qualified) C++
+/// identifier, it should not contain special characters which cannot be part
+/// of a C++ identifier, such as '<', '>', or ':'.
+///
+/// The parameter \a actionid specifies an unique integer value which will be
+/// used to represent the action during serialization.
+///
+/// \note This macro has to be used once for each of the component actions
+/// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION or global actions
+/// \a HPX_DEFINE_PLAIN_ACTION macros. It has to occur exactly once for each of
+/// the actions, thus it is recommended to place it into the source file defining
+/// the component.
+///
+/// \note Only one of the forms of this macro \a HPX_REGISTER_ACTION or
+///       \a HPX_REGISTER_ACTION_ID should be used for a particular action,
+///       never both.
+///
+#define HPX_REGISTER_ACTION_ID(action, actionname, actionid)                  \
+    HPX_REGISTER_ACTION_2(action, actionname)                                 \
+    HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(actionname, actionid)                \
 /**/
 
 #endif

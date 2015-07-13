@@ -89,7 +89,7 @@ Example:
         template<class , int, class> struct tss_resource_with_cache ;
     }
 
-    struct default_types 
+    struct default_types
     {
 #ifdef HPX_LOG_USE_WCHAR_T
         typedef wchar_t char_type;

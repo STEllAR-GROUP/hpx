@@ -87,16 +87,8 @@ namespace hpx { namespace parcelset
       , std::size_t parcel_count
     )
     {
-        std::vector<serialization::serialization_chunk> chunks(decode_chunks(buffer));
-
-        unsigned archive_flags = 0U;
-        if (!pp.allow_array_optimizations()) {
-            archive_flags |= serialization::disable_array_optimization;
-            archive_flags |= serialization::disable_data_chunking;
-        }
-        else if (!pp.allow_zero_copy_optimizations()) {
-            archive_flags |= serialization::disable_data_chunking;
-        }
+        std::vector<serialization::serialization_chunk> chunks(
+            decode_chunks(buffer));
         boost::uint64_t inbound_data_size = buffer.data_size_;
 
         // protect from un-handled exceptions bubbling up
@@ -111,10 +103,10 @@ namespace hpx { namespace parcelset
                 {
                     // De-serialize the parcel data
                     serialization::input_archive archive(buffer.data_,
-                        archive_flags, inbound_data_size, &chunks);
+                        inbound_data_size, &chunks);
 
                     if(parcel_count == 0)
-                        archive >> parcel_count; //-V128a
+                        archive >> parcel_count; //-V128
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
                         // de-serialize parcel and add it to incoming parcel queue

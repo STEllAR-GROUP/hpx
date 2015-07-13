@@ -145,7 +145,7 @@ namespace hpx { namespace util
             std::size_t num_localities)
         {
             std::size_t batch_localities = env.retrieve_number_of_localities();
-            if (num_localities == 1)
+            if (num_localities == 1 && batch_localities != std::size_t(-1))
             {
                 std::size_t cfg_num_localities = cfgmap.get_value<std::size_t>(
                     "hpx.localities", batch_localities);
@@ -383,7 +383,7 @@ namespace hpx { namespace util
                 if (debug_clp)
                     std::cerr << "failed opening: " << node_file << std::endl;
 
-                // raise hard error if nodefile could not be opened
+                // raise hard error if node file could not be opened
                 throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Could not open nodefile: '%s'") % node_file));
             }
@@ -392,7 +392,8 @@ namespace hpx { namespace util
             nodelist = vm["hpx:nodes"].as<std::vector<std::string> >();
         }
 
-        util::batch_environment env(nodelist, debug_clp);
+        bool enable_batch_env = vm.count("hpx:ignore-batch-env") == 0;
+        util::batch_environment env(nodelist, debug_clp, enable_batch_env);
 
         if(!nodelist.empty())
         {
@@ -496,6 +497,10 @@ namespace hpx { namespace util
                     mode_ = hpx::runtime_mode_console;
                 }
                 else {
+                    // don't use port zero for non-console localities
+                    if (hpx_port == 0 && node != 0)
+                        hpx_port = HPX_INITIAL_IP_PORT;
+
                     // each node gets an unique port
                     hpx_port = static_cast<boost::uint16_t>(hpx_port + node);
                     mode_ = hpx::runtime_mode_worker;
@@ -639,6 +644,17 @@ namespace hpx { namespace util
                     vm["hpx:debug-agas-log"].as<std::string>());
             ini_config += "hpx.logging.console.agas.level=5";
             ini_config += "hpx.logging.agas.level=5";
+        }
+
+        if (vm.count("hpx:debug-parcel-log")) {
+            ini_config += "hpx.logging.console.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.parcel.destination=" +
+                detail::convert_to_log_file(
+                    vm["hpx:debug-parcel-log"].as<std::string>());
+            ini_config += "hpx.logging.console.parcel.level=5";
+            ini_config += "hpx.logging.parcel.level=5";
         }
 
         // Set number of cores and OS threads in configuration.
@@ -809,7 +825,7 @@ namespace hpx { namespace util
 
                 if (!threads::any(pu_mask))
                 {
-                    strm << std::setw(4) << i << ": thread binding disabled"
+                    strm << std::setw(4) << i << ": thread binding disabled" //-V112
                          << std::endl;
                 }
                 else
@@ -954,12 +970,16 @@ namespace hpx { namespace util
         rtcfg_.reconfigure(ini_config_);
 
         // print version/copyright information
-        if (vm_.count("hpx:version"))
+        if (vm_.count("hpx:version")) {
             detail::print_version(std::cout);
+            return 1;
+        }
 
         // print configuration information (static and dynamic)
-        if (vm_.count("hpx:info"))
+        if (vm_.count("hpx:info")) {
             detail::print_info(std::cout, *this);
+            return 1;
+        }
 
         // all is good
         return 0;

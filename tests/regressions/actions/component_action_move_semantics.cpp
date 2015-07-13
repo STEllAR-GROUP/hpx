@@ -43,7 +43,7 @@ std::size_t move_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::async<Action>(test.get_gid(), boost::move(obj)).get();
+    return hpx::async<Action>(test.get_gid(), std::move(obj)).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@ std::size_t return_move_object(hpx::naming::id_type id)
 
     action_move_semantics test = action_move_semantics::create(id);
 
-    Object obj(boost::move(hpx::async<Action>(test.get_gid()).move_out()));
+    Object obj(std::move(hpx::async<Action>(test.get_gid()).move_out()));
     return obj.get_count();
 }
 

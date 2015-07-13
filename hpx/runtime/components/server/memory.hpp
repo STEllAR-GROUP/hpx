@@ -11,7 +11,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/util/numerics/uint128.hpp>
+#include <hpx/util/integer/uint128.hpp>
 
 #include <utility>
 
@@ -32,7 +32,7 @@ namespace hpx { namespace components { namespace server
             components::set_component_type<memory>(t);
         }
 
-        typedef util::numerics::uint128 uint128_t;
+        typedef util::integer::uint128 uint128_t;
 
         // constructor
         memory()
@@ -174,8 +174,7 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::memory::load128_action, load128_action)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::components::server::memory::uint128_t
-  , hpx_components_memory_uint128_t
-)
+    hpx::components::server::memory::uint128_t, hpx_components_memory_uint128_t)
+
 #endif
 

@@ -13,9 +13,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
@@ -42,23 +42,25 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename ForwardIter1>
             static ForwardIter2
-            sequential(ExPolicy const&, ForwardIter1 first1, ForwardIter1 last1,
+            sequential(ExPolicy, ForwardIter1 first1, ForwardIter1 last1,
                 ForwardIter2 first2)
             {
                 return std::swap_ranges(first1, last1, first2);
             }
 
             template <typename ExPolicy, typename ForwardIter1>
-            static typename detail::algorithm_result<ExPolicy, ForwardIter2>::type
-            parallel(ExPolicy const& policy, ForwardIter1 first1,
+            static typename util::detail::algorithm_result<
+                ExPolicy, ForwardIter2
+            >::type
+            parallel(ExPolicy policy, ForwardIter1 first1,
                 ForwardIter1 last1, ForwardIter2 first2)
             {
                 typedef hpx::util::zip_iterator<ForwardIter1, ForwardIter2>
                     zip_iterator;
                 typedef typename zip_iterator::reference reference;
-                typedef
-                    typename detail::algorithm_result<ExPolicy, ForwardIter2>::type
-                result_type;
+                typedef typename util::detail::algorithm_result<
+                        ExPolicy, ForwardIter2
+                    >::type result_type;
 
                 return get_iter<1, result_type>(
                     for_each_n<zip_iterator>().call(
@@ -123,7 +125,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename ForwardIter1, typename ForwardIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, ForwardIter2>::type
+        typename util::detail::algorithm_result<ExPolicy, ForwardIter2>::type
     >::type
     swap_ranges(ExPolicy && policy, ForwardIter1 first1, ForwardIter1 last1,
         ForwardIter2 first2)

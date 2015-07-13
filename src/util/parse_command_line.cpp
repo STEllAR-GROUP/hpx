@@ -403,6 +403,7 @@ namespace hpx { namespace util
                 ("hpx:node", value<std::size_t>(),
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
+                ("hpx:ignore-batch-env", "ignore batch environment variables")
 #if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
@@ -482,6 +483,9 @@ namespace hpx { namespace util
                 ("hpx:debug-agas-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the AGAS log channel and send all "
                   "AGAS logs to the target destination")
+                ("hpx:debug-parcel-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the parcel transport log channel and send all "
+                  "parcel transport logs to the target destination")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
 #if defined(_POSIX_VERSION) || defined(BOOST_WINDOWS)

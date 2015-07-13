@@ -53,6 +53,7 @@ described in the table below:
                                  application startup (default: 1)]]
     [[`--hpx:node arg`]         [number of the node this locality is run on
                                  (must be unique)]]
+    [[`--hpx:ignore-batch-env`] [ignore batch environment variables]]
     [[`--hpx:pu-offset`]        [the first processing unit this instance of __hpx__ should be
                                  run on (default: 0), valid for
                                  `--hpx:queuing=local`, `--hpx:queuing=abp-priority`,
@@ -106,10 +107,16 @@ described in the table below:
     [[`--hpx:list-component-types`][list all dynamic component types after startup]]
     [[`--hpx:dump-config-initial`][print the initial runtime configuration]]
     [[`--hpx:dump-config`]      [print the final runtime configuration]]
-    [[`--hpx:debug-hpx-log`]    [enable all messages on the __hpx__ log channel and send all
-                                 __hpx__ logs to the target destination]]
-    [[`--hpx:debug-agas-log`]   [enable all messages on the AGAS log channel and send all
-                                 AGAS logs to the target destination]]
+    [[`--hpx:debug-hpx-log [arg]`]    [enable all messages on the __hpx__ log
+                                       channel and send all __hpx__ logs to the
+                                       target destination (default: cout)]]
+    [[`--hpx:debug-agas-log [arg]`]   [enable all messages on the AGAS log channel
+                                       and send all AGAS logs to the target
+                                       destination (default: cout)]]
+    [[`--hpx:debug-parcel-log [arg]`] [enable all messages on the parcel transport
+                                       log channel and send all parcel transport
+                                       logs to the target destination (default:
+                                       cout)]]
     [[`--hpx:debug-clp`]        [debug command line processing]]
     [[`--hpx:attach-debugger arg`] [wait for a debugger to be attached, possible arg values:
                                     startup or exception (default: startup)]]

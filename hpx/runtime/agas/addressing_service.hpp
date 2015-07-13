@@ -146,7 +146,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     state get_status() const
     {
         if (!hosted && !bootstrap)
-            return stopping;
+            return state_stopping;
         return state_.load();
     }
 
@@ -217,7 +217,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
 protected:
     void launch_bootstrap(
-        boost::shared_ptr<parcelset::parcelport> pp
+        boost::shared_ptr<parcelset::parcelport> const& pp
       , parcelset::endpoints_type const & endpoints
       , util::runtime_configuration const& ini_
         );

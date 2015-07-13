@@ -44,7 +44,7 @@ namespace hpx { namespace serialization
     }
 
     template <typename Archive>
-    struct basic_archive
+    struct HPX_EXPORT basic_archive
     {
         static const boost::uint64_t npos = -1;
 
@@ -57,16 +57,12 @@ namespace hpx { namespace serialization
         {}
 
         template <typename T>
-        void invoke(T * (&t))
-        {
-            BOOST_STATIC_ASSERT_MSG(!boost::is_pointer<T *>::value,
-                "HPX does not support serialization of raw pointers. "
-                "Please use smart pointers.");
-        }
-
-        template <typename T>
         void invoke(T & t)
         {
+            BOOST_STATIC_ASSERT_MSG(!boost::is_pointer<T>::value,
+                "HPX does not support serialization of raw pointers. "
+                "Please use smart pointers.");
+
             static_cast<Archive *>(this)->invoke_impl(t);
         }
 
@@ -101,6 +97,14 @@ namespace hpx { namespace serialization
         boost::uint32_t flags() const
         {
             return flags_;
+        }
+
+        // Archives can be used to do 'fake' serialization, in which case no
+        // data is being stored/restored and no side effects should be
+        // performed during serialization/de-serialization.
+        bool is_saving() const
+        {
+            return false;
         }
 
         boost::uint32_t flags_;

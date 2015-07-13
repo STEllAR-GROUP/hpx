@@ -111,7 +111,7 @@ struct small_object
     }
 
 
-    friend inline std::istream& 
+    friend inline std::istream&
     operator>> (std::istream& in, small_object& obj)
     {
         in >> obj.x_;
@@ -123,7 +123,7 @@ struct small_object
         return in;
     }
 
-    friend inline std::ostream& 
+    friend inline std::ostream&
     operator<< (std::ostream& out, small_object const& obj)
     {
         out << obj.x_;
@@ -242,7 +242,7 @@ struct big_object
         return x_ + y_ + z_ + w_;
     }
 
-    friend inline std::istream& 
+    friend inline std::istream&
     operator>> (std::istream& in, big_object& obj)
     {
         in >> obj.x_;
@@ -255,7 +255,7 @@ struct big_object
         return in;
     }
 
-    friend inline std::ostream& 
+    friend inline std::ostream&
     operator<< (std::ostream& out, big_object const& obj)
     {
         out << obj.x_;

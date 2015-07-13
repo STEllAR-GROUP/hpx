@@ -26,10 +26,8 @@
 #include <boost/exception/detail/attribute_noreturn.hpp>
 #endif
 
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/preprocessor/arithmetic/add.hpp>
-#include <boost/preprocessor/selection/min.hpp>
-#include <boost/preprocessor/facilities/expand.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure DEBUG macro is defined consistently across platforms
@@ -434,6 +432,17 @@
 #endif
 #if !defined(HPX_HUGE_STACK_SIZE)
 #  define HPX_HUGE_STACK_SIZE     0x2000000       // 32MByte
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// This limits how deep the internal recursion of future continuations will go
+// before a new operation is re-spawned.
+#if !defined(HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+#if defined(HPX_DEBUG)
+#define HPX_CONTINUATION_MAX_RECURSION_DEPTH 14
+#else
+#define HPX_CONTINUATION_MAX_RECURSION_DEPTH 20
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

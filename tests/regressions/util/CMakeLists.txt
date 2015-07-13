@@ -6,12 +6,14 @@
 
 set(tests
     command_line_arguments_706
+    configuration_1572
     function_argument
     function_serialization_728
     iarchive_1237
     protect_with_nullary_pfo
     serialize_buffer_1069
     tuple_serialization_803
+    unwrapped_1528
     zero_copy_parcels_1001
    )
 
@@ -51,14 +53,14 @@ foreach(test ${tests})
   add_hpx_regression_test("util" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.util.${test})
+  add_hpx_pseudo_target(tests.regressions.util_dir.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.util
-                              tests.regressions.util.${test})
+  add_hpx_pseudo_dependencies(tests.regressions.util_dir
+                              tests.regressions.util_dir.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.util.${test}
+  add_hpx_pseudo_dependencies(tests.regressions.util_dir.${test}
                               ${test}_test_exe)
 endforeach()
 

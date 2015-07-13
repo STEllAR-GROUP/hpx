@@ -94,7 +94,7 @@ namespace hpx
             typedef typename std::map<Key, Value, Comp, Alloc>::value_type value_type;
 
             size_type size;
-            ar >> size;
+            ar >> size; //-V128
             for (size_type i = 0; i < size; ++i)
             {
                 value_type v;
@@ -108,7 +108,7 @@ namespace hpx
         {
             typedef typename std::map<Key, Value, Comp, Alloc>::value_type value_type;
 
-            ar << t.size();
+            ar << t.size(); //-V128
             for(value_type& val : t)
             {
                 ar << val;

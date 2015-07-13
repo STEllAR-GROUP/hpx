@@ -29,6 +29,9 @@
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
 #include <link.h>
 #endif
+#if defined(__APPLE__)
+#include <mach-o/dyld.h>
+#endif
 #include <dlfcn.h>
 #include <limits.h>
 
@@ -293,9 +296,11 @@ namespace hpx { namespace util { namespace plugin {
         std::string get_directory(error_code& ec = throws) const
         {
             // now find the full path of the loaded library
-            char directory[PATH_MAX] = { '\0' };
+            using boost::filesystem::path;
+            std::string result;
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
+            char directory[PATH_MAX] = { '\0' };
             const_cast<dll&>(*this).LoadLibrary(ec);
             if (!ec && ::dlinfo(dll_handle, RTLD_DI_ORIGIN, directory) < 0) {
                 std::ostringstream str;
@@ -307,13 +312,38 @@ namespace hpx { namespace util { namespace plugin {
                     "plugin::get_directory",
                     str.str());
             }
+            result = directory;
+            ::dlerror();                // Clear the error state.
+#elif defined(__APPLE__)
+            // SO staticfloat's solution
+            const_cast<dll&>(*this).LoadLibrary(ec);
+            if (ec)
+            {
+                // iterate through all images currently in memory
+                for (size_t i = 0; i < ::_dyld_image_count(); ++i)
+                {
+                    if (const char* image_name = ::_dyld_get_image_name(i))
+                    {
+                        HMODULE probe_handle = ::dlopen(image_name, RTLD_NOW);
+                        ::dlclose(probe_handle);
+
+                        // If the handle is the same as what was passed in
+                        // (modulo mode bits), return this image name
+                        if (((intptr_t)dll_handle & (-4)) == ((intptr_t)probe_handle & (-4)))
+                        {
+                            result = path(image_name).parent_path().string();
+                            std::cout << "found directory: " << result << std::endl;
+                            break;
+                        }
+                    }
+                }
+            }
             ::dlerror();                // Clear the error state.
 #endif
-
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return directory;
+            return result;
         }
 
     protected:

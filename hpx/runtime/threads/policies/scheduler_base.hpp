@@ -10,6 +10,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
@@ -25,16 +26,18 @@ namespace hpx { namespace threads { namespace policies
     {
         struct reset_on_exit
         {
-            reset_on_exit(boost::atomic<bool>& flag)
-              : flag_(flag)
+            reset_on_exit(boost::atomic<boost::int32_t>& counter)
+              : counter_(counter)
             {
-                flag_ = true;
+                ++counter_;
+                HPX_ASSERT(counter_ > 0);
             }
             ~reset_on_exit()
             {
-                flag_ = false;
+                HPX_ASSERT(counter_ > 0);
+                --counter_;
             }
-            boost::atomic<bool>& flag_;
+            boost::atomic<boost::int32_t>& counter_;
         };
     }
 #endif
@@ -49,7 +52,6 @@ namespace hpx { namespace threads { namespace policies
           , affinity_data_(num_threads)
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
-          , waiting_(false)
 #endif
         {}
 
@@ -72,7 +74,8 @@ namespace hpx { namespace threads { namespace policies
             affinity_data_.add_punit(virt_core, thread_num, topology_);
         }
 
-        std::size_t init(init_affinity_data const& data, topology const& topology)
+        std::size_t init(init_affinity_data const& data,
+            topology const& topology)
         {
             return affinity_data_.init(data, topology);
         }
@@ -86,13 +89,11 @@ namespace hpx { namespace threads { namespace policies
             boost::posix_time::millisec period(++wait_count_);
 
             boost::mutex::scoped_lock l(mtx_);
-            policies::detail::reset_on_exit w(waiting_);
             cond_.timed_wait(l, period);
 #else
             boost::chrono::milliseconds period(++wait_count_);
 
             boost::mutex::scoped_lock l(mtx_);
-            policies::detail::reset_on_exit w(waiting_);
             cond_.wait_for(l, period);
 #endif
 #endif
@@ -101,14 +102,15 @@ namespace hpx { namespace threads { namespace policies
         /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
         /// possibly idling OS threads
-        void do_some_work(std::size_t /*num_thread*/)
+        void do_some_work(std::size_t num_thread)
         {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
             wait_count_.store(0, boost::memory_order_release);
-            if (waiting_)
-            {
+
+            if (num_thread == std::size_t(-1))
+                cond_.notify_all();
+            else
                 cond_.notify_one();
-            }
 #endif
         }
 
@@ -121,27 +123,29 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        virtual boost::uint64_t get_num_pending_misses(std::size_t num_thread,
+        virtual boost::int64_t get_num_pending_misses(std::size_t num_thread,
             bool reset) = 0;
-        virtual boost::uint64_t get_num_pending_accesses(std::size_t num_thread,
+        virtual boost::int64_t get_num_pending_accesses(std::size_t num_thread,
             bool reset) = 0;
 
-        virtual boost::uint64_t get_num_stolen_from_pending(std::size_t num_thread,
+        virtual boost::int64_t get_num_stolen_from_pending(std::size_t num_thread,
             bool reset) = 0;
-        virtual boost::uint64_t get_num_stolen_to_pending(std::size_t num_thread,
+        virtual boost::int64_t get_num_stolen_to_pending(std::size_t num_thread,
             bool reset) = 0;
-        virtual boost::uint64_t get_num_stolen_from_staged(std::size_t num_thread,
+        virtual boost::int64_t get_num_stolen_from_staged(std::size_t num_thread,
             bool reset) = 0;
-        virtual boost::uint64_t get_num_stolen_to_staged(std::size_t num_thread,
+        virtual boost::int64_t get_num_stolen_to_staged(std::size_t num_thread,
             bool reset) = 0;
 #endif
 
         virtual boost::int64_t get_queue_length(
             std::size_t num_thread = std::size_t(-1)) const = 0;
 
-        virtual boost::int64_t get_thread_count(thread_state_enum state = unknown,
+        virtual boost::int64_t get_thread_count(
+            thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
-            std::size_t num_thread = std::size_t(-1), bool reset = false) const = 0;
+            std::size_t num_thread = std::size_t(-1),
+            bool reset = false) const = 0;
 
         virtual void abort_all_suspended_threads() = 0;
 
@@ -151,7 +155,7 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread) = 0;
 
-        virtual bool get_next_thread(std::size_t num_thread, bool running,
+        virtual bool get_next_thread(std::size_t num_thread,
             boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd) = 0;
 
         virtual void schedule_thread(threads::thread_data_base* thrd,
@@ -169,7 +173,8 @@ namespace hpx { namespace threads { namespace policies
 
         virtual void on_start_thread(std::size_t num_thread) = 0;
         virtual void on_stop_thread(std::size_t num_thread) = 0;
-        virtual void on_error(std::size_t num_thread, boost::exception_ptr const& e) = 0;
+        virtual void on_error(std::size_t num_thread,
+            boost::exception_ptr const& e) = 0;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         virtual boost::int64_t get_average_thread_wait_time(
@@ -177,6 +182,10 @@ namespace hpx { namespace threads { namespace policies
         virtual boost::int64_t get_average_task_wait_time(
             std::size_t num_thread = std::size_t(-1)) const = 0;
 #endif
+
+        virtual void start_periodic_maintenance(
+            boost::atomic<hpx::state>& global_state)
+        {}
 
     protected:
         topology const& topology_;
@@ -187,7 +196,6 @@ namespace hpx { namespace threads { namespace policies
         boost::mutex mtx_;
         boost::condition_variable cond_;
         boost::atomic<boost::uint32_t> wait_count_;
-        boost::atomic<bool> waiting_;
 #endif
     };
 }}}

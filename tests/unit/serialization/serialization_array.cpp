@@ -7,6 +7,7 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+#include <hpx/runtime/serialization/multi_array.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
@@ -152,6 +153,28 @@ void test_boost_array(T first)
     }
 }
 
+template <class T>
+void test_multi_array(T first)
+{
+    std::vector<char> buffer;
+    hpx::serialization::output_archive oarchive(buffer);
+    boost::multi_array<T, 3u> oarray(boost::extents[3][4][2]);
+
+    for(std::size_t i = 0; i < 3; ++i)
+        for(std::size_t j = 0; j < 4; ++j)
+            for(std::size_t k = 0; k < 2; ++first, ++k)
+                oarray[i][j][k] = first;
+    oarchive << oarray;
+
+    hpx::serialization::input_archive iarchive(buffer);
+    boost::multi_array<T, 3> iarray;
+    iarchive >> iarray;
+    for(std::size_t i = 0; i < 3; ++i)
+        for(std::size_t j = 0; j < 4; ++j)
+            for(std::size_t k = 0; k < 2; ++k)
+                HPX_TEST_EQ(oarray[i][j][k], iarray[i][j][k]);
+}
+
 int main()
 {
     test<char>((std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
@@ -173,5 +196,8 @@ int main()
     test_boost_array<char, 100U>('\0');
     test_boost_array<double, 40U>((std::numeric_limits<double>::min)());
     test_boost_array<float, 100U>(0.f);
+
+    test_multi_array(0);
+    test_multi_array(0.);
     return hpx::util::report_errors();
 }

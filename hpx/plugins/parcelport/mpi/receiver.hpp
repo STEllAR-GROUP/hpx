@@ -78,12 +78,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
                     receiver_.handles_header_.erase(header_handle_);
                 }
-// #ifdef HPX_DEBUG
-//                 else
-//                 {
-//                     HPX_ASSERT(header_handle_ != receiver_.handles_header_.end());
-//                 }
-// #endif
+#if defined(HPX_DEBUG) && !defined(BOOST_MSVC)
+                else
+                {
+                    HPX_ASSERT(header_handle_ != receiver_.handles_header_.end());
+                }
+#endif
             }
 
             receiver &receiver_;

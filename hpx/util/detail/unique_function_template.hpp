@@ -129,20 +129,7 @@ namespace hpx { namespace util
         typedef detail::unique_function_vtable_ptr<Sig, IArchive, OArchive> vtable_ptr;
         typedef detail::basic_function<vtable_ptr, Sig> base_type;
 
-#if defined(HPX_INTEL14_WORKAROUND)
-    private:
-        unique_function& operator=(unique_function const&);
-
-    public:
-        // The Intel Compiler sometimes erroneously instantiates this ctor. In order
-        // to avoid compile errors, we provide the definition here
-        unique_function(unique_function const & other) BOOST_NOEXCEPT
-        {
-            HPX_ASSERT(false);
-        }
-#else
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function);
-#endif
 
     public:
         typedef typename base_type::result_type result_type;
@@ -232,20 +219,7 @@ namespace hpx { namespace util
         typedef detail::unique_function_vtable_ptr<Sig, void, void> vtable_ptr;
         typedef detail::basic_function<vtable_ptr, Sig> base_type;
 
-#if defined(HPX_INTEL14_WORKAROUND)
-    private:
-        unique_function& operator=(unique_function const&);
-
-    public:
-        // The Intel Compiler sometimes erroneously instantiates this ctor. In order
-        // to avoid compile errors, we provide the definition here
-        unique_function(unique_function const & other) BOOST_NOEXCEPT
-        {
-            HPX_ASSERT(false);
-        }
-#else
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function);
-#endif
 
     public:
         typedef typename base_type::result_type result_type;
@@ -309,20 +283,7 @@ namespace hpx { namespace util
     {
         typedef unique_function<Sig, void, void> base_type;
 
-#if defined(HPX_INTEL14_WORKAROUND)
-    private:
-        unique_function_nonser& operator=(unique_function_nonser const&);
-
-    public:
-        // The Intel Compiler sometimes erroneously instantiates this ctor. In order
-        // to avoid compile errors, we provide the definition here
-        unique_function_nonser(unique_function_nonser const & other) BOOST_NOEXCEPT
-        {
-            HPX_ASSERT(false);
-        }
-#else
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function_nonser);
-#endif
 
     public:
         unique_function_nonser() BOOST_NOEXCEPT

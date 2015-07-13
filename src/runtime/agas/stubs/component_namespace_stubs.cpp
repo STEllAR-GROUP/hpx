@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/runtime/agas/stubs/component_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/serialization/vector.hpp>

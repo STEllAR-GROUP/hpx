@@ -21,7 +21,10 @@ to drive the development of the runtime system, coining out required
 functionalities and converging onto a stable API which will provide a
 smooth migration path for developers. The API exposed by HPX is modelled
 after the interfaces defined by the C++11/14 ISO standard and adheres to the
-programming guidelines used by the Boost collection of C++ libraries.
+programming guidelines used by the Boost collection of C++ libraries. We
+aim improve the scalability of today's applications and to expose new 
+levels of parallelism which are necessary to take advantage
+of the exascale systems of the future.
 
 ****************************
 What's so special about HPX?
@@ -36,6 +39,8 @@ What's so special about HPX?
   synchronization.
 * It implements a rich set of runtime services supporting a broad range of
   use cases.
+* HPX exposes a uniform, flexible, and extendable performance counter 
+  framework which can enable runtime adaptivity
 * It is designed to solve problems conventionally considered to be
   scaling-impaired.
 * HPX has been designed and developed for systems of any scale, from
@@ -417,9 +422,9 @@ steps that explain how to use a docker image::
     
     # For example, build the binary "example" from "example.cpp" using
     # the built-in hpx compilation script "hpxcxx". Note that hpx libraries
-    # other than the core library have to be linked explicitely (like iostreams).
+    # other than the core library have to be linked explicitely (like hpx_iostreams).
     docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev \
-        hpxcxx example.cpp --exe=example -liostreams
+        hpxcxx example.cpp --exe=example -lhpx_iostreams
 
     # Now run the resulting program:
     docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev ./example

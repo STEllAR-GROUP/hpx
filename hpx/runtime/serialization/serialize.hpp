@@ -10,6 +10,7 @@
 #include <hpx/runtime/serialization/access.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/runtime/serialization/detail/size_gatherer_container.hpp>
 
 namespace hpx { namespace serialization
 {
@@ -34,14 +35,14 @@ namespace hpx { namespace serialization
     }
 
     template <typename T>
-    output_archive & operator&(output_archive & ar, T const & t)
+    output_archive & operator&(output_archive & ar, T const & t) //-V524
     {
         ar.invoke(t);
         return ar;
     }
 
     template <typename T>
-    input_archive & operator&(input_archive & ar, T & t)
+    input_archive & operator&(input_archive & ar, T & t) //-V524
     {
         ar.invoke(t);
         return ar;

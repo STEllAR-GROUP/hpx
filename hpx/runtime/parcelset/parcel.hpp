@@ -98,8 +98,6 @@ namespace hpx { namespace parcelset
 
             virtual std::size_t get_type_size(int flags) const = 0;
 
-            virtual bool may_require_id_splitting() const = 0;
-
             virtual bool does_termination_detection() const = 0;
 
             virtual void wait_for_futures() = 0;
@@ -321,11 +319,6 @@ namespace hpx { namespace parcelset
             std::size_t get_type_size(int flags) const
             {
                 return sizeof(parcel_buffer) + this->get_action()->get_type_size(flags);
-            }
-
-            bool may_require_id_splitting() const
-            {
-                return this->get_action()->may_require_id_splitting();
             }
 
             bool does_termination_detection() const
@@ -719,11 +712,6 @@ namespace hpx { namespace parcelset
         std::size_t get_type_size(int flags) const
         {
             return data_->get_type_size(flags);
-        }
-
-        bool may_require_id_splitting() const
-        {
-            return data_->may_require_id_splitting();
         }
 
         bool does_termination_detection() const

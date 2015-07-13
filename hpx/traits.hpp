@@ -79,9 +79,6 @@ namespace hpx { namespace traits
 #endif
 
     template <typename Action, typename Enable = void>
-    struct action_may_require_id_splitting;
-
-    template <typename Action, typename Enable = void>
     struct action_is_target_valid;
 
     template <typename Action, typename Enable = void>
@@ -114,6 +111,9 @@ namespace hpx { namespace traits
     template <typename Future, typename Enable = void>
     struct future_traits;
 
+    template <typename Future, typename Enable = void>
+    struct future_access;
+
     template <typename Range, typename Enable = void>
     struct is_future_range;
 
@@ -128,6 +128,12 @@ namespace hpx { namespace traits
 
     template <typename Future, typename Enable = void>
     struct acquire_future;
+
+    template <typename Future, typename Enable = void>
+    struct acquire_shared_state;
+
+    template <typename T, typename Enable = void>
+    struct is_shared_state;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Plugin, typename Enable = void>
@@ -152,6 +158,9 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
     struct is_distribution_policy;
+
+    template <typename T, typename Enable = void>
+    struct is_executor;
 }}
 
 #endif

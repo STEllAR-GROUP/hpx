@@ -19,7 +19,7 @@ namespace hpx { namespace serialization
         typedef std::basic_string<Char, CharTraits, Allocator> string_type;
         typedef typename string_type::size_type size_type;
         size_type size = 0;
-        ar >> size;
+        ar >> size; //-V128
 
         s.clear();
         s.resize(size);
@@ -31,7 +31,7 @@ namespace hpx { namespace serialization
     template <typename Char, typename CharTraits, typename Allocator>
     void serialize(output_archive & ar, std::basic_string<Char, CharTraits, Allocator> & s, unsigned)
     {
-        ar << s.size();
+        ar << s.size(); //-V128
         save_binary(ar, s.data(), s.size() * sizeof(Char));
     }
 }}

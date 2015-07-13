@@ -14,7 +14,7 @@
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
-#include <hpx/runtime/serialization/raw_ptr.hpp>
+#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
@@ -30,6 +30,7 @@
 namespace hpx { namespace components { namespace server
 {
     class memory_block;     // forward declaration only
+    class runtime_support;
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,8 +124,17 @@ namespace hpx { namespace components { namespace server { namespace detail
             components::set_component_type<memory_block_header>(t);
         }
 
-        naming::id_type get_gid() const;
+        naming::id_type get_id() const;
+        naming::id_type get_unmanaged_id() const;
 
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_unmanaged_id();
+        }
+#endif
+
+    protected:
         naming::gid_type get_base_gid() const;
 
     protected:
@@ -287,7 +297,7 @@ namespace hpx { namespace components
             HPX_ASSERT(act);
 
             ar << size; //-V128
-            ar << hpx::serialization::raw_ptr(act);
+            ar << hpx::serialization::detail::raw_ptr(act);
 
             HPX_ASSERT(act->save());
             if (config) {
@@ -319,20 +329,20 @@ namespace hpx { namespace components
             actions::manage_object_action_base* act = 0;
 
             ar >> size; //-V128
-            ar >> hpx::serialization::raw_ptr(act);
+            ar >> hpx::serialization::detail::raw_ptr(act);
 
             typedef server::detail::memory_block_header alloc_type;
             alloc_type* p =
                 new (server::detail::allocate_block<alloc_type>(size))
-                    alloc_type(size, act->get_instance());
+                    alloc_type(size, act->get_instance()); //-V522
 
-            HPX_ASSERT(act->load());
+            HPX_ASSERT(act->load()); //-V522
             if (config) {
-                act->load()(p->get_ptr(), size, ar, version,
+                act->load()(p->get_ptr(), size, ar, version, //-V522
                     config->get_ptr());
             }
             else {
-                act->load()(p->get_ptr(), size, ar, version, 0);
+                act->load()(p->get_ptr(), size, ar, version, 0); //-V522
             }
 
             delete act;
@@ -648,10 +658,27 @@ namespace hpx { namespace components { namespace server
 
     public:
         /// \brief Return the global id of this \a future instance
+        naming::id_type get_id() const
+        {
+            return get_checked()->get_id();
+        }
+
+        naming::id_type get_unmanaged_id() const
+        {
+            return get_checked()->get_unmanaged_id();
+        }
+
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
         naming::id_type get_gid() const
         {
             return get_checked()->get_gid();
         }
+#endif
+
+    protected:
+        friend class server::detail::memory_block;
+        friend class server::detail::memory_block_header;
+        friend class server::runtime_support;
 
         naming::gid_type get_base_gid() const
         {
@@ -659,8 +686,6 @@ namespace hpx { namespace components { namespace server
         }
 
     private:
-        friend class detail::memory_block;
-
         /// \brief We use a intrusive pointer here to make sure the size of the
         ///        overall memory_block class is exactly equal to the size of
         ///        a single pointer
@@ -669,7 +694,12 @@ namespace hpx { namespace components { namespace server
 
     namespace detail
     {
-        inline naming::id_type memory_block_header::get_gid() const
+        inline naming::id_type memory_block_header::get_id() const
+        {
+            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        }
+
+        inline naming::id_type memory_block_header::get_unmanaged_id() const //-V524
         {
             return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
         }
@@ -701,8 +731,7 @@ HPX_REGISTER_ACTION_DECLARATION(
     memory_block_clone_action)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::components::memory_block_data,
-    memory_data_type)
+    hpx::components::memory_block_data, hpx_memory_data_type)
 
 #include <hpx/config/warnings_suffix.hpp>
 

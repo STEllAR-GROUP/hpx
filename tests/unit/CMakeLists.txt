@@ -8,11 +8,11 @@ set(subdirs
     actions
     agas
     build
-    components
+    component
     diagnostics
     lcos
     parcelset
-    performance_counters
+    performance_counter
     serialization
     threads
     traits

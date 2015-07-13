@@ -205,11 +205,9 @@ HPX_REGISTER_ACTION_DECLARATION(
     performance_counter_stop_action)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::performance_counters::counter_info,
-    counter_info)
+    hpx::performance_counters::counter_info, hpx_counter_info)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::performance_counters::counter_value,
-    counter_value)
+    hpx::performance_counters::counter_value, hpx_counter_value)
 
 #endif
 

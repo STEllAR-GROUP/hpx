@@ -12,6 +12,7 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/format.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -80,8 +81,6 @@ namespace hpx { namespace util { namespace batch_environments {
             if (ifs.is_open()) {
                 std::map<std::string, std::size_t> nodes;
                 typedef std::map<std::string, std::size_t>::iterator nodes_iterator;
-
-                std::string hostname = boost::asio::ip::host_name();
 
                 bool fill_nodelist = nodelist.empty();
 

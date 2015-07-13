@@ -13,9 +13,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static bool
-            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, F && f)
             {
                 return sequential_equal_binary(first1, last1, first2, last2,
@@ -68,8 +68,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+            static typename util::detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, F && f)
             {
                 typedef typename std::iterator_traits<FwdIter1>::difference_type
@@ -79,12 +79,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 if (first1 == last1)
                 {
-                    return detail::algorithm_result<ExPolicy, bool>::get(
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
                         first2 == last2);
                 }
 
                 if (first2 == last2)
-                    return detail::algorithm_result<ExPolicy, bool>::get(false);
+                {
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
+                        false);
+                }
 
                 difference_type1 count1 = std::distance(first1, last1);
 
@@ -97,7 +100,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 // iterators. This could turn into a QoI issue.
                 difference_type2 count2 = std::distance(first2, last2);
                 if (count1 != count2)
-                    return detail::algorithm_result<ExPolicy, bool>::get(false);
+                {
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
+                        false);
+                }
 
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
                 typedef typename zip_iterator::reference reference;
@@ -190,7 +196,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     equal(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2)
@@ -293,7 +299,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     equal(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, F && f)
@@ -335,7 +341,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static bool
-            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, F && f)
             {
                 return std::equal(first1, last1, first2, std::forward<F>(f));
@@ -343,12 +349,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+            static typename util::detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, F && f)
             {
                 if (first1 == last1)
-                    return detail::algorithm_result<ExPolicy, bool>::get(true);
+                {
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
+                        true);
+                }
 
                 typedef typename std::iterator_traits<FwdIter1>::difference_type
                     difference_type;
@@ -441,7 +450,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     equal(ExPolicy&& policy, InIter1 first1, InIter1 last1,
         InIter2 first2)
@@ -540,7 +549,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     equal(ExPolicy&& policy, InIter1 first1, InIter1 last1, InIter2 first2,
         F && f)

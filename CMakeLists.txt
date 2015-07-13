@@ -150,6 +150,16 @@ hpx_option(HPX_WITH_DOCUMENTATION_SINGLEPAGE BOOL
   "The HPX documentation should be build as a single page HTML (default OFF)."
   OFF CATEGORY "Build Targets")
 
+if(WIN32)
+  hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
+    "Force creating pseudo targets and pseudo dependencies (default OFF)."
+    OFF CATEGORY "Build Targets")
+else()
+  hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
+    "Force creating pseudo targets and pseudo dependencies (default ON)."
+    ON CATEGORY "Build Targets")
+endif()
+
 ################################################################################
 # Some platforms do not support dynamic linking. Enable this to link all
 # libraries statically. This also changes some of the internals of HPX related
@@ -167,7 +177,7 @@ endif()
 
 ################################################################################
 
-hpx_option(HPX_WITH_EXAMPLES BOOL "Build the HPX examples (default OFF)" ON CATEGORY "Build Targets")
+hpx_option(HPX_WITH_EXAMPLES BOOL "Build the HPX examples (default ON)" ON CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS BOOL "Build the HPX tests (default ON)" ON CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
@@ -175,6 +185,10 @@ hpx_option(HPX_WITH_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVA
 hpx_option(HPX_WITH_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+
+hpx_option(HPX_WITH_COMPILE_ONLY_TESTS BOOL
+  "Create build system support for compile time only HPX tests (default ON)"
+  ON CATEGORY "Build Targets")
 
 set(HPX_FULL_RPATH_DEFAULT ON)
 if(APPLE)
@@ -508,12 +522,21 @@ hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel da
 
 ################################################################################
 # Backwards compatibility options (edit for each release)
+
 # HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
 hpx_option(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
     "Enable backwards compatibility for apply_colocated, async_colocated and friends"
     ON ADVANCED)
 if(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
+endif()
+
+# HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY: introduced in V0.9.11
+hpx_option(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY BOOL
+    "Enable backwards compatibility for component::get_gid() functions"
+    ON ADVANCED)
+if(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
 endif()
 
 ################################################################################
@@ -726,7 +749,11 @@ hpx_check_for_cxx11_constexpr(
   DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
 
 hpx_check_for_cxx11_decltype(
-  DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
+  REQUIRED "HPX needs support for C++11 decltype")
+hpx_add_config_define(BOOST_RESULT_OF_USE_DECLTYPE)
+
+hpx_check_for_cxx11_decltype_n3276(
+  DEFINITIONS HPX_HAVE_CXX11_DECLTYPE_N3276)
 
 hpx_check_for_cxx11_defaulted_functions(
   DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
@@ -769,6 +796,9 @@ hpx_check_for_cxx11_variadic_macros(
 
 hpx_check_for_cxx11_variadic_templates(
   REQUIRED "HPX needs support for C++11 variadic templates")
+
+hpx_check_for_cxx11_extended_friend_declarations(
+  DEFINITIONS HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
 
 # Check the availability of certain C++11 library features
 hpx_check_for_cxx11_std_chrono(

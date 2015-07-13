@@ -8,6 +8,7 @@
 #define HPX_SERIALIZATION_FWD_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/detail/pp_strip_parens.hpp>
 
 #if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
 #include <boost/shared_ptr.hpp>
@@ -73,6 +74,23 @@ namespace hpx { namespace serialization
     void serialize(hpx::serialization::output_archive & ar, T & t, unsigned)        \
     {                                                                               \
         save(ar, const_cast<boost::add_const<T>::type &>(t), 0);                    \
+    }                                                                               \
+/**/
+#define HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(TEMPLATE, ARGS)                       \
+    HPX_UTIL_STRIP(TEMPLATE)                                                        \
+    BOOST_FORCEINLINE                                                               \
+    void serialize(hpx::serialization::input_archive & ar,                          \
+            HPX_UTIL_STRIP(ARGS) & t, unsigned)                                     \
+    {                                                                               \
+        load(ar, t, 0);                                                             \
+    }                                                                               \
+    HPX_UTIL_STRIP(TEMPLATE)                                                        \
+    BOOST_FORCEINLINE                                                               \
+    void serialize(hpx::serialization::output_archive & ar,                         \
+            HPX_UTIL_STRIP(ARGS) & t, unsigned)                                     \
+    {                                                                               \
+        save(ar, const_cast<typename boost::add_const                               \
+                <HPX_UTIL_STRIP(ARGS)>::type &>(t), 0);                             \
     }                                                                               \
 /**/
 

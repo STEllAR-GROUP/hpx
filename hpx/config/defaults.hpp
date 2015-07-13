@@ -10,6 +10,8 @@
 #include <hpx/version.hpp>
 #include <hpx/util/find_prefix.hpp>
 
+#include <boost/preprocessor/stringize.hpp>
+
 // The HPX runtime needs to know where to look for the HPX ini files if no ini
 // path is specified by the user (default in $HPX_LOCATION/share/hpx-1.0.0/ini).
 // Also, the default component path is set within the same prefix

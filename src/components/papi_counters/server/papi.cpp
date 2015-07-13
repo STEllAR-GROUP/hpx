@@ -213,7 +213,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
                 const_cast<int *>(&event_)),
                 cpe.countername_+" does not seem to be a valid event name",
                 locstr);
-            papi_call(  
+            papi_call(
                 PAPI_query_event(event_),
                 "event "+cpe.countername_+" is not available on this platform",
                 locstr);

@@ -360,7 +360,7 @@ namespace hpx { namespace util
                     if (p.second) {
                         // have all path elements, now find ini files in there...
                         fs::path this_path (hpx::util::create_path(*p.first));
-                        if (fs::exists(this_path)) {
+                        if (fs::exists(this_path, fsec) && !fsec) {
                             plugin_list_type tmp_regs =
                                 util::init_ini_data_default(
                                     this_path.string(), *this, basenames, modules_);

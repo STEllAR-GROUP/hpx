@@ -36,7 +36,7 @@ inline void worker(
   , boost::uint64_t updates
     )
 {
-    b.wait(); 
+    b.wait();
 
     for (double i = 0.; i < updates; ++i)
     {
