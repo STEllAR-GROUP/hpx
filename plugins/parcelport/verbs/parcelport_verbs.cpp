@@ -180,7 +180,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
                 util::function_nonser<void()> const& on_stop_thread) :
                     parcelset::parcelport(ini, here(ini), "verbs"), archive_flags_(0)
-        , stopped_(false), active_send_count_(0)
+        , stopped_(false), active_send_count_(0),
+        connection_started(ATOMIC_FLAG_INIT)
         //      , parcels_sent_(0)
         {
             FUNC_START_DEBUG_MSG;
@@ -212,6 +213,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             _rdmaController = std::make_shared<RdmaController>
                 (_ibverbs_device.c_str(), _ibverbs_interface.c_str(), _port);
 
+            connection_started.clear();
             FUNC_END_DEBUG_MSG;
         }
 
@@ -258,6 +260,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         boost::atomic_uint        active_send_count_;
         memory_pool_ptr_type      chunk_pool_;
         verbs::tag_provider       tag_provider_;
+        std::atomic_flag          connection_started;
 
         // performance_counters::parcels::gatherer& parcels_sent_;
 
@@ -318,6 +321,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 hpx_background_work();
             }
             LOG_ERROR_MSG("HPX is now stopped");
+            std::cout << "hpx background work thread stopped" << std::endl;
         }
 
         // ----------------------------------------------------------------------------------------------
@@ -402,6 +406,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 active_recvs.erase(recv);
                 LOG_DEBUG_MSG("Active recv after erase size " << active_recvs.size() );
             }
+        }
+
+        int handle_verbs_preconnection() {
+            if (connection_started.test_and_set(std::memory_order_acquire)) {
+                LOG_ERROR_MSG("Got a connection request during race detection");
+                return 0;
+            }
+            return 1;
         }
 
         // ----------------------------------------------------------------------------------------------
@@ -875,11 +887,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             FUNC_END_DEBUG_MSG;
         }
 
+        // This should start the receiving side of your PP
         bool run(bool blocking = true) {
             FUNC_START_DEBUG_MSG;
             _rdmaController->startup();
             LOG_DEBUG_MSG("Fetching memory pool");
             chunk_pool_ = _rdmaController->getMemoryPool();
+
+            LOG_DEBUG_MSG("Setting Pre-Connection function");
+            auto preConnection_function = std::bind( &parcelport::handle_verbs_preconnection, this);
+            _rdmaController->setPreConnectionFunction(preConnection_function);
 
             LOG_DEBUG_MSG("Setting Connection function");
             auto connection_function = std::bind( &parcelport::handle_verbs_connection, this, std::placeholders::_1, std::placeholders::_2);
@@ -903,6 +920,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         }
 
         void stop(bool blocking = true) {
+            std::cout << "Entering verbs stop " << std::endl;
             FUNC_START_DEBUG_MSG;
             if (!stopped_) {
                 bool finished = false;
@@ -913,17 +931,22 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                         std::terminate();
                         do_background_work(1);
                     }
-                } while (!finished);
+                } while (!finished && !hpx::is_stopped());
+
+
+                std::cout << "stopped checking for background work" << std::endl;
 
                 scoped_lock lock(stop_mutex);
                 LOG_DEBUG_MSG("Removing all initiated connections");
                 _rdmaController->removeAllInitiatedConnections();
 
                 // wait for all clients initiated elsewhere to be disconnected
-                while (_rdmaController->num_clients()!=0) {
+                while (_rdmaController->num_clients()!=0 && !hpx::is_stopped()) {
                     _rdmaController->eventMonitor(0);
+                    std::cout << "Polling before shutdown" << std::endl;
                 }
                 LOG_DEBUG_MSG("wait done");
+                std::cout << "stopped removing clients and terminating" << std::endl;
             }
             stopped_ = true;
             // Stop receiving and sending of parcels
@@ -962,18 +985,31 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             {
                 // lock this region as we are creating a connection to a remote locality
                 // if two threads attempt to do this at the same time, we'll get duplicated clients
-                scoped_lock lock(connection_mutex);
-                ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
-                if (ip_it!=ip_qp_map.end()) {
-                    LOG_DEBUG_MSG("Connection found with qp " << ip_it->second);
-                    client = _rdmaController->getClient(ip_it->second);
-                }
-                else {
-                    LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
-                    client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
-                    LOG_DEBUG_MSG("Setting qpnum in main client map");
-                    ip_qp_map[dest_ip] = client->getQpNum();
-                }
+                bool connection = 0;
+                unique_lock lock(connection_mutex);
+                do {
+                    ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
+                    if (ip_it!=ip_qp_map.end()) {
+                        LOG_DEBUG_MSG("Connection found with qp " << ip_it->second);
+                        client = _rdmaController->getClient(ip_it->second);
+                        connection = 1;
+                    }
+                    else {
+                        if (connection_started.test_and_set(std::memory_order_acquire)) {
+                            lock.unlock();
+                            LOG_ERROR_MSG("A connection race has been detected, do not connect");
+                            hpx::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+                            lock.lock();
+                        }
+                        else {
+                            LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
+                            client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
+                            LOG_DEBUG_MSG("Setting qpnum in main client map");
+                            ip_qp_map[dest_ip] = client->getQpNum();
+                            connection = 1;
+                        }
+                    }
+                } while (connection==0);
             }
 
             // connection ok, we can now send required info to the remote peer
@@ -1175,6 +1211,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // OS thread, but we do want to suspend hpx threads when necessary.
         // ----------------------------------------------------------------------------------------------
         bool hpx_background_work() {
+//            if(hpx::is_stopped()) return true;
             bool done = false;
             // this must be called on an HPX thread
             HPX_ASSERT(threads::get_self_ptr() != 0);
