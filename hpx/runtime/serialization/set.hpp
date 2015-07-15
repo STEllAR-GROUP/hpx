@@ -12,8 +12,8 @@
 
 namespace hpx { namespace serialization
 {
-    template <typename T, typename Allocator>
-    void serialize(input_archive & ar, std::set<T, Allocator> & set, unsigned)
+    template <class T, class Compare, class Allocator>
+    void serialize(input_archive & ar, std::set<T, Compare, Allocator> & set, unsigned)
     {
         set.clear();
         std::size_t size;
@@ -25,8 +25,8 @@ namespace hpx { namespace serialization
         }
     }
 
-    template <typename T, typename Allocator>
-    void serialize(output_archive & ar, std::set<T, Allocator> & set, unsigned)
+    template <class T, class Compare, class Allocator>
+    void serialize(output_archive & ar, std::set<T, Compare, Allocator> & set, unsigned)
     {
         ar << set.size(); //-V128
         if(set.empty()) return;
