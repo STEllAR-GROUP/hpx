@@ -21,7 +21,7 @@ namespace hpx { namespace serialization
         for (std::size_t i = 0; i < size; ++i) {
             T t;
             ar >> t;
-            set.insert(t);
+            set.insert(set.end(), t);
         }
     }
 
