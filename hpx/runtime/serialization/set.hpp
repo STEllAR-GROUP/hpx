@@ -16,19 +16,20 @@ namespace hpx { namespace serialization
     void serialize(input_archive & ar, std::set<T, Compare, Allocator> & set, unsigned)
     {
         set.clear();
-        std::size_t size;
+        boost::uint64_t size;
         ar >> size;
         for (std::size_t i = 0; i < size; ++i) {
             T t;
             ar >> t;
-            set.insert(set.end(), t);
+            set.insert(set.end(), std::move(t));
         }
     }
 
     template <class T, class Compare, class Allocator>
     void serialize(output_archive & ar, std::set<T, Compare, Allocator> & set, unsigned)
     {
-        ar << set.size(); //-V128
+        boost::uint64_t size = set.size();
+        ar << size;
         if(set.empty()) return;
         for (typename std::set<T, Allocator>::iterator i = set.begin(); i != set.end(); ++i) {
             ar << *i;
