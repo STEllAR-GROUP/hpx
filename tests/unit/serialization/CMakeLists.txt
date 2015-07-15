@@ -8,6 +8,7 @@ set(tests
     serialization_builtins
     serialization_complex
     serialization_map
+    serialization_set
     serialization_simple
     serialization_smart_ptr
     serialization_vector
