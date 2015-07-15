@@ -31,8 +31,8 @@ namespace hpx { namespace serialization
         boost::uint64_t size = set.size();
         ar << size;
         if(set.empty()) return;
-        for (typename std::set<T, Allocator>::iterator i = set.begin(); i != set.end(); ++i) {
-            ar << *i;
+        for (T const& i: set) {
+            ar << i;
         }
     }
 
