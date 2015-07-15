@@ -420,7 +420,7 @@ response primary_namespace::end_migration(
 {
     naming::gid_type id = req.get_gid();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     migration_table_type::iterator it = migrating_objects_.find(id);
     if (it == migrating_objects_.end())

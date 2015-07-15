@@ -43,7 +43,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 // as handle_header tries to acquire a mutex as well, we need
                 // to ignore the headers_mtx_ here
                 util::ignore_while_checking<mutex_type::scoped_lock> il(l_);
-                mutex_type::scoped_lock lk(receiver_.handles_header_mtx_);
+                boost::lock_guard<mutex_type> lk(receiver_.handles_header_mtx_);
                 std::pair<int, int> p(it->first, it->second.tag());
                 header_handle_ = receiver_.handles_header_.find(p);
 
@@ -71,7 +71,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 // as handle_header tries to acquire a mutex as well, we need
                 // to ignore the headers_mtx_ here
                 util::ignore_while_checking<mutex_type::scoped_lock> il(l_);
-                mutex_type::scoped_lock lk(receiver_.handles_header_mtx_);
+                boost::lock_guard<mutex_type> lk(receiver_.handles_header_mtx_);
                 if(handles_)
                 {
                     HPX_ASSERT(header_handle_ != receiver_.handles_header_.end());

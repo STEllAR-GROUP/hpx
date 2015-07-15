@@ -19,6 +19,8 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
+#include <boost/thread/locks.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -554,7 +556,7 @@ namespace hpx { namespace parcelset
                 return false;
 
             {
-                lcos::local::spinlock::scoped_lock l(mtx_);
+                boost::lock_guard<lcos::local::spinlock> l(mtx_);
 
                 iterator it = pending_parcels_.find(locality_id);
 
@@ -723,7 +725,7 @@ namespace hpx { namespace parcelset
                             thread_num, threads::thread_stacksize_default
                         );
                     {
-                        mutex_type::scoped_lock l(sender_threads_mtx_);
+                        boost::lock_guard<mutex_type> l(sender_threads_mtx_);
                         HPX_ASSERT(new_send_thread != threads::invalid_thread_id);
                         sender_threads_.insert(new_send_thread);
                     }
@@ -734,7 +736,7 @@ namespace hpx { namespace parcelset
                     new_send_thread = threads::get_self_id();
                     if(new_send_thread != threads::invalid_thread_id)
                     {
-                        mutex_type::scoped_lock l(sender_threads_mtx_);
+                        boost::lock_guard<mutex_type> l(sender_threads_mtx_);
                         sender_threads_.insert(new_send_thread);
                     }
                     send_pending_parcels(
@@ -761,7 +763,7 @@ namespace hpx { namespace parcelset
             client_connection->set_state(parcelport_connection::state_scheduled_thread);
 #endif
             {
-                lcos::local::spinlock::scoped_lock l(mtx_);
+                boost::lock_guard<lcos::local::spinlock> l(mtx_);
 
                 HPX_ASSERT(locality_id == sender_connection->destination());
                 if (!ec)
@@ -849,7 +851,7 @@ namespace hpx { namespace parcelset
             threads::thread_id_type this_thread = threads::get_self_id();
             if(this_thread != threads::invalid_thread_id)
             {
-                mutex_type::scoped_lock l(sender_threads_mtx_);
+                boost::lock_guard<lcos::local::spinlock> l(sender_threads_mtx_);
                 std::set<threads::thread_id_type>::iterator it
                     = sender_threads_.find(this_thread);
                 HPX_ASSERT(it != sender_threads_.end());

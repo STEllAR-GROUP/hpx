@@ -6,6 +6,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
 
+#include <boost/thread/locks.hpp>
+
 #include <set>
 
 namespace hpx
@@ -93,7 +95,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     boost::system::error_code exception_list::get_error() const
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         if (exceptions_.empty())
             return hpx::no_success;
         return hpx::get_error(exceptions_.front());
@@ -101,7 +103,7 @@ namespace hpx
 
     std::string exception_list::get_message() const
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         if (exceptions_.empty())
             return "";
 

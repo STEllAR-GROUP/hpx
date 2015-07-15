@@ -556,12 +556,12 @@ namespace detail
 
         threads::thread_id_type get_id() const
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             return id_;
         }
         void set_id(threads::thread_id_type id)
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             id_ = id;
         }
 
@@ -611,13 +611,13 @@ namespace detail
     private:
         bool started_test() const
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             return started_;
         }
 
         bool started_test_and_set()
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             if (started_)
                 return true;
 
@@ -627,7 +627,7 @@ namespace detail
 
         void check_started()
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             if (started_) {
                 HPX_THROW_EXCEPTION(task_already_started,
                     "task_base::check_started",

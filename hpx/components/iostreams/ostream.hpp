@@ -8,22 +8,22 @@
 #define HPX_97FC0FA2_E773_4F83_8477_806EC68C2253
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local/recursive_mutex.hpp>
-
-#include <iterator>
-#include <ios>
-#include <iostream>
-
-#include <boost/swap.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <boost/atomic.hpp>
-
 #include <hpx/state.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/stubs/output_stream.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/lcos/local/recursive_mutex.hpp>
+
+#include <boost/swap.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/atomic.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <iterator>
+#include <ios>
+#include <iostream>
 
 namespace hpx { namespace iostreams
 {
@@ -288,14 +288,14 @@ namespace hpx { namespace iostreams
         template <typename T>
         ostream& operator<<(T const& subject)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return streaming_operator_lazy(subject);
         }
 
         ///////////////////////////////////////////////////////////////////////
         ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&))
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return streaming_operator_lazy(manip_fun);
         }
     };

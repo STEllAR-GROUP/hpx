@@ -30,6 +30,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <sstream>
 #include <vector>
@@ -111,7 +112,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         void shutdown()
         {
-            mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
             // gracefully and portably shutdown the socket
             boost::system::error_code ec;
             if (socket_.is_open()) {

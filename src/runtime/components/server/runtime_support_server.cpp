@@ -51,6 +51,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <algorithm>
 #include <set>
@@ -560,7 +561,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::dijkstra_make_black()
     {
         // Rule 1: A machine sending a message makes itself black.
-        dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
+        boost::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
         dijkstra_color_ = true;
     }
 
@@ -599,7 +600,7 @@ namespace hpx { namespace components { namespace server
         // Rule 2: When machine nr.i + 1 propagates the probe, it hands over a
         // black token to machine nr.i if it is black itself, whereas while
         // being white it leaves the color of the token unchanged.
-        dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
+        boost::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
         bool dijkstra_token = dijkstra_color_;
 
         // Rule 5: Upon transmission of the token to machine nr.i, machine
@@ -684,7 +685,7 @@ namespace hpx { namespace components { namespace server
         // black token to machine nr.i if it is black itself, whereas while
         // being white it leaves the color of the token unchanged.
         {
-            dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
+            boost::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
             if (dijkstra_color_)
                 dijkstra_token = dijkstra_color_;
 
@@ -715,7 +716,7 @@ namespace hpx { namespace components { namespace server
             // we received the token after a full circle
             if (dijkstra_token)
             {
-                dijkstra_mtx_type::scoped_lock l(dijkstra_mtx_);
+                boost::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
                 dijkstra_color_ = true;     // unsuccessful termination
             }
 
@@ -926,7 +927,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::tidy()
     {
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::lock_guard<component_map_mutex_type> l(cm_mtx_);
 
         // Only after releasing the components we are allowed to release
         // the modules. This is done in reverse order of loading.
@@ -1122,7 +1123,7 @@ namespace hpx { namespace components { namespace server
     // this will be called after the thread manager has exited
     void runtime_support::stopped()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         if (!terminated_) {
             terminated_ = true;
             stop_condition_.notify_all();   // finished cleanup/termination
@@ -1199,7 +1200,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::keep_factory_alive(component_type type)
     {
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::lock_guard<component_map_mutex_type> l(cm_mtx_);
 
         // Only after releasing the components we are allowed to release
         // the modules. This is done in reverse order of loading.
@@ -1395,7 +1396,7 @@ namespace hpx { namespace components { namespace server
                 }
 
                 // store component factory and module for later use
-                component_map_mutex_type::scoped_lock l(cm_mtx_);
+                boost::lock_guard<component_map_mutex_type> l(cm_mtx_);
 
                 component_factory_type data(factory, isenabled);
                 std::pair<component_map_type::iterator, bool> p =
@@ -1922,7 +1923,7 @@ namespace hpx { namespace components { namespace server
                 }
 
                 // store component factory and module for later use
-                component_map_mutex_type::scoped_lock l(cm_mtx_);
+                boost::lock_guard<component_map_mutex_type> l(cm_mtx_);
 
                 component_factory_type data(factory, d, isenabled);
                 std::pair<component_map_type::iterator, bool> p =

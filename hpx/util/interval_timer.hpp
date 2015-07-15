@@ -9,6 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/thread/locks.hpp>
+
 #include <string>
 #include <vector>
 
@@ -45,18 +47,18 @@ namespace hpx { namespace util
 
         boost::int64_t get_interval() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return microsecs_;
         }
 
         void slow_down(boost::int64_t max_interval)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             microsecs_ = (std::min)((110 * microsecs_) / 100, max_interval);
         }
         void speed_up(boost::int64_t min_interval)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             microsecs_ = (std::max)((90 * microsecs_) / 100, min_interval);
         }
 

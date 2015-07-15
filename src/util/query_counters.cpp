@@ -16,6 +16,7 @@
 #include <hpx/lcos/wait_all.hpp>
 
 #include <boost/format.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -151,7 +152,7 @@ namespace hpx { namespace util
     {
         std::vector<naming::id_type> ids;
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             // give up control over all performance counters
             std::swap(ids, ids_);
         }
@@ -162,7 +163,7 @@ namespace hpx { namespace util
     {
         bool has_been_started = false;
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             has_been_started = !ids_.empty();
         }
 
@@ -207,7 +208,7 @@ namespace hpx { namespace util
     {
         bool has_been_started = false;
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             has_been_started = !ids_.empty();
         }
 
@@ -252,7 +253,7 @@ namespace hpx { namespace util
     {
         bool has_been_started = false;
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             has_been_started = !ids_.empty();
         }
 
@@ -306,7 +307,7 @@ namespace hpx { namespace util
         bool has_been_started = false;
         bool destination_is_cout = false;
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             has_been_started = !ids_.empty();
             destination_is_cout = destination_ == "cout";
         }
@@ -322,7 +323,7 @@ namespace hpx { namespace util
 
         std::vector<id_type> ids;
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             ids = ids_;
         }
 

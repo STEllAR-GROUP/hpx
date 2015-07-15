@@ -12,6 +12,8 @@
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <boost/thread/locks.hpp>
+
 #include <utility>
 
 namespace hpx { namespace lcos { namespace local
@@ -45,7 +47,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (this != &rhs)
             {
-                typename mutex_type::scoped_lock l(rhs.mtx_);
+                boost::lock_guard<mutex_type> l(rhs.mtx_);
                 promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);
@@ -73,7 +75,7 @@ namespace hpx { namespace lcos { namespace local
         future<void> get_future(std::size_t* generation_value = 0,
             error_code& ec = hpx::throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             HPX_ASSERT(generation_ != std::size_t(-1));
             ++generation_;
@@ -90,7 +92,7 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Trigger this object.
         bool set(error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -184,7 +186,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         std::size_t next_generation()
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
@@ -195,7 +197,7 @@ namespace hpx { namespace lcos { namespace local
 
         std::size_t generation() const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return generation_;
         }
 

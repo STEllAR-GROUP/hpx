@@ -7,8 +7,6 @@
 #if !defined(HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E)
 #define HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E
 
-#include <boost/intrusive/slist.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -17,6 +15,9 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
 #include <hpx/lcos/base_lco.hpp>
+
+#include <boost/intrusive/slist.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <memory>
 
@@ -157,7 +158,7 @@ struct object_semaphore
 
     void abort_pending(error ec)
     { // {{{
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         LLCO_(info)
             << "object_semaphore::abort_pending: thread_queue is not empty, "
@@ -193,7 +194,7 @@ struct object_semaphore
             lcos::template base_lco_with_value<ValueType>::get_value_action
         action_type;
 
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         typename thread_queue_type::const_iterator it = thread_queue_.begin()
                                                  , end = thread_queue_.end();

@@ -16,6 +16,8 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace parcelset { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -38,7 +40,7 @@ namespace hpx { namespace parcelset { namespace policies
 
             // Add parcel to queue.
             {
-                mutex_type::scoped_lock l(mtx_);
+                boost::lock_guard<mutex_type> l(mtx_);
                 std::pair<parcel_map_type::iterator, bool> ret =
                     parcels_.insert(parcel_map_type::value_type(id, p));
 
@@ -60,7 +62,7 @@ namespace hpx { namespace parcelset { namespace policies
         bool get_parcel(parcel& p)
         {
             // Remove the first parcel from queue.
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             if (!parcels_.empty()) {
                 parcel_map_type::iterator front = parcels_.begin();
@@ -75,7 +77,7 @@ namespace hpx { namespace parcelset { namespace policies
         bool get_parcel(parcel& p, naming::gid_type const& parcel_id)
         {
             // Remove the requested parcel from queue.
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             parcel_map_type::iterator it = parcels_.find(parcel_id);
             if (it != parcels_.end()) {
@@ -106,7 +108,7 @@ namespace hpx { namespace parcelset { namespace policies
 
         std::size_t get_queue_length() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return parcels_.size();
         }
 

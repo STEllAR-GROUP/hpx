@@ -18,6 +18,7 @@
 #include <boost/config.hpp>
 #include <boost/current_function.hpp>
 #include <boost/preprocessor/stringize.hpp>
+#include <boost/thread/locks.hpp>
 
 // Use smart_ptr's spinlock header because this header is used by the CMake
 // config tests, and therefore we can't include other hpx headers in this file.
@@ -86,7 +87,7 @@ struct fixture
     {
         if (!t)
         {
-            mutex_type::scoped_lock l(mutex_);
+            boost::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             stream_
                 << file << "(" << line << "): "
@@ -104,7 +105,7 @@ struct fixture
     {
         if (!(t == u))
         {
-            mutex_type::scoped_lock l(mutex_);
+            boost::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             stream_
                 << file << "(" << line << "): " << msg
@@ -123,7 +124,7 @@ struct fixture
     {
         if (!(t != u))
         {
-            mutex_type::scoped_lock l(mutex_);
+            boost::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             stream_
                 << file << "(" << line << "): " << msg
@@ -141,7 +142,7 @@ struct fixture
     {
         if (!(t < u))
         {
-            mutex_type::scoped_lock l(mutex_);
+            boost::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             stream_
                 << file << "(" << line << "): " << msg
@@ -160,7 +161,7 @@ struct fixture
     {
         if (!(t <= u))
         {
-            mutex_type::scoped_lock l(mutex_);
+            boost::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             stream_
                 << file << "(" << line << "): " << msg
@@ -179,7 +180,7 @@ struct fixture
     {
         if (!(t >= u && t <= v))
         {
-            mutex_type::scoped_lock l(mutex_);
+            boost::lock_guard<mutex_type> l(mutex_);
             boost::io::ios_flags_saver ifs(stream_);
             if (!(t >= u))
             {

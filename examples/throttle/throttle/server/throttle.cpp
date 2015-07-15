@@ -7,12 +7,12 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/util/scoped_unlock.hpp>
-
 #include <hpx/util/assert.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
+#include <boost/thread/locks.hpp>
 
 #include "throttle.hpp"
 
@@ -43,7 +43,7 @@ namespace throttle { namespace server
             return;
         }
 
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         if (shepherd >= blocked_os_threads_.size()) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::suspend",
@@ -59,7 +59,7 @@ namespace throttle { namespace server
 
     void throttle::resume(std::size_t shepherd)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         if (shepherd >= blocked_os_threads_.size()) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::resume",
@@ -71,7 +71,7 @@ namespace throttle { namespace server
 
     bool throttle::is_suspended(std::size_t shepherd) const
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         if (shepherd >= blocked_os_threads_.size()) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::is_suspended",

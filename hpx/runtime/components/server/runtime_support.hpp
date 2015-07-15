@@ -29,6 +29,7 @@
 
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/atomic.hpp>
@@ -285,25 +286,25 @@ namespace hpx { namespace components { namespace server
 
         void add_pre_startup_function(util::function_nonser<void()> const& f)
         {
-            lcos::local::spinlock::scoped_lock l(globals_mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(globals_mtx_);
             pre_startup_functions_.push_back(f);
         }
 
         void add_startup_function(util::function_nonser<void()> const& f)
         {
-            lcos::local::spinlock::scoped_lock l(globals_mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(globals_mtx_);
             startup_functions_.push_back(f);
         }
 
         void add_pre_shutdown_function(util::function_nonser<void()> const& f)
         {
-            lcos::local::spinlock::scoped_lock l(globals_mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(globals_mtx_);
             pre_shutdown_functions_.push_back(f);
         }
 
         void add_shutdown_function(util::function_nonser<void()> const& f)
         {
-            lcos::local::spinlock::scoped_lock l(globals_mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(globals_mtx_);
             shutdown_functions_.push_back(f);
         }
 

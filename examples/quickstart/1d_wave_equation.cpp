@@ -28,6 +28,7 @@
 
 #include <boost/format.hpp>
 #include <boost/math/constants/constants.hpp>
+#include <boost/thread/locks.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -128,7 +129,7 @@ double calculate_u_tplus_x_1st(double u_t_xplus, double u_t_x,
 
 double wave(boost::uint64_t t, boost::uint64_t x)
 {
-  hpx::lcos::local::mutex::scoped_lock l(u[t][x].mtx);
+  boost::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
   //  cout << (boost::format("calling wave... t=%1% x=%2%\n") % t % x) << flush;
   if (u[t][x].computed)
     {

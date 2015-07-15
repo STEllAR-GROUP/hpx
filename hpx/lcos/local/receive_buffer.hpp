@@ -14,11 +14,12 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/move.hpp>
 
-#include <utility>
-#include <map>
-
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <utility>
+#include <map>
 
 namespace hpx { namespace lcos { namespace local
 {
@@ -100,7 +101,7 @@ namespace hpx { namespace lcos { namespace local
 
         hpx::future<T> receive(std::size_t step)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             iterator it = get_buffer_entry(step);
             HPX_ASSERT(it != buffer_map_.end());
@@ -123,7 +124,7 @@ namespace hpx { namespace lcos { namespace local
             boost::shared_ptr<entry_data> entry;
 
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::lock_guard<mutex_type> l(mtx_);
 
                 iterator it = get_buffer_entry(step);
                 HPX_ASSERT(it != buffer_map_.end());
@@ -250,7 +251,7 @@ namespace hpx { namespace lcos { namespace local
 
         hpx::future<void> receive(std::size_t step)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             iterator it = get_buffer_entry(step);
             HPX_ASSERT(it != buffer_map_.end());
@@ -273,7 +274,7 @@ namespace hpx { namespace lcos { namespace local
             boost::shared_ptr<entry_data> entry;
 
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::lock_guard<mutex_type> l(mtx_);
 
                 iterator it = get_buffer_entry(step);
                 HPX_ASSERT(it != buffer_map_.end());

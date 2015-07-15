@@ -11,6 +11,7 @@
 #include <hpx/util/scoped_unlock.hpp>
 
 #include <boost/bind.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace util
 {
@@ -96,7 +97,7 @@ namespace hpx { namespace util
 
     bool interval_timer::stop()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         is_stopped_ = true;
         return stop_locked();
     }

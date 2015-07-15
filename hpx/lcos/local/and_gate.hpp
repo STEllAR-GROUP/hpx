@@ -13,9 +13,10 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/dynamic_bitset.hpp>
-#include <utility>
+#include <boost/thread/locks.hpp>
 
 #include <list>
+#include <utility>
 
 namespace hpx { namespace lcos { namespace local
 {
@@ -52,7 +53,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (this != &rhs)
             {
-                typename mutex_type::scoped_lock l(rhs.mtx_);
+                boost::lock_guard<mutex_type> l(rhs.mtx_);
                 received_segments_ = std::move(rhs.received_segments_);
                 promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;
@@ -81,7 +82,7 @@ namespace hpx { namespace lcos { namespace local
         future<void> get_future(std::size_t count = std::size_t(~0U),
             std::size_t* generation_value = 0, error_code& ec = hpx::throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             // by default we use as many segments as specified during construction
             if (count == std::size_t(~0U))
@@ -235,7 +236,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         std::size_t next_generation()
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
@@ -246,7 +247,7 @@ namespace hpx { namespace lcos { namespace local
 
         std::size_t generation() const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return generation_;
         }
 

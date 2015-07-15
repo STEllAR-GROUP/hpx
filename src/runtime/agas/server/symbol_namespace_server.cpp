@@ -16,6 +16,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/make_shared.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace agas
 {
@@ -468,7 +469,7 @@ response symbol_namespace::unbind(
     // parameters
     std::string key = req.get_name();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key);
     gid_table_type::iterator end = gids_.end();

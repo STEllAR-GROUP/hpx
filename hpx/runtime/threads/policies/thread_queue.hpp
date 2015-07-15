@@ -23,8 +23,9 @@
 #   include <hpx/util/tick_counter.hpp>
 #endif
 
-#include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/thread/locks.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/atomic.hpp>
 #include <boost/unordered_set.hpp>
 
@@ -492,7 +493,7 @@ namespace hpx { namespace threads { namespace policies
                 bool thread_map_is_empty = false;
                 while (true)
                 {
-                    typename mutex_type::scoped_lock lk(mtx_);
+                    boost::lock_guard<mutex_type> lk(mtx_);
                     if (cleanup_terminated_locked_helper(false))
                     {
                         thread_map_is_empty =
@@ -503,7 +504,7 @@ namespace hpx { namespace threads { namespace policies
                 return thread_map_is_empty;
             }
 
-            typename mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
             return cleanup_terminated_locked_helper(false) &&
                 (thread_map_count_ == 0) && (new_tasks_count_ == 0);
         }
@@ -877,7 +878,7 @@ namespace hpx { namespace threads { namespace policies
                 return thread_map_count_ + new_tasks_count_ - terminated_items_count_;
 
             // acquire lock only if absolutely necessary
-            typename mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
 
             boost::int64_t num_threads = 0;
             thread_map_type::const_iterator end = thread_map_.end();
@@ -893,7 +894,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void abort_all_suspended_threads()
         {
-            typename mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
             thread_map_type::iterator end =  thread_map_.end();
             for (thread_map_type::iterator it = thread_map_.begin();
                  it != end; ++it)
@@ -961,7 +962,7 @@ namespace hpx { namespace threads { namespace policies
             return false;
 #else
             if (minimal_deadlock_detection) {
-                typename mutex_type::scoped_lock lk(mtx_);
+                boost::lock_guard<mutex_type> lk(mtx_);
                 return detail::dump_suspended_threads(num_thread, thread_map_
                   , idle_loop_count, running);
             }

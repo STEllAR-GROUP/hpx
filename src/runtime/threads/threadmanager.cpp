@@ -30,6 +30,7 @@
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <numeric>
 #include <sstream>
@@ -160,7 +161,7 @@ namespace hpx { namespace threads
         get_thread_count(thread_state_enum state, thread_priority priority,
             std::size_t num_thread, bool reset) const
     {
-        mutex_type::scoped_lock lk(mtx_);
+        boost::lock_guard<mutex_type> lk(mtx_);
         return pool_.get_thread_count(state, priority, num_thread, reset);
     }
 
@@ -172,7 +173,7 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy>::
         abort_all_suspended_threads()
     {
-        mutex_type::scoped_lock lk(mtx_);
+        boost::lock_guard<mutex_type> lk(mtx_);
         pool_.abort_all_suspended_threads();
     }
 
@@ -185,7 +186,7 @@ namespace hpx { namespace threads
     bool threadmanager_impl<SchedulingPolicy>::
         cleanup_terminated(bool delete_all)
     {
-        mutex_type::scoped_lock lk(mtx_);
+        boost::lock_guard<mutex_type> lk(mtx_);
         return pool_.cleanup_terminated(delete_all);
     }
 

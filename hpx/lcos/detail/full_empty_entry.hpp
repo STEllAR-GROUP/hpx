@@ -18,6 +18,7 @@
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/intrusive/slist.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <memory>
 #include <sstream>
@@ -101,7 +102,7 @@ namespace hpx { namespace lcos { namespace detail
 
         void log_non_empty_queue(char const* const desc, queue_type& queue)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             while (!queue.empty()) {
                 threads::thread_id_type id = queue.front().id_;
                 queue.front().id_ = threads::invalid_thread_id;
@@ -154,28 +155,28 @@ namespace hpx { namespace lcos { namespace detail
         // returns whether this entry is currently empty
         bool is_empty() const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return state_ == empty;
         }
 
         // sets this entry to empty
         bool set_empty(error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return set_empty_locked(ec);
         }
 
         // sets this entry to full
         bool set_full(error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return set_full_locked(ec);
         }
 
         template <typename F>
         bool peek(F f) const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             if (state_ == empty)
                 return false;
             return f(data_);      // pass the data to the provided function
@@ -440,7 +441,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void set_and_fill(T && src, error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             // set the data
             data_ = std::forward<T>(src);
@@ -452,7 +453,7 @@ namespace hpx { namespace lcos { namespace detail
         // same as above, but for entries without associated data
         void set_and_fill(error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             // make sure the entry is full
             set_full_locked(ec);    // state_ = full
@@ -461,7 +462,7 @@ namespace hpx { namespace lcos { namespace detail
         // returns whether this entry is still in use
         bool is_used() const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return is_used_locked();
         }
 

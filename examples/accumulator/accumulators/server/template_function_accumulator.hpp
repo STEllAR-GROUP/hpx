@@ -52,7 +52,7 @@ namespace examples { namespace server
         void reset()
         {
             // Atomically set value_ to 0.
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             value_ = 0;
         }
 
@@ -61,7 +61,7 @@ namespace examples { namespace server
         void add(T arg)
         {
             // Atomically add value_ to arg, and store the result in value_.
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             value_ += boost::lexical_cast<double>(arg);
         }
 
@@ -69,7 +69,7 @@ namespace examples { namespace server
         double query() const
         {
             // Get the value of value_.
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return value_;
         }
 

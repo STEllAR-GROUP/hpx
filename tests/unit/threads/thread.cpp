@@ -12,6 +12,7 @@
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/locks.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -122,7 +123,7 @@ void interruption_point_thread(hpx::lcos::local::barrier* b,
     hpx::lcos::local::spinlock* m, bool* failed)
 {
     try {
-        hpx::lcos::local::spinlock::scoped_lock lk(*m);
+        boost::lock_guard<hpx::lcos::local::spinlock> lk(*m);
         hpx::this_thread::interruption_point();
         *failed = true;
     }
@@ -162,7 +163,7 @@ void disabled_interruption_point_thread(hpx::lcos::local::spinlock* m,
 {
     hpx::this_thread::disable_interruption dc;
     try {
-        hpx::lcos::local::spinlock::scoped_lock lk(*m);
+        boost::lock_guard<hpx::lcos::local::spinlock> lk(*m);
         hpx::this_thread::interruption_point();
         *failed = false;
     }
@@ -240,7 +241,7 @@ void test_creation_through_reference_wrapper()
 //
 //     void operator()()
 //     {
-//         boost::mutex::scoped_lock lk(mut);
+//         boost::lock_guard<boost::mutex> lk(mut);
 //         while(!done)
 //         {
 //             cond.wait(lk);
@@ -261,7 +262,7 @@ void test_creation_through_reference_wrapper()
 //     HPX_TEST(!joined);
 //     HPX_TEST(thrd.joinable());
 //     {
-//         boost::mutex::scoped_lock lk(f.mut);
+//         boost::lock_guard<boost::mutex> lk(f.mut);
 //         f.done=true;
 //         f.cond.notify_one();
 //     }

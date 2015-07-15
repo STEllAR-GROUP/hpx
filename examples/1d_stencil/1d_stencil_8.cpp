@@ -46,7 +46,7 @@ public:
 
     ~partition_allocator()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         while (!heap_.empty())
         {
             T* p = heap_.top();
@@ -57,7 +57,7 @@ public:
 
     T* allocate(std::size_t n)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         if (heap_.empty())
             return new T[n];
 
@@ -68,7 +68,7 @@ public:
 
     void deallocate(T* p)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         if (max_size_ == static_cast<std::size_t>(-1) || heap_.size() < max_size_)
             heap_.push(p);
         else
