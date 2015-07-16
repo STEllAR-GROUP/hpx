@@ -12,6 +12,7 @@
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace traits
 {
@@ -80,7 +81,7 @@ namespace hpx { namespace plugins { namespace parcel
         parcelset::locality const & dest, parcelset::parcel& p,
         write_handler_type const& f)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (stopped_) {
             l.unlock();
 

@@ -41,7 +41,7 @@ namespace hpx { namespace util
 
     bool interval_timer::start(bool evaluate_)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (is_terminated_)
             return false;
 
@@ -49,7 +49,7 @@ namespace hpx { namespace util
             if (first_start_) {
                 first_start_ = false;
 
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                 if (pre_shutdown_)
                     register_pre_shutdown_function(boost::bind(&interval_timer::terminate, this));
                 else
@@ -76,7 +76,7 @@ namespace hpx { namespace util
         if (!is_started_)
             return start(evaluate_);
 
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
 
         if (is_terminated_)
             return false;
@@ -122,7 +122,7 @@ namespace hpx { namespace util
 
     void interval_timer::terminate()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (!is_terminated_) {
             is_terminated_ = true;
             stop_locked();
@@ -148,7 +148,7 @@ namespace hpx { namespace util
         threads::thread_state_ex_enum statex)
     {
         try {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             if (is_stopped_ || is_terminated_ ||
                 statex == threads::wait_abort || 0 == microsecs_)
@@ -165,7 +165,7 @@ namespace hpx { namespace util
             bool result = false;
 
             {
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                 result = f_();            // invoke the supplied function
             }
 

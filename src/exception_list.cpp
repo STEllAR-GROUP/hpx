@@ -125,12 +125,12 @@ namespace hpx
 
     void exception_list::add(boost::exception_ptr const& e)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (exceptions_.empty())
         {
             hpx::exception ex;
             {
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                 ex = hpx::exception(hpx::get_error(e));
             }
 

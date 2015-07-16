@@ -82,7 +82,7 @@ namespace hpx { namespace iostreams { namespace detail
         template <typename Mutex>
         void write(write_function_type const& f, Mutex& mtx)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             if (data_.get() && !data_->empty())
             {
                 boost::shared_ptr<std::vector<char> > data(data_);

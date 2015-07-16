@@ -145,7 +145,7 @@ namespace hpx { namespace lcos { namespace local
             char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             synchronize(generation_value, l, function_name, ec);
         }
 

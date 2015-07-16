@@ -163,7 +163,7 @@ namespace hpx
 
     void thread::join()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
 
         if(!joinable_locked())
         {
@@ -185,7 +185,7 @@ namespace hpx
                 util::bind(&resume_thread, this_id)))
         {
             // wait for thread to be terminated
-            util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+            util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
             this_thread::suspend(threads::suspended, "thread::join");
         }
 

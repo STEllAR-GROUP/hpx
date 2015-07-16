@@ -542,7 +542,7 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
   , error_code& ec
     )
 { // {{{
-    mutex_type::scoped_lock l(resolved_localities_mtx_);
+    boost::unique_lock<mutex_type> l(resolved_localities_mtx_);
     resolved_localities_type::iterator it = resolved_localities_.find(gid);
     if(it == resolved_localities_.end())
     {
@@ -565,7 +565,7 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
         else
         {
             {
-                hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                hpx::util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                 future<parcelset::endpoints_type> endpoints_future =
                     hosted->locality_ns_.service_async<parcelset::endpoints_type>(
                         req
@@ -1979,7 +1979,7 @@ void addressing_service::decref(
 
     try {
         naming::gid_type raw = naming::detail::get_stripped_gid(gid);
-        mutex_type::scoped_lock l(refcnt_requests_mtx_);
+        boost::unique_lock<mutex_type> l(refcnt_requests_mtx_);
 
         // Match the decref request with entries in the incref table
         typedef refcnt_requests_type::iterator iterator;

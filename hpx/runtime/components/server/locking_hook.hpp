@@ -14,6 +14,8 @@
 #include <hpx/util/register_locks.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace components
 {
     /// This hook can be inserted into the derivation chain of any component
@@ -69,7 +71,7 @@ namespace hpx { namespace components
             threads::thread_state_enum result = threads::unknown;
 
             // now lock the mutex and execute the action
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             // We can safely ignore this lock while checking as it is
             // guaranteed to be unlocked before the thread is suspended.
@@ -77,7 +79,7 @@ namespace hpx { namespace components
             // If this lock is not ignored it will cause false positives as the
             // check for held locks is performed before this lock is unlocked.
             util::ignore_while_checking<
-                    typename mutex_type::scoped_lock
+                    boost::unique_lock<mutex_type>
                 > ignore_lock(&l);
 
             {

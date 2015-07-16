@@ -209,7 +209,7 @@ namespace hpx { namespace iostreams
 
         bool flush()
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             if (!this->detail::buffer::empty())
             {
                 // Create the next buffer, returns the previous buffer
@@ -240,7 +240,7 @@ namespace hpx { namespace iostreams
         // reset this object during runtime system shutdown
         void uninitialize()
         {
-            mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
+            boost::unique_lock<mutex_type> l(mtx_, boost::try_to_lock);
             if (l)
             {
                 streaming_operator_sync(hpx::async_flush, l);   // unlocks l
@@ -259,28 +259,28 @@ namespace hpx { namespace iostreams
         // hpx::flush manipulator
         ostream& operator<<(hpx::iostreams::flush_type const& m)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_sync(m, l);
         }
 
         // hpx::endl manipulator
         ostream& operator<<(hpx::iostreams::endl_type const& m)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_sync(m, l);
         }
 
         // hpx::async_flush manipulator
         ostream& operator<<(hpx::iostreams::async_flush_type const& m)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_async(m, l);
         }
 
         // hpx::async_endl manipulator
         ostream& operator<<(hpx::iostreams::async_endl_type const& m)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_async(m, l);
         }
 

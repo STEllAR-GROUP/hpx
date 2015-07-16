@@ -187,7 +187,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void enqueue_full_full(T& dest, error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -204,7 +204,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -223,7 +223,7 @@ namespace hpx { namespace lcos { namespace detail
         // same as above, but for entries without associated data
         void enqueue_full_full(error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -240,7 +240,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -257,7 +257,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void enqueue_full_full_move(T& dest, error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -274,7 +274,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -301,7 +301,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void enqueue_full_empty(T& dest, error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -316,7 +316,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_empty", ec);
                     if (ec) return;
@@ -336,7 +336,7 @@ namespace hpx { namespace lcos { namespace detail
         // same as above, but for entries without associated data
         void enqueue_full_empty(error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -351,7 +351,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_empty", ec);
                     if (ec) return;
@@ -370,7 +370,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void enqueue_if_full(T && src, error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is already full
             if (state_ == full) {
@@ -385,7 +385,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full", ec);
                     if (ec) return;
@@ -406,7 +406,7 @@ namespace hpx { namespace lcos { namespace detail
         // same as above, but for entries without associated data
         void enqueue_if_full(error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             // block if this entry is already full
             if (state_ == full) {
@@ -421,7 +421,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full", ec);
                     if (ec) return;

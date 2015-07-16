@@ -83,7 +83,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 sizeof(buffer_.num_chunks_)));
 
             {
-                mutex_type::scoped_lock lk(mtx_);
+                boost::unique_lock<mutex_type> lk(mtx_);
                 if(!socket_.is_open())
                 {
                     lk.unlock();
@@ -197,7 +197,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 }
 
                 {
-                    mutex_type::scoped_lock lk(mtx_);
+                    boost::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();
@@ -253,7 +253,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     = &receiver::handle_read_data<Handler>;
 
                 {
-                    mutex_type::scoped_lock lk(mtx_);
+                    boost::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();
@@ -301,7 +301,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
                 ack_ = true;
                 {
-                    mutex_type::scoped_lock lk(mtx_);
+                    boost::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();

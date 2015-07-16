@@ -63,7 +63,7 @@ namespace hpx { namespace util
 
     void query_counters::find_counters()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
 
         std::vector<std::string> names;
         std::swap(names, names_);
@@ -86,7 +86,7 @@ namespace hpx { namespace util
 
                 // find matching counter type
                 {
-                    hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                    hpx::util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                     performance_counters::discover_counter_type(name, func,
                         performance_counters::discover_counters_full);
                 }

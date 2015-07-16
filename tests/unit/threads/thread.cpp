@@ -139,7 +139,7 @@ void do_test_thread_interrupts_at_interruption_point()
     hpx::lcos::local::spinlock m;
     hpx::lcos::local::barrier b(2);
     bool failed = false;
-    hpx::lcos::local::spinlock::scoped_lock lk(m);
+    boost::unique_lock<hpx::lcos::local::spinlock> lk(m);
     hpx::thread thrd(&interruption_point_thread, &b, &m, &failed);
     thrd.interrupt();
     lk.unlock();
@@ -179,7 +179,7 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
     hpx::lcos::local::spinlock m;
     hpx::lcos::local::barrier b(2);
     bool failed = true;
-    hpx::lcos::local::spinlock::scoped_lock lk(m);
+    boost::unique_lock<hpx::lcos::local::spinlock> lk(m);
     hpx::thread thrd(&disabled_interruption_point_thread, &m, &b, &failed);
     thrd.interrupt();
     lk.unlock();

@@ -303,7 +303,7 @@ response component_namespace::bind_prefix(
     std::string key = req.get_name();
     boost::uint32_t prefix = req.get_locality_id();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     component_id_table_type::left_map::iterator cit = component_ids_.left.find(key)
                                     , cend = component_ids_.left.end();
@@ -405,7 +405,7 @@ response component_namespace::bind_name(
     // parameters
     std::string key = req.get_name();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     component_id_table_type::left_map::iterator it = component_ids_.left.find(key)
                                     , end = component_ids_.left.end();

@@ -311,7 +311,7 @@ response locality_namespace::allocate(
     boost::uint32_t const num_threads = req.get_num_threads();
     naming::gid_type const suggested_prefix = req.get_suggested_prefix();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_DEBUG)
     for (partition_table_type::value_type const& partition : partitions_)
@@ -436,7 +436,7 @@ response locality_namespace::free(
     naming::gid_type locality = req.get_gid();
     boost::uint32_t prefix = naming::get_locality_id_from_gid(locality);
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     partition_table_type::iterator pit = partitions_.find(prefix)
                                  , pend = partitions_.end();

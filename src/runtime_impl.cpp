@@ -372,7 +372,7 @@ namespace hpx {
 
         // wait for the thread to run
         {
-            boost::mutex::scoped_lock lk(mtx);
+            boost::unique_lock<boost::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -410,7 +410,7 @@ namespace hpx {
         // manager
         boost::mutex mtx;
         boost::condition cond;
-        boost::mutex::scoped_lock l(mtx);
+        boost::unique_lock<boost::mutex> l(mtx);
 
         boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking,
             boost::ref(cond), boost::ref(mtx)));

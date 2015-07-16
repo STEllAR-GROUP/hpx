@@ -32,6 +32,7 @@ namespace hpx { namespace lcos
 #include <hpx/util/unwrapped.hpp>
 
 #include <boost/preprocessor/cat.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <vector>
 
@@ -65,7 +66,7 @@ namespace hpx { namespace lcos
 
             hpx::future<std::vector<T> > get_result(std::size_t which, T && t)
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::unique_lock<mutex_type> l(mtx_);
 
                 using util::placeholders::_1;
                 hpx::future<std::vector<T> > f = gate_.get_future().then(
@@ -78,7 +79,7 @@ namespace hpx { namespace lcos
 
             void set_result(std::size_t which, T && t)
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::unique_lock<mutex_type> l(mtx_);
                 set_result_locked(which, std::move(t), l);
             }
 

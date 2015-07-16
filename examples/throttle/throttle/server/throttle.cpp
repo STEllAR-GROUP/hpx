@@ -84,7 +84,7 @@ namespace throttle { namespace server
     // do the requested throttling
     void throttle::throttle_controller(std::size_t shepherd)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (!blocked_os_threads_[shepherd])
             return;     // nothing more to do
 
@@ -93,7 +93,7 @@ namespace throttle { namespace server
             boost::system_time xt(boost::get_system_time() +
                 boost::posix_time::milliseconds(100));
 
-            hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+            hpx::util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
             boost::thread::sleep(xt);
         }
 

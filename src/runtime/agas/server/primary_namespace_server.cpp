@@ -378,7 +378,7 @@ response primary_namespace::begin_migration(
 
     naming::gid_type id = req.get_gid();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     resolved_type r = resolve_gid_locked(id, ec);
     if (at_c<0>(r) == naming::invalid_gid)
@@ -468,7 +468,7 @@ response primary_namespace::bind_gid(
 
     naming::detail::strip_internal_bits_from_gid(id);
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     gva_table_type::iterator it = gvas_.lower_bound(id)
                            , begin = gvas_.begin()
@@ -680,7 +680,7 @@ response primary_namespace::unbind_gid(
     naming::gid_type id = req.get_gid();
     naming::detail::strip_internal_bits_from_gid(id);
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     gva_table_type::iterator it = gvas_.find(id)
                            , end = gvas_.end();

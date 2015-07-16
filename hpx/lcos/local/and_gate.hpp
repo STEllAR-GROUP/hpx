@@ -108,7 +108,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename OuterLock>
         bool set(std::size_t which, OuterLock & outer_lock, error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             if (which >= received_segments_.size())
             {
                 // out of bounds index
@@ -152,7 +152,7 @@ namespace hpx { namespace lcos { namespace local
         bool set(std::size_t which, error_code& ec = throws)
         {
             no_mutex mtx;
-            no_mutex::scoped_lock lk(mtx);
+            boost::unique_lock<no_mutex> lk(mtx);
             return set(which, lk, ec);
         }
 
@@ -195,7 +195,7 @@ namespace hpx { namespace lcos { namespace local
             char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             synchronize(generation_value, l, function_name, ec);
         }
 

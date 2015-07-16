@@ -993,7 +993,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::run()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         stopped_ = false;
         terminated_ = false;
         shutdown_all_invoked_.store(false);
@@ -1001,7 +1001,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::wait()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         while (!stopped_) {
             LRT_(info) << "runtime_support: about to enter wait state";
             wait_condition_.wait(l);
@@ -1112,7 +1112,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::notify_waiting_main()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (!stopped_) {
             stopped_ = true;
             wait_condition_.notify_all();

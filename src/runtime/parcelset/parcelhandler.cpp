@@ -29,6 +29,7 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <algorithm>
 #include <sstream>
@@ -506,14 +507,14 @@ namespace hpx { namespace parcelset
         std::size_t num_messages, std::size_t interval,
         locality const& loc, error_code& ec)
     {
-        mutex_type::scoped_lock l(handlers_mtx_);
+        boost::unique_lock<mutex_type> l(handlers_mtx_);
         handler_key_type key(loc, action);
         message_handler_map::iterator it = handlers_.find(key);
         if (it == handlers_.end()) {
             boost::shared_ptr<policies::message_handler> p;
 
             {
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
                 p.reset(hpx::create_message_handler(message_handler_type,
                     action, find_parcelport(loc.type()), num_messages, interval, ec));
             }

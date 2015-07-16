@@ -724,7 +724,7 @@ namespace detail
 
         void cancel()
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::unique_lock<mutex_type> l(this->mtx_);
             try {
                 if (!this->started_)
                     boost::throw_exception(hpx::thread_interrupted());
