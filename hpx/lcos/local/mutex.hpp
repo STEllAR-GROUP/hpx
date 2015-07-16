@@ -16,7 +16,7 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/intrusive/slist.hpp>
 #include <boost/thread/locks.hpp>

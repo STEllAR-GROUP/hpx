@@ -130,7 +130,7 @@ namespace hpx
         {
             hpx::exception ex;
             {
-                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 ex = hpx::exception(hpx::get_error(e));
             }
 

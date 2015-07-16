@@ -25,7 +25,7 @@
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail
@@ -261,7 +261,7 @@ namespace hpx { namespace components { namespace detail
                 {
                     // this is the first call to get_gid() for this heap - allocate
                     // a sufficiently large range of global ids
-                    util::scoped_unlock<scoped_lock> ul(l);
+                    util::unlock_guard<scoped_lock> ul(l);
                     base_gid = ids.get_id(step_);
 
                     // register the global ids and the base address of this heap
@@ -284,7 +284,7 @@ namespace hpx { namespace components { namespace detail
                 else
                 {
                     // unbind the range which is not needed anymore
-                    util::scoped_unlock<scoped_lock> ul(l);
+                    util::unlock_guard<scoped_lock> ul(l);
                     applier::unbind_range_local(base_gid, step_);
                 }
             }
@@ -323,7 +323,7 @@ namespace hpx { namespace components { namespace detail
                 naming::gid_type base_gid = base_gid_;
                 base_gid_ = naming::invalid_gid;
 
-                util::scoped_unlock<scoped_lock> ull(lk);
+                util::unlock_guard<scoped_lock> ull(lk);
                 applier::unbind_range_local(base_gid, step_);
             }
 

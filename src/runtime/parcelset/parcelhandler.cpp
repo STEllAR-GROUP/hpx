@@ -261,7 +261,7 @@ namespace hpx { namespace parcelset
                     if ((*it).second)
                     {
                         boost::shared_ptr<policies::message_handler> p((*it).second);
-                        util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                        util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                         did_some_work = p->flush(stop_buffering) || did_some_work;
                     }
                 }
@@ -514,7 +514,7 @@ namespace hpx { namespace parcelset
             boost::shared_ptr<policies::message_handler> p;
 
             {
-                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 p.reset(hpx::create_message_handler(message_handler_type,
                     action, find_parcelport(loc.type()), num_messages, interval, ec));
             }

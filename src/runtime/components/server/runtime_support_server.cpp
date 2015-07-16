@@ -11,7 +11,7 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -636,7 +636,7 @@ namespace hpx { namespace components { namespace server
                 dijkstra_termination_action act;
                 bool termination_aborted = false;
                 {
-                    util::scoped_unlock<dijkstra_mtx_type::scoped_lock> ul(l);
+                    util::unlock_guard<dijkstra_mtx_type::scoped_lock> ul(l);
                     termination_aborted = lcos::reduce(act,
                         locality_ids, std_logical_or_type()).get()
                 }
@@ -760,7 +760,7 @@ namespace hpx { namespace components { namespace server
                 dijkstra_color_ = false;        // start off with white
 
                 {
-                    util::scoped_unlock<dijkstra_mtx_type::scoped_lock> ul(l);
+                    util::unlock_guard<dijkstra_mtx_type::scoped_lock> ul(l);
                     send_dijkstra_termination_token(target_id - 1,
                         initiating_locality_id, num_localities, false);
                 }
@@ -1021,7 +1021,7 @@ namespace hpx { namespace components { namespace server
 
         // give the scheduler some time to work on remaining tasks
         {
-            util::scoped_unlock<Lock> ul(l);
+            util::unlock_guard<Lock> ul(l);
             self->yield(threads::pending);
         }
 
@@ -2195,7 +2195,7 @@ namespace hpx { namespace components { namespace server
 
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<boost::unique_lock<component_map_mutex_type> > ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
             caps = factory->get_required_capabilities();
         }
         return caps;

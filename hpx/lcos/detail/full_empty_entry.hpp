@@ -11,7 +11,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/aligned_storage.hpp>
@@ -204,7 +204,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                    util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -240,7 +240,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                    util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -274,7 +274,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                    util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -316,7 +316,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                    util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_empty", ec);
                     if (ec) return;
@@ -351,7 +351,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                    util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_empty", ec);
                     if (ec) return;
@@ -385,7 +385,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                    util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full", ec);
                     if (ec) return;
@@ -421,7 +421,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                    util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full", ec);
                     if (ec) return;
@@ -687,7 +687,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<Lock> ul(l);
+                    util::unlock_guard<Lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -722,7 +722,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<Lock> ul(l);
+                    util::unlock_guard<Lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -754,7 +754,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<Lock> ul(l);
+                    util::unlock_guard<Lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -795,7 +795,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<Lock> ul(l);
+                    util::unlock_guard<Lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_empty", ec);
                     if (ec) return;
@@ -829,7 +829,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<Lock> ul(l);
+                    util::unlock_guard<Lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_empty", ec);
                     if (ec) return;
@@ -861,7 +861,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<Lock> ul(l);
+                    util::unlock_guard<Lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full", ec);
                     if (ec) return;
@@ -896,7 +896,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::scoped_unlock<Lock> ul(l);
+                    util::unlock_guard<Lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full", ec);
                     if (ec) return;

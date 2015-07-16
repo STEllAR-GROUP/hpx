@@ -185,7 +185,7 @@ namespace hpx
                 util::bind(&resume_thread, this_id)))
         {
             // wait for thread to be terminated
-            util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+            util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
             this_thread::suspend(threads::suspended, "thread::join");
         }
 

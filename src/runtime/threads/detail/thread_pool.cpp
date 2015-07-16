@@ -15,7 +15,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
@@ -398,7 +398,7 @@ namespace hpx { namespace threads { namespace detail
                         << " join:" << i; //-V128
 
                     // unlock the lock while joining
-                    util::scoped_unlock<Lock> ul(l);
+                    util::unlock_guard<Lock> ul(l);
                     threads_[i].join();
                 }
                 threads_.clear();

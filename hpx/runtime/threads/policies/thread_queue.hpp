@@ -210,7 +210,7 @@ namespace hpx { namespace threads { namespace policies
 
             else
             {
-                hpx::util::scoped_unlock<Lock> ull(lk);
+                hpx::util::unlock_guard<Lock> ull(lk);
 
                 // Allocate a new thread object.
                 if (data.stacksize != 0)

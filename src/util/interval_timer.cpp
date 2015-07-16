@@ -8,7 +8,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/interval_timer.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/thread/locks.hpp>
@@ -49,7 +49,7 @@ namespace hpx { namespace util
             if (first_start_) {
                 first_start_ = false;
 
-                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 if (pre_shutdown_)
                     register_pre_shutdown_function(boost::bind(&interval_timer::terminate, this));
                 else
@@ -165,7 +165,7 @@ namespace hpx { namespace util
             bool result = false;
 
             {
-                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 result = f_();            // invoke the supplied function
             }
 
@@ -199,7 +199,7 @@ namespace hpx { namespace util
             // the allocators use hpx::lcos::local::spinlock. Unlocking the
             // lock here would be the right thing but leads to crashes and hangs
             // at shutdown.
-            //util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+            //util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
             id = hpx::applier::register_thread_plain(
                 boost::bind(&interval_timer::evaluate, this, _1),
                 description_.c_str(), threads::suspended, true,

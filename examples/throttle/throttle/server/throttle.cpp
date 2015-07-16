@@ -8,7 +8,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
@@ -93,7 +93,7 @@ namespace throttle { namespace server
             boost::system_time xt(boost::get_system_time() +
                 boost::posix_time::milliseconds(100));
 
-            hpx::util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+            hpx::util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
             boost::thread::sleep(xt);
         }
 

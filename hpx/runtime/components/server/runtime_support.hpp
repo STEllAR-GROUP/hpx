@@ -479,7 +479,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<boost::unique_lock<component_map_mutex_type> > ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
             id = factory->create();
         }
         LRT_(info) << "successfully created component " << id
@@ -524,7 +524,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<boost::unique_lock<component_map_mutex_type> > ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
 
             typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(
@@ -576,7 +576,7 @@ namespace hpx { namespace components { namespace server
 
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<boost::unique_lock<component_map_mutex_type> > ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
             for (std::size_t i = 0; i != count; ++i)
             {
                 ids.push_back(factory->create());
@@ -628,7 +628,7 @@ namespace hpx { namespace components { namespace server
 
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<boost::unique_lock<component_map_mutex_type> > ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
             for (std::size_t i = 0; i != count; ++i)
             {
                 typedef typename Component::wrapping_type wrapping_type;
@@ -682,7 +682,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<boost::unique_lock<component_map_mutex_type> > ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
 
             typedef typename Component::wrapping_type wrapping_type;
             if (!local_op) {
@@ -742,7 +742,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<boost::unique_lock<component_map_mutex_type> > ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
 
             typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(migrated_id,

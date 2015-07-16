@@ -157,7 +157,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                         headers_.erase(it);
 
                         {
-                            hpx::util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                            hpx::util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
 
                             std::size_t num_thread(-1);
                             if(threads::get_self_ptr())

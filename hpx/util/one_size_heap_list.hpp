@@ -123,7 +123,7 @@ namespace hpx { namespace util
                         bool allocated = false;
 
                         {
-                            util::scoped_unlock<unique_lock_type> ul(guard);
+                            util::unlock_guard<unique_lock_type> ul(guard);
                             allocated = heap->alloc(&p, count);
                         }
 
@@ -169,7 +169,7 @@ namespace hpx { namespace util
                 bool result = false;
 
                 {
-                    util::scoped_unlock<unique_lock_type> ul(guard);
+                    util::unlock_guard<unique_lock_type> ul(guard);
                     result = heap->alloc(&p, count);
                 }
 
@@ -272,7 +272,7 @@ namespace hpx { namespace util
                 bool did_allocate = false;
 
                 {
-                    util::scoped_unlock<unique_lock_type> ull(ul);
+                    util::unlock_guard<unique_lock_type> ull(ul);
                     did_allocate = heap->did_alloc(p);
                     if (did_allocate)
                         heap->free(p, count);
@@ -303,7 +303,7 @@ namespace hpx { namespace util
                 bool did_allocate = false;
 
                 {
-                    util::scoped_unlock<unique_lock_type> ull(ul);
+                    util::unlock_guard<unique_lock_type> ull(ul);
                     did_allocate = heap->did_alloc(p);
                 }
 

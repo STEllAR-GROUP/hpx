@@ -188,7 +188,7 @@ namespace hpx { namespace components
             {
                 naming::gid_type raw_prefix;
                 {
-                    util::scoped_unlock<boost::unique_lock<prefix_mutex_type> > ul(l);
+                    util::unlock_guard<boost::unique_lock<prefix_mutex_type> > ul(l);
                     naming::get_agas_client().get_console_locality(raw_prefix);
                 }
 

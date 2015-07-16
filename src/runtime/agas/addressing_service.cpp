@@ -565,7 +565,7 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
         else
         {
             {
-                hpx::util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                hpx::util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 future<parcelset::endpoints_type> endpoints_future =
                     hosted->locality_ns_.service_async<parcelset::endpoints_type>(
                         req

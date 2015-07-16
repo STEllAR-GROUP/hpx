@@ -393,7 +393,7 @@ response symbol_namespace::bind(
             boost::shared_ptr<naming::gid_type> current_gid = gid_it->second;
 
             {
-                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
 
                 // split the credit as the receiving end will expect to keep the
                 // object alive
@@ -516,7 +516,7 @@ response symbol_namespace::iterate(
         naming::gid_type gid = *(it->second);
 
         {
-            util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+            util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
             f(key, gid);
         }
 
@@ -564,7 +564,7 @@ response symbol_namespace::on_event(
             // split the credit as the receiving end will expect to keep the
             // object alive
             {
-                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 naming::gid_type new_gid = naming::detail::split_gid_if_needed(
                     *current_gid);
 

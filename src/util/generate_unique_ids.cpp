@@ -11,7 +11,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/spinlock_pool.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/swap.hpp>
@@ -33,7 +33,7 @@ namespace hpx { namespace util
             std::size_t count_ = (std::max)(std::size_t(range_delta), count);
 
             {
-                scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
+                unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 lower = hpx::agas::get_next_id(count_);
             }
 
