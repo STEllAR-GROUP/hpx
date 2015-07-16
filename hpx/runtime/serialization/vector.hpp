@@ -129,7 +129,6 @@ namespace hpx { namespace serialization
     template <typename T, typename Allocator>
     void serialize(output_archive & ar, std::vector<T, Allocator> & v, unsigned)
     {
-        typedef typename std::vector<T>::size_type size_type;
         ar << v.size(); //-V128
         if(v.empty()) return;
         save_impl(
