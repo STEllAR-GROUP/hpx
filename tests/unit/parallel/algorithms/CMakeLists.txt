@@ -4,6 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    adjacentdifference
     adjacentfind
     adjacentfind_binary
     all_of
@@ -32,6 +33,7 @@ set(tests
     includes
     inclusive_scan
     inclusive_scan_executors
+    inner_product
     is_partitioned
     is_sorted
     is_sorted_executors

@@ -112,6 +112,9 @@ parallel::local_queue_executor           "local_queue_executor"             "hpx
 parallel::local_priority_queue_executor  "local_priority_queue_executor"    "hpx\.parallel\.v3\.local_priority_qu_.*"
 parallel::static_priority_queue_executor "static_priority_queue_executor"   "hpx\.parallel\.v3\.static_priority_q_.*"
 
+# hpx/parallel/algorithms/adjacent_difference.hpp
+parallel::adjacent_difference         "adjacent_difference" "hpx\.parallel\.v1\.adjacent_difference.*"
+
 # hpx/parallel/algorithms/adjacent_find.hpp
 parallel::adjacent_find               "adjacent_find" "hpx\.parallel\.v1\.adjacent_find.*"
 
