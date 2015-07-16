@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
@@ -88,8 +89,10 @@ struct object_semaphore
 
   private:
     // assumes that this thread has acquired l
-    void resume(mutex_type::scoped_lock& l)
+    void resume(boost::unique_lock<mutex_type>& l)
     { // {{{
+        HPX_ASSERT(l.owns_lock());
+
         // resume as many waiting LCOs as possible
         while (!thread_queue_.empty() && !value_queue_.empty())
         {
@@ -111,7 +114,7 @@ struct object_semaphore
             thread_queue_.pop_front();
 
             {
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
 
                 // set the LCO's result
                 applier::trigger(id, std::move(value));
@@ -134,7 +137,7 @@ struct object_semaphore
         std::unique_ptr<queue_value_entry> node
             (new queue_value_entry(val, count));
 
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         value_queue_.push_back(*node);
 
         node.release();
@@ -147,7 +150,7 @@ struct object_semaphore
         // push the LCO's GID onto the queue
         std::unique_ptr<queue_thread_entry> node(new queue_thread_entry(lco));
 
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
 
         thread_queue_.push_back(*node);
 

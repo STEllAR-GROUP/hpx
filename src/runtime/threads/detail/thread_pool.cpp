@@ -78,7 +78,7 @@ namespace hpx { namespace threads { namespace detail
             if (state_.load() == state_running)
             {
                 lcos::local::no_mutex mtx;
-                lcos::local::no_mutex::scoped_lock l(mtx);
+                boost::unique_lock<lcos::local::no_mutex> l(mtx);
                 stop_locked(l);
             }
             threads_.clear();
@@ -226,6 +226,8 @@ namespace hpx { namespace threads { namespace detail
     bool thread_pool<Scheduler>::run(boost::unique_lock<boost::mutex>& l,
         std::size_t num_threads)
     {
+        HPX_ASSERT(l.owns_lock());
+
         LTM_(info) //-V128
             << "thread_pool::run: " << pool_name_
             << " number of processing units available: " //-V128
@@ -359,6 +361,8 @@ namespace hpx { namespace threads { namespace detail
     void thread_pool<Scheduler>::stop (
         boost::unique_lock<boost::mutex>& l, bool blocking)
     {
+        HPX_ASSERT(l.owns_lock());
+
         return stop_locked(l, blocking);
     }
 

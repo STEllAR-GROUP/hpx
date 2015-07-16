@@ -268,7 +268,7 @@ namespace hpx { namespace components { namespace server
         components::component_type type, std::size_t count)
     {
         // locate the factory for the requested component type
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
 
         std::vector<naming::gid_type> ids;
 
@@ -307,7 +307,7 @@ namespace hpx { namespace components { namespace server
         runtime_support::get_promise_heap(components::component_type type)
     {
         // locate the factory for the requested component type
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
 
         component_map_type::iterator it = components_.find(type);
         if (it == components_.end())
@@ -409,7 +409,7 @@ namespace hpx { namespace components { namespace server
         boost::shared_ptr<component_factory_base> factory;
 
         {
-            component_map_mutex_type::scoped_lock l(cm_mtx_);
+            boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
             component_map_type::const_iterator it = components_.find(g.type);
             if (it == components_.end()) {
                 // we don't know anything about this component
@@ -958,7 +958,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     boost::int32_t runtime_support::get_instance_count(components::component_type type)
     {
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
 
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
@@ -1032,7 +1032,7 @@ namespace hpx { namespace components { namespace server
     void runtime_support::stop(double timeout,
         naming::id_type const& respond_to, bool remove_from_remote_caches)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (!stopped_) {
             // push pending logs
             components::cleanup_logging();
@@ -2163,7 +2163,7 @@ namespace hpx { namespace components { namespace server
     {
         components::security::capability caps;
 
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             std::ostringstream strm;
@@ -2195,7 +2195,7 @@ namespace hpx { namespace components { namespace server
 
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            util::scoped_unlock<boost::unique_lock<component_map_mutex_type> > ul(l);
             caps = factory->get_required_capabilities();
         }
         return caps;

@@ -811,7 +811,7 @@ void notify_worker_security(notification_header_security const& header)
 ///////////////////////////////////////////////////////////////////////////////
 void big_boot_barrier::spin()
 {
-    boost::mutex::scoped_lock lock(mtx);
+    boost::unique_lock<boost::mutex> lock(mtx);
     while (connected)
         cond.wait(lock);
 }

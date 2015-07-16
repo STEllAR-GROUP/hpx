@@ -2434,7 +2434,7 @@ void addressing_service::start_shutdown(error_code& ec)
     if (!caching_)
         return;
 
-    mutex_type::scoped_lock l(refcnt_requests_mtx_);
+    boost::unique_lock<mutex_type> l(refcnt_requests_mtx_);
     enable_refcnt_caching_ = false;
     send_refcnt_requests_sync(l, ec);
 }
@@ -2833,8 +2833,8 @@ void addressing_service::garbage_collect_non_blocking(
     error_code& ec
     )
 {
-    mutex_type::scoped_lock l(refcnt_requests_mtx_, boost::try_to_lock);
-    if (!l) return;     // no need to compete for garbage collection
+    boost::unique_lock<mutex_type> l(refcnt_requests_mtx_, boost::try_to_lock);
+    if (!l.owns_lock()) return;     // no need to compete for garbage collection
 
     send_refcnt_requests_non_blocking(l, ec);
 }
@@ -2843,14 +2843,14 @@ void addressing_service::garbage_collect(
     error_code& ec
     )
 {
-    mutex_type::scoped_lock l(refcnt_requests_mtx_, boost::try_to_lock);
-    if (!l) return;     // no need to compete for garbage collection
+    boost::unique_lock<mutex_type> l(refcnt_requests_mtx_, boost::try_to_lock);
+    if (!l.owns_lock()) return;     // no need to compete for garbage collection
 
     send_refcnt_requests_sync(l, ec);
 }
 
 void addressing_service::send_refcnt_requests(
-    addressing_service::mutex_type::scoped_lock& l
+    boost::unique_lock<addressing_service::mutex_type>& l
   , error_code& ec
     )
 {
@@ -2871,11 +2871,13 @@ void addressing_service::send_refcnt_requests(
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     void dump_refcnt_requests(
-        addressing_service::mutex_type::scoped_lock& l
+        boost::unique_lock<addressing_service::mutex_type>& l
       , addressing_service::refcnt_requests_type const& requests
       , const char* func_name
         )
     {
+        HPX_ASSERT(l.owns_lock());
+
         std::stringstream ss;
         ss << ( boost::format(
               "%1%, dumping client-side refcnt table, requests(%2%):")
@@ -2899,10 +2901,12 @@ void addressing_service::send_refcnt_requests(
 #endif
 
 void addressing_service::send_refcnt_requests_non_blocking(
-    addressing_service::mutex_type::scoped_lock& l
+    boost::unique_lock<addressing_service::mutex_type>& l
   , error_code& ec
     )
 {
+    HPX_ASSERT(l.owns_lock());
+
     try {
         if (refcnt_requests_->empty())
         {
@@ -2965,9 +2969,11 @@ void addressing_service::send_refcnt_requests_non_blocking(
 
 std::vector<hpx::future<std::vector<response> > >
 addressing_service::send_refcnt_requests_async(
-    addressing_service::mutex_type::scoped_lock& l
+    boost::unique_lock<addressing_service::mutex_type>& l
     )
 {
+    HPX_ASSERT(l.owns_lock());
+
     if (refcnt_requests_->empty())
     {
         l.unlock();
@@ -3024,7 +3030,7 @@ addressing_service::send_refcnt_requests_async(
 }
 
 void addressing_service::send_refcnt_requests_sync(
-    addressing_service::mutex_type::scoped_lock& l
+    boost::unique_lock<addressing_service::mutex_type>& l
   , error_code& ec
     )
 {

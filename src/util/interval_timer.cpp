@@ -184,8 +184,10 @@ namespace hpx { namespace util
     }
 
     // schedule a high priority task after a given time interval
-    void interval_timer::schedule_thread(mutex_type::scoped_lock & l)
+    void interval_timer::schedule_thread(boost::unique_lock<mutex_type> & l)
     {
+        HPX_ASSERT(l.owns_lock());
+
         using namespace hpx::threads;
 
         error_code ec;
@@ -197,7 +199,7 @@ namespace hpx { namespace util
             // the allocators use hpx::lcos::local::spinlock. Unlocking the
             // lock here would be the right thing but leads to crashes and hangs
             // at shutdown.
-            //util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+            //util::scoped_unlock<boost::unique_lock<mutex_type> > ul(l);
             id = hpx::applier::register_thread_plain(
                 boost::bind(&interval_timer::evaluate, this, _1),
                 description_.c_str(), threads::suspended, true,

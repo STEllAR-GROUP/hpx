@@ -304,8 +304,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         void accept()
         {
-            mutex_type::scoped_try_lock l(headers_mtx_);
-            if(l)
+            boost::unique_lock<mutex_type> l(headers_mtx_, boost::try_to_lock);
+            if(l.owns_lock())
                 accept_locked();
         }
 

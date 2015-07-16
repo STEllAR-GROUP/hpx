@@ -612,8 +612,8 @@ namespace hpx { namespace parcelset
             std::vector<locality> destinations;
 
             {
-                lcos::local::spinlock::scoped_try_lock l(mtx_);
-                if(l)
+                boost::unique_lock<lcos::local::spinlock> l(mtx_, boost::try_to_lock);
+                if(l.owns_lock())
                 {
                     if (parcel_destinations_.empty())
                         return true;
@@ -657,8 +657,8 @@ namespace hpx { namespace parcelset
                 // need to force a new connection to avoid deadlocks.
                 bool force_connection = false;
                 {
-                    mutex_type::scoped_try_lock l(sender_threads_mtx_);
-                    if(l)
+                    boost::unique_lock<mutex_type> l(sender_threads_mtx_, boost::try_to_lock);
+                    if(l.owns_lock())
                     {
                         std::vector<threads::thread_id_type> threads;
                         threads.reserve(sender_threads_.size());

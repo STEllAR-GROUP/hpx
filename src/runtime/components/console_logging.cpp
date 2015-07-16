@@ -182,13 +182,13 @@ namespace hpx { namespace components
         // Resolve the console prefix if it's still invalid.
         if (HPX_UNLIKELY(naming::invalid_id == prefix_))
         {
-            prefix_mutex_type::scoped_try_lock l(prefix_mtx_);
+            boost::unique_lock<prefix_mutex_type> l(prefix_mtx_, boost::try_to_lock);
 
             if (l.owns_lock() && (naming::invalid_id == prefix_))
             {
                 naming::gid_type raw_prefix;
                 {
-                    util::scoped_unlock<prefix_mutex_type::scoped_try_lock> ul(l);
+                    util::scoped_unlock<boost::unique_lock<prefix_mutex_type> > ul(l);
                     naming::get_agas_client().get_console_locality(raw_prefix);
                 }
 

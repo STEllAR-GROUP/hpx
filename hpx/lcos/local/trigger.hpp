@@ -11,6 +11,7 @@
 #include <hpx/lcos/local/conditional_trigger.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/assert_owns_lock.hpp>
 
 #include <boost/thread/locks.hpp>
 
@@ -155,7 +156,7 @@ namespace hpx { namespace lcos { namespace local
             char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
-            HPX_ASSERT(l.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(l);
 
             if (generation_value < generation_)
             {

@@ -64,7 +64,7 @@ namespace hpx { namespace util
 
     protected:
         // schedule a high priority task after a given time interval
-        void schedule_thread(mutex_type::scoped_lock & l);
+        void schedule_thread(boost::unique_lock<mutex_type> & l);
 
         threads::thread_state_enum
             evaluate(threads::thread_state_ex_enum statex);

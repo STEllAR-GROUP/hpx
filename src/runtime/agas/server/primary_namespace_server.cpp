@@ -19,13 +19,14 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <list>
-
 #include <boost/fusion/include/at_c.hpp>
+#include <boost/thread/locks.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
 #include <boost/make_shared.hpp>
 #endif
+
+#include <list>
 
 namespace hpx { namespace agas
 {
@@ -439,10 +440,12 @@ response primary_namespace::end_migration(
 
 // wait if given object is currently being migrated
 void primary_namespace::wait_for_migration_locked(
-    mutex_type::scoped_lock& l
+    boost::unique_lock<mutex_type>& l
   , naming::gid_type id
   , error_code& ec)
 {
+    HPX_ASSERT(l.owns_lock());
+
     migration_table_type::iterator it = migrating_objects_.find(id);
     if (it != migrating_objects_.end())
     {
@@ -640,7 +643,7 @@ response primary_namespace::resolve_gid(
     resolved_type r;
 
     {
-        mutex_type::scoped_lock l(mutex_);
+        boost::unique_lock<mutex_type> l(mutex_);
 
         // wait for any migration to be completed
         wait_for_migration_locked(l, id, ec);
@@ -867,7 +870,7 @@ response primary_namespace::allocate(
       , refcnt_table_type::iterator upper_it
       , naming::gid_type const& lower
       , naming::gid_type const& upper
-      , mutex_type::scoped_lock& l
+      , boost::unique_lock<mutex_type>& l
       , const char* func_name
         )
     { // dump_refcnt_matches implementation
@@ -905,7 +908,7 @@ void primary_namespace::increment(
   , error_code& ec
     )
 { // {{{ increment implementation
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     if (LAGAS_ENABLED(debug))
@@ -979,7 +982,7 @@ void primary_namespace::increment(
 
 ///////////////////////////////////////////////////////////////////////////////
 void primary_namespace::resolve_free_list(
-    mutex_type::scoped_lock& l
+    boost::unique_lock<mutex_type>& l
   , std::list<refcnt_table_type::iterator> const& free_list
   , std::list<free_entry>& free_entry_list
   , naming::gid_type const& lower
@@ -987,6 +990,8 @@ void primary_namespace::resolve_free_list(
   , error_code& ec
     )
 {
+    HPX_ASSERT(l.owns_lock());
+
     using boost::fusion::at_c;
 
     typedef refcnt_table_type::iterator iterator;
@@ -1082,7 +1087,7 @@ void primary_namespace::decrement_sweep(
     free_entry_list.clear();
 
     {
-        mutex_type::scoped_lock l(mutex_);
+        boost::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
         if (LAGAS_ENABLED(debug))
