@@ -51,7 +51,7 @@ void test_adjacent_difference_async(ExPolicy p)
         boost::end(c), boost::begin(d_ans));
 
     f_it.wait();
-    HPX_TEST(std::equal(boost::begin(d), boost::end(d),    
+    HPX_TEST(std::equal(boost::begin(d), boost::end(d),
         boost::begin(d_ans), [](std::size_t lhs, std::size_t rhs) -> bool
         {
             return lhs == rhs;
@@ -121,7 +121,7 @@ void test_adjacent_difference_exception_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(10007);    
+    std::vector<std::size_t> d(10007);
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -224,7 +224,7 @@ void test_adjacent_difference_bad_alloc_async(ExPolicy p, IteratorTag)
         decorated_iterator;
 
     std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(10007);    
+    std::vector<std::size_t> d(10007);
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
@@ -291,7 +291,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
-    
+
     adjacent_difference_test();
     adjacent_difference_exception_test();
     adjacent_difference_bad_alloc_test();
