@@ -36,7 +36,7 @@ namespace hpx { namespace util
                 f = other.f;
                 return *this;
             }
-            
+
             template <typename>
             struct result;
 

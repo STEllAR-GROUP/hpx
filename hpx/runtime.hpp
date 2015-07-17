@@ -72,7 +72,7 @@ namespace hpx
     class HPX_EXPORT runtime
     {
     public:
-      
+
         state get_state() const { return state_.load(); }
 
         /// The \a hpx_main_function_type is the default function type usable

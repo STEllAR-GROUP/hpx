@@ -124,7 +124,7 @@ int hpx_main(variables_map &vm)
 #endif
                 return 1;
             }
-            
+
                 std::cout << "A: " << dim << "x" << dim << " number of non zeros: " << non_zero_entries << "\n";
         }
         if(vm.count("vector"))
