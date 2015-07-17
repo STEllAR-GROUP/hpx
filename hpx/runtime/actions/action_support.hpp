@@ -227,24 +227,11 @@ namespace hpx { namespace actions
         /// Return the thread stacksize this action has to be executed with
         virtual threads::thread_stacksize get_thread_stacksize() const = 0;
 
-        /// Return whether the embedded action may require id-splitting
-        virtual bool may_require_id_splitting() const = 0;
-
         /// Return whether the embedded action is part of termination detection
         virtual bool does_termination_detection() const = 0;
 
         /// Wait for embedded futures to become ready
         virtual void wait_for_futures() = 0;
-
-//         /// Return all data needed for thread initialization
-//         virtual threads::thread_init_data&
-//         get_thread_init_data(naming::id_type const& target,
-//             naming::address::address_type lva, threads::thread_init_data& data) = 0;
-//
-//         virtual threads::thread_init_data&
-//         get_thread_init_data(continuation_type& cont,
-//             naming::id_type const& target, naming::address::address_type lva,
-//             threads::thread_init_data& data) = 0;
 
         /// Return all data needed for thread initialization
         virtual void schedule_thread(naming::id_type const& target,

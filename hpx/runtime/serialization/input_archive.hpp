@@ -147,6 +147,18 @@ namespace hpx { namespace serialization
             val = static_cast<T>(ul);
         }
 
+#if defined(BOOST_HAS_INT128)
+        void load_integral(boost::int128_type& t, boost::mpl::false_)
+        {
+            load_integral_impl(t);
+        }
+
+        void load_integral(boost::uint128_type& t, boost::mpl::true_)
+        {
+            load_integral_impl(t);
+        }
+#endif
+
         void load(float & f)
         {
             load_binary(&f, sizeof(float));
@@ -168,25 +180,11 @@ namespace hpx { namespace serialization
             HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
         }
 
-        void load_integral_impl(boost::int64_t & l)
+        template <class Promoted>
+        void load_integral_impl(Promoted& l)
         {
-            const std::size_t size = sizeof(boost::int64_t);
+            const std::size_t size = sizeof(Promoted);
             char* cptr = reinterpret_cast<char *>(&l); //-V206
-            load_binary(cptr, static_cast<std::size_t>(size));
-
-#ifdef BOOST_BIG_ENDIAN
-            if (endian_little())
-                reverse_bytes(size, cptr);
-#else
-            if (endian_big())
-                reverse_bytes(size, cptr);
-#endif
-        }
-
-        void load_integral_impl(boost::uint64_t & ul)
-        {
-            const std::size_t size = sizeof(boost::uint64_t);
-            char* cptr = reinterpret_cast<char *>(&ul); //-V206
             load_binary(cptr, static_cast<std::size_t>(size));
 
 #ifdef BOOST_BIG_ENDIAN

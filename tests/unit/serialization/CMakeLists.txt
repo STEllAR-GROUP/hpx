@@ -4,11 +4,12 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    serialization
     serialization_array
     serialization_builtins
     serialization_complex
     serialization_map
+    serialization_set
+    serialization_simple
     serialization_smart_ptr
     serialization_vector
     serialization_variant

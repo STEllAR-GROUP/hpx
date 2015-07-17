@@ -1,95 +1,66 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2015 Andreas Schaefer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/set.hpp>
 
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 
-#include <boost/cstdint.hpp>
-
-template <typename T>
-struct A
-{
-    A() {}
-
-    A(T t) : t_(t) {}
-    T t_;
-
-    A & operator=(T t) { t_ = t; return *this; }
-
-    template <typename Archive>
-    void serialize(Archive & ar, unsigned)
-    {
-        ar & t_;
-    }
-};
-
-#if defined(BOOST_HAS_INT128)
-std::ostream& operator<<(std::ostream& s, boost::int128_type i)
-{
-    boost::int64_t low = i;
-    i >>= 64;
-    boost::int64_t high = i;
-    s << std::hex << "high: i" << high << "; low: " << low;
-    return s;
-}
-
-std::ostream& operator<<(std::ostream& s, boost::uint128_type i)
-{
-    boost::uint64_t low = i;
-    i >>= 64;
-    boost::uint64_t high = i;
-    s << std::hex << "high: i" << high << "; low: " << low;
-    return s;
-}
-#endif
-
 #include <hpx/util/lightweight_test.hpp>
 
-void test_bool()
+template <typename CARGO>
+struct DummyContainer
+{
+    DummyContainer()
+    {}
+
+    DummyContainer(CARGO cargo) :
+        cargo(cargo)
+    {}
+
+    template <typename Archive>
+    void serialize(Archive & archive, unsigned)
+    {
+        archive & cargo;
+    }
+
+    bool operator<(const DummyContainer<CARGO> other) const
+    {
+        return cargo < other.cargo;
+    }
+
+    CARGO cargo;
+};
+
+void test_int()
 {
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
 
-        bool b = true;
-        oarchive << b;
-        b = false;
-        oarchive << b;
-        b = false;
-        oarchive << b;
-        b = true;
-        oarchive << b;
+        std::set<int> os;
+        os.insert(-1000);
+        os.insert(12345);
+        os.insert(34567);
+        os.insert(-2000);
+        oarchive << os;
 
         hpx::serialization::input_archive iarchive(buffer);
-        b = false;
-        iarchive >> b; HPX_TEST_EQ(b, true);
-        iarchive >> b; HPX_TEST_EQ(b, false);
-        iarchive >> b; HPX_TEST_EQ(b, false);
-        iarchive >> b; HPX_TEST_EQ(b, true);
-    }
-    {
-        std::vector<char> buffer;
-        hpx::serialization::output_archive oarchive(buffer);
+        std::set<int> is;
+        iarchive >> is;
+        HPX_TEST_EQ(os.size(), is.size());
 
-        A<bool> b = true;
-        oarchive << b;
-        b = false;
-        oarchive << b;
-        b = false;
-        oarchive << b;
-        b = true;
-        oarchive << b;
-
-        hpx::serialization::input_archive iarchive(buffer);
-        b = false;
-        iarchive >> b; HPX_TEST_EQ(b.t_, true);
-        iarchive >> b; HPX_TEST_EQ(b.t_, false);
-        iarchive >> b; HPX_TEST_EQ(b.t_, false);
-        iarchive >> b; HPX_TEST_EQ(b.t_, true);
+        std::set<int>::iterator j = is.begin();
+        for(std::set<int>::iterator i = os.begin();
+            i != os.end();
+            ++i, ++j)
+        {
+            HPX_TEST_EQ(*i, *j);
+        }
     }
 }
 
@@ -99,30 +70,43 @@ void test(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
+        std::set<T> os;
         for(T c = min; c < max; ++c)
         {
-            oarchive << c;
+            os.insert(c);
         }
+        oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        for(T c = min; c < max; ++c)
+        std::set<T> is;
+        iarchive >> is;
+        HPX_TEST_EQ(os.size(), is.size());
+
+        typename std::set<T>::iterator j = is.begin();
+        for(typename std::set<T>::iterator i = os.begin(); i != os.end(); ++i)
         {
-            T cc = 0;
-            iarchive >> cc; HPX_TEST_EQ(c, cc);
+            HPX_TEST_EQ(*i, *j);
+            ++j;
         }
     }
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
+        std::set<DummyContainer<T> > os;
         for(T c = min; c < max; ++c)
         {
-            A<T> cc = c;
-            oarchive << cc;
+            os.insert(c);
         }
+        oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        for(T c = min; c < max; ++c)
+        std::set<DummyContainer<T> > is;
+        iarchive >> is;
+        HPX_TEST_EQ(os.size(), is.size());
+
+        typename std::set<DummyContainer<T> >::iterator j = is.begin();
+        for(typename std::set<DummyContainer<T> >::iterator i = os.begin(); i != os.end(); ++i)
         {
-            A<T> cc = 0;
-            iarchive >> cc; HPX_TEST_EQ(c, cc.t_);
+            HPX_TEST_EQ(i->cargo, j->cargo);
+            ++j;
         }
     }
 }
@@ -133,37 +117,50 @@ void test_fp(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
+        std::set<T> os;
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
-            oarchive << c;
+            os.insert(c);
         }
+        oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        std::set<T> is;
+        iarchive >> is;
+        HPX_TEST_EQ(os.size(), is.size());
+
+        typename std::set<T>::iterator j = is.begin();
+        for(typename std::set<T>::iterator i = os.begin(); i != os.end(); ++i)
         {
-            T cc = 0;
-            iarchive >> cc; HPX_TEST_EQ(c, cc);
+            HPX_TEST_EQ(*i, *j);
+            ++j;
         }
     }
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
+        std::set<DummyContainer<T> > os;
         for(T c = min; c < max; c += static_cast<T>(0.5))
         {
-            A<T> cc = c;
-            oarchive << cc;
+            os.insert(c);
         }
+        oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        for(T c = min; c < max; c += static_cast<T>(0.5))
+        std::set<DummyContainer<T> > is;
+        iarchive >> is;
+        HPX_TEST_EQ(os.size(), is.size());
+
+        typename std::set<DummyContainer<T> >::iterator j = is.begin();
+        for(typename std::set<DummyContainer<T> >::iterator i = os.begin(); i != os.end(); ++i)
         {
-            A<T> cc = 0;
-            iarchive >> cc; HPX_TEST_EQ(c, cc.t_);
+            HPX_TEST_EQ(i->cargo, j->cargo);
+            ++j;
         }
     }
 }
 
 int main()
 {
-    test_bool();
+    test_int();
     test<char>((std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
     test<int>((std::numeric_limits<int>::min)(), (std::numeric_limits<int>::min)() + 100);
     test<int>((std::numeric_limits<int>::max)() - 100, (std::numeric_limits<int>::max)());
@@ -175,13 +172,12 @@ int main()
     test<long>(-100, 100);
     test<unsigned long>((std::numeric_limits<unsigned long>::min)(), (std::numeric_limits<unsigned long>::min)() + 100);
     test<unsigned long>((std::numeric_limits<unsigned long>::max)() - 100, (std::numeric_limits<unsigned long>::max)());
-#if defined(BOOST_HAS_INT128)
-    test<boost::int128_type>((std::numeric_limits<boost::int128_type>::max)() - 100, (std::numeric_limits<boost::int128_type>::max)());
-    test<boost::uint128_type>((std::numeric_limits<boost::uint128_type>::max)() - 100, (std::numeric_limits<boost::uint128_type>::max)());
-#endif
     test_fp<float>((std::numeric_limits<float>::min)(), (std::numeric_limits<float>::min)() + 100);
+    test_fp<float>((std::numeric_limits<float>::max)() - 100, (std::numeric_limits<float>::max)()); //it's incorrect
+    // because floatmax() - 100 causes cancellations error, digits are not affected
     test_fp<float>(-100, 100);
     test<double>((std::numeric_limits<double>::min)(), (std::numeric_limits<double>::min)() + 100);
+    test<double>((std::numeric_limits<double>::max)() - 100, (std::numeric_limits<double>::max)()); //it's the same
     test<double>(-100, 100);
 
     return hpx::util::report_errors();

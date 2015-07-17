@@ -53,14 +53,14 @@ foreach(test ${tests})
   add_hpx_regression_test("util" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.util.${test})
+  add_hpx_pseudo_target(tests.regressions.util_dir.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.util
-                              tests.regressions.util.${test})
+  add_hpx_pseudo_dependencies(tests.regressions.util_dir
+                              tests.regressions.util_dir.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.util.${test}
+  add_hpx_pseudo_dependencies(tests.regressions.util_dir.${test}
                               ${test}_test_exe)
 endforeach()
 

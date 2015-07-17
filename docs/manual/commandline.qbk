@@ -53,6 +53,7 @@ described in the table below:
                                  application startup (default: 1)]]
     [[`--hpx:node arg`]         [number of the node this locality is run on
                                  (must be unique)]]
+    [[`--hpx:ignore-batch-env`] [ignore batch environment variables]]
     [[`--hpx:pu-offset`]        [the first processing unit this instance of __hpx__ should be
                                  run on (default: 0), valid for
                                  `--hpx:queuing=local`, `--hpx:queuing=abp-priority`,

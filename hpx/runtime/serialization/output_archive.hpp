@@ -144,6 +144,18 @@ namespace hpx { namespace serialization
             save_integral_impl(static_cast<boost::uint64_t>(val));
         }
 
+#if defined(BOOST_HAS_INT128)
+        void save_integral(boost::int128_type t, boost::mpl::false_)
+        {
+            save_integral_impl(t);
+        }
+
+        void save_integral(boost::uint128_type t, boost::mpl::true_)
+        {
+            save_integral_impl(t);
+        }
+#endif
+
         void save(float f)
         {
             save_binary(&f, sizeof(float));
@@ -165,26 +177,11 @@ namespace hpx { namespace serialization
             save_binary(&b, sizeof(bool));
         }
 
-        void save_integral_impl(boost::int64_t l)
+        template <class Promoted>
+        void save_integral_impl(Promoted l)
         {
-            const std::size_t size = sizeof(boost::int64_t);
+            const std::size_t size = sizeof(Promoted);
             char* cptr = reinterpret_cast<char *>(&l); //-V206
-#ifdef BOOST_BIG_ENDIAN
-            if(endian_little())
-                reverse_bytes(size, cptr);
-#else
-            if(endian_big())
-                reverse_bytes(size, cptr);
-#endif
-
-            save_binary(cptr, size);
-        }
-
-        void save_integral_impl(boost::uint64_t ul)
-        {
-            const std::size_t size = sizeof(boost::uint64_t);
-            char* cptr = reinterpret_cast<char*>(&ul); //-V206
-
 #ifdef BOOST_BIG_ENDIAN
             if(endian_little())
                 reverse_bytes(size, cptr);

@@ -383,7 +383,7 @@ namespace hpx { namespace util
                 if (debug_clp)
                     std::cerr << "failed opening: " << node_file << std::endl;
 
-                // raise hard error if nodefile could not be opened
+                // raise hard error if node file could not be opened
                 throw hpx::detail::command_line_error(boost::str(boost::format(
                     "Could not open nodefile: '%s'") % node_file));
             }
@@ -392,7 +392,8 @@ namespace hpx { namespace util
             nodelist = vm["hpx:nodes"].as<std::vector<std::string> >();
         }
 
-        util::batch_environment env(nodelist, debug_clp);
+        bool enable_batch_env = vm.count("hpx:ignore-batch-env") == 0;
+        util::batch_environment env(nodelist, debug_clp, enable_batch_env);
 
         if(!nodelist.empty())
         {
@@ -534,6 +535,10 @@ namespace hpx { namespace util
                         "number given, using default value instead."
                     << std::endl;
             }
+        }
+
+        if (vm.count("hpx:connect") && hpx_host==std::string("127.0.0.1")) {
+            hpx_host = hpx::util::resolve_public_ip_address();
         }
 
         queuing_ = "local-priority";
@@ -984,4 +989,3 @@ namespace hpx { namespace util
         return 0;
     }
 }}
-

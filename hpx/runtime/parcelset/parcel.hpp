@@ -95,8 +95,6 @@ namespace hpx { namespace parcelset
             virtual naming::gid_type get_parcel_id() const = 0;
             virtual void set_parcel_id(naming::gid_type const& id) = 0;
 
-            virtual bool may_require_id_splitting() const = 0;
-
             virtual bool does_termination_detection() const = 0;
 
             virtual void wait_for_futures() = 0;
@@ -313,11 +311,6 @@ namespace hpx { namespace parcelset
             void set_parcel_id(naming::gid_type const& id)
             {
                 data_.parcel_id_ = id;
-            }
-
-            bool may_require_id_splitting() const
-            {
-                return this->get_action()->may_require_id_splitting();
             }
 
             bool does_termination_detection() const
@@ -698,11 +691,6 @@ namespace hpx { namespace parcelset
             parcelset::parcelhandler* ph, locality const& loc) const
         {
             return data_->get_message_handler(ph, loc, *this);
-        }
-
-        bool may_require_id_splitting() const
-        {
-            return data_->may_require_id_splitting();
         }
 
         bool does_termination_detection() const
