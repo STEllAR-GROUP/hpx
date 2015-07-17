@@ -24,13 +24,13 @@ endif()
 # C++ overrides
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
-    "${CMAKE_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
 
 ################################################################################
 # Fortran overrides
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
-    "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
 
 ################################################################################
 # Build type (needs to be handled before project command below)
@@ -149,6 +149,16 @@ hpx_option(HPX_WITH_DOCUMENTATION BOOL
 hpx_option(HPX_WITH_DOCUMENTATION_SINGLEPAGE BOOL
   "The HPX documentation should be build as a single page HTML (default OFF)."
   OFF CATEGORY "Build Targets")
+
+if(WIN32)
+  hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
+    "Force creating pseudo targets and pseudo dependencies (default OFF)."
+    OFF CATEGORY "Build Targets")
+else()
+  hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
+    "Force creating pseudo targets and pseudo dependencies (default ON)."
+    ON CATEGORY "Build Targets")
+endif()
 
 ################################################################################
 # Some platforms do not support dynamic linking. Enable this to link all
@@ -475,12 +485,21 @@ hpx_option(HPX_WITH_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel da
 
 ################################################################################
 # Backwards compatibility options (edit for each release)
+
 # HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY: introduced in V0.9.11
 hpx_option(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY BOOL
     "Enable backwards compatibility for apply_colocated, async_colocated and friends"
     ON ADVANCED)
 if(HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
+endif()
+
+# HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY: introduced in V0.9.11
+hpx_option(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY BOOL
+    "Enable backwards compatibility for component::get_gid() functions"
+    ON ADVANCED)
+if(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
 endif()
 
 ################################################################################
@@ -827,6 +846,9 @@ hpx_check_for_cxx11_variadic_macros(
 
 hpx_check_for_cxx11_variadic_templates(
   REQUIRED "HPX needs support for C++11 variadic templates")
+
+hpx_check_for_cxx11_extended_friend_declarations(
+  DEFINITIONS HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
 
 # Check the availability of certain C++11 library features
 hpx_check_for_cxx11_std_chrono(
@@ -1383,7 +1405,7 @@ install( # Install HPX Python scripts
   PATTERN ".git" EXCLUDE)
 
 #   if(UNIX)
-#     file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py")
+#     file(GLOB scripts "${PROJECT_SOURCE_DIR}/python/scripts/*.py")
 #     execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory
 #       "${CMAKE_BINARY_DIR}/python/scripts" )
 #     foreach(script ${scripts})
@@ -1412,7 +1434,7 @@ install( # Install HPX Python scripts
 #
 #   execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/python" )
 #   #make symlink, so that we have intact hpx symlink in CMAKE_BINARY_DIR
-#   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "${CMAKE_SOURCE_DIR}/python/hpx"
+#   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/python/hpx"
 #     "hpx-${HPX_VERSION}" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
 #   # create a symlink in share pointing to the latest HPX installation
 #   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")

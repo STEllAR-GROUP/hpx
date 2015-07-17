@@ -287,7 +287,7 @@ void primary_namespace::register_server_instance(
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name_sync(instance_name_, get_gid().get_gid(), ec);
+    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
 }
 
 void primary_namespace::unregister_server_instance(
@@ -464,7 +464,7 @@ response primary_namespace::bind_gid(
     // parameters
     gva g = req.get_gva();
     naming::gid_type id = req.get_gid();
-    naming::gid_type locality_ = req.get_locality();
+    naming::gid_type locality = req.get_locality();
 
     naming::detail::strip_internal_bits_from_gid(id);
 
@@ -505,11 +505,11 @@ response primary_namespace::bind_gid(
                   , boost::str(boost::format(
                         "attempt to update a GVA with an invalid type, "
                         "gid(%1%), gva(%2%), locality(%3%)")
-                        % id % g % locality_));
+                        % id % g % locality));
                 return response();
             }
 
-            if (HPX_UNLIKELY(!locality_))
+            if (HPX_UNLIKELY(!locality))
             {
                 l.unlock();
 
@@ -518,7 +518,7 @@ response primary_namespace::bind_gid(
                   , boost::str(boost::format(
                         "attempt to update a GVA with an invalid locality id, "
                         "gid(%1%), gva(%2%), locality(%3%)")
-                        % id % g % locality_));
+                        % id % g % locality));
                 return response();
             }
 
@@ -527,12 +527,12 @@ response primary_namespace::bind_gid(
             gaddr.type   = g.type;
             gaddr.lva(g.lva());
             gaddr.offset = g.offset;
-            loc = locality_;
+            loc = locality;
 
             LAGAS_(info) << (boost::format(
                 "primary_namespace::bind_gid, gid(%1%), gva(%2%), "
                 "locality(%3%), response(repeated_request)")
-                % id % g % locality_);
+                % id % g % locality);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -598,13 +598,13 @@ response primary_namespace::bind_gid(
           , boost::str(boost::format(
                 "attempt to insert a GVA with an invalid type, "
                 "gid(%1%), gva(%2%), locality(%3%)")
-                % id % g % locality_));
+                % id % g % locality));
         return response();
     }
 
     // Insert a GID -> GVA entry into the GVA table.
     if (HPX_UNLIKELY(!util::insert_checked(gvas_.insert(
-            std::make_pair(id, std::make_pair(g, locality_))))))
+            std::make_pair(id, std::make_pair(g, locality))))))
     {
         l.unlock();
 
@@ -613,13 +613,13 @@ response primary_namespace::bind_gid(
           , boost::str(boost::format(
                 "GVA table insertion failed due to a locking error or "
                 "memory corruption, gid(%1%), gva(%2%)")
-                % id % g % locality_));
+                % id % g % locality));
         return response();
     }
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::bind_gid, gid(%1%), gva(%2%), locality(%3%)")
-        % id % g % locality_);
+        % id % g % locality);
 
     if (&ec != &throws)
         ec = make_success_code();

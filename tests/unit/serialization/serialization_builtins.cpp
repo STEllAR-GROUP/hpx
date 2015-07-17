@@ -8,7 +8,7 @@
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <boost/cstdint.hpp>
 
 template <typename T>
 struct A
@@ -26,6 +26,28 @@ struct A
         ar & t_;
     }
 };
+
+#if defined(BOOST_HAS_INT128)
+std::ostream& operator<<(std::ostream& s, boost::int128_type i)
+{
+    boost::int64_t low = i;
+    i >>= 64;
+    boost::int64_t high = i;
+    s << std::hex << "high: i" << high << "; low: " << low;
+    return s;
+}
+
+std::ostream& operator<<(std::ostream& s, boost::uint128_type i)
+{
+    boost::uint64_t low = i;
+    i >>= 64;
+    boost::uint64_t high = i;
+    s << std::hex << "high: i" << high << "; low: " << low;
+    return s;
+}
+#endif
+
+#include <hpx/util/lightweight_test.hpp>
 
 void test_bool()
 {
@@ -153,6 +175,10 @@ int main()
     test<long>(-100, 100);
     test<unsigned long>((std::numeric_limits<unsigned long>::min)(), (std::numeric_limits<unsigned long>::min)() + 100);
     test<unsigned long>((std::numeric_limits<unsigned long>::max)() - 100, (std::numeric_limits<unsigned long>::max)());
+#if defined(BOOST_HAS_INT128)
+    test<boost::int128_type>((std::numeric_limits<boost::int128_type>::max)() - 100, (std::numeric_limits<boost::int128_type>::max)());
+    test<boost::uint128_type>((std::numeric_limits<boost::uint128_type>::max)() - 100, (std::numeric_limits<boost::uint128_type>::max)());
+#endif
     test_fp<float>((std::numeric_limits<float>::min)(), (std::numeric_limits<float>::min)() + 100);
     test_fp<float>(-100, 100);
     test<double>((std::numeric_limits<double>::min)(), (std::numeric_limits<double>::min)() + 100);

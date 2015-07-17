@@ -262,9 +262,7 @@ namespace hpx
         class HPX_EXPORT thread_data_base;
         class HPX_EXPORT thread_data;
 
-        template <
-            typename SchedulingPolicy,
-            typename NotificationPolicy = threads::policies::callback_notifier>
+        template <typename SchedulingPolicy>
         class HPX_EXPORT threadmanager_impl;
 
         ///////////////////////////////////////////////////////////////////////
@@ -513,9 +511,7 @@ namespace hpx
         std::size_t dflt);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename SchedulingPolicy,
-        typename NotificationPolicy = threads::policies::callback_notifier>
+    template <typename SchedulingPolicy>
     class HPX_API_EXPORT runtime_impl;
 
     /// The function \a get_runtime returns a reference to the (thread
@@ -1488,66 +1484,6 @@ namespace hpx
         naming::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Trigger the LCO referenced by the given id
-    ///
-    /// \param id [in] This represents the id of the LCO which should be
-    ///                triggered.
-    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id);
-
-    /// \brief Trigger the LCO referenced by the given id
-    ///
-    /// \param id   [in] This represents the id of the LCO which should be
-    ///                  triggered.
-    /// \param cont [in] This represents the LCO to trigger after completion.
-    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id,
-        naming::id_type const& cont);
-
-    /// \brief Set the result value for the LCO referenced by the given id
-    ///
-    /// \param id [in] This represents the id of the LCO which should
-    ///                receive the given value.
-    /// \param t  [in] This is the value which should be sent to the LCO.
-    template <typename T>
-    void set_lco_value(naming::id_type const& id, T && t);
-
-    /// \brief Set the result value for the LCO referenced by the given id
-    ///
-    /// \param id   [in] This represents the id of the LCO which should
-    ///                  receive the given value.
-    /// \param t    [in] This is the value which should be sent to the LCO.
-    /// \param cont [in] This represents the LCO to trigger after completion.
-    template <typename T>
-    void set_lco_value(naming::id_type const& id, T && t,
-        naming::id_type const& cont);
-
-    /// \brief Set the error state for the LCO referenced by the given id
-    ///
-    /// \param id [in] This represents the id of the LCO which should
-    ///                receive the error value.
-    /// \param e  [in] This is the error value which should be sent to
-    ///                the LCO.
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr const& e);
-
-    /// \copydoc hpx::set_lco_error(naming::id_type const& id, boost::exception_ptr const& e)
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr && e);
-
-    /// \brief Set the error state for the LCO referenced by the given id
-    ///
-    /// \param id   [in] This represents the id of the LCO which should
-    ///                  receive the error value.
-    /// \param e    [in] This is the error value which should be sent to
-    ///                  the LCO.
-    /// \param cont [in] This represents the LCO to trigger after completion.
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr const& e, naming::id_type const& cont);
-
-    /// \copydoc hpx::set_lco_error(naming::id_type const& id, boost::exception_ptr const& e, naming::id_type const& cont)
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        boost::exception_ptr && e, naming::id_type const& cont);
-
-    ///////////////////////////////////////////////////////////////////////////
     /// \brief Start all active performance counters, optionally naming the
     ///        section of code
     ///
@@ -1706,6 +1642,7 @@ namespace hpx
 }
 
 // Including declarations of various API function declarations
+#include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 

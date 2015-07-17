@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -299,7 +300,7 @@ namespace detail
 }
 
 void addressing_service::launch_bootstrap(
-    boost::shared_ptr<parcelset::parcelport> pp
+    boost::shared_ptr<parcelset::parcelport> const& pp
   , parcelset::endpoints_type const & endpoints
   , util::runtime_configuration const& ini_
     )
@@ -2185,7 +2186,7 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     }
 
     lcos::promise<naming::id_type, naming::gid_type> p;
-    request req(symbol_ns_on_event, name, evt, call_for_past_events, p.get_gid());
+    request req(symbol_ns_on_event, name, evt, call_for_past_events, p.get_id());
     hpx::future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
 
@@ -2199,8 +2200,11 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
 typedef hpx::agas::server::symbol_namespace::service_action
     symbol_namespace_service_action;
 
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_service_action)
-HPX_REGISTER_BROADCAST_ACTION(symbol_namespace_service_action)
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_service_action,
+        symbol_namespace_service_action)
+HPX_REGISTER_BROADCAST_ACTION_ID(symbol_namespace_service_action,
+        symbol_namespace_service_action,
+        hpx::actions::broadcast_symbol_namespace_service_action_id)
 
 namespace hpx { namespace agas
 {
@@ -2771,7 +2775,7 @@ void addressing_service::register_counter_types()
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_get_entry_count, _2),
+              _1, cache_get_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
@@ -2780,7 +2784,7 @@ void addressing_service::register_counter_types()
               "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_insert_entry_count, _2),
+              _1, cache_insert_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
@@ -2789,7 +2793,7 @@ void addressing_service::register_counter_types()
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_update_entry_count, _2),
+              _1, cache_update_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
@@ -2798,7 +2802,7 @@ void addressing_service::register_counter_types()
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_erase_entry_count, _2),
+              _1, cache_erase_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           "ns"
         }

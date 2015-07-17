@@ -95,17 +95,17 @@ namespace hpx { namespace iostreams
             return get_consolestream();
         }
 
-        inline char const* const get_outstream_name(cout_tag)
+        inline char const* get_outstream_name(cout_tag)
         {
             return "/locality#console/output_stream#cout";
         }
 
-        inline char const* const get_outstream_name(cerr_tag)
+        inline char const* get_outstream_name(cerr_tag)
         {
             return "/locality#console/output_stream#cerr";
         }
 
-        inline char const* const get_outstream_name(consolestream_tag)
+        inline char const* get_outstream_name(consolestream_tag)
         {
             return "/locality#console/output_stream#consolestream";
         }

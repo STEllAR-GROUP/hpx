@@ -19,6 +19,7 @@ set(subdirs
     jacobi_smp
     nqueen
     performance_counters
+    queue
     quickstart
     qt
     random_mem_access

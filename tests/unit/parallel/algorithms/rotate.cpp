@@ -126,7 +126,7 @@ void test_rotate_exception(ExPolicy policy, IteratorTag)
     base_iterator mid = boost::begin(c);
 
     // move at least one element to guarantee an exception to be thrown
-    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -163,7 +163,7 @@ void test_rotate_exception_async(ExPolicy p, IteratorTag)
     base_iterator mid = boost::begin(c);
 
     // move at least one element to guarantee an exception to be thrown
-    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -236,7 +236,7 @@ void test_rotate_bad_alloc(ExPolicy policy, IteratorTag)
     base_iterator mid = boost::begin(c);
 
     // move at least one element to guarantee an exception to be thrown
-    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -272,7 +272,7 @@ void test_rotate_bad_alloc_async(ExPolicy p, IteratorTag)
     base_iterator mid = boost::begin(c);
 
     // move at least one element to guarantee an exception to be thrown
-    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(1)); //-V104
+    std::size_t delta = (std::max)(std::rand() % c.size(), std::size_t(2)); //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;

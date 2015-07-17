@@ -18,7 +18,7 @@ namespace jacobi
     struct row
     {
         row() {}
-        
+
         hpx::lcos::future<void> init(std::size_t nx, double value = 0.0)
         {
             return hpx::async<server::row::init_action>(id, nx, value);
@@ -30,7 +30,7 @@ namespace jacobi
         {
             return hpx::async<server::row::get_action>(id, begin, end);
         }
-    
+
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {

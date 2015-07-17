@@ -96,8 +96,6 @@ namespace hpx { namespace lcos { namespace local
             }
 
             /// \brief Signal the semaphore
-            ///
-            ///
             void signal(boost::int64_t count = 1)
             {
                 boost::unique_lock<mutex_type> l(mtx_);
@@ -131,6 +129,7 @@ namespace hpx { namespace lcos { namespace local
                 HPX_ASSERT(l.owns_lock());
 
                 mutex_type* mtx = l.mutex();
+
                 // release no more threads than we get resources
                 value_ += count;
                 for (boost::int64_t i = 0; value_ >= 0 && i < count; ++i)

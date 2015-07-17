@@ -360,7 +360,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             threads::detail::scheduling_loop(virt_core, scheduler_,
                 states_[virt_core], executed_threads, executed_thread_phases,
                 overall_times, thread_times, util::function_nonser<void()>(),
-                util::bind(
+                util::bind( //-V107
                     &thread_pool_executor::suspend_back_into_calling_context,
                     this, virt_core));
 

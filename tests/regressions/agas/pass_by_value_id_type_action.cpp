@@ -41,7 +41,7 @@ int hpx_main(boost::program_options::variables_map&)
 
             HPX_TEST_EQ(id, a);
         }
-        
+
         {
 
             test_return_action act;

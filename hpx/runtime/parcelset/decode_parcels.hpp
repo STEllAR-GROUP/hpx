@@ -106,7 +106,7 @@ namespace hpx { namespace parcelset
                         inbound_data_size, &chunks);
 
                     if(parcel_count == 0)
-                        archive >> parcel_count; //-V128a
+                        archive >> parcel_count; //-V128
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
                         // de-serialize parcel and add it to incoming parcel queue

@@ -22,10 +22,12 @@ HPX_REGISTER_COMPONENT(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     primary_namespace, component_agas_primary_namespace)
 
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     primary_namespace::service_action,
-    primary_namespace_service_action)
+    primary_namespace_service_action,
+    hpx::actions::primary_namespace_service_action_id)
 
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     primary_namespace::bulk_service_action,
-    primary_namespace_bulk_service_action)
+    primary_namespace_bulk_service_action,
+    hpx::actions::primary_namespace_bulk_service_action_id)

@@ -5,68 +5,113 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    void trigger_lco_event(naming::id_type const& id)
+    void trigger_lco_event(naming::id_type const& id, bool move_credits)
     {
-        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
-        id.make_unmanaged();
-
         lcos::base_lco::set_event_action set;
-        apply(set, target);
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply(set, target);
+        }
+        else
+        {
+            apply(set, id);
+        }
     }
 
-    void trigger_lco_event(naming::id_type const& id, naming::id_type const& cont)
+    void trigger_lco_event(naming::id_type const& id,
+        naming::id_type const& cont, bool move_credits)
     {
-        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
-        id.make_unmanaged();
-
         lcos::base_lco::set_event_action set;
-        apply_c(set, cont, target);
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply_c(set, cont, target);
+        }
+        else
+        {
+            apply_c(set, cont, id);
+        }
     }
 
-    void set_lco_error(naming::id_type const& id, boost::exception_ptr const& e)
+    void set_lco_error(naming::id_type const& id,
+        boost::exception_ptr const& e, bool move_credits)
     {
-        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
-        id.make_unmanaged();
-
         lcos::base_lco::set_exception_action set;
-        apply(set, target, e);
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply(set, target, e);
+        }
+        else
+        {
+            apply(set, id, e);
+        }
     }
 
     void set_lco_error(naming::id_type const& id, //-V659
-        boost::exception_ptr && e)
+        boost::exception_ptr && e, bool move_credits)
     {
-        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
-        id.make_unmanaged();
-
         lcos::base_lco::set_exception_action set;
-        apply(set, target, std::move(e));
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply(set, target, std::move(e));
+        }
+        else
+        {
+            apply(set, id, std::move(e));
+        }
     }
 
     void set_lco_error(naming::id_type const& id, boost::exception_ptr const& e,
-        naming::id_type const& cont)
+        naming::id_type const& cont, bool move_credits)
     {
-        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
-        id.make_unmanaged();
-
         lcos::base_lco::set_exception_action set;
-        apply_c(set, cont, target, e);
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply_c(set, cont, target, e);
+        }
+        else
+        {
+            apply_c(set, cont, id, e);
+        }
     }
 
     void set_lco_error(naming::id_type const& id, //-V659
-        boost::exception_ptr && e, naming::id_type const& cont)
+        boost::exception_ptr && e, naming::id_type const& cont,
+        bool move_credits)
     {
-        naming::id_type target(id.get_gid(), id_type::managed_move_credit);
-        id.make_unmanaged();
-
         lcos::base_lco::set_exception_action set;
-        apply_c(set, cont, target, std::move(e));
+        if (move_credits)
+        {
+            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            id.make_unmanaged();
+
+            apply_c(set, cont, target, std::move(e));
+        }
+        else
+        {
+            apply_c(set, cont, id, std::move(e));
+        }
     }
 }
 

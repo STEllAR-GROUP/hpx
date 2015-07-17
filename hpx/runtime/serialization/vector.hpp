@@ -20,7 +20,7 @@ namespace hpx { namespace serialization
         // normal load ...
         typedef typename std::vector<T>::size_type size_type;
         size_type size;
-        ar >> size;
+        ar >> size; //-V128
         if(size == 0) return;
 
         vs.reserve(size);
@@ -46,7 +46,7 @@ namespace hpx { namespace serialization
             typedef typename std::vector<T>::value_type value_type;
             typedef typename std::vector<T>::size_type size_type;
             size_type size;
-            ar >> size;
+            ar >> size; //-V128
             if(size == 0) return;
 
             v.resize(size);
@@ -59,7 +59,7 @@ namespace hpx { namespace serialization
     {
         typedef typename std::vector<bool>::size_type size_type;
         size_type size = 0;
-        ar >> size;
+        ar >> size; //-V128
         if(size == 0) return;
         v.clear();
 
@@ -116,7 +116,7 @@ namespace hpx { namespace serialization
     void serialize(output_archive & ar, std::vector<bool, Allocator> & v, unsigned)
     {
         typedef typename std::vector<bool>::size_type size_type;
-        ar << v.size();
+        ar << v.size(); //-V128
         if(v.empty()) return;
         // normal save ... no chance of doing bitwise here ...
         for(size_type i = 0; i < v.size(); ++i)
@@ -129,8 +129,7 @@ namespace hpx { namespace serialization
     template <typename T, typename Allocator>
     void serialize(output_archive & ar, std::vector<T, Allocator> & v, unsigned)
     {
-        typedef typename std::vector<T>::size_type size_type;
-        ar << v.size();
+        ar << v.size(); //-V128
         if(v.empty()) return;
         save_impl(
             ar

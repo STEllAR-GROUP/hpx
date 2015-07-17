@@ -581,7 +581,7 @@ namespace hpx { namespace components { namespace server
                 ids.push_back(factory->create());
             }
         }
-        LRT_(info) << "successfully created " << count
+        LRT_(info) << "successfully created " << count //-V128
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
 
@@ -637,7 +637,7 @@ namespace hpx { namespace components { namespace server
                         std::forward<T>(v), std::forward<Ts>(vs)...)));
             }
         }
-        LRT_(info) << "successfully created " << count
+        LRT_(info) << "successfully created " << count //-V128
                    << " component(s) of type: "
                    << components::get_component_type_name(type);
 

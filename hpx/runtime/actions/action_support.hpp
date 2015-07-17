@@ -231,24 +231,11 @@ namespace hpx { namespace actions
         /// flags should contain serialization options which affect the space required
         virtual std::size_t get_type_size(int flags) const = 0;
 
-        /// Return whether the embedded action may require id-splitting
-        virtual bool may_require_id_splitting() const = 0;
-
         /// Return whether the embedded action is part of termination detection
         virtual bool does_termination_detection() const = 0;
 
         /// Wait for embedded futures to become ready
         virtual void wait_for_futures() = 0;
-
-//         /// Return all data needed for thread initialization
-//         virtual threads::thread_init_data&
-//         get_thread_init_data(naming::id_type const& target,
-//             naming::address::address_type lva, threads::thread_init_data& data) = 0;
-//
-//         virtual threads::thread_init_data&
-//         get_thread_init_data(continuation_type& cont,
-//             naming::id_type const& target, naming::address::address_type lva,
-//             threads::thread_init_data& data) = 0;
 
         /// Return all data needed for thread initialization
         virtual void schedule_thread(naming::id_type const& target,
@@ -276,7 +263,7 @@ namespace hpx { namespace actions
 #endif
 
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        void serialize(Archive &, unsigned)
         {}
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(base_action);
     };
@@ -346,5 +333,7 @@ namespace hpx { namespace actions
     }
     /// \endcond
 }}
+
+HPX_TRAITS_SERIALIZED_WITH_ID(hpx::actions::base_action)
 
 #endif
