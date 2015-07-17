@@ -12,6 +12,7 @@ set(tests
     parallel_fork_executor
     sequential_executor
     service_executors
+    this_thread_executors
     thread_pool_executors
    )
 

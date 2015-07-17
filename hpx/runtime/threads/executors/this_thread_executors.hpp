@@ -3,10 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_SERIAL_EXECUTOR_JAN_11_2013_0831PM)
-#define HPX_RUNTIME_THREADS_EXECUTORS_SERIAL_EXECUTOR_JAN_11_2013_0831PM
+#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_THIS_THREAD_EXECUTOR_JUL_16_2015_0740M)
+#define HPX_RUNTIME_THREADS_EXECUTORS_THIS_THREAD_EXECUTOR_JUL_16_2015_0740M
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_LOCAL_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+
 #include <hpx/state.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -26,13 +29,12 @@ namespace hpx { namespace threads { namespace executors
 
         //////////////////////////////////////////////////////////////////////
         template <typename Scheduler>
-        class HPX_EXPORT thread_pool_executor
+        class HPX_EXPORT this_thread_executor
           : public threads::detail::scheduled_executor_base
         {
         public:
-            thread_pool_executor(std::size_t max_punits = 1,
-                std::size_t min_punits = 1);
-            ~thread_pool_executor();
+            this_thread_executor();
+            ~this_thread_executor();
 
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
@@ -61,7 +63,7 @@ namespace hpx { namespace threads { namespace executors
             boost::uint64_t num_pending_closures(error_code& ec) const;
 
         protected:
-            friend class manage_thread_executor<thread_pool_executor>;
+            friend class manage_thread_executor<this_thread_executor>;
 
             // Return the requested policy element
             std::size_t get_policy_element(threads::detail::executor_parameter p,
@@ -93,56 +95,40 @@ namespace hpx { namespace threads { namespace executors
             // the scheduler used by this executor
             Scheduler scheduler_;
             lcos::local::counting_semaphore shutdown_sem_;
-            boost::ptr_vector<boost::atomic<hpx::state> > states_;
+            boost::atomic<hpx::state> state_;
+            std::size_t thread_num_;
 
             // collect statistics
-            boost::atomic<std::size_t> current_concurrency_;
-            boost::atomic<std::size_t> max_current_concurrency_;
             boost::atomic<boost::uint64_t> tasks_scheduled_;
             boost::atomic<boost::uint64_t> tasks_completed_;
-
-            // policy elements
-            std::size_t const max_punits_;
-            std::size_t const min_punits_;
 
             // resource manager registration
             std::size_t cookie_;
 
             // store the self reference to the HPX thread running this scheduler
-            std::vector<threads::thread_self*> self_;
+            threads::thread_self* self_;
 
             // protect scheduler initialization
             typedef lcos::local::spinlock mutex_type;
             mutex_type mtx_;
         };
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-    struct HPX_EXPORT local_queue_executor : public scheduled_executor
+    struct HPX_EXPORT this_thread_local_queue_executor
+      : public scheduled_executor
     {
-        local_queue_executor();
-
-        explicit local_queue_executor(std::size_t max_punits,
-            std::size_t min_punits = 1);
+        this_thread_local_queue_executor();
     };
 #endif
 
-    struct HPX_EXPORT local_priority_queue_executor : public scheduled_executor
-    {
-        local_priority_queue_executor();
-
-        explicit local_priority_queue_executor(std::size_t max_punits,
-            std::size_t min_punits = 1);
-    };
-
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-    struct HPX_EXPORT static_priority_queue_executor : public scheduled_executor
+    struct HPX_EXPORT this_thread_static_priority_queue_executor
+      : public scheduled_executor
     {
-        static_priority_queue_executor();
-
-        explicit static_priority_queue_executor(std::size_t max_punits,
-            std::size_t min_punits = 1);
+        this_thread_static_priority_queue_executor();
     };
 #endif
 }}}
