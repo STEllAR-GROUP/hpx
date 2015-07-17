@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 
@@ -44,7 +43,7 @@ namespace hpx { namespace traits
 
     template <typename T>
     struct acquire_future_impl<T,
-        typename boost::disable_if<is_future_or_future_range<T> >::type>
+        typename boost::disable_if_c<is_future_or_future_range<T>::value>::type>
     {
         typedef T type;
 
@@ -57,30 +56,30 @@ namespace hpx { namespace traits
     };
 
     template <typename R>
-    struct acquire_future_impl<hpx::future<R> >
+    struct acquire_future_impl<hpx::lcos::future<R> >
     {
-        typedef hpx::future<R> type;
+        typedef hpx::lcos::future<R> type;
 
-        BOOST_FORCEINLINE hpx::future<R>
-        operator()(hpx::future<R>& future) const
+        BOOST_FORCEINLINE hpx::lcos::future<R>
+        operator()(hpx::lcos::future<R>& future) const
         {
             return std::move(future);
         }
 
-        BOOST_FORCEINLINE hpx::future<R>
-        operator()(hpx::future<R>&& future) const
+        BOOST_FORCEINLINE hpx::lcos::future<R>
+        operator()(hpx::lcos::future<R>&& future) const
         {
             return std::move(future);
         }
     };
 
     template <typename R>
-    struct acquire_future_impl<hpx::shared_future<R> >
+    struct acquire_future_impl<hpx::lcos::shared_future<R> >
     {
-        typedef hpx::shared_future<R> type;
+        typedef hpx::lcos::shared_future<R> type;
 
-        BOOST_FORCEINLINE hpx::shared_future<R>
-        operator()(hpx::shared_future<R> future) const
+        BOOST_FORCEINLINE hpx::lcos::shared_future<R>
+        operator()(hpx::lcos::shared_future<R> future) const
         {
             return future;
         }
@@ -91,12 +90,14 @@ namespace hpx { namespace traits
         // Reserve sufficient space in the given vector if the underlying
         // iterator type of the given range allow calculating the size on O(1).
         template <typename Future, typename Range>
+        BOOST_FORCEINLINE
         void reserve_if_random_access(std::vector<Future>& v, Range const& r,
             boost::mpl::false_)
         {
         }
 
         template <typename Future, typename Range>
+        BOOST_FORCEINLINE
         void reserve_if_random_access(std::vector<Future>& v, Range const& r,
             boost::mpl::true_)
         {
@@ -104,6 +105,7 @@ namespace hpx { namespace traits
         }
 
         template <typename Future, typename Range>
+        BOOST_FORCEINLINE
         void reserve_if_random_access(std::vector<Future>& v, Range const& r)
         {
             typedef typename std::iterator_traits<
@@ -120,7 +122,7 @@ namespace hpx { namespace traits
 
     template <typename Range>
     struct acquire_future_impl<Range,
-        typename boost::enable_if<traits::is_future_range<Range> >::type>
+        typename boost::enable_if_c<traits::is_future_range<Range>::value>::type>
     {
         typedef typename traits::future_range_traits<Range>::future_type
             future_type;

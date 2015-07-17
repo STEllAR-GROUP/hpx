@@ -300,7 +300,7 @@ namespace detail
 }
 
 void addressing_service::launch_bootstrap(
-    boost::shared_ptr<parcelset::parcelport> pp
+    boost::shared_ptr<parcelset::parcelport> const& pp
   , parcelset::endpoints_type const & endpoints
   , util::runtime_configuration const& ini_
     )
@@ -2775,7 +2775,7 @@ void addressing_service::register_counter_types()
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_get_entry_count, _2),
+              _1, cache_get_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
@@ -2784,7 +2784,7 @@ void addressing_service::register_counter_types()
               "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_insert_entry_count, _2),
+              _1, cache_insert_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
@@ -2793,7 +2793,7 @@ void addressing_service::register_counter_types()
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_update_entry_count, _2),
+              _1, cache_update_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
@@ -2802,7 +2802,7 @@ void addressing_service::register_counter_types()
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
-              _1, cache_erase_entry_count, _2),
+              _1, cache_erase_entry_time, _2),
           &performance_counters::locality_counter_discoverer,
           "ns"
         }

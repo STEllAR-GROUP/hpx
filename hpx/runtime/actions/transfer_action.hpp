@@ -25,7 +25,6 @@
 #endif
 #include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
-#include <hpx/traits/action_may_require_id_splitting.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
@@ -261,12 +260,6 @@ namespace hpx { namespace actions
         std::size_t get_type_size(int flags) const
         {
             return traits::type_size<arguments_type>::call(arguments_, flags);
-        }
-
-        /// Return whether the embedded action may require id-splitting
-        bool may_require_id_splitting() const
-        {
-            return traits::action_may_require_id_splitting<derived_type>::call(arguments_);
         }
 
         /// Wait for embedded futures to become ready

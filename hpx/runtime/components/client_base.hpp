@@ -17,6 +17,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -72,14 +73,14 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct is_future<Derived,
-        typename boost::enable_if<is_client<Derived> >::type>
+        typename boost::enable_if_c<is_client<Derived>::value>::type>
       : boost::mpl::true_
     {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct future_traits<Derived,
-        typename boost::enable_if<is_client<Derived> >::type>
+        typename boost::enable_if_c<is_client<Derived>::value>::type>
     {
         typedef naming::id_type type;
     };
@@ -87,10 +88,10 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct future_access<Derived,
-        typename boost::enable_if<is_client<Derived> >::type>
+        typename boost::enable_if_c<is_client<Derived>::value>::type>
     {
         BOOST_FORCEINLINE static
-        typename lcos::detail::shared_state_ptr<naming::id_type>::type const&
+        typename traits::detail::shared_state_ptr<naming::id_type>::type const&
         get_shared_state(Derived const& client)
         {
             return client.share().shared_state_;
@@ -100,7 +101,7 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct acquire_future_impl<Derived,
-        typename boost::enable_if<is_client<Derived> >::type>
+        typename boost::enable_if_c<is_client<Derived>::value>::type>
     {
         typedef Derived type;
 

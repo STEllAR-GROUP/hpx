@@ -122,6 +122,7 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_any.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
@@ -214,18 +215,20 @@ namespace hpx { namespace lcos
             {}
 
             template <typename Future>
-            void operator()(Future& future) const
+            void operator()(Future& future,
+                typename boost::enable_if_c<
+                    traits::is_future<Future>::value
+                >::type* = 0) const
             {
                 std::size_t index =
                     when_.index_.load(boost::memory_order_seq_cst);
                 if (index == when_any_result<Sequence>::index_error())
                 {
-                    typedef typename lcos::detail::shared_state_ptr_for<
+                    typedef typename traits::detail::shared_state_ptr_for<
                             Future
                         >::type shared_state_ptr;
-
                     shared_state_ptr const& shared_state =
-                        lcos::detail::get_shared_state(future);
+                        traits::detail::get_shared_state(future);
 
                     if (!shared_state->is_ready())
                     {
@@ -257,15 +260,31 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            void apply(Sequence_& sequence, typename boost::enable_if<
-                boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
+            BOOST_FORCEINLINE
+            void operator()(Sequence_& sequence,
+                typename boost::enable_if_c<
+                    traits::is_future_range<Sequence_>::value
+                >::type* = 0) const
+            {
+                apply(sequence);
+            }
+
+            template <typename Sequence_>
+            BOOST_FORCEINLINE
+            void apply(Sequence_& sequence,
+                typename boost::enable_if_c<
+                    boost::fusion::traits::is_sequence<Sequence_>::value
+                >::type* = 0) const
             {
                 boost::fusion::for_each(sequence, *this);
             }
 
             template <typename Sequence_>
-            void apply(Sequence_& sequence, typename boost::disable_if<
-                boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
+            BOOST_FORCEINLINE
+            void apply(Sequence_& sequence,
+                typename boost::disable_if_c<
+                    boost::fusion::traits::is_sequence<Sequence_>::value
+                >::type* = 0) const
             {
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
@@ -275,6 +294,7 @@ namespace hpx { namespace lcos
         };
 
         template <typename Sequence>
+        BOOST_FORCEINLINE
         void set_on_completed_callback(when_any<Sequence>& when)
         {
             set_when_any_callback_impl<Sequence> callback(when);

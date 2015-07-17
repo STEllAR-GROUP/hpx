@@ -69,7 +69,7 @@ namespace hpx { namespace util
     {
         ///////////////////////////////////////////////////////////////////////
         template <std::size_t I, typename T, typename Enable = void>
-        struct tuple_member
+        struct tuple_member //-V690
         {
         public:
             BOOST_CONSTEXPR tuple_member()

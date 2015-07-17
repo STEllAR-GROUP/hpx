@@ -226,11 +226,11 @@ namespace hpx { namespace threads { namespace detail
     bool thread_pool<Scheduler>::run(boost::unique_lock<boost::mutex>& l,
         std::size_t num_threads)
     {
-        LTM_(info)
+        LTM_(info) //-V128
             << "thread_pool::run: " << pool_name_
             << " number of processing units available: " //-V128
             << threads::hardware_concurrency();
-        LTM_(info)
+        LTM_(info) //-V128
             << "thread_pool::run: " << pool_name_
             << " creating " << num_threads << " OS thread(s)"; //-V128
 
@@ -288,7 +288,7 @@ namespace hpx { namespace threads { namespace detail
                 threads::mask_cref_type mask =
                     sched_.Scheduler::get_pu_mask(topology_, thread_num);
 
-                LTM_(info)
+                LTM_(info) //-V128
                     << "thread_pool::run: " << pool_name_
                     << " create OS thread " << thread_num //-V128
                     << ": will run on processing units within this mask: "
@@ -312,7 +312,7 @@ namespace hpx { namespace threads { namespace detail
                     topology_.set_thread_affinity_mask(threads_.back(), mask, ec);
                     if (ec)
                     {
-                        LTM_(warning)
+                        LTM_(warning) //-V128
                             << "thread_pool::run: " << pool_name_
                             << " setting thread affinity on OS thread " //-V128
                             << thread_num << " failed with: "
@@ -321,7 +321,7 @@ namespace hpx { namespace threads { namespace detail
                 }
                 else
                 {
-                    LTM_(debug)
+                    LTM_(debug) //-V128
                         << "thread_pool::run: " << pool_name_
                         << " setting thread affinity on OS thread " //-V128
                         << thread_num << " was explicitly disabled.";
@@ -389,7 +389,7 @@ namespace hpx { namespace threads { namespace detail
 
                     sched_.Scheduler::do_some_work(std::size_t(-1));
 
-                    LTM_(info)
+                    LTM_(info) //-V128
                         << "thread_pool::stop: " << pool_name_
                         << " join:" << i; //-V128
 
@@ -456,7 +456,7 @@ namespace hpx { namespace threads { namespace detail
             topology.set_thread_affinity_mask(mask, ec);
             if (ec)
             {
-                LTM_(warning)
+                LTM_(warning) //-V128
                     << "thread_pool::thread_func: " << pool_name_
                     << " setting thread affinity on OS thread " //-V128
                     << num_thread << " failed with: " << ec.get_message();
@@ -464,7 +464,7 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            LTM_(debug)
+            LTM_(debug) //-V128
                 << "thread_pool::thread_func: " << pool_name_
                 << " setting thread affinity on OS thread " //-V128
                 << num_thread << " was explicitly disabled.";
@@ -477,7 +477,7 @@ namespace hpx { namespace threads { namespace detail
             topology.reduce_thread_priority(ec);
             if (ec)
             {
-                LTM_(warning)
+                LTM_(warning) //-V128
                     << "thread_pool::thread_func: " << pool_name_
                     << " reducing thread priority on OS thread " //-V128
                     << num_thread << " failed with: " << ec.get_message();
@@ -491,7 +491,7 @@ namespace hpx { namespace threads { namespace detail
         startup.wait();
 
         {
-            LTM_(info)
+            LTM_(info) //-V128
                 << "thread_pool::thread_func: " << pool_name_
                 << " starting OS thread: " << num_thread; //-V128
 
@@ -518,7 +518,7 @@ namespace hpx { namespace threads { namespace detail
                         state_ == state_terminating);
                 }
                 catch (hpx::exception const& e) {
-                    LFATAL_
+                    LFATAL_ //-V128
                         << "thread_pool::thread_func: " << pool_name_
                         << " thread_num:" << num_thread //-V128
                         << " : caught hpx::exception: "
@@ -528,7 +528,7 @@ namespace hpx { namespace threads { namespace detail
                     return;
                 }
                 catch (boost::system::system_error const& e) {
-                    LFATAL_
+                    LFATAL_ //-V128
                         << "thread_pool::thread_func: " << pool_name_
                         << " thread_num:" << num_thread //-V128
                         << " : caught boost::system::system_error: "
@@ -544,7 +544,7 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
             catch (...) {
-                LFATAL_
+                LFATAL_ //-V128
                     << "thread_pool::thread_func: " << pool_name_
                     << " thread_num:" << num_thread //-V128
                     << " : caught unexpected " //-V128
@@ -554,7 +554,7 @@ namespace hpx { namespace threads { namespace detail
                 return;
             }
 
-            LTM_(info)
+            LTM_(info) //-V128
                 << "thread_pool::thread_func: " << pool_name_
                 << " thread_num: " << num_thread
                 << " : ending OS thread, " //-V128

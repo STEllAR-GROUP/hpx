@@ -183,7 +183,7 @@ namespace hpx
                           , filter.get());
 
                         if(num_parcels != std::size_t(-1))
-                            archive << parcels_sent;
+                            archive << parcels_sent; //-V128
 
                         for(std::size_t i = 0; i != parcels_sent; ++i)
                         {

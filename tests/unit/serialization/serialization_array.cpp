@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2015 Andreas Schaefer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -175,6 +176,29 @@ void test_multi_array(T first)
                 HPX_TEST_EQ(oarray[i][j][k], iarray[i][j][k]);
 }
 
+template <typename T, std::size_t SIZE>
+void test_plain_array()
+{
+    std::vector<char> buffer;
+    T iarray[SIZE];
+    T oarray[SIZE];
+
+    for(std::size_t i = 0; i < SIZE; ++i) {
+        iarray[i] = i * i;
+        oarray[i] = -1;
+    }
+
+    hpx::serialization::output_archive oarchive(buffer);
+    oarchive << iarray;
+
+    hpx::serialization::input_archive iarchive(buffer);
+    iarchive >> oarray;
+
+    for(std::size_t i = 0; i < SIZE; ++i) {
+        HPX_TEST_EQ(oarray[i], iarray[i]);
+    }
+}
+
 int main()
 {
     test<char>((std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
@@ -199,5 +223,8 @@ int main()
 
     test_multi_array(0);
     test_multi_array(0.);
+
+    test_plain_array<double, 20>();
+    test_plain_array<int, 200>();
     return hpx::util::report_errors();
 }
