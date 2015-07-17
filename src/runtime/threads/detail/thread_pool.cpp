@@ -503,10 +503,13 @@ namespace hpx { namespace threads { namespace detail
                     hpx::util::coroutines::prepare_main_thread main_thread;
 
                     // run main Scheduler loop until terminated
-                    detail::scheduling_loop(num_thread, sched_, state_,
+                    detail::scheduling_counters counters(
                         executed_threads_[num_thread],
                         executed_thread_phases_[num_thread],
-                        tfunc_times_[num_thread], exec_times_[num_thread],
+                        tfunc_times_[num_thread], exec_times_[num_thread]);
+
+                    detail::scheduling_loop(
+                        num_thread, sched_, state_, counters,
                         util::bind(&policies::scheduler_base::idle_callback,
                             &sched_, num_thread
                         ));
