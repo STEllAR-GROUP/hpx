@@ -16,6 +16,7 @@
 #endif
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/this_thread_executors.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
@@ -36,6 +37,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     this_thread_executor<Scheduler>::this_thread_executor()
       : scheduler_(1, false), shutdown_sem_(0),
         state_(state_initialized), thread_num_(std::size_t(-1)),
+        parent_thread_num_(std::size_t(-1)),
         tasks_scheduled_(0), tasks_completed_(0), cookie_(0),
         self_(0)
     {
@@ -129,7 +131,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         }
 
         // execute scheduler directly, if necessary
-        run(0, thread_num_);
+        run();
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -173,7 +175,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         }
 
         // execute scheduler directly, if necessary
-        run(0, thread_num_);
+        run();
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -216,11 +218,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     };
 
     template <typename Scheduler>
-    void this_thread_executor<Scheduler>::suspend_back_into_calling_context(
-        std::size_t virt_core)
+    void this_thread_executor<Scheduler>::suspend_back_into_calling_context()
     {
-        HPX_ASSERT(0 == virt_core);
-
         // Give invoking context a chance to catch up with its tasks, but only
         // if this scheduler is currently in running state (this scheduler is
         // always in stopping state as it has to exit as early as possible).
@@ -228,7 +227,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (state_.compare_exchange_strong(expected, state_suspended))
         {
             {
+                threads::detail::reset_tss_helper reset_on_exit(
+                    parent_thread_num_);
                 on_self_reset on_exit(self_);
+
                 this_thread::suspend();
             }
 
@@ -265,11 +267,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     // execute all work
     template <typename Scheduler>
-    void this_thread_executor<Scheduler>::run(std::size_t virt_core,
-        std::size_t thread_num)
+    void this_thread_executor<Scheduler>::run()
     {
-        HPX_ASSERT(0 == virt_core);
-
         // We want to exit this scheduling loop as early as possible, thus
         // we use 'state_stopping' instead of 'state_running'.
 
@@ -281,13 +280,17 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         {
             {
                 typename mutex_type::scoped_lock l(mtx_);
-                scheduler_.add_punit(virt_core, thread_num);
-                scheduler_.on_start_thread(virt_core);
+                scheduler_.add_punit(0, thread_num_);
+                scheduler_.on_start_thread(0);
             }
 
             self_ = threads::get_self_ptr();
 
             on_run_exit on_exit(shutdown_sem_, self_);
+
+            // manage the thread num
+            threads::detail::reset_tss_helper reset_on_exit(thread_num_);
+            parent_thread_num_ = reset_on_exit.previous_thread_num();
 
             // FIXME: turn these values into performance counters
             boost::int64_t executed_threads = 0, executed_thread_phases = 0;
@@ -297,16 +300,16 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times);
 
-            threads::detail::scheduling_loop(virt_core, scheduler_,
+            threads::detail::scheduling_loop(0, scheduler_,
                 state_, counters, util::function_nonser<void()>(),
                 util::bind( //-V107
                     &this_thread_executor::suspend_back_into_calling_context,
-                    this, virt_core));
+                    this));
 
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist
             HPX_ASSERT(!scheduler_.get_thread_count(
-                unknown, thread_priority_default, virt_core) ||
+                unknown, thread_priority_default, 0) ||
                 state_ == state_terminating);
         }
     }
@@ -373,6 +376,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_ASSERT(oldstate == state_suspended || oldstate == state_stopped);
 
         thread_num_ = std::size_t(-1);
+        parent_thread_num_ = std::size_t(-1);
     }
 }}}}
 

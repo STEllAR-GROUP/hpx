@@ -83,11 +83,11 @@ namespace hpx { namespace threads { namespace executors
             void remove_processing_unit(std::size_t thread_num, error_code& ec);
 
             // give invoking context a chance to catch up with its tasks
-            void suspend_back_into_calling_context(std::size_t virt_core);
+            void suspend_back_into_calling_context();
 
         private:
             // internal run method
-            void run(std::size_t virt_core, std::size_t num_thread);
+            void run();
 
             threads::thread_state_enum thread_function_nullary(
                 closure_type func);
@@ -97,6 +97,7 @@ namespace hpx { namespace threads { namespace executors
             lcos::local::counting_semaphore shutdown_sem_;
             boost::atomic<hpx::state> state_;
             std::size_t thread_num_;
+            std::size_t parent_thread_num_;
 
             // collect statistics
             boost::atomic<boost::uint64_t> tasks_scheduled_;
