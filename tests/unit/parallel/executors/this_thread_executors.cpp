@@ -15,14 +15,14 @@
 #include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::thread::id test() { return boost::this_thread::get_id(); }
+std::size_t test() { return hpx::get_worker_thread_num(); }
 
 template <typename Executor>
 void test_sync(Executor& exec)
 {
     typedef hpx::parallel::executor_traits<Executor> traits;
 
-    HPX_TEST(traits::execute(exec, &test) == boost::this_thread::get_id());
+    HPX_TEST(traits::execute(exec, &test) == hpx::get_worker_thread_num());
 }
 
 template <typename Executor>
@@ -32,13 +32,13 @@ void test_async(Executor& exec)
 
     HPX_TEST(
         traits::async_execute(exec, &test).get() ==
-        boost::this_thread::get_id());
+        hpx::get_worker_thread_num());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(boost::thread::id tid, int value)
+void bulk_test(std::size_t tid, int value)
 {
-    HPX_TEST(tid == boost::this_thread::get_id());
+    HPX_TEST(tid == hpx::get_worker_thread_num());
 }
 
 template <typename Executor>
@@ -46,7 +46,7 @@ void test_bulk_sync(Executor& exec)
 {
     typedef hpx::parallel::executor_traits<Executor> traits;
 
-    boost::thread::id tid = boost::this_thread::get_id();
+    std::size_t tid = hpx::get_worker_thread_num();
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), std::rand());
@@ -60,7 +60,7 @@ void test_bulk_async(Executor& exec)
 {
     typedef hpx::parallel::executor_traits<Executor> traits;
 
-    boost::thread::id tid = boost::this_thread::get_id();
+    std::size_t tid = hpx::get_worker_thread_num();
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), std::rand());

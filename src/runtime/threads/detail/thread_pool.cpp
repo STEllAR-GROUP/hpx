@@ -33,24 +33,15 @@ namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    hpx::util::thread_specific_ptr<
-            std::size_t, typename thread_pool<Scheduler>::tls_tag
-        > thread_pool<Scheduler>::thread_num_;
-
-    template <typename Scheduler>
     void thread_pool<Scheduler>::init_tss(std::size_t num)
     {
-        // shouldn't be initialized yet
-        HPX_ASSERT(NULL == thread_pool::thread_num_.get());
-
-        thread_pool::thread_num_.reset(new std::size_t);
-        *thread_pool::thread_num_.get() = num;
+        thread_num_tss_.init_tss(num);
     }
 
     template <typename Scheduler>
     void thread_pool<Scheduler>::deinit_tss()
     {
-        thread_pool::thread_num_.reset();
+        thread_num_tss_.deinit_tss();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -198,11 +189,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     std::size_t thread_pool<Scheduler>::get_worker_thread_num() const
     {
-        if (NULL != thread_pool::thread_num_.get())
-            return *thread_pool::thread_num_;
-
-        // some OS threads are not managed by the thread-manager
-        return std::size_t(-1);
+        return thread_num_tss_.get_worker_thread_num();
     }
 
     template <typename Scheduler>
