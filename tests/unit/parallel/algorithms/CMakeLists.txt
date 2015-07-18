@@ -27,7 +27,9 @@ set(tests
     findifnot
     foreach
     foreach_executors
+    foreach_projection
     foreachn
+    foreachn_projection
     generate
     generaten
     includes

@@ -28,7 +28,7 @@ namespace hpx { namespace parallel { namespace util
             static Iter call(Iter it, Iter end, F && f)
             {
                 for (/**/; it != end; ++it)
-                    f(*it);
+                    f(it);
 
                 return it;
             }
@@ -40,7 +40,7 @@ namespace hpx { namespace parallel { namespace util
                 {
                     if (tok.was_cancelled())
                         break;
-                    func(*it);
+                    func(it);
                 }
                 return it;
             }
