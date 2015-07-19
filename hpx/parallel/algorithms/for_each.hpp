@@ -70,9 +70,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         policy, first, count,
                         [f, proj](Iter part_begin, std::size_t part_size)
                         {
-                            // VS2015 bails out when proj is captured by ref
+                            // VS2015 bails out when proj ot f are captured by ref
                             util::loop_n(part_begin, part_size,
-                                [=, &f](Iter const& curr)
+                                [=](Iter const& curr)
                                 {
                                     f(proj(*curr));
                                 });
