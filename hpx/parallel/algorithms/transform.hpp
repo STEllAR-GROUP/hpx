@@ -35,27 +35,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         template <typename InIter1, typename OutIter, typename F,
             typename Proj>
-        BOOST_FORCEINLINE
-        OutIter sequential_transform(InIter1 first1, InIter1 last1,
+        BOOST_FORCEINLINE hpx::util::tuple<InIter1, OutIter>
+        sequential_transform(InIter1 first1, InIter1 last1,
             OutIter dest, F && f, Proj && proj)
         {
             while (first1 != last1)
                 *dest++ = f(proj(*first1++));
-            return dest;
+            return hpx::util::make_tuple(first1, dest);
         }
 
-        template <typename OutIter>
-        struct transform : public detail::algorithm<transform<OutIter>, OutIter>
+        template <typename IterTuple>
+        struct transform
+          : public detail::algorithm<transform<IterTuple>, IterTuple>
         {
+            typedef typename hpx::util::tuple_element<1, IterTuple>::type
+                output_iterator;
+
             transform()
               : transform::algorithm("transform")
             {}
 
             template <typename ExPolicy, typename InIter, typename F,
                 typename Proj>
-            static OutIter
-            sequential(ExPolicy, InIter first, InIter last, OutIter dest,
-                F && f, Proj && proj)
+            static hpx::util::tuple<InIter, output_iterator>
+            sequential(ExPolicy, InIter first, InIter last,
+                output_iterator dest, F && f, Proj && proj)
             {
                 return sequential_transform(first, last, dest,
                     std::forward<F>(f), std::forward<Proj>(proj));
@@ -64,18 +68,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter
+                ExPolicy, hpx::util::tuple<FwdIter, output_iterator>
             >::type
             parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                OutIter dest, F && f, Proj && proj)
+                output_iterator dest, F && f, Proj && proj)
             {
-                typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter, output_iterator>
+                    zip_iterator;
                 typedef typename zip_iterator::reference reference;
                 typedef typename util::detail::algorithm_result<
-                        ExPolicy, OutIter
+                        ExPolicy, hpx::util::tuple<FwdIter, output_iterator>
                     >::type result_type;
 
-                return get_iter<1, result_type>(
+                return get_iter_tuple<result_type>(
                     for_each_n<zip_iterator>().call(
                         policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first, dest),
@@ -153,7 +158,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a transform algorithm returns a \a hpx::future<OutIter>
     ///           if the execution policy is of type \a parallel_task_execution_policy
     ///           and returns \a OutIter otherwise.
-    ///           The \a transform algorithm returns the output iterator to the
+    ///           The \a transform algorithm returns a tuple holding an iterator
+    ///           referring to the first element after the input sequence and
+    ///           the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
@@ -164,7 +171,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             hpx::traits::is_callable<
                 Proj(typename std::iterator_traits<InIter>::value_type)
             >::value,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy,
+                hpx::util::tuple<InIter, OutIter>
+            >::type
     >::type
     transform(ExPolicy && policy, InIter first, InIter last, OutIter dest,
         F && f, Proj && proj = Proj())
@@ -181,7 +190,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, iterator_category>
         >::type is_seq;
 
-        return detail::transform<OutIter>().call(
+        return detail::transform<hpx::util::tuple<InIter, OutIter> >().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, last, dest, std::forward<F>(f),
             std::forward<Proj>(proj));
@@ -194,29 +203,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F, typename Proj1, typename Proj2>
-        BOOST_FORCEINLINE
-        OutIter sequential_transform(InIter1 first1, InIter1 last1,
+        BOOST_FORCEINLINE hpx::util::tuple<InIter1, InIter2, OutIter>
+        sequential_transform(InIter1 first1, InIter1 last1,
             InIter2 first2,  OutIter dest, F && f,
             Proj1 && proj1, Proj2 && proj2)
         {
             while (first1 != last1)
                 *dest++ = f(proj1(*first1++), proj2(*first2++));
-            return dest;
+            return hpx::util::make_tuple(first1, first2, dest);
         }
 
-        template <typename OutIter>
+        template <typename IterTuple>
         struct transform_binary
-          : public detail::algorithm<transform_binary<OutIter>, OutIter>
+          : public detail::algorithm<transform_binary<IterTuple>, IterTuple>
         {
+            typedef typename hpx::util::tuple_element<2, IterTuple>::type
+                output_iterator;
+
             transform_binary()
               : transform_binary::algorithm("transform_binary")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F, typename Proj1, typename Proj2>
-            static OutIter
+            static hpx::util::tuple<InIter1, InIter2, output_iterator>
             sequential(ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2,
-                OutIter dest, F && f, Proj1 && proj1, Proj2 && proj2)
+                output_iterator dest, F && f, Proj1 && proj1, Proj2 && proj2)
             {
                 return sequential_transform(first1, last1, first2, dest,
                     std::forward<F>(f), std::forward<Proj1>(proj1),
@@ -226,20 +238,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F, typename Proj1, typename Proj2>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter
+                ExPolicy, hpx::util::tuple<FwdIter1, FwdIter2, output_iterator>
             >::type
             parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, OutIter dest, F && f,
+                FwdIter2 first2, output_iterator dest, F && f,
                 Proj1 && proj1, Proj2 && proj2)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2, OutIter>
-                    zip_iterator;
+                typedef hpx::util::zip_iterator<
+                        FwdIter1, FwdIter2, output_iterator
+                    > zip_iterator;
                 typedef typename zip_iterator::reference reference;
                 typedef typename util::detail::algorithm_result<
-                        ExPolicy, OutIter
+                        ExPolicy,
+                        hpx::util::tuple<FwdIter1, FwdIter2, output_iterator>
                     >::type result_type;
 
-                return get_iter<2, result_type>(
+                return get_iter_tuple<result_type>(
                     for_each_n<zip_iterator>().call(
                         policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first1, first2, dest),
@@ -334,7 +348,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a transform algorithm returns a \a hpx::future<OutIter>
     ///           if the execution policy is of type \a parallel_task_execution_policy
     ///           and returns \a OutIter otherwise.
-    ///           The \a transform algorithm returns the output iterator to the
+    ///           The \a transform algorithm returns a tuple holding an iterator
+    ///           referring to the first element after the first input sequence,
+    ///           an iterator referring to the first element after the second
+    ///           input sequence, and the output iterator referring to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
@@ -351,7 +368,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             hpx::traits::is_callable<
                 Proj2(typename std::iterator_traits<InIter2>::value_type)
             >::value,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<
+                ExPolicy, hpx::util::tuple<InIter1, InIter2, OutIter>
+            >::type
     >::type
     transform(ExPolicy && policy,
         InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F && f,
@@ -373,10 +392,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, category2>
         >::type is_seq;
 
-        return detail::transform_binary<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, dest, std::forward<F>(f),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        return detail::transform_binary<
+                hpx::util::tuple<InIter1, InIter2, OutIter>
+            >().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first1, last1, first2, dest, std::forward<F>(f),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -386,30 +407,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \cond NOINTERNAL
         template <typename InIter1, typename InIter2, typename OutIter,
             typename F, typename Proj1, typename Proj2>
-        BOOST_FORCEINLINE
-        OutIter sequential_transform(InIter1 first1, InIter1 last1,
+        BOOST_FORCEINLINE hpx::util::tuple<InIter1, InIter2, OutIter>
+        sequential_transform(InIter1 first1, InIter1 last1,
             InIter2 first2, InIter2 last2, OutIter dest, F && f,
             Proj1 && proj1, Proj2 && proj2)
         {
             while (first1 != last1 && first2 != last2)
                 *dest++ = f(proj1(*first1++), proj2(*first2++));
-            return dest;
+            return hpx::util::make_tuple(first1, first2, dest);
         }
 
-        template <typename OutIter>
+        template <typename IterTuple>
         struct transform_binary2
-          : public detail::algorithm<transform_binary2<OutIter>, OutIter>
+          : public detail::algorithm<transform_binary2<IterTuple>, IterTuple>
         {
+            typedef typename hpx::util::tuple_element<2, IterTuple>::type
+                output_iterator;
+
             transform_binary2()
               : transform_binary2::algorithm("transform_binary")
             {}
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F, typename Proj1, typename Proj2>
-            static OutIter
+            static hpx::util::tuple<InIter1, InIter2, output_iterator>
             sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2,
-                OutIter dest, F && f, Proj1 && proj1, Proj2 && proj2)
+                output_iterator dest, F && f, Proj1 && proj1, Proj2 && proj2)
             {
                 return sequential_transform(first1, last1, first2, last2, dest,
                     std::forward<F>(f), std::forward<Proj1>(proj1),
@@ -419,20 +443,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F, typename Proj1, typename Proj2>
             static typename util::detail::algorithm_result<
-                ExPolicy, OutIter
+                ExPolicy, hpx::util::tuple<FwdIter1, FwdIter2, output_iterator>
             >::type
             parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2, OutIter dest, F && f,
+                FwdIter2 first2, FwdIter2 last2, output_iterator dest, F && f,
                 Proj1 && proj1, Proj2 && proj2)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2, OutIter>
-                    zip_iterator;
+                typedef hpx::util::zip_iterator<
+                        FwdIter1, FwdIter2, output_iterator
+                    > zip_iterator;
                 typedef typename zip_iterator::reference reference;
                 typedef typename util::detail::algorithm_result<
-                        ExPolicy, OutIter
+                        ExPolicy,
+                        hpx::util::tuple<FwdIter1, FwdIter2, output_iterator>
                     >::type result_type;
 
-                return get_iter<2, result_type>(
+                return get_iter_tuple<result_type>(
                     for_each_n<zip_iterator>().call(
                         policy, boost::mpl::false_(),
                         hpx::util::make_zip_iterator(first1, first2, dest),
@@ -535,7 +561,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \returns  The \a transform algorithm returns a \a hpx::future<OutIter>
     ///           if the execution policy is of type \a parallel_task_execution_policy
     ///           and returns \a OutIter otherwise.
-    ///           The \a transform algorithm returns the output iterator to the
+    ///           The \a transform algorithm returns a tuple holding an iterator
+    ///           referring to the first element after the first input sequence,
+    ///           an iterator referring to the first element after the second
+    ///           input sequence, and the output iterator referring to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
@@ -552,7 +581,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             hpx::traits::is_callable<
                 Proj2(typename std::iterator_traits<InIter2>::value_type)
             >::value,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<
+                ExPolicy, hpx::util::tuple<InIter1, InIter2, OutIter>
+            >::type
     >::type
     transform(ExPolicy && policy,
         InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
@@ -575,10 +606,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::input_iterator_tag, category2>
         >::type is_seq;
 
-        return detail::transform_binary2<OutIter>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, dest, std::forward<F>(f),
-            std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+        return detail::transform_binary2<
+                hpx::util::tuple<InIter1, InIter2, OutIter>
+            >().call(
+                std::forward<ExPolicy>(policy), is_seq(),
+                first1, last1, first2, last2, dest, std::forward<F>(f),
+                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
     }
 }}}
 
