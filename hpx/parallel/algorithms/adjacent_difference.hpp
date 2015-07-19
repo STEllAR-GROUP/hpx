@@ -80,12 +80,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     policy, make_zip_iterator(first, prev, dest), count,
                     [op](zip_iterator part_begin, std::size_t part_size)
                     {
+                        // VS2015RC bails out when op is captured by ref
                         using hpx::util::get;
                         util::loop_n(part_begin, part_size,
-                        [&op](zip_iterator it)
-                        {
-                            get<2>(*it) = op(get<0>(*it), get<1>(*it));
-                        });
+                            [op](zip_iterator it)
+                            {
+                                get<2>(*it) = op(get<0>(*it), get<1>(*it));
+                            });
                     },
                     [dest, count](std::vector<hpx::future<void> > &&)
                         mutable -> Iter

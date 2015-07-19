@@ -74,21 +74,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, T>::call(
                     policy, make_zip_iterator(first1, first2), count,
-                    [op1, op2](zip_iterator part_begin, std::size_t part_size)
+                    [op1, op2](zip_iterator part_begin, std::size_t part_size) ->T
                     {
                         using hpx::util::get;
                         T part_sum = op2(
                             get<0>(*part_begin), get<1>(*part_begin));
                         part_begin++;
+
+                        // VS2015RC bails out when op is captured by ref
                         util::loop_n(part_begin, part_size - 1,
-                            [&](zip_iterator it)
+                            [=, &part_sum](zip_iterator it)
                             {
                                 part_sum = op1(
                                     part_sum, op2(get<0>(*it), get<1>(*it)));
                             });
                         return part_sum;
                     },
-                    [init, op1](std::vector<hpx::future<T> > && results)
+                    [init, op1](std::vector<hpx::future<T> > && results) -> T
                     {
                         T ret = init;
                         for(auto && fut : results)

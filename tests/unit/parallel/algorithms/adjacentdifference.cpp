@@ -95,7 +95,7 @@ void test_adjacent_difference_exception(ExPolicy policy, IteratorTag)
         hpx::parallel::adjacent_difference(policy,
             decorated_iterator(boost::begin(c)),
             decorated_iterator(boost::end(c)), boost::begin(d),
-            [](std::size_t lhs, std::size_t rhs)
+            [](std::size_t lhs, std::size_t rhs) -> std::size_t
             {
                 throw std::runtime_error("test");
                 return lhs - rhs;
@@ -131,7 +131,7 @@ void test_adjacent_difference_exception_async(ExPolicy p, IteratorTag)
         hpx::parallel::adjacent_difference(p,
             decorated_iterator(boost::begin(c)),
             decorated_iterator(boost::end(c)), boost::begin(d),
-            [](std::size_t lhs, std::size_t rhs)
+            [](std::size_t lhs, std::size_t rhs) -> std::size_t
             {
                 throw std::runtime_error("test");
                 return lhs - rhs;
@@ -200,7 +200,7 @@ void test_adjacent_difference_bad_alloc(ExPolicy policy, IteratorTag)
         hpx::parallel::adjacent_difference(policy,
             decorated_iterator(boost::begin(c)),
             decorated_iterator(boost::end(c)), boost::begin(d),
-            [](std::size_t lhs, std::size_t rhs)
+            [](std::size_t lhs, std::size_t rhs) -> std::size_t
             {
                 throw std::bad_alloc();
                 return lhs - rhs;
@@ -234,7 +234,7 @@ void test_adjacent_difference_bad_alloc_async(ExPolicy p, IteratorTag)
         hpx::parallel::adjacent_difference(p,
             decorated_iterator(boost::begin(c)),
             decorated_iterator(boost::end(c)), boost::begin(d),
-            [](std::size_t lhs, std::size_t rhs)
+            [](std::size_t lhs, std::size_t rhs) -> std::size_t
             {
                 throw std::bad_alloc();
                 return lhs - rhs;
