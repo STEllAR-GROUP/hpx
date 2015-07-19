@@ -172,7 +172,7 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_async(get_gid(), hpx::get_locality_id(),
+                this->base_type::write_async(get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
 
@@ -197,7 +197,7 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_sync(get_gid(), hpx::get_locality_id(),
+                this->base_type::write_sync(get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
 
@@ -220,7 +220,7 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_async(get_gid(), hpx::get_locality_id(),
+                this->base_type::write_async(get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
             return true;

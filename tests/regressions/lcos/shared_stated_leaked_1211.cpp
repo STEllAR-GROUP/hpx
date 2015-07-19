@@ -52,7 +52,7 @@ struct test : hpx::components::client_base<test, test_server>
 
     hpx::future<int> call() const
     {
-        return hpx::async(test_action(), get_gid());
+        return hpx::async(test_action(), get_id());
     }
 };
 

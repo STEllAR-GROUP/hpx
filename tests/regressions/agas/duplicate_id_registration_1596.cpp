@@ -88,7 +88,7 @@ struct ViewRegistrationListener
     {
         typedef server::ViewRegistrationListener::register_view_action
             action_type;
-        hpx::async<action_type>(this->get_gid()).get();
+        hpx::async<action_type>(this->get_id()).get();
     }
 };
 
@@ -136,7 +136,7 @@ int hpx_main()
             cout << "resolved id: " << id << endl;
 
             client::ViewRegistrationListener client(id);
-            cout << "created client with id " << client.get_gid() << endl;
+            cout << "created client with id " << client.get_id() << endl;
 
             client.register_view();
             client.register_view();

@@ -34,18 +34,18 @@ struct test_client
 
     test_client(hpx::future<hpx::id_type>&& id) : base_type(std::move(id)) {}
 
-    std::size_t check_ptr() { return check_ptr_action()(this->get_gid()); }
+    std::size_t check_ptr() { return check_ptr_action()(this->get_id()); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 bool test_get_ptr1(hpx::id_type id)
 {
     test_client t = test_client::create(id);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_gid());
+    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
 
     try {
         hpx::future<boost::shared_ptr<test_server> > f =
-            hpx::get_ptr<test_server>(t.get_gid());
+            hpx::get_ptr<test_server>(t.get_id());
 
         boost::shared_ptr<test_server> ptr = f.get();
 
@@ -62,10 +62,10 @@ bool test_get_ptr1(hpx::id_type id)
 bool test_get_ptr2(hpx::id_type id)
 {
     test_client t = test_client::create(id);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_gid());
+    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
 
     hpx::future<boost::shared_ptr<test_server> > f =
-        hpx::get_ptr<test_server>(t.get_gid());
+        hpx::get_ptr<test_server>(t.get_id());
 
     f.wait();
     bool has_exception = f.has_exception();

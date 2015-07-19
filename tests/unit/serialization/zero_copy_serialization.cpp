@@ -133,7 +133,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     hpx::actions::continuation_type incont = inp.get_continuation();
 
     HPX_TEST_EQ(outcont->get_continuation_name(), incont->get_continuation_name());
-    HPX_TEST_EQ(outcont->get_gid(), incont->get_gid());
+    HPX_TEST_EQ(outcont->get_id(), incont->get_id());
 
     //// invoke action encapsulated in inp
     //naming::address const* inaddrs = pin.get_destination_addrs();

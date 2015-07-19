@@ -61,7 +61,7 @@ namespace examples
 
             // request gid;
             *this = simple_central_tuplespace(hpx::components::new_<examples::server::simple_central_tuplespace>(locality));
-            bool rc = hpx::agas::register_name(symbol_name, this->get_gid()).get();
+            bool rc = hpx::agas::register_name(symbol_name, this->get_id()).get();
 
             if(rc)
             {
@@ -97,8 +97,8 @@ namespace examples
         //[simple_central_tuplespace_client_write_async
         hpx::lcos::future<int> write_async(const tuple_type& tuple)
         {
-            HPX_ASSERT(this->get_gid());
-            return this->base_type::write_async(this->get_gid(), tuple);
+            HPX_ASSERT(this->get_id());
+            return this->base_type::write_async(this->get_id(), tuple);
         }
         //]
 
@@ -107,8 +107,8 @@ namespace examples
         /// \note This function is fully synchronous.
         int write_sync(const tuple_type& tuple)
         {
-            HPX_ASSERT(this->get_gid());
-            return this->base_type::write_sync(this->get_gid(), tuple);
+            HPX_ASSERT(this->get_id());
+            return this->base_type::write_sync(this->get_id(), tuple);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -119,8 +119,8 @@ namespace examples
         ///       immediately after the action has has been dispatched.
         hpx::lcos::future<tuple_type> read_async(const tuple_type& tp, long const timeout)
         {
-            HPX_ASSERT(this->get_gid());
-            return this->base_type::read_async(this->get_gid(), tp, timeout);
+            HPX_ASSERT(this->get_id());
+            return this->base_type::read_async(this->get_id(), tp, timeout);
         }
 
         /// read matching tuple from tuplespace within \p timeout.
@@ -129,8 +129,8 @@ namespace examples
         //[simple_central_tuplespace_client_read_sync
         tuple_type read_sync(const tuple_type& tp, long const timeout)
         {
-            HPX_ASSERT(this->get_gid());
-            return this->base_type::read_sync(this->get_gid(), tp, timeout);
+            HPX_ASSERT(this->get_id());
+            return this->base_type::read_sync(this->get_id(), tp, timeout);
         }
         //]
 
@@ -145,8 +145,8 @@ namespace examples
         //[simple_central_tuplespace_client_take_async
         hpx::lcos::future<tuple_type> take_async(const tuple_type& tp, long const timeout)
         {
-            HPX_ASSERT(this->get_gid());
-            return this->base_type::take_async(this->get_gid(), tp, timeout);
+            HPX_ASSERT(this->get_id());
+            return this->base_type::take_async(this->get_id(), tp, timeout);
         }
         //]
 
@@ -155,8 +155,8 @@ namespace examples
         /// \note This function is fully synchronous.
         tuple_type take_sync(const tuple_type& tp, long const timeout)
         {
-            HPX_ASSERT(this->get_gid());
-            return this->base_type::take_sync(this->get_gid(), tp, timeout);
+            HPX_ASSERT(this->get_id());
+            return this->base_type::take_sync(this->get_id(), tp, timeout);
         }
 
     private:

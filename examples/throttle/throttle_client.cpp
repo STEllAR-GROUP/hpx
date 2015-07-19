@@ -36,7 +36,7 @@ int hpx_main(variables_map& vm)
         char const* throttle_component_name = "/throttle/0";
         hpx::naming::id_type gid = hpx::agas::resolve_name(throttle_component_name).get();
         throttle::throttle t;
-        if (!t.get_gid()) {
+        if (!t.get_id()) {
             std::vector<hpx::naming::id_type> localities =
                 hpx::find_remote_localities();
 
@@ -46,7 +46,7 @@ int hpx_main(variables_map& vm)
                 // use AGAS client to get the component type as we do not
                 // register any factories
                 t.create(localities[0]);
-                hpx::agas::register_name(throttle_component_name, t.get_gid());
+                hpx::agas::register_name(throttle_component_name, t.get_id());
             }
             else {
                 std::cerr << "Can't find throttle component." << std::endl;
@@ -54,7 +54,7 @@ int hpx_main(variables_map& vm)
         }
 
         // handle commands
-        if (t.get_gid()) {
+        if (t.get_id()) {
             if (vm.count("suspend")) {
                 t.suspend(vm["suspend"].as<int>());
             }

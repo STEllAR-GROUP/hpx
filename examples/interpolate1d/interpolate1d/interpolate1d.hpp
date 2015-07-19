@@ -34,18 +34,18 @@ namespace interpolate1d
         hpx::lcos::future<double>
         interpolate_async(double value)
         {
-            return stubs::partition::interpolate_async(get_gid(value), value);
+            return stubs::partition::interpolate_async(get_id(value), value);
         }
 
         double interpolate(double value)
         {
-            return stubs::partition::interpolate(get_gid(value), value);
+            return stubs::partition::interpolate(get_id(value), value);
         }
 
     private:
         // map the given value to the gid of the partition responsible for the
         // interpolation
-        hpx::naming::id_type get_gid(double value);
+        hpx::naming::id_type get_id(double value);
 
         // initialize the partitions and store the mappings
         typedef hpx::components::distributing_factory distributing_factory;

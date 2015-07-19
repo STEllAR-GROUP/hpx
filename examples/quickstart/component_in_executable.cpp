@@ -41,7 +41,7 @@ struct hello_world : client_base<hello_world, hello_world_server>
 
     hello_world(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
 
-    void print() { async<print_action>(this->get_gid()).get(); }
+    void print() { async<print_action>(this->get_id()).get(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////

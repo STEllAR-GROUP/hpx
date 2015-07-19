@@ -290,7 +290,14 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
         naming::id_type const & get_gid() const
+        {
+            return gid_.get();
+        }
+
+#endif
+        naming::id_type const & get_id() const
         {
             return gid_.get();
         }

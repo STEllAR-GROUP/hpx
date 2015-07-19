@@ -61,7 +61,7 @@ struct test_client
       : base_type(id)
     {}
 
-    hpx::id_type call() const { return call_action()(this->get_gid()); }
+    hpx::id_type call() const { return call_action()(this->get_id()); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,18 +73,18 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
     {
         // create component on given locality
         test_client t1(source);
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_gid());
+        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
 
         // the new object should live on the source locality
         HPX_TEST_EQ(t1.call(), source);
 
         // remember the original id for later resurrection
-        oldid = hpx::id_type(t1.get_gid().get_gid(), t);
+        oldid = hpx::id_type(t1.get_id().get_gid(), t);
 
         try {
             // migrate of t1 to the target storage
             test_client t2(hpx::components::migrate_to_storage(t1, storage));
-            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_gid());
+            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
         }
         catch (hpx::exception const&) {
             return false;
@@ -101,7 +101,7 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
         test_client t1(hpx::components::migrate_from_storage<test_server>(oldid));
 
         // the id of the newly resurrected object should be the same as the old id
-        HPX_TEST_EQ(oldid, t1.get_gid());
+        HPX_TEST_EQ(oldid, t1.get_id());
 
         // the new object should live on the (original) source locality
         HPX_TEST_EQ(t1.call(), source);
@@ -121,18 +121,18 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
     {
         // create component on given locality
         test_client t1(source);
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_gid());
+        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
 
         // the new object should live on the source locality
         HPX_TEST_EQ(t1.call(), source);
 
         // remember the original id for later resurrection
-        oldid = hpx::id_type(t1.get_gid().get_gid(), t);
+        oldid = hpx::id_type(t1.get_id().get_gid(), t);
 
         try {
             // migrate of t1 to the target storage
             test_client t2(hpx::components::migrate_to_storage(t1, storage));
-            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_gid());
+            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
         }
         catch (hpx::exception const&) {
             return false;
@@ -150,7 +150,7 @@ bool test_migrate_component_to_storage(hpx::id_type const& source,
             oldid, target));
 
         // the id of the newly resurrected object should be the same as the old id
-        HPX_TEST_EQ(oldid, t1.get_gid());
+        HPX_TEST_EQ(oldid, t1.get_id());
 
         // the new object should now live on the target locality
         HPX_TEST_EQ(t1.call(), target);
@@ -170,18 +170,18 @@ bool test_migrate_component_from_storage(hpx::id_type const& source,
     {
         // create component on given locality
         test_client t1(source);
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_gid());
+        HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
 
         // the new object should live on the source locality
         HPX_TEST_EQ(t1.call(), source);
 
         // remember the original id for later action invocation
-        oldid = t1.get_gid();
+        oldid = t1.get_id();
 
         try {
             // migrate of t1 to the target storage
             test_client t2(hpx::components::migrate_to_storage(t1, storage));
-            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_gid());
+            HPX_TEST_EQ(hpx::naming::invalid_id, t2.get_id());
         }
         catch (hpx::exception const&) {
             return false;
@@ -212,7 +212,7 @@ void test_storage(hpx::id_type const& here, hpx::id_type const& there)
 {
     // create a new storage instance
     hpx::components::component_storage storage(here);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, storage.get_gid());
+    HPX_TEST_NEQ(hpx::naming::invalid_id, storage.get_id());
 
     HPX_TEST(test_migrate_component_to_storage(here, storage,
         hpx::id_type::unmanaged));

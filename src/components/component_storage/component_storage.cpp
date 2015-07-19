@@ -19,7 +19,7 @@ namespace hpx { namespace components
         naming::address const& addr)
     {
         typedef server::component_storage::migrate_to_here_action action_type;
-        return hpx::async<action_type>(this->get_gid(), data, id, addr);
+        return hpx::async<action_type>(this->get_id(), data, id, addr);
     }
 
     naming::id_type component_storage::migrate_to_here_sync(
@@ -33,7 +33,7 @@ namespace hpx { namespace components
         naming::gid_type id)
     {
         typedef server::component_storage::migrate_from_here_action action_type;
-        return hpx::async<action_type>(this->get_gid(), id);
+        return hpx::async<action_type>(this->get_id(), id);
     }
 
     std::vector<char> component_storage::migrate_from_here_sync(
@@ -45,7 +45,7 @@ namespace hpx { namespace components
     hpx::future<std::size_t> component_storage::size() const
     {
         typedef server::component_storage::size_action action_type;
-        return hpx::async<action_type>(this->get_gid());
+        return hpx::async<action_type>(this->get_id());
     }
 
     std::size_t component_storage::size_sync() const

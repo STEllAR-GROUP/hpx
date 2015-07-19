@@ -80,7 +80,7 @@ struct clientA : hpx::components::client_base<clientA, A>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -96,13 +96,13 @@ struct clientB : hpx::components::client_base<clientB, B>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test1()
     {
         test1_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 

@@ -179,7 +179,7 @@ int hpx_main(variables_map& vm)
 
         t.restart();
         future<void> n = async<quicksort_int_action>(
-            prefix, prefix, mb.get_gid(), 0, elements);
+            prefix, prefix, mb.get_id(), 0, elements);
         ::hpx::wait_all(n);
         elapsed = t.elapsed();
 

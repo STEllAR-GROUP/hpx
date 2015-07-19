@@ -307,7 +307,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
     hpx::future<partition_data> get_data(partition_server::partition_type t) const
     {
         partition_server::get_data_action act;
-        return hpx::async(act, get_gid(), t);
+        return hpx::async(act, get_id(), t);
     }
 };
 
@@ -413,7 +413,7 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
     stepper()
       : base_type(hpx::new_<stepper_server>(hpx::find_here(), hpx::get_num_localities_sync()))
     {
-        hpx::register_id_with_basename(stepper_basename, get_gid(), hpx::get_locality_id());
+        hpx::register_id_with_basename(stepper_basename, get_id(), hpx::get_locality_id());
     }
 
     stepper(hpx::future<hpx::id_type> && id)
@@ -423,7 +423,7 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
     hpx::future<stepper_server::space> do_work(
         std::size_t local_np, std::size_t nx, std::size_t nt)
     {
-        return hpx::async(do_work_action(), get_gid(), local_np, nx, nt);
+        return hpx::async(do_work_action(), get_id(), local_np, nx, nt);
     }
 };
 
@@ -468,7 +468,7 @@ partition stepper_server::heat_part(partition const& left,
 
                 // The new partition_data will be allocated on the same locality
                 // as 'middle'.
-                return partition(middle.get_gid(), next);
+                return partition(middle.get_id(), next);
             }
         ),
         std::move(next_middle),
