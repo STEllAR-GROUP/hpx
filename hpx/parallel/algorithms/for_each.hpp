@@ -162,8 +162,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           It returns \a first + \a count for non-negative values of
     ///           \a count and \a first for negative values.
     ///
-    template <typename ExPolicy, typename InIter, typename Size, typename F,
-        typename Proj = util::projection_identity>
+    template <typename Proj = util::projection_identity,
+        typename ExPolicy, typename InIter, typename Size, typename F>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_callable<
@@ -355,8 +355,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename InIter, typename F,
-        typename Proj = util::projection_identity>
+    template <typename Proj = util::projection_identity,
+        typename ExPolicy, typename InIter, typename F>
     inline typename std::enable_if<
         is_execution_policy<ExPolicy>::value &&
             hpx::traits::is_callable<
