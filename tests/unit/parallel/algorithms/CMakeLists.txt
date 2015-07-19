@@ -68,6 +68,7 @@ set(tests
     swapranges
     transform
     transform_binary
+    transform_binary2
     transform_exclusive_scan
     transform_inclusive_scan
     transform_reduce
