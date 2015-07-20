@@ -30,7 +30,6 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
-#include <hpx/traits/type_size.hpp>
 #include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/serialize_exception.hpp>
@@ -253,13 +252,6 @@ namespace hpx { namespace actions
         threads::thread_stacksize get_thread_stacksize() const
         {
             return stacksize_;
-        }
-
-        /// Return the size of action arguments in bytes
-        /// flags should contain serialization options which affect the space required
-        std::size_t get_type_size(int flags) const
-        {
-            return traits::type_size<arguments_type>::call(arguments_, flags);
         }
 
         /// Wait for embedded futures to become ready

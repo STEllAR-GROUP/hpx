@@ -94,10 +94,6 @@ namespace hpx { namespace traits
     struct action_schedule_thread;
 
     ///////////////////////////////////////////////////////////////////////////
-    // Customization point for type_size
-    template <typename T, typename Enable = void>
-    struct type_size;
-
     template <typename A, typename Enable = void>
     struct is_chunk_allocator;
 
