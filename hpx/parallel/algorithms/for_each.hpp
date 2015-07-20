@@ -9,9 +9,10 @@
 #define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/concepts.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -21,6 +22,7 @@
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/traits/projected.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -163,14 +165,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           \a count and \a first for negative values.
     ///
     template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename Size, typename F>
-    inline typename std::enable_if<
+        typename ExPolicy, typename InIter, typename Size, typename F,
+    HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_callable<
-                Proj(typename std::iterator_traits<InIter>::value_type)
-            >::value,
-        typename util::detail::algorithm_result<ExPolicy, InIter>::type
-    >::type
+        traits::detail::is_iterator<InIter>::value &&
+        traits::is_projected<Proj, InIter>::value &&
+        traits::is_indirect_callable<
+            F, traits::projected<Proj, InIter>
+        >::value)>
+    typename util::detail::algorithm_result<ExPolicy, InIter>::type
     for_each_n(ExPolicy && policy, InIter first, Size count, F && f,
         Proj && proj = Proj())
     {
@@ -356,14 +359,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           It returns \a last.
     ///
     template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename F>
-    inline typename std::enable_if<
+        typename ExPolicy, typename InIter, typename F,
+    HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_callable<
-                Proj(typename std::iterator_traits<InIter>::value_type)
-            >::value,
-        typename util::detail::algorithm_result<ExPolicy, InIter>::type
-    >::type
+        traits::detail::is_iterator<InIter>::value &&
+        traits::is_projected<Proj, InIter>::value &&
+        traits::is_indirect_callable<
+            F, traits::projected<Proj, InIter>
+        >::value)>
+    typename util::detail::algorithm_result<ExPolicy, InIter>::type
     for_each(ExPolicy && policy, InIter first, InIter last, F && f,
         Proj && proj = Proj())
     {

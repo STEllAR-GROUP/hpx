@@ -10,7 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/concepts.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -18,6 +20,8 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/traits/projected.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -165,16 +169,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           copied.
     ///
     template <typename Proj = util::projection_identity,
-        typename ExPolicy, typename InIter, typename OutIter, typename F>
-    inline typename std::enable_if<
+        typename ExPolicy, typename InIter, typename OutIter, typename F,
+    HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_callable<
-                Proj(typename std::iterator_traits<InIter>::value_type)
-            >::value,
-        typename util::detail::algorithm_result<ExPolicy,
-                hpx::util::tuple<InIter, OutIter>
-            >::type
-    >::type
+        traits::detail::is_iterator<InIter>::value &&
+        traits::detail::is_iterator<OutIter>::value &&
+        traits::is_projected<Proj, InIter>::value &&
+        traits::is_indirect_callable<
+            F, traits::projected<Proj, InIter>
+        >::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+            hpx::util::tuple<InIter, OutIter>
+        >::type
     transform(ExPolicy && policy, InIter first, InIter last, OutIter dest,
         F && f, Proj && proj = Proj())
     {
@@ -359,19 +365,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
         typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
-    inline typename std::enable_if<
+        typename OutIter, typename F,
+    HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_callable<
-                Proj1(typename std::iterator_traits<InIter1>::value_type)
-            >::value &&
-            hpx::traits::is_callable<
-                Proj2(typename std::iterator_traits<InIter2>::value_type)
-            >::value,
-        typename util::detail::algorithm_result<
-                ExPolicy, hpx::util::tuple<InIter1, InIter2, OutIter>
-            >::type
-    >::type
+        traits::detail::is_iterator<InIter1>::value &&
+        traits::detail::is_iterator<InIter2>::value &&
+        traits::detail::is_iterator<OutIter>::value &&
+        traits::is_projected<Proj1, InIter1>::value &&
+        traits::is_projected<Proj2, InIter2>::value &&
+        traits::is_indirect_callable<
+            F, traits::projected<Proj1, InIter1>,
+                traits::projected<Proj2, InIter2>
+        >::value)>
+    typename util::detail::algorithm_result<
+            ExPolicy, hpx::util::tuple<InIter1, InIter2, OutIter>
+        >::type
     transform(ExPolicy && policy,
         InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest, F && f,
         Proj1 && proj1 = Proj1(), Proj2 && proj2 = Proj2())
@@ -572,19 +580,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
         typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
-    inline typename std::enable_if<
+        typename OutIter, typename F,
+    HPX_CONCEPT_REQUIRES_(
         is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_callable<
-                Proj1(typename std::iterator_traits<InIter1>::value_type)
-            >::value &&
-            hpx::traits::is_callable<
-                Proj2(typename std::iterator_traits<InIter2>::value_type)
-            >::value,
-        typename util::detail::algorithm_result<
-                ExPolicy, hpx::util::tuple<InIter1, InIter2, OutIter>
-            >::type
-    >::type
+        traits::detail::is_iterator<InIter1>::value &&
+        traits::detail::is_iterator<InIter2>::value &&
+        traits::detail::is_iterator<OutIter>::value &&
+        traits::is_projected<Proj1, InIter1>::value &&
+        traits::is_projected<Proj2, InIter2>::value &&
+        traits::is_indirect_callable<
+            F, traits::projected<Proj1, InIter1>,
+                traits::projected<Proj2, InIter2>
+        >::value)>
+    typename util::detail::algorithm_result<
+            ExPolicy, hpx::util::tuple<InIter1, InIter2, OutIter>
+        >::type
     transform(ExPolicy && policy,
         InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
         OutIter dest, F && f,
