@@ -7,12 +7,32 @@
 #define HPX_PARALLEL_TRAITS_PROJECTED_JUL_18_2015_1001PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pack.hpp>
 
 #include <type_traits>
 #include <iterator>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    // For segmented iterators, we consider the local_raw_iterator instead of
+    // the given one.
+    template <typename Iterator>
+    struct projected_iterator<Iterator,
+        typename std::enable_if<is_segmented_iterator<Iterator>::value>::type>
+    {
+        typedef typename segmented_iterator_traits<
+                Iterator
+            >::local_iterator local_iterator;
+
+        typedef typename segmented_local_iterator_traits<
+                local_iterator
+            >::local_raw_iterator type;
+    };
+}}
 
 namespace hpx { namespace parallel { namespace traits
 {
@@ -99,7 +119,7 @@ namespace hpx { namespace parallel { namespace traits
     struct is_projected
       : detail::is_projected<
             typename hpx::util::decay<F>::type,
-            typename hpx::util::decay<Iter>::type>
+            typename hpx::traits::projected_iterator<Iter>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -107,7 +127,8 @@ namespace hpx { namespace parallel { namespace traits
     struct projected
     {
         typedef typename hpx::util::decay<Proj>::type projector_type;
-        typedef typename hpx::util::decay<Iter>::type iterator_type;
+        typedef typename hpx::traits::projected_iterator<Iter>::type
+            iterator_type;
     };
 
     template <typename Projected, typename Enable = void>
