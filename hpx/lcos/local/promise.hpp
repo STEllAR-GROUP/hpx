@@ -583,19 +583,19 @@ namespace std { namespace experimental
                 // This gives up the coroutine's reference count on the shared
                 // state. If this was the last reference count, the coroutine
                 // should not suspend before exiting.
-                return !this->requires_delete();
+                return !this->base_type::requires_delete();
             }
 
             template <typename U, typename U2 = T,
                 typename = std::enable_if<!std::is_void<U2>::value>::type>
-            void set_result(U && value)
+            void return_value(U && value)
             {
                 this->base_type::set_result(std::forward<U>(value));
             }
 
             template <typename U = T,
                 typename = std::enable_if<std::is_void<U>::value>::type>
-            void set_result()
+            void return_value()
             {
                 this->base_type::set_result();
             }
