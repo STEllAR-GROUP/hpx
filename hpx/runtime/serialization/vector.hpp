@@ -29,7 +29,7 @@ namespace hpx { namespace serialization
         {
             value_type v;
             ar >> v;
-            vs.push_back(v);
+            vs.push_back(std::move(v));
         }
     }
 
