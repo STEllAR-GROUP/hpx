@@ -82,7 +82,7 @@ struct client : hpx::components::client_base<client, A>
     void print()
     {
         print_action act;
-        act(base_type::get_gid());
+        act(base_type::get_id());
     }
 };
 

@@ -9,6 +9,8 @@
 #include <hpx/lcos/local/once.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -46,7 +48,7 @@ namespace hpx { namespace threads
         if (ec1) max_punits = get_os_thread_count();
 
         // lock the resource manager from this point on
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         // allocate initial resources for the given executor
         std::vector<std::pair<std::size_t, std::size_t> > cores =
@@ -142,7 +144,7 @@ namespace hpx { namespace threads
     // Stop the executor identified with the given cookie
     void resource_manager::stop_executor(std::size_t cookie, error_code& ec)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         proxies_map_type::iterator it = proxies_.find(cookie);
         if (it == proxies_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "resource_manager::detach",
@@ -161,7 +163,7 @@ namespace hpx { namespace threads
     // Detach the executor identified with the given cookie
     void resource_manager::detach(std::size_t cookie, error_code& ec)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         proxies_map_type::iterator it = proxies_.find(cookie);
         if (it == proxies_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "resource_manager::detach",

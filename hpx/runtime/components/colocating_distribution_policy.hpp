@@ -59,7 +59,7 @@ namespace hpx { namespace components
         colocating_distribution_policy operator()(
             client_base<Client, Stub> const& client) const
         {
-            return colocating_distribution_policy(client.get_gid());
+            return colocating_distribution_policy(client.get_id());
         }
 
         /// Create one object on the locality of the object this distribution

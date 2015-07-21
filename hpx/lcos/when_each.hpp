@@ -105,6 +105,7 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/util/detail/pack.hpp>
@@ -120,9 +121,8 @@ namespace hpx { namespace lcos
 {
     namespace detail
     {
-
         template <typename Tuple, typename F>
-        struct when_each_frame
+        struct when_each_frame //-V690
           : lcos::detail::future_data<void>
         {
             typedef lcos::future<void> type;
@@ -168,7 +168,8 @@ namespace hpx { namespace lcos
                 {
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
-                    > next_future_data = lcos::detail::get_shared_state(*next);
+                    > next_future_data =
+                        traits::detail::get_shared_state(*next);
 
                     if (!next_future_data->is_ready())
                     {
@@ -233,7 +234,8 @@ namespace hpx { namespace lcos
 
                 boost::intrusive_ptr<
                     lcos::detail::future_data<future_result_type>
-                > next_future_data = lcos::detail::get_shared_state(fut);
+                > next_future_data =
+                    traits::detail::get_shared_state(fut);
 
                 if (!next_future_data->is_ready())
                 {

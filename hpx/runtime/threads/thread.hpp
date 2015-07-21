@@ -11,6 +11,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/thread/locks.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -58,14 +59,14 @@ namespace hpx
         void swap(thread&) BOOST_NOEXCEPT;
         bool joinable() const BOOST_NOEXCEPT
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return joinable_locked();
         }
 
         void join();
         void detach()
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             detach_locked();
         }
 
@@ -73,7 +74,7 @@ namespace hpx
 
         native_handle_type native_handle() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return id_;
         }
 

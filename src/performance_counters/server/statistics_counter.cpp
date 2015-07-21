@@ -15,6 +15,7 @@
 
 #include <boost/version.hpp>
 #include <boost/chrono/chrono.hpp>
+#include <boost/thread/locks.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
@@ -55,7 +56,7 @@ namespace hpx { namespace performance_counters { namespace server
     hpx::performance_counters::counter_value
         statistics_counter<Statistic>::get_counter_value(bool reset)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         hpx::performance_counters::counter_value value;
 
@@ -96,7 +97,7 @@ namespace hpx { namespace performance_counters { namespace server
             return false;
         }
         else {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             (*value_)(static_cast<double>(base_value.value_));          // accumulate new value
         }
         return true;
@@ -107,7 +108,7 @@ namespace hpx { namespace performance_counters { namespace server
     {
         // lock here to avoid checking out multiple reference counted GIDs
         // from AGAS
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         if (!base_counter_id_) {
             // get or create the base counter
@@ -158,7 +159,7 @@ namespace hpx { namespace performance_counters { namespace server
                 counter_value base_value;
                 if (evaluate_base_counter(base_value))
                 {
-                    mutex_type::scoped_lock l(mtx_);
+                    boost::lock_guard<mutex_type> l(mtx_);
                     (*value_)(static_cast<double>(base_value.value_));
                     prev_value_ = base_value;
                 }
@@ -187,7 +188,7 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Statistic>
     void statistics_counter<Statistic>::reset_counter_value()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         value_.reset(detail::counter_type_from_statistic<Statistic>::create(
             parameter2_)); // reset accumulator

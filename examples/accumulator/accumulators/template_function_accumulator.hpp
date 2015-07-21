@@ -45,8 +45,8 @@ namespace examples
         ///       immediately after the action has has been dispatched.
         void reset_non_blocking()
         {
-            HPX_ASSERT(this->get_gid());
-            this->base_type::reset_non_blocking(this->get_gid());
+            HPX_ASSERT(this->get_id());
+            this->base_type::reset_non_blocking(this->get_id());
         }
 
         /// Reset the accumulator's value to 0.
@@ -54,8 +54,8 @@ namespace examples
         /// \note This function is fully synchronous.
         void reset_sync()
         {
-            HPX_ASSERT(this->get_gid());
-            this->base_type::reset_sync(this->get_gid());
+            HPX_ASSERT(this->get_id());
+            this->base_type::reset_sync(this->get_id());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -67,8 +67,8 @@ namespace examples
         template <typename T>
         void add_non_blocking(T arg)
         {
-            HPX_ASSERT(this->get_gid());
-            this->base_type::add_non_blocking(this->get_gid(), arg);
+            HPX_ASSERT(this->get_id());
+            this->base_type::add_non_blocking(this->get_id(), arg);
         }
 
         /// Add \p arg to the accumulator's value.
@@ -77,8 +77,8 @@ namespace examples
         template <typename T>
         void add_sync(T arg)
         {
-            HPX_ASSERT(this->get_gid());
-            this->base_type::add_sync(this->get_gid(), arg);
+            HPX_ASSERT(this->get_id());
+            this->base_type::add_sync(this->get_id(), arg);
         }
         //]
 
@@ -92,8 +92,8 @@ namespace examples
         ///          until the value is ready.
         hpx::lcos::future<double> query_async()
         {
-            HPX_ASSERT(this->get_gid());
-            return this->base_type::query_async(this->get_gid());
+            HPX_ASSERT(this->get_id());
+            return this->base_type::query_async(this->get_id());
         }
 
         /// Query the current value of the accumulator.
@@ -101,8 +101,8 @@ namespace examples
         /// \note This function is fully synchronous.
         double query_sync()
         {
-            HPX_ASSERT(this->get_gid());
-            return this->base_type::query_sync(this->get_gid());
+            HPX_ASSERT(this->get_id());
+            return this->base_type::query_sync(this->get_id());
         }
     };
 }

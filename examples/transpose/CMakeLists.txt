@@ -9,7 +9,7 @@ set(example_programs
   transpose_serial_block
   transpose_smp
   transpose_smp_block
-  transpose
+  transpose_block
   transpose_serial_vector
 )
 

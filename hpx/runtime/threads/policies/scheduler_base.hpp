@@ -88,12 +88,12 @@ namespace hpx { namespace threads { namespace policies
 #if BOOST_VERSION < 105000
             boost::posix_time::millisec period(++wait_count_);
 
-            boost::mutex::scoped_lock l(mtx_);
+            boost::unique_lock<boost::mutex> l(mtx_);
             cond_.timed_wait(l, period);
 #else
             boost::chrono::milliseconds period(++wait_count_);
 
-            boost::mutex::scoped_lock l(mtx_);
+            boost::unique_lock<boost::mutex> l(mtx_);
             cond_.wait_for(l, period);
 #endif
 #endif

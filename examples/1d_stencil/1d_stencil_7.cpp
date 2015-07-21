@@ -230,7 +230,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
     hpx::future<partition_data> get_data(partition_server::partition_type t) const
     {
         partition_server::get_data_action act;
-        return hpx::async(act, get_gid(), t);
+        return hpx::async(act, get_id(), t);
     }
 };
 
@@ -243,7 +243,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
     }
 
     //[stepper_7
@@ -287,7 +287,7 @@ struct stepper
 
                     // The new partition_data will be allocated on the same locality
                     // as 'middle'.
-                    return partition(middle.get_gid(), next);
+                    return partition(middle.get_id(), next);
                 }
             ),
             std::move(next_middle),

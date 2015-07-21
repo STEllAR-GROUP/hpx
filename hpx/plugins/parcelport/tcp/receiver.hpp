@@ -30,6 +30,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <sstream>
 #include <vector>
@@ -82,7 +83,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 sizeof(buffer_.num_chunks_)));
 
             {
-                mutex_type::scoped_lock lk(mtx_);
+                boost::unique_lock<mutex_type> lk(mtx_);
                 if(!socket_.is_open())
                 {
                     lk.unlock();
@@ -111,7 +112,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         void shutdown()
         {
-            mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
             // gracefully and portably shutdown the socket
             boost::system::error_code ec;
             if (socket_.is_open()) {
@@ -196,7 +197,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 }
 
                 {
-                    mutex_type::scoped_lock lk(mtx_);
+                    boost::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();
@@ -252,7 +253,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     = &receiver::handle_read_data<Handler>;
 
                 {
-                    mutex_type::scoped_lock lk(mtx_);
+                    boost::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();
@@ -300,7 +301,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
                 ack_ = true;
                 {
-                    mutex_type::scoped_lock lk(mtx_);
+                    boost::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();

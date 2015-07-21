@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 
 #include <boost/detail/scoped_enum_emulation.hpp>
@@ -48,7 +48,7 @@ namespace hpx { namespace lcos { namespace local
         {
             util::ignore_all_while_checking ignore_lock;
             boost::unique_lock<mutex_type> l(mtx_);
-            util::scoped_unlock<Lock> unlock(lock);
+            util::unlock_guard<Lock> unlock(lock);
 
             cond_.wait(l, ec);
 
@@ -71,7 +71,7 @@ namespace hpx { namespace lcos { namespace local
         {
             util::ignore_all_while_checking ignore_lock;
             boost::unique_lock<mutex_type> l(mtx_);
-            util::scoped_unlock<Lock> unlock(lock);
+            util::unlock_guard<Lock> unlock(lock);
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_until(l, abs_time, ec);

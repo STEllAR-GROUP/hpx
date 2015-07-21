@@ -222,6 +222,9 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/acquire_future.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
@@ -232,13 +235,13 @@ namespace hpx
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/traits/acquire_future.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
@@ -307,7 +310,10 @@ namespace hpx { namespace lcos
             {}
 
             template <typename Future>
-            void operator()(Future& future) const
+            void operator()(Future& future,
+                typename boost::enable_if_c<
+                    traits::is_future<Future>::value
+                >::type* = 0) const
             {
                 std::size_t counter =
                     when_.count_.load(boost::memory_order_seq_cst);
@@ -317,12 +323,12 @@ namespace hpx { namespace lcos
                         // yet also, do not touch any futures which are already
                         // ready
 
-                        typedef typename lcos::detail::shared_state_ptr_for<
-                                Future
-                            >::type shared_state_ptr;
+                        typedef
+                            typename traits::detail::shared_state_ptr_for<Future>::type
+                            shared_state_ptr;
 
                         shared_state_ptr const& shared_state =
-                            lcos::detail::get_shared_state(future);
+                            traits::detail::get_shared_state(future);
 
                         shared_state->execute_deferred();
 
@@ -349,15 +355,31 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            void apply(Sequence_& sequence, typename boost::enable_if<
-                boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
+            BOOST_FORCEINLINE
+            void operator()(Sequence_& sequence,
+                typename boost::enable_if_c<
+                    traits::is_future_range<Sequence_>::value
+                >::type* = 0) const
+            {
+                apply(sequence);
+            }
+
+            template <typename Sequence_>
+            BOOST_FORCEINLINE
+            void apply(Sequence_& sequence,
+                typename boost::enable_if_c<
+                    boost::fusion::traits::is_sequence<Sequence_>::value
+                >::type* = 0) const
             {
                 boost::fusion::for_each(sequence, *this);
             }
 
             template <typename Sequence_>
-            void apply(Sequence_& sequence, typename boost::disable_if<
-                boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
+            BOOST_FORCEINLINE
+            void apply(Sequence_& sequence,
+                typename boost::disable_if_c<
+                    boost::fusion::traits::is_sequence<Sequence_>::value
+                >::type* = 0) const
             {
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
@@ -367,6 +389,7 @@ namespace hpx { namespace lcos
         };
 
         template <typename Sequence>
+        BOOST_FORCEINLINE
         void set_on_completed_callback(when_some<Sequence>& when)
         {
             set_when_some_callback_impl<Sequence> callback(when);
@@ -385,7 +408,7 @@ namespace hpx { namespace lcos
                 if (new_count <= needed_count_)
                 {
                     {
-                        typename mutex_type::scoped_lock l(this->mtx_);
+                        boost::lock_guard<mutex_type> l(this->mtx_);
                         lazy_values_.indices.push_back(idx);
                     }
                     if (new_count == needed_count_) {

@@ -15,11 +15,12 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <stdexcept>
-
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <stdexcept>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -155,9 +156,6 @@ namespace test
             HPX_ITT_SYNC_RELEASED(this);
             hpx::util::unregister_lock(this);
         }
-
-        typedef boost::unique_lock<local_spinlock> scoped_lock;
-        typedef boost::detail::try_lock_wrapper<local_spinlock> scoped_try_lock;
     };
 }
 
@@ -169,7 +167,7 @@ double null_function(std::size_t i)
     double d = 0.;
     std::size_t idx = i % N;
     {
-        test::local_spinlock::scoped_lock l(mtx[idx]);
+        boost::lock_guard<test::local_spinlock> l(mtx[idx]);
         d = global_init[idx];
     }
     for (double j = 0.; j < num_iterations; ++j)
@@ -177,7 +175,7 @@ double null_function(std::size_t i)
         d += 1. / (2. * j + 1.);
     }
     {
-        test::local_spinlock::scoped_lock l(mtx[idx]);
+        boost::lock_guard<test::local_spinlock> l(mtx[idx]);
         global_init[idx] = d;
     }
     return d;

@@ -14,6 +14,8 @@
 #include <hpx/util/memory_chunk_pool.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
     class parcelport;
@@ -35,15 +37,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         struct handle_header
         {
             handle_header(header_list::iterator it, receiver &receiver,
-                    mutex_type::scoped_lock * l)
+                    boost::unique_lock<mutex_type> * l)
               : receiver_(receiver)
               , handles_(false)
               , l_(l)
             {
                 // as handle_header tries to acquire a mutex as well, we need
                 // to ignore the headers_mtx_ here
-                util::ignore_while_checking<mutex_type::scoped_lock> il(l_);
-                mutex_type::scoped_lock lk(receiver_.handles_header_mtx_);
+                util::ignore_while_checking<boost::unique_lock<mutex_type> > il(l_);
+                boost::lock_guard<mutex_type> lk(receiver_.handles_header_mtx_);
                 std::pair<int, int> p(it->first, it->second.tag());
                 header_handle_ = receiver_.handles_header_.find(p);
 
@@ -70,8 +72,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 // as handle_header tries to acquire a mutex as well, we need
                 // to ignore the headers_mtx_ here
-                util::ignore_while_checking<mutex_type::scoped_lock> il(l_);
-                mutex_type::scoped_lock lk(receiver_.handles_header_mtx_);
+                util::ignore_while_checking<boost::unique_lock<mutex_type> > il(l_);
+                boost::lock_guard<mutex_type> lk(receiver_.handles_header_mtx_);
                 if(handles_)
                 {
                     HPX_ASSERT(header_handle_ != receiver_.handles_header_.end());
@@ -88,7 +90,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             receiver &receiver_;
             bool handles_;
-            mutex_type::scoped_lock * l_;
+            boost::unique_lock<mutex_type> * l_;
             handles_header_type::iterator header_handle_;
             HPX_MOVABLE_BUT_NOT_COPYABLE(handle_header);
         };
@@ -141,7 +143,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 check_num_connections chk(this);
                 if(!chk.decrement_) break;
-                mutex_type::scoped_lock l(headers_mtx_);
+                boost::unique_lock<mutex_type> l(headers_mtx_);
                 accept_locked();
                 iterator it = headers_.begin();
                 while(it != headers_.end())
@@ -155,7 +157,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                         headers_.erase(it);
 
                         {
-                            hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                            hpx::util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
 
                             std::size_t num_thread(-1);
                             if(threads::get_self_ptr())
@@ -302,8 +304,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         void accept()
         {
-            mutex_type::scoped_try_lock l(headers_mtx_);
-            if(l)
+            boost::unique_lock<mutex_type> l(headers_mtx_, boost::try_to_lock);
+            if(l.owns_lock())
                 accept_locked();
         }
 

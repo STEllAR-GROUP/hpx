@@ -112,6 +112,9 @@ parallel::local_queue_executor           "local_queue_executor"             "hpx
 parallel::local_priority_queue_executor  "local_priority_queue_executor"    "hpx\.parallel\.v3\.local_priority_qu_.*"
 parallel::static_priority_queue_executor "static_priority_queue_executor"   "hpx\.parallel\.v3\.static_priority_q_.*"
 
+# hpx/parallel/algorithms/adjacent_difference.hpp
+parallel::adjacent_difference         "adjacent_difference" "hpx\.parallel\.v1\.adjacent_difference.*"
+
 # hpx/parallel/algorithms/adjacent_find.hpp
 parallel::adjacent_find               "adjacent_find" "hpx\.parallel\.v1\.adjacent_find.*"
 
@@ -159,6 +162,9 @@ parallel::includes                    "includes" "hpx\.parallel\.v1\.includes.*"
 
 # hpx/parallel/algorithms/inclusive_scan.hpp
 parallel::inclusive_scan              "inclusive_scan" "hpx\.parallel\.v1\.inclusive_scan.*"
+
+# hpx/parallel/algorithms/inner_product.hpp
+parallel::inner_product               "inner_product" "hpx\.parallel\.v1\.inner_product.*"
 
 # hpx/parallel/algorithms/is_partitioned.hpp
 parallel::is_partitioned              "is_partitioned" "hpx\.parallel\.v1\.is_partitioned.*"

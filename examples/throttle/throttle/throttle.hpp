@@ -38,12 +38,12 @@ namespace throttle
 
         void suspend(std::size_t thread_num) const
         {
-            return stubs::throttle::suspend(this->get_gid(), thread_num);
+            return stubs::throttle::suspend(this->get_id(), thread_num);
         }
 
         void resume(std::size_t thread_num) const
         {
-            return stubs::throttle::resume(this->get_gid(), thread_num);
+            return stubs::throttle::resume(this->get_id(), thread_num);
         }
     };
 }

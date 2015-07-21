@@ -23,14 +23,14 @@ foreach(test ${tests})
   add_hpx_unit_test("performance_counters" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.unit.performance_counters.${test})
+  add_hpx_pseudo_target(tests.unit.performance_counter.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.performance_counters
-                              tests.unit.performance_counters.${test})
+  add_hpx_pseudo_dependencies(tests.unit.performance_counter
+                              tests.unit.performance_counter.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.unit.performance_counters.${test}
+  add_hpx_pseudo_dependencies(tests.unit.performance_counter.${test}
                               ${test}_test_exe)
 endforeach()
 

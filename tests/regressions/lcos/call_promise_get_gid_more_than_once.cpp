@@ -21,7 +21,7 @@ int hpx_main()
 
         hpx::id_type id1 = promise.get_id();
 
-        auto future_data = hpx::lcos::detail::get_shared_state(future);
+        auto future_data = hpx::traits::detail::get_shared_state(future);
         auto shared_state = boost::static_pointer_cast<shared_state_type>(future_data);
         hpx::id_type id2 = shared_state->get_id();
 

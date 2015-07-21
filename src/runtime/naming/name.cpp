@@ -273,7 +273,7 @@ namespace hpx { namespace naming
                 if(src_log2credits == 1)
                 {
 
-                    util::scoped_unlock<scoped_lock> ul(l);
+                    util::unlock_guard<scoped_lock> ul(l);
                     boost::int64_t new_credit = (HPX_GLOBALCREDIT_INITIAL - 1) * 2;
                     agas::incref(new_gid, new_credit);
                 }
@@ -315,7 +315,7 @@ namespace hpx { namespace naming
                     if(overflow_credit > 0)
                     {
                         HPX_ASSERT(overflow_credit <= HPX_GLOBALCREDIT_INITIAL-1);
-                        util::scoped_unlock<scoped_lock> ul(l);
+                        util::unlock_guard<scoped_lock> ul(l);
                         agas::decref(new_gid, overflow_credit);
                     }
                 }

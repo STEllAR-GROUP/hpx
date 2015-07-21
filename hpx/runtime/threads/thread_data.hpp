@@ -57,7 +57,7 @@ namespace hpx { namespace threads
                 return get_locked();
             }
 
-            CoroutineImpl* try_get()
+            CoroutineImpl* try_get() //-V524
             {
                 return get_locked();
             }

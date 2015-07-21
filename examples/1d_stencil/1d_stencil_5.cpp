@@ -179,7 +179,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
     // This is a pure helper function hiding the async.
     hpx::future<partition_data> get_data() const
     {
-        return hpx::async(get_data_action(), get_gid());
+        return hpx::async(get_data_action(), get_id());
     }
 };
 
@@ -192,7 +192,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all elements
@@ -227,7 +227,7 @@ struct stepper
                 {
                     // The new partition_data will be allocated on the same
                     // locality as 'middle'.
-                    return partition(middle.get_gid(), heat_part_data(l, m, r));
+                    return partition(middle.get_id(), heat_part_data(l, m, r));
                 }
             ),
             left.get_data(), middle.get_data(), right.get_data());

@@ -172,7 +172,14 @@ namespace hpx { namespace actions
         }
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(continuation);
 
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
         naming::id_type const& get_gid() const
+        {
+            return gid_;
+        }
+#endif
+
+        naming::id_type const& get_id() const
         {
             return gid_;
         }
@@ -417,19 +424,19 @@ namespace hpx { namespace actions
         {
             LLCO_(info)
                 << "typed_continuation<Result>::trigger_value("
-                << this->get_gid() << ")";
+                << this->get_id() << ")";
 
             if (f_.empty()) {
-                if (!this->get_gid()) {
+                if (!this->get_id()) {
                     HPX_THROW_EXCEPTION(invalid_status,
                         "typed_continuation<Result>::trigger_value",
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value(this->get_gid(), std::move(result));
+                hpx::set_lco_value(this->get_id(), std::move(result));
             }
             else {
-                f_(this->get_gid(), std::move(result));
+                f_(this->get_id(), std::move(result));
             }
         }
 
@@ -526,19 +533,19 @@ namespace hpx { namespace actions
         {
             LLCO_(info)
                 << "typed_continuation<void>::trigger("
-                << this->get_gid() << ")";
+                << this->get_id() << ")";
 
             if (f_.empty()) {
-                if (!this->get_gid()) {
+                if (!this->get_id()) {
                     HPX_THROW_EXCEPTION(invalid_status,
                         "typed_continuation<void>::trigger",
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                trigger_lco_event(this->get_gid());
+                trigger_lco_event(this->get_id());
             }
             else {
-                f_(this->get_gid());
+                f_(this->get_id());
             }
         }
 

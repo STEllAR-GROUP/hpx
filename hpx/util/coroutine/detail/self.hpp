@@ -189,6 +189,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 #endif
 
+    std::size_t& get_continuation_recursion_count()
+    {
+        HPX_ASSERT(m_pimpl);
+        return m_pimpl->get_continuation_recursion_count();
+    }
+
   private:
     yield_decorator_type yield_decorator_;
 

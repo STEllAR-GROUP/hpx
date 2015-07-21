@@ -53,7 +53,7 @@ namespace hpx { namespace components { namespace server
         /// Initialize the accumulator
         void init(int i)
         {
-            hpx::lcos::local::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::mutex> l(mtx_);
 
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace server
         /// Add the given number to the accumulator
         void add()
         {
-            hpx::lcos::local::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::mutex> l(mtx_);
 
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace server
         /// Return the current value to the caller
         int query()
         {
-            hpx::lcos::local::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::mutex> l(mtx_);
 
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
@@ -94,7 +94,7 @@ namespace hpx { namespace components { namespace server
         /// Print the current value of the accumulator
         void print()
         {
-            hpx::lcos::local::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::mutex> l(mtx_);
 
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"

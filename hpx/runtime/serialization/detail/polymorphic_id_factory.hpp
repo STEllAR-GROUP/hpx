@@ -118,9 +118,9 @@ namespace hpx { namespace serialization {
 
             void cache_id(boost::uint32_t id, ctor_t ctor)
             {
-                if (id >= cache.size())
-                    cache.resize(id + 1, NULL);
-                cache[id] = ctor;
+                if (id >= cache.size()) //-V104
+                    cache.resize(id + 1, NULL); //-V106
+                cache[id] = ctor; //-V108
             }
 
             boost::uint32_t max_id;
@@ -142,13 +142,13 @@ namespace hpx { namespace serialization {
             {
                 const cache_t& vec = id_registry::instance().cache;
 
-                if (id > vec.size())
+                if (id > vec.size()) //-V104
                     HPX_THROW_EXCEPTION(serialization_error
                       , "polymorphic_id_factory::create"
                       , "Unknown type descriptor " +
                             util::safe_lexical_cast<std::string>(id));
 
-                ctor_t ctor = vec[id];
+                ctor_t ctor = vec[id]; //-V108
                 HPX_ASSERT(ctor != NULL);
                 return static_cast<T*>(ctor());
             }

@@ -37,7 +37,7 @@ int hpx_main(
         simple_mobile_object a(hpx::find_here());
         simple_mobile_object b(hpx::find_here());
 
-        id_type a_id = a.get_gid();
+        id_type a_id = a.get_id();
         gid_type a_gid = get_stripped_gid(a_id.get_gid());
         boost::uint64_t b_lva = b.get_lva();
 

@@ -81,14 +81,14 @@ namespace hpx { namespace serialization
     }
 
     template <typename D, typename B> BOOST_FORCEINLINE
-    output_archive & operator&(output_archive & ar, base_object_type<D, B> t)
+    output_archive & operator&(output_archive & ar, base_object_type<D, B> t) //-V524
     {
         ar.invoke(t);
         return ar;
     }
 
     template <typename D, typename B> BOOST_FORCEINLINE
-    input_archive & operator&(input_archive & ar, base_object_type<D, B> t)
+    input_archive & operator&(input_archive & ar, base_object_type<D, B> t) //-V524
     {
         ar.invoke(t);
         return ar;

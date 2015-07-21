@@ -19,19 +19,18 @@ bool c_ctor = false;
 bool c_dtor = false;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Concrete
-struct A : hpx::components::managed_component_base<A>
+// Abstract
+struct A : hpx::components::abstract_managed_component_base<A>
 {
     A() { a_ctor = true; }
     virtual ~A() { a_dtor = true; }
 
-    virtual std::string test0() const { return "A"; }
+    virtual std::string test0() const = 0;
     std::string test0_nonvirt() const { return test0(); }
     HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
 };
 
-typedef hpx::components::managed_component<A> serverA_type;
-HPX_REGISTER_COMPONENT(serverA_type, A);
+HPX_DEFINE_GET_COMPONENT_TYPE(A);
 
 typedef A::test0_action test0_action;
 HPX_REGISTER_ACTION_DECLARATION(test0_action);
@@ -43,12 +42,8 @@ struct B : A, hpx::components::managed_component_base<B>
 {
     typedef hpx::components::managed_component_base<B>::wrapping_type
         wrapping_type;
-    typedef hpx::components::managed_component_base<B>::wrapped_type
-        wrapped_type;
     using hpx::components::managed_component_base<B>::decorate_action;
     using hpx::components::managed_component_base<B>::schedule_thread;
-    using hpx::components::managed_component_base<B>::set_back_ptr;
-    using hpx::components::managed_component_base<B>::finalize;
     using hpx::components::managed_component_base<B>::is_target_valid;
 
     typedef B type_holder;
@@ -118,7 +113,7 @@ struct clientA : hpx::components::client_base<clientA, A>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -134,13 +129,13 @@ struct clientB : hpx::components::client_base<clientB, B>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test1()
     {
         test1_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -156,19 +151,19 @@ struct clientC : hpx::components::client_base<clientC, C>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test1()
     {
         test1_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test2()
     {
         test2_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -185,20 +180,6 @@ void reset_globals()
 
 int main()
 {
-    ///////////////////////////////////////////////////////////////////////////
-
-    { // Client to A, instance of A
-        clientA obj(hpx::components::new_<A>(hpx::find_here()));
-
-        HPX_TEST_EQ(obj.test0(), "A");
-    }
-
-    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-    HPX_TEST(!b_ctor); HPX_TEST(!b_dtor);
-    HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
-
-    reset_globals();
-
     ///////////////////////////////////////////////////////////////////////////
 
     { // Client to A, instance of B

@@ -11,6 +11,7 @@
 #include <boost/atomic.hpp>
 #include <boost/array.hpp>
 #include <boost/random.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -329,7 +330,7 @@ int RemoveCompletions()
     while(FuturesActive)
     {
         {
-            hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
+            boost::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
             for(std::vector<hpx::future<int> > &futvec : ActiveFutures) {
                 for(std::vector<hpx::future<int> >::iterator fut = futvec.begin();
                     fut != futvec.end(); /**/)
@@ -375,7 +376,7 @@ hpx::lcos::barrier create_barrier(std::size_t num_localities, char const* symnam
     );
 
     hpx::lcos::barrier b = hpx::lcos::barrier::create(hpx::find_here(), num_localities);
-    hpx::agas::register_name_sync(symname, b.get_gid());
+    hpx::agas::register_name_sync(symname, b.get_id());
     return b;
 }
 
@@ -454,7 +455,7 @@ void test_write(
                 );
 #ifdef USE_CLEANING_THREAD
                 ++FuturesWaiting[send_rank];
-                hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
+                boost::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
 #endif
                 ActiveFutures[send_rank].push_back(
                     hpx::async(actWrite, locality,
@@ -619,7 +620,7 @@ void test_read(
             {
 #ifdef USE_CLEANING_THREAD
                 ++FuturesWaiting[send_rank];
-                hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
+                boost::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
 #endif
                 using hpx::util::placeholders::_1;
                 std::size_t buffer_address = reinterpret_cast<std::size_t>(general_buffer.data());

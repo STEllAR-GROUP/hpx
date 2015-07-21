@@ -39,7 +39,7 @@ struct test_client
     test_client(hpx::id_type const& id) : base_type(id) {}
     test_client(hpx::shared_future<hpx::id_type> const& id) : base_type(id) {}
 
-    hpx::id_type call() const { return call_action()(this->get_gid()); }
+    hpx::id_type call() const { return call_action()(this->get_id()); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ void test_find_all_ids_from_basename()
     char const* basename = "/find_all_ids_from_prefix_test/";
 
     test_client t1 = test_client::create(hpx::find_here());
-    hpx::id_type client_id = t1.get_gid();
+    hpx::id_type client_id = t1.get_id();
 
     HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
 
@@ -87,7 +87,7 @@ void test_find_ids_from_basename()
     char const* basename = "/find_ids_from_prefix_test/";
 
     test_client t1 = test_client::create(hpx::find_here());
-    hpx::id_type client_id = t1.get_gid();
+    hpx::id_type client_id = t1.get_id();
 
     HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
 
@@ -134,7 +134,7 @@ void test_find_id_from_basename()
     char const* basename = "/find_id_from_prefix_test/";
 
     test_client t1 = test_client::create(hpx::find_here());
-    hpx::id_type client_id = t1.get_gid();
+    hpx::id_type client_id = t1.get_id();
 
     HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
 

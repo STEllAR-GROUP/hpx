@@ -13,8 +13,9 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/spinlock.hpp>
 
-#include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
@@ -43,12 +44,11 @@ namespace hpx { namespace util
         /// Generate next unique component id
         naming::gid_type get_id(std::size_t count = 1);
 
-        /// Not thread-safe
         void set_range(
             naming::gid_type const& lower
           , naming::gid_type const& upper)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             lower_ = lower;
             upper_ = upper;
         }

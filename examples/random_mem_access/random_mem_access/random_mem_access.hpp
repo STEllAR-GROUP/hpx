@@ -42,41 +42,41 @@ namespace hpx { namespace components
         /// Initialize the random_mem_access value
         void init(int i)
         {
-            this->base_type::init(get_gid(),i);
+            this->base_type::init(get_id(),i);
         }
 
         /// Add the given number to the random_mem_access
         void add ()
         {
-            this->base_type::add(get_gid());
+            this->base_type::add(get_id());
         }
 
         hpx::lcos::future<void> add_async ()
         {
-            return(this->base_type::add_async(get_gid()));
+            return(this->base_type::add_async(get_id()));
         }
 
         /// Print the current value of the random_mem_access
         void print()
         {
-            this->base_type::print(get_gid());
+            this->base_type::print(get_id());
         }
         /// Asynchronously query the current value of the random_mem_access
         hpx::lcos::future<void> print_async ()
         {
-            return(this->base_type::print_async(get_gid()));
+            return(this->base_type::print_async(get_id()));
         }
 
         /// Query the current value of the random_mem_access
         int query()
         {
-            return static_cast<int>(this->base_type::query(get_gid()));
+            return static_cast<int>(this->base_type::query(get_id()));
         }
 
         /// Asynchronously query the current value of the random_mem_access
         lcos::future<int> query_async()
         {
-            return this->base_type::query_async(get_gid());
+            return this->base_type::query_async(get_id());
         }
     };
 

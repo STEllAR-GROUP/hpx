@@ -5,9 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <boost/config.hpp>
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
 
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
@@ -24,6 +21,11 @@
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
+
+#include <boost/config.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -335,7 +337,7 @@ namespace hpx {
     {
         // signal successful initialization
         {
-            boost::mutex::scoped_lock lk(mtx);
+            boost::lock_guard<boost::mutex> lk(mtx);
             running = true;
             cond.notify_all();
         }
@@ -370,7 +372,7 @@ namespace hpx {
 
         // wait for the thread to run
         {
-            boost::mutex::scoped_lock lk(mtx);
+            boost::unique_lock<boost::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -408,7 +410,7 @@ namespace hpx {
         // manager
         boost::mutex mtx;
         boost::condition cond;
-        boost::mutex::scoped_lock l(mtx);
+        boost::unique_lock<boost::mutex> l(mtx);
 
         boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking,
             boost::ref(cond), boost::ref(mtx)));
@@ -439,7 +441,7 @@ namespace hpx {
 
         LRT_(info) << "runtime_impl: stopped all services";
 
-        boost::mutex::scoped_lock l(mtx);
+        boost::lock_guard<boost::mutex> l(mtx);
         cond.notify_all();                  // we're done now
     }
 
@@ -456,7 +458,7 @@ namespace hpx {
 
             // store the exception to be able to rethrow it later
             {
-                boost::mutex::scoped_lock l(mtx_);
+                boost::lock_guard<boost::mutex> l(mtx_);
                 exception_ = e;
             }
 
@@ -500,7 +502,7 @@ namespace hpx {
     {
         if (state_.load() > state_running)
         {
-            boost::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<boost::mutex> l(mtx_);
             if (exception_)
             {
                 boost::exception_ptr e = exception_;
