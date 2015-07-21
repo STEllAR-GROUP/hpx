@@ -26,7 +26,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             boost::lock_guard<mutex_type> l(mtx_);
             if(free_tags_.empty())
             {
-                HPX_ASSERT(next_tag_ < std::numeric_limits<int>::max());
+                HPX_ASSERT(next_tag_ < (std::numeric_limits<int>::max)());
                 tag = next_tag_++;
             }
             else
