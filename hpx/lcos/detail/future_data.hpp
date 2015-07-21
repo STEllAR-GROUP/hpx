@@ -64,6 +64,11 @@ namespace detail
             return 0 == --count_;
         }
 
+        virtual void destroy()
+        {
+            delete this;
+        }
+
     protected:
         future_data_refcnt_base() : count_(0) {}
 
@@ -82,7 +87,7 @@ namespace detail
     inline void intrusive_ptr_release(future_data_refcnt_base* p)
     {
         if (p->requires_delete())
-            delete p;
+            p->destroy();
     }
 
     ///////////////////////////////////////////////////////////////////////////

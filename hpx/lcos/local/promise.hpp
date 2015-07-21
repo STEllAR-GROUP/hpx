@@ -484,4 +484,140 @@ namespace hpx { namespace lcos
 }}
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_AWAIT)
+
+#include <experimental/resumable>
+#include <type_traits>
+
+namespace hpx { namespace lcos
+{
+    // Allow for using __await with an expression which evaluates to
+    // hpx::future<T>.
+    template <typename T>
+    BOOST_FORCEINLINE bool await_ready(future<T> const& f)
+    {
+        return f.is_ready();
+    }
+
+    template <typename T, typename Promise>
+    BOOST_FORCEINLINE void await_suspend(future<T>& f,
+        std::experimental::coroutine_handle<Promise> rh)
+    {
+        // f.then([=](future<T> result) mutable
+        lcos::detail::get_shared_state(f)->set_on_completed(rh);
+    }
+
+    template <typename T>
+    BOOST_FORCEINLINE T await_resume(future<T>& f)
+    {
+        return f.get();
+    }
+
+    // allow for wrapped futures to be unwrapped, if possible
+    template <typename T>
+    BOOST_FORCEINLINE T await_resume(future<future<T> >& f)
+    {
+        return f.get().get();
+    }
+
+    template <typename T>
+    BOOST_FORCEINLINE T await_resume(future<shared_future<T> >& f)
+    {
+        return f.get().get();
+    }
+
+    // Allow for using __await with an expression which evaluates to
+    // hpx::shared_future<T>.
+    template <typename T>
+    BOOST_FORCEINLINE bool await_ready(shared_future<T> const& f)
+    {
+        return f.is_ready();
+    }
+
+    template <typename T, typename Promise>
+    BOOST_FORCEINLINE void await_suspend(shared_future<T>& f,
+        std::experimental::coroutine_handle<Promise> rh)
+    {
+        // f.then([=](shared_future<T> result) mutable
+        lcos::detail::get_shared_state(f)->set_on_completed(rh);
+    }
+
+    template <typename T>
+    BOOST_FORCEINLINE T await_resume(shared_future<T>& f)
+    {
+        return f.get();
+    }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace std { namespace experimental
+{
+    // Allow for functions which use __await to return an hpx::future<T>
+    template <typename T, typename ...Ts>
+    struct coroutine_traits<hpx::lcos::future<T>, Ts...>
+    {
+        // derive from future shared state as this will be combined with the
+        // necessary stack frame for the resumable function
+        struct promise_type : hpx::lcos::detail::future_data<T>
+        {
+            typedef hpx::lcos::detail::future_data<T> base_type;
+
+            promise_type()
+            {
+                // the shared state is held alive by the coroutine
+                hpx::lcos::detail::intrusive_ptr_add_ref(this);
+            }
+
+            hpx::lcos::future<T> get_return_object()
+            {
+                boost::intrusive_ptr<base_type> shared_state(this);
+                return hpx::traits::future_access<hpx::lcos::future<T> >::
+                    create(std::move(shared_state));
+            }
+
+            bool initial_suspend() { return false; }
+
+            bool final_suspend()
+            {
+                // This gives up the coroutine's reference count on the shared
+                // state. If this was the last reference count, the coroutine
+                // should not suspend before exiting.
+                return !this->base_type::requires_delete();
+            }
+
+            template <typename U, typename U2 = T,
+                typename = std::enable_if<!std::is_void<U2>::value>::type>
+            void return_value(U && value)
+            {
+                this->base_type::set_result(std::forward<U>(value));
+            }
+
+            template <typename U = T,
+                typename = std::enable_if<std::is_void<U>::value>::type>
+            void return_value()
+            {
+                this->base_type::set_result();
+            }
+
+            void set_exception(std::exception_ptr e)
+            {
+                try {
+                    std::rethrow_exception(e);
+                }
+                catch (...) {
+                    this->base_type::set_exception(boost::current_exception());
+                }
+            }
+
+            void destroy()
+            {
+                coroutine_handle<promise_type>::from_promise(this).destroy();
+            }
+        };
+    };
+}}
+
+#endif // HPX_HAVE_AWAIT
+
 #endif

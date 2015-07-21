@@ -212,7 +212,7 @@ namespace hpx { namespace lcos
             // End of the tuple is reached
             template <typename TupleIter>
             BOOST_FORCEINLINE
-            void await(TupleIter&&, boost::mpl::true_)
+            void do_await(TupleIter&&, boost::mpl::true_)
             {
                 this->set_result(when_all_result<Tuple>::call(std::move(t_)));
             }
@@ -259,7 +259,7 @@ namespace hpx { namespace lcos
                     next_type;
                 typedef boost::is_same<next_type, end_type> pred;
 
-                await(boost::fusion::next(iter), pred());
+                do_await(boost::fusion::next(iter), pred());
             }
 
             template <typename TupleIter>
@@ -319,12 +319,12 @@ namespace hpx { namespace lcos
                     next_type;
                 typedef boost::is_same<next_type, end_type> pred;
 
-                await(boost::fusion::next(iter), pred());
+                do_await(boost::fusion::next(iter), pred());
             }
 
             template <typename TupleIter>
             BOOST_FORCEINLINE
-            void await(TupleIter&& iter, boost::mpl::false_)
+            void do_await(TupleIter&& iter, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
                     typename boost::fusion::result_of::deref<TupleIter>::type
@@ -337,13 +337,13 @@ namespace hpx { namespace lcos
             }
 
         public:
-            BOOST_FORCEINLINE void await()
+            BOOST_FORCEINLINE void do_await()
             {
                 typedef typename boost::fusion::result_of::begin<Tuple>::type
                     begin_type;
                 typedef boost::is_same<begin_type, end_type> pred;
 
-                await(boost::fusion::begin(t_), pred());
+                do_await(boost::fusion::begin(t_), pred());
             }
 
         private:
@@ -362,7 +362,7 @@ namespace hpx { namespace lcos
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
             hpx::util::forward_as_tuple(std::move(values))));
-        p->await();
+        p->do_await();
 
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
@@ -446,7 +446,7 @@ namespace hpx { namespace lcos
         result_type values(func(std::forward<Ts>(ts))...);
 
         boost::intrusive_ptr<frame_type> p(new frame_type(std::move(values)));
-        p->await();
+        p->do_await();
 
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
