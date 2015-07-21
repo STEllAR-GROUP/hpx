@@ -788,6 +788,48 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     static parallel_vector_execution_policy const par_vec;
 
     ///////////////////////////////////////////////////////////////////////////
+    // Allow to detect execution policies which were created as a result
+    // of a rebind operation. This information can be used to inhibit the
+    // construction of a generic execution_policy from any of the rebound
+    // policies.
+    namespace detail
+    {
+        template <typename Executor>
+        struct is_rebound_execution_policy
+          : std::false_type
+        {};
+
+        template <typename Executor>
+        struct is_rebound_execution_policy<
+                sequential_execution_policy_shim<Executor> >
+          : std::true_type
+        {};
+
+        template <typename Executor>
+        struct is_rebound_execution_policy<
+                sequential_task_execution_policy_shim<Executor> >
+          : std::true_type
+        {};
+
+        template <typename Executor>
+        struct is_rebound_execution_policy<
+                parallel_execution_policy_shim<Executor> >
+          : std::true_type
+        {};
+
+        template <typename Executor>
+        struct is_rebound_execution_policy<
+                parallel_task_execution_policy_shim<Executor> >
+          : std::true_type
+        {};
+    }
+
+    template <typename T>
+    struct is_rebound_execution_policy
+      : detail::is_rebound_execution_policy<typename hpx::util::decay<T>::type>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
     class execution_policy;
 
     namespace detail
@@ -1090,7 +1132,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template <typename ExPolicy>
         execution_policy(ExPolicy const& policy,
                 typename std::enable_if<
-                    is_execution_policy<ExPolicy>::value, ExPolicy
+                    is_execution_policy<ExPolicy>::value &&
+                        !is_rebound_execution_policy<ExPolicy>::value,
+                    ExPolicy
                 >::type* = 0)
           : inner_(boost::make_shared<
                     detail::execution_policy_shim<ExPolicy>
@@ -1137,7 +1181,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \param policy Specifies the inner execution policy
         template <typename ExPolicy>
         typename std::enable_if<
-            is_execution_policy<ExPolicy>::value, execution_policy
+            is_execution_policy<ExPolicy>::value &&
+                !is_rebound_execution_policy<ExPolicy>::value,
+            execution_policy
         >::type&
         operator=(ExPolicy const& policy)
         {
