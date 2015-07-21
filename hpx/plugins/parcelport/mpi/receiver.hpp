@@ -158,7 +158,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return std::unique_ptr<connection_type>();
         }
 
-        connection_ptr accept_locked(mutex_type::scoped_try_lock & header_lock)
+        connection_ptr accept_locked(boost::unique_lock<mutex_type> & header_lock)
         {
             util::mpi_environment::scoped_try_lock l;
 
