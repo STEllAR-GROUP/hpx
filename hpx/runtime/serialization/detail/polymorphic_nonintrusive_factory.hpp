@@ -204,7 +204,36 @@ namespace hpx { namespace serialization { namespace detail
     template hpx::serialization::detail::register_class<Class>                \
         hpx::serialization::detail::register_class<Class>::instance;          \
 /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(Parameters, Template, Name) \
+    namespace hpx { namespace serialization { namespace detail {              \
+        Parameters                                                            \
+        struct get_serialization_name<Template>                               \
+        {                                                                     \
+            char const* operator()()                                          \
+            {                                                                 \
+                return Name;                                                  \
+            }                                                                 \
+        };                                                                    \
+    }}}                                                                       \
+/**/
 #define HPX_SERIALIZATION_REGISTER_CLASS(Class)                               \
     HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, BOOST_PP_STRINGIZE(Class))   \
-
+/**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(Parameters, Template)       \
+    HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                           \
+        Parameters, Template,                                                 \
+        hpx::util::type_id<HPX_UTIL_STRIP(Template) >::typeid_.type_id())     \
+    Parameters hpx::serialization::detail::register_class<Template>           \
+        Template::hpx_register_class_instance;                                \
+/**/
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SEMIINTRUSIVE(Template)        \
+    static hpx::serialization::detail::register_class<Template>               \
+    hpx_register_class_instance;                                              \
+                                                                              \
+    virtual hpx::serialization::detail::register_class<Template>&             \
+    hpx_get_register_class_instance(hpx::serialization::detail::register_class<Template>*) const \
+    {                                                                         \
+        return hpx_register_class_instance;                                   \
+    }                                                                         \
+/**/
 #endif
