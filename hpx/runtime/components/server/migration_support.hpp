@@ -9,6 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace components
 {
     /// This hook has to be inserted into the derivation chain of any component
@@ -42,24 +44,24 @@ namespace hpx { namespace components
         // Pinning functionality
         void pin()
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             ++pin_count_;
         }
         void unpin()
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(pin_count_ != 0);
             if (pin_count_ != ~0x0u)
                 --pin_count_;
         }
         boost::uint32_t pin_count() const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return pin_count_;
         }
         void mark_as_migrated()
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(1 == pin_count_);
             pin_count_ = ~0x0u;
         }

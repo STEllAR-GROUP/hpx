@@ -506,7 +506,7 @@ void test_condition_waits()
         HPX_TEST(lock ? true : false);
 
         {
-            hpx::util::scoped_unlock<unique_lock> ul(lock);
+            hpx::util::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
         }
 
@@ -518,7 +518,7 @@ void test_condition_waits()
         HPX_TEST_EQ(data.awoken, 1);
 
         {
-            hpx::util::scoped_unlock<unique_lock> ul(lock);
+            hpx::util::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
         }
 
@@ -530,7 +530,7 @@ void test_condition_waits()
         HPX_TEST_EQ(data.awoken, 2);
 
         {
-            hpx::util::scoped_unlock<unique_lock> ul(lock);
+            hpx::util::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
         }
 
@@ -542,7 +542,7 @@ void test_condition_waits()
         HPX_TEST_EQ(data.awoken, 3);
 
         {
-            hpx::util::scoped_unlock<unique_lock> ul(lock);
+            hpx::util::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
         }
 
@@ -555,7 +555,7 @@ void test_condition_waits()
 
 
         {
-            hpx::util::scoped_unlock<unique_lock> ul(lock);
+            hpx::util::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(boost::chrono::milliseconds(1));
         }
 

@@ -14,12 +14,13 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <boost/ref.hpp>
+#include <boost/format.hpp>
+#include <boost/thread/locks.hpp>
+
 #include <vector>
 #include <list>
 #include <set>
-
-#include <boost/ref.hpp>
-#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // The purpose of this example is to execute a HPX-thread printing "Hello world"
@@ -110,7 +111,7 @@ void hello_world_foreman()
             hpx::util::unwrapped([&](std::size_t t) {
                 if (std::size_t(-1) != t)
                 {
-                    hpx::lcos::local::spinlock::scoped_lock lk(mtx);
+                    boost::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
                     attendance.erase(t);
                 }
             }),

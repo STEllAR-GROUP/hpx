@@ -9,6 +9,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/thread/locks.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 bool on_shutdown_executed = false;
 boost::uint32_t locality_id = boost::uint32_t(-1);
@@ -18,7 +20,7 @@ hpx::util::spinlock result_mutex;
 
 void receive_result(boost::int32_t i)
 {
-    hpx::util::spinlock::scoped_lock l(result_mutex);
+    boost::lock_guard<hpx::util::spinlock> l(result_mutex);
     if (i > final_result)
         final_result = i;
 }
@@ -59,7 +61,7 @@ HPX_REGISTER_ACTION(call_action);
 ///////////////////////////////////////////////////////////////////////////////
 void on_shutdown()
 {
-    hpx::util::spinlock::scoped_lock l(result_mutex);
+    boost::lock_guard<hpx::util::spinlock> l(result_mutex);
     HPX_TEST_EQ(final_result, 3);
 
     on_shutdown_executed = true;

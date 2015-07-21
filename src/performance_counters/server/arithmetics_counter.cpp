@@ -14,6 +14,7 @@
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
@@ -75,7 +76,7 @@ namespace hpx { namespace performance_counters { namespace server
         // lock here to avoid checking out multiple reference counted GIDs
         // from AGAS
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
             {
@@ -125,7 +126,7 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Operation>
     bool arithmetics_counter<Operation>::start()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
         {
             if (!base_counter_ids_[i] &&
@@ -156,7 +157,7 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Operation>
     bool arithmetics_counter<Operation>::stop()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
         {
             if (!base_counter_ids_[i] &&
@@ -187,7 +188,7 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Operation>
     void arithmetics_counter<Operation>::reset_counter_value()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
         {
             if (!base_counter_ids_[i] &&

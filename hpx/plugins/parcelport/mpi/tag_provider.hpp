@@ -23,7 +23,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         int acquire()
         {
             int tag = -1;
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             if(free_tags_.empty())
             {
                 HPX_ASSERT(next_tag_ < std::numeric_limits<int>::max());
@@ -41,7 +41,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         void release(int tag)
         {
             HPX_ASSERT(tag > 1);
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(tag <= next_tag_);
 
             if(tag == next_tag_) return;

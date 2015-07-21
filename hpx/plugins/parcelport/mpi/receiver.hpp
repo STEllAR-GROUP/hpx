@@ -16,6 +16,8 @@
 #include <list>
 #include <iterator>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
     class parcelport;
@@ -150,7 +152,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         connection_ptr accept()
         {
-            mutex_type::scoped_try_lock l(headers_mtx_);
+            boost::unique_lock<mutex_type> l(headers_mtx_, boost::try_to_lock);
             if(l)
                 return accept_locked(l);
             return std::unique_ptr<connection_type>();

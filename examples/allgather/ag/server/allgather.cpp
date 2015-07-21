@@ -14,6 +14,7 @@
 #include <boost/ref.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -23,14 +24,14 @@ namespace ag { namespace server
 {
     void allgather::init(std::size_t item,std::size_t np)
     {
-      //hpx::util::spinlock::scoped_lock l(mtx_);
+      //boost::lock_guard<hpx::util::spinlock> l(mtx_);
       item_ = item;
       value_ = item*3.14159;
     }
 
     void allgather::compute(std::vector<hpx::naming::id_type> const& point_components)
     {
-     // hpx::util::spinlock::scoped_lock l(mtx_);
+     // boost::lock_guard<hpx::util::spinlock> l(mtx_);
       typedef std::vector<hpx::lcos::future< double > > lazy_results_type;
       lazy_results_type lazy_results;
 
@@ -46,7 +47,7 @@ namespace ag { namespace server
     double allgather::get_item() const
     {
       //std::cout << " Get_item " << item_ << std::endl;
-      //hpx::util::spinlock::scoped_lock l(mtx_);
+      //boost::lock_guard<hpx::util::spinlock> l(mtx_);
       return value_;
     }
 

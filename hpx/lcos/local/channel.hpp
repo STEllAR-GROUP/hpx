@@ -12,6 +12,8 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace lcos { namespace detail
 {
 
@@ -29,7 +31,7 @@ struct channel_future_data : future_data<Result>
         // yields control if needed
         data_type d;
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::unique_lock<mutex_type> l(this->mtx_);
             // moves the data from the store
             this->data_.read_and_empty(d, l, ec);
             if (ec) return result_type();

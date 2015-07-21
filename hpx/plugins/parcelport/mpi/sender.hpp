@@ -16,6 +16,8 @@
 #include <list>
 #include <iterator>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
     template <typename Buffer>
