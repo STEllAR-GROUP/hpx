@@ -177,8 +177,10 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
     std::vector<block> & trans, boost::uint64_t blocks_start,
     boost::uint64_t blocks_end);
 
-////////////////////////////////////////////////////////////////////////////////
-hpx::future<void> transpose_phase(
+///////////////////////////////////////////////////////////////////////////////
+// The returned value type has to be the same as the return type used for
+// __await below
+hpx::future<sub_block> transpose_phase(
     std::vector<block> const& A, std::vector<block>& B,
     boost::uint64_t block_order, boost::uint64_t b,
     boost::uint64_t num_blocks, boost::uint64_t num_local_blocks,
@@ -201,6 +203,8 @@ hpx::future<void> transpose_phase(
 
         transpose(__await from, __await to, block_order, tile_size);
     }
+
+    return sub_block();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -312,7 +316,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                 {
                     transpose_phase(A, B, block_order, b,
                         num_blocks, num_local_blocks, block_size, tile_size
-                    );
+                    ).get();
                 });
 
             double elapsed = t.elapsed();
