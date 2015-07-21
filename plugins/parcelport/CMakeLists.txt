@@ -35,12 +35,12 @@ macro(add_parcelport name)
     add_hpx_source_group(
       NAME hpx
       CLASS "Header Files"
-      ROOT "${hpx_SOURCE_DIR}/hpx"
+      ROOT "${PROJECT_SOURCE_DIR}/hpx"
       TARGETS ${${name}_HEADERS})
     add_hpx_source_group(
       NAME hpx
       CLASS "Source Files"
-      ROOT "${hpx_SOURCE_DIR}"
+      ROOT "${PROJECT_SOURCE_DIR}"
       TARGETS ${${name}_SOURCES})
 
     set(HPX_STATIC_PARCELPORT_PLUGINS
@@ -110,7 +110,7 @@ macro(add_parcelport_modules)
         "${_parcelport_init}        HPX_ASSERT(parcelport_${parcelport}_factory_base_ptr);\n        parcelport_${parcelport}_factory_base_ptr->force_init();\n")
   endforeach()
 
-  configure_file("${hpx_SOURCE_DIR}/cmake/templates/static_parcelports.hpp.in"
+  configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/static_parcelports.hpp.in"
                  "${CMAKE_BINARY_DIR}/hpx/runtime/parcelset/static_parcelports.hpp"
                  @ONLY)
 endmacro()
