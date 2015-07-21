@@ -45,6 +45,11 @@ set(tests
     when_some
    )
 
+if(HPX_WITH_AWAIT)
+  set(tests ${tests} await)
+  set(await_PARAMETERS THREADS_PER_LOCALITY 4)
+endif()
+
 set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(apply_local_PARAMETERS THREADS_PER_LOCALITY 4)
 set(apply_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
