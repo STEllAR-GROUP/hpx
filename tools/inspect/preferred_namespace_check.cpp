@@ -75,7 +75,7 @@ namespace boost
             const floo *ptr;
             long errors = 0, currline = 0;
             //For line number
-            char_separator<char> sep("\n");
+            char_separator<char> sep("\n", "", boost::keep_empty_tokens);
             tokenizer<char_separator<char>> tokens(contents, sep);
             for (const auto& t : tokens) {
                 size_t rend = t.find_first_of("\r"), size = t.size();
@@ -88,7 +88,7 @@ namespace boost
                 }
                 else
                 {
-                    char_separator<char> sep2("\r");
+                    char_separator<char> sep2("\r", "", boost::keep_empty_tokens);
                     tokenizer<char_separator<char>> tokens2(t, sep2);
                     for (const auto& u : tokens2) {
                         file.push_back(u);
