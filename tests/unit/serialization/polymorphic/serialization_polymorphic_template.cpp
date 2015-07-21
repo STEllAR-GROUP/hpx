@@ -9,6 +9,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -75,10 +76,12 @@ int main()
     boost::shared_ptr<A<int> > b;
     boost::shared_ptr<A<char> > c;
     archive >> b >> c;
-    std::cout << "b: " << boost::static_pointer_cast<B<int> >(b)->a << ", "
-        << boost::static_pointer_cast<B<int> >(b)->b << std::endl;
-    std::cout << "c: " << boost::static_pointer_cast<B<char> >(c)->a << ", "
-        << boost::static_pointer_cast<B<char> >(c)->b << std::endl;
+
+    HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->a, 1);
+    HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->b, 2);
+
+    HPX_TEST_EQ(boost::static_pointer_cast<B<char> >(c)->a, 7);
+    HPX_TEST_EQ(boost::static_pointer_cast<B<char> >(c)->b, 8);
   }
 
 }
