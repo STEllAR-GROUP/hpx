@@ -282,8 +282,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
     // Create new component on locality 'where' and initialize the held data
     partition(hpx::id_type where, std::size_t size, double initial_value)
       : base_type(hpx::new_<partition_server>(where, size, initial_value))
-    {
-    }
+    {}
 
     // Create a new component on the locality co-located to the id 'where'. The
     // new instance will be initialized from the given partition_data.
@@ -489,15 +488,12 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
 
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-
     // U[t][i] is the state of position i at time t.
     for (space& s: U_)
         s.resize(local_np);
 
     // Initial conditions: f(0, i) = i
     hpx::id_type here = hpx::find_here();
-
-    
     for (std::size_t i = 0; i != local_np; ++i)
         U_[0][i] = partition(here, nx, double(i));
 
@@ -582,6 +578,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // Create the local stepper instance, register it
     stepper step;
+    
     // Measure execution time.
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
 
@@ -614,7 +611,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                 stepper_server::space const& s = solution[i];
                 for (std::size_t j = 0; j != np/nl; ++j)
                 {
-                        std::cout << "U[" << i*(np/nl) + j << "] = "
+                    std::cout << "U[" << i*(np/nl) + j << "] = "
                         << s[j].get_data(partition_server::middle_partition).get()
                         << std::endl;
                 }
