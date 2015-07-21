@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2015 Andreas Schaefer
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
@@ -27,22 +28,25 @@
 namespace hpx { namespace serialization { namespace detail
 {
         template <typename T>
-        char const* get_serialization_name()
+        struct get_serialization_name
 #ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
         ;
 #else
         {
-            /// If you encounter this assert while compiling code, that means that
-            /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
-            /// but the header in which the action is defined misses a
-            /// HPX_REGISTER_ACTION_DECLARATION
-            BOOST_MPL_ASSERT_MSG(
-                traits::needs_automatic_registration<T>::value
-              , HPX_REGISTER_ACTION_DECLARATION_MISSING
-              , (T)
-            );
-            return util::type_id<T>::typeid_.type_id();
-        }
+            const char *operator()()
+            {
+                /// If you encounter this assert while compiling code, that means that
+                /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
+                /// but the header in which the action is defined misses a
+                /// HPX_REGISTER_ACTION_DECLARATION
+                BOOST_MPL_ASSERT_MSG(
+                    traits::needs_automatic_registration<T>::value
+                  , HPX_REGISTER_ACTION_DECLARATION_MISSING
+                  , (T)
+                );
+                return util::type_id<T>::typeid_.type_id();
+            }
+        };
 #endif
 
     struct function_bunch_type
@@ -158,7 +162,7 @@ namespace hpx { namespace serialization { namespace detail
             polymorphic_nonintrusive_factory::instance().
                 register_class(
                     typeid(Derived),
-                    get_serialization_name<Derived>(),
+                    get_serialization_name<Derived>()(),
                     bunch
                 );
         }
@@ -176,7 +180,7 @@ namespace hpx { namespace serialization { namespace detail
 #define HPX_SERIALIZATION_REGISTER_CLASS_DECLARATION(Class)                   \
     namespace hpx { namespace serialization { namespace detail {              \
         template <> HPX_ALWAYS_EXPORT                                         \
-        char const* get_serialization_name<Class>();                          \
+        struct get_serialization_name<Class>;                                 \
     }}}                                                                       \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
@@ -189,10 +193,13 @@ namespace hpx { namespace serialization { namespace detail
 #define HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, Name)                    \
     namespace hpx { namespace serialization { namespace detail {              \
         template <> HPX_ALWAYS_EXPORT                                         \
-        char const* get_serialization_name<Class>()                           \
+        struct get_serialization_name<Class>                                  \
         {                                                                     \
-            return Name;                                                      \
-        }                                                                     \
+            char const* operator()()                                          \
+            {                                                                 \
+                return Name;                                                  \
+            }                                                                 \
+        };                                                                    \
     }}}                                                                       \
     template hpx::serialization::detail::register_class<Class>                \
         hpx::serialization::detail::register_class<Class>::instance;          \
