@@ -18,6 +18,7 @@
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/thread.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/throw_exception.hpp>
@@ -114,7 +115,7 @@ namespace hpx { namespace util { namespace plugin {
                 if (NULL != h_)
                 {
                     dll::initialize_mutex();
-                    boost::mutex::scoped_lock lock(dll::mutex_instance());
+                    boost::lock_guard<boost::mutex> lock(dll::mutex_instance());
 
                     dll::deinit_library(h_);
                     dlerror();
@@ -207,7 +208,7 @@ namespace hpx { namespace util { namespace plugin {
             if (ec) return std::pair<SymbolType, Deleter>();
 
             initialize_mutex();
-            boost::mutex::scoped_lock lock(mutex_instance());
+            boost::lock_guard<boost::mutex> lock(mutex_instance());
 
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
 
@@ -270,7 +271,7 @@ namespace hpx { namespace util { namespace plugin {
         {
             if (!dll_handle || force) {
                 initialize_mutex();
-                boost::mutex::scoped_lock lock(mutex_instance());
+                boost::lock_guard<boost::mutex> lock(mutex_instance());
 
                 ::dlerror();                // Clear the error state.
                 dll_handle = MyLoadLibrary((dll_name.empty() ? NULL : dll_name.c_str()));
@@ -352,7 +353,7 @@ namespace hpx { namespace util { namespace plugin {
             if (NULL != dll_handle)
             {
                 initialize_mutex();
-                boost::mutex::scoped_lock lock(mutex_instance());
+                boost::lock_guard<boost::mutex> lock(mutex_instance());
 
                 deinit_library(dll_handle);
                 dlerror();

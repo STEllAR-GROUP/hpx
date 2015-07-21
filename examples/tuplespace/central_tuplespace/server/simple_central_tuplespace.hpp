@@ -14,6 +14,8 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/local_lcos.hpp>
 
+#include <boost/thread/locks.hpp>
+
 #include "tuples_warehouse.hpp"
 
 // #define TS_DEBUG
@@ -92,7 +94,7 @@ namespace examples { namespace server
                 }
 
                 {
-                    mutex_type::scoped_lock l(mtx_);
+                    boost::lock_guard<mutex_type> l(mtx_);
 
                     tuples_.insert(tp);
                 }
@@ -115,7 +117,7 @@ namespace examples { namespace server
                     }
 
                     {
-                        mutex_type::scoped_lock l(mtx_);
+                        boost::lock_guard<mutex_type> l(mtx_);
 
                         result = tuples_.match(tp);
                     }
@@ -146,7 +148,7 @@ namespace examples { namespace server
                     }
 
                     {
-                        mutex_type::scoped_lock l(mtx_);
+                        boost::lock_guard<mutex_type> l(mtx_);
 
                         result = tuples_.match_and_erase(tp);
                     }

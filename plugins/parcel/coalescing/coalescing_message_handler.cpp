@@ -12,6 +12,7 @@
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace traits
 {
@@ -80,7 +81,7 @@ namespace hpx { namespace plugins { namespace parcel
         parcelset::locality const & dest, parcelset::parcel& p,
         write_handler_type const& f)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (stopped_) {
             l.unlock();
 
@@ -118,7 +119,7 @@ namespace hpx { namespace plugins { namespace parcel
     bool coalescing_message_handler::timer_flush()
     {
         // adjust timer if needed
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (!buffer_.empty())
             flush(l, false);
 
@@ -128,13 +129,16 @@ namespace hpx { namespace plugins { namespace parcel
 
     bool coalescing_message_handler::flush(bool stop_buffering)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         return flush(l, stop_buffering);
     }
 
-    bool coalescing_message_handler::flush(mutex_type::scoped_lock& l,
+    bool coalescing_message_handler::flush(
+        boost::unique_lock<mutex_type>& l,
         bool stop_buffering)
     {
+        HPX_ASSERT(l.owns_lock());
+
         if (!stopped_ && stop_buffering) {
             stopped_ = true;
             l.unlock();

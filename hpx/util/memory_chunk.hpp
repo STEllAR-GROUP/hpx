@@ -7,8 +7,9 @@
 #define HPX_UTIL_MEMORY_CHUNK_HPP
 
 #include <hpx/config.hpp>
-
 #include <hpx/lcos/local/spinlock.hpp>
+
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace util
 {
@@ -77,7 +78,7 @@ namespace hpx { namespace util
 
         bool full() const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             check_invariants_locked();
             if(allocated_ == chunk_size_)
             {
@@ -88,7 +89,7 @@ namespace hpx { namespace util
 
         bool contains(char * p) const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return contains_locked(p);
         }
 
@@ -105,7 +106,7 @@ namespace hpx { namespace util
         void check_invariants(char * p = 0, std::size_t size = 0) const
         {
 #ifdef HPX_DEBUG
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             check_invariants_locked(p, size);
 #endif
         }
@@ -142,7 +143,7 @@ namespace hpx { namespace util
 
         char *allocate(size_type size)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             check_invariants_locked();
 
             if(!data_) charge();
@@ -193,7 +194,7 @@ namespace hpx { namespace util
 
         bool deallocate(char * p, size_type size)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(data_);
             if(!contains_locked(p))
                 return false;

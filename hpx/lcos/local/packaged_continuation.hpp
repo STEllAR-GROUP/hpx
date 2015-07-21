@@ -21,6 +21,8 @@
 #include <boost/make_shared.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <boost/thread/locks.hpp>
+
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,12 +169,12 @@ namespace hpx { namespace lcos { namespace detail
     protected:
         threads::thread_id_type get_id() const
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             return id_;
         }
         void set_id(threads::thread_id_type const& id)
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             id_ = id;
         }
 
@@ -213,7 +215,7 @@ namespace hpx { namespace lcos { namespace detail
             >::type const& f, error_code& ec)
         {
             {
-                typename mutex_type::scoped_lock l(this->mtx_);
+                boost::lock_guard<mutex_type> l(this->mtx_);
                 if (started_) {
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::run",
@@ -257,7 +259,7 @@ namespace hpx { namespace lcos { namespace detail
             error_code& ec)
         {
             {
-                typename mutex_type::scoped_lock l(this->mtx_);
+                boost::lock_guard<mutex_type> l(this->mtx_);
                 if (started_) {
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::async",
@@ -287,7 +289,7 @@ namespace hpx { namespace lcos { namespace detail
             threads::executor& sched, error_code& ec)
         {
             {
-                typename mutex_type::scoped_lock l(this->mtx_);
+                boost::lock_guard<mutex_type> l(this->mtx_);
                 if (started_) {
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::async",
@@ -318,7 +320,7 @@ namespace hpx { namespace lcos { namespace detail
             Executor& exec, error_code& ec)
         {
             {
-                typename mutex_type::scoped_lock l(this->mtx_);
+                boost::lock_guard<mutex_type> l(this->mtx_);
                 if (started_) {
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::async_exec",
@@ -375,7 +377,7 @@ namespace hpx { namespace lcos { namespace detail
 
         void cancel()
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::unique_lock<mutex_type> l(this->mtx_);
             try {
                 if (!this->started_)
                     boost::throw_exception(hpx::thread_interrupted());

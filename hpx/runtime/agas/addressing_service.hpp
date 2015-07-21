@@ -11,16 +11,6 @@
 
 #include <hpx/config.hpp>
 
-#include <vector>
-
-#include <boost/make_shared.hpp>
-#include <boost/cache/entries/lfu_entry.hpp>
-#include <boost/cache/local_cache.hpp>
-#include <boost/cache/statistics/local_full_statistics.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/dynamic_bitset.hpp>
-
 #include <hpx/exception.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
@@ -30,7 +20,17 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
+#include <boost/make_shared.hpp>
+#include <boost/cache/entries/lfu_entry.hpp>
+#include <boost/cache/local_cache.hpp>
+#include <boost/cache/statistics/local_full_statistics.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/dynamic_bitset.hpp>
+#include <boost/thread/locks.hpp>
+
 #include <map>
+#include <vector>
 
 // TODO: split into a base class and two implementations (one for bootstrap,
 // one for hosted).
@@ -242,25 +242,25 @@ protected:
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , error_code& ec = throws
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests_non_blocking(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , error_code& ec
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     std::vector<hpx::future<std::vector<response> > >
     send_refcnt_requests_async(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests_sync(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , error_code& ec
         );
 

@@ -433,7 +433,7 @@ namespace hpx { namespace parcelset
         {
             write_handler_type f;
             {
-                mutex_type::scoped_lock l(mtx_);
+                boost::lock_guard<mutex_type> l(mtx_);
                 f = write_handler_;
             }
             f(ec, p);
@@ -441,7 +441,7 @@ namespace hpx { namespace parcelset
 
         write_handler_type set_write_handler(write_handler_type f)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             std::swap(f, write_handler_);
             return f;
         }

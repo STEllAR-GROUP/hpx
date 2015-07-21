@@ -19,6 +19,7 @@
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -108,7 +109,7 @@ namespace hpx { namespace components
             // queue up the new message and log it with the rest of it
             messages_type msgs;
             {
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 queue_.push_back(msg);
                 queue_.swap(msgs);
             }
@@ -124,7 +125,7 @@ namespace hpx { namespace components
             std::size_t size = 0;
 
             {
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 queue_.push_back(msg);
                 size = queue_.size();
             }
@@ -143,7 +144,7 @@ namespace hpx { namespace components
             if (!naming::get_agas_client().is_console())
             {
                 // queue it for delivery to the console
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 queue_.push_back(msg);
             }
             else
@@ -166,7 +167,7 @@ namespace hpx { namespace components
         {
             messages_type msgs;
             {
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 if (queue_.empty())
                     return;         // some other thread did the deed
                 queue_.swap(msgs);
@@ -181,13 +182,13 @@ namespace hpx { namespace components
         // Resolve the console prefix if it's still invalid.
         if (HPX_UNLIKELY(naming::invalid_id == prefix_))
         {
-            prefix_mutex_type::scoped_try_lock l(prefix_mtx_);
+            boost::unique_lock<prefix_mutex_type> l(prefix_mtx_, boost::try_to_lock);
 
             if (l.owns_lock() && (naming::invalid_id == prefix_))
             {
                 naming::gid_type raw_prefix;
                 {
-                    util::scoped_unlock<prefix_mutex_type::scoped_try_lock> ul(l);
+                    util::unlock_guard<boost::unique_lock<prefix_mutex_type> > ul(l);
                     naming::get_agas_client().get_console_locality(raw_prefix);
                 }
 
@@ -219,7 +220,7 @@ namespace hpx { namespace components
 
         try {
             {
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 if (queue_.empty())
                     return;         // some other thread did the deed
             }
@@ -229,7 +230,7 @@ namespace hpx { namespace components
 
             messages_type msgs;
             {
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 if (queue_.empty())
                     return;         // some other thread did the deed
                 queue_.swap(msgs);

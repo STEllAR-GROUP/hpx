@@ -7,10 +7,8 @@
 #if !defined(HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM)
 #define HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM
 
-#include <map>
-#include <memory>
-
 #include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/block_profiler.hpp>
@@ -23,10 +21,14 @@
 #   include <hpx/util/tick_counter.hpp>
 #endif
 
-#include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/thread/locks.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/atomic.hpp>
 #include <boost/unordered_set.hpp>
+
+#include <map>
+#include <memory>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost
@@ -143,6 +145,8 @@ namespace hpx { namespace threads { namespace policies
         void create_thread_object(threads::thread_id_type& thrd,
             threads::thread_init_data& data, thread_state_enum state, Lock& lk)
         {
+            HPX_ASSERT(lk.owns_lock());
+
             std::ptrdiff_t stacksize = data.stacksize;
 
             std::list<thread_id_type>* heap = 0;
@@ -206,7 +210,7 @@ namespace hpx { namespace threads { namespace policies
 
             else
             {
-                hpx::util::scoped_unlock<Lock> ull(lk);
+                hpx::util::unlock_guard<Lock> ull(lk);
 
                 // Allocate a new thread object.
                 if (data.stacksize != 0)
@@ -221,8 +225,10 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // add new threads if there is some amount of work available
         std::size_t add_new(boost::int64_t add_count, thread_queue* addfrom,
-            typename mutex_type::scoped_try_lock &lk, bool steal = false)
+            boost::unique_lock<mutex_type> &lk, bool steal = false)
         {
+            HPX_ASSERT(lk.owns_lock());
+
             if (HPX_UNLIKELY(0 == add_count))
                 return 0;
 
@@ -285,8 +291,10 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         bool add_new_if_possible(std::size_t& added, thread_queue* addfrom,
-            typename mutex_type::scoped_try_lock &lk, bool steal = false)
+            boost::unique_lock<mutex_type> &lk, bool steal = false)
         {
+            HPX_ASSERT(lk.owns_lock());
+
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(add_new_time_);
 #endif
@@ -320,8 +328,10 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         bool add_new_always(std::size_t& added, thread_queue* addfrom,
-            typename mutex_type::scoped_try_lock &lk, bool steal = false)
+            boost::unique_lock<mutex_type> &lk, bool steal = false)
         {
+            HPX_ASSERT(lk.owns_lock());
+
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(add_new_time_);
 #endif
@@ -492,7 +502,7 @@ namespace hpx { namespace threads { namespace policies
                 bool thread_map_is_empty = false;
                 while (true)
                 {
-                    typename mutex_type::scoped_lock lk(mtx_);
+                    boost::lock_guard<mutex_type> lk(mtx_);
                     if (cleanup_terminated_locked_helper(false))
                     {
                         thread_map_is_empty =
@@ -503,7 +513,7 @@ namespace hpx { namespace threads { namespace policies
                 return thread_map_is_empty;
             }
 
-            typename mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
             return cleanup_terminated_locked_helper(false) &&
                 (thread_map_count_ == 0) && (new_tasks_count_ == 0);
         }
@@ -877,7 +887,7 @@ namespace hpx { namespace threads { namespace policies
                 return thread_map_count_ + new_tasks_count_ - terminated_items_count_;
 
             // acquire lock only if absolutely necessary
-            typename mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
 
             boost::int64_t num_threads = 0;
             thread_map_type::const_iterator end = thread_map_.end();
@@ -893,7 +903,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void abort_all_suspended_threads()
         {
-            typename mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
             thread_map_type::iterator end =  thread_map_.end();
             for (thread_map_type::iterator it = thread_map_.begin();
                  it != end; ++it)
@@ -928,8 +938,8 @@ namespace hpx { namespace threads { namespace policies
                 // just falls through to the cleanup work below (no work is available)
                 // in which case the current thread (which failed to acquire
                 // the lock) will just retry to enter this loop.
-                typename mutex_type::scoped_try_lock lk(mtx_);
-                if (!lk)
+                boost::unique_lock<mutex_type> lk(mtx_, boost::try_to_lock);
+                if (!lk.owns_lock())
                     return false;            // avoid long wait on lock
 
                 // stop running after all HPX threads have been terminated
@@ -961,7 +971,7 @@ namespace hpx { namespace threads { namespace policies
             return false;
 #else
             if (minimal_deadlock_detection) {
-                typename mutex_type::scoped_lock lk(mtx_);
+                boost::lock_guard<mutex_type> lk(mtx_);
                 return detail::dump_suspended_threads(num_thread, thread_map_
                   , idle_loop_count, running);
             }

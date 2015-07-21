@@ -27,6 +27,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <vector>
 #include <memory>
@@ -251,13 +252,13 @@ namespace hpx { namespace threads
         /// is running.
         std::size_t get_os_thread_count() const
         {
-            mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
             return pool_.get_os_thread_count();
         }
 
         boost::thread& get_os_thread_handle(std::size_t num_thread)
         {
-            mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
             return pool_.get_os_thread_handle(num_thread);
         }
 

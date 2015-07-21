@@ -19,7 +19,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/itt_notify.hpp>
@@ -30,6 +30,7 @@
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <numeric>
 #include <sstream>
@@ -160,7 +161,7 @@ namespace hpx { namespace threads
         get_thread_count(thread_state_enum state, thread_priority priority,
             std::size_t num_thread, bool reset) const
     {
-        mutex_type::scoped_lock lk(mtx_);
+        boost::lock_guard<mutex_type> lk(mtx_);
         return pool_.get_thread_count(state, priority, num_thread, reset);
     }
 
@@ -172,7 +173,7 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy>::
         abort_all_suspended_threads()
     {
-        mutex_type::scoped_lock lk(mtx_);
+        boost::lock_guard<mutex_type> lk(mtx_);
         pool_.abort_all_suspended_threads();
     }
 
@@ -185,7 +186,7 @@ namespace hpx { namespace threads
     bool threadmanager_impl<SchedulingPolicy>::
         cleanup_terminated(bool delete_all)
     {
-        mutex_type::scoped_lock lk(mtx_);
+        boost::lock_guard<mutex_type> lk(mtx_);
         return pool_.cleanup_terminated(delete_all);
     }
 
@@ -1369,7 +1370,7 @@ namespace hpx { namespace threads
     bool threadmanager_impl<SchedulingPolicy>::
         run(std::size_t num_threads)
     {
-        mutex_type::scoped_lock lk(mtx_);
+        boost::unique_lock<mutex_type> lk(mtx_);
 
         if (pool_.get_os_thread_count() != 0 ||
             pool_.get_state() == state_running)
@@ -1396,7 +1397,7 @@ namespace hpx { namespace threads
     {
         LTM_(info) << "stop: blocking(" << std::boolalpha << blocking << ")";
 
-        mutex_type::scoped_lock lk(mtx_);
+        boost::unique_lock<mutex_type> lk(mtx_);
         pool_.stop(lk, blocking);
 
         LTM_(info) << "stop: stopping timer pool";

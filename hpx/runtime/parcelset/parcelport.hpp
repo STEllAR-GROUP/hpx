@@ -19,6 +19,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <map>
 #include <set>
@@ -311,7 +312,7 @@ namespace hpx { namespace parcelset
 
         boost::uint64_t get_pending_parcels_count(bool /*reset*/)
         {
-            lcos::local::spinlock::scoped_lock l(mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(mtx_);
             return pending_parcels_.size();
         }
 

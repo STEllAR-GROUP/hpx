@@ -41,6 +41,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <sstream>
 
@@ -810,7 +811,7 @@ void notify_worker_security(notification_header_security const& header)
 ///////////////////////////////////////////////////////////////////////////////
 void big_boot_barrier::spin()
 {
-    boost::mutex::scoped_lock lock(mtx);
+    boost::unique_lock<boost::mutex> lock(mtx);
     while (connected)
         cond.wait(lock);
 }
@@ -966,7 +967,7 @@ void big_boot_barrier::wait_hosted(
 
 void big_boot_barrier::notify()
 {
-    boost::mutex::scoped_lock lk(mtx, boost::adopt_lock);
+    boost::lock_guard<boost::mutex> lk(mtx, boost::adopt_lock);
     --connected;
     cond.notify_all();
 }

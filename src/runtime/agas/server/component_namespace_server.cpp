@@ -14,6 +14,8 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
+#include <boost/thread/locks.hpp>
+
 // TODO: Remove the use of the name "prefix"
 
 namespace hpx { namespace agas
@@ -301,7 +303,7 @@ response component_namespace::bind_prefix(
     std::string key = req.get_name();
     boost::uint32_t prefix = req.get_locality_id();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     component_id_table_type::left_map::iterator cit = component_ids_.left.find(key)
                                     , cend = component_ids_.left.end();
@@ -403,7 +405,7 @@ response component_namespace::bind_name(
     // parameters
     std::string key = req.get_name();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     component_id_table_type::left_map::iterator it = component_ids_.left.find(key)
                                     , end = component_ids_.left.end();
@@ -452,7 +454,7 @@ response component_namespace::resolve_id(
     if (key != components::get_base_type(key))
         key = components::get_derived_type(key);
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     factory_table_type::const_iterator it = factories_.find(key)
                                      , end = factories_.end();
@@ -502,7 +504,7 @@ response component_namespace::unbind(
     // parameters
     std::string key = req.get_name();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     component_id_table_type::left_map::iterator it = component_ids_.left.find(key);
 
@@ -542,7 +544,7 @@ response component_namespace::iterate_types(
 { // {{{ iterate implementation
     iterate_types_function_type f = req.get_iterate_types_function();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     for (component_id_table_type::left_map::iterator it = component_ids_.left.begin()
                                          , end = component_ids_.left.end();
@@ -579,7 +581,7 @@ response component_namespace::get_component_type_name(
 { // {{{ get_component_type_name implementation
     components::component_type t = req.get_component_type();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     std::string result;
 
@@ -629,7 +631,7 @@ response component_namespace::get_num_localities(
     if (key != components::get_base_type(key))
         key = components::get_derived_type(key);
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     factory_table_type::const_iterator it = factories_.find(key)
                                      , end = factories_.end();

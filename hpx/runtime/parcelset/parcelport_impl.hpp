@@ -19,6 +19,8 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
+#include <boost/thread/locks.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -488,11 +490,13 @@ namespace hpx { namespace parcelset
         {
             typedef pending_parcels_map::mapped_type mapped_type;
 
-            lcos::local::spinlock::scoped_lock l(mtx_);
+            boost::unique_lock<lcos::local::spinlock> l(mtx_);
             // We ignore the lock here. It might happen that while enqueuing,
             // we need to acquire a lock. This should not cause any problems
             // (famous last words)
-            util::ignore_while_checking<lcos::local::spinlock::scoped_lock> il(&l);
+            util::ignore_while_checking<
+                boost::unique_lock<lcos::local::spinlock>
+            > il(&l);
 
             mapped_type& e = pending_parcels_[locality_id];
             e.first.push_back(std::move(p));
@@ -507,11 +511,13 @@ namespace hpx { namespace parcelset
         {
             typedef pending_parcels_map::mapped_type mapped_type;
 
-            lcos::local::spinlock::scoped_lock l(mtx_);
+            boost::unique_lock<lcos::local::spinlock> l(mtx_);
             // We ignore the lock here. It might happen that while enqueuing,
             // we need to acquire a lock. This should not cause any problems
             // (famous last words)
-            util::ignore_while_checking<lcos::local::spinlock::scoped_lock> il(&l);
+            util::ignore_while_checking<
+                boost::unique_lock<lcos::local::spinlock>
+            > il(&l);
 
             HPX_ASSERT(parcels.size() == handlers.size());
 
@@ -554,7 +560,7 @@ namespace hpx { namespace parcelset
                 return false;
 
             {
-                lcos::local::spinlock::scoped_lock l(mtx_);
+                boost::lock_guard<lcos::local::spinlock> l(mtx_);
 
                 iterator it = pending_parcels_.find(locality_id);
 
@@ -606,8 +612,8 @@ namespace hpx { namespace parcelset
             std::vector<locality> destinations;
 
             {
-                lcos::local::spinlock::scoped_try_lock l(mtx_);
-                if(l)
+                boost::unique_lock<lcos::local::spinlock> l(mtx_, boost::try_to_lock);
+                if(l.owns_lock())
                 {
                     if (parcel_destinations_.empty())
                         return true;
@@ -651,8 +657,8 @@ namespace hpx { namespace parcelset
                 // need to force a new connection to avoid deadlocks.
                 bool force_connection = false;
                 {
-                    mutex_type::scoped_try_lock l(sender_threads_mtx_);
-                    if(l)
+                    boost::unique_lock<mutex_type> l(sender_threads_mtx_, boost::try_to_lock);
+                    if(l.owns_lock())
                     {
                         std::vector<threads::thread_id_type> threads;
                         threads.reserve(sender_threads_.size());
@@ -723,7 +729,7 @@ namespace hpx { namespace parcelset
                             thread_num, threads::thread_stacksize_default
                         );
                     {
-                        mutex_type::scoped_lock l(sender_threads_mtx_);
+                        boost::lock_guard<mutex_type> l(sender_threads_mtx_);
                         HPX_ASSERT(new_send_thread != threads::invalid_thread_id);
                         sender_threads_.insert(new_send_thread);
                     }
@@ -734,7 +740,7 @@ namespace hpx { namespace parcelset
                     new_send_thread = threads::get_self_id();
                     if(new_send_thread != threads::invalid_thread_id)
                     {
-                        mutex_type::scoped_lock l(sender_threads_mtx_);
+                        boost::lock_guard<mutex_type> l(sender_threads_mtx_);
                         sender_threads_.insert(new_send_thread);
                     }
                     send_pending_parcels(
@@ -761,7 +767,7 @@ namespace hpx { namespace parcelset
             client_connection->set_state(parcelport_connection::state_scheduled_thread);
 #endif
             {
-                lcos::local::spinlock::scoped_lock l(mtx_);
+                boost::lock_guard<lcos::local::spinlock> l(mtx_);
 
                 HPX_ASSERT(locality_id == sender_connection->destination());
                 if (!ec)
@@ -849,7 +855,7 @@ namespace hpx { namespace parcelset
             threads::thread_id_type this_thread = threads::get_self_id();
             if(this_thread != threads::invalid_thread_id)
             {
-                mutex_type::scoped_lock l(sender_threads_mtx_);
+                boost::lock_guard<lcos::local::spinlock> l(sender_threads_mtx_);
                 std::set<threads::thread_id_type>::iterator it
                     = sender_threads_.find(this_thread);
                 HPX_ASSERT(it != sender_threads_.end());
