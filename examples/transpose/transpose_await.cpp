@@ -149,7 +149,8 @@ struct block
         hpx::register_id_with_basename(base_name, get_gid(), id);
     }
 
-    hpx::future<sub_block> get_sub_block(boost::uint64_t offset, boost::uint64_t size)
+    hpx::future<sub_block>
+        get_sub_block(boost::uint64_t offset, boost::uint64_t size) const
     {
         block_component::get_sub_block_action act;
         return hpx::async(act, get_gid(), offset, size);
@@ -157,7 +158,7 @@ struct block
 };
 
 // The macros below are necessary to generate the code required for exposing
-// our partition type remotely.
+// our block_component type remotely.
 //
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
@@ -169,11 +170,38 @@ HPX_REGISTER_COMPONENT(block_component_type, block_component);
 typedef block_component::get_sub_block_action get_sub_block_action;
 HPX_REGISTER_ACTION(get_sub_block_action);
 
-void transpose(hpx::future<sub_block> A, hpx::future<sub_block> B,
+void transpose(sub_block const A, sub_block B,
     boost::uint64_t block_order, boost::uint64_t tile_size);
+
 double test_results(boost::uint64_t order, boost::uint64_t block_order,
     std::vector<block> & trans, boost::uint64_t blocks_start,
     boost::uint64_t blocks_end);
+
+////////////////////////////////////////////////////////////////////////////////
+hpx::future<void> transpose_phase(
+    std::vector<block> const& A, std::vector<block>& B,
+    boost::uint64_t block_order, boost::uint64_t b,
+    boost::uint64_t num_blocks, boost::uint64_t num_local_blocks,
+    boost::uint64_t block_size, boost::uint64_t tile_size)
+{
+    const boost::uint64_t from_phase = b;
+    const boost::uint64_t A_offset = from_phase * block_size;
+
+    auto phase_range = boost::irange(
+        static_cast<boost::uint64_t>(0), num_blocks);
+    for(boost::uint64_t phase: phase_range)
+    {
+        const boost::uint64_t from_block = phase;
+        const boost::uint64_t B_offset = phase * block_size;
+
+        hpx::future<sub_block> from =
+            A[from_block].get_sub_block(A_offset, block_size);
+        hpx::future<sub_block> to =
+            B[b].get_sub_block(B_offset, block_size);
+
+        transpose(__await from, __await to, block_order, tile_size);
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
@@ -214,7 +242,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         for(boost::uint64_t b = 0; b != num_blocks; ++b)
         {
             // Allocate block
-            if(b >= blocks_start && b < blocks_end)
+            if(b >= blocks_start && b != blocks_end)
             {
                 A[b] = block(b, col_block_size, A_block_basename);
                 B[b] = block(b, col_block_size, B_block_basename);
@@ -278,42 +306,14 @@ int hpx_main(boost::program_options::variables_map& vm)
 
             auto range = boost::irange(blocks_start, blocks_end);
 
-            std::vector<hpx::future<void> > block_futures;
-            block_futures.resize(num_local_blocks);
-
+            const boost::uint64_t block_size = block_order * block_order;
             for_each(par, boost::begin(range), boost::end(range),
                 [&](boost::uint64_t b)
                 {
-                    std::vector<hpx::future<void> > phase_futures;
-                    phase_futures.reserve(num_blocks);
-
-                    auto phase_range = boost::irange(
-                        static_cast<boost::uint64_t>(0), num_blocks);
-                    for(boost::uint64_t phase: phase_range)
-                    {
-                        const boost::uint64_t block_size = block_order * block_order;
-                        const boost::uint64_t from_block = phase;
-                        const boost::uint64_t from_phase = b;
-                        const boost::uint64_t A_offset = from_phase * block_size;
-                        const boost::uint64_t B_offset = phase * block_size;
-
-                        phase_futures.push_back(
-                            hpx::lcos::local::dataflow(
-                                &transpose
-                              , A[from_block].get_sub_block(A_offset, block_size)
-                              , B[b].get_sub_block(B_offset, block_size)
-                              , block_order
-                              , tile_size
-                            )
-                        );
-                    }
-
-                    block_futures[b - blocks_start] =
-                        hpx::when_all(phase_futures);
-                }
-            );
-
-            hpx::wait_all(block_futures);
+                    transpose_phase(A, B, block_order, b,
+                        num_blocks, num_local_blocks, block_size, tile_size
+                    );
+                });
 
             double elapsed = t.elapsed();
 
@@ -387,12 +387,9 @@ int main(int argc, char* argv[])
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
 
-void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
+void transpose(sub_block const A, sub_block B,
     boost::uint64_t block_order, boost::uint64_t tile_size)
 {
-    const sub_block A(Af.get());
-    sub_block B(Bf.get());
-
     if(tile_size < block_order)
     {
         for(boost::uint64_t i = 0; i != block_order; i += tile_size)
