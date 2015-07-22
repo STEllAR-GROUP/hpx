@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
-                    policy, first, count ,
+                    policy, first, count,
                     [tok, pred, last](FwdIter part_begin,
                     std::size_t part_size) mutable -> bool
                     {

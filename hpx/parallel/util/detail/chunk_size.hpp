@@ -93,22 +93,22 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     template <typename ExPolicy, typename Future, typename F1,
         typename FwdIter>
         // requires traits::is_future<Future>
-    std::vector<std::pair<FwdIter, std::size_t > > get_static_shape(
-        ExPolicy policy, std::vector<Future>& workitems,
+    std::vector<hpx::util::tuple<FwdIter, std::size_t> > get_static_shape(
+        ExPolicy policy, std::vector<Future>& inititems,
         F1 && f1, FwdIter& first, std::size_t& count,
         std::size_t chunk_size)
     {
-        chunk_size = get_static_chunk_size(policy, workitems,
+        chunk_size = get_static_chunk_size(policy, inititems,
             std::forward<F1>(f1), first, count, chunk_size);
 
-        std::vector<std::pair<FwdIter, std::size_t> > shape;
-        shape.reserve(count);
+        std::vector<hpx::util::tuple<FwdIter, std::size_t> > shape;
+        shape.reserve(count / chunk_size + 1);
 
         while (count != 0)
         {
             std::size_t chunk = (std::min)(chunk_size, count);
 
-            shape.push_back(std::make_pair(first, chunk));
+            shape.push_back(hpx::util::make_tuple(first, chunk));
 
             count -= chunk;
             std::advance(first, chunk);
@@ -193,6 +193,38 @@ namespace hpx { namespace parallel { namespace util { namespace detail
             }
         }
         return chunk_size;
+    }
+
+    template <typename ExPolicy, typename Future, typename F1,
+        typename FwdIter>
+        // requires traits::is_future<Future>
+    std::vector<hpx::util::tuple<std::size_t, FwdIter, std::size_t > >
+        get_static_shape_idx(ExPolicy policy,
+        std::vector<Future>& inititems, F1 && f1,
+        std::size_t& base_idx, FwdIter& first, std::size_t& count,
+        std::size_t chunk_size)
+    {
+        typedef typename hpx::util::tuple<std::size_t, FwdIter, std::size_t>
+            tuple;
+
+        chunk_size = get_static_chunk_size_idx(policy, inititems,
+            std::forward<F1>(f1), base_idx, first, count, chunk_size);
+
+        std::vector<tuple> shape;
+        shape.reserve(count / chunk_size + 1);
+
+        while (count != 0)
+        {
+            std::size_t chunk = (std::min)(chunk_size, count);
+
+            shape.push_back(hpx::util::make_tuple(base_idx, first, chunk));
+
+            count -= chunk;
+            std::advance(first, chunk);
+            base_idx += chunk;
+        }
+
+        return shape;
     }
 }}}}
 
