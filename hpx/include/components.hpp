@@ -26,6 +26,8 @@
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 
+#include <hpx/runtime/components/server/invoke_function.hpp>
+
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
