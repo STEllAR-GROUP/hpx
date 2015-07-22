@@ -1,4 +1,4 @@
-﻿#  Header making script  ------------------------------------------//
+#  Header making script  ------------------------------------------//
 
 #  Copyright (c) 2015 Brandon Cordes
 #  Distributed under the Boost Software License, Version 1.0.
