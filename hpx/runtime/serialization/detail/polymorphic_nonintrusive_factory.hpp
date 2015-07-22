@@ -207,7 +207,7 @@ namespace hpx { namespace serialization { namespace detail
 #define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                       \
         Parameters, Template, Name)                                           \
     namespace hpx { namespace serialization { namespace detail {              \
-        HPX_UTIL_STRIP(Parameters)                                            \
+        HPX_UTIL_STRIP(Parameters) HPX_ALWAYS_EXPORT                          \
         struct get_serialization_name<HPX_UTIL_STRIP(Template)>               \
         {                                                                     \
             char const* operator()()                                          \
