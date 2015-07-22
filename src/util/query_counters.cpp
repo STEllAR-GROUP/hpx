@@ -222,7 +222,7 @@ namespace hpx { namespace util
                 {
                     f.get();
                 }
-                else                                                                                                                                                                                                                                                                                                                                       
+                else
                 {
                     ec = make_error_code(f.get_exception_ptr());
                 }
