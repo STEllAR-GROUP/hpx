@@ -319,7 +319,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             template <typename Executor>
             static auto call(wrap_int, Executor& exec) -> bool
             {
-                return hpx::get_os_thread_count();
+                return false;   // assume stateless scheduling
             }
 
             template <typename Executor>

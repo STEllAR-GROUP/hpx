@@ -26,13 +26,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
       : detail::threads_executor
 #endif
     {
-        /// Creates a new local_queue_executor
-        ///
-        /// \param max_punits   [in] The maximum number of processing units to
-        ///                     associate with the newly created executor.
-        /// \param min_punits   [in] The minimum number of processing units to
-        ///                     associate with the newly created executor
-        ///                     (default: 1).
+        /// Creates a new this_thread_local_queue_executor
         ///
         explicit this_thread_local_queue_executor()
           : threads_executor(
@@ -47,13 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
       : detail::threads_executor
 #endif
     {
-        /// Creates a new static_priority_queue_executor
-        ///
-        /// \param max_punits   [in] The maximum number of processing units to
-        ///                     associate with the newly created executor.
-        /// \param min_punits   [in] The minimum number of processing units to
-        ///                     associate with the newly created executor
-        ///                     (default: 1).
+        /// Creates a new this_thread_static_priority_queue_executor
         ///
         explicit this_thread_static_priority_queue_executor()
           : threads_executor(
