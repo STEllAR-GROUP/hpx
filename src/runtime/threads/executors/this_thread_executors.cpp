@@ -5,11 +5,11 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_LOCAL_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 
 #include <hpx/runtime/threads/resource_manager.hpp>
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
-#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+#include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 #endif
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
@@ -384,11 +384,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
 namespace hpx { namespace threads { namespace executors
 {
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
-    this_thread_local_queue_executor::this_thread_local_queue_executor()
+    this_thread_static_queue_executor::this_thread_static_queue_executor()
       : scheduled_executor(new detail::this_thread_executor<
-            policies::local_queue_scheduler<> >())
+            policies::static_queue_scheduler<> >())
     {}
 #endif
 

@@ -20,17 +20,17 @@
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
-    struct this_thread_local_queue_executor
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+    struct this_thread_static_queue_executor
 #if !defined(DOXYGEN)
       : detail::threads_executor
 #endif
     {
-        /// Creates a new this_thread_local_queue_executor
+        /// Creates a new local_queue_executor
         ///
-        explicit this_thread_local_queue_executor()
+        explicit this_thread_static_queue_executor()
           : threads_executor(
-                threads::executors::this_thread_local_queue_executor())
+                threads::executors::this_thread_static_queue_executor())
         {}
     };
 #endif
@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
       : detail::threads_executor
 #endif
     {
-        /// Creates a new this_thread_static_priority_queue_executor
+        /// Creates a new static_priority_queue_executor
         ///
         explicit this_thread_static_priority_queue_executor()
           : threads_executor(
@@ -53,9 +53,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     namespace detail
     {
         /// \cond NOINTERNAL
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
         template <>
-        struct is_executor<this_thread_local_queue_executor>
+        struct is_executor<this_thread_static_queue_executor>
           : std::true_type
         {};
 #endif
