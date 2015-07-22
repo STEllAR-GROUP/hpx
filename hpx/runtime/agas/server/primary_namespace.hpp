@@ -22,16 +22,17 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 
-#include <map>
-
+#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/atomic.hpp>
+#include <boost/thread/locks.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
 #include <boost/shared_ptr.hpp>
 #endif
+
+#include <map>
 
 namespace hpx { namespace agas
 {
@@ -241,7 +242,7 @@ struct HPX_EXPORT primary_namespace
       , refcnt_table_type::iterator upper_it
       , naming::gid_type const& lower
       , naming::gid_type const& upper
-      , mutex_type::scoped_lock& l
+      , boost::unique_lock<mutex_type>& l
       , const char* func_name
         );
 #endif
@@ -256,7 +257,7 @@ struct HPX_EXPORT primary_namespace
 
     // helper function
     void wait_for_migration_locked(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , naming::gid_type id
       , error_code& ec);
 
@@ -385,7 +386,7 @@ struct HPX_EXPORT primary_namespace
     };
 
     void resolve_free_list(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , std::list<refcnt_table_type::iterator> const& free_list
       , std::list<free_entry>& free_entry_list
       , naming::gid_type const& lower

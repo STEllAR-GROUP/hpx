@@ -24,13 +24,13 @@ endif()
 # C++ overrides
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
-    "${CMAKE_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
 
 ################################################################################
 # Fortran overrides
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
-    "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
 
 ################################################################################
 # Build type (needs to be handled before project command below)
@@ -688,6 +688,16 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
+if(MSVC14 AND CMAKE_CL_64)
+  hpx_option(HPX_WITH_AWAIT BOOL
+      "Enable the use of experimental __await functionality"
+      OFF ADVANCED CATEGORY "LCOs")
+  if(HPX_WITH_AWAIT)
+    hpx_add_config_define(HPX_HAVE_AWAIT)
+    hpx_add_compile_flag(-await LANGUAGES CXX)
+  endif()
+endif()
+
 ################################################################################
 
 ################################################################################
@@ -866,8 +876,13 @@ if(MSVC)
   enable_language(ASM_MASM)
   hpx_add_compile_flag(-Ox
     CONFIGURATIONS Release LANGUAGES CXX C)
-  hpx_add_compile_flag(-RTC1
-    CONFIGURATIONS Debug LANGUAGES CXX C)
+
+  if(NOT HPX_WITH_AWAIT)
+    hpx_add_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
+  else()
+    # /RTC1 is incompatible with /await
+    hpx_remove_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
+  endif()
 
   # VS2012 and above has a special flag for improving the debug experience by
   # adding more symbol information to the build (-d2Zi)
@@ -877,7 +892,7 @@ if(MSVC)
   # VS2013 and above know how to do link time constant data segment folding
   # VS2013 update 2 and above know how to remove debug information for
   #     non-referenced functions and data (-Zc:inline)
-  if(MSVC12 OR MSVC13)
+  if(MSVC12 OR MSVC14)
     hpx_add_compile_flag(-Zc:inline)
     hpx_add_compile_flag(-Gw
       CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
@@ -1355,7 +1370,7 @@ install( # Install HPX Python scripts
   PATTERN ".git" EXCLUDE)
 
 #   if(UNIX)
-#     file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py")
+#     file(GLOB scripts "${PROJECT_SOURCE_DIR}/python/scripts/*.py")
 #     execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory
 #       "${CMAKE_BINARY_DIR}/python/scripts" )
 #     foreach(script ${scripts})
@@ -1384,7 +1399,7 @@ install( # Install HPX Python scripts
 #
 #   execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/python" )
 #   #make symlink, so that we have intact hpx symlink in CMAKE_BINARY_DIR
-#   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "${CMAKE_SOURCE_DIR}/python/hpx"
+#   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/python/hpx"
 #     "hpx-${HPX_VERSION}" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
 #   # create a symlink in share pointing to the latest HPX installation
 #   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")

@@ -8,9 +8,10 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/interval_timer.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/bind.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace util
 {
@@ -40,7 +41,7 @@ namespace hpx { namespace util
 
     bool interval_timer::start(bool evaluate_)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (is_terminated_)
             return false;
 
@@ -48,7 +49,7 @@ namespace hpx { namespace util
             if (first_start_) {
                 first_start_ = false;
 
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 if (pre_shutdown_)
                     register_pre_shutdown_function(boost::bind(&interval_timer::terminate, this));
                 else
@@ -75,7 +76,7 @@ namespace hpx { namespace util
         if (!is_started_)
             return start(evaluate_);
 
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
 
         if (is_terminated_)
             return false;
@@ -96,7 +97,7 @@ namespace hpx { namespace util
 
     bool interval_timer::stop()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
         is_stopped_ = true;
         return stop_locked();
     }
@@ -121,7 +122,7 @@ namespace hpx { namespace util
 
     void interval_timer::terminate()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (!is_terminated_) {
             is_terminated_ = true;
             stop_locked();
@@ -147,7 +148,7 @@ namespace hpx { namespace util
         threads::thread_state_ex_enum statex)
     {
         try {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             if (is_stopped_ || is_terminated_ ||
                 statex == threads::wait_abort || 0 == microsecs_)
@@ -164,7 +165,7 @@ namespace hpx { namespace util
             bool result = false;
 
             {
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 result = f_();            // invoke the supplied function
             }
 
@@ -183,8 +184,10 @@ namespace hpx { namespace util
     }
 
     // schedule a high priority task after a given time interval
-    void interval_timer::schedule_thread(mutex_type::scoped_lock & l)
+    void interval_timer::schedule_thread(boost::unique_lock<mutex_type> & l)
     {
+        HPX_ASSERT(l.owns_lock());
+
         using namespace hpx::threads;
 
         error_code ec;
@@ -196,7 +199,7 @@ namespace hpx { namespace util
             // the allocators use hpx::lcos::local::spinlock. Unlocking the
             // lock here would be the right thing but leads to crashes and hangs
             // at shutdown.
-            //util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+            //util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
             id = hpx::applier::register_thread_plain(
                 boost::bind(&interval_timer::evaluate, this, _1),
                 description_.c_str(), threads::suspended, true,

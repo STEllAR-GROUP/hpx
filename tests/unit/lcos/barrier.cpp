@@ -42,7 +42,7 @@ void local_tests(boost::program_options::variables_map& vm)
         boost::atomic<std::size_t> c(0);
         for (std::size_t j = 0; j < pxthreads; ++j)
         {
-            hpx::async(boost::bind(&barrier_test, b.get_gid(), boost::ref(c)));
+            hpx::async(boost::bind(&barrier_test, b.get_id(), boost::ref(c)));
         }
 
         b.wait();       // wait for all threads to enter the barrier
@@ -70,7 +70,7 @@ void remote_test_multiple(boost::program_options::variables_map& vm)
     {
         // create the barrier, register it with AGAS
         barrier b = barrier::create(here, localities.size());
-        HPX_TEST(hpx::agas::register_name_sync(barrier_test_name, b.get_gid()));
+        HPX_TEST(hpx::agas::register_name_sync(barrier_test_name, b.get_id()));
 
         for (std::size_t i = 0; i != iterations; ++i)
             b.wait();
@@ -108,7 +108,7 @@ void remote_test_single(boost::program_options::variables_map& vm)
     {
         outer = barrier::create(here, localities.size());
         HPX_TEST(hpx::agas::register_name_sync(barrier_test_name_outer,
-            outer.get_gid()));
+            outer.get_id()));
     }
     else
     {
@@ -124,7 +124,7 @@ void remote_test_single(boost::program_options::variables_map& vm)
         {
             // create the barrier, register it with AGAS
             barrier b = barrier::create(here, localities.size());
-            HPX_TEST(hpx::agas::register_name_sync(barrier_test_name, b.get_gid()));
+            HPX_TEST(hpx::agas::register_name_sync(barrier_test_name, b.get_id()));
 
             b.wait();
 

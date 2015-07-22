@@ -46,7 +46,7 @@ namespace jacobi {
 
             row_range get(std::size_t begin, std::size_t end)
             {
-                //std::cout << this->get_gid() << "row::get ...\n";
+                //std::cout << this->get_id() << "row::get ...\n";
                 HPX_ASSERT(values);
                 return row_range(values, begin, end);
             }

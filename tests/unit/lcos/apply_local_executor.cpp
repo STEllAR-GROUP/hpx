@@ -124,7 +124,7 @@ void test_apply_with_executor(Executor& exec)
     }
 
     hpx::lcos::local::no_mutex result_mutex;
-    hpx::lcos::local::no_mutex::scoped_lock l(result_mutex);
+    boost::unique_lock<hpx::lcos::local::no_mutex> l(result_mutex);
     result_cv.wait_for(l, boost::chrono::seconds(1),
         hpx::util::bind(std::equal_to<boost::int32_t>(),
             boost::ref(accumulator), 18));

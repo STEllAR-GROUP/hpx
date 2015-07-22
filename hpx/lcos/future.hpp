@@ -1231,16 +1231,16 @@ namespace hpx { namespace actions
         void deferred_trigger(lcos::future<R> result) const
         {
             if (f_.empty()) {
-                if (!this->get_gid()) {
+                if (!this->get_id()) {
                     HPX_THROW_EXCEPTION(invalid_status,
                         "typed_continuation<lcos::future<R> >::trigger_value",
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value(this->get_gid(), result.get());
+                hpx::set_lco_value(this->get_id(), result.get());
             }
             else {
-                f_(this->get_gid(), result.get());
+                f_(this->get_id(), result.get());
             }
         }
 
@@ -1248,7 +1248,7 @@ namespace hpx { namespace actions
         {
             LLCO_(info)
                 << "typed_continuation<lcos::future<R> >::trigger("
-                << this->get_gid() << ")";
+                << this->get_id() << ")";
 
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {
@@ -1351,18 +1351,18 @@ namespace hpx { namespace actions
         void deferred_trigger(lcos::future<void> result) const
         {
             if (f_.empty()) {
-                if (!this->get_gid()) {
+                if (!this->get_id()) {
                     HPX_THROW_EXCEPTION(invalid_status,
                         "typed_continuation<lcos::future<void> >::trigger_value",
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
                 result.get();
-                hpx::trigger_lco_event(this->get_gid());
+                hpx::trigger_lco_event(this->get_id());
             }
             else {
                 result.get();
-                f_(this->get_gid());
+                f_(this->get_id());
             }
         }
 
@@ -1370,7 +1370,7 @@ namespace hpx { namespace actions
         {
             LLCO_(info)
                 << "typed_continuation<lcos::future<void> >::trigger("
-                << this->get_gid() << ")";
+                << this->get_id() << ")";
 
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {
@@ -1473,16 +1473,16 @@ namespace hpx { namespace actions
         void deferred_trigger(lcos::shared_future<R> result) const
         {
             if (f_.empty()) {
-                if (!this->get_gid()) {
+                if (!this->get_id()) {
                     HPX_THROW_EXCEPTION(invalid_status,
                         "typed_continuation<lcos::shared_future<R> >::trigger_value",
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value(this->get_gid(), result.get());
+                hpx::set_lco_value(this->get_id(), result.get());
             }
             else {
-                f_(this->get_gid(), result.get());
+                f_(this->get_id(), result.get());
             }
         }
 
@@ -1490,7 +1490,7 @@ namespace hpx { namespace actions
         {
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
-                << this->get_gid() << ")";
+                << this->get_id() << ")";
 
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {
@@ -1593,18 +1593,18 @@ namespace hpx { namespace actions
         void deferred_trigger(lcos::shared_future<void> result) const
         {
             if (f_.empty()) {
-                if (!this->get_gid()) {
+                if (!this->get_id()) {
                     HPX_THROW_EXCEPTION(invalid_status,
                         "typed_continuation<lcos::shared_future<void> >::trigger_value",
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
                 result.get();
-                hpx::trigger_lco_event(this->get_gid());
+                hpx::trigger_lco_event(this->get_id());
             }
             else {
                 result.get();
-                f_(this->get_gid());
+                f_(this->get_id());
             }
         }
 
@@ -1612,7 +1612,7 @@ namespace hpx { namespace actions
         {
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
-                << this->get_gid() << ")";
+                << this->get_id() << ")";
 
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {

@@ -12,6 +12,8 @@
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
     struct tag_provider
@@ -50,7 +52,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         int acquire()
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             if(free_tags_.empty())
                 return next_tag_++;
 
@@ -63,7 +65,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if(tag == next_tag_) return;
 
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             free_tags_.push_back(tag);
         }
 

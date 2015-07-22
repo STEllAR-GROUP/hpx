@@ -46,14 +46,14 @@ namespace interpolate1d
         init_async(std::string datafilename, dimension const& dim,
             std::size_t num_nodes)
         {
-            return stubs::partition::init_async(this->get_gid(), datafilename,
+            return stubs::partition::init_async(this->get_id(), datafilename,
                 dim, num_nodes);
         }
 
         void init(std::string datafilename, dimension const& dim,
             std::size_t num_nodes)
         {
-            stubs::partition::init(this->get_gid(), datafilename, dim, num_nodes);
+            stubs::partition::init(this->get_id(), datafilename, dim, num_nodes);
         }
 
         // ask this partition to interpolate, note that value must be in the
@@ -61,12 +61,12 @@ namespace interpolate1d
         hpx::lcos::future<double>
         interpolate_async(double value)
         {
-            return stubs::partition::interpolate_async(this->get_gid(), value);
+            return stubs::partition::interpolate_async(this->get_id(), value);
         }
 
         double interpolate(double value)
         {
-            return stubs::partition::interpolate(this->get_gid(), value);
+            return stubs::partition::interpolate(this->get_id(), value);
         }
     };
 }

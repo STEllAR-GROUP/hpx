@@ -19,7 +19,6 @@ set(tests
     async_remote
     broadcast
     broadcast_apply
-    composable_guard
     condition_variable
     barrier
     fold
@@ -28,8 +27,7 @@ set(tests
     future_then
     future_then_executor
     future_wait
-    latch_local
-    latch_remote
+    local_latch
     local_barrier
     local_dataflow
     local_dataflow_executor
@@ -38,12 +36,19 @@ set(tests
     packaged_action
     promise
     reduce
+    remote_latch
+    run_guarded
     shared_future
     unwrapped
     when_all
     when_any
     when_some
    )
+
+if(HPX_WITH_AWAIT)
+  set(tests ${tests} await)
+  set(await_PARAMETERS THREADS_PER_LOCALITY 4)
+endif()
 
 set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(apply_local_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -69,8 +74,8 @@ set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(latch_local_PARAMETERS THREADS_PER_LOCALITY 4)
-set(latch_remote_PARAMETERS LOCALITIES 2)
+set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
+set(remote_latch_PARAMETERS LOCALITIES 2)
 
 set(local_event_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -81,6 +86,8 @@ set(packaged_action_PARAMETERS THREADS_PER_LOCALITY 4)
 set(promise_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(reduce_PARAMETERS LOCALITIES 2)
+
+set(run_guarded_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources

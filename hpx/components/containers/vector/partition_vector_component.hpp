@@ -467,7 +467,7 @@ namespace hpx
         boost::shared_ptr<server::partition_vector<T> > get_ptr() const
         {
             error_code ec(lightweight);
-            return hpx::get_ptr<server::partition_vector<T> >(this->get_gid()).get(ec);
+            return hpx::get_ptr<server::partition_vector<T> >(this->get_id()).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -479,8 +479,8 @@ namespace hpx
         ///
         future<std::size_t> size_async() const
         {
-            HPX_ASSERT(this->get_gid());
-            return hpx::async<typename server_type::size_action>(this->get_gid());
+            HPX_ASSERT(this->get_id());
+            return hpx::async<typename server_type::size_action>(this->get_id());
         }
 
         /// Return the size of the partition_vector component.
@@ -494,8 +494,8 @@ namespace hpx
 
 //         future<std::size_t> max_size_async() const
 //         {
-//             HPX_ASSERT(this->get_gid());
-//             return this->base_type::max_size_async(this->get_gid());
+//             HPX_ASSERT(this->get_id());
+//             return this->base_type::max_size_async(this->get_id());
 //         }
 //         std::size_t max_size() const
 //         {
@@ -526,15 +526,15 @@ namespace hpx
         ///
         future<void> resize_async(std::size_t n, T const& val = T())
         {
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::resize_action>(
-                this->get_gid(), n, val);
+                this->get_id(), n, val);
         }
 
 //         future<std::size_t> capacity_async() const
 //         {
-//             HPX_ASSERT(this->get_gid());
-//             return this->base_type::capacity_async(this->get_gid());
+//             HPX_ASSERT(this->get_id());
+//             return this->base_type::capacity_async(this->get_id());
 //         }
 //         std::size_t capacity() const
 //         {
@@ -543,8 +543,8 @@ namespace hpx
 
 //         future<bool> empty_async() const
 //         {
-//             HPX_ASSERT(this->get_gid());
-//             return this->base_type::empty_async(this->get_gid());
+//             HPX_ASSERT(this->get_id());
+//             return this->base_type::empty_async(this->get_id());
 //         }
 //         bool empty() const
 //         {
@@ -553,8 +553,8 @@ namespace hpx
 
 //         void reserve(std::size_t n)
 //         {
-//             HPX_ASSERT(this->get_gid());
-//             this->base_type::reserve_async(this->get_gid(), n).get();
+//             HPX_ASSERT(this->get_id());
+//             this->base_type::reserve_async(this->get_id(), n).get();
 //         }
 
         //  Element Access API's in Client class
@@ -581,9 +581,9 @@ namespace hpx
         ///
         future<T> get_value(std::size_t pos) const
         {
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::get_value_action>(
-                this->get_gid(), pos);
+                this->get_id(), pos);
         }
 
         /// Returns the value at position \a pos in the partition_vector
@@ -608,26 +608,26 @@ namespace hpx
         ///
         future<std::vector<T> > get_values(std::vector<std::size_t> const& pos) const
         {
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::get_values_action>(
-                this->get_gid(), pos);
+                this->get_id(), pos);
         }
 
 //         future<T> front_async() const
 //         {
-//             HPX_ASSERT(this->get_gid());
-//             return this->base_type::front_async(this->get_gid());
+//             HPX_ASSERT(this->get_id());
+//             return this->base_type::front_async(this->get_id());
 //         }
 //         T front() const
 //         {
-//             HPX_ASSERT(this->get_gid());
+//             HPX_ASSERT(this->get_id());
 //             return front_async().get();
 //         }
 
 //         future<T> back_async() const
 //         {
-//             HPX_ASSERT(this->get_gid());
-//             return this->base_type::back_async(this->get_gid());
+//             HPX_ASSERT(this->get_id());
+//             return this->base_type::back_async(this->get_id());
 //         }
 //         T back() const
 //         {
@@ -637,22 +637,22 @@ namespace hpx
         //  Modifiers API's in client class
 //         void assign(std::size_t n, T const& val)
 //         {
-//             HPX_ASSERT(this->get_gid());
-//             this->base_type::assign_async(this->get_gid(), n, val).get();
+//             HPX_ASSERT(this->get_id());
+//             this->base_type::assign_async(this->get_id(), n, val).get();
 //         }
 
 //         template <typename T_>
 //         void push_back(T_ && val)
 //         {
-//             HPX_ASSERT(this->get_gid());
+//             HPX_ASSERT(this->get_id());
 //             this->base_type::push_back_async(
-//                 this->get_gid(), std::forward<T_>(val)).get();
+//                 this->get_id(), std::forward<T_>(val)).get();
 //         }
 
 //         void pop_back()
 //         {
-//             HPX_ASSERT(this->get_gid());
-//             this->base_type::pop_back_async(this->get_gid()).get();
+//             HPX_ASSERT(this->get_id());
+//             this->base_type::pop_back_async(this->get_id()).get();
 //         }
 
         /// Copy the value of \a val in the element at position
@@ -678,9 +678,9 @@ namespace hpx
         template <typename T_>
         future<void> set_value(std::size_t pos, T_ && val)
         {
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::set_value_action>(
-                this->get_gid(), pos, std::forward<T_>(val));
+                this->get_id(), pos, std::forward<T_>(val));
         }
 
         /// Copy the value of \a val in the element at position
@@ -706,15 +706,15 @@ namespace hpx
         future<void> set_values(std::vector<std::size_t> const& pos,
             std::vector<T> const& val)
         {
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::set_values_action>(
-                this->get_gid(), pos, val);
+                this->get_id(), pos, val);
         }
 
 //         void clear()
 //         {
-//             HPX_ASSERT(this->get_gid());
-//             this->base_type::clear_async(this->get_gid()).get();
+//             HPX_ASSERT(this->get_id());
+//             this->base_type::clear_async(this->get_id()).get();
 //         }
     };
 }

@@ -9,8 +9,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <stdexcept>
-
 #include <hpx/exception.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
@@ -18,6 +16,9 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <stdexcept>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -70,7 +71,7 @@ namespace hpx { namespace util
 
     io_service_pool::~io_service_pool()
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
         stop_locked();
         join_locked();
         clear_locked();
@@ -90,7 +91,7 @@ namespace hpx { namespace util
 
     bool io_service_pool::run(bool join_threads)
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
 
         // Create a pool of threads to run all of the io_services.
         if (!threads_.empty())   // should be called only once
@@ -143,7 +144,7 @@ namespace hpx { namespace util
 
     void io_service_pool::join()
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
         join_locked();
     }
 
@@ -157,7 +158,7 @@ namespace hpx { namespace util
 
     void io_service_pool::stop()
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
         stop_locked();
     }
 
@@ -179,7 +180,7 @@ namespace hpx { namespace util
 
     void io_service_pool::clear()
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
         clear_locked();
     }
 
@@ -195,14 +196,14 @@ namespace hpx { namespace util
 
     bool io_service_pool::stopped()
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
         return stopped_;
     }
 
     boost::asio::io_service& io_service_pool::get_io_service(int index)
     {
         // use this function for single group io_service pools only
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
 
         if (index == -1) {
             if (++next_io_service_ == pool_size_)

@@ -64,6 +64,11 @@ namespace detail
             return 0 == --count_;
         }
 
+        virtual void destroy()
+        {
+            delete this;
+        }
+
     protected:
         future_data_refcnt_base() : count_(0) {}
 
@@ -82,7 +87,7 @@ namespace detail
     inline void intrusive_ptr_release(future_data_refcnt_base* p)
     {
         if (p->requires_delete())
-            delete p;
+            p->destroy();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -556,12 +561,12 @@ namespace detail
 
         threads::thread_id_type get_id() const
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             return id_;
         }
         void set_id(threads::thread_id_type id)
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             id_ = id;
         }
 
@@ -611,13 +616,13 @@ namespace detail
     private:
         bool started_test() const
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             return started_;
         }
 
         bool started_test_and_set()
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             if (started_)
                 return true;
 
@@ -627,7 +632,7 @@ namespace detail
 
         void check_started()
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::lock_guard<mutex_type> l(this->mtx_);
             if (started_) {
                 HPX_THROW_EXCEPTION(task_already_started,
                     "task_base::check_started",
@@ -724,7 +729,7 @@ namespace detail
 
         void cancel()
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::unique_lock<mutex_type> l(this->mtx_);
             try {
                 if (!this->started_)
                     boost::throw_exception(hpx::thread_interrupted());

@@ -29,6 +29,7 @@
 
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/atomic.hpp>
@@ -285,25 +286,25 @@ namespace hpx { namespace components { namespace server
 
         void add_pre_startup_function(util::function_nonser<void()> const& f)
         {
-            lcos::local::spinlock::scoped_lock l(globals_mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(globals_mtx_);
             pre_startup_functions_.push_back(f);
         }
 
         void add_startup_function(util::function_nonser<void()> const& f)
         {
-            lcos::local::spinlock::scoped_lock l(globals_mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(globals_mtx_);
             startup_functions_.push_back(f);
         }
 
         void add_pre_shutdown_function(util::function_nonser<void()> const& f)
         {
-            lcos::local::spinlock::scoped_lock l(globals_mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(globals_mtx_);
             pre_shutdown_functions_.push_back(f);
         }
 
         void add_shutdown_function(util::function_nonser<void()> const& f)
         {
-            lcos::local::spinlock::scoped_lock l(globals_mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(globals_mtx_);
             shutdown_functions_.push_back(f);
         }
 
@@ -449,7 +450,7 @@ namespace hpx { namespace components { namespace server
             components::get_component_type<
                 typename Component::wrapped_type>();
 
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             std::ostringstream strm;
@@ -478,7 +479,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
             id = factory->create();
         }
         LRT_(info) << "successfully created component " << id
@@ -494,7 +495,7 @@ namespace hpx { namespace components { namespace server
             components::get_component_type<
                 typename Component::wrapped_type>();
 
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             std::ostringstream strm;
@@ -523,7 +524,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
 
             typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(
@@ -544,7 +545,7 @@ namespace hpx { namespace components { namespace server
             components::get_component_type<
                 typename Component::wrapped_type>();
 
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             std::ostringstream strm;
@@ -575,7 +576,7 @@ namespace hpx { namespace components { namespace server
 
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
             for (std::size_t i = 0; i != count; ++i)
             {
                 ids.push_back(factory->create());
@@ -596,7 +597,7 @@ namespace hpx { namespace components { namespace server
             components::get_component_type<
                 typename Component::wrapped_type>();
 
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             std::ostringstream strm;
@@ -627,7 +628,7 @@ namespace hpx { namespace components { namespace server
 
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
             for (std::size_t i = 0; i != count; ++i)
             {
                 typedef typename Component::wrapping_type wrapping_type;
@@ -652,7 +653,7 @@ namespace hpx { namespace components { namespace server
             components::get_component_type<
                 typename Component::wrapped_type>();
 
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             std::ostringstream strm;
@@ -681,7 +682,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
 
             typedef typename Component::wrapping_type wrapping_type;
             if (!local_op) {
@@ -708,7 +709,7 @@ namespace hpx { namespace components { namespace server
             components::get_component_type<
                 typename Component::wrapped_type>();
 
-        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        boost::unique_lock<component_map_mutex_type> l(cm_mtx_);
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             std::ostringstream strm;
@@ -741,7 +742,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+            util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
 
             typedef typename Component::wrapping_type wrapping_type;
             id = factory->create_with_args(migrated_id,

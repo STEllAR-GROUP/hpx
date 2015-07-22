@@ -37,14 +37,14 @@ HPX_REGISTER_ACTION_DECLARATION(test0_action);
 HPX_REGISTER_ACTION(test0_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-// Concrete
-struct B : A, hpx::components::managed_component_base<B>
+// Abstract
+struct B : A, hpx::components::abstract_managed_component_base<B>
 {
-    typedef hpx::components::managed_component_base<B>::wrapping_type
+    typedef hpx::components::abstract_managed_component_base<B>::wrapping_type
         wrapping_type;
-    using hpx::components::managed_component_base<B>::decorate_action;
-    using hpx::components::managed_component_base<B>::schedule_thread;
-    using hpx::components::managed_component_base<B>::is_target_valid;
+    using hpx::components::abstract_managed_component_base<B>::decorate_action;
+    using hpx::components::abstract_managed_component_base<B>::schedule_thread;
+    using hpx::components::abstract_managed_component_base<B>::is_target_valid;
 
     typedef B type_holder;
     typedef A base_type_holder;
@@ -54,13 +54,12 @@ struct B : A, hpx::components::managed_component_base<B>
 
     virtual std::string test0() const { return "B"; }
 
-    virtual std::string test1() const { return "B"; }
+    virtual std::string test1() const = 0;
     std::string test1_nonvirt() const { return test1(); }
     HPX_DEFINE_COMPONENT_ACTION(B, test1_nonvirt, test1_action);
 };
 
-typedef hpx::components::managed_component<B> serverB_type;
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(serverB_type, B, "A");
+HPX_DEFINE_GET_COMPONENT_TYPE(B);
 
 typedef B::test1_action test1_action;
 HPX_REGISTER_ACTION_DECLARATION(test1_action);
@@ -72,12 +71,8 @@ struct C : B, hpx::components::managed_component_base<C>
 {
     typedef hpx::components::managed_component_base<C>::wrapping_type
         wrapping_type;
-    typedef hpx::components::managed_component_base<C>::wrapped_type
-        wrapped_type;
     using hpx::components::managed_component_base<C>::decorate_action;
     using hpx::components::managed_component_base<C>::schedule_thread;
-    using hpx::components::managed_component_base<C>::set_back_ptr;
-    using hpx::components::managed_component_base<C>::finalize;
     using hpx::components::managed_component_base<C>::is_target_valid;
 
     typedef C type_holder;
@@ -113,7 +108,7 @@ struct clientA : hpx::components::client_base<clientA, A>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -129,13 +124,13 @@ struct clientB : hpx::components::client_base<clientB, B>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test1()
     {
         test1_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -151,19 +146,19 @@ struct clientC : hpx::components::client_base<clientC, C>
     std::string test0()
     {
         test0_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test1()
     {
         test1_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 
     std::string test2()
     {
         test2_action act;
-        return act(base_type::get_gid());
+        return act(base_type::get_id());
     }
 };
 
@@ -180,35 +175,6 @@ void reset_globals()
 
 int main()
 {
-    ///////////////////////////////////////////////////////////////////////////
-
-    { // Client to A, instance of B
-        clientA obj(hpx::components::new_<B>(hpx::find_here()));
-
-        HPX_TEST_EQ(obj.test0(), "B");
-    }
-
-    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-    HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
-
-    reset_globals();
-
-    ///////////////////////////////////////////////////////////////////////////
-
-    { // Client to B, instance of B
-        clientB obj(hpx::components::new_<B>(hpx::find_here()));
-
-        HPX_TEST_EQ(obj.test0(), "B");
-        HPX_TEST_EQ(obj.test1(), "B");
-    }
-
-    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-    HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
-
-    reset_globals();
-
     ///////////////////////////////////////////////////////////////////////////
 
     { // Client to A, instance of C

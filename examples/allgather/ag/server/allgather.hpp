@@ -11,7 +11,7 @@
 
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace ag { namespace server

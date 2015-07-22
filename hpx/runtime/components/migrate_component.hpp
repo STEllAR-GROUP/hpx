@@ -75,7 +75,7 @@ namespace hpx { namespace components
     {
         typedef typename client_base<Derived, Stub>::server_component_type
             component_type;
-        return Derived(migrate<component_type>(to_migrate.get_gid(),
+        return Derived(migrate<component_type>(to_migrate.get_id(),
             target_storage));
     }
 }}

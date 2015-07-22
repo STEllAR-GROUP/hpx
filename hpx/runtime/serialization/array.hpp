@@ -1,5 +1,6 @@
 //  (C) Copyright 2005 Matthias Troyer and Dave Abrahams
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2015 Andreas Schaefer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -143,6 +144,39 @@ namespace hpx { namespace serialization
     input_archive & operator&(input_archive & ar, array<T> t) //-V524
     {
         ar.invoke(t);
+        return ar;
+    }
+
+    // serialize plain arrays:
+    template <typename T, std::size_t N> BOOST_FORCEINLINE
+    output_archive & operator<<(output_archive & ar, T (&t)[N])
+    {
+        array<T> array = make_array(t, N);
+        ar.invoke(array);
+        return ar;
+    }
+
+    template <typename T, std::size_t N> BOOST_FORCEINLINE
+    input_archive & operator>>(input_archive & ar, T (&t)[N])
+    {
+        array<T> array = make_array(t, N);
+        ar.invoke(array);
+        return ar;
+    }
+
+    template <typename T, std::size_t N> BOOST_FORCEINLINE
+    output_archive & operator&(output_archive & ar, T (&t)[N]) //-V524
+    {
+        array<T> array = make_array(t, N);
+        ar.invoke(array);
+        return ar;
+    }
+
+    template <typename T, std::size_t N> BOOST_FORCEINLINE
+    input_archive & operator&(input_archive & ar, T (&t)[N]) //-V524
+    {
+        array<T> array = make_array(t, N);
+        ar.invoke(array);
         return ar;
     }
 }}

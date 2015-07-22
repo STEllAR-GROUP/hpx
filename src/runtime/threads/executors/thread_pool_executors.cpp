@@ -16,6 +16,8 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace threads { namespace detail
 {
     // The function \a set_self_ptr sets a pointer to the (OS thread
@@ -336,7 +338,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             ++max_current_concurrency_;
 
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::lock_guard<mutex_type> l(mtx_);
                 scheduler_.add_punit(virt_core, thread_num);
                 scheduler_.on_start_thread(virt_core);
             }

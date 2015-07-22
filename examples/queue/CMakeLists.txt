@@ -7,8 +7,8 @@ add_hpx_executable(queue_client
   SOURCES queue_client.cpp
   FOLDER "Examples/Quickstart/Queue")
 
-add_hpx_pseudo_target(examples.queue.queue)
-add_hpx_pseudo_dependencies(examples.queue examples.queue.queue)
-add_hpx_pseudo_dependencies(examples.queue.queue queue_client_exe)
+add_hpx_pseudo_target(examples.queue.queue_client)
+add_hpx_pseudo_dependencies(examples.queue examples.queue.queue_client)
+add_hpx_pseudo_dependencies(examples.queue.queue_client queue_client_exe)
 
 

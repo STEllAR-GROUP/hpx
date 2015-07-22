@@ -97,12 +97,6 @@ else()
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
-# If the found Boost installation is < 1.57, we need to include extra
-# serialization headers
-if(Boost_VERSION LESS 105700)
-  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${hpx_SOURCE_DIR}/external/serialization")
-endif()
-
 set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})
 set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${hpx_SOURCE_DIR}/external/cache)
 set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${hpx_SOURCE_DIR}/external/endian)

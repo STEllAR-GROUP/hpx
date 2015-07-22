@@ -95,7 +95,7 @@ namespace hpx { namespace threads
         while(!exit_funcs_.empty())
         {
             {
-                hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                hpx::util::unlock_guard<mutex_type::scoped_lock> ul(l);
                 if(!exit_funcs_.back().empty())
                     exit_funcs_.back()();
             }

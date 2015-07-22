@@ -29,7 +29,7 @@ namespace hpx { namespace serialization
         {
             value_type v;
             ar >> v;
-            vs.push_back(v);
+            vs.push_back(std::move(v));
         }
     }
 
@@ -129,7 +129,6 @@ namespace hpx { namespace serialization
     template <typename T, typename Allocator>
     void serialize(output_archive & ar, std::vector<T, Allocator> & v, unsigned)
     {
-        typedef typename std::vector<T>::size_type size_type;
         ar << v.size(); //-V128
         if(v.empty()) return;
         save_impl(

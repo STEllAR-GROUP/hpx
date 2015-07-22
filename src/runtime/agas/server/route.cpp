@@ -32,7 +32,7 @@ namespace hpx { namespace agas { namespace server
         // resolve destination addresses, we should be able to resolve all of
         // them, otherwise it's an error
         {
-            mutex_type::scoped_lock l(mutex_);
+            boost::unique_lock<mutex_type> l(mutex_);
 
             cache_addresses.reserve(size);
             for (std::size_t i = 0; i != size; ++i)

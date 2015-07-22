@@ -91,7 +91,17 @@
   cause the preprocessor constant `HPX_HAVE_MALLOC` to be defined. The actual
   name of the constant (i.e. `MALLOC`) has not changed. Please see the
   corresponding documentation for more details (__cmake_options__).
-
+* The `get_gid()` functions exposed by the component base classes
+  `hpx::components::server::simple_component_base`,
+  `hpx::components::server::managed_component_base`, and
+  `hpx::components::server::fixed_component_base` have been replaced by two new
+  functions: `get_unmanaged_id()` and `get_id()`. To enable the old function
+  name for backwards compatibility, use the cmake configuration option
+  `HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY=On`.
+* All functions which were named `get_gid()` but were returning `hpx::id_type`
+  have been renamed to `get_id()`. To enable the old function names for
+  backwards compatibility, use the cmake configuration option
+  `HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY=On`.
 
 
 [heading Bug Fixes (Closed Tickets)]

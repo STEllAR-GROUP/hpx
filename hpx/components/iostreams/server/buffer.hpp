@@ -9,11 +9,12 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/move.hpp>
-
-#include <vector>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/shared_ptr.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <vector>
 
 namespace hpx { namespace iostreams { namespace detail
 {
@@ -57,13 +58,13 @@ namespace hpx { namespace iostreams { namespace detail
 
         bool empty() const
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return !data_.get() || data_->empty();
         }
 
         buffer init()
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             buffer b;
             boost::swap(b.data_, data_);
@@ -73,7 +74,7 @@ namespace hpx { namespace iostreams { namespace detail
         template <typename Char>
         std::streamsize write(Char const* s, std::streamsize n)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             std::copy(s, s + n, std::back_inserter(*data_));
             return n;
         }
@@ -81,14 +82,14 @@ namespace hpx { namespace iostreams { namespace detail
         template <typename Mutex>
         void write(write_function_type const& f, Mutex& mtx)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             if (data_.get() && !data_->empty())
             {
                 boost::shared_ptr<std::vector<char> > data(data_);
                 data_.reset();
                 l.unlock();
 
-                typename Mutex::scoped_lock ll(mtx);
+                boost::lock_guard<Mutex> ll(mtx);
                 f(*data);
             }
         }

@@ -20,6 +20,7 @@
 #include <boost/asio/placeholders.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -141,7 +142,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
     {
         {
             // cancel all pending read operations, close those sockets
-            lcos::local::spinlock::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
             for (boost::shared_ptr<receiver> const& c : accepted_connections_)
             {
                 boost::system::error_code ec;
@@ -259,7 +260,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
             {
                 // keep track of all the accepted connections
-                lcos::local::spinlock::scoped_lock l(mtx_);
+                boost::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
                 accepted_connections_.insert(c);
             }
 
@@ -270,7 +271,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         }
         else {
             // remove this connection from the list of known connections
-            lcos::local::spinlock::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
             accepted_connections_.erase(receiver_conn);
         }
     }
@@ -293,7 +294,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 //         if (e != boost::asio::error::eof)
         {
             // remove this connection from the list of known connections
-            lcos::local::spinlock::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
             accepted_connections_.erase(receiver_conn);
         }
     }

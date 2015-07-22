@@ -457,23 +457,6 @@ namespace hpx { namespace traits
     struct supports_streaming_with_any<serialization::serialize_buffer<T, Allocator> >
       : boost::mpl::false_
     {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Calculate the required amount of raw memory for serialization.
-    template <typename T, typename Allocator>
-    struct type_size<serialization::serialize_buffer<T, Allocator> >
-    {
-        static std::size_t call(serialization::serialize_buffer<T, Allocator> const& b, int flags)
-        {
-            if (flags & hpx::serialization::disable_data_chunking) {
-                return b.size() * sizeof(T) + sizeof(std::size_t) + sizeof(Allocator); //-V119
-            }
-            else {
-                // size required to specify a new pointer chunk is coming (needs checking)
-                return 8;
-            }
-        }
-    };
 }}
 
 #endif

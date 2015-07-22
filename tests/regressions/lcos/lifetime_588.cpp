@@ -54,7 +54,7 @@ struct test_client
     test_client create_new(hpx::id_type const& id) const
     {
         create_new_action new_;
-        return test_client(hpx::async(new_, this->get_gid(), id));
+        return test_client(hpx::async(new_, this->get_id(), id));
     }
 };
 
@@ -62,7 +62,7 @@ struct test_client
 hpx::id_type test_server::create_new(hpx::id_type const& id) const
 {
     // this waits for the new object to be created
-    return test_client::create(id).get_gid();
+    return test_client::create(id).get_id();
 }
 
 int main()

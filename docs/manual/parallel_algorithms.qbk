@@ -298,6 +298,12 @@ __hpx__ provides implementations of the following parallel algorithms:
 
 [table Numeric Parallel Algorithms (In Header: <hpx/include/parallel_numeric.hpp>)
     [[Name]     [Description]   [In Header]]
+    [[ [algoref adjacent_difference] ]
+     [Calculates the difference between each element in an input range and the preceeding elemnt.]
+     [`<hpx/include/parallel_adjacent_difference.hpp>`]]
+    [[ [algoref inner_product] ]
+     [Accumulates the inner products of two input ranges.]
+     [`<hpx/include/parallel_inner_product.hpp>`]]
     [[ [algoref reduce] ]
      [Sums up a range of elements.]
      [`<hpx/include/parallel_reduce.hpp>`]]
