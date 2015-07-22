@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_LOCAL_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 
 #include <hpx/state.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -117,11 +117,11 @@ namespace hpx { namespace threads { namespace executors
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
-    struct HPX_EXPORT this_thread_local_queue_executor
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+    struct HPX_EXPORT this_thread_static_queue_executor
       : public scheduled_executor
     {
-        this_thread_local_queue_executor();
+        this_thread_static_queue_executor();
     };
 #endif
 

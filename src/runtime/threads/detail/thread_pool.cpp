@@ -901,6 +901,12 @@ template class HPX_EXPORT hpx::threads::detail::thread_pool<
     hpx::threads::policies::local_queue_scheduler<> >;
 #endif
 
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+#include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::threads::detail::thread_pool<
+    hpx::threads::policies::static_queue_scheduler<> >;
+#endif
+
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<

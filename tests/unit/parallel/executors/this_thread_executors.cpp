@@ -81,9 +81,9 @@ void test_this_thread_executor(Executor& exec)
 
 int hpx_main(int argc, char* argv[])
 {
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
     {
-        hpx::parallel::this_thread_local_queue_executor exec;
+        hpx::parallel::this_thread_static_queue_executor exec;
         test_this_thread_executor(exec);
     }
 #endif
