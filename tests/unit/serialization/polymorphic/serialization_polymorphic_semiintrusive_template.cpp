@@ -78,22 +78,22 @@ namespace hpx { namespace serialization {
     template <class Archive, class T>
     void serialize(Archive& archive, A<T>& s, unsigned)
     {
-      archive & s.a;
+        archive & s.a;
     }
 
     template <class Archive, class T>
     void serialize(Archive& archive, B<T>& s, unsigned)
     {
-      archive & hpx::serialization::base_object<A<T> >(s);
-      archive & s.b;
+        archive & hpx::serialization::base_object<A<T> >(s);
+        archive & s.b;
     }
 
     template <class Archive, class S, class T>
     void serialize(Archive& archive, C<S, T>& s, unsigned)
     {
-      archive & hpx::serialization::base_object<A<T> >(s);
-      archive & s.b;
-      archive & s.c;
+        archive & hpx::serialization::base_object<A<T> >(s);
+        archive & s.b;
+        archive & s.c;
     }
 
 } }
@@ -102,35 +102,35 @@ int main()
 {
   std::vector<char> vector;
   {
-    hpx::serialization::output_archive archive{vector};
-    boost::shared_ptr<A<int> > b = boost::make_shared<B<int> >(-4);
-    boost::shared_ptr<A<char> > c = boost::make_shared<B<char> >(44);
-    boost::shared_ptr<A<double> > d = boost::make_shared<B<double> >(99);
-    boost::shared_ptr<A<float> > e = boost::make_shared<C<short, float> >(222);
-    archive << b << c << d << e;
+      hpx::serialization::output_archive archive{vector};
+      boost::shared_ptr<A<int> > b = boost::make_shared<B<int> >(-4);
+      boost::shared_ptr<A<char> > c = boost::make_shared<B<char> >(44);
+      boost::shared_ptr<A<double> > d = boost::make_shared<B<double> >(99);
+      boost::shared_ptr<A<float> > e = boost::make_shared<C<short, float> >(222);
+      archive << b << c << d << e;
   }
 
   {
-    hpx::serialization::input_archive archive{vector};
-    boost::shared_ptr<A<int> > b;
-    boost::shared_ptr<A<char> > c;
-    boost::shared_ptr<A<double> > d;
-    boost::shared_ptr<A<float> > e;
+      hpx::serialization::input_archive archive{vector};
+      boost::shared_ptr<A<int> > b;
+      boost::shared_ptr<A<char> > c;
+      boost::shared_ptr<A<double> > d;
+      boost::shared_ptr<A<float> > e;
 
-    archive >> b >> c >> d >> e;
+      archive >> b >> c >> d >> e;
 
-    HPX_TEST_EQ(b->a, -5);
-    HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->b, -4);
+      HPX_TEST_EQ(b->a, -5);
+      HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->b, -4);
 
-    HPX_TEST_EQ(c->a, 43);
-    HPX_TEST_EQ(boost::static_pointer_cast<B<char> >(c)->b, 44);
+      HPX_TEST_EQ(c->a, 43);
+      HPX_TEST_EQ(boost::static_pointer_cast<B<char> >(c)->b, 44);
 
-    HPX_TEST_EQ(d->a, 98);
-    HPX_TEST_EQ(boost::static_pointer_cast<B<double> >(d)->b, 99);
+      HPX_TEST_EQ(d->a, 98);
+      HPX_TEST_EQ(boost::static_pointer_cast<B<double> >(d)->b, 99);
 
-    HPX_TEST_EQ(e->a, 221);
-    HPX_TEST_EQ((boost::static_pointer_cast<C<short, float> >(e)->b), 222);
-    HPX_TEST_EQ((boost::static_pointer_cast<C<short, float> >(e)->c), 223);
+      HPX_TEST_EQ(e->a, 221);
+      HPX_TEST_EQ((boost::static_pointer_cast<C<short, float> >(e)->b), 222);
+      HPX_TEST_EQ((boost::static_pointer_cast<C<short, float> >(e)->c), 223);
   }
 
 }

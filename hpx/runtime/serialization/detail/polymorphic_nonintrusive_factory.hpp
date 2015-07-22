@@ -204,7 +204,8 @@ namespace hpx { namespace serialization { namespace detail
     template hpx::serialization::detail::register_class<Class>                \
         hpx::serialization::detail::register_class<Class>::instance;          \
 /**/
-#define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(Parameters, Template, Name) \
+#define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                       \
+        Parameters, Template, Name)                                           \
     namespace hpx { namespace serialization { namespace detail {              \
         HPX_UTIL_STRIP(Parameters)                                            \
         struct get_serialization_name<HPX_UTIL_STRIP(Template)>               \
@@ -223,7 +224,8 @@ namespace hpx { namespace serialization { namespace detail
     HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                           \
         Parameters, Template,                                                 \
         hpx::util::type_id<HPX_UTIL_STRIP(Template) >::typeid_.type_id())     \
-    HPX_UTIL_STRIP(Parameters) hpx::serialization::detail::register_class<HPX_UTIL_STRIP(Template)> \
+    HPX_UTIL_STRIP(Parameters) hpx::serialization::detail::register_class<    \
+        HPX_UTIL_STRIP(Template)>                                             \
         HPX_UTIL_STRIP(Template)::hpx_register_class_instance;                \
 /**/
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SEMIINTRUSIVE(Template)        \
@@ -231,7 +233,8 @@ namespace hpx { namespace serialization { namespace detail
     hpx_register_class_instance;                                              \
                                                                               \
     virtual hpx::serialization::detail::register_class<Template>&             \
-    hpx_get_register_class_instance(hpx::serialization::detail::register_class<Template>*) const \
+    hpx_get_register_class_instance(                                          \
+        hpx::serialization::detail::register_class<Template>*) const          \
     {                                                                         \
         return hpx_register_class_instance;                                   \
     }                                                                         \
