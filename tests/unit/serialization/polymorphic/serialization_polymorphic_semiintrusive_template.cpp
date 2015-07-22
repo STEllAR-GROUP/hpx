@@ -52,6 +52,27 @@ struct B: A<T>
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE(template<class T>, B<T>)
 HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(template<class T>, B<T>)
 
+template <class S, class T>
+struct C: A<T>
+{
+    int b = 0;
+    S c = 0;
+
+    explicit C(int b):
+        A<T>(b-1),
+        b(b),
+        c(b + 1)
+    {}
+    C() = default;
+
+    virtual void foo() const{}
+
+    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SEMIINTRUSIVE(C);
+};
+
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE((template<class S, class T>), (C<S, T>))
+HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE((template<class S, class T>), (C<S, T>))
+
 namespace hpx { namespace serialization {
 
     template <class Archive, class T>
@@ -67,6 +88,14 @@ namespace hpx { namespace serialization {
       archive & s.b;
     }
 
+    template <class Archive, class S, class T>
+    void serialize(Archive& archive, C<S, T>& s, unsigned)
+    {
+      archive & hpx::serialization::base_object<A<T> >(s);
+      archive & s.b;
+      archive & s.c;
+    }
+
 } }
 
 int main()
@@ -77,7 +106,8 @@ int main()
     boost::shared_ptr<A<int> > b = boost::make_shared<B<int> >(-4);
     boost::shared_ptr<A<char> > c = boost::make_shared<B<char> >(44);
     boost::shared_ptr<A<double> > d = boost::make_shared<B<double> >(99);
-    archive << b << c << d;
+    boost::shared_ptr<A<float> > e = boost::make_shared<C<short, float> >(222);
+    archive << b << c << d << e;
   }
 
   {
@@ -85,7 +115,10 @@ int main()
     boost::shared_ptr<A<int> > b;
     boost::shared_ptr<A<char> > c;
     boost::shared_ptr<A<double> > d;
-    archive >> b >> c >> d;
+    boost::shared_ptr<A<float> > e;
+
+    archive >> b >> c >> d >> e;
+
     HPX_TEST_EQ(b->a, -5);
     HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->b, -4);
 
@@ -94,6 +127,10 @@ int main()
 
     HPX_TEST_EQ(d->a, 98);
     HPX_TEST_EQ(boost::static_pointer_cast<B<double> >(d)->b, 99);
+
+    HPX_TEST_EQ(e->a, 221);
+    HPX_TEST_EQ((boost::static_pointer_cast<C<short, float> >(e)->b), 222);
+    HPX_TEST_EQ((boost::static_pointer_cast<C<short, float> >(e)->c), 223);
   }
 
 }

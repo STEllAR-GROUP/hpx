@@ -206,8 +206,8 @@ namespace hpx { namespace serialization { namespace detail
 /**/
 #define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(Parameters, Template, Name) \
     namespace hpx { namespace serialization { namespace detail {              \
-        Parameters                                                            \
-        struct get_serialization_name<Template>                               \
+        HPX_UTIL_STRIP(Parameters)                                            \
+        struct get_serialization_name<HPX_UTIL_STRIP(Template)>               \
         {                                                                     \
             char const* operator()()                                          \
             {                                                                 \
@@ -223,8 +223,8 @@ namespace hpx { namespace serialization { namespace detail
     HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                           \
         Parameters, Template,                                                 \
         hpx::util::type_id<HPX_UTIL_STRIP(Template) >::typeid_.type_id())     \
-    Parameters hpx::serialization::detail::register_class<Template>           \
-        Template::hpx_register_class_instance;                                \
+    HPX_UTIL_STRIP(Parameters) hpx::serialization::detail::register_class<HPX_UTIL_STRIP(Template)> \
+        HPX_UTIL_STRIP(Template)::hpx_register_class_instance;                \
 /**/
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SEMIINTRUSIVE(Template)        \
     static hpx::serialization::detail::register_class<Template>               \
