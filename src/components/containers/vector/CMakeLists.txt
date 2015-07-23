@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
-set(root "${hpx_SOURCE_DIR}/hpx/components/containers/vector")
+set(root "${PROJECT_SOURCE_DIR}/hpx/components/containers/vector")
 
 add_hpx_component(vector
   FOLDER "Core/Components/Containers"

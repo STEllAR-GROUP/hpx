@@ -9,8 +9,8 @@ find_package(Git)
 
 if(GIT_FOUND)
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" "log" "--pretty=%H" "-1" "${hpx_SOURCE_DIR}"
-    WORKING_DIRECTORY "${hpx_SOURCE_DIR}"
+    COMMAND "${GIT_EXECUTABLE}" "log" "--pretty=%H" "-1" "${PROJECT_SOURCE_DIR}"
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
     OUTPUT_VARIABLE HPX_WITH_GIT_COMMIT ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
 
