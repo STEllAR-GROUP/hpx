@@ -54,6 +54,9 @@
 
 [heading Breaking Changes]
 
+* The CMake project name has changed from 'hpx' to 'HPX' for consistency and 
+  compatibilty with naming conventions and other CMake projects. Generated
+  config files go into <prefix>/lib/cmake/HPX and not <prefix>/lib/cmake/hpx.
 * The macro `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY` has been deprecated. Please
   use [macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`] instead.
   The old macro will be removed in the next release.

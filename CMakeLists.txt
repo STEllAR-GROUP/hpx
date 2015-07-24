@@ -42,7 +42,7 @@ endif()
 ################################################################################
 # project metadata
 ################################################################################
-project(hpx CXX C)
+project(HPX CXX C)
 
 set(HPX_MAJOR_VERSION 0)
 set(HPX_MINOR_VERSION 9)
@@ -50,6 +50,7 @@ set(HPX_PATCH_LEVEL   11)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
+set(HPX_PACKAGE_NAME HPX)
 
 if(MSVC)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -58,7 +59,7 @@ endif()
 ################################################################################
 # CMake configuration
 ################################################################################
-set(CMAKE_MODULE_PATH "${hpx_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # We safe the passed compiler flag to a special variable. This is needed for our
 # build system unit tests. Some flags might influence the created symbols (
@@ -542,7 +543,7 @@ endif()
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################
-include_directories("${hpx_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
 ################################################################################
@@ -1273,18 +1274,18 @@ endforeach()
 
 # Generate a defines.hpp to be used in the build directory ...
 set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
                @ONLY)
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
-configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp"
                @ONLY)
 
 # Configure hpxrun.py
-configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
+configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
                "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
                @ONLY)
 
@@ -1354,7 +1355,7 @@ install( # install all hpx tests source files
 
 install( # Install all HPX cmake utility files
   DIRECTORY cmake/
-  DESTINATION ${LIB}/cmake/hpx
+  DESTINATION ${LIB}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT core
   PATTERN ".cmake.in" EXCLUDE
   PATTERN ".git" EXCLUDE)
@@ -1452,7 +1453,7 @@ if(Boost_VERSION LESS 105300)
 endif()
 
 install(
-  FILES "${hpx_SOURCE_DIR}/LICENSE_1_0.txt"
+  FILES "${PROJECT_SOURCE_DIR}/LICENSE_1_0.txt"
   DESTINATION share/hpx-${HPX_VERSION}
   COMPONENT license)
 
@@ -1471,19 +1472,19 @@ if(HPX_WITH_DOCUMENTATION)
     PATTERN "*images*" EXCLUDE)
 
   install(
-    FILES "${hpx_SOURCE_DIR}/docs/index.html"
+    FILES "${PROJECT_SOURCE_DIR}/docs/index.html"
     DESTINATION share/hpx-${HPX_VERSION}/
     COMPONENT docs)
 
   install(
-    DIRECTORY "${hpx_SOURCE_DIR}/docs/html/src/"
+    DIRECTORY "${PROJECT_SOURCE_DIR}/docs/html/src/"
     DESTINATION share/hpx-${HPX_VERSION}/docs/html/src
     COMPONENT docs
     FILES_MATCHING PATTERN "*.css"
     PATTERN ".git" EXCLUDE)
 
   install(
-    DIRECTORY "${hpx_SOURCE_DIR}/docs/html/images/"
+    DIRECTORY "${PROJECT_SOURCE_DIR}/docs/html/images/"
     DESTINATION share/hpx-${HPX_VERSION}/docs/html/images
     COMPONENT docs
     FILES_MATCHING PATTERN "*.png"

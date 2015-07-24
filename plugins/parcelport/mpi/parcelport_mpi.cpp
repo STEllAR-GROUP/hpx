@@ -176,6 +176,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool run(bool blocking = true)
         {
             receiver_.run();
+            sender_.run();
             receive_early_parcels_thread_ =
                 boost::thread(&parcelport::receive_early_parcels, this,
                     hpx::get_runtime_ptr());
@@ -237,31 +238,29 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 return;
             }
 
-            util::high_resolution_timer timer;
-
             allocator_type alloc(chunk_pool_);
             snd_buffer_type buffer(alloc);
             encode_parcels(&p, std::size_t(-1), buffer, archive_flags_,
                 this->get_max_outbound_message_size());
 
-            buffer.data_point_.time_ = timer.elapsed_nanoseconds();
+            buffer.data_point_.time_ = util::high_resolution_clock::now();
 
             int dest_rank = dest.get<locality>().rank();
             HPX_ASSERT(dest_rank != util::mpi_environment::rank());
 
             sender_.send(
                 dest_rank
-              , buffer
-              , hpx::util::bind(&receiver::receive, boost::ref(receiver_), false)
+              , std::move(p)
+              , std::move(f)
+              , std::move(buffer)
+              , parcels_sent_
             );
 
-            error_code ec;
-            f(ec, p);
-            buffer.data_point_.time_ =
-                timer.elapsed_nanoseconds() - buffer.data_point_.time_;
-            parcels_sent_.add_data(buffer.data_point_);
+            std::size_t num_thread(0);
+            if(threads::get_self_ptr())
+                num_thread = hpx::get_worker_thread_num();
 
-            //do_background_work();
+            do_background_work(num_thread);
         }
 
         bool do_background_work(std::size_t num_thread)
@@ -273,7 +272,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(!enable_parcel_handling_)
                 return false;
 
-            return receiver_.receive();
+            bool has_work = sender_.background_work(num_thread);
+            has_work = receiver_.background_work(num_thread) || has_work;
+            return has_work;
         }
 
     private:
@@ -296,7 +297,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         mutex_type connections_mtx_;
         lcos::local::detail::condition_variable connections_cond_;
-        sender sender_;
+        sender<snd_buffer_type> sender_;
         receiver receiver_;
 
         boost::thread receive_early_parcels_thread_;
@@ -389,7 +390,7 @@ namespace hpx { namespace traits
                         "MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE"
                     "}\n"
 #endif
-                "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:1}\n"
+                "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}\n"
                 "max_connections = ${HPX_HAVE_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"
                 ;
         }

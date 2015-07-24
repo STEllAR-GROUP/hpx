@@ -28,10 +28,16 @@ function(hpx_check_boost_compatibility)
   if(NOT DEFINED BOOST_ROOT)
     return()
   endif()
-  if(NOT HPX_BOOST_ROOT STREQUAL BOOST_ROOT)
+  
+  # make sure paths are tested even if not string identical
+  get_filename_component(PATH1 ${HPX_BOOST_ROOT} ABSOLUTE)
+  get_filename_component(PATH2 ${BOOST_ROOT} ABSOLUTE)
+  
+  if(NOT PATH1 STREQUAL PATH2)
     hpx_error("The specified BOOST_ROOT differs from what has been used when"
               " configuring and building HPX. Please use the same Boost "
-              "versions"
+              "versions. HPX boost is ${HPX_BOOST_ROOT} and users is ${BOOST_ROOT}. "
+              "To disable this message set HPX_IGNORE_BOOST_COMPATIBILITY On."
     )
   endif()
 endfunction()

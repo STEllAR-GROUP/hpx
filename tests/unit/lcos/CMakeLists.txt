@@ -141,7 +141,17 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
                       SOURCES ${sources}
                       EXCLUDE_FROM_ALL
                       FOLDER "Tests/Unit/LCOs/CompileOnly")
-      set(target ${compile_test}_compile_test_lib)
+
+      # add a custom target for this example
+      add_hpx_pseudo_target(tests.unit.lcos.${compile_test})
+
+      # make pseudo-targets depend on master pseudo-target
+      add_hpx_pseudo_dependencies(tests.unit.lcos
+                                  tests.unit.lcos.${compile_test})
+
+      # add dependencies to pseudo-target
+      add_hpx_pseudo_dependencies(tests.unit.lcos.${compile_test}
+                                  ${compile_test}_compile_test_lib)
     else()
       add_hpx_unit_compile_test(
         "lcos"
@@ -149,18 +159,8 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
         SOURCES ${sources}
         ${${compile_test}_FLAGS}
         FOLDER "Tests/Unit/LCOs/CompileOnly")
-      set(target ${compile_test}_test_exe)
+      # there is no way to make this test depend on one of our pseudo targets
     endif()
-
-    # add a custom target for this example
-    add_hpx_pseudo_target(tests.unit.lcos.${compile_test})
-
-    # make pseudo-targets depend on master pseudo-target
-    add_hpx_pseudo_dependencies(tests.unit.lcos
-                                tests.unit.lcos.${compile_test})
-
-    # add dependencies to pseudo-target
-    add_hpx_pseudo_dependencies(tests.unit.lcos.${compile_test} ${target})
   endforeach()
 endif()
 

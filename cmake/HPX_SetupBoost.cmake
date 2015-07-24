@@ -86,8 +86,8 @@ endif()
 # If the found Boost installation is < 1.53, we need to include our packaged
 # atomic library
 if(Boost_VERSION LESS 105300)
-  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${hpx_SOURCE_DIR}/external/atomic")
-  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${hpx_SOURCE_DIR}/external/lockfree")
+  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${PROJECT_SOURCE_DIR}/external/atomic")
+  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${PROJECT_SOURCE_DIR}/external/lockfree")
 else()
   find_package(Boost 1.53 QUIET REQUIRED COMPONENTS atomic)
   if(Boost_ATOMIC_FOUND)
@@ -98,14 +98,14 @@ else()
 endif()
 
 set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})
-set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${hpx_SOURCE_DIR}/external/cache)
-set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${hpx_SOURCE_DIR}/external/endian)
+set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/external/cache)
+set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/external/endian)
 
 # If we compile natively for the MIC, we need some workarounds for certain
 # Boost headers
 # FIXME: push changes upstream
 if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-  set(Boost_INCLUDE_DIRS ${hpx_SOURCE_DIR}/external/asio ${Boost_INCLUDE_DIRS})
+  set(Boost_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/external/asio ${Boost_INCLUDE_DIRS})
 endif()
 
 # Boost preprocessor definitions

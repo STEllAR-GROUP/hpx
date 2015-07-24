@@ -35,8 +35,8 @@ if(HPX_WITH_DOCUMENTATION)
 endif()
 
 
-set(BOOSTBOOK_DTD_PATH "${hpx_SOURCE_DIR}/external/boostbook/dtd/")
-set(BOOSTBOOK_XSL_PATH "${hpx_SOURCE_DIR}/external/boostbook/xsl/")
+set(BOOSTBOOK_DTD_PATH "${PROJECT_SOURCE_DIR}/external/boostbook/dtd/")
+set(BOOSTBOOK_XSL_PATH "${PROJECT_SOURCE_DIR}/external/boostbook/xsl/")
 
 # Generate catalog file for XSLT processing
 macro(hpx_write_boostbook_catalog file)
@@ -70,11 +70,11 @@ macro(hpx_write_boostbook_catalog file)
     #"  />\n"
     "   <rewriteURI\n"
     "    uriStartString=\"http://www.boost.org/tools/boostbook/dtd/\"\n"
-    "    rewritePrefix=\"file:///${hpx_SOURCE_DIR}/external/boostbook/dtd/\"\n"
+    "    rewritePrefix=\"file:///${PROJECT_SOURCE_DIR}/external/boostbook/dtd/\"\n"
     "  />\n"
     "  <rewriteURI\n"
     "    uriStartString=\"http://www.boost.org/tools/boostbook/xsl/\"\n"
-    "    rewritePrefix=\"file:///${hpx_SOURCE_DIR}/external/boostbook/xsl/\"\n"
+    "    rewritePrefix=\"file:///${PROJECT_SOURCE_DIR}/external/boostbook/xsl/\"\n"
     "  />\n"
     "</catalog>\n"
   )
@@ -173,10 +173,10 @@ macro(hpx_docbook_to_xslfo name)
     PARAMETERS
       paper.type=USLetter
       admon.graphics.extension=.png
-      img.src.path=${hpx_SOURCE_DIR}/docs/html/
-      boost.graphics.root=${hpx_SOURCE_DIR}/docs/html/images/
-      admon.graphics.path=${hpx_SOURCE_DIR}/docs/html/images/
-      callout.graphics.path=${hpx_SOURCE_DIR}/docs/html/images/
+      img.src.path=${PROJECT_SOURCE_DIR}/docs/html/
+      boost.graphics.root=${PROJECT_SOURCE_DIR}/docs/html/images/
+      admon.graphics.path=${PROJECT_SOURCE_DIR}/docs/html/images/
+      callout.graphics.path=${PROJECT_SOURCE_DIR}/docs/html/images/
       ${${name}_XSLTPROC_ARGS}
     CATALOG ${${name}_CATALOG}
     DEPENDS ${${name}_DEPENDENCIES}
