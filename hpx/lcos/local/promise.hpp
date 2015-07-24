@@ -505,7 +505,7 @@ namespace hpx { namespace lcos
         std::experimental::coroutine_handle<Promise> rh)
     {
         // f.then([=](future<T> result) mutable
-        lcos::detail::get_shared_state(f)->set_on_completed(rh);
+        traits::detail::get_shared_state(f)->set_on_completed(rh);
     }
 
     template <typename T>
