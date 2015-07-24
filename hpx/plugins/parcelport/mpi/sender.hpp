@@ -9,78 +9,42 @@
 
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
+#include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
+#include <hpx/plugins/parcelport/mpi/tag_provider.hpp>
+
+#include <list>
+#include <iterator>
 
 #include <boost/thread/locks.hpp>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
-    struct tag_provider
-    {
-        typedef lcos::local::spinlock mutex_type;
-
-        struct tag
-        {
-            tag(tag_provider *provider)
-              : provider_(provider)
-              , tag_(provider_->acquire())
-            {}
-
-            operator int () const
-            {
-                return tag_;
-            }
-
-            ~tag()
-            {
-                provider_->release(tag_);
-            }
-
-            tag_provider *provider_;
-            int tag_;
-        };
-
-        tag_provider()
-          : next_tag_(1)
-        {}
-
-        tag operator()()
-        {
-            return tag(this);
-        }
-
-        int acquire()
-        {
-            boost::lock_guard<mutex_type> l(mtx_);
-            if(free_tags_.empty())
-                return next_tag_++;
-
-            int tag = free_tags_.front();
-            free_tags_.pop_front();
-            return tag;
-        }
-
-        void release(int tag)
-        {
-            if(tag == next_tag_) return;
-
-            boost::lock_guard<mutex_type> l(mtx_);
-            free_tags_.push_back(tag);
-        }
-
-        mutex_type mtx_;
-        int next_tag_;
-        std::deque<int> free_tags_;
-    };
-
+    template <typename Buffer>
     struct sender
     {
+        typedef
+            sender_connection<typename hpx::util::decay<Buffer>::type>
+            connection_type;
+#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
+        typedef boost::shared_ptr<connection_type> connection_ptr;
+#else
+        typedef std::unique_ptr<connection_type> connection_ptr;
+#endif
+        typedef std::list<connection_ptr> connection_list;
+
         typedef hpx::lcos::local::spinlock mutex_type;
         sender(std::size_t max_connections)
           : max_connections_(max_connections)
           , num_connections_(0)
-        {}
+          , next_free_tag_(-1)
+        {
+        }
+
+        void run()
+        {
+            get_next_free_tag();
+        }
 
         struct check_num_connections
         {
@@ -113,151 +77,179 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             bool decrement_;
         };
 
-        template <typename Buffer, typename Background>
-        void send(int dest, Buffer & buffer, Background background)
+        template <typename Handler>
+        void send(
+            int dest
+          , parcel && p
+          , Handler && handler
+          , Buffer && buffer
+          , performance_counters::parcels::gatherer & parcels_sent
+        )
         {
             check_num_connections chk(this);
-            tag_provider::tag tag(tag_provider_());
 
-            header h(buffer, tag);
-            h.assert_valid();
-
-            MPI_Request request;
-            MPI_Request *wait_request = NULL;
-            {
-                util::mpi_environment::scoped_lock l;
-                MPI_Isend(
-                    h.data()
-                  , h.data_size_
-                  , MPI_BYTE
+            connection_ptr sender(
+                new connection_type(
+                    tag_provider_.acquire()
                   , dest
-                  , 0
-                  , util::mpi_environment::communicator()
-                  , &request
-                );
-                wait_request = &request;
-            }
+                  , std::move(p)
+                  , std::move(buffer)
+                  , std::forward<Handler>(handler)
+                  , parcels_sent
+                )
+            );
 
-            std::vector<typename Buffer::transmission_chunk_type>& chunks =
-                buffer.transmission_chunks_;
-            if(!chunks.empty())
+            if(!sender->send())
             {
-                wait_done(wait_request, background);
+                boost::unique_lock<mutex_type> l(connections_mtx_);
+                connections_.push_back(std::move(sender));
+            }
+        }
+
+        void send_messages(
+            connection_list connections
+        )
+        {
+            std::size_t k = 0;
+            typename connection_list::iterator it = connections.begin();
+
+            // We try to handle all receives within 1 secone
+            while(it != connections.end())
+            {
+                connection_type & sender = **it;
+                if(sender.send())
                 {
-                    util::mpi_environment::scoped_lock l;
-                    MPI_Isend(
-                        chunks.data()
-                      , static_cast<int>(
-                            chunks.size()
-                          * sizeof(typename Buffer::transmission_chunk_type)
-                        )
-                      , MPI_BYTE
-                      , dest
-                      , tag
-                      , util::mpi_environment::communicator()
-                      , &request
-                    );
-                    wait_request = &request;
+                    it = connections.erase(it);
                 }
-            }
-
-            if(!h.piggy_back())
-            {
-                wait_done(wait_request, background);
+                else
                 {
-                    util::mpi_environment::scoped_lock l;
-                    MPI_Isend(
-                        buffer.data_.data()
-                      , static_cast<int>(buffer.data_.size())
-                      , MPI_BYTE
-                      , dest
-                      , tag
-                      , util::mpi_environment::communicator()
-                      , &request
-                    );
-                    wait_request = &request;
-                }
-            }
-
-            for (serialization::serialization_chunk& c : buffer.chunks_)
-            {
-                if(c.type_ == serialization::chunk_type_pointer)
-                {
-                    wait_done(wait_request, background);
+                    if(k < 32 || k & 1) //-V112
                     {
-                        util::mpi_environment::scoped_lock l;
-                        MPI_Isend(
-                            const_cast<void *>(c.data_.cpos_)
-                          , static_cast<int>(c.size_)
-                          , MPI_BYTE
-                          , dest
-                          , tag
-                          , util::mpi_environment::communicator()
-                          , &request
-                        );
-                        wait_request = &request;
+                        if(threads::get_self_ptr())
+                            hpx::this_thread::suspend(hpx::threads::pending,
+                                "mpi::sender::wait_done");
                     }
+                    ++k;
+                    ++it;
                 }
             }
 
-            wait_done(wait_request, background);
+            if(!connections.empty())
+            {
+                boost::unique_lock<mutex_type> l(connections_mtx_);
+                if(connections_.empty())
+                {
+                    std::swap(connections, connections_);
+                }
+                else
+                {
+                    connections_.insert(
+                        connections_.end()
+#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
+                      , connections.begin()
+                      , connections.end()
+#else
+                      , std::make_move_iterator(connections.begin())
+                      , std::make_move_iterator(connections.end())
+#endif
+                    );
+                }
+            }
+        }
+
+        bool background_work(std::size_t num_thread)
+        {
+            connection_list connections;
+            {
+                boost::unique_lock<mutex_type> l(connections_mtx_);
+                std::swap(connections, connections_);
+            }
+            bool has_work = false;
+            if(!connections.empty())
+            {
+                if(hpx::is_starting())
+                {
+                    send_messages(std::move(connections));
+                }
+                else
+                {
+//                     error_code ec(lightweight);
+                    hpx::applier::register_thread_nullary(
+                        util::bind(
+                            util::one_shot(&sender::send_messages),
+                            this, std::move(connections)),
+                        "mpi::sender::send_messages",
+                        threads::pending, true, threads::thread_priority_boost,
+                        num_thread, threads::thread_stacksize_default);
+                }
+                has_work = true;
+            }
+            next_free_tag();
+            return has_work;
         }
 
     private:
         tag_provider tag_provider_;
 
+        void next_free_tag()
+        {
+            int next_free = -1;
+            {
+                mutex_type::scoped_try_lock l(next_free_tag_mtx_);
+                if(l)
+                    next_free = next_free_tag_locked();
+            }
+
+            if(next_free != -1)
+            {
+                HPX_ASSERT(next_free > 1);
+                tag_provider_.release(next_free);
+            }
+        }
+
+        int next_free_tag_locked()
+        {
+            util::mpi_environment::scoped_try_lock l;
+
+            if(l.locked)
+            {
+                MPI_Status status;
+                int completed = 0;
+                int ret = 0;
+                ret = MPI_Test(&next_free_tag_request_, &completed, &status);
+                HPX_ASSERT(ret == MPI_SUCCESS);
+                if(completed)// && status->MPI_ERROR != MPI_ERR_PENDING)
+                {
+                    return get_next_free_tag();
+                }
+            }
+            return -1;
+        }
+
+        int get_next_free_tag()
+        {
+            int next_free = next_free_tag_;
+            MPI_Irecv(
+                &next_free_tag_
+              , 1
+              , MPI_INT
+              , MPI_ANY_SOURCE
+              , 1
+              , util::mpi_environment::communicator()
+              , &next_free_tag_request_
+            );
+            return next_free;
+        }
+
         mutex_type connections_mtx_;
         lcos::local::detail::condition_variable connections_cond_;
         std::size_t const max_connections_;
         std::size_t num_connections_;
+        connection_list connections_;
 
-        template <typename Background>
-        void wait_done(MPI_Request *& request, Background const & background)
-        {
-            if(request == NULL) return;
-
-            std::size_t k = 0;
-
-            while(true)
-            {
-                if(request_done(*request))
-                {
-                    break;
-                }
-
-                if (k < 4) //-V112
-                {
-                }
-                else if(k < 32 || k & 1) //-V112
-                {
-                    if(threads::get_self_ptr())
-                        this_thread::suspend(threads::pending,
-                            "mpi::sender::wait_done");
-                }
-                else
-                {
-                    background();
-                }
-                ++k;
-            }
-            request = NULL;
-        }
-
-        bool request_done(MPI_Request & r)
-        {
-            util::mpi_environment::scoped_lock l;
-
-            int completed = 0;
-            MPI_Status status;
-            int ret = 0;
-            ret = MPI_Test(&r, &completed, &status);
-            HPX_ASSERT(ret == MPI_SUCCESS);
-            if(completed)// && status.MPI_ERROR != MPI_ERR_PENDING)
-            {
-                return true;
-            }
-            return false;
-        }
+        mutex_type next_free_tag_mtx_;
+        MPI_Request next_free_tag_request_;
+        int next_free_tag_;
     };
 
 }}}}
