@@ -262,7 +262,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         if(root)
         {
             std::cout
-                << "Serial Matrix transpose: B = A^T\n"
+                << "Distributed HPX Matrix transpose (await): B = A^T\n"
                 << "Matrix order          = " << order << "\n"
                 << "Matrix local columns  = " << block_order << "\n"
                 << "Number of blocks      = " << num_blocks << "\n"
