@@ -8,6 +8,8 @@ set(tests
     serialization_polymorphic_pointer
     serialization_polymorphic_nonintrusive
     serialization_polymorphic_nonintrusive_abstract
+    serialization_polymorphic_semiintrusive_template
+    serialization_polymorphic_template
     serialization_smart_ptr_polymorphic
     serialization_smart_ptr_polymorphic_nonintrusive
 )
