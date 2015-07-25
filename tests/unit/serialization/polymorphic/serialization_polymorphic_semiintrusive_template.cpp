@@ -18,7 +18,9 @@
 template <class T>
 struct A
 {
-    int a = 0;
+    int a;
+    
+    A() : a(0) {}
 
     explicit A(int a):
         a(a)
@@ -35,7 +37,9 @@ HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE(template<class T>, A<T>)
 template <class T>
 struct B: A<T>
 {
-    int b = 0;
+    int b;
+    
+    B() : b(0) {}
 
     explicit B(int b):
         A<T>(b-1),
@@ -55,8 +59,10 @@ HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(template<class T>, B<T>)
 template <class S, class T>
 struct C: A<T>
 {
-    int b = 0;
-    S c = 0;
+    int b;
+    S c;
+    
+    C() : b(0), c(0) {}
 
     explicit C(int b):
         A<T>(b-1),
