@@ -183,7 +183,6 @@ namespace hpx
             struct lockfree_fifo;
             struct lockfree_lifo;
 
-            // multi priority scheduler with work-stealing
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
                     , typename StagedQueuing = lockfree_fifo
@@ -191,7 +190,6 @@ namespace hpx
                      >
             class HPX_EXPORT local_priority_queue_scheduler;
 
-            // single priority scheduler with work-stealing
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
                     , typename StagedQueuing = lockfree_fifo
@@ -209,23 +207,12 @@ namespace hpx
 #endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-            // multi priority scheduler with no work-stealing
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
                     , typename StagedQueuing = lockfree_fifo
                     , typename TerminatedQueuing = lockfree_lifo
                      >
             class HPX_EXPORT static_priority_queue_scheduler;
-#endif
-
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
-            // single priority scheduler with no work-stealing
-            template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_fifo
-                    , typename StagedQueuing = lockfree_fifo
-                    , typename TerminatedQueuing = lockfree_lifo
-                     >
-            class HPX_EXPORT static_queue_scheduler;
 #endif
 
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)

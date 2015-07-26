@@ -10,7 +10,5 @@
 #include <hpx/parallel/executors/parallel_executor.hpp>
 #include <hpx/parallel/executors/parallel_fork_executor.hpp>
 #include <hpx/parallel/executors/sequential_executor.hpp>
-#include <hpx/parallel/executors/thread_pool_executors.hpp>
-#include <hpx/parallel/executors/this_thread_executors.hpp>
 
 #endif

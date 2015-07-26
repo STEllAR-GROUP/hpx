@@ -42,28 +42,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     };
 #endif
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
-    struct static_queue_executor
-#if !defined(DOXYGEN)
-      : detail::threads_executor
-#endif
-    {
-        /// Creates a new static_queue_executor
-        ///
-        /// \param max_punits   [in] The maximum number of processing units to
-        ///                     associate with the newly created executor.
-        /// \param min_punits   [in] The minimum number of processing units to
-        ///                     associate with the newly created executor
-        ///                     (default: 1).
-        ///
-        explicit static_queue_executor(std::size_t max_punits,
-                std::size_t min_punits = 1)
-          : threads_executor(threads::executors::static_queue_executor(
-                max_punits, min_punits))
-        {}
-    };
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     struct local_priority_queue_executor
 #if !defined(DOXYGEN)
@@ -113,13 +91,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
         template <>
         struct is_executor<local_queue_executor>
-          : std::true_type
-        {};
-#endif
-
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
-        template <>
-        struct is_executor<static_queue_executor>
           : std::true_type
         {};
 #endif

@@ -372,7 +372,7 @@ hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
 # Scheduler configuration
 ################################################################################
 hpx_option(HPX_WITH_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are build. Options are: all, abp-priority, local, static-priority, static, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "Which thread schedulers are build. Options are: all, abp-priority, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
   "all"
   CATEGORY "Thread Manager" ADVANCED)
 
@@ -393,10 +393,6 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
   if(_scheduler STREQUAL "STATIC-PRIORITY" OR _all)
     hpx_add_config_define(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     set(HPX_HAVE_STATIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  if(_scheduler STREQUAL "STATIC" OR _all)
-    hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
-    set(HPX_HAVE_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
