@@ -272,11 +272,11 @@ namespace hpx { namespace lcos { namespace detail
 
         Result get_value(error_code& ec = throws)
         {
-            typedef typename future_data_type::data_type data_type;
-            data_type& data = this->get_result();
+            typedef typename future_data_type::result_type result_type;
+            result_type* result = this->get_result();
 
             // no error has been reported, return the result
-            return data.move_value();
+            return std::move(*result);
         }
 
         void add_ref()

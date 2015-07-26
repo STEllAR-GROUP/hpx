@@ -58,7 +58,7 @@ namespace hpx { namespace lcos { namespace detail
             ar >> value;
 
             boost::intrusive_ptr<shared_state> p(new shared_state());
-            p->set_result(std::move(value));
+            p->set_value(std::move(value));
 
             f = traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
@@ -88,7 +88,7 @@ namespace hpx { namespace lcos { namespace detail
         if (state == future_state::has_value)
         {
             boost::intrusive_ptr<shared_state> p(new shared_state());
-            p->set_result(util::unused);
+            p->set_value(util::unused);
 
             f = traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
@@ -271,9 +271,9 @@ namespace hpx { namespace lcos { namespace detail
       : future_data_result<T&>
     {
         BOOST_FORCEINLINE static
-        T& get(T& u)
+        T& get(T* u)
         {
-            return u;
+            return *u;
         }
 
         static T& get_default()
@@ -431,12 +431,10 @@ namespace hpx { namespace lcos { namespace detail
                     "this future has no valid shared state");
             }
 
-            typedef typename shared_state_type::data_type data_type;
             error_code ec(lightweight);
-            data_type& data = this->shared_state_->get_result(ec);
+            this->shared_state_->get_result(ec);
             if (!ec) return boost::exception_ptr();
-
-            return data.get_error();
+            return hpx::detail::access_exception(ec);
         }
 
         // Notes: The three functions differ only by input parameters.
@@ -804,11 +802,11 @@ namespace hpx { namespace lcos
 
             invalidate on_exit(*this, true);
 
-            typedef typename shared_state_type::data_type data_type;
-            data_type& data = this->shared_state_->get_result();
+            typedef typename shared_state_type::result_type result_type;
+            result_type* result = this->shared_state_->get_result();
 
             // no error has been reported, return the result
-            return detail::future_value<R>::get(data.move_value());
+            return detail::future_value<R>::get(std::move(*result));
         }
 
         typename traits::future_traits<future>::result_type
@@ -824,12 +822,12 @@ namespace hpx { namespace lcos
 
             invalidate on_exit(*this, true);
 
-            typedef typename shared_state_type::data_type data_type;
-            data_type& data = this->shared_state_->get_result(ec);
+            typedef typename shared_state_type::result_type result_type;
+            result_type* result = this->shared_state_->get_result(ec);
             if (ec) return detail::future_value<R>::get_default();
 
             // no error has been reported, return the result
-            return detail::future_value<R>::get(data.move_value());
+            return detail::future_value<R>::get(std::move(*result));
         }
         using base_type::get_exception_ptr;
 
@@ -1039,18 +1037,16 @@ namespace hpx { namespace lcos
                     "this future has no valid shared state");
             }
 
-            typedef typename shared_state_type::data_type data_type;
-            data_type& data = this->shared_state_->get_result();
+            typedef typename shared_state_type::result_type result_type;
+            result_type* result = this->shared_state_->get_result();
 
             // no error has been reported, return the result
-            return detail::future_value<R>::get(data.get_value());
+            return detail::future_value<R>::get(*result);
         }
         typename traits::future_traits<shared_future>::result_type
         get(error_code& ec) const //-V659
         {
-            typedef
-                typename traits::future_traits<shared_future>::result_type
-                result_type;
+            typedef typename shared_state_type::result_type result_type;
             if (!this->shared_state_)
             {
                 HPX_THROWS_IF(ec, no_state,
@@ -1060,8 +1056,7 @@ namespace hpx { namespace lcos
                 return res;
             }
 
-            typedef typename shared_state_type::data_type data_type;
-            data_type& data = this->shared_state_->get_result(ec);
+            result_type* result = this->shared_state_->get_result(ec);
             if (ec)
             {
                 static result_type res(detail::future_value<R>::get_default());
@@ -1069,7 +1064,7 @@ namespace hpx { namespace lcos
             }
 
             // no error has been reported, return the result
-            return detail::future_value<R>::get(data.get_value());
+            return detail::future_value<R>::get(*result);
         }
         using base_type::get_exception_ptr;
 
@@ -1110,7 +1105,7 @@ namespace hpx { namespace lcos
         typedef lcos::detail::future_data<result_type> shared_state;
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
-        p->set_result(std::forward<Result>(init));
+        p->set_value(std::forward<Result>(init));
 
         return traits::future_access<future<result_type> >::create(std::move(p));
     }
@@ -1168,7 +1163,7 @@ namespace hpx { namespace lcos
         typedef lcos::detail::future_data<void> shared_state;
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
-        p->set_result(util::unused);
+        p->set_value(util::unused);
 
         return traits::future_access<future<void> >::create(std::move(p));
     }
