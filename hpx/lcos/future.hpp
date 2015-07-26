@@ -637,14 +637,6 @@ namespace hpx { namespace lcos { namespace detail
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    // [N3722, 4.1] asks for this...
-    namespace local
-    {
-        template <typename Result>
-        class promise;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename R>
     class future : public detail::future_base<future<R>, R>
     {
@@ -748,13 +740,6 @@ namespace hpx { namespace lcos
         //   - destroys *this.
         ~future()
         {}
-
-        // [N3722, 4.1] asks for this...
-        typedef lcos::local::promise<R> promise_type;
-#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        // defined at promise.hpp
-        explicit future(promise_type& promise);
-#endif
 
         // Effects:
         //   - releases any shared state (30.6.4).
@@ -980,13 +965,6 @@ namespace hpx { namespace lcos
         //   - destroys *this.
         ~shared_future()
         {}
-
-        // [N3722, 4.1] asks for this...
-        typedef lcos::local::promise<R> promise_type;
-#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        // defined at promise.hpp
-        explicit shared_future(promise_type& promise);
-#endif
 
         // Effects:
         //   - releases any shared state (30.6.4).
