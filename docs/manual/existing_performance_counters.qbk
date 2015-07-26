@@ -1036,27 +1036,6 @@ system and application performance.
 ]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[table Performance Counters related to LCOs
-    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
-    [   [`/dataflow/count/<operation>`
-
-          where:[br] `<operation>` is one of the following:
-          `constructed`, `destructed`, `initialized`, `fired`
-        ]
-        [`locality#*/total`
-
-          where:[br] `*` is the locality id of the locality the number of
-          invocations of the specified operation should be queried for (see
-          `<operation>`, e.g. `constructed`, `destructed`, `initialized`,
-          `fired`). The locality id is a (zero based) number identifying the
-          locality.]
-        [None]
-        [Returns the overall number of operations performed on dataflow
-         components on the specified locality.]
-    ]
-]
-
-[/////////////////////////////////////////////////////////////////////////////]
 [table General Performance Counters exposing Characteristics of Localities
     [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
     [   [`/runtime/count/component`]
