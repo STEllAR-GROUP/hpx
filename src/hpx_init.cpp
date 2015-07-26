@@ -53,6 +53,13 @@ namespace hpx
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx_startup
+{
+    std::vector<std::string> (*user_main_config_function)(
+        std::vector<std::string> const&) = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
 {
     // forward declarations only
@@ -967,9 +974,11 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT int run_or_start(
-            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            > const& f,
             boost::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> const& ini_config,
+            int argc, char** argv, std::vector<std::string> && ini_config,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown, hpx::runtime_mode mode,
             bool blocking)
@@ -996,7 +1005,8 @@ namespace hpx
 
             try {
                 // handle all common command line switches
-                util::command_line_handling cfg(mode, f, ini_config, argv[0]);
+                util::command_line_handling cfg(
+                    mode, f, std::move(ini_config), argv[0]);
 
                 util::apex_wrapper_init apex(argc, argv);
 
