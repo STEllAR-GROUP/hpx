@@ -394,7 +394,7 @@ namespace hpx
                 // itself to run after the given interval
                 boost::shared_ptr<util::query_counters> qc =
                     boost::make_shared<util::query_counters>(
-                        boost::ref(counters), interval, destination, counter_format, 
+                        boost::ref(counters), interval, destination, counter_format,
                         counter_shortnames, csv_header);
 
                 // schedule to run at shutdown
@@ -1367,4 +1367,3 @@ namespace hpx
         }
     }
 }
-
