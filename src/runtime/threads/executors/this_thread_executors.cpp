@@ -245,9 +245,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct on_run_exit
+    struct this_thread_on_run_exit
     {
-        on_run_exit(lcos::local::counting_semaphore& shutdown_sem,
+        this_thread_on_run_exit(lcos::local::counting_semaphore& shutdown_sem,
                 threads::thread_self* self)
           : shutdown_sem_(shutdown_sem),
             self_(self)
@@ -255,7 +255,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             threads::detail::set_self_ptr(0);
         }
 
-        ~on_run_exit()
+        ~this_thread_on_run_exit()
         {
             threads::detail::set_self_ptr(self_);
             shutdown_sem_.signal();
@@ -286,7 +286,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             self_ = threads::get_self_ptr();
 
-            on_run_exit on_exit(shutdown_sem_, self_);
+            this_thread_on_run_exit on_exit(shutdown_sem_, self_);
 
             // manage the thread num
             threads::detail::reset_tss_helper reset_on_exit(thread_num_);
