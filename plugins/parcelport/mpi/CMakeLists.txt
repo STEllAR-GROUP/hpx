@@ -59,14 +59,14 @@ if(HPX_WITH_PARCELPORT_MPI)
     add_parcelport(mpi
       STATIC
       SOURCES
-        "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/mpi_environment.cpp"
-        "${hpx_SOURCE_DIR}/plugins/parcelport/mpi/parcelport_mpi.cpp"
+        "${PROJECT_SOURCE_DIR}/plugins/parcelport/mpi/mpi_environment.cpp"
+        "${PROJECT_SOURCE_DIR}/plugins/parcelport/mpi/parcelport_mpi.cpp"
       HEADERS
-        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/header.hpp"
-        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/locality.hpp"
-        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/mpi_environment.hpp"
-        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
-        "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/header.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/locality.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/mpi_environment.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver.hpp"
       DEPENDENCIES
         ${_mpi_libraries}
       FOLDER "Core/Plugins/Parcelport/MPI")

@@ -17,7 +17,7 @@
 template <class T>
 struct A
 {
-  int a = 0;
+  int a;
 
   explicit A(int a):
     a(a)
@@ -39,7 +39,7 @@ struct A
 template <class T>
 struct B: A<T>
 {
-  int b = 0;
+  int b;
 
   explicit B(int b):
     A<T>(b-1),

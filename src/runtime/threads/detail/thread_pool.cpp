@@ -755,7 +755,7 @@ namespace hpx { namespace threads { namespace detail
         if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
             return 10000LL;
 
-        HPX_ASSERT(tfunc_total > exec_total);
+        HPX_ASSERT(tfunc_total >= exec_total);
 
         double const percent = 1. - (exec_total / tfunc_total);
         return boost::int64_t(10000. * percent);    // 0.01 percent

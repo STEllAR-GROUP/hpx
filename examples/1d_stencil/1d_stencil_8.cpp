@@ -576,7 +576,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // Create the local stepper instance, register it
     stepper step;
-
+    
     // Measure execution time.
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
 
@@ -607,9 +607,9 @@ int hpx_main(boost::program_options::variables_map& vm)
             for (std::size_t i = 0; i != nl; ++i)
             {
                 stepper_server::space const& s = solution[i];
-                for (std::size_t j = 0; j != np; ++j)
+                for (std::size_t j = 0; j != s.size(); ++j)
                 {
-                    std::cout << "U[" << i*np + j << "] = "
+                    std::cout << "U[" << i*(s.size()) + j << "] = "
                         << s[j].get_data(partition_server::middle_partition).get()
                         << std::endl;
                 }

@@ -251,6 +251,12 @@ namespace hpx { namespace util
             mtx_.unlock();
     }
 
+    void mpi_environment::scoped_lock::unlock()
+    {
+        if(!multi_threaded())
+            mtx_.unlock();
+    }
+
     mpi_environment::scoped_try_lock::scoped_try_lock()
       : locked(false)
     {
@@ -258,16 +264,21 @@ namespace hpx { namespace util
         {
             locked = mtx_.try_lock();
         }
-        else
-        {
-            locked = true;
-        }
     }
 
     mpi_environment::scoped_try_lock::~scoped_try_lock()
     {
         if(!multi_threaded() && locked)
             mtx_.unlock();
+    }
+
+    void mpi_environment::scoped_try_lock::unlock()
+    {
+        if(!multi_threaded() && locked)
+        {
+            locked = false;
+            mtx_.unlock();
+        }
     }
 }}
 

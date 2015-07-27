@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
-set(root "${hpx_SOURCE_DIR}/hpx/components/memory")
+set(root "${PROJECT_SOURCE_DIR}/hpx/components/memory")
 
 if(HPX_WITH_DEFAULT_TARGETS)
   add_hpx_component(memory
