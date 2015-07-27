@@ -453,7 +453,7 @@ namespace hpx { namespace applier
 
         // decode the action-type in the parcel
         actions::continuation_type cont = p.get_continuation();
-        actions::action_type act = p.get_action();
+        actions::base_action * act = p.get_action();
 
 #if defined(HPX_HAVE_SECURITY)
         // we look up the certificate of the originating locality, no matter

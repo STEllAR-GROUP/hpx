@@ -25,7 +25,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -87,7 +86,6 @@ namespace hpx { namespace actions
     /// \cond NOINTERNAL
 
     struct HPX_API_EXPORT base_action;
-    typedef boost::shared_ptr<base_action> action_type;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -153,7 +151,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     /// The \a base_action class is an abstract class used as the base class
     /// for all action types. It's main purpose is to allow polymorphic
-    /// serialization of action instances through a shared_ptr.
+    /// serialization of action instances through a unique_ptr.
     struct HPX_API_EXPORT base_action
     {
         /// The type of an action defines whether this action will be executed

@@ -181,7 +181,7 @@ void early_parcel_sink(
     )
 { // {{{
         // decode the action-type in the parcel
-        actions::action_type act = p.get_action();
+        actions::base_action * act = p.get_action();
 
         // early parcels should only be plain actions
         HPX_ASSERT(actions::base_action::plain_action == act->get_action_type());

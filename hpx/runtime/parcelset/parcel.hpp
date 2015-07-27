@@ -24,6 +24,8 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
+#include <memory>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,10 +48,6 @@ namespace hpx { namespace parcelset
             {}
 
             parcel_data(actions::base_action* act)
-              : count_(0), action_(act)
-            {}
-
-            parcel_data(actions::action_type act)
               : count_(0), action_(act)
             {}
 
@@ -116,9 +114,9 @@ namespace hpx { namespace parcelset
                 source_id_ = source_id;
             }
 
-            actions::action_type get_action() const
+            actions::base_action * get_action() const
             {
-                return action_;
+                return action_.get();
             }
 
             actions::continuation_type get_continuation() const
@@ -157,7 +155,7 @@ namespace hpx { namespace parcelset
 
         protected:
             naming::id_type source_id_;
-            actions::action_type action_;
+            std::unique_ptr<actions::base_action> action_;
             actions::continuation_type continuation_;
         };
 
@@ -382,7 +380,7 @@ namespace hpx { namespace parcelset
             multi_destination_parcel_data(
                     std::vector<naming::id_type> const& apply_to,
                     std::vector<naming::address> const& addrs,
-                    actions::action_type act)
+                    actions::base_action * act)
               : parcel_data(act)
               , dests_(apply_to)
               , addrs_(addrs)
@@ -547,7 +545,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         parcel(std::vector<naming::id_type> const& apply_to,
                 std::vector<naming::address> const& addrs,
-                actions::action_type act)
+                actions::base_action * act)
           : data_(new detail::multi_destination_parcel_data(apply_to, addrs, act))
         {
         }
@@ -572,7 +570,7 @@ namespace hpx { namespace parcelset
         // default copy constructor is ok
         // default assignment operator is ok
 
-        actions::action_type get_action() const
+        actions::base_action * get_action() const
         {
             return data_->get_action();
         }

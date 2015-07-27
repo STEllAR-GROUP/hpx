@@ -129,8 +129,8 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     HPX_TEST_EQ(outp.get_destination_locality(), inp.get_destination_locality());
     HPX_TEST_EQ(outp.get_start_time(), inp.get_start_time());
 
-    hpx::actions::action_type outact = outp.get_action();
-    hpx::actions::action_type inact = inp.get_action();
+    hpx::actions::base_action *outact = outp.get_action();
+    hpx::actions::base_action *inact = inp.get_action();
 
     HPX_TEST_EQ(outact->get_component_type(), inact->get_component_type());
     HPX_TEST_EQ(outact->get_action_name(), inact->get_action_name());

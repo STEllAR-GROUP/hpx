@@ -319,8 +319,7 @@ parcelset::policies::message_handler* primary_namespace::get_message_handler(
         server::primary_namespace::service_action
     > action_type;
 
-    boost::shared_ptr<action_type> act =
-        boost::static_pointer_cast<action_type>(p.get_action());
+    action_type * act = static_cast<action_type *>(p.get_action());
     agas::request const& req = hpx::actions::get<0>(*act);
 
     // only routing is handled in a special way
@@ -339,8 +338,7 @@ serialization::binary_filter* primary_namespace::get_serialization_filter(
         server::primary_namespace::service_action
     > action_type;
 
-    boost::shared_ptr<action_type> act =
-        boost::static_pointer_cast<action_type>(p.get_action());
+    action_type * act = static_cast<action_type *>(p.get_action());
     agas::request const& req = hpx::actions::get<0>(*act);
 
     // only routing is handled in a special way

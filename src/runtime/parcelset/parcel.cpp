@@ -8,6 +8,7 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
+#include <hpx/runtime/serialization/unique_ptr.hpp>
 
 #include <sstream>
 
