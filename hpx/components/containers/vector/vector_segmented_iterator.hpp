@@ -122,11 +122,11 @@ namespace hpx
           : base_type(it), data_(data)
         {}
 
-        local_iterator remote()
+        local_const_iterator remote()
         {
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->cbegin(), this->base());
-            return local_iterator(partition_vector<T>(data_->get_id()),
+            return local_const_iterator(partition_vector<T>(data_->get_id()),
                 local_index, data_);
         }
         local_const_iterator remote() const
