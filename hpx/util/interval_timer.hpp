@@ -35,7 +35,7 @@ namespace hpx { namespace util
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    class interval_timer
+    class HPX_EXPORT interval_timer
       : public boost::enable_shared_from_this<interval_timer>
     {
     private:
