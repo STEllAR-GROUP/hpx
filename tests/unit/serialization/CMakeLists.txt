@@ -7,6 +7,7 @@ set(tests
     serialization_array
     serialization_builtins
     serialization_complex
+    serialization_custom_constructor
     serialization_map
     serialization_set
     serialization_simple
