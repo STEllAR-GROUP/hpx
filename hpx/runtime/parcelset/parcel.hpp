@@ -9,7 +9,7 @@
 #if !defined(HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM)
 #define HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>

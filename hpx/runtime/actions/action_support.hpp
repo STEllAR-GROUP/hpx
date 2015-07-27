@@ -10,7 +10,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM)
 #define HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -81,11 +81,13 @@ namespace hpx { namespace traits
 /// \endcond
 
 ///////////////////////////////////////////////////////////////////////////////
+/// \namespace actions
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
 
-    struct base_action;
+    struct HPX_API_EXPORT base_action;
+    typedef boost::shared_ptr<base_action> action_type;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -152,7 +154,7 @@ namespace hpx { namespace actions
     /// The \a base_action class is an abstract class used as the base class
     /// for all action types. It's main purpose is to allow polymorphic
     /// serialization of action instances through a shared_ptr.
-    struct base_action
+    struct HPX_API_EXPORT base_action
     {
         /// The type of an action defines whether this action will be executed
         /// directly or by a HPX-threads

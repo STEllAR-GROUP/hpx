@@ -6,10 +6,11 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM)
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -103,7 +104,8 @@ namespace hpx
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    class HPX_EXPORT continuation;
+    class HPX_API_EXPORT continuation;
+    typedef boost::shared_ptr<continuation> continuation_type;
 
     namespace detail
     {
@@ -130,7 +132,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     // Parcel continuations are polymorphic objects encapsulating the
     // id_type of the destination where the result has to be sent.
-    class HPX_EXPORT continuation
+    class HPX_API_EXPORT continuation
       : public boost::enable_shared_from_this<continuation>
     {
     public:

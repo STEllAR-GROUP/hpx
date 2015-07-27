@@ -10,11 +10,12 @@
 #if !defined(HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM)
 #define HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
@@ -99,13 +100,6 @@ namespace hpx { namespace actions
             >
         {};
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \tparam Component         component type
-    /// \tparam Signature         return type and arguments
-    /// \tparam Derived           derived action class
-    template <typename Component, typename Signature, typename Derived>
-    struct basic_action;
 
     template <typename Component, typename R, typename ...Args, typename Derived>
     struct basic_action<Component, R(Args...), Derived>
