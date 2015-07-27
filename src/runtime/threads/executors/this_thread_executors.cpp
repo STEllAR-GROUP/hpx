@@ -37,7 +37,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     this_thread_executor<Scheduler>::this_thread_executor()
       : scheduler_(1, false), shutdown_sem_(0),
         state_(state_initialized), thread_num_(std::size_t(-1)),
-        parent_thread_num_(std::size_t(-1)),
+        parent_thread_num_(std::size_t(-1)), orig_thread_num_(std::size_t(-1)),
         tasks_scheduled_(0), tasks_completed_(0), cookie_(0),
         self_(0)
     {
@@ -289,7 +289,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             this_thread_on_run_exit on_exit(shutdown_sem_, self_);
 
             // manage the thread num
-            threads::detail::reset_tss_helper reset_on_exit(thread_num_);
+            HPX_ASSERT(orig_thread_num_ != std::size_t(-1));
+
+            threads::detail::reset_tss_helper reset_on_exit(orig_thread_num_);
             parent_thread_num_ = reset_on_exit.previous_thread_num();
 
             // FIXME: turn these values into performance counters
@@ -355,8 +357,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         HPX_ASSERT(0 == virt_core);
         HPX_ASSERT(std::size_t(-1) == thread_num_);
+        HPX_ASSERT(std::size_t(-1) == orig_thread_num_);
 
         thread_num_ = thread_num;
+        orig_thread_num_ = threads::detail::thread_num_tss_.get_worker_thread_num();
 
         state expected = state_initialized;
         bool result = state_.compare_exchange_strong(expected, state_starting);
@@ -377,6 +381,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         thread_num_ = std::size_t(-1);
         parent_thread_num_ = std::size_t(-1);
+        orig_thread_num_ = std::size_t(-1);
     }
 }}}}
 

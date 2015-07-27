@@ -98,6 +98,7 @@ namespace hpx { namespace threads { namespace executors
             boost::atomic<hpx::state> state_;
             std::size_t thread_num_;
             std::size_t parent_thread_num_;
+            std::size_t orig_thread_num_;
 
             // collect statistics
             boost::atomic<boost::uint64_t> tasks_scheduled_;
