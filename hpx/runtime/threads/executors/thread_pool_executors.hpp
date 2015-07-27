@@ -32,7 +32,8 @@ namespace hpx { namespace threads { namespace executors
         {
         public:
             thread_pool_executor(std::size_t max_punits = 1,
-                std::size_t min_punits = 1);
+                std::size_t min_punits = 1,
+                char const* description = "thread_pool_executor");
             ~thread_pool_executor();
 
             // Schedule the specified function for execution in this executor.

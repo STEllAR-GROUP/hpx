@@ -55,12 +55,13 @@ namespace hpx { namespace threads { namespace policies
     /// scheduler policies
     struct scheduler_base : boost::noncopyable
     {
-        scheduler_base(std::size_t num_threads)
+        scheduler_base(std::size_t num_threads, char const* description = "")
           : topology_(get_topology())
           , affinity_data_(num_threads)
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
 #endif
+          , description_(description)
         {
             states_.resize(num_threads);
             for (std::size_t i = 0; i != num_threads; ++i)
@@ -280,6 +281,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
         boost::ptr_vector<boost::atomic<hpx::state> > states_;
+        char const* description_;
     };
 }}}
 

@@ -724,7 +724,8 @@ namespace hpx
             typedef hpx::threads::policies::local_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000, numa_sensitive);
+                cfg.num_threads_, 1000, numa_sensitive,
+                "core-local_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
@@ -766,7 +767,8 @@ namespace hpx
             typedef hpx::threads::policies::static_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, num_high_priority_queues, 1000);
+                cfg.num_threads_, num_high_priority_queues, 1000,
+                "core-static_priority_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
@@ -786,9 +788,9 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // local static scheduler with priority queue (one queue for each OS
-        // threads plus one separate queue for high priority HPX-threads). Doesn't
-        // steal.
+        // local static scheduler without priority queue (one queue for each OS
+        // threads plus one separate queue for high priority HPX-threads).
+        // Doesn't steal.
         int run_static(startup_function_type const& startup,
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
@@ -807,7 +809,7 @@ namespace hpx
             typedef hpx::threads::policies::static_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000);
+                cfg.num_threads_, 1000, false, "core-static_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
@@ -848,7 +850,7 @@ namespace hpx
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
-                numa_sensitive);
+                numa_sensitive, "core-local_priority_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
@@ -884,7 +886,7 @@ namespace hpx
                 abp_priority_queue_policy;
             abp_priority_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
-                numa_sensitive);
+                numa_sensitive, "core-abp_fifo_priority_queue_scheduler");
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
@@ -918,7 +920,8 @@ namespace hpx
             if (cfg.vm_.count("hpx:hierarchy-arity"))
                 arity = cfg.vm_["hpx:hierarchy-arity"].as<std::size_t>();
 
-            queue_policy::init_parameter_type init(cfg.num_threads_, arity, 1000);
+            queue_policy::init_parameter_type init(cfg.num_threads_, arity,
+                1000, false, "core-hierarchy_scheduler");
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<queue_policy> runtime_type;
@@ -956,7 +959,8 @@ namespace hpx
             typedef hpx::threads::policies::periodic_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(cfg.num_threads_,
-                num_high_priority_queues, 1000, numa_sensitive);
+                num_high_priority_queues, 1000, numa_sensitive,
+                "core-periodic_priority_queue_scheduler");
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;

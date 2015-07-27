@@ -32,7 +32,7 @@ namespace hpx { namespace threads { namespace executors
           : public threads::detail::scheduled_executor_base
         {
         public:
-            this_thread_executor();
+            this_thread_executor(char const* description = "this_thread_executor");
             ~this_thread_executor();
 
             // Schedule the specified function for execution in this executor.

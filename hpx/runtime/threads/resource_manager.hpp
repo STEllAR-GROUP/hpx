@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2015 Nidhi Makhijani
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -51,7 +52,7 @@ namespace hpx { namespace  threads
 
         // Request an initial resource allocation
         std::size_t initial_allocation(detail::manage_executor* proxy,
-            error_code& ec = throws);
+                error_code& ec = throws);
 
         // Stop the executor identified by the given cookie
         void stop_executor(std::size_t cookie, error_code& ec = throws);
@@ -64,12 +65,16 @@ namespace hpx { namespace  threads
 
     protected:
         std::vector<coreids_type> allocate_virt_cores(
-            detail::manage_executor* proxy, std::size_t min_punits,
-            std::size_t max_punits, error_code& ec);
+                detail::manage_executor* proxy, std::size_t min_punits,
+                std::size_t max_punits, error_code& ec);
 
         std::size_t reserve_processing_units(
-            std::size_t use_count, std::size_t desired,
-            std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
+                std::size_t use_count, std::size_t desired,
+                std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
+
+        std::size_t reserve_at_higher_use_count(
+                std::size_t desired,
+                std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
 
     private:
         mutable mutex_type mtx_;
@@ -87,6 +92,8 @@ namespace hpx { namespace  threads
 
         typedef std::vector<punit_data> punit_array_type;
         punit_array_type punits_;
+
+        threads::topology const& topology_;
 
         ///////////////////////////////////////////////////////////////////////
         // Store information about the virtual processing unit allocation for
@@ -127,14 +134,73 @@ namespace hpx { namespace  threads
                 return *this;
             }
 
-            boost::shared_ptr<detail::manage_executor> proxy_;  // hold on to proxy
-            std::vector<coreids_type> core_ids_;                // map physical to logical puinit ids
+            // hold on to proxy
+            boost::shared_ptr<detail::manage_executor> proxy_;
+
+            // map physical to logical puinit ids
+            std::vector<coreids_type> core_ids_;
         };
 
         typedef std::map<std::size_t, proxy_data> proxies_map_type;
         proxies_map_type proxies_;
 
-        threads::topology const& topology_;
+        ///////////////////////////////////////////////////////////////////////
+        // Used to store information during static and dynamic allocation.
+        struct allocation_data
+        {
+            // The scheduler proxy this allocation data is for.
+            boost::shared_ptr<detail::manage_executor> proxy_;  // hold on to proxy
+
+            // Additional allocation to give to a scheduler after proportional
+            // allocation decisions are made.
+            std::size_t allocation;
+
+            // Used to hold a scaled allocation value during proportional
+            // allocation.
+            double scaled_allocation;
+
+            std::size_t num_borrowed_cores;
+            std::size_t num_owned_cores;
+            std::size_t min_proxy_cores;
+            std::size_t max_proxy_cores;
+        };
+
+        struct static_allocation_data : public allocation_data
+        {
+            // A field used during static allocation to decide on an allocation
+            // proportional to each scheduler's desired value.
+            double adjusted_desired;
+
+            // Keeps track of stolen cores during static allocation.
+            std::size_t num_cores_stolen;
+        };
+
+        typedef std::map<std::size_t, static_allocation_data>
+            allocation_data_map_type;
+        allocation_data_map_type proxies_static_allocation_data;
+
+        void preprocess_static_allocation();
+
+        std::size_t const release_borrowed_cores = (std::size_t)-1;
+        std::size_t const release_cores_to_min = (std::size_t)-2;
+
+        bool release_scheduler_resources(
+            allocation_data_map_type::iterator it,
+            std::size_t number_to_free,
+            std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
+
+        std::size_t release_cores_on_existing_scedulers(
+            std::size_t number_to_free,
+            std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
+
+        std::size_t redistribute_cores_among_all(std::size_t reserved,
+            std::size_t min_punits, std::size_t max_punits,
+            std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
+
+        void roundup_scaled_allocations(
+            allocation_data_map_type &scaled_static_allocation_data,
+            std::size_t total_allocated);
+
     };
 }}
 
