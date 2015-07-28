@@ -90,6 +90,22 @@ namespace hpx { namespace util
 
     private:
         typedef std::unique_ptr<boost::asio::io_service> io_service_ptr;
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700)
+        typedef std::unique_ptr<boost::asio::io_service::work> work_type;
+#else
+        typedef boost::asio::io_service::work work_type;
+#endif
+
+        BOOST_FORCEINLINE work_type initialize_work(boost::asio::io_service& io_service)
+        {
+            return work_type(
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700)
+                    new boost::asio::io_service::work(io_service)
+#else
+                    io_service
+#endif
+            );
+        }
 
         boost::mutex mtx_;
 
@@ -98,7 +114,7 @@ namespace hpx { namespace util
         std::vector<boost::thread> threads_;
 
         /// The work that keeps the io_services running.
-        std::vector<boost::asio::io_service::work> work_;
+        std::vector<work_type> work_;
 
         /// The next io_service to use for a connection.
         std::size_t next_io_service_;

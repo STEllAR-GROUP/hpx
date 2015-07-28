@@ -44,7 +44,7 @@ namespace hpx { namespace util
         for (std::size_t i = 0; i < pool_size; ++i)
         {
             io_services_.emplace_back(new boost::asio::io_service);
-            work_.emplace_back(boost::asio::io_service::work(*io_services_[i]));
+            work_.emplace_back(initialize_work(*io_services_[i]));
         }
     }
 
@@ -60,7 +60,7 @@ namespace hpx { namespace util
         for (std::size_t i = 0; i < pool_size_; ++i)
         {
             io_services_.emplace_back(new boost::asio::io_service);
-            work_.emplace_back(boost::asio::io_service::work(*io_services_[i]));
+            work_.emplace_back(initialize_work(*io_services_[i]));
         }
     }
 
@@ -111,7 +111,7 @@ namespace hpx { namespace util
             for (std::size_t i = 0; i < pool_size_; ++i)
             {
                 io_services_.emplace_back(new boost::asio::io_service);
-                work_.emplace_back(boost::asio::io_service::work(*io_services_[i]));
+                work_.emplace_back(initialize_work(*io_services_[i]));
             }
         }
 
