@@ -40,6 +40,8 @@ namespace hpx
 
     template <typename T, typename BaseIter>
     class local_raw_vector_iterator;
+    template <typename T, typename BaseIter>
+    class const_local_raw_vector_iterator;
 
     template <typename T> class vector_iterator;
     template <typename T> class const_vector_iterator;
@@ -91,6 +93,46 @@ namespace hpx
         {
             HPX_ASSERT(data_);
             std::size_t local_index = std::distance(data_->begin(), this->base());
+            return local_const_iterator(partition_vector<T>(data_->get_id()),
+                local_index, data_);
+        }
+
+    private:
+        boost::shared_ptr<server::partition_vector<T> > data_;
+    };
+
+    template <typename T, typename BaseIter>
+    class const_local_raw_vector_iterator
+      : public boost::iterator_adaptor<
+            const_local_raw_vector_iterator<T, BaseIter>, BaseIter
+        >
+    {
+    private:
+        typedef boost::iterator_adaptor<
+                const_local_raw_vector_iterator<T, BaseIter>, BaseIter
+            > base_type;
+        typedef BaseIter base_iterator;
+
+    public:
+        typedef const_local_vector_iterator<T> local_iterator;
+        typedef const_local_vector_iterator<T> local_const_iterator;
+
+        const_local_raw_vector_iterator(base_iterator const& it,
+                boost::shared_ptr<server::partition_vector<T> > const& data)
+          : base_type(it), data_(data)
+        {}
+
+        local_const_iterator remote()
+        {
+            HPX_ASSERT(data_);
+            std::size_t local_index = std::distance(data_->cbegin(), this->base());
+            return local_const_iterator(partition_vector<T>(data_->get_id()),
+                local_index, data_);
+        }
+        local_const_iterator remote() const
+        {
+            HPX_ASSERT(data_);
+            std::size_t local_index = std::distance(data_->cbegin(), this->base());
             return local_const_iterator(partition_vector<T>(data_->get_id()),
                 local_index, data_);
         }
@@ -220,7 +262,7 @@ namespace hpx
         typedef local_raw_vector_iterator<
                 T, typename std::vector<T>::iterator
             > local_raw_iterator;
-        typedef local_raw_vector_iterator<
+        typedef const_local_raw_vector_iterator<
                 T, typename std::vector<T>::const_iterator
             > local_raw_const_iterator;
 
@@ -346,7 +388,13 @@ namespace hpx
             data_(data)
         {}
 
-        typedef local_raw_vector_iterator<
+        const_local_vector_iterator(local_vector_iterator<T> it)
+          : partition_(it.get_partition()),
+            local_index_(it.get_local_index()),
+            data_(it.get_data())
+        {}
+
+        typedef const_local_raw_vector_iterator<
                 T, typename std::vector<T>::const_iterator
             > local_raw_iterator;
         typedef local_raw_iterator local_raw_const_iterator;

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,7 +35,7 @@ void test_transform_binary(ExPolicy policy, IteratorTag)
     hpx::util::tuple<iterator, base_iterator, base_iterator> result =
         hpx::parallel::transform(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2), boost::begin(d1), add);
+            boost::begin(c2), boost::end(c2), boost::begin(d1), add);
 
     HPX_TEST(hpx::util::get<0>(result) == iterator(boost::end(c1)));
     HPX_TEST(hpx::util::get<1>(result) == boost::end(c2));
@@ -76,7 +76,7 @@ void test_transform_binary_async(ExPolicy p, IteratorTag)
     hpx::future<hpx::util::tuple<iterator, base_iterator, base_iterator> > f =
         hpx::parallel::transform(p,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2), boost::begin(d1), add);
+            boost::begin(c2), boost::end(c2), boost::begin(d1), add);
     f.wait();
 
     hpx::util::tuple<iterator, base_iterator, base_iterator> result = f.get();
@@ -145,7 +145,7 @@ void test_transform_binary_exception(ExPolicy policy, IteratorTag)
     try {
         hpx::parallel::transform(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2), boost::begin(d1),
+            boost::begin(c2), boost::end(c2), boost::begin(d1),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), v1 + v2;
             });
@@ -181,7 +181,7 @@ void test_transform_binary_exception_async(ExPolicy p, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::transform(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
-                boost::begin(c2), boost::begin(d1),
+                boost::begin(c2), boost::end(c2), boost::begin(d1),
                 [](std::size_t v1, std::size_t v2) {
                     return throw std::runtime_error("test"), v1 + v2;
                 });
@@ -249,7 +249,7 @@ void test_transform_binary_bad_alloc(ExPolicy policy, IteratorTag)
     try {
         hpx::parallel::transform(policy,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
-            boost::begin(c2), boost::begin(d1),
+            boost::begin(c2), boost::end(c2), boost::begin(d1),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;
             });
@@ -284,7 +284,7 @@ void test_transform_binary_bad_alloc_async(ExPolicy p, IteratorTag)
         hpx::future<void> f =
             hpx::parallel::transform(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
-                boost::begin(c2), boost::begin(d1),
+                boost::begin(c2), boost::end(c2), boost::begin(d1),
                 [](std::size_t v1, std::size_t v2) {
                     return throw std::bad_alloc(), v1 + v2;
                 });
