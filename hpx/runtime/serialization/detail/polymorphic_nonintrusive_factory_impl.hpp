@@ -44,7 +44,7 @@ namespace hpx { namespace serialization { namespace detail
        ar >> class_name;
 
        const function_bunch_type& bunch = map_.at(class_name);
-       T* t = static_cast<T*>(bunch.create_function());
+       T* t = static_cast<T*>(bunch.create_function(ar));
 
        bunch.load_function(ar, t);
        return t;

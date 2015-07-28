@@ -13,6 +13,10 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+/**
+ * In this class we use the custom c-tor macro to simply delegate to
+ * another c-tor without actually accessing the archive.
+ */
 struct A
 {
     A(int a) : a(a) {}
@@ -24,17 +28,60 @@ struct A
 template <typename Archive>
 void serialize(Archive& ar, A& a, unsigned)
 {
-  ar & a.a;
+    ar & a.a;
 }
 
-A *a_factory()
+A *a_factory(hpx::serialization::input_archive& ar)
 {
     return new A(123);
 }
 
 HPX_SERIALIZATION_REGISTER_CLASS(A);
 HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(A, a_factory);
-void test_shared()
+
+/**
+ * In this example we leverage the custom factory to pull data from
+ * the archive and prevent duplicate construction of potentially
+ * expensive members. Side effect: serialize() needs to be specialized
+ * for input archives as to avoid duplicate reads.
+ */
+struct B
+{
+    B(double b, bool flag) :
+        b(b)
+    {
+        if (flag) {
+            std::cout << "B(" << b << ")\n";
+        }
+    }
+
+    virtual ~B() {}
+
+    double b;
+};
+
+template <typename Archive>
+void serialize(Archive& ar, B& b, unsigned)
+{
+    ar & b.b;
+}
+
+void serialize(hpx::serialization::input_archive& ar, B& b, unsigned)
+{}
+
+B *b_factory(hpx::serialization::input_archive& ar)
+{
+    double b;
+    ar & b;
+
+    bool flag = (b < 8);
+    return new B(b, flag);
+}
+
+HPX_SERIALIZATION_REGISTER_CLASS(B);
+HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(B, b_factory);
+
+void test_delegate()
 {
     std::vector<char> buffer;
 
@@ -51,9 +98,27 @@ void test_shared()
     }
 }
 
+void test_custom_factory()
+{
+    std::vector<char> buffer;
+
+    {
+        boost::shared_ptr<B> struct_a(new B(1981, false));
+        hpx::serialization::output_archive oarchive(buffer);
+        oarchive << struct_a;
+    }
+    {
+        boost::shared_ptr<B> struct_b;
+        hpx::serialization::input_archive iarchive(buffer);
+        iarchive >> struct_b;
+        HPX_TEST_EQ(struct_b->b, 1981);
+    }
+}
+
 int main()
 {
-    test_shared();
+    test_delegate();
+    test_custom_factory();
 
     return hpx::util::report_errors();
 }

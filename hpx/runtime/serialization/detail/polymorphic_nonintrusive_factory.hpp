@@ -53,7 +53,7 @@ namespace hpx { namespace serialization { namespace detail
     {
         typedef void (*save_function_type) (output_archive& , const void* base);
         typedef void (*load_function_type) (input_archive& , void* base);
-        typedef void* (*create_function_type) ();
+        typedef void* (*create_function_type) (input_archive&);
 
         save_function_type save_function;
         load_function_type load_function;
@@ -64,7 +64,7 @@ namespace hpx { namespace serialization { namespace detail
     class constructor_selector
     {
     public:
-        static T *create()
+        static T *create(input_archive& /* unused ar*/)
         {
             return new T;
         }
@@ -153,9 +153,9 @@ namespace hpx { namespace serialization { namespace detail
         }
 
         // this function is needed for pointer type serialization
-        static void* create()
+        static void* create(input_archive& ar)
         {
-            return constructor_selector<Derived>::create();
+            return constructor_selector<Derived>::create(ar);
         }
 
         register_class()
@@ -256,9 +256,9 @@ namespace hpx { namespace serialization { namespace detail
     class constructor_selector<HPX_UTIL_STRIP(Class)>                         \
     {                                                                         \
     public:                                                                   \
-        static Class *create()                                                \
+        static Class *create(input_archive& ar)                               \
         {                                                                     \
-            return Func();                                                    \
+            return Func(ar);                                                  \
         }                                                                     \
     };                                                                        \
     }}}                                                                       \
@@ -270,9 +270,9 @@ namespace hpx { namespace serialization { namespace detail
     class constructor_selector<HPX_UTIL_STRIP(Template)>                      \
     {                                                                         \
     public:                                                                   \
-        static Template *create()                                             \
+        static Template *create(input_archive& ar)                            \
         {                                                                     \
-            return Func();                                                    \
+            return Func(ar);                                                  \
         }                                                                     \
     };                                                                        \
     }}}                                                                       \
