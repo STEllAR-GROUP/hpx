@@ -576,7 +576,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // Create the local stepper instance, register it
     stepper step;
-    
+
     // Measure execution time.
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
 
