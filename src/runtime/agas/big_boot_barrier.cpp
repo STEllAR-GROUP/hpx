@@ -44,6 +44,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <sstream>
+#include <cstdlib>
 
 namespace hpx { namespace detail
 {
@@ -955,8 +956,9 @@ void big_boot_barrier::wait_hosted(
         , unassigned
         , suggested_prefix);
 
+    std::srand(static_cast<unsigned>(std::time(0)));
     apply(
-        naming::invalid_locality_id
+          static_cast<boost::uint32_t>(std::rand()) // random first parcel id
         , 0
         , bootstrap_agas
         , new actions::transfer_action<register_worker_action>(hdr));
