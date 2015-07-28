@@ -270,9 +270,9 @@ namespace hpx { namespace serialization { namespace detail
     class constructor_selector<HPX_UTIL_STRIP(Template)>                      \
     {                                                                         \
     public:                                                                   \
-        static Template *create(input_archive& ar)                            \
+        static HPX_UTIL_STRIP(Template) *create(input_archive& ar)            \
         {                                                                     \
-            return Func(ar);                                                  \
+            return Func(ar, static_cast<HPX_UTIL_STRIP(Template)*>(0));       \
         }                                                                     \
     };                                                                        \
     }}}                                                                       \

@@ -81,6 +81,33 @@ B *b_factory(hpx::serialization::input_archive& ar)
 HPX_SERIALIZATION_REGISTER_CLASS(B);
 HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(B, b_factory);
 
+/**
+ * Obviously we need to check templates, too.
+ */
+template<typename T>
+struct C
+{
+    C(T c) :
+        c(c)
+    {}
+
+    T c;
+};
+
+template<typename Archive, typename T>
+void serialize(Archive& ar, C<T>& c, unsigned)
+{
+    ar & c.c;
+}
+
+template<typename T>
+C<T> *c_factory(hpx::serialization::input_archive& ar, C<T> */*unused*/)
+{
+    return new C<T>(666);
+}
+
+HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE((template<typename T>), (C<T>), c_factory);
+
 void test_delegate()
 {
     std::vector<char> buffer;
@@ -115,10 +142,28 @@ void test_custom_factory()
     }
 }
 
+void test_template()
+{
+    std::vector<char> buffer;
+
+    {
+        boost::shared_ptr<C<float> > struct_a(new C<float>(777));
+        hpx::serialization::output_archive oarchive(buffer);
+        oarchive << struct_a;
+    }
+    {
+        boost::shared_ptr<C<float> > struct_b;
+        hpx::serialization::input_archive iarchive(buffer);
+        iarchive >> struct_b;
+        HPX_TEST_EQ(struct_b->c, 777);
+    }
+}
+
 int main()
 {
     test_delegate();
     test_custom_factory();
+    test_template();
 
     return hpx::util::report_errors();
 }
