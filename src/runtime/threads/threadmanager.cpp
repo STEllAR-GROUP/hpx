@@ -997,6 +997,22 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
+            // /threads{locality#%d/total}/time/cumulative
+            // /threads{locality#%d/worker-thread%d}/time/cumulative
+            { "time/cumulative",
+              util::bind(&ti::get_cumulative_thread_duration, this, -1, _1),
+              util::bind(&ti::get_cumulative_thread_duration, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/time/cumulative-overhead
+            // /threads{locality#%d/worker-thread%d}/time/cumulative-overhead
+            { "time/cumulative-overhead",
+              util::bind(&ti::get_cumulative_thread_overhead, this, -1, _1),
+              util::bind(&ti::get_cumulative_thread_overhead, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
 #endif
 #endif
             // /threads{locality#%d/total}/count/instantaneous/all
@@ -1254,6 +1270,18 @@ namespace hpx { namespace threads
               &performance_counters::locality_thread_counter_discoverer,
               "ns"
             },
+            { "/threads/time/cumulative", performance_counters::counter_raw,
+              "returns the cumulative time spent executing HPX-threads",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
+            },
+            { "/threads/time/cumulative-overhead", performance_counters::counter_raw,
+              "returns the cumulative overhead time incurred by executing HPX threads",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
+            },
 #endif
 #endif
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
@@ -1450,6 +1478,20 @@ namespace hpx { namespace threads
         get_thread_overhead(std::size_t num, bool reset)
     {
         return pool_.get_thread_overhead(num, reset);
+    }
+
+    template <typename SchedulingPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy>::
+        get_cumulative_thread_duration(std::size_t num, bool reset)
+    {
+        return pool_.get_cumulative_thread_duration(num, reset);
+    }
+
+    template <typename SchedulingPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy>::
+        get_cumulative_thread_overhead(std::size_t num, bool reset)
+    {
+        return pool_.get_cumulative_thread_overhead(num, reset);
     }
 #endif
 #endif

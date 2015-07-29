@@ -80,6 +80,8 @@ namespace hpx { namespace threads { namespace detail
         boost::int64_t get_thread_duration(std::size_t num, bool reset);
         boost::int64_t get_thread_phase_overhead(std::size_t num, bool reset);
         boost::int64_t get_thread_overhead(std::size_t num, bool reset);
+        boost::int64_t get_cumulative_thread_duration(std::size_t num, bool reset);
+        boost::int64_t get_cumulative_thread_overhead(std::size_t num, bool reset);
 #endif
 #endif
 
