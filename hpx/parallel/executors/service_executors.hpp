@@ -86,16 +86,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
           : threads_executor(detail::get_service_executor(t))
         {}
     };
-
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <>
-        struct is_executor<service_executor>
-          : std::true_type
-        {};
-        /// \endcond
-    }
 }}}
 
 #endif
