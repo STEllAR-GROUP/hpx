@@ -84,7 +84,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         T val = conv(*part_begin);
                         return util::accumulate_n(++part_begin, --part_size,
                             std::move(val),
-                            [&r, &conv](T const& res, reference next)
+                            // MSVC14 bails out if r and conv are captured by
+                            // reference
+                            [=](T const& res, reference next)
                             {
                                 return r(res, conv(next));
                             });

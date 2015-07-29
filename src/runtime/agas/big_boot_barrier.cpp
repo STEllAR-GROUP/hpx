@@ -15,6 +15,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
@@ -956,7 +957,7 @@ void big_boot_barrier::wait_hosted(
         , unassigned
         , suggested_prefix);
 
-    std::srand(static_cast<unsigned>(std::time(0)));
+    std::srand(static_cast<unsigned>(util::high_resolution_clock::now()));
     apply(
           static_cast<boost::uint32_t>(std::rand()) // random first parcel id
         , 0

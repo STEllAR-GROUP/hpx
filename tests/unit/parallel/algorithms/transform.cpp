@@ -25,11 +25,15 @@ void test_transform(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::parallel::transform(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
-        [](std::size_t v) {
-            return v + 1;
-        });
+    hpx::util::tuple<iterator, base_iterator> result =
+        hpx::parallel::transform(policy,
+            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
+            [](std::size_t v) {
+                return v + 1;
+            });
+
+    HPX_TEST(hpx::util::get<0>(result) == iterator(boost::end(c)));
+    HPX_TEST(hpx::util::get<1>(result) == boost::end(d));
 
     // verify values
     std::size_t count = 0;
@@ -52,13 +56,17 @@ void test_transform_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<base_iterator> f =
+    hpx::future<hpx::util::tuple<iterator, base_iterator> > f =
         hpx::parallel::transform(p,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
             [](std::size_t& v) {
                 return v + 1;
             });
     f.wait();
+
+    hpx::util::tuple<iterator, base_iterator> result = f.get();
+    HPX_TEST(hpx::util::get<0>(result) == iterator(boost::end(c)));
+    HPX_TEST(hpx::util::get<1>(result) == boost::end(d));
 
     // verify values
     std::size_t count = 0;
@@ -145,7 +153,7 @@ void test_transform_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        hpx::future<void> f =
             hpx::parallel::transform(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
@@ -243,7 +251,7 @@ void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        hpx::future<void> f =
             hpx::parallel::transform(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 boost::begin(d),
@@ -321,6 +329,7 @@ int main(int argc, char* argv[])
         ("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run")
         ;
+
     // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +

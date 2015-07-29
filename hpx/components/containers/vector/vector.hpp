@@ -432,7 +432,7 @@ namespace hpx
         {
             std::size_t part = get_partition(global_index);
             if (part == partitions_.size())
-                return segment_iterator(partitions_.end());
+                return segment_iterator(partitions_.end(), this);
 
             return segment_iterator(partitions_.begin() + part, this);
         }
@@ -442,7 +442,7 @@ namespace hpx
         {
             std::size_t part = get_partition(global_index);
             if (part == partitions_.size())
-                return const_segment_iterator(partitions_.cend());
+                return const_segment_iterator(partitions_.cend(), this);
 
             return const_segment_iterator(partitions_.cbegin() + part, this);
         }
@@ -1482,17 +1482,17 @@ namespace hpx
 
         segment_iterator segment_end()
         {
-            return segment_iterator(partitions_.end());
+            return segment_iterator(partitions_.end(), this);
         }
 
         const_segment_iterator segment_end() const
         {
-            return const_segment_iterator(partitions_.cend());
+            return const_segment_iterator(partitions_.cend(), this);
         }
 
         const_segment_iterator segment_cend() const //-V524
         {
-            return const_segment_iterator(partitions_.cend());
+            return const_segment_iterator(partitions_.cend(), this);
         }
 
         ///////////////////////////////////////////////////////////////////////

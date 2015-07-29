@@ -67,7 +67,7 @@ namespace hpx
     async_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs)
     {
         typedef
-            typename traits::promise_local_result<
+            typename traits::promise_remote_result<
                 typename detail::result_of_async_continue<Action, Cont>::type
             >::type
         result_type;
@@ -105,7 +105,7 @@ namespace hpx
     async_continue(Cont&& cont, DistPolicy const& policy, Ts&&... vs)
     {
         typedef
-            typename traits::promise_local_result<
+            typename traits::promise_remote_result<
                 typename detail::result_of_async_continue<Action, Cont>::type
             >::type
         result_type;
