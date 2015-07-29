@@ -64,9 +64,15 @@ namespace hpx { namespace serialization { namespace detail
     class constructor_selector
     {
     public:
-        static T *create(input_archive& /* unused ar*/)
+        static T *create(input_archive& ar)
         {
             return new T;
+        }
+
+        template<typename Pointer>
+        static void load(input_archive& ar, Pointer& t)
+        {
+            ar >> *t;
         }
     };
 
@@ -260,6 +266,10 @@ namespace hpx { namespace serialization { namespace detail
         {                                                                     \
             return Func(ar);                                                  \
         }                                                                     \
+                                                                              \
+        template<typename Pointer>                                            \
+        static void load(input_archive& ar, Pointer& t)                       \
+        {}                                                                    \
     };                                                                        \
     }}}                                                                       \
 /**/
@@ -274,6 +284,10 @@ namespace hpx { namespace serialization { namespace detail
         {                                                                     \
             return Func(ar, static_cast<HPX_UTIL_STRIP(Template)*>(0));       \
         }                                                                     \
+                                                                              \
+        template<typename Pointer>                                            \
+        static void load(input_archive& ar, Pointer& t)                       \
+        {}                                                                    \
     };                                                                        \
     }}}                                                                       \
 /**/

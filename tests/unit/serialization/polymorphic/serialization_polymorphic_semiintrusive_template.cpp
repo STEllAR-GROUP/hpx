@@ -117,7 +117,10 @@ int main()
       boost::shared_ptr<A<double> > d;
       boost::shared_ptr<A<float> > e;
 
-      archive >> b >> c >> d >> e;
+      archive >> b;
+      archive >> c;
+      archive >> d;
+      archive >> e;
 
       HPX_TEST_EQ(b->a, -5);
       HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->b, -4);

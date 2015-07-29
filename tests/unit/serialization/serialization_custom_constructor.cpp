@@ -33,7 +33,9 @@ void serialize(Archive& ar, A& a, unsigned)
 
 A *a_factory(hpx::serialization::input_archive& ar)
 {
-    return new A(123);
+    A *a = new A(123);
+    ar >> *a;
+    return a;
 }
 
 HPX_SERIALIZATION_REGISTER_CLASS(A);
@@ -65,9 +67,6 @@ void serialize(Archive& ar, B& b, unsigned)
 {
     ar & b.b;
 }
-
-void serialize(hpx::serialization::input_archive& ar, B& b, unsigned)
-{}
 
 B *b_factory(hpx::serialization::input_archive& ar)
 {
@@ -103,7 +102,9 @@ void serialize(Archive& ar, C<T>& c, unsigned)
 template<typename T>
 C<T> *c_factory(hpx::serialization::input_archive& ar, C<T> */*unused*/)
 {
-    return new C<T>(666);
+    C<T> *c = new C<T>(666);
+    ar >> *c;
+    return c;
 }
 
 HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE((template<typename T>), (C<T>), c_factory);
@@ -111,7 +112,6 @@ HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE((template<typename T>), (C<T>
 void test_delegate()
 {
     std::vector<char> buffer;
-
     {
         boost::shared_ptr<A> struct_a(new A(4711));
         hpx::serialization::output_archive oarchive(buffer);
@@ -145,7 +145,6 @@ void test_custom_factory()
 void test_template()
 {
     std::vector<char> buffer;
-
     {
         boost::shared_ptr<C<float> > struct_a(new C<float>(777));
         hpx::serialization::output_archive oarchive(buffer);
