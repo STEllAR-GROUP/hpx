@@ -176,32 +176,6 @@ namespace hpx { namespace agas
 //    >
 //> response_heap_type;
 
-// TODO: Make assertions exceptions
-void early_parcel_sink(
-    parcelset::parcel const& p
-    )
-{ // {{{
-        // decode the action-type in the parcel
-        actions::base_action * act = p.get_action();
-
-        // early parcels should only be plain actions
-        HPX_ASSERT(actions::base_action::plain_action == act->get_action_type());
-
-        // early parcels can't have continuations
-        HPX_ASSERT(!p.get_continuation());
-
-        // We should not allow any exceptions to escape the execution of the
-        // action as this would bring down the ASIO thread we execute in.
-        try {
-            act->get_thread_function(0)
-                (threads::thread_state_ex(threads::wait_signaled));
-        }
-        catch (...) {
-            hpx::report_error(boost::current_exception());
-        }
-//     }
-} // }}}
-
 // This structure is used when a locality registers with node zero
 // (first round trip)
 struct registration_header
@@ -859,9 +833,6 @@ big_boot_barrier::big_boot_barrier(
     // register all not registered typenames
     if (service_type == service_mode_bootstrap)
         detail::register_unassigned_typenames();
-
-    if(pp_)
-        pp_->register_event_handler(&early_parcel_sink);
 }
 
 void big_boot_barrier::apply(

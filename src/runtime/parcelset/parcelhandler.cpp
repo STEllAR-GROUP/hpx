@@ -76,32 +76,12 @@ namespace hpx { namespace parcelset
         sent_future.get(); // wait for the parcel to be sent
     }
 
-    void parcelhandler::parcel_sink(parcel const& p)
-    {
-        // wait for thread-manager to become active
-        while (threads::threadmanager_is(state_starting))
-        {
-            boost::this_thread::sleep(boost::get_system_time() +
-                boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
-        }
-
-        // Give up if we're shutting down.
-        if (threads::threadmanager_is(state_stopping))
-        {
-//             LPT_(debug) << "parcel_sink: dropping late parcel";
-            return;
-        }
-
-        parcels_->add_parcel(p);
-    }
-
     parcelhandler::parcelhandler(
             util::runtime_configuration & cfg,
-            threads::threadmanager_base* tm, parcelhandler_queue_base* policy,
+            threads::threadmanager_base* tm,
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
             util::function_nonser<void()> const& on_stop_thread)
       : tm_(tm),
-        parcels_(policy),
         use_alternative_parcelports_(false),
         enable_parcel_handling_(true),
         load_message_handlers_(
@@ -142,12 +122,10 @@ namespace hpx { namespace parcelset
     }
 
 
-    void parcelhandler::initialize(naming::resolver_client &resolver)
+    void parcelhandler::initialize(naming::resolver_client &resolver, applier::applier *applier)
     {
         resolver_ = &resolver;
-        HPX_ASSERT(parcels_);
 
-        parcels_->set_parcelhandler(this);
         for (pports_type::value_type& pp : pports_)
         {
             if(pp.second != get_bootstrap_parcelport())
@@ -155,12 +133,7 @@ namespace hpx { namespace parcelset
                 if(pp.first > 0)
                     pp.second->run(false);
             }
-            else
-            {
-                using util::placeholders::_1;
-                pp.second->register_event_handler(
-                    util::bind(&parcelhandler::parcel_sink, this, _1));
-            }
+            pp.second->set_applier(applier);
         }
     }
 
@@ -203,9 +176,6 @@ namespace hpx { namespace parcelset
         using util::placeholders::_1;
 
         if(!pp) return;
-
-        // register our callback function with the parcelport
-        pp->register_event_handler(util::bind(&parcelhandler::parcel_sink, this, _1));
 
         // add the new parcelport to the list of parcel-ports we care about
         int priority = pp->priority();
@@ -369,24 +339,6 @@ namespace hpx { namespace parcelset
         return result;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        // The original parcel-sent handler is wrapped to keep the parcel alive
-        // until after the data has been reliably sent (which is needed for zero
-        // copy serialization).
-        void parcel_sent_handler(boost::system::error_code const& ec,
-            parcelhandler::write_handler_type const& f, parcel const& p)
-        {
-            // invoke the original handler
-            f(ec, p);
-
-            // inform termination detection of a sent message
-            if (!p.does_termination_detection())
-                hpx::detail::dijkstra_make_black();
-        }
-    }
-
     void parcelhandler::put_parcel(parcel& p, write_handler_type const& f)
     {
         HPX_ASSERT(resolver_);
@@ -430,11 +382,6 @@ namespace hpx { namespace parcelset
         // parcel directly to the destination.
         if (resolved_locally)
         {
-            // re-wrap the given parcel-sent handler
-            using util::placeholders::_1;
-            write_handler_type wrapped_f =
-                util::bind(&detail::parcel_sent_handler, _1, f, p);
-
             // dispatch to the message handler which is associated with the
             // encapsulated action
             typedef std::pair<boost::shared_ptr<parcelport>, locality> destination_pair;
@@ -446,12 +393,12 @@ namespace hpx { namespace parcelset
                     p.get_message_handler(this, dest.second);
 
                 if (mh) {
-                    mh->put_parcel(dest.second, p, wrapped_f);
+                    mh->put_parcel(dest.second, p, f);
                     return;
                 }
             }
 
-            dest.first->put_parcel(dest.second, p, wrapped_f);
+            dest.first->put_parcel(dest.second, p, f);
             return;
         }
 

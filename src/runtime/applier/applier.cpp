@@ -532,7 +532,7 @@ namespace hpx { namespace applier
                       << addr.type_ << ") action_type(" << comptype
                       << ") parcel ("  << p << ")";
                 HPX_THROW_EXCEPTION(bad_component_type,
-                    "action_manager::fetch_parcel",
+                    "applier::schedule_action",
                     strm.str());
             }
 

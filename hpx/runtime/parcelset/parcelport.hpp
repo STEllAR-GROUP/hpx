@@ -13,7 +13,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -171,28 +170,6 @@ namespace hpx { namespace parcelset
         /// Return the name of this locality
         virtual std::string get_locality_name() const = 0;
 
-        /// Register an event handler to be called whenever a parcel has been
-        /// received.
-        ///
-        /// \param sink     [in] A function object to be invoked whenever a
-        ///                 parcel has been received by the parcelport. The
-        ///                 signature of this function object is expected to be:
-        ///
-        /// \code
-        ///      void handler(hpx::parcelset::parcelport& pp,
-        ///                   boost::shared_ptr<std::vector<char> > const& data,
-        ///                   hpx::threads::thread_priority priority);
-        /// \endcode
-        ///
-        ///                 where \a pp is a reference to the parcelport this
-        ///                 function object instance is invoked by, and \a dest
-        ///                 is the local destination address of the parcel.
-        template <typename F>
-        void register_event_handler(F sink)
-        {
-            parcels_.register_event_handler(sink);
-        }
-
         /// \brief Allow access to the locality this parcelport is associated
         /// with.
         ///
@@ -317,11 +294,13 @@ namespace hpx { namespace parcelset
             return pending_parcels_.size();
         }
 
-        void add_received_parcel(parcel const& p)
+
+        void set_applier(applier::applier * applier)
         {
-            // do some work (notify event handlers)
-            parcels_.add_parcel(p);
+            applier_ = applier;
         }
+
+        void add_received_parcel(parcel const& p);
 
         /// Update performance counter data
         void add_received_data(performance_counters::parcels::data_point const& data)
@@ -371,8 +350,7 @@ namespace hpx { namespace parcelset
         /// mutex for all of the member data
         mutable lcos::local::spinlock mtx_;
 
-        /// The handler for all incoming requests.
-        server::parcelport_queue parcels_;
+        hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
         typedef std::pair<std::deque<parcel>, std::deque<write_handler_type> >
