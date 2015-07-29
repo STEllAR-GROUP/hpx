@@ -31,10 +31,13 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
 /**
 @brief Writes the thread_id to the log
 
-@param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
+@param convert [optional] In case there needs to be a conversion between
+std::(w)string and the string that holds your logged message. See convert_format.
+For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
+"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::prepend> struct thread_id_t : is_generic, hpx::util::logging::op_equal::always_equal {
+template<class convert = do_convert_format::prepend> struct thread_id_t : is_generic,
+hpx::util::logging::op_equal::always_equal {
     typedef convert convert_type;
 
     template<class msg_type> void operator()(msg_type & msg) const {

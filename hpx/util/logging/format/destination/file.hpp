@@ -38,7 +38,8 @@
 namespace hpx { namespace util { namespace logging { namespace destination {
 
 /**
-    @brief settings for when constructing a file class. To see how it's used, see @ref dealing_with_flags.
+    @brief settings for when constructing a file class. To see how it's used,
+    see @ref dealing_with_flags.
 */
 struct file_settings {
     typedef ::hpx::util::logging::detail::flag<file_settings> flag;
@@ -80,7 +81,8 @@ namespace detail {
               settings(settings_) {}
 
         void open() {
-            out.reset( new std::basic_ofstream<char_type>( name.c_str(), open_flags(settings) ) );
+            out.reset( new std::basic_ofstream<char_type>( name.c_str(),
+                open_flags(settings) ) );
         }
 
         void close() {
@@ -106,7 +108,8 @@ struct file_t : is_generic, non_const_context<detail::file_info>
         @brief constructs the file destination
 
         @param file_name name of the file
-        @param set [optional] file settings - see file_settings class, and @ref dealing_with_flags
+        @param set [optional] file settings - see file_settings class,
+        and @ref dealing_with_flags
     */
     file_t(const std::string & file_name, file_settings set = file_settings() )
       : non_const_context_base(file_name,set)

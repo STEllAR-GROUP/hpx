@@ -103,7 +103,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // resource manager to interact with this executor using the
         // manage_executor interface.
         resource_manager& rm = resource_manager::get();
-        cookie_ = rm.initial_allocation(new manage_thread_pool_executor<Scheduler>(*this));
+        cookie_ = rm.initial_allocation(new
+            manage_thread_pool_executor<Scheduler>(*this));
     }
 
     inline bool starting_up(boost::ptr_vector<boost::atomic<hpx::state> >& states)

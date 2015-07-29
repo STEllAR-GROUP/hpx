@@ -28,10 +28,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// for a given \a service_executor.
     BOOST_SCOPED_ENUM_START(service_executor_type)
     {
-        io_thread_pool,        ///< Selects creating a service executor using the I/O pool of threads
-        parcel_thread_pool,    ///< Selects creating a service executor using the parcel pool of threads
-        timer_thread_pool,     ///< Selects creating a service executor using the timer pool of threads
-        main_thread            ///< Selects creating a service executor using the main thread
+        io_thread_pool,
+        ///< Selects creating a service executor using the I/O pool of threads
+        parcel_thread_pool,
+        ///< Selects creating a service executor using the parcel pool of threads
+        timer_thread_pool,
+        ///< Selects creating a service executor using the timer pool of threads
+        main_thread
+        ///< Selects creating a service executor using the main thread
     };
     BOOST_SCOPED_ENUM_END
 

@@ -123,14 +123,16 @@ int hpx_main(po::variables_map &vm)
         for (int i=0;i<array_length;i++) {
           components::access_memory_block<data>
                   result( components::stubs::memory_block::get(n[i].get()) );
-          std::cout << " Result index: " << i << " value : "  << result->val_ << std::endl;
+          std::cout << " Result index: " << i << " value : "
+                  << result->val_ << std::endl;
         }
 
         // What is the elapsed time?
         elapsed = t.elapsed();
 
         // Print out a completion message. The correct answer is 12 for this example.
-        std::cout << "Achieved result of " << result << " in " << elapsed << " seconds."<< std::endl;
+        std::cout << "Achieved result of " << result << " in "
+            << elapsed << " seconds."<< std::endl;
     }
 
     // Initiate shutdown of the runtime systems on all localities

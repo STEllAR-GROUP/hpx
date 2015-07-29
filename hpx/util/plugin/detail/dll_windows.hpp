@@ -130,13 +130,15 @@ namespace hpx { namespace util { namespace plugin {
         std::pair<SymbolType, Deleter>
         get(std::string const& symbol_name, error_code& ec = throws) const
         {
-            const_cast<dll&>(*this).LoadLibrary(ec);      // make sure everything is initialized
+            const_cast<dll&>(*this).LoadLibrary(ec);
+            // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
 
             // Cast the to right type.
-            SymbolType address = (SymbolType)GetProcAddress(dll_handle, symbol_name.c_str());
+            SymbolType address = (SymbolType)GetProcAddress
+                (dll_handle, symbol_name.c_str());
             if (NULL == address)
             {
                 std::ostringstream str;
@@ -209,7 +211,8 @@ namespace hpx { namespace util { namespace plugin {
         {
             char buffer[_MAX_PATH] = { '\0' };
 
-            const_cast<dll&>(*this).LoadLibrary(ec);      // make sure everything is initialized
+            const_cast<dll&>(*this).LoadLibrary(ec);
+            // make sure everything is initialized
             if (ec) return buffer;
 
             DWORD name_length =

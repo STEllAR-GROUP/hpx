@@ -75,13 +75,15 @@ namespace hpx { namespace parcelset
                 ini, key + ".max_connections", HPX_PARCEL_MAX_CONNECTIONS);
         }
 
-        static std::size_t max_connections_per_loc(util::runtime_configuration const& ini)
+        static std::size_t max_connections_per_loc(util
+            ::runtime_configuration const& ini)
         {
             std::string key("hpx.parcel.");
             key += connection_handler_type();
 
             return hpx::util::get_entry_as<std::size_t>(
-                ini, key + ".max_connections_per_locality", HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
+                ini, key + ".max_connections_per_locality",
+                HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
         }
 
     public:
@@ -528,7 +530,8 @@ namespace hpx { namespace parcelset
 #if HPX_GCC_VERSION < 40700
                 // GCC4.6 gets incredibly confused
                 std::swap(e.first, static_cast<std::vector<parcel>&>(parcels));
-                std::swap(e.second, static_cast<std::vector<write_handler_type>&>(handlers));
+                std::swap(e.second, static_cast<std
+                    ::vector<write_handler_type>&>(handlers));
 #else
                 std::swap(e.first, parcels);
                 std::swap(e.second, handlers);
@@ -657,7 +660,8 @@ namespace hpx { namespace parcelset
                 // need to force a new connection to avoid deadlocks.
                 bool force_connection = false;
                 {
-                    boost::unique_lock<mutex_type> l(sender_threads_mtx_, boost::try_to_lock);
+                    boost::unique_lock<mutex_type> l(sender_threads_mtx_,
+                        boost::try_to_lock);
                     if(l.owns_lock())
                     {
                         std::vector<threads::thread_id_type> threads;
@@ -717,7 +721,8 @@ namespace hpx { namespace parcelset
                     new_send_thread =
                         hpx::applier::register_thread_nullary(
                             hpx::util::bind(
-                                hpx::util::one_shot(&parcelport_impl::send_pending_parcels)
+                                hpx::util::one_shot(&parcelport_impl
+                                    ::send_pending_parcels)
                               , this
                               , locality_id
                               , sender_connection

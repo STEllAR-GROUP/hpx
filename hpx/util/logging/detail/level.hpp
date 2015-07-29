@@ -27,7 +27,8 @@
 namespace hpx { namespace util { namespace logging {
 
 /**
-    @brief Handling levels - classes that can hold and/or deal with levels - filters and level holders
+    @brief Handling levels - classes that can hold and/or deal with levels
+    - filters and level holders
 
     By default we have these levels:
 
@@ -37,11 +38,13 @@ namespace hpx { namespace util { namespace logging {
         - error ,
         - fatal (highest level)
 
-    Depending on which level is enabled for your application, some messages will reach the log: those
+    Depending on which level is enabled for your application,
+    some messages will reach the log: those
     messages having at least that level. For instance, if info level is enabled, all
     logged messages will reach the log.
     If warning level is enabled, all messages are logged, but the warnings.
-    If debug level is enabled, messages that have levels debug, error, fatal will be logged.
+    If debug level is enabled, messages that have levels debug,
+    error, fatal will be logged.
 
 */
 namespace level {
@@ -65,7 +68,8 @@ namespace level {
         Holds the level, and tells you if a specific level is enabled.
         It does this in a non-thread-safe way.
 
-        If you change set_enabled() while program is running, it can take a bit to propagate
+        If you change set_enabled() while program is running,
+        it can take a bit to propagate
         between threads. Most of the time, this should be acceptable.
     */
     struct holder_no_ts {
@@ -91,7 +95,8 @@ namespace level {
         typedef hpx::util::logging::threading::scoped_lock scoped_lock;
         typedef hpx::util::logging::threading::mutex mutex;
 
-        holder_ts(type default_level = enable_all) : m_level(default_level) {}
+        holder_ts(type default_level = enable_all)
+            : m_level(default_level) {}
         bool is_enabled(type level) const {
             scoped_lock lk(m_cs);
             return level >= m_level;
@@ -106,7 +111,8 @@ namespace level {
     };
 
     /**
-        @brief Filter - holds the level - and tells you at compile time if a filter is enabled or not.
+        @brief Filter - holds the level
+        - and tells you at compile time if a filter is enabled or not.
 
         Fix (compile time) holder
     */
@@ -124,13 +130,15 @@ namespace level {
     /**
         @brief Filter - holds the level, in a thread-safe way, using TLS.
 
-        Uses TLS (Thread Local Storage) to find out if a level is enabled or not. It caches the current "is_enabled" on each thread.
+        Uses TLS (Thread Local Storage) to find out if a level is enabled or not.
+        It caches the current "is_enabled" on each thread.
         Then, at a given period, it retrieves the real "level".
     */
     template<int default_cache_secs = 5> struct holder_tss_with_cache {
         typedef locker::tss_resource_with_cache<type, default_cache_secs> data;
 
-        holder_tss_with_cache(int cache_secs = default_cache_secs, type default_level = enable_all) : m_level(default_level, cache_secs) {}
+        holder_tss_with_cache(int cache_secs = default_cache_secs,
+            type default_level = enable_all) : m_level(default_level, cache_secs) {}
         bool is_enabled(type test_level) const {
             typename data::read cur_level(m_level);
             return test_level >= cur_level.use();

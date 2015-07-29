@@ -1175,7 +1175,8 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             // average thread wait time for queue(s)
             { "/threads/wait-time/pending", performance_counters::counter_raw,
-              "returns the average wait time of pending threads for the referenced queue",
+              "returns the average wait time of \
+                 pending threads for the referenced queue",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::thread_wait_time_counter_creator, this, _1, _2),
               &performance_counters::locality_thread_counter_discoverer,
@@ -1263,25 +1264,31 @@ namespace hpx { namespace threads
               ""
             },
             { "/threads/count/instantaneous/active", performance_counters::counter_raw,
-              "returns the current number of active HPX-threads at the referenced locality",
+              "returns the current number of active \
+                 HPX-threads at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
               ""
             },
             { "/threads/count/instantaneous/pending", performance_counters::counter_raw,
-              "returns the current number of pending HPX-threads at the referenced locality",
+              "returns the current number of pending \
+                 HPX-threads at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
               ""
             },
-            { "/threads/count/instantaneous/suspended", performance_counters::counter_raw,
-              "returns the current number of suspended HPX-threads at the referenced locality",
+            { "/threads/count/instantaneous/suspended",
+                  performance_counters::counter_raw,
+              "returns the current number of suspended \
+                 HPX-threads at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
               ""
             },
-            { "/threads/count/instantaneous/terminated", performance_counters::counter_raw,
-              "returns the current number of terminated HPX-threads at the referenced locality",
+            { "/threads/count/instantaneous/terminated",
+                performance_counters::counter_raw,
+              "returns the current number of terminated \
+                 HPX-threads at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
               ""

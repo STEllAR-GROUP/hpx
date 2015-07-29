@@ -26,7 +26,8 @@ namespace hpx { namespace detail
 {
     // Defer the evaluation of result_of during the SFINAE checks below
 #if defined(__clang__)
-    template <typename F, typename Result = typename util::deferred_call_result_of<F>::type>
+    template <typename F, typename Result =
+        typename util::deferred_call_result_of<F>::type>
     struct create_future
     {
         typedef lcos::future<Result> type;
@@ -52,7 +53,8 @@ namespace hpx { namespace detail
         {
             return lcos::make_ready_future(boost::ref(f()));
         } catch (...) {
-            return lcos::make_exceptional_future<result_type>(boost::current_exception());
+            return lcos::make_exceptional_future<result_type>
+                (boost::current_exception());
         }
     }
 
@@ -69,7 +71,8 @@ namespace hpx { namespace detail
         {
             return lcos::make_ready_future(f());
         } catch (...) {
-            return lcos::make_exceptional_future<result_type>(boost::current_exception());
+            return lcos::make_exceptional_future<result_type>
+                (boost::current_exception());
         }
     }
 

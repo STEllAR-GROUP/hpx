@@ -59,7 +59,7 @@ namespace boost
 
             string total, linenum;
             long errors = 0, currline = 0;
-            size_t p = 0, extend = 0;
+            size_t p = 0;
             vector<string> someline, lineorder;
 
             char_separator<char> sep("\n", "", boost::keep_empty_tokens);
@@ -84,26 +84,23 @@ namespace boost
                 currline++;
                 size_t rend = someline[p].find_last_of("\r");
                 bool check_not = 0;
-                boost::regex error_note;
+                boost::regex error_note, http_note;
                 error_note = "\\s*#\\s*error";
+                http_note = "http://";
                 boost::smatch m;
-                if (boost::regex_search(someline[p], m, error_note))
+                if (boost::regex_search(someline[p], m, error_note)) //#error
                 {
                     if (m.position() == 0)
                     {
                         check_not = 1;
                     }
                 }
-                if (rend != string::npos)
+                else if (boost::regex_search(someline[p], m, http_note)) //#error
                 {
-                    extend = limit + 2;
-                }
-                else
-                {
-                    extend = limit;
+                    check_not = 1;
                 }
                 size_t size = someline[p].size();
-                if (size > extend && check_not == 0)
+                if (size > limit && check_not == 0)
                 {
                     errors++;
                     linenum = to_string(currline);

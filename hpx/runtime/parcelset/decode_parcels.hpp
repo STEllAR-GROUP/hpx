@@ -115,7 +115,8 @@ namespace hpx { namespace parcelset
                         // make sure this parcel ended up on the right locality
 #ifdef HPX_DEBUG
                         if(hpx::get_runtime_ptr() && hpx::get_locality())
-                            HPX_ASSERT(p.get_destination_locality() == hpx::get_locality());
+                            HPX_ASSERT(p.get_destination_locality() ==
+                                hpx::get_locality());
 #endif
 
                         // be sure not to measure add_parcel as serialization time

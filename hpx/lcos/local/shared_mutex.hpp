@@ -139,7 +139,8 @@ namespace hpx { namespace lcos { namespace local
             {
                 boost::unique_lock<mutex_type> lk(state_change);
 
-                while (state.exclusive || state.exclusive_waiting_blocked || state.upgrade)
+                while (state.exclusive || state.exclusive_waiting_blocked
+                    || state.upgrade)
                 {
                     shared_cond.wait_locked(1, lk);
                 }

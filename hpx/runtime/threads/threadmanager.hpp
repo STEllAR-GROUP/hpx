@@ -207,10 +207,12 @@ namespace hpx { namespace threads
         ///                 thread is not known to the threadmanager the return
         ///                 value will be the string "<unknown>".
         virtual char const* get_description(thread_id_type const& id) const = 0;
-        virtual char const* set_description(thread_id_type const& id, char const* desc = 0) = 0;
+        virtual char const* set_description(thread_id_type const& id,
+            char const* desc = 0) = 0;
 
         virtual char const* get_lco_description(thread_id_type const& id) const = 0;
-        virtual char const* set_lco_description(thread_id_type const& id, char const* desc = 0) = 0;
+        virtual char const* set_lco_description(thread_id_type const& id,
+            char const* desc = 0) = 0;
 
         /// The function get_thread_backtrace is part of the thread related API
         /// allows to query the currently stored thread back trace (which is
@@ -227,10 +229,12 @@ namespace hpx { namespace threads
         ///                   thread-manager the return value will be the zero.
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
         virtual char const* get_backtrace(thread_id_type const& id) const = 0;
-        virtual char const* set_backtrace(thread_id_type const& id, char const* bt = 0) = 0;
+        virtual char const* set_backtrace(thread_id_type const& id,
+            char const* bt = 0) = 0;
 #else
         virtual util::backtrace const* get_backtrace(thread_id_type const& id) const = 0;
-        virtual util::backtrace const* set_backtrace(thread_id_type const& id, util::backtrace const* bt = 0) = 0;
+        virtual util::backtrace const* set_backtrace(thread_id_type const& id,
+            util::backtrace const* bt = 0) = 0;
 #endif
 
         /// The function \a register_work adds a new work item to the thread
@@ -471,7 +475,8 @@ namespace hpx { namespace threads
         virtual mask_cref_type get_used_processing_units() const = 0;
 
         // Return the executor associated with th egiven thread
-        virtual executor get_executor(thread_id_type const& id, error_code& ec) const = 0;
+        virtual executor get_executor(thread_id_type const& id,
+            error_code& ec) const = 0;
 
         ///////////////////////////////////////////////////////////////////////
         virtual std::size_t get_worker_thread_num(bool* numa_sensitive = 0) = 0;

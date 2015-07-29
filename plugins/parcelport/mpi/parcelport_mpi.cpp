@@ -233,7 +233,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(!enable_parcel_handling_)
             {
                 hpx::threads::register_thread(
-                    util::bind(&parcelport::wait_for_enabled_put_parcel, this, dest, p, f)
+                    util::bind(&parcelport::wait_for_enabled_put_parcel,
+                        this, dest, p, f)
                   , "mpi::parcelport::put_parcel");
                 return;
             }
@@ -279,7 +280,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
     private:
         typedef util::memory_chunk_pool<> memory_pool_type;
-        typedef util::detail::memory_chunk_pool_allocator<char, util::memory_chunk_pool<>> allocator_type;
+        typedef util::detail::memory_chunk_pool_allocator<char,
+            util::memory_chunk_pool<>> allocator_type;
         typedef
             std::vector<char, allocator_type>
             data_type;

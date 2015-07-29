@@ -379,7 +379,8 @@ namespace hpx { namespace applier
         error_code& ec) const
     {
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_localities(raw_prefixes, components::component_invalid, ec))
+        if (!parcel_handler_.get_raw_localities(raw_prefixes,
+            components::component_invalid, ec))
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)

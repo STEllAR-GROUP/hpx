@@ -290,7 +290,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                 {
                     std::vector<hpx::future<void> > phase_futures;
                     //phase_futures.resize(num_local_blocks);
-                    auto phase_range = boost::irange(static_cast<boost::uint64_t>(0), num_blocks);
+                    auto phase_range = boost::irange(static_cast<boost::uint64_t>(0),
+                        num_blocks);
                     for(boost::uint64_t phase: phase_range)
                     {
                         const boost::uint64_t block_size = block_order * block_order;
@@ -402,9 +403,11 @@ void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
         {
             for(boost::uint64_t j = 0; j < block_order; j += tile_size)
             {
-                for(boost::uint64_t it = i; it < (std::min)(block_order, i + tile_size); ++it)
+                for(boost::uint64_t it = i; it < (std::min)
+                    (block_order, i + tile_size); ++it)
                 {
-                    for(boost::uint64_t jt = j; jt < (std::min)(block_order, j + tile_size); ++jt)
+                    for(boost::uint64_t jt = j; jt < (std::min)
+                        (block_order, j + tile_size); ++jt)
                     {
                         B[it + block_order * jt] = A[jt + block_order * it];
                     }
@@ -437,7 +440,8 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
         transform_reduce(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t b) -> double
             {
-                sub_block trans_block = trans[b].get_sub_block(0, order * block_order).get();
+                sub_block trans_block =
+                    trans[b].get_sub_block(0, order * block_order).get();
                 double errsq = 0.0;
                 for(boost::uint64_t i = 0; i < order; ++i)
                 {

@@ -112,7 +112,8 @@ namespace hpx { namespace lcos { namespace detail
                 LERR_(info) << "~full_empty_entry: aborting pending thread in "
                         << desc << ": "
                         << get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id.get() << "): " << threads::get_thread_description(id);
+                        << "(" << id.get() << "): "
+                        << threads::get_thread_description(id);
 
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
@@ -121,7 +122,8 @@ namespace hpx { namespace lcos { namespace detail
                 if (ec) {
                     LERR_(error) << "~full_empty_entry: could not abort thread"
                         << get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id.get() << "): " << threads::get_thread_description(id);
+                        << "(" << id.get() << "): "
+                        << threads::get_thread_description(id);
                 }
             }
         }
@@ -525,7 +527,8 @@ namespace hpx { namespace lcos { namespace detail
 
         bool is_used_locked() const
         {
-            return !(write_queue_.empty() && read_and_empty_queue_.empty() && read_queue_.empty());
+            return !(write_queue_.empty() && read_and_empty_queue_.empty()
+                && read_queue_.empty());
         }
 
     private:
@@ -601,7 +604,8 @@ namespace hpx { namespace lcos { namespace detail
                 LERR_(info) << "~full_empty_entry: aborting pending thread in "
                         << desc << ": "
                         << get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id.get() << "): " << threads::get_thread_description(id);
+                        << "(" << id.get() << "): "
+                        << threads::get_thread_description(id);
 
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
@@ -610,7 +614,8 @@ namespace hpx { namespace lcos { namespace detail
                 if (ec) {
                     LERR_(error) << "~full_empty_entry: could not abort thread"
                         << get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id.get() << "): " << threads::get_thread_description(id);
+                        << "(" << id.get() << "): "
+                        << threads::get_thread_description(id);
                 }
             }
         }
@@ -995,7 +1000,8 @@ namespace hpx { namespace lcos { namespace detail
 
         bool is_used_locked() const
         {
-            return !(write_queue_.empty() && read_and_empty_queue_.empty() && read_queue_.empty());
+            return !(write_queue_.empty() && read_and_empty_queue_.empty()
+                && read_queue_.empty());
         }
 
     private:

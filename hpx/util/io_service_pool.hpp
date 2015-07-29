@@ -35,9 +35,11 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 2,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread =
-                util::function_nonser<void(std::size_t, char const*)>(),
-            util::function_nonser<void()> const& on_stop_thread = util::function_nonser<void()>(),
+            util::function_nonser<void(std::size_t, char const*)>
+                 const& on_start_thread = util::function_nonser<void(std::size_t,
+                        char const*)>(),
+            util::function_nonser<void()> const& on_stop_thread =
+                 util::function_nonser<void()>(),
             char const* pool_name = "", char const* name_postfix = "");
 
         /// \brief Construct the io_service pool.
@@ -45,7 +47,8 @@ namespace hpx { namespace util
         ///                 [in]
         explicit io_service_pool(
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread = util::function_nonser<void()>(),
+            util::function_nonser<void()> const& on_stop_thread =
+                                  util::function_nonser<void()>(),
             char const* pool_name = "", char const* name_postfix = "");
 
         ~io_service_pool();

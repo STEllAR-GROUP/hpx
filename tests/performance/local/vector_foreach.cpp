@@ -79,7 +79,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         // retrieve reference time
         std::vector<int> ref(vector_size);
         boost::uint64_t seq_ref = foreach_vector(hpx::parallel::seq, ref);
-        boost::uint64_t par_ref = foreach_vector(hpx::parallel::par(chunk_size), ref); //-V106
+        boost::uint64_t par_ref = foreach_vector(hpx::parallel::par(chunk_size),
+            ref); //-V106
 
         // sequential hpx::vector iteration
         {
@@ -89,7 +90,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                 << foreach_vector(hpx::parallel::seq, v)/double(seq_ref)
                 << "\n";
             hpx::cout << "hpx::vector<int>(par): "
-                << foreach_vector(hpx::parallel::par(chunk_size), v)/double(par_ref) //-V106
+                << foreach_vector(hpx::parallel::par(chunk_size),
+                    v)/double(par_ref) //-V106
                 << "\n";
         }
 
@@ -100,7 +102,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                 << foreach_vector(hpx::parallel::seq, v)/double(seq_ref)
                 << "\n";
             hpx::cout << "hpx::vector<int>(par, container_layout(2)): "
-                << foreach_vector(hpx::parallel::par(chunk_size), v)/double(par_ref) //-V106
+                << foreach_vector(hpx::parallel::par(chunk_size),
+                    v)/double(par_ref) //-V106
                 << "\n";
         }
 
@@ -111,7 +114,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                 << foreach_vector(hpx::parallel::seq, v)/double(seq_ref)
                 << "\n";
             hpx::cout << "hpx::vector<int>(par, container_layout(10)): "
-                << foreach_vector(hpx::parallel::par(chunk_size), v)/double(par_ref) //-V106
+                << foreach_vector(hpx::parallel::par(chunk_size),
+                    v)/double(par_ref) //-V106
                 << "\n";
         }
     }

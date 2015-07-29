@@ -511,7 +511,8 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         int run(hpx::runtime& rt,
-            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<int(boost::program_options::variables_map& vm)>
+            const& f,
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown)
@@ -527,7 +528,8 @@ namespace hpx
         }
 
         int start(hpx::runtime& rt,
-            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<int(boost::program_options::variables_map& vm)>
+            const& f,
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown)
@@ -1009,7 +1011,8 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT int run_or_start(
-            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<int(boost::program_options::variables_map& vm)>
+            const& f,
             boost::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> const& ini_config,
             startup_function_type const& startup,
@@ -1077,7 +1080,8 @@ namespace hpx
                     // local scheduler with priority queue (one queue for each OS threads
                     // plus separate dequeues for low/high priority HPX-threads)
                     cfg.queuing_ = "local-priority";
-                    result = detail::run_priority_local(startup, shutdown, cfg, blocking);
+                    result = detail::run_priority_local(startup, shutdown,
+                        cfg, blocking);
                 }
                 else if (0 == std::string("abp-priority").find(cfg.queuing_)) {
 #if defined(HPX_HAVE_ABP_SCHEDULER)

@@ -87,7 +87,8 @@ namespace hpx { namespace parcelset
             virtual naming::address const* get_destination_addrs() const = 0;
             virtual void set_destination_addr(naming::address const& addr) = 0;
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            virtual void set_destination_addrs(std::vector<naming::address> const& addrs) = 0;
+            virtual void set_destination_addrs(std::vector<naming::address> const& addrs)
+                = 0;
 #endif
             virtual boost::uint32_t get_destination_locality_id() const = 0;
             virtual naming::gid_type const& get_destination_locality() const = 0;
@@ -132,7 +133,8 @@ namespace hpx { namespace parcelset
                 return action_->get_thread_priority();
             }
 
-            serialization::binary_filter* get_serialization_filter(parcelset::parcel const& p) const
+            serialization::binary_filter* get_serialization_filter(parcelset::parcel
+                const& p) const
             {
                 return action_->get_serialization_filter(p);
             }
@@ -145,9 +147,11 @@ namespace hpx { namespace parcelset
             }
 
         protected:
-            void save(serialization::output_archive& ar, bool has_source_id, bool has_continuation) const;
+            void save(serialization::output_archive& ar, bool has_source_id,
+                bool has_continuation) const;
 
-            void load(serialization::input_archive& ar, bool has_source_id, bool has_continuation);
+            void load(serialization::input_archive& ar, bool has_source_id,
+                bool has_continuation);
 
         private:
             friend void intrusive_ptr_add_ref(parcel_data* p);
@@ -556,14 +560,16 @@ namespace hpx { namespace parcelset
         parcel(naming::id_type const& apply_to,
                 naming::address const& addrs, actions::base_action* act,
                 actions::continuation* do_after)
-          : data_(new detail::single_destination_parcel_data(apply_to, addrs, act, do_after))
+          : data_(new detail::single_destination_parcel_data(apply_to, addrs,
+              act, do_after))
         {
         }
 
         parcel(naming::id_type const& apply_to,
                 naming::address const& addrs, actions::base_action* act,
                 actions::continuation_type do_after)
-          : data_(new detail::single_destination_parcel_data(apply_to, addrs, act, do_after))
+          : data_(new detail::single_destination_parcel_data(apply_to, addrs,
+              act, do_after))
         {
         }
 

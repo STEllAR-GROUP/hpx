@@ -44,7 +44,8 @@ namespace jacobi_smp {
             << ((double((n-2)*(n-2) * iterations)/1e6)/elapsed) << " MLUPS/s\n";
     }
 
-    inline void output_grid(std::string filename, std::vector<double> const & grid, std::size_t n)
+    inline void output_grid(std::string filename,
+        std::vector<double> const & grid, std::size_t n)
     {
         if(!filename.empty())
         {

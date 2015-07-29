@@ -623,7 +623,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 close_operation_.store(false);
             } BOOST_SCOPE_EXIT_END
 
-//             std::cout << "data_window: " << here_ << "/" << there_ << ": close" << std::endl;
+//             std::cout << "data_window: " << here_ << "/" << there_
+//                       << ": close" << std::endl;
 
             // wait for pending operations to exit
             while (executing_operation_.load())
@@ -650,7 +651,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         void shutdown(boost::system::error_code &ec)
         {
             if (write_mq_) {
-//                 std::cout << "data_window: " << here_ <<  "/" << there_ << ": shutdown" << std::endl;
+//                 std::cout << "data_window: " << here_ <<  "/"
+//                           << there_ << ": shutdown" << std::endl;
                 send_command(*write_mq_, message::shutdown, 0, ec);
             }
         }
@@ -662,7 +664,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                 aborted_.store(false);
             } BOOST_SCOPE_EXIT_END
 
-//             std::cout << "data_window: " << here_ <<  "/" << there_ << ": destroy" << std::endl;
+//             std::cout << "data_window: " << here_ <<  "/" << there_
+//                       << ": destroy" << std::endl;
 
             // cancel operation
             while (executing_operation_.load())

@@ -75,7 +75,8 @@ namespace hpx
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
         boost::exception_ptr const& e, bool move_credits = true);
 
-    /// \copydoc hpx::set_lco_error(naming::id_type const& id, boost::exception_ptr const& e, bool move_credits)
+    /// \copydoc hpx::set_lco_error(naming::id_type const& id,
+    ///  boost::exception_ptr const& e, bool move_credits)
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
         boost::exception_ptr && e, bool move_credits = true);
 
@@ -93,7 +94,8 @@ namespace hpx
         boost::exception_ptr const& e, naming::id_type const& cont,
         bool move_credits = true);
 
-    /// \copydoc hpx::set_lco_error(naming::id_type const& id, boost::exception_ptr const& e, naming::id_type const& cont, bool move_credits)
+    /// \copydoc hpx::set_lco_error(naming::id_type const& id,
+    ///  boost::exception_ptr const& e, naming::id_type const& cont, bool move_credits)
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
         boost::exception_ptr && e, naming::id_type const& cont,
         bool move_credits = true);

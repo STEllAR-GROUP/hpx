@@ -212,7 +212,8 @@ void symbol_namespace::register_global_counter_types(
 
         std::string help;
         if (detail::symbol_namespace_services[i].target_ == detail::counter_target_count)
-            help = "returns the overall number of invocations of all symbol AGAS services";
+            help = "returns the overall number of invocations \
+                    of all symbol AGAS services";
         else
             help = "returns the overall execution time of all symbol AGAS services";
 
@@ -669,7 +670,8 @@ response symbol_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_count, &counter_data_, ::_1);
             break;
         case symbol_ns_iterate_names:
-            get_data_func = boost::bind(&cd::get_iterate_names_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_iterate_names_count,
+                &counter_data_, ::_1);
             break;
         case symbol_ns_on_event:
             get_data_func = boost::bind(&cd::get_on_event_count, &counter_data_, ::_1);
@@ -697,7 +699,8 @@ response symbol_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_time, &counter_data_, ::_1);
             break;
         case symbol_ns_iterate_names:
-            get_data_func = boost::bind(&cd::get_iterate_names_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_iterate_names_time,
+                &counter_data_, ::_1);
             break;
         case symbol_ns_on_event:
             get_data_func = boost::bind(&cd::get_on_event_time, &counter_data_, ::_1);

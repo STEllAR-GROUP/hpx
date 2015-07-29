@@ -94,7 +94,8 @@ public:
         return state_ += x1+x2+x3+x4+x5+x6+x7+x8;
     }
 
-    int operator()(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8, int x9)
+    int operator()(int x1, int x2, int x3, int x4, int x5,
+        int x6, int x7, int x8, int x9)
     {
         return state_ += x1+x2+x3+x4+x5+x6+x7+x8+x9;
     }
@@ -193,10 +194,12 @@ void stateful_function_object_test()
     test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4, 5, 6, 7 ), n, 1+2+3+4+5+6+7 );
     n += 3*(1+2+3+4+5+6+7);
 
-    test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4, 5, 6, 7, 8 ), n, 1+2+3+4+5+6+7+8 );
+    test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4, 5,
+        6, 7, 8 ), n, 1+2+3+4+5+6+7+8 );
     n += 3*(1+2+3+4+5+6+7+8);
 
-    test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4, 5, 6, 7, 8, 9 ), n, 1+2+3+4+5+6+7+8+9 );
+    test( hpx::util::bind( boost::ref(x), 1, 2, 3, 4, 5,
+        6, 7, 8, 9 ), n, 1+2+3+4+5+6+7+8+9 );
     n += 3*(1+2+3+4+5+6+7+8+9);
 
     HPX_TEST( x.state() == n );

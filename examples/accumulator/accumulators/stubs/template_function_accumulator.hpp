@@ -63,7 +63,8 @@ namespace examples { namespace stubs
         static void
         add_sync(hpx::naming::id_type const& gid, T arg)
         {
-            typedef typename server::template_function_accumulator::add_action<T> action_type;
+            typedef typename server::template_function_accumulator::add_action<T>
+                 action_type;
             hpx::async<action_type>(gid, arg).get();
         }
 

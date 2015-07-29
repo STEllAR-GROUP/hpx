@@ -64,7 +64,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 {
                     int verrno = errno;
                     close(ec);
-                    boost::system::error_code err(verrno, boost::system::system_category());
+                    boost::system::error_code err(verrno,
+                        boost::system::system_category());
                     HPX_IBVERBS_THROWS_IF(
                         ec
                       , err
@@ -85,7 +86,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 {
                     int verrno = errno;
                     close(ec);
-                    boost::system::error_code err(verrno, boost::system::system_category());
+                    boost::system::error_code err(verrno,
+                        boost::system::system_category());
                     HPX_IBVERBS_THROWS_IF(
                         ec
                       , err
@@ -107,7 +109,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 {
                     int verrno = errno;
                     close(ec);
-                    boost::system::error_code err(verrno, boost::system::system_category());
+                    boost::system::error_code err(verrno,
+                        boost::system::system_category());
                     HPX_IBVERBS_THROWS_IF(
                         ec
                       , err
@@ -119,7 +122,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 {
                     int verrno = errno;
                     close(ec);
-                    boost::system::error_code err(verrno, boost::system::system_category());
+                    boost::system::error_code err(verrno,
+                        boost::system::system_category());
                     HPX_IBVERBS_THROWS_IF(
                         ec
                       , err
@@ -166,7 +170,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         template <typename Parcelport>
         boost::shared_ptr<receiver> accept(
-            Parcelport & parcelport, util::memory_chunk_pool & pool, boost::system::error_code &ec)
+            Parcelport & parcelport, util::memory_chunk_pool & pool,
+            boost::system::error_code &ec)
         {
             boost::shared_ptr<receiver> rcv;
             rdma_cm_event event;

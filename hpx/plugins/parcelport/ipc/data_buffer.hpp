@@ -51,7 +51,8 @@ namespace boost { namespace container { namespace container_detail
     // We provide the specialization for 'char' to implement proper
     // uninitialized expansion of the vectors we use below.
     template <>
-    struct default_construct_aux_proxy<hpx::parcelset::policies::ipc::ipc_allocator_type, char*>
+    struct default_construct_aux_proxy<hpx::parcelset::policies::ipc::ipc_allocator_type,
+        char*>
       : public advanced_insert_aux_int<char*>
     {
         typedef hpx::parcelset::policies::ipc::ipc_allocator_type allocator_type;
@@ -122,12 +123,14 @@ namespace boost { namespace container { namespace container_detail
 //             size_type i = 0;
 //             try {
 //                 for(; i < n; ++i, ++p){
-//                     alloc_traits::construct(this->a_, container_detail::to_raw_pointer(&*p));
+//                     alloc_traits::construct(this->a_,
+//                     container_detail::to_raw_pointer(&*p));
 //                 }
 //             }
 //             catch(...) {
 //                 while(i--) {
-//                     alloc_traits::destroy(this->a_, container_detail::to_raw_pointer(&*orig_p++));
+//                     alloc_traits::destroy(this->a_,
+//                     container_detail::to_raw_pointer(&*orig_p++));
 //                 }
 //                 throw;
 //             }
@@ -164,12 +167,14 @@ namespace boost { namespace container { namespace container_detail
 //             size_type n_left = n;
 //             BOOST_TRY{
 //                for(; n_left--; ++p){
-//                   alloc_traits::construct(this->a_, container_detail::to_raw_pointer(&*p));
+//                   alloc_traits::construct(this->a_,
+//                   container_detail::to_raw_pointer(&*p));
 //                }
 //             }
 //             BOOST_CATCH(...){
 //                for(; orig_p != p; ++orig_p){
-//                   alloc_traits::destroy(this->a_, container_detail::to_raw_pointer(&*orig_p++));
+//                   alloc_traits::destroy(this->a_,
+//                   container_detail::to_raw_pointer(&*orig_p++));
 //                }
 //                BOOST_RETHROW
 //             }
@@ -323,12 +328,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         data_buffer(allocator_type const &)
         {}
 
-        data_buffer(data_buffer const & other, allocator_type const & dummy = allocator_type())
+        data_buffer(data_buffer const & other,
+            allocator_type const & dummy = allocator_type())
           : data_(other.data_)
         {}
 
         template <typename Allocator>
-        data_buffer(data_buffer && other, allocator_type const & dummy = allocator_type())
+        data_buffer(data_buffer && other,
+            allocator_type const & dummy = allocator_type())
           : data_(std::move(other.data_))
         {}
 

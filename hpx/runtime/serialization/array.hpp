@@ -59,7 +59,8 @@ namespace hpx { namespace serialization
 #endif
             else
             {
-                // this behaviour has been kept from old version with portable boost archives
+                // this behaviour has been kept from old version with
+                // portable boost archives
                 serialize_optimized(ar, v, boost::mpl::true_());
             }
         }

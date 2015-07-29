@@ -32,7 +32,8 @@ template lcos::future<response> locality_namespace::service_async<response>(
     );
 
 template lcos::future<std::map<naming::gid_type, parcelset::endpoints_type> >
-locality_namespace::service_async<std::map<naming::gid_type, parcelset::endpoints_type> >(
+locality_namespace::service_async<std::map<naming::gid_type,
+    parcelset::endpoints_type> >(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
@@ -45,13 +46,15 @@ locality_namespace::service_async<parcelset::endpoints_type>(
   , threads::thread_priority priority
     );
 
-template lcos::future<std::vector<boost::uint32_t> > locality_namespace::service_async<std::vector<boost::uint32_t> >(
+template lcos::future<std::vector<boost::uint32_t> >
+locality_namespace::service_async<std::vector<boost::uint32_t> >(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
     );
 
-template lcos::future<boost::uint32_t> locality_namespace::service_async<boost::uint32_t>(
+template lcos::future<boost::uint32_t>
+locality_namespace::service_async<boost::uint32_t>(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
