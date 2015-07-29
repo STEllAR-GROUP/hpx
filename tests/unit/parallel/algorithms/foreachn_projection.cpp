@@ -9,7 +9,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/range/functions.hpp>
-#include <boost/atomic/atomic.hpp>
+#include <boost/atomic.hpp>
 
 #include "test_utils.hpp"
 
