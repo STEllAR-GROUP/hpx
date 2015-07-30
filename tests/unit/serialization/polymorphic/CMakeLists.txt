@@ -4,14 +4,14 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    serialization_polymorphic_reference
-    serialization_polymorphic_pointer
-    serialization_polymorphic_nonintrusive
-    serialization_polymorphic_nonintrusive_abstract
-    serialization_polymorphic_semiintrusive_template
-    serialization_polymorphic_template
-    serialization_smart_ptr_polymorphic
-    serialization_smart_ptr_polymorphic_nonintrusive
+    polymorphic_reference
+    polymorphic_pointer
+    polymorphic_nonintrusive
+    polymorphic_nonintrusive_abstract
+    polymorphic_semiintrusive_template
+    polymorphic_template
+    smart_ptr_polymorphic
+    smart_ptr_polymorphic_nonintrusive
 )
 
 foreach(test ${tests})
