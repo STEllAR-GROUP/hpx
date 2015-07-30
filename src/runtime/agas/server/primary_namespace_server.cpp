@@ -56,11 +56,8 @@ response primary_namespace::service(
     {
         case primary_ns_route:
             {
-                update_time_on_exit update(
-                    counter_data_.route_.time_
-                );
-                counter_data_.increment_route_count();
-                return route(req, ec);
+                HPX_ASSERT(false);
+                return response();
             }
         case primary_ns_bind_gid:
             {
@@ -316,17 +313,12 @@ parcelset::policies::message_handler* primary_namespace::get_message_handler(
     )
 {
     typedef hpx::actions::transfer_action<
-        server::primary_namespace::service_action
+        server::primary_namespace::route_action
     > action_type;
 
     action_type * act = static_cast<action_type *>(p.get_action());
-    agas::request const& req = hpx::actions::get<0>(*act);
 
-    // only routing is handled in a special way
-    if (req.get_action_code() != primary_ns_route)
-        return 0;
-
-    parcelset::parcel routed_p = req.get_parcel();
+    parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
     return routed_p.get_message_handler(ph, loc);
 }
 
@@ -335,17 +327,12 @@ serialization::binary_filter* primary_namespace::get_serialization_filter(
     )
 {
     typedef hpx::actions::transfer_action<
-        server::primary_namespace::service_action
+        server::primary_namespace::route_action
     > action_type;
 
     action_type * act = static_cast<action_type *>(p.get_action());
-    agas::request const& req = hpx::actions::get<0>(*act);
 
-    // only routing is handled in a special way
-    if (req.get_action_code() != primary_ns_route)
-        return 0;
-
-    parcelset::parcel routed_p = req.get_parcel();
+    parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
     return routed_p.get_serialization_filter();
 }
 

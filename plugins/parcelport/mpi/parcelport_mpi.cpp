@@ -142,18 +142,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             HPX_ASSERT(dests.size() == handlers.size());
             for(std::size_t i = 0; i != dests.size(); ++i)
             {
-                put_parcel(dests[i], parcels[i], handlers[i]);
+                put_parcel(dests[i], std::move(parcels[i]), std::move(handlers[i]));
             }
         }
 
-        void send_early_parcel(parcelset::locality const & dest, parcel& p)
+        void send_early_parcel(parcelset::locality const & dest, parcel p)
         {
-            put_parcel(dest, p
-              , boost::bind(
+            put_parcel(dest, std::move(p)
+              , util::bind(
                     &parcelport::early_write_handler
                   , this
-                  , ::_1
-                  , p
+                  , util::placeholders::_1
+                  , util::placeholders::_2
                 )
             );
         }
@@ -219,8 +219,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 std::size_t thread_num = get_worker_thread_num();
                 hpx::applier::register_thread_nullary(
-                    hpx::util::bind(
-                        &parcelport::put_parcel_async
+                    util::bind(
+                        util::one_shot(&parcelport::put_parcel_async)
                       , this
                       , dest
                       , std::move(p)
@@ -233,7 +233,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
             else
             {
-                put_parcel_async(dest, p, f);
+                put_parcel_async(dest, std::move(p), f);
             }
         }
 

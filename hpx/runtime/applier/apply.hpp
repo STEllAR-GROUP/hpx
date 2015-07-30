@@ -91,7 +91,7 @@ namespace hpx
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 std::move(action));
 
-            ph.put_parcel(p);
+            ph.put_parcel(std::move(p));
 
             return false;     // destinations are remote
         }
@@ -115,7 +115,7 @@ namespace hpx
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 std::move(action), cont);
 
-            ph.put_parcel(p);
+            ph.put_parcel(std::move(p));
 
             return false;     // destinations are remote
         }
@@ -139,7 +139,7 @@ namespace hpx
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 std::move(action));
 
-            ph.put_parcel(p, cb);
+            ph.put_parcel(std::move(p), cb);
 
             return false;     // destinations are remote
         }
@@ -164,7 +164,7 @@ namespace hpx
             parcelset::parcel p(id, complement_addr<action_type>(addr),
                 std::move(action), cont);
 
-            ph.put_parcel(p, cb);
+            ph.put_parcel(std::move(p), cb);
 
             return false;     // destinations are remote
         }
@@ -202,7 +202,7 @@ namespace hpx
                 parcelset::parcel p(e.second.gids_, e.second.addrs_, act_);
 
                 // Send the parcel through the parcel handler
-                ph_.put_parcel(p);
+                ph_.put_parcel(std::move(p));
             }
 
             parcelset::parcelhandler& ph_;
@@ -482,7 +482,7 @@ namespace hpx
                 std::move(act));
 
             // Send the parcel through the parcel handler
-            hpx::applier::get_applier().get_parcel_handler().sync_put_parcel(p);
+            hpx::applier::get_applier().get_parcel_handler().sync_put_parcel(std::move(p));
             return false;     // destination is remote
         }
 

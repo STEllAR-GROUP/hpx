@@ -1763,20 +1763,19 @@ bool addressing_service::resolve_cached(
 
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::route(
-    parcelset::parcel const& p
+    parcelset::parcel p
   , util::function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> const& f
     )
 {
     // compose request
-    request req(primary_ns_route, p);
     naming::id_type const* ids = p.get_destinations();
 
     naming::id_type const target(
         stubs::primary_namespace::get_service_instance(ids[0])
       , naming::id_type::unmanaged);
 
-    typedef server::primary_namespace::service_action action_type;
+    typedef server::primary_namespace::route_action action_type;
 
     // Determine whether the gid is local or remote
     naming::address addr;
@@ -1784,7 +1783,7 @@ void addressing_service::route(
     {
         // route through the local AGAS service instance
         applier::detail::apply_l_p<action_type>(
-            target, addr, action_priority_, req);
+            target, addr, action_priority_, std::move(p));
         f(boost::system::error_code(), parcelset::parcel());      // invoke callback
         return;
     }
@@ -1802,21 +1801,21 @@ void addressing_service::route(
 
             std::unique_ptr<actions::base_action> act(
                 new actions::transfer_action<action_type>(action_priority_,
-                    req));
+                    std::move(p)));
 
             parcelset::parcel route_p(
                 route_target, primary_ns_addr_
               , std::move(act));
 
             // send to the main AGAS instance for routing
-            hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);
+            hpx::applier::get_applier().get_parcel_handler().put_parcel(std::move(route_p), f);
             return;
         }
     }
 
     // apply directly as we have the resolved destination address
     applier::detail::apply_r_p_cb<action_type>(std::move(addr), target,
-        action_priority_, f, req);
+        action_priority_, f, std::move(p));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -431,7 +431,7 @@ namespace hpx { namespace applier
     }
 
     // schedule threads based on given parcel
-    void applier::schedule_action(parcelset::parcel const& p)
+    void applier::schedule_action(parcelset::parcel p)
     {
         // fetch the set of destinations
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
@@ -446,8 +446,8 @@ namespace hpx { namespace applier
         naming::resolver_client& client = hpx::naming::get_agas_client();
         if (client.was_object_migrated(ids, size))
         {
-            client.route(p, util::bind(&detail::parcel_sent_handler,
-                std::ref(parcel_handler_), util::placeholders::_1, p));
+            client.route(std::move(p), util::bind(&detail::parcel_sent_handler,
+                std::ref(parcel_handler_), util::placeholders::_1, util::placeholders::_2));
             return;
         }
 

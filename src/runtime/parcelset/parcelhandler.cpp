@@ -62,12 +62,12 @@ namespace hpx { namespace parcelset
     // A parcel is submitted for transport at the source locality site to
     // the parcel set of the locality with the put-parcel command
     // This function is synchronous.
-    void parcelhandler::sync_put_parcel(parcel& p) //-V669
+    void parcelhandler::sync_put_parcel(parcel p) //-V669
     {
         lcos::local::promise<void> promise;
         future<void> sent_future = promise.get_future();
         put_parcel(
-            p
+            std::move(p)
           , [&promise](boost::system::error_code const&, parcel const&)
             {
                 promise.set_value();
@@ -339,7 +339,7 @@ namespace hpx { namespace parcelset
         return result;
     }
 
-    void parcelhandler::put_parcel(parcel& p, write_handler_type const& f)
+    void parcelhandler::put_parcel(parcel p, write_handler_type f)
     {
         HPX_ASSERT(resolver_);
 
@@ -393,12 +393,12 @@ namespace hpx { namespace parcelset
                     p.get_message_handler(this, dest.second);
 
                 if (mh) {
-                    mh->put_parcel(dest.second, p, f);
+                    mh->put_parcel(dest.second, std::move(p), f);
                     return;
                 }
             }
 
-            dest.first->put_parcel(dest.second, p, f);
+            dest.first->put_parcel(dest.second, std::move(p), f);
             return;
         }
 
@@ -406,7 +406,7 @@ namespace hpx { namespace parcelset
         // to the AGAS managing the destination.
         ++count_routed_;
 
-        resolver_->route(p, f);
+        resolver_->route(std::move(p), f);
     }
 
     boost::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const

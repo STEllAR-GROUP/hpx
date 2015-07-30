@@ -551,6 +551,7 @@ namespace hpx { namespace actions
         performance_counter_stop_action_id,
         primary_namespace_bulk_service_action_id,
         primary_namespace_service_action_id,
+        primary_namespace_route_action_id,
         remove_from_connection_cache_action_id,
         set_value_action_agas_bool_response_type_id,
         set_value_action_agas_id_type_response_type_id,

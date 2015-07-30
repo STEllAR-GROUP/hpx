@@ -846,7 +846,7 @@ void big_boot_barrier::apply(
     parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, std::move(act));
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
-    pp->send_early_parcel(dest, p);
+    pp->send_early_parcel(dest, std::move(p));
 } // }}}
 
 void big_boot_barrier::apply_late(
@@ -859,7 +859,7 @@ void big_boot_barrier::apply_late(
     parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, std::move(act));
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
-    get_runtime().get_parcel_handler().put_parcel(p);
+    get_runtime().get_parcel_handler().put_parcel(std::move(p));
 } // }}}
 
 void big_boot_barrier::wait_bootstrap()

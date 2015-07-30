@@ -522,6 +522,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT parcel
     {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(parcel);
     public:
         parcel() {}
 
@@ -559,7 +560,17 @@ namespace hpx { namespace parcelset
         {
         }
 
+        parcel(parcel && p)
+          : data_(std::move(p.data_))
+        {}
+
         ~parcel() {}
+
+        parcel & operator=(parcel && p)
+        {
+            data_ = std::move(p.data_);
+            return *this;
+        }
 
         // default copy constructor is ok
         // default assignment operator is ok

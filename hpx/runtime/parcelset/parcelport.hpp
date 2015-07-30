@@ -138,7 +138,7 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        virtual void send_early_parcel(locality const & dest, parcel& p) = 0;
+        virtual void send_early_parcel(locality const & dest, parcel p) = 0;
 
         /// Cache specific functionality
         virtual void remove_from_connection_cache(locality const& loc) = 0;
@@ -300,7 +300,7 @@ namespace hpx { namespace parcelset
             applier_ = applier;
         }
 
-        void add_received_parcel(parcel const& p);
+        void add_received_parcel(parcel p);
 
         /// Update performance counter data
         void add_received_data(performance_counters::parcels::data_point const& data)

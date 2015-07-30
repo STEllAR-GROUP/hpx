@@ -120,7 +120,7 @@ namespace hpx { namespace parcelset
 
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
-                        pp.add_received_parcel(p);
+                        pp.add_received_parcel(std::move(p));
                         overall_add_parcel_time += timer.elapsed_nanoseconds() -
                             add_parcel_time;
                     }

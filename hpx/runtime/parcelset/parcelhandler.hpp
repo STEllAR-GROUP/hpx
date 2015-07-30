@@ -154,7 +154,7 @@ namespace hpx { namespace parcelset
         ///                 transmitted. The parcel \a p will be modified in
         ///                 place, as it will get set the resolved destination
         ///                 address and parcel id (if not already set).
-        void sync_put_parcel(parcel& p);
+        void sync_put_parcel(parcel p);
 
         /// A parcel is submitted for transport at the source locality site to
         /// the parcel set of the locality with the put-parcel command
@@ -178,7 +178,7 @@ namespace hpx { namespace parcelset
         ///                 where \a err is the status code of the operation and
         ///                       \a size is the number of successfully
         ///                              transferred bytes.
-        void put_parcel(parcel& p, write_handler_type const& f);
+        void put_parcel(parcel p, write_handler_type f);
 
         /// This put_parcel() function overload is asynchronous, but no
         /// callback functor is provided by the user.
@@ -189,11 +189,11 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        BOOST_FORCEINLINE void put_parcel(parcel& p)
+        BOOST_FORCEINLINE void put_parcel(parcel p)
         {
             using util::placeholders::_1;
             using util::placeholders::_2;
-            put_parcel(p, util::bind(
+            put_parcel(std::move(p), util::bind(
                 &parcelhandler::invoke_write_handler, this, _1, _2));
         }
 
@@ -328,7 +328,7 @@ namespace hpx { namespace parcelset
 
         // manage default exception handler
         void invoke_write_handler(
-            boost::system::error_code const& ec, parcel const& p) const
+            boost::system::error_code const& ec, parcel const & p) const
         {
             write_handler_type f;
             {

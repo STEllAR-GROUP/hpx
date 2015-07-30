@@ -183,7 +183,7 @@ void test_normal_serialization(T& arg)
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here);
 
-    test_parcel_serialization(outp, out_archive_flags, false);
+    test_parcel_serialization(std::move(outp), out_archive_flags, false);
 }
 
 template <typename T1, typename T2>
@@ -213,7 +213,7 @@ void test_normal_serialization(T1& arg1, T2& arg2)
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here);
 
-    test_parcel_serialization(outp, out_archive_flags, false);
+    test_parcel_serialization(std::move(outp), out_archive_flags, false);
 }
 
 template <typename T1, typename T2>
@@ -244,7 +244,7 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here);
 
-    test_parcel_serialization(outp, out_archive_flags, false);
+    test_parcel_serialization(std::move(outp), out_archive_flags, false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -275,7 +275,7 @@ void test_zero_copy_serialization(T& arg)
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here);
 
-    test_parcel_serialization(outp, out_archive_flags, true);
+    test_parcel_serialization(std::move(outp), out_archive_flags, true);
 }
 
 template <typename T1, typename T2>
@@ -305,7 +305,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here);
 
-    test_parcel_serialization(outp, out_archive_flags, true);
+    test_parcel_serialization(std::move(outp), out_archive_flags, true);
 }
 
 template <typename T1, typename T2>
@@ -336,7 +336,7 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here);
 
-    test_parcel_serialization(outp, out_archive_flags, true);
+    test_parcel_serialization(std::move(outp), out_archive_flags, true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

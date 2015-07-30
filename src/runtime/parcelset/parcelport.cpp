@@ -61,7 +61,7 @@ namespace hpx { namespace parcelset
         }
     }
 
-    void parcelport::add_received_parcel(parcel const & p)
+    void parcelport::add_received_parcel(parcel p)
     {
         // do some work (notify event handlers)
         if(applier_)
@@ -83,7 +83,7 @@ namespace hpx { namespace parcelset
             // write this parcel to the log
     //         LPT_(debug) << "parcelport: add_received_parcel: " << p;
 
-            applier_->schedule_action(p);
+            applier_->schedule_action(std::move(p));
         }
         // If the applier has not been set yet, we are in bootstrapping and
         // need to execute the action directly
