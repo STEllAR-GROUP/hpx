@@ -3,9 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
-#include <vector>
-
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
@@ -13,6 +10,10 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/current_function.hpp>
+
+#include <iostream>
+#include <vector>
 
 template <class T>
 struct A
@@ -31,7 +32,7 @@ struct A
   void serialize(Ar& ar, unsigned)
   {
     ar & a;
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << BOOST_CURRENT_FUNCTION << std::endl;
   }
   HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(A);
 };
@@ -53,7 +54,7 @@ struct B: A<T>
   template <class Ar>
   void serialize(Ar& ar, unsigned)
   {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << BOOST_CURRENT_FUNCTION << std::endl;
     ar & hpx::serialization::base_object<A<T> >(*this);
     ar & b;
   }
