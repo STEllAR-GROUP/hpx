@@ -75,7 +75,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
 
     # add dependencies to pseudo-target
     add_hpx_pseudo_dependencies(tests.unit.actions.${compile_test}
-                                ${compile_test}_compile_test)
+                                "tests.unit.actions.${compile_test}")
 
   endforeach()
 endif()
