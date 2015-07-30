@@ -11,49 +11,27 @@ macro(add_hpx_compile_test category name)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(expected FALSE)
+  set(exclude_from_all)
 
   if(${name}_FAILURE_EXPECTED)
     set(expected TRUE)
+    set(exclude_from_all EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD)
   endif()
 
-  get_directory_property(_INCLUDE_DIRS INCLUDE_DIRECTORIES)
-  foreach(dir ${_INCLUDE_DIRS})
-    if(NOT MSVC)
-      set(include_flags ${include_flags} "-I${dir}")
-    else()
-      set(include_flags ${include_flags} "/I ${dir}")
-    endif()
-  endforeach()
+  add_hpx_executable(
+    ${name}
+    SOURCE_ROOT ${${name}_SOURCE_ROOT}
+    SOURCES ${${name}_SOURCES}
+    ${exclude_from_all}
+    FOLDER ${${name}_FOLDER})
 
-  if(NOT ${name}_SOURCE_ROOT)
-    set(${name}_SOURCE_ROOT ".")
-  endif()
-  add_hpx_source_group(
-    NAME ${name}
-    CLASS "Source Files"
-    ROOT ${${name}_SOURCE_ROOT}
-    TARGETS ${${name}_SOURCES})
+  add_test(NAME "${category}.${name}"
+    COMMAND ${CMAKE_COMMAND}
+      --build .
+      --target ${name}_exe
+      --config $<CONFIGURATION>
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
-  set(sources)
-  foreach(source ${${name}_SOURCES})
-    set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/${source}")
-  endforeach()
-
-  string(REPLACE " " ";" CMAKE_CXX_FLAGS_LIST ${CMAKE_CXX_FLAGS})
-  set(cmd
-    ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS_LIST} ${include_flags} ${sources}
-  )
-
-  if(MSVC)
-    set(cmd ${cmd} -c /Fo"${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}")
-  else()
-    set(cmd ${cmd} -c -o "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${name}.o")
-  endif()
-
-  add_test(
-    NAME "${category}.${name}"
-    COMMAND ${cmd}
-  )
   if(expected)
     set_tests_properties("${category}.${name}" PROPERTIES WILL_FAIL TRUE)
   endif()
