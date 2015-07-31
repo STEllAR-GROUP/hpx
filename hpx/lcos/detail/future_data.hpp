@@ -32,7 +32,6 @@
 #include <boost/type_traits/alignment_of.hpp>
 
 #include <memory>
-#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -301,11 +300,15 @@ namespace detail
             wait(ec);
             if (ec) return NULL;
 
-            boost::unique_lock<mutex_type> l(mtx_);
+            // No locking is required. Once a future has been made ready, which
+            // is a postcondition of wait, either:
+            //
+            // - there is only one writer (future), or
+            // - there are multiple readers only (shared_future, lock hurts
+            //   concurrency)
 
             if (state_ == empty) {
                 // the value has already been moved out of this future
-                l.unlock();
                 HPX_THROWS_IF(ec, no_state,
                     "future_data::get_result",
                     "this future has no valid shared state");
@@ -313,7 +316,7 @@ namespace detail
             }
 
             // the thread has been re-activated by one of the actions
-            // supported by this promise (see \a promise::set_event
+            // supported by this promise (see promise::set_event
             // and promise::set_exception).
             if (state_ == exception)
             {
@@ -496,20 +499,11 @@ namespace detail
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset(error_code& /*ec*/ = throws)
         {
-            state s = empty;
-
-            {
-                boost::unique_lock<mutex_type> l(this->mtx_);
-
-                std::swap(state_, s);
-                on_completed_ = completed_callback_type();
-
-                // unlock for the destruction of embedded data
-                // FIXME: is that correct?
-            }
+            // no locking is required as semantics guarantee a single writer
+            // and no reader
 
             // release any stored data and callback functions
-            switch (s) {
+            switch (state_) {
             case value:
             {
                 result_type* value_ptr =
@@ -526,6 +520,9 @@ namespace detail
             }
             default: break;
             }
+
+            state_ = empty;
+            on_completed_ = completed_callback_type();
         }
 
         // continuation support
