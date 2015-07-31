@@ -38,14 +38,15 @@ foreach(header ${headers})
     SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
     FOLDER "Tests/Headers/${header_dir}")
 
-#  # add a custom target for this example
-#  add_hpx_pseudo_target(tests.headers.${test_name})
-#
-#  # make pseudo-targets depend on master pseudo-target
-#  add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
-#
-#  # add dependencies to pseudo-target
-#  add_hpx_pseudo_dependencies(tests.headers.${test_name} "tests.unit.headers.${test_name}")
+  # add a custom target for this example
+  add_hpx_pseudo_target(tests.headers.${test_name})
+
+  # make pseudo-targets depend on master pseudo-target
+  add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
+
+  # add dependencies to pseudo-target
+  add_hpx_pseudo_dependencies(tests.headers.${test_name}
+                              "tests.unit.headers.${test_name}")
 
 endforeach()
 
@@ -63,11 +64,12 @@ add_hpx_unit_compile_test(
   SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}"
   FOLDER "Tests/Headers")
 
-## add a custom target for this example
-#add_hpx_pseudo_target(tests.headers.${test_name})
-#
-## make pseudo-targets depend on master pseudo-target
-#add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
-#
-## add dependencies to pseudo-target
-#add_hpx_pseudo_dependencies(tests.headers.${test_name} "tests.unit.headers.${test_name}")
+# add a custom target for this example
+add_hpx_pseudo_target(tests.headers.${test_name})
+
+# make pseudo-targets depend on master pseudo-target
+add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
+
+# add dependencies to pseudo-target
+add_hpx_pseudo_dependencies(tests.headers.${test_name}
+                            "tests.unit.headers.${test_name}")
