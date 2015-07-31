@@ -11,18 +11,17 @@ macro(add_hpx_compile_test category name)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(expected FALSE)
-  set(exclude_from_all)
 
   if(${name}_FAILURE_EXPECTED)
     set(expected TRUE)
-    set(exclude_from_all EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD)
   endif()
 
   add_hpx_executable(
     ${name}
     SOURCE_ROOT ${${name}_SOURCE_ROOT}
     SOURCES ${${name}_SOURCES}
-    ${exclude_from_all}
+    EXCLUDE_FROM_ALL
+    EXCLUDE_FROM_DEFAULT_BUILD
     FOLDER ${${name}_FOLDER})
 
   add_test(NAME "${category}.${name}"
