@@ -300,6 +300,13 @@ namespace detail
             wait(ec);
             if (ec) return NULL;
 
+            // No locking is required. Once a future has been made ready, which
+            // is a postcondition of wait, either:
+            //
+            // - there is only one writer (future), or
+            // - there are multiple readers only (shared_future, lock hurts
+            //   concurrency)
+
             if (state_ == empty) {
                 // the value has already been moved out of this future
                 HPX_THROWS_IF(ec, no_state,
@@ -309,7 +316,7 @@ namespace detail
             }
 
             // the thread has been re-activated by one of the actions
-            // supported by this promise (see \a promise::set_event
+            // supported by this promise (see promise::set_event
             // and promise::set_exception).
             if (state_ == exception)
             {
@@ -388,6 +395,7 @@ namespace detail
 
             // check whether the data has already been set
             if (is_ready_locked()) {
+                l.unlock();
                 HPX_THROWS_IF(ec, promise_already_satisfied,
                     "future_data::set_value",
                     "data has already been set for this future");
@@ -423,6 +431,7 @@ namespace detail
 
             // check whether the data has already been set
             if (is_ready_locked()) {
+                l.unlock();
                 HPX_THROWS_IF(ec, promise_already_satisfied,
                     "future_data::set_exception",
                     "data has already been set for this future");
@@ -436,7 +445,8 @@ namespace detail
             // set the data
             boost::exception_ptr* exception_ptr =
                 static_cast<boost::exception_ptr*>(storage_.address());
-            ::new ((void*)exception_ptr) boost::exception_ptr(std::forward<Target>(data));
+            ::new ((void*)exception_ptr) boost::exception_ptr(
+                std::forward<Target>(data));
             state_ = exception;
 
             // handle all threads waiting for the future to become ready
@@ -489,7 +499,8 @@ namespace detail
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset(error_code& /*ec*/ = throws)
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            // no locking is required as semantics guarantee a single writer
+            // and no reader
 
             // release any stored data and callback functions
             switch (state_) {
@@ -509,6 +520,7 @@ namespace detail
             }
             default: break;
             }
+
             state_ = empty;
             on_completed_ = completed_callback_type();
         }

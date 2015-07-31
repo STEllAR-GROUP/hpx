@@ -3,8 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
-
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
@@ -14,6 +12,8 @@
 #include <hpx/runtime/serialization/output_archive.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
+
+#include <iostream>
 
 // =========================shared_ptr test==============================
 struct A

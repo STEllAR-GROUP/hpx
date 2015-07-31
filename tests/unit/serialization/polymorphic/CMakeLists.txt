@@ -26,7 +26,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Serialization/")
+                     FOLDER "Tests/Unit/Serialization/Polymorphic")
 
   add_hpx_unit_test("serialization" ${test} ${${test}_PARAMETERS})
 
