@@ -227,6 +227,10 @@ as header
 
 [teletype]
 ```
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 0 on locality 0
+    /threads{locality#*/total}/count/cumulative,/threads{locality#*/total}/count/cumulative-phases
+    39,93
 ```
 
 [c++]
@@ -247,7 +251,6 @@ as header
 
 [teletype]
 ```
-
     hello world from OS-thread 1 on locality 0
     hello world from OS-thread 0 on locality 0
     cumulative,phases
