@@ -32,6 +32,7 @@
 #include <boost/type_traits/alignment_of.hpp>
 
 #include <memory>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -300,8 +301,11 @@ namespace detail
             wait(ec);
             if (ec) return NULL;
 
+            boost::unique_lock<mutex_type> l(mtx_);
+
             if (state_ == empty) {
                 // the value has already been moved out of this future
+                l.unlock();
                 HPX_THROWS_IF(ec, no_state,
                     "future_data::get_result",
                     "this future has no valid shared state");
@@ -388,6 +392,7 @@ namespace detail
 
             // check whether the data has already been set
             if (is_ready_locked()) {
+                l.unlock();
                 HPX_THROWS_IF(ec, promise_already_satisfied,
                     "future_data::set_value",
                     "data has already been set for this future");
@@ -423,6 +428,7 @@ namespace detail
 
             // check whether the data has already been set
             if (is_ready_locked()) {
+                l.unlock();
                 HPX_THROWS_IF(ec, promise_already_satisfied,
                     "future_data::set_exception",
                     "data has already been set for this future");
@@ -436,7 +442,8 @@ namespace detail
             // set the data
             boost::exception_ptr* exception_ptr =
                 static_cast<boost::exception_ptr*>(storage_.address());
-            ::new ((void*)exception_ptr) boost::exception_ptr(std::forward<Target>(data));
+            ::new ((void*)exception_ptr) boost::exception_ptr(
+                std::forward<Target>(data));
             state_ = exception;
 
             // handle all threads waiting for the future to become ready
@@ -489,10 +496,20 @@ namespace detail
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset(error_code& /*ec*/ = throws)
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
+            state s = empty;
+
+            {
+                boost::unique_lock<mutex_type> l(this->mtx_);
+
+                std::swap(state_, s);
+                on_completed_ = completed_callback_type();
+
+                // unlock for the destruction of embedded data
+                // FIXME: is that correct?
+            }
 
             // release any stored data and callback functions
-            switch (state_) {
+            switch (s) {
             case value:
             {
                 result_type* value_ptr =
@@ -509,8 +526,6 @@ namespace detail
             }
             default: break;
             }
-            state_ = empty;
-            on_completed_ = completed_callback_type();
         }
 
         // continuation support
