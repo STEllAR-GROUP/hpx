@@ -8,13 +8,15 @@
 #if !defined(HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM)
 #define HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors.hpp>
+#include <hpx/parallel/execution_policy_fwd.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -41,7 +43,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
     /// Rebind the type of executor used by an execution policy. The execution
     /// category of Executor shall not be weaker than that of ExecutionPolicy.
-    template <typename ExecutionPolicy, typename Executor>
+    template <typename ExecutionPolicy, typename Executor, typename Parameters>
     struct rebind_executor
     {
         /// \cond NOINTERNAL
@@ -54,7 +56,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
 
         /// The type of the rebound execution policy
-        typedef typename ExecutionPolicy::template rebind<Executor>::type type;
+        typedef typename ExecutionPolicy::template rebind<
+                Executor, Parameters
+            >::type type;
     };
 
     /// The execution policy tag \a task can be used to create a execution
@@ -63,9 +67,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     static task_execution_policy_tag const task;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Executor> struct sequential_execution_policy_shim;
-    template <typename Executor> struct sequential_task_execution_policy_shim;
-
     /// Extension: The class sequential_task_execution_policy is an execution
     /// policy type used as a unique type to disambiguate parallel algorithm
     /// overloading and indicate that a parallel algorithm's execution may not
@@ -79,6 +80,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// The type of the executor associated with this execution policy
         typedef parallel::sequential_executor executor_type;
 
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        typedef v3::detail::extract_executor_parameters<
+                executor_type
+            >::type executor_parameters_type;
+
         /// The category of the execution agents created by this execution
         /// policy.
         typedef parallel::sequential_execution_tag execution_category;
@@ -86,16 +93,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor_>
+        template <typename Executor_, typename Parameters_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequential_task_execution_policy_shim<Executor_> type;
+            typedef sequential_task_execution_policy_shim<
+                    Executor_, Parameters_
+                > type;
         };
 
         /// \cond NOINTERNAL
-        static std::size_t get_chunk_size() { return 0; }
-
         sequential_task_execution_policy() {}
         /// \endcond
 
@@ -124,20 +131,50 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \note Requires: is_executor<Executor>::value is true
         ///
-        /// \returns The new parallel_task_execution_policy
+        /// \returns The new sequential_task_execution_policy
         ///
         template <typename Executor>
         typename rebind_executor<
-            sequential_task_execution_policy, Executor
+            sequential_task_execution_policy, Executor,
+            executor_parameters_type
         >::type
         on(Executor& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
 
             typedef typename rebind_executor<
-                sequential_task_execution_policy, Executor
+                sequential_task_execution_policy, Executor,
+                executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec);
+            return rebound_type(exec, parameters());
+        }
+
+        /// Create a new sequential_task_execution_policy from the given
+        /// execution parameters
+        ///
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        ///
+        /// \returns The new sequential_task_execution_policy
+        ///
+        template <typename Parameters>
+        typename rebind_executor<
+            sequential_task_execution_policy, executor_type, Parameters
+        >::type
+        with(Parameters& params) const
+        {
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+
+            typedef typename rebind_executor<
+                sequential_task_execution_policy, executor_type, Parameters
+            >::type rebound_type;
+            return rebound_type(executor(), params);
         }
 
         /// Return the associated executor object.
@@ -145,6 +182,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             static parallel::sequential_executor exec;
             return exec;
+        }
+
+        /// Return the associated executor parameters object
+        static executor_parameters_type& parameters()
+        {
+            static executor_parameters_type params;
+            return params;
         }
     };
 
@@ -161,12 +205,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// The algorithm returns a future representing the result of the
     /// corresponding algorithm when invoked with the
     /// sequential_execution_policy.
-    template <typename Executor>
+    template <typename Executor, typename Parameters>
     struct sequential_task_execution_policy_shim
       : sequential_task_execution_policy
     {
         /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
+
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        typedef Parameters executor_parameters_type;
 
         /// The category of the execution agents created by this execution
         /// policy.
@@ -176,16 +224,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor_>
+        template <typename Executor_, typename Parameters_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequential_task_execution_policy_shim<Executor_> type;
+            typedef sequential_task_execution_policy_shim<
+                    Executor_, Parameters_
+                > type;
         };
-
-        /// \cond NOINTERNAL
-        static std::size_t get_chunk_size() { return 0; }
-        /// \endcond
 
         /// Create a new sequential_task_execution_policy from itself
         ///
@@ -194,10 +240,68 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_task_execution_policy
         ///
-        sequential_task_execution_policy_shim operator()(
+        sequential_task_execution_policy_shim const& operator()(
             task_execution_policy_tag tag) const
         {
             return *this;
+        }
+
+        /// Create a new sequential_task_execution_policy from the given
+        /// executor
+        ///
+        /// \tparam Executor    The type of the executor to associate with this
+        ///                     execution policy.
+        ///
+        /// \param exec         [in] The executor to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor<Executor>::value is true
+        ///
+        /// \returns The new sequential_task_execution_policy
+        ///
+        template <typename Executor>
+        typename rebind_executor<
+            sequential_task_execution_policy_shim, Executor,
+            executor_parameters_type
+        >::type
+        on(Executor& exec) const
+        {
+            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+
+            typedef typename rebind_executor<
+                sequential_task_execution_policy_shim, Executor,
+                executor_parameters_type
+            >::type rebound_type;
+            return rebound_type(exec, params_);
+        }
+
+        /// Create a new sequential_task_execution_policy from the given
+        /// execution parameters
+        ///
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        ///
+        /// \returns The new sequential_task_execution_policy
+        ///
+        template <typename Parameters>
+        typename rebind_executor<
+            sequential_task_execution_policy_shim, Executor, Parameters
+        >::type
+        with(Parameters& params) const
+        {
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+
+            typedef typename rebind_executor<
+                sequential_task_execution_policy_shim, Executor, Parameters
+            >::type rebound_type;
+            return rebound_type(exec_, params);
         }
 
         /// Return the associated executor object.
@@ -205,16 +309,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Return the associated executor object.
         Executor const& executor() const { return exec_; }
 
-    private:
-        /// \cond NOINTERNAL
-        friend struct sequential_task_execution_policy;
-        template <typename> friend struct sequential_execution_policy_shim;
+        /// Return the associated executor parameters object.
+        Parameters& parameters() { return params_; }
+        /// Return the associated executor parameters object.
+        Parameters const& parameters() const { return params_; }
 
-        sequential_task_execution_policy_shim(Executor& exec)
-          : exec_(exec)
+        /// \cond NOINTERNAL
+        sequential_task_execution_policy_shim(Executor& exec, Parameters& params)
+          : exec_(exec), params_(params)
         {}
 
+    private:
         Executor& exec_;
+        Parameters& params_;
         /// \endcond
     };
 
@@ -227,6 +334,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// The type of the executor associated with this execution policy
         typedef parallel::sequential_executor executor_type;
 
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        typedef v3::detail::extract_executor_parameters<
+                executor_type
+            >::type executor_parameters_type;
+
         /// The category of the execution agents created by this execution
         /// policy.
         typedef parallel::sequential_execution_tag execution_category;
@@ -234,17 +347,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor_>
+        template <typename Executor_, typename Parameters_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequential_execution_policy_shim<Executor_> type;
+            typedef sequential_execution_policy_shim<
+                    Executor_, Parameters_
+                > type;
         };
 
         /// \cond NOINTERNAL
         sequential_execution_policy() {}
-
-        static std::size_t get_chunk_size() { return 0; }
         /// \endcond
 
         /// Create a new sequential_task_execution_policy.
@@ -254,7 +367,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_task_execution_policy
         ///
-        sequential_task_execution_policy operator()(
+        sequential_task_execution_policy const& operator()(
             task_execution_policy_tag tag) const
         {
             return seq_task;
@@ -275,15 +388,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \returns The new parallel_task_execution_policy
         ///
         template <typename Executor>
-        typename rebind_executor<sequential_execution_policy, Executor>::type
+        typename rebind_executor<
+            sequential_execution_policy, Executor, executor_parameters_type
+        >::type
         on(Executor& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
 
             typedef typename rebind_executor<
-                sequential_execution_policy, Executor
+                sequential_execution_policy, Executor, executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec);
+            return rebound_type(exec, parameters());
+        }
+
+        /// Create a new sequential_execution_policy from the given
+        /// execution parameters
+        ///
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        ///
+        /// \returns The new sequential_execution_policy
+        ///
+        template <typename Parameters>
+        typename rebind_executor<
+            sequential_execution_policy, executor_type, Parameters
+        >::type
+        with(Parameters& params) const
+        {
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+
+            typedef typename rebind_executor<
+                sequential_execution_policy, executor_type, Parameters
+            >::type rebound_type;
+            return rebound_type(executor(), params);
         }
 
         /// Return the associated executor object.
@@ -291,6 +434,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             static parallel::sequential_executor exec;
             return exec;
+        }
+
+        /// Return the associated executor parameters object
+        static executor_parameters_type& parameters()
+        {
+            static executor_parameters_type params;
+            return params;
         }
     };
 
@@ -300,11 +450,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// The class sequential_execution_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
     /// require that a parallel algorithm's execution may not be parallelized.
-    template <typename Executor>
+    template <typename Executor, typename Parameters>
     struct sequential_execution_policy_shim : sequential_execution_policy
     {
         /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
+
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        typedef Parameters executor_parameters_type;
 
         /// The category of the execution agents created by this execution
         /// policy.
@@ -314,11 +468,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor_>
+        template <typename Executor_, typename Parameters_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef sequential_execution_policy_shim<Executor_> type;
+            typedef sequential_execution_policy_shim<
+                    Executor_, Parameters_
+                > type;
         };
 
         /// Create a new sequential_task_execution_policy.
@@ -328,10 +484,69 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_task_execution_policy_shim
         ///
-        sequential_task_execution_policy_shim<Executor> operator()(
+        sequential_task_execution_policy_shim<Executor, Parameters> operator()(
             task_execution_policy_tag tag) const
         {
-            return sequential_task_execution_policy_shim<Executor>(exec_);
+            return sequential_task_execution_policy_shim<
+                Executor, Parameters>(exec_, params_);
+        }
+
+        /// Create a new sequential_execution_policy from the given
+        /// executor
+        ///
+        /// \tparam Executor    The type of the executor to associate with this
+        ///                     execution policy.
+        ///
+        /// \param exec         [in] The executor to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor<Executor>::value is true
+        ///
+        /// \returns The new sequential_execution_policy
+        ///
+        template <typename Executor>
+        typename rebind_executor<
+            sequential_execution_policy_shim, Executor,
+            executor_parameters_type
+        >::type
+        on(Executor& exec) const
+        {
+            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+
+            typedef typename rebind_executor<
+                sequential_execution_policy_shim, Executor,
+                executor_parameters_type
+            >::type rebound_type;
+            return rebound_type(exec, params_);
+        }
+
+        /// Create a new sequential_execution_policy from the given
+        /// execution parameters
+        ///
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        ///
+        /// \returns The new sequential_execution_policy
+        ///
+        template <typename Parameters>
+        typename rebind_executor<
+            sequential_execution_policy_shim, executor_type, Parameters
+        >::type
+        with(Parameters& params) const
+        {
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+
+            typedef typename rebind_executor<
+                sequential_execution_policy_shim, executor_type, Parameters
+            >::type rebound_type;
+            return rebound_type(exec_, params);
         }
 
         /// Return the associated executor object.
@@ -339,22 +554,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Return the associated executor object.
         Executor const& executor() const { return exec_; }
 
-    private:
-        /// \cond NOINTERNAL
-        friend struct sequential_execution_policy;
+        /// Return the associated executor parameters object.
+        Parameters& parameters() { return params_; }
+        /// Return the associated executor parameters object.
+        Parameters const& parameters() const { return params_; }
 
-        sequential_execution_policy_shim(Executor& exec)
-          : exec_(exec)
+        /// \cond NOINTERNAL
+        sequential_execution_policy_shim(Executor& exec, Parameters& params)
+          : exec_(exec), params_(params)
         {}
 
+    private:
         Executor& exec_;
+        Parameters& params_;
         /// \endcond
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Executor> struct parallel_execution_policy_shim;
-    template <typename Executor> struct parallel_task_execution_policy_shim;
-
     /// Extension: The class parallel_task_execution_policy is an execution
     /// policy type used as a unique type to disambiguate parallel algorithm
     /// overloading and indicate that a parallel algorithm's execution may be
@@ -367,6 +583,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// The type of the executor associated with this execution policy
         typedef parallel::parallel_executor executor_type;
 
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        typedef v3::detail::extract_executor_parameters<
+                executor_type
+            >::type executor_parameters_type;
+
         /// The category of the execution agents created by this execution
         /// policy.
         typedef parallel::parallel_execution_tag execution_category;
@@ -374,16 +596,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor_>
+        template <typename Executor_, typename Parameters_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_task_execution_policy_shim<Executor_> type;
+            typedef parallel_task_execution_policy_shim<
+                    Executor_, Parameters_
+                > type;
         };
 
         /// \cond NOINTERNAL
         parallel_task_execution_policy() {}
         /// \endcond
+
+        /// Create a new parallel_task_execution_policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new parallel_task_execution_policy
+        ///
+        parallel_task_execution_policy operator()(
+            task_execution_policy_tag tag) const
+        {
+            return *this;
+        }
 
         /// Create a new parallel_task_execution_policy from given executor
         ///
@@ -400,42 +637,45 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         template <typename Executor>
         typename rebind_executor<
-            parallel_task_execution_policy, Executor
+            parallel_task_execution_policy, Executor, executor_parameters_type
         >::type
         on(Executor& exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
 
             typedef typename rebind_executor<
-                parallel_task_execution_policy, Executor
+                parallel_task_execution_policy, Executor,
+                executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec, chunk_size_);
+            return rebound_type(exec, parameters());
         }
 
-        /// Create a new parallel_task_execution_policy referencing a chunk size.
+        /// Create a new parallel_task_execution_policy from the given
+        /// execution parameters
         ///
-        /// \param chunk_size   [in] The chunk size controlling the number of
-        ///                     iterations scheduled to be executed on the same
-        ///                     HPX thread
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor_parameters<Parameters>::value is true
         ///
         /// \returns The new parallel_task_execution_policy
         ///
-        parallel_task_execution_policy operator()(std::size_t chunk_size) const
+        template <typename Parameters>
+        typename rebind_executor<
+            parallel_task_execution_policy, executor_type, Parameters
+        >::type
+        with(Parameters& params) const
         {
-            return parallel_task_execution_policy(chunk_size);
-        }
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
 
-        /// Create a new parallel_task_execution_policy from itself
-        ///
-        /// \param tag          [in] Specify that the corresponding asynchronous
-        ///                     execution policy should be used
-        ///
-        /// \returns The new parallel_task_execution_policy
-        ///
-        parallel_task_execution_policy operator()(
-            task_execution_policy_tag tag) const
-        {
-            return *this;
+            typedef typename rebind_executor<
+                parallel_task_execution_policy, executor_type, Parameters
+            >::type rebound_type;
+            return rebound_type(executor(), params);
         }
 
         /// Return the associated executor object.
@@ -445,28 +685,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return exec;
         }
 
-        /// \cond NOINTERNAL
-        std::size_t get_chunk_size() const { return chunk_size_; }
-        /// \endcond
-
-    private:
-        /// \cond NOINTERNAL
-        friend class hpx::serialization::access;
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned)
+        /// Return the associated executor parameters object
+        static executor_parameters_type& parameters()
         {
-            ar & chunk_size_;
+            static executor_parameters_type params;
+            return params;
         }
-
-    protected:
-        parallel_task_execution_policy(std::size_t chunk_size)
-          : chunk_size_(chunk_size)
-        {}
-
-    private:
-        std::size_t chunk_size_;
-        /// \endcond
     };
 
     /// Default parallel task execution policy object.
@@ -482,11 +706,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// The algorithm returns a future representing the result of the
     /// corresponding algorithm when invoked with the
     /// sequential_execution_policy.
-    template <typename Executor>
+    template <typename Executor, typename Parameters>
     struct parallel_task_execution_policy_shim : parallel_task_execution_policy
     {
         /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
+
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        typedef Parameters executor_parameters_type;
 
         /// The category of the execution agents created by this execution
         /// policy.
@@ -496,11 +724,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor_>
+        template <typename Executor_, typename Parameters_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_task_execution_policy_shim<Executor_> type;
+            typedef parallel_task_execution_policy_shim<
+                    Executor_, Parameters_
+                > type;
         };
 
         /// Create a new parallel_task_execution_policy_shim from itself
@@ -516,22 +746,82 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return *this;
         }
 
+        /// Create a new parallel_task_execution_policy from the given
+        /// executor
+        ///
+        /// \tparam Executor    The type of the executor to associate with this
+        ///                     execution policy.
+        ///
+        /// \param exec         [in] The executor to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor<Executor>::value is true
+        ///
+        /// \returns The new parallel_task_execution_policy
+        ///
+        template <typename Executor>
+        typename rebind_executor<
+            parallel_task_execution_policy_shim, Executor,
+            executor_parameters_type
+        >::type
+        on(Executor& exec) const
+        {
+            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+
+            typedef typename rebind_executor<
+                parallel_task_execution_policy_shim, Executor,
+                executor_parameters_type
+            >::type rebound_type;
+            return rebound_type(exec, params_);
+        }
+
+        /// Create a new parallel_task_execution_policy from the given
+        /// execution parameters
+        ///
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        ///
+        /// \returns The new sequential_task_execution_policy
+        ///
+        template <typename Parameters>
+        typename rebind_executor<
+            parallel_task_execution_policy_shim, Executor, Parameters
+        >::type
+        with(Parameters& params) const
+        {
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+
+            typedef typename rebind_executor<
+                parallel_task_execution_policy_shim, Executor, Parameters
+            >::type rebound_type;
+            return rebound_type(exec_, params);
+        }
+
         /// Return the associated executor object.
         Executor& executor() { return exec_; }
         /// Return the associated executor object.
         Executor const& executor() const { return exec_; }
 
-    private:
-        /// \cond NOINTERNAL
-        friend struct parallel_task_execution_policy;
-        template <typename> friend struct parallel_execution_policy_shim;
+        /// Return the associated executor parameters object.
+        Parameters& parameters() { return params_; }
+        /// Return the associated executor parameters object.
+        Parameters const& parameters() const { return params_; }
 
-        parallel_task_execution_policy_shim(Executor& exec,
-                std::size_t chunk_size)
-          : parallel_task_execution_policy(chunk_size), exec_(exec)
+        /// \cond NOINTERNAL
+        parallel_task_execution_policy_shim(Executor& exec, Parameters& params)
+          : exec_(exec), params_(params)
         {}
 
+    private:
         Executor& exec_;
+        Parameters& params_;
         /// \endcond
     };
 
@@ -544,6 +834,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// The type of the executor associated with this execution policy
         typedef parallel::parallel_executor executor_type;
 
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        typedef v3::detail::extract_executor_parameters<
+                executor_type
+            >::type executor_parameters_type;
+
         /// The category of the execution agents created by this execution
         /// policy.
         typedef parallel::parallel_execution_tag execution_category;
@@ -551,66 +847,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor_>
+        template <typename Executor_, typename Parameters_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_execution_policy_shim<Executor_> type;
+            typedef parallel_execution_policy_shim<
+                    Executor_, Parameters_
+                > type;
         };
 
         /// \cond NOINTERNAL
         parallel_execution_policy() {}
         /// \endcond
-
-        /// Create a new parallel_execution_policy referencing an executor and
-        /// a chunk size.
-        ///
-        /// \param exec         [in] The executor to use for the execution of
-        ///                     the parallel algorithm the returned execution
-        ///                     policy is used with
-        ///
-        /// \returns The new parallel_execution_policy
-        ///
-        template <typename Executor>
-        typename rebind_executor<parallel_execution_policy, Executor>::type
-        on(Executor& exec) const
-        {
-            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
-
-            typedef typename rebind_executor<
-                parallel_execution_policy, Executor
-            >::type rebound_type;
-            return rebound_type(exec, this->get_chunk_size());
-        }
-
-        /// Create a new parallel_execution_policy referencing a chunk size.
-        ///
-        /// \param chunk_size   [in] The chunk size controlling the number of
-        ///                     iterations scheduled to be executed on the same
-        ///                     HPX thread
-        ///
-        /// \returns The new parallel_execution_policy
-        ///
-        parallel_execution_policy operator()(std::size_t chunk_size) const
-        {
-            return parallel_execution_policy(chunk_size);
-        }
-
-        /// Create a new parallel_execution_policy referencing a chunk size.
-        ///
-        /// \param tag          [in] Specify that the corresponding asynchronous
-        ///                     execution policy should be used
-        /// \param chunk_size   [in] The chunk size controlling the number of
-        ///                     iterations scheduled to be executed on the same
-        ///                     HPX thread
-        ///
-        /// \returns The new parallel_execution_policy
-        ///
-        parallel_task_execution_policy operator()(task_execution_policy_tag tag,
-            std::size_t chunk_size) const
-        {
-            return par_task(chunk_size);
-        }
 
         /// Create a new parallel_execution_policy referencing a chunk size.
         ///
@@ -622,12 +870,59 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         parallel_task_execution_policy operator()(
             task_execution_policy_tag tag) const
         {
-            return par_task(chunk_size_);
+            return par_task;
         }
 
-        /// \cond NOINTERNAL
-        std::size_t get_chunk_size() const { return chunk_size_; }
-        /// \endcond
+        /// Create a new parallel_execution_policy referencing an executor and
+        /// a chunk size.
+        ///
+        /// \param exec         [in] The executor to use for the execution of
+        ///                     the parallel algorithm the returned execution
+        ///                     policy is used with
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        template <typename Executor>
+        typename rebind_executor<
+            parallel_execution_policy, Executor, executor_parameters_type
+        >::type
+        on(Executor& exec) const
+        {
+            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+
+            typedef typename rebind_executor<
+                parallel_execution_policy, Executor, executor_parameters_type
+            >::type rebound_type;
+            return rebound_type(exec, parameters());
+        }
+
+        /// Create a new parallel_execution_policy from the given
+        /// execution parameters
+        ///
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        template <typename Parameters>
+        typename rebind_executor<
+            parallel_execution_policy, executor_type, Parameters
+        >::type
+        with(Parameters& params) const
+        {
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+
+            typedef typename rebind_executor<
+                parallel_execution_policy, executor_type, Parameters
+            >::type rebound_type;
+            return rebound_type(executor(), params);
+        }
 
         /// Return the associated executor object.
         static executor_type& executor()
@@ -636,24 +931,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return exec;
         }
 
-    private:
-        /// \cond NOINTERNAL
-        friend class hpx::serialization::access;
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned)
+        /// Return the associated executor parameters object
+        static executor_parameters_type& parameters()
         {
-            ar & chunk_size_;
+            static executor_parameters_type params;
+            return params;
         }
-
-    protected:
-        parallel_execution_policy(std::size_t chunk_size)
-          : chunk_size_(chunk_size)
-        {}
-
-    private:
-        std::size_t chunk_size_;
-        /// \endcond
     };
 
     /// Default parallel execution policy object.
@@ -662,11 +945,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// The class parallel_execution_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
     /// indicate that a parallel algorithm's execution may be parallelized.
-    template <typename Executor>
+    template <typename Executor, typename Parameters>
     struct parallel_execution_policy_shim : parallel_execution_policy
     {
         /// The type of the executor associated with this execution policy
         typedef Executor executor_type;
+
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        typedef Parameters executor_parameters_type;
 
         /// The category of the execution agents created by this execution
         /// policy.
@@ -676,42 +963,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Rebind the type of executor used by this execution policy. The
         /// execution category of Executor shall not be weaker than that of
         /// this execution policy
-        template <typename Executor_>
+        template <typename Executor_, typename Parameters_>
         struct rebind
         {
             /// The type of the rebound execution policy
-            typedef parallel_execution_policy_shim<Executor_> type;
+            typedef parallel_execution_policy_shim<
+                    Executor_, Parameters_
+                > type;
         };
-
-        /// Create a new parallel_execution_policy_shim referencing a chunk size.
-        ///
-        /// \param chunk_size   [in] The chunk size controlling the number of
-        ///                     iterations scheduled to be executed on the same
-        ///                     HPX thread
-        ///
-        /// \returns The new parallel_execution_policy_shim
-        ///
-        parallel_execution_policy_shim operator()(std::size_t chunk_size) const
-        {
-            return parallel_execution_policy_shim(exec_, chunk_size);
-        }
-
-        /// Create a new parallel_execution_policy_shim referencing a chunk size.
-        ///
-        /// \param tag          [in] Specify that the corresponding asynchronous
-        ///                     execution policy should be used
-        /// \param chunk_size   [in] The chunk size controlling the number of
-        ///                     iterations scheduled to be executed on the same
-        ///                     HPX thread
-        ///
-        /// \returns The new parallel_execution_policy_shim
-        ///
-        parallel_task_execution_policy_shim<Executor>
-        operator()(task_execution_policy_tag tag, std::size_t chunk_size) const
-        {
-            return parallel_task_execution_policy_shim<Executor>(
-                exec_, chunk_size);
-        }
 
         /// Create a new parallel_execution_policy referencing a chunk size.
         ///
@@ -720,11 +979,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_execution_policy
         ///
-        parallel_task_execution_policy_shim<Executor>
+        parallel_task_execution_policy_shim<Executor, Parameters>
         operator()(task_execution_policy_tag tag) const
         {
-            return parallel_task_execution_policy_shim<Executor>(
-                exec_, this->get_chunk_size());
+            return parallel_task_execution_policy_shim<Executor, Parameters>(
+                exec_, params_);
         }
 
         /// Return the associated executor object.
@@ -732,26 +991,36 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// Return the associated executor object.
         Executor const& executor() const { return exec_; }
 
-    private:
-        /// \cond NOINTERNAL
-        friend struct parallel_execution_policy;
+        /// Return the associated executor parameters object.
+        Parameters& parameters() { return params_; }
+        /// Return the associated executor parameters object.
+        Parameters const& parameters() const { return params_; }
 
-        parallel_execution_policy_shim(Executor& exec, std::size_t chunk_size)
-          : parallel_execution_policy(chunk_size), exec_(exec)
+        /// \cond NOINTERNAL
+        parallel_execution_policy_shim(Executor& exec, Parameters& params)
+          : exec_(exec), params_(params)
         {}
 
+    private:
         Executor& exec_;
+        Parameters& params_;
         /// \endcond
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The class parallel_vector_execution_policy is an execution policy type used as
-    /// a unique type to disambiguate parallel algorithm overloading and
-    /// indicate that a parallel algorithm's execution may be vectorized.
+    /// The class parallel_vector_execution_policy is an execution policy type
+    /// used as a unique type to disambiguate parallel algorithm overloading
+    /// and indicate that a parallel algorithm's execution may be vectorized.
     struct parallel_vector_execution_policy
     {
         /// The type of the executor associated with this execution policy
         typedef parallel::parallel_executor executor_type;
+
+        /// The type of the associated executor parameters object which is
+        /// associated with this execution policy
+        typedef v3::detail::extract_executor_parameters<
+                executor_type
+            >::type executor_parameters_type;
 
         /// The category of the execution agents created by this execution
         /// policy.
@@ -759,8 +1028,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// \cond NOINTERNAL
         parallel_vector_execution_policy() {}
-
-        static std::size_t get_chunk_size() { return 0; }
         /// \endcond
 
         /// Create a new parallel_vector_execution_policy from itself
@@ -782,6 +1049,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static parallel::parallel_executor exec;
             return exec;
         }
+
+        /// Return the associated executor parameters object
+        static executor_parameters_type& parameters()
+        {
+            static executor_parameters_type params;
+            return params;
+        }
     };
 
     /// Default vector execution policy object.
@@ -799,27 +1073,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : std::false_type
         {};
 
-        template <typename Executor>
+        template <typename Executor, typename Parameters>
         struct is_rebound_execution_policy<
-                sequential_execution_policy_shim<Executor> >
+                sequential_execution_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
 
-        template <typename Executor>
+        template <typename Executor, typename Parameters>
         struct is_rebound_execution_policy<
-                sequential_task_execution_policy_shim<Executor> >
+                sequential_task_execution_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
 
-        template <typename Executor>
+        template <typename Executor, typename Parameters>
         struct is_rebound_execution_policy<
-                parallel_execution_policy_shim<Executor> >
+                parallel_execution_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
 
-        template <typename Executor>
+        template <typename Executor, typename Parameters>
         struct is_rebound_execution_policy<
-                parallel_task_execution_policy_shim<Executor> >
+                parallel_task_execution_policy_shim<Executor, Parameters> >
           : std::true_type
         {};
     }
@@ -898,8 +1172,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : boost::mpl::true_
         {};
 
-        template <typename Executor>
-        struct is_execution_policy<parallel_execution_policy_shim<Executor> >
+        template <typename Executor, typename Parameters>
+        struct is_execution_policy<
+                parallel_execution_policy_shim<Executor, Parameters> >
           : boost::mpl::true_
         {};
 
@@ -913,8 +1188,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : boost::mpl::true_
         {};
 
-        template <typename Executor>
-        struct is_execution_policy<sequential_execution_policy_shim<Executor> >
+        template <typename Executor, typename Parameters>
+        struct is_execution_policy<
+                sequential_execution_policy_shim<Executor, Parameters> >
           : boost::mpl::true_
         {};
 
@@ -924,9 +1200,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : boost::mpl::true_
         {};
 
-        template <typename Executor>
+        template <typename Executor, typename Parameters>
         struct is_execution_policy<
-                sequential_task_execution_policy_shim<Executor> >
+                sequential_task_execution_policy_shim<Executor, Parameters> >
           : boost::mpl::true_
         {};
 
@@ -935,9 +1211,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : boost::mpl::true_
         {};
 
-        template <typename Executor>
+        template <typename Executor, typename Parameters>
         struct is_execution_policy<
-                parallel_task_execution_policy_shim<Executor> >
+                parallel_task_execution_policy_shim<Executor, Parameters> >
           : boost::mpl::true_
         {};
 
@@ -1022,9 +1298,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : boost::mpl::true_
         {};
 
-        template <typename Executor>
+        template <typename Executor, typename Parameters>
         struct is_sequential_execution_policy<
-                sequential_task_execution_policy_shim<Executor> >
+                sequential_task_execution_policy_shim<Executor, Parameters> >
           : boost::mpl::true_
         {};
 
@@ -1033,9 +1309,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : boost::mpl::true_
         {};
 
-        template <typename Executor>
+        template <typename Executor, typename Parameters>
         struct is_sequential_execution_policy<
-                sequential_execution_policy_shim<Executor> >
+                sequential_execution_policy_shim<Executor, Parameters> >
           : boost::mpl::true_
         {};
         /// \endcond

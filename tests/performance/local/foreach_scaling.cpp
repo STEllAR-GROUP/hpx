@@ -7,6 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
@@ -46,8 +47,11 @@ void measure_parallel_foreach(std::size_t size)
         boost::end(data_representation),
         std::rand());
 
+    // create executor parameters object
+    hpx::parallel::constant_chunk_size ccs(chunk_size);
+
     // invoke parallel for_each
-    hpx::parallel::for_each(hpx::parallel::par(chunk_size),
+    hpx::parallel::for_each(hpx::parallel::par.with(ccs),
         boost::begin(data_representation),
         boost::end(data_representation),
         [](std::size_t) {
@@ -63,10 +67,13 @@ hpx::future<void> measure_task_foreach(std::size_t size)
         boost::end(*data_representation),
         std::rand());
 
+    // create executor parameters object
+    hpx::parallel::constant_chunk_size ccs(chunk_size);
+
     // invoke parallel for_each
     return
         hpx::parallel::for_each(
-            hpx::parallel::par(hpx::parallel::task, chunk_size),
+            hpx::parallel::par(hpx::parallel::task).with(ccs),
             boost::begin(*data_representation),
             boost::end(*data_representation),
             [](std::size_t) {

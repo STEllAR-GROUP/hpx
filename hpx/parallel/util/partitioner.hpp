@@ -54,8 +54,8 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    shape = get_static_shape(policy, inititems, f1, first,
-                        count, chunk_size);
+                    shape = get_bulk_iteration_shape(policy, inititems, f1,
+                        first, count, chunk_size);
 
                     std::vector<hpx::future<Result> > workitems;
                     workitems.reserve(shape.size());
@@ -169,7 +169,7 @@ namespace hpx { namespace parallel { namespace util
                 try {
                     // estimate a chunk size based on number of cores used
                     std::size_t base_idx = 0;
-                    shape = get_static_shape_idx(policy, inititems, f1,
+                    shape = get_bulk_iteration_shape_idx(policy, inititems, f1,
                         base_idx, first, count, chunk_size);
 
                     std::vector<hpx::future<Result> > workitems;
@@ -220,8 +220,8 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimate a chunk size based on number of cores used
-                    shape = get_static_shape(policy, inititems, f1, first,
-                        count, chunk_size);
+                    shape = get_bulk_iteration_shape(policy, inititems, f1,
+                        first, count, chunk_size);
 
                     std::vector<hpx::future<Result> > workitems;
                     workitems.reserve(shape.size());
@@ -347,7 +347,7 @@ namespace hpx { namespace parallel { namespace util
                 try {
                     // estimate a chunk size based on number of cores used
                     std::size_t base_idx = 0;
-                    shape = get_static_shape_idx(policy, inititems, f1,
+                    shape = get_bulk_iteration_shape_idx(policy, inititems, f1,
                         base_idx, first, count, chunk_size);
 
                     std::vector<hpx::future<Result> > workitems;
@@ -384,9 +384,11 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-        template <typename Executor, typename R, typename Result>
+        template <typename Executor, typename Parameters, typename R,
+            typename Result>
         struct static_partitioner<
-                parallel_task_execution_policy_shim<Executor>, R, Result>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                R, Result>
           : static_partitioner<parallel_task_execution_policy, R, Result>
         {};
 
@@ -474,26 +476,29 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-        template <typename Executor, typename R, typename Result>
+        template <typename Executor, typename Parameters, typename R,
+            typename Result>
         struct partitioner<
-                parallel_task_execution_policy_shim<Executor>, R, Result,
-                parallel::traits::static_partitioner_tag>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                R, Result, parallel::traits::static_partitioner_tag>
           : partitioner<parallel_task_execution_policy, R, Result,
                 parallel::traits::static_partitioner_tag>
         {};
 
-        template <typename Executor, typename R, typename Result>
+        template <typename Executor, typename Parameters, typename R,
+            typename Result>
         struct partitioner<
-                parallel_task_execution_policy_shim<Executor>, R, Result,
-                parallel::traits::auto_partitioner_tag>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                R, Result, parallel::traits::auto_partitioner_tag>
           : partitioner<parallel_task_execution_policy, R, Result,
                 parallel::traits::auto_partitioner_tag>
         {};
 
-        template <typename Executor, typename R, typename Result>
+        template <typename Executor, typename Parameters, typename R,
+            typename Result>
         struct partitioner<
-                parallel_task_execution_policy_shim<Executor>, R, Result,
-                parallel::traits::default_partitioner_tag>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                R, Result, parallel::traits::default_partitioner_tag>
           : partitioner<parallel_task_execution_policy, R, Result,
                 parallel::traits::static_partitioner_tag>
         {};
