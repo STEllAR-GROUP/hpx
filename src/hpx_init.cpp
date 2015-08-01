@@ -43,6 +43,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -361,6 +363,29 @@ namespace hpx
                 std::vector<std::string> counters =
                     vm["hpx:print-counter"].as<std::vector<std::string> >();
 
+                std::vector<std::string> counter_shortnames;
+                std::string counter_format("normal");
+                if (vm.count("hpx:print-counter-format")) {
+                    counter_format = vm["hpx:print-counter-format"].as<std::string>();
+                    if (counter_format == "csv-short"){
+                        for (std::size_t i=0; i< counters.size() ; ++i) {
+                            std::vector<std::string> entry;
+                            boost::algorithm::split(entry, counters[i],
+                            boost::algorithm::is_any_of(","),
+                            boost::algorithm::token_compress_on);
+
+                            HPX_ASSERT(entry.size() == 2);
+
+                            counter_shortnames.push_back(entry[0]);
+                            counters[i] = entry[1];
+                        }
+                    }
+                }
+
+                bool csv_header = true;
+                if(vm.count("hpx:no-csv-header"))
+                    csv_header = false;
+
                 std::string destination("cout");
                 if (vm.count("hpx:print-counter-destination"))
                     destination = vm["hpx:print-counter-destination"].as<std::string>();
@@ -369,7 +394,8 @@ namespace hpx
                 // itself to run after the given interval
                 boost::shared_ptr<util::query_counters> qc =
                     boost::make_shared<util::query_counters>(
-                        boost::ref(counters), interval, destination);
+                        boost::ref(counters), interval, destination, counter_format,
+                        counter_shortnames, csv_header);
 
                 // schedule to run at shutdown
                 rt.add_pre_shutdown_function(
@@ -389,6 +415,11 @@ namespace hpx
             else if (vm.count("hpx:print-counter-destination")) {
                 throw detail::command_line_error("Invalid command line option "
                     "--hpx:print-counter-destination, valid in conjunction with "
+                    "--hpx:print-counter only");
+            }
+            else if (vm.count("hpx:print-counter-format")) {
+                throw detail::command_line_error("Invalid command line option "
+                    "--hpx:print-counter-format, valid in conjunction with "
                     "--hpx:print-counter only");
             }
         }
@@ -1336,4 +1367,3 @@ namespace hpx
         }
     }
 }
-
