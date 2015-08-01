@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -47,8 +48,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     struct rebind_executor
     {
         /// \cond NOINTERNAL
+        typedef typename hpx::util::decay<Executor>::type executor_type;
+        typedef typename hpx::util::decay<Parameters>::type parameters_type;
+
         typedef typename ExecutionPolicy::execution_category category1;
-        typedef typename executor_traits<Executor>::execution_category category2;
+        typedef typename executor_traits<executor_type>::execution_category
+            category2;
 
         BOOST_STATIC_ASSERT(
             (parallel::v3::detail::is_not_weaker<category2, category1>::value)
@@ -57,7 +62,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         /// The type of the rebound execution policy
         typedef typename ExecutionPolicy::template rebind<
-                Executor, Parameters
+                executor_type, parameters_type
             >::type type;
     };
 
@@ -138,7 +143,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sequential_task_execution_policy, Executor,
             executor_parameters_type
         >::type
-        on(Executor& exec) const
+        on(Executor && exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
 
@@ -146,7 +151,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 sequential_task_execution_policy, Executor,
                 executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec, parameters());
+            return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
         /// Create a new sequential_task_execution_policy from the given
@@ -167,14 +172,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename rebind_executor<
             sequential_task_execution_policy, executor_type, Parameters
         >::type
-        with(Parameters& params) const
+        with(Parameters && params) const
         {
             BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
 
             typedef typename rebind_executor<
                 sequential_task_execution_policy, executor_type, Parameters
             >::type rebound_type;
-            return rebound_type(executor(), params);
+            return rebound_type(executor(), std::forward<Parameters>(params));
         }
 
         /// Return the associated executor object.
@@ -260,20 +265,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_task_execution_policy
         ///
-        template <typename Executor>
+        template <typename Executor_>
         typename rebind_executor<
-            sequential_task_execution_policy_shim, Executor,
+            sequential_task_execution_policy_shim, Executor_,
             executor_parameters_type
         >::type
-        on(Executor& exec) const
+        on(Executor_ && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
 
             typedef typename rebind_executor<
-                sequential_task_execution_policy_shim, Executor,
+                sequential_task_execution_policy_shim, Executor_,
                 executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec, params_);
+            return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
         /// Create a new sequential_task_execution_policy from the given
@@ -290,18 +295,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_task_execution_policy
         ///
-        template <typename Parameters>
+        template <typename Parameters_>
         typename rebind_executor<
-            sequential_task_execution_policy_shim, Executor, Parameters
+            sequential_task_execution_policy_shim, Executor, Parameters_
         >::type
-        with(Parameters& params) const
+        with(Parameters_ && params) const
         {
-            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters_>::value);
 
             typedef typename rebind_executor<
-                sequential_task_execution_policy_shim, Executor, Parameters
+                sequential_task_execution_policy_shim, Executor, Parameters_
             >::type rebound_type;
-            return rebound_type(exec_, params);
+            return rebound_type(exec_, std::forward<Parameters_>(params));
         }
 
         /// Return the associated executor object.
@@ -315,13 +320,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         Parameters const& parameters() const { return params_; }
 
         /// \cond NOINTERNAL
-        sequential_task_execution_policy_shim(Executor& exec, Parameters& params)
-          : exec_(exec), params_(params)
+        sequential_task_execution_policy_shim() {}
+
+        template <typename Executor_, typename Parameters_>
+        sequential_task_execution_policy_shim(
+                Executor_ && exec, Parameters_ && params)
+          : exec_(std::forward<Executor_>(exec)),
+            params_(std::forward<Parameters_>(params))
         {}
 
     private:
-        Executor& exec_;
-        Parameters& params_;
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & exec_ & params_;
+        }
+
+    private:
+        Executor exec_;
+        Parameters params_;
         /// \endcond
     };
 
@@ -391,14 +410,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename rebind_executor<
             sequential_execution_policy, Executor, executor_parameters_type
         >::type
-        on(Executor& exec) const
+        on(Executor && exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
 
             typedef typename rebind_executor<
                 sequential_execution_policy, Executor, executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec, parameters());
+            return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
         /// Create a new sequential_execution_policy from the given
@@ -419,14 +438,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename rebind_executor<
             sequential_execution_policy, executor_type, Parameters
         >::type
-        with(Parameters& params) const
+        with(Parameters && params) const
         {
             BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
 
             typedef typename rebind_executor<
                 sequential_execution_policy, executor_type, Parameters
             >::type rebound_type;
-            return rebound_type(executor(), params);
+            return rebound_type(executor(), std::forward<Parameters>(params));
         }
 
         /// Return the associated executor object.
@@ -505,20 +524,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_execution_policy
         ///
-        template <typename Executor>
+        template <typename Executor_>
         typename rebind_executor<
-            sequential_execution_policy_shim, Executor,
+            sequential_execution_policy_shim, Executor_,
             executor_parameters_type
         >::type
-        on(Executor& exec) const
+        on(Executor_ && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
 
             typedef typename rebind_executor<
-                sequential_execution_policy_shim, Executor,
+                sequential_execution_policy_shim, Executor_,
                 executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec, params_);
+            return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
         /// Create a new sequential_execution_policy from the given
@@ -535,18 +554,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_execution_policy
         ///
-        template <typename Parameters>
+        template <typename Parameters_>
         typename rebind_executor<
-            sequential_execution_policy_shim, executor_type, Parameters
+            sequential_execution_policy_shim, executor_type, Parameters_
         >::type
-        with(Parameters& params) const
+        with(Parameters_& params) const
         {
-            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters_>::value);
 
             typedef typename rebind_executor<
-                sequential_execution_policy_shim, executor_type, Parameters
+                sequential_execution_policy_shim, executor_type, Parameters_
             >::type rebound_type;
-            return rebound_type(exec_, params);
+            return rebound_type(exec_, std::forward<Parameters_>(params));
         }
 
         /// Return the associated executor object.
@@ -560,13 +579,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         Parameters const& parameters() const { return params_; }
 
         /// \cond NOINTERNAL
-        sequential_execution_policy_shim(Executor& exec, Parameters& params)
-          : exec_(exec), params_(params)
+        sequential_execution_policy_shim() {}
+
+        template <typename Executor_, typename Parameters_>
+        sequential_execution_policy_shim(
+                Executor_ && exec, Parameters_ && params)
+          : exec_(std::forward<Executor_>(exec)),
+            params_(std::forward<Parameters_>(params))
         {}
 
     private:
-        Executor& exec_;
-        Parameters& params_;
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & exec_ & params_;
+        }
+
+    private:
+        Executor exec_;
+        Parameters params_;
         /// \endcond
     };
 
@@ -639,7 +672,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename rebind_executor<
             parallel_task_execution_policy, Executor, executor_parameters_type
         >::type
-        on(Executor& exec) const
+        on(Executor && exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
 
@@ -647,7 +680,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 parallel_task_execution_policy, Executor,
                 executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec, parameters());
+            return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
         /// Create a new parallel_task_execution_policy from the given
@@ -668,14 +701,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename rebind_executor<
             parallel_task_execution_policy, executor_type, Parameters
         >::type
-        with(Parameters& params) const
+        with(Parameters && params) const
         {
             BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
 
             typedef typename rebind_executor<
                 parallel_task_execution_policy, executor_type, Parameters
             >::type rebound_type;
-            return rebound_type(executor(), params);
+            return rebound_type(executor(), std::forward<Parameters>(params));
         }
 
         /// Return the associated executor object.
@@ -760,20 +793,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_task_execution_policy
         ///
-        template <typename Executor>
+        template <typename Executor_>
         typename rebind_executor<
-            parallel_task_execution_policy_shim, Executor,
+            parallel_task_execution_policy_shim, Executor_,
             executor_parameters_type
         >::type
-        on(Executor& exec) const
+        on(Executor_ && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
 
             typedef typename rebind_executor<
-                parallel_task_execution_policy_shim, Executor,
+                parallel_task_execution_policy_shim, Executor_,
                 executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec, params_);
+            return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
         /// Create a new parallel_task_execution_policy from the given
@@ -790,18 +823,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_task_execution_policy
         ///
-        template <typename Parameters>
+        template <typename Parameters_>
         typename rebind_executor<
-            parallel_task_execution_policy_shim, Executor, Parameters
+            parallel_task_execution_policy_shim, Executor, Parameters_
         >::type
-        with(Parameters& params) const
+        with(Parameters_ && params) const
         {
-            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters_>::value);
 
             typedef typename rebind_executor<
-                parallel_task_execution_policy_shim, Executor, Parameters
+                parallel_task_execution_policy_shim, Executor, Parameters_
             >::type rebound_type;
-            return rebound_type(exec_, params);
+            return rebound_type(exec_, std::forward<Parameters_>(params));
         }
 
         /// Return the associated executor object.
@@ -815,13 +848,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         Parameters const& parameters() const { return params_; }
 
         /// \cond NOINTERNAL
-        parallel_task_execution_policy_shim(Executor& exec, Parameters& params)
-          : exec_(exec), params_(params)
+        parallel_task_execution_policy_shim() {}
+
+        template <typename Executor_, typename Parameters_>
+        parallel_task_execution_policy_shim(
+                Executor_ && exec, Parameters_ && params)
+          : exec_(std::forward<Executor_>(exec)),
+            params_(std::forward<Parameters_>(params))
         {}
 
     private:
-        Executor& exec_;
-        Parameters& params_;
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & exec_ & params_;
+        }
+
+    private:
+        Executor exec_;
+        Parameters params_;
         /// \endcond
     };
 
@@ -886,14 +933,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename rebind_executor<
             parallel_execution_policy, Executor, executor_parameters_type
         >::type
-        on(Executor& exec) const
+        on(Executor && exec) const
         {
             BOOST_STATIC_ASSERT(is_executor<Executor>::value);
 
             typedef typename rebind_executor<
                 parallel_execution_policy, Executor, executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec, parameters());
+            return rebound_type(std::forward<Executor>(exec), parameters());
         }
 
         /// Create a new parallel_execution_policy from the given
@@ -914,14 +961,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename rebind_executor<
             parallel_execution_policy, executor_type, Parameters
         >::type
-        with(Parameters& params) const
+        with(Parameters && params) const
         {
             BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
 
             typedef typename rebind_executor<
                 parallel_execution_policy, executor_type, Parameters
             >::type rebound_type;
-            return rebound_type(executor(), params);
+            return rebound_type(executor(), std::forward<Parameters>(params));
         }
 
         /// Return the associated executor object.
@@ -1000,20 +1047,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_execution_policy
         ///
-        template <typename Executor>
+        template <typename Executor_>
         typename rebind_executor<
-            parallel_execution_policy_shim, Executor,
+            parallel_execution_policy_shim, Executor_,
             executor_parameters_type
         >::type
-        on(Executor& exec) const
+        on(Executor_ && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
 
             typedef typename rebind_executor<
-                parallel_execution_policy_shim, Executor,
+                parallel_execution_policy_shim, Executor_,
                 executor_parameters_type
             >::type rebound_type;
-            return rebound_type(exec, params_);
+            return rebound_type(std::forward<Executor_>(exec), params_);
         }
 
         /// Create a new parallel_execution_policy from the given
@@ -1030,18 +1077,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new parallel_execution_policy
         ///
-        template <typename Parameters>
+        template <typename Parameters_>
         typename rebind_executor<
-            parallel_execution_policy_shim, Executor, Parameters
+            parallel_execution_policy_shim, Executor, Parameters_
         >::type
-        with(Parameters& params) const
+        with(Parameters_ && params) const
         {
-            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters_>::value);
 
             typedef typename rebind_executor<
-                parallel_execution_policy_shim, Executor, Parameters
+                parallel_execution_policy_shim, Executor, Parameters_
             >::type rebound_type;
-            return rebound_type(exec_, params);
+            return rebound_type(exec_, std::forward<Parameters_>(params));
         }
 
         /// Return the associated executor object.
@@ -1055,13 +1102,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         Parameters const& parameters() const { return params_; }
 
         /// \cond NOINTERNAL
-        parallel_execution_policy_shim(Executor& exec, Parameters& params)
-          : exec_(exec), params_(params)
+        parallel_execution_policy_shim() {}
+
+        template <typename Executor_, typename Parameters_>
+        parallel_execution_policy_shim(
+                Executor_ && exec, Parameters_ && params)
+          : exec_(std::forward<Executor_>(exec)),
+            params_(std::forward<Parameters_>(params))
         {}
 
     private:
-        Executor& exec_;
-        Parameters& params_;
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & exec_ & params_;
+        }
+
+    private:
+        Executor exec_;
+        Parameters params_;
         /// \endcond
     };
 

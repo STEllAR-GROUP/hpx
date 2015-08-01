@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -61,7 +62,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             std::size_t const cores =
                 executor_traits<Executor>::os_thread_count(exec);
 
-            std::size_t chunk_size = 0;
             if (count > 100*cores)
             {
                 using hpx::util::high_resolution_clock;
@@ -81,6 +81,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             }
 
             return (count + cores - 1) / cores;
+        }
+        /// \endcond
+
+    private:
+        /// \cond NOINTERNAL
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & min_time_;
         }
         /// \endcond
 

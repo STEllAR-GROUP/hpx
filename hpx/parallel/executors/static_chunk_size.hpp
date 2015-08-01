@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 
@@ -61,6 +62,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 os_thread_count(exec);
 
             return (num_tasks + cores - 1) / cores;
+        }
+        /// \endcond
+
+    private:
+        /// \cond NOINTERNAL
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & chunk_size_;
         }
         /// \endcond
 
