@@ -84,30 +84,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {}
     };
 #endif
-
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
-        template <>
-        struct is_executor<local_queue_executor>
-          : std::true_type
-        {};
-#endif
-
-        template <>
-        struct is_executor<local_priority_queue_executor>
-          : std::true_type
-        {};
-
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-        template <>
-        struct is_executor<static_priority_queue_executor>
-          : std::true_type
-        {};
-#endif
-        /// \endcond
-    }
 }}}
 
 #endif

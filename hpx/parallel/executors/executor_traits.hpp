@@ -9,7 +9,7 @@
 #if !defined(HPX_PARALLEL_EXECUTOR_TRAITS_MAY_10_2015_1128AM)
 #define HPX_PARALLEL_EXECUTOR_TRAITS_MAY_10_2015_1128AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_executor.hpp>

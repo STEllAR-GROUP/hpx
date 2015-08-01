@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_MAY_13_2015_1057AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -25,7 +26,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// executor prefers continuing with the creating thread first before
     /// executing newly created threads.
     ///
-    struct parallel_executor
+    struct parallel_executor : executor_tag
     {
 #if defined(DOXYGEN)
         /// Create a new parallel executor
@@ -49,16 +50,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
         /// \endcond
     };
-
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <>
-        struct is_executor<parallel_executor>
-          : std::true_type
-        {};
-        /// \endcond
-    }
 }}}
 
 #endif

@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_THREAD_EXECUTOR_MAY_15_2015_0546PM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
@@ -22,7 +23,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     namespace detail
     {
         /// \cond NOINTERNAL
-        struct threads_executor
+        struct threads_executor : executor_tag
         {
             threads_executor(threads::executor exec)
               : exec_(exec)
@@ -45,11 +46,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         private:
             threads::executor exec_;
         };
-
-        template <>
-        struct is_executor<threads_executor>
-          : std::true_type
-        {};
         /// \endcond
     }
 }}}
