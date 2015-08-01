@@ -373,7 +373,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return seq_task;
         }
 
-        /// Create a new sequential_execution_policy_shim from the given
+        /// Create a new sequential_execution_policy from the given
         /// executor
         ///
         /// \tparam Executor    The type of the executor to associate with this
@@ -385,7 +385,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \note Requires: is_executor<Executor>::value is true
         ///
-        /// \returns The new parallel_task_execution_policy
+        /// \returns The new sequential_execution_policy
         ///
         template <typename Executor>
         typename rebind_executor<
@@ -788,7 +788,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \note Requires: is_executor_parameters<Parameters>::value is true
         ///
-        /// \returns The new sequential_task_execution_policy
+        /// \returns The new parallel_task_execution_policy
         ///
         template <typename Parameters>
         typename rebind_executor<
@@ -984,6 +984,64 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             return parallel_task_execution_policy_shim<Executor, Parameters>(
                 exec_, params_);
+        }
+
+        /// Create a new parallel_execution_policy from the given
+        /// executor
+        ///
+        /// \tparam Executor    The type of the executor to associate with this
+        ///                     execution policy.
+        ///
+        /// \param exec         [in] The executor to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor<Executor>::value is true
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        template <typename Executor>
+        typename rebind_executor<
+            parallel_execution_policy_shim, Executor,
+            executor_parameters_type
+        >::type
+        on(Executor& exec) const
+        {
+            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+
+            typedef typename rebind_executor<
+                parallel_execution_policy_shim, Executor,
+                executor_parameters_type
+            >::type rebound_type;
+            return rebound_type(exec, params_);
+        }
+
+        /// Create a new parallel_execution_policy from the given
+        /// execution parameters
+        ///
+        /// \tparam Parameters  The type of the executor parameters to
+        ///                     associate with this execution policy.
+        ///
+        /// \param params       [in] The executor parameters to use for the
+        ///                     execution of the parallel algorithm the
+        ///                     returned execution policy is used with.
+        ///
+        /// \note Requires: is_executor_parameters<Parameters>::value is true
+        ///
+        /// \returns The new parallel_execution_policy
+        ///
+        template <typename Parameters>
+        typename rebind_executor<
+            parallel_execution_policy_shim, Executor, Parameters
+        >::type
+        with(Parameters& params) const
+        {
+            BOOST_STATIC_ASSERT(is_executor_parameters<Parameters>::value);
+
+            typedef typename rebind_executor<
+                parallel_execution_policy_shim, Executor, Parameters
+            >::type rebound_type;
+            return rebound_type(exec_, params);
         }
 
         /// Return the associated executor object.

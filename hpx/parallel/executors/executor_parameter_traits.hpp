@@ -134,12 +134,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param params   [in] The executor parameters object to use for
         ///                 determining the chunk size for the given number of
         ///                 tasks \a num_tasks.
-        /// \param exec     [in] The executor object to use for scheduling of
-        ///                 the function \a f.
+        /// \param exec     [in] The executor object which will be used used
+        ///                 for scheduling of the the loop iterations.
         /// \param f        [in] The function which will be optionally scheduled
         ///                 using the given executor.
         /// \param num_tasks [in] The number of tasks the chunk size should be
         ///                 determined for
+        ///
+        /// \note  The parameter \a f is expected to be a nullary function
+        ///        returning a `std::size_t` representing the number of
+        ///        iteration the function has already executed (i.e. which
+        ///        don't have to be scheduled anymore).
         ///
         template <typename Executor, typename F>
         static std::size_t get_chunk_size(executor_parameters_type& params,
