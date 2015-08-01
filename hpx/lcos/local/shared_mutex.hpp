@@ -33,9 +33,9 @@ namespace hpx { namespace lcos { namespace local
 
             state_data state;
             mutex_type state_change;
-            lcos::local::detail::counting_semaphore<no_mutex> shared_cond;
-            lcos::local::detail::counting_semaphore<no_mutex> exclusive_cond;
-            lcos::local::detail::counting_semaphore<no_mutex> upgrade_cond;
+            lcos::local::detail::counting_semaphore<mutex> shared_cond;
+            lcos::local::detail::counting_semaphore<mutex> exclusive_cond;
+            lcos::local::detail::counting_semaphore<mutex> upgrade_cond;
 
             void release_waiters()
             {
