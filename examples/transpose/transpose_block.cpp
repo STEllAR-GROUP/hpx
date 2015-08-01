@@ -278,7 +278,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
             auto range = boost::irange(blocks_start, blocks_end);
 
-            std::vector<hpx::future<void> > block_futures;
+            std::vector<hpx::shared_future<void> > block_futures;
             block_futures.resize(num_local_blocks);
 
             for_each(par, boost::begin(range), boost::end(range),
@@ -309,7 +309,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                     }
 
                     block_futures[b - blocks_start] =
-                        hpx::when_all(phase_futures);
+                        hpx::when_all(phase_futures).share();
                 }
             );
 
