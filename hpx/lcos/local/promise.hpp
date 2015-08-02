@@ -160,19 +160,6 @@ namespace hpx { namespace lcos { namespace local
                 if (ec) return;
             }
 
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-            // [N3722, 4.1] asks for this...
-            explicit operator lcos::future<R>()
-            {
-                return get_future();
-            }
-
-            explicit operator lcos::shared_future<R>()
-            {
-                return get_future();
-            }
-#endif
-
         private:
             boost::intrusive_ptr<shared_state_type> shared_state_;
             bool future_retrieved_;
@@ -477,37 +464,6 @@ namespace hpx { namespace lcos { namespace local
         x.swap(y);
     }
 }}}
-
-#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-namespace hpx { namespace lcos
-{
-    // [N3722, 4.1] asks for this...
-    template <typename R>
-    inline future<R>::future(local::promise<R>& promise)
-    {
-        promise.get_future().swap(*this);
-    }
-
-    template <typename R>
-    inline shared_future<R>::shared_future(local::promise<R>& promise)
-    {
-        shared_future<R>(promise.get_future()).swap(*this);
-    }
-
-    // [N3722, 4.1] asks for this...
-    template <>
-    inline future<void>::future(local::promise<void>& promise)
-    {
-        promise.get_future().swap(*this);
-    }
-
-    template <>
-    inline shared_future<void>::shared_future(local::promise<void>& promise)
-    {
-        shared_future<void>(promise.get_future()).swap(*this);
-    }
-}}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_AWAIT)
