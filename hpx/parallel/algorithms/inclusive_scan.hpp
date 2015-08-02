@@ -138,9 +138,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                 *it = op(*it, val);
                             });
                     },
-                    // use this return value
-                    [final_dest](std::vector<hpx::shared_future<T> >,
-                        std::vector<hpx::future<void> >)
+                    // step 4 use this return value
+                    [final_dest](std::vector<hpx::shared_future<T> > &&,
+                        std::vector<hpx::future<void> > &&)
                     {
                         return final_dest;
                     });

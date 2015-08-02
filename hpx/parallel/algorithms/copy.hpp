@@ -367,6 +367,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return scan_partitioner_type::call(
                     policy, make_zip_iterator(first, flags.get()),
                     count, init,
+                    // step 1 performs first part of scan algorithm
                     [pred](zip_iterator part_begin, std::size_t part_size)
                         -> std::size_t
                     {
@@ -374,16 +375,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         util::loop_n(part_begin, part_size,
                             [&pred, &curr](zip_iterator it) mutable
                             {
-                                if(pred(get<0>(*it)))
+                                if(get<1>(*it) = pred(get<0>(*it)))
                                 {
-                                    get<1>(*it) = true;
                                     ++curr;
-                                } // else get<1>(*it) will be false;
+                                }
                             });
                         return curr;
                     },
+                    // step 2 propagates the partition results from left
+                    // to right
                     hpx::util::unwrapped(std::plus<std::size_t>()),
-                    [dest, flags](zip_iterator part_begin, std::size_t part_size,
+                    // step 3 runs final accumulation on each partition
+                    [dest, flags](
+                        zip_iterator part_begin, std::size_t part_size,
                         hpx::shared_future<std::size_t> f_accu) mutable
                     {
                         std::advance(dest, f_accu.get());
@@ -394,8 +398,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                     *dest++ = get<0>(*it);
                             });
                     },
-                    [dest, flags](std::vector<hpx::shared_future<std::size_t> > items,
-                        std::vector<hpx::future<void> >) mutable
+                    // step 4 use this return value
+                    [dest, flags](
+                        std::vector<hpx::shared_future<std::size_t> > && items,
+                        std::vector<hpx::future<void> > &&) mutable -> Iter
                     {
                         std::advance(dest, items.back().get());
                         return dest;

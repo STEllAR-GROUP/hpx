@@ -46,7 +46,7 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
             HPX_TEST_NEQ(v1, v2);
             ++count;
             return v1 != v2;
-    }));
+        }));
 
     HPX_TEST_EQ(count, d.size());
 }
@@ -84,7 +84,7 @@ void test_remove_copy_if_async(ExPolicy p, IteratorTag)
             HPX_TEST_NEQ(v1, v2);
             ++count;
             return v1!=v2;
-    }));
+        }));
 
     HPX_TEST_EQ(count, d.size());
 }

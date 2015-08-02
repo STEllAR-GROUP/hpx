@@ -137,13 +137,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         OutIter dst = get<1>(part_begin.get_iterator_tuple());
                         util::loop_n(dst, part_size,
                             [&op, &val](OutIter it)
-                        {
-                            *it = op(*it, val);
-                        });
+                            {
+                                *it = op(*it, val);
+                            });
                     },
-                    // use this return value
-                    [final_dest](std::vector<hpx::shared_future<T> >,
-                        std::vector<hpx::future<void> >)
+                    // step 4 use this return value
+                    [final_dest](std::vector<hpx::shared_future<T> > &&,
+                        std::vector<hpx::future<void> > &&)
                     {
                         return final_dest;
                     });
