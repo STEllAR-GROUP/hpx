@@ -375,7 +375,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         util::loop_n(part_begin, part_size,
                             [&pred, &curr](zip_iterator it) mutable
                             {
-                                if(get<1>(*it) = pred(get<0>(*it)))
+                                if((get<1>(*it) = pred(get<0>(*it))))
                                 {
                                     ++curr;
                                 }
