@@ -7,6 +7,7 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
@@ -141,7 +142,8 @@ namespace hpx { namespace plugins { namespace parcel
 
         if (!stopped_ && stop_buffering) {
             stopped_ = true;
-            l.unlock();
+
+            util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
             timer_.stop();              // interrupt timer
         }
 

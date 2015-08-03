@@ -43,6 +43,12 @@ The following table summarizes the available command line options:
         [list the names of all registered performance counters]]
     [   [`--hpx:list-counter-infos`]
         [list the description of all registered performance counters]]
+    [   [`--hpx:print-counter-format`]
+        [print the performance counter(s) specified with `--hpx:print-counter`, possible formats in csv format with  header or without any header (see option `--hpx:no-csv-header`)
+        values: 'csv' (prints counter values in CSV format with full names as header)
+                'csv-short' (prints counter values in CSV format with shortnames provided with `--hpx:print-counter` as `--hpx:print-counter shortname,full-countername`)]]
+    [   [`--hpx:no-csv-header`]
+        [print the performance counter(s) specified with `--hpx:print-counter` and `csv` or `csv-short` format specified with `--hpx:print-counter-format` without header]]
 ]
 
 While the options `--hpx:list-counters` and `--hpx:list-counter-infos` give a
@@ -163,6 +169,7 @@ example for brevity):
     threads{locality#0/total}/count/cumulative,3,0.037514[s],46
     agas{locality#0/total}/count/bind,3,0.038679[s],10
 ```
+
 [c++]
 
 The command `--hpx:print-counter-destination=<file>` will redirect all counter
@@ -199,6 +206,106 @@ threads:
     /threads{locality#0/worker-thread#2}/count/cumulative,1,0.0025683[s],29
     /threads{locality#0/worker-thread#3}/count/cumulative,1,0.0025904[s],33
 ```
+[c++]
+
+The command `--hpx:print-counter-format` takes values `csv` and `csv-short`
+to generate CSV formatted counter values with header
+
+With format as csv:
+[teletype]
+```
+    hello_world \
+        --hpx:threads=2 \
+        --hpx:print-counter-format csv \
+        --hpx:print-counter /threads{locality#*/total}/count/cumulative \
+        --hpx:print-counter /threads{locality#*/total}/count/cumulative-phases
+```
+
+[c++]
+will print the values of performance counters in CSV format with full countername
+as header
+
+[teletype]
+```
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 0 on locality 0
+    /threads{locality#*/total}/count/cumulative,/threads{locality#*/total}/count/cumulative-phases
+    39,93
+```
+
+[c++]
+
+With format csv-short:
+[teletype]
+```
+    hello_world \
+        --hpx:threads 2 \
+        --hpx:print-counter-format csv-short \
+        --hpx:print-counter cumulative,/threads{locality#*/total}/count/cumulative \
+        --hpx:print-counter phases,/threads{locality#*/total}/count/cumulative-phases
+```
+
+[c++]
+will print the values of performance counters in CSV format with short countername
+as header
+
+[teletype]
+```
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 0 on locality 0
+    cumulative,phases
+    39,93
+```
+
+[c++]
+
+With format csv and csv-short when used with `--hpx:print-counter-interval`:
+[teletype]
+```
+    hello_world \
+        --hpx:threads 2 \
+        --hpx:print-counter-format csv-short \
+        --hpx:print-counter cumulative,/threads{locality#*/total}/count/cumulative \
+        --hpx:print-counter phases,/threads{locality#*/total}/count/cumulative-phases \
+        --hpx:print-counter-interval 5
+```
+
+[c++]
+will print the header only once repeating the performance counter value(s) repeatidly
+
+[teletype]
+```
+    cum,phases
+    25,42
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 0 on locality 0
+    44,95
+```
+
+[c++]
+The command `--hpx:no-csv-header` to be used with `--hpx:print-counter-format` to
+print performance counter values in CSV format without any header
+
+[teletype]
+```
+    hello_world \
+    --hpx:threads 2 \
+    --hpx:print-counter-format csv-short \
+    --hpx:print-counter cumulative,/threads{locality#*/total}/count/cumulative \
+    --hpx:print-counter phases,/threads{locality#*/total}/count/cumulative-phases \
+    --hpx:no-csv-header
+```
+
+[c++]
+will print
+
+[teletype]
+```
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 0 on locality 0
+    37,91
+```
+
 [c++]
 
 [endsect]

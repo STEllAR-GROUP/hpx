@@ -16,6 +16,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
@@ -45,6 +46,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <sstream>
+#include <cstdlib>
 
 namespace hpx { namespace detail
 {
@@ -935,8 +937,9 @@ void big_boot_barrier::wait_hosted(
     std::unique_ptr<actions::base_action> act(
             new actions::transfer_action<register_worker_action>(hdr)
         );
+    std::srand(static_cast<unsigned>(util::high_resolution_clock::now()));
     apply(
-        naming::invalid_locality_id
+          static_cast<boost::uint32_t>(std::rand()) // random first parcel id
         , 0
         , bootstrap_agas
         , std::move(act));

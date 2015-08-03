@@ -3,20 +3,22 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
-#include <vector>
-
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/current_function.hpp>
+
+#include <iostream>
+#include <vector>
 
 template <class T>
 struct A
 {
-  int a = 0;
+  int a;
 
   explicit A(int a):
     a(a)
@@ -30,7 +32,7 @@ struct A
   void serialize(Ar& ar, unsigned)
   {
     ar & a;
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << BOOST_CURRENT_FUNCTION << std::endl;
   }
   HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(A);
 };
@@ -38,7 +40,7 @@ struct A
 template <class T>
 struct B: A<T>
 {
-  int b = 0;
+  int b;
 
   explicit B(int b):
     A<T>(b-1),
@@ -52,7 +54,7 @@ struct B: A<T>
   template <class Ar>
   void serialize(Ar& ar, unsigned)
   {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << BOOST_CURRENT_FUNCTION << std::endl;
     ar & hpx::serialization::base_object<A<T> >(*this);
     ar & b;
   }
@@ -75,10 +77,12 @@ int main()
     boost::shared_ptr<A<int> > b;
     boost::shared_ptr<A<char> > c;
     archive >> b >> c;
-    std::cout << "b: " << boost::static_pointer_cast<B<int> >(b)->a << ", "
-        << boost::static_pointer_cast<B<int> >(b)->b << std::endl;
-    std::cout << "c: " << boost::static_pointer_cast<B<char> >(c)->a << ", "
-        << boost::static_pointer_cast<B<char> >(c)->b << std::endl;
+
+    HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->a, 1);
+    HPX_TEST_EQ(boost::static_pointer_cast<B<int> >(b)->b, 2);
+
+    HPX_TEST_EQ(boost::static_pointer_cast<B<char> >(c)->a, 7);
+    HPX_TEST_EQ(boost::static_pointer_cast<B<char> >(c)->b, 8);
   }
 
 }

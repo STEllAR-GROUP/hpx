@@ -115,6 +115,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/new.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_enums.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/fold.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/reduce.hpp"
@@ -195,19 +196,22 @@ set(image
 set(HPX_CMAKE_OPTIONS "")
 foreach(_cat ${HPX_OPTION_CATEGORIES})
   string(REPLACE " " "_" _cat_link "${_cat}")
-  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_cat_link} ${_cat} Options]\n")
+  set(HPX_CMAKE_OPTIONS
+    "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_cat_link} ${_cat} Options]\n")
 endforeach()
 set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}\n")
 
 get_cmake_property(_variableNames CACHE_VARIABLES)
 foreach(_cat ${HPX_OPTION_CATEGORIES})
   string(REPLACE " " "_" _cat_anchor "${_cat}")
-  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}[#build_system.cmake_variables.${_cat_anchor}][h3 ${_cat} Options]\n")
+  set(HPX_CMAKE_OPTIONS
+    "${HPX_CMAKE_OPTIONS}[#build_system.cmake_variables.${_cat_anchor}][h3 ${_cat} Options]\n")
   foreach (_variableName ${_variableNames})
     if(${_variableName}Category)
       if(_cat STREQUAL ${_variableName}Category)
         string(REPLACE " " "_" _variableName_anchor "${_variableName}")
-        set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_variableName_anchor} ${_variableName}]\n")
+        set(HPX_CMAKE_OPTIONS
+          "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_variableName_anchor} ${_variableName}]\n")
       endif()
     endif()
   endforeach()
@@ -249,8 +253,10 @@ set(HPX_CMAKE_TOOLCHAINS "")
 foreach(_toolchain ${_toolchain_files})
   get_filename_component(_toolchain_name ${_toolchain} NAME_WE)
   string(REGEX REPLACE "[ -]" "_" _toolchain_anchor "${_toolchain_name}")
-  set(HPX_CMAKE_TOOLCHAINS_LIST "${HPX_CMAKE_TOOLCHAINS_LIST}* [link hpx.manual.build_system.building_hpx.cmake_toolchains.${_toolchain_anchor} ${_toolchain_name}]\n")
-  set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}[heading:${_toolchain_anchor} ${_toolchain_name}]\n")
+  set(HPX_CMAKE_TOOLCHAINS_LIST
+   "${HPX_CMAKE_TOOLCHAINS_LIST}* [link hpx.manual.build_system.building_hpx.cmake_toolchains.${_toolchain_anchor} ${_toolchain_name}]\n")
+  set(HPX_CMAKE_TOOLCHAINS
+    "${HPX_CMAKE_TOOLCHAINS}[heading:${_toolchain_anchor} ${_toolchain_name}]\n")
   set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}\n``\n")
   file(STRINGS ${_toolchain} _toolchain_content)
   foreach(_line ${_toolchain_content})

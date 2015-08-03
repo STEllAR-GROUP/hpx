@@ -35,7 +35,7 @@ namespace hpx { namespace lcos { namespace detail
         void apply(Source&& src, Destination& dest, boost::mpl::false_) const
         {
             try {
-                dest.set_result(src.get());
+                dest.set_value(src.get());
             }
             catch (...) {
                 dest.set_exception(boost::current_exception());
@@ -47,7 +47,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             try {
                 src.get();
-                dest.set_result(util::unused);
+                dest.set_value(util::unused);
             }
             catch (...) {
                 dest.set_exception(boost::current_exception());
@@ -70,7 +70,7 @@ namespace hpx { namespace lcos { namespace detail
         boost::mpl::false_)
     {
         try {
-            cont.set_result(func(std::move(future)));
+            cont.set_value(func(std::move(future)));
         }
         catch (...) {
             cont.set_exception(boost::current_exception());
@@ -83,7 +83,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         try {
             func(std::move(future));
-            cont.set_result(util::unused);
+            cont.set_value(util::unused);
         }
         catch (...) {
             cont.set_exception(boost::current_exception());
@@ -648,7 +648,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             try {
                 (void)state->get_result();
-                this->set_result(util::unused);
+                this->set_value(util::unused);
             }
             catch (...) {
                 this->set_exception(boost::current_exception());

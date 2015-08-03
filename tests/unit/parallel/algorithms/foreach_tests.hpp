@@ -25,11 +25,14 @@ void test_for_each(ExPolicy && policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::parallel::for_each(std::forward<ExPolicy>(policy),
-        iterator(boost::begin(c)), iterator(boost::end(c)),
-        [](std::size_t& v) {
-            v = 42;
-        });
+    iterator result =
+        hpx::parallel::for_each(std::forward<ExPolicy>(policy),
+            iterator(boost::begin(c)), iterator(boost::end(c)),
+            [](std::size_t& v) {
+                v = 42;
+            });
+
+    HPX_TEST(result == iterator(boost::end(c)));
 
     // verify values
     std::size_t count = 0;
@@ -50,13 +53,15 @@ void test_for_each_async(ExPolicy && p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<void> f =
+    hpx::future<iterator> f =
         hpx::parallel::for_each(std::forward<ExPolicy>(p),
             iterator(boost::begin(c)), iterator(boost::end(c)),
             [](std::size_t& v) {
                 v = 42;
             });
     f.wait();
+
+    HPX_TEST(f.get() == iterator(boost::end(c)));
 
     // verify values
     std::size_t count = 0;
@@ -111,7 +116,7 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<void> f =
+        hpx::future<iterator> f =
             hpx::parallel::for_each(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 [](std::size_t& v) { throw std::runtime_error("test"); });
@@ -174,7 +179,7 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<void> f =
+        hpx::future<iterator> f =
             hpx::parallel::for_each(p,
                 iterator(boost::begin(c)), iterator(boost::end(c)),
                 [](std::size_t& v) { throw std::bad_alloc(); });
