@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/parallel/executors/thread_pool_executors.hpp>
+#include <hpx/parallel/executors/this_thread_executors.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
@@ -15,14 +15,14 @@
 #include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::thread::id test() { return hpx::this_thread::get_id(); }
+std::size_t test() { return hpx::get_worker_thread_num(); }
 
 template <typename Executor>
 void test_sync(Executor& exec)
 {
     typedef hpx::parallel::executor_traits<Executor> traits;
 
-    HPX_TEST(traits::execute(exec, &test) != hpx::this_thread::get_id());
+    HPX_TEST(traits::execute(exec, &test) == hpx::get_worker_thread_num());
 }
 
 template <typename Executor>
@@ -31,14 +31,14 @@ void test_async(Executor& exec)
     typedef hpx::parallel::executor_traits<Executor> traits;
 
     HPX_TEST(
-        traits::async_execute(exec, &test).get() !=
-        hpx::this_thread::get_id());
+        traits::async_execute(exec, &test).get() ==
+        hpx::get_worker_thread_num());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(hpx::thread::id tid, int value)
+void bulk_test(std::size_t tid, int value)
 {
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST(tid == hpx::get_worker_thread_num());
 }
 
 template <typename Executor>
@@ -46,7 +46,7 @@ void test_bulk_sync(Executor& exec)
 {
     typedef hpx::parallel::executor_traits<Executor> traits;
 
-    hpx::thread::id tid = hpx::this_thread::get_id();
+    std::size_t tid = hpx::get_worker_thread_num();
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), std::rand());
@@ -60,7 +60,7 @@ void test_bulk_async(Executor& exec)
 {
     typedef hpx::parallel::executor_traits<Executor> traits;
 
-    hpx::thread::id tid = hpx::this_thread::get_id();
+    std::size_t tid = hpx::get_worker_thread_num();
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), std::rand());
@@ -71,7 +71,7 @@ void test_bulk_async(Executor& exec)
 }
 
 template <typename Executor>
-void test_thread_pool_executor(Executor& exec)
+void test_this_thread_executor(Executor& exec)
 {
     test_sync(exec);
     test_async(exec);
@@ -81,24 +81,17 @@ void test_thread_pool_executor(Executor& exec)
 
 int hpx_main(int argc, char* argv[])
 {
-    std::size_t num_threads = hpx::get_os_thread_count();
-
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
     {
-        hpx::parallel::static_queue_executor exec(num_threads);
-        test_thread_pool_executor(exec);
+        hpx::parallel::this_thread_static_queue_executor exec;
+        test_this_thread_executor(exec);
     }
 #endif
 
-    {
-        hpx::parallel::local_priority_queue_executor exec(num_threads);
-        test_thread_pool_executor(exec);
-    }
-
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     {
-        hpx::parallel::static_priority_queue_executor exec(num_threads);
-        test_thread_pool_executor(exec);
+        hpx::parallel::this_thread_static_priority_queue_executor exec;
+        test_this_thread_executor(exec);
     }
 #endif
 
@@ -107,13 +100,8 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    // By default this test should run on all available cores
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
-
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
+    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();

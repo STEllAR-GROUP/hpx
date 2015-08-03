@@ -43,6 +43,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 return hpx::get_os_thread_count(exec_);
             }
 
+            bool has_pending_closures() const
+            {
+                return exec_.num_pending_closures() != 0;
+            }
+
         private:
             threads::executor exec_;
         };
