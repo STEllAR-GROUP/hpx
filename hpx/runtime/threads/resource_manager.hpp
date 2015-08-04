@@ -64,14 +64,18 @@ namespace hpx { namespace  threads
         static resource_manager& get();
 
     protected:
+        // allocate virtual cores 
+        // called by initial_allocation
         std::vector<coreids_type> allocate_virt_cores(
                 detail::manage_executor* proxy, std::size_t min_punits,
                 std::size_t max_punits, error_code& ec);
 
+        // reserve virtual cores for scheduler
         std::size_t reserve_processing_units(
                 std::size_t use_count, std::size_t desired,
                 std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
 
+        // reserve virtual cores for scheduler at higher use count
         std::size_t reserve_at_higher_use_count(
                 std::size_t desired,
                 std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
@@ -155,14 +159,13 @@ namespace hpx { namespace  threads
             // allocation decisions are made.
             std::size_t allocation;
 
-            // Used to hold a scaled allocation value during proportional
-            // allocation.
+            // Scaled allocation value during proportional allocation.
             double scaled_allocation;
 
-            std::size_t num_borrowed_cores;
-            std::size_t num_owned_cores;
-            std::size_t min_proxy_cores;
-            std::size_t max_proxy_cores;
+            std::size_t num_borrowed_cores; // borrowed cores held by scheduler 
+            std::size_t num_owned_cores;    // owned cores held by scheduler
+            std::size_t min_proxy_cores;    // min cores required by scheduler
+            std::size_t max_proxy_cores;    // max cores required by scheduler 
         };
 
         struct static_allocation_data : public allocation_data
@@ -179,20 +182,28 @@ namespace hpx { namespace  threads
             allocation_data_map_type;
         allocation_data_map_type proxies_static_allocation_data;
 
-        void preprocess_static_allocation();
+        // stores static allocation data for all schedulers
+        void preprocess_static_allocation(std::size_t min_punits,
+            std::size_t max_punits); 
 
-        std::size_t const release_borrowed_cores = (std::size_t)-1;
-        std::size_t const release_cores_to_min = (std::size_t)-2;
+        // constants used for parameters to the release_scheduler API
+        std::size_t const release_borrowed_cores = std::size_t(-1);
+        std::size_t const release_cores_to_min = std::size_t(-2);
 
+        // release cores from scheduler
         bool release_scheduler_resources(
             allocation_data_map_type::iterator it,
             std::size_t number_to_free,
             std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
 
+        // release cores from all schedulers
+        // calls release_scheduler_resources                
         std::size_t release_cores_on_existing_scedulers(
             std::size_t number_to_free,
             std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
 
+        // distribute cores to schedulers proportional to max_punits of
+        // the schedulers 
         std::size_t redistribute_cores_among_all(std::size_t reserved,
             std::size_t min_punits, std::size_t max_punits,
             std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
@@ -200,7 +211,6 @@ namespace hpx { namespace  threads
         void roundup_scaled_allocations(
             allocation_data_map_type &scaled_static_allocation_data,
             std::size_t total_allocated);
-
     };
 }}
 
