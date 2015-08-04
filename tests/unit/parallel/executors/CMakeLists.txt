@@ -6,6 +6,7 @@
 set(tests
     bulk_async
     created_executor
+    executor_parameters
     minimal_async_executor
     minimal_sync_executor
     parallel_executor
