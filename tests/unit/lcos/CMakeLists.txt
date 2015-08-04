@@ -20,6 +20,7 @@ set(tests
     broadcast
     broadcast_apply
     condition_variable
+    counting_semaphore
     barrier
     fold
     future
@@ -72,6 +73,7 @@ set(future_then_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
+set(counting_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
