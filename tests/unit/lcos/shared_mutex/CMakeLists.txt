@@ -5,9 +5,11 @@
 
 set(tests
     shared_mutex1
+    shared_mutex2
    )
 
 set(shared_future1_PARAMETERS THREADS_PER_LOCALITY 4)
+set(shared_future2_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources

@@ -10,11 +10,11 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
 
-#include <hpx/runtime/threads/detail/thread_group.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/chrono.hpp>
 
+#include "thread_group.hpp"
 #include "shared_mutex_locking_thread.hpp"
 
 #define CHECK_LOCKED_VALUE_EQUAL(mutex_name, value, expected_value)           \
@@ -30,7 +30,7 @@ void test_multiple_readers()
 
     unsigned const number_of_threads = 10;
 
-    hpx::threads::detail::thread_group pool;
+    test::thread_group pool;
 
     hpx::lcos::local::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;
@@ -86,7 +86,7 @@ void test_only_one_writer_permitted()
 
     unsigned const number_of_threads = 10;
 
-    hpx::threads::detail::thread_group pool;
+    test::thread_group pool;
 
     hpx::lcos::local::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;
@@ -136,7 +136,7 @@ void test_reader_blocks_writer()
     typedef hpx::lcos::local::shared_mutex shared_mutex_type;
     typedef hpx::lcos::local::mutex mutex_type;
 
-    hpx::threads::detail::thread_group pool;
+    test::thread_group pool;
 
     hpx::lcos::local::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;
@@ -203,7 +203,7 @@ void test_unlocking_writer_unblocks_all_readers()
     typedef hpx::lcos::local::shared_mutex shared_mutex_type;
     typedef hpx::lcos::local::mutex mutex_type;
 
-    hpx::threads::detail::thread_group pool;
+    test::thread_group pool;
 
     hpx::lcos::local::shared_mutex rw_mutex;
     boost::unique_lock<hpx::lcos::local::shared_mutex>  write_lock(rw_mutex);
@@ -267,7 +267,7 @@ void test_unlocking_last_reader_only_unblocks_one_writer()
     typedef hpx::lcos::local::shared_mutex shared_mutex_type;
     typedef hpx::lcos::local::mutex mutex_type;
 
-    hpx::threads::detail::thread_group pool;
+    test::thread_group pool;
 
     hpx::lcos::local::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;

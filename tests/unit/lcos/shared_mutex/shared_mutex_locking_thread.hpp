@@ -138,6 +138,38 @@ namespace test
             boost::unique_lock<hpx::lcos::local::mutex> flk(finish_mutex);
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    class simple_upgrade_thread
+    {
+    private:
+        hpx::lcos::local::shared_mutex& rwm;
+        hpx::lcos::local::mutex& finish_mutex;
+        hpx::lcos::local::mutex& unblocked_mutex;
+        unsigned& unblocked_count;
+
+    public:
+        simple_upgrade_thread(
+                hpx::lcos::local::shared_mutex& rwm_,
+                hpx::lcos::local::mutex& finish_mutex_,
+                hpx::lcos::local::mutex& unblocked_mutex_,
+                unsigned& unblocked_count_)
+          : rwm(rwm_),
+            finish_mutex(finish_mutex_),
+            unblocked_mutex(unblocked_mutex_),
+            unblocked_count(unblocked_count_)
+        {}
+
+        void operator()()
+        {
+            boost::upgrade_lock<hpx::lcos::local::shared_mutex> lk(rwm);
+            {
+                boost::unique_lock<hpx::lcos::local::mutex> ulk(unblocked_mutex);
+                ++unblocked_count;
+            }
+            boost::unique_lock<hpx::lcos::local::mutex> flk(finish_mutex);
+        }
+    };
 }
 
 #endif
