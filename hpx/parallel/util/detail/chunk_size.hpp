@@ -56,6 +56,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         typedef executor_parameter_traits<parameters_type> traits;
         typedef hpx::util::tuple<FwdIter, std::size_t> tuple_type;
 
+        typedef typename ExPolicy::executor_type executor_type;
+        std::size_t const cores = executor_traits<executor_type>::
+            os_thread_count(policy.executor());
+
         bool variable_chunk_sizes = traits::variable_chunk_size(
             policy.parameters(), policy.executor());
 
@@ -84,6 +88,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                     policy.executor(), test_function, count);
             }
 
+            if (chunk_size == 0)
+                chunk_size = (count + cores - 1) / cores;
+
             shape.reserve(count / chunk_size + 1);
             while (count != 0)
             {
@@ -101,6 +108,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                 chunk_size = traits::get_chunk_size(
                     policy.parameters(), policy.executor(),
                     [](){ return 0; }, count);
+
+                if (chunk_size == 0)
+                    chunk_size = (count + cores - 1) / cores;
 
                 std::size_t chunk = (std::min)(chunk_size, count);
 
@@ -182,7 +192,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
                     policy.executor(), test_function, count);
             }
 
-            shape.reserve(count / chunk_size + 1);
+            shape.reserve(count / (chunk_size + 1));
             while (count != 0)
             {
                 std::size_t chunk = (std::min)(chunk_size, count);
