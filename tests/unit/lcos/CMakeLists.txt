@@ -166,3 +166,15 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   endforeach()
 endif()
 
+#########################################################################################
+set(subdirs
+    shared_mutex
+   )
+
+# add sub directories
+foreach(subdir ${subdirs})
+  add_hpx_pseudo_target(tests.unit.lcos.${subdir}dir)
+  add_subdirectory(${subdir})
+  add_hpx_pseudo_dependencies(tests.unit.lcos tests.unit.lcos.${subdir}dir)
+endforeach()
+
