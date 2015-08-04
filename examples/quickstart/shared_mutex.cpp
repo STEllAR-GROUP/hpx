@@ -14,9 +14,9 @@
 #include <boost/atomic.hpp>
 #include <boost/chrono.hpp>
 #include <boost/random.hpp>
-#include <boost/random/random_device.hpp>
 
 #include <vector>
+#include <ctime>
 
 int const writers = 3;
 int const readers = 3;
@@ -35,8 +35,8 @@ int main()
         threads.emplace_back(
             [&ready, &stm, i]
             {
-                boost::random::random_device rd;
-                boost::random::mt19937 urng(rd());
+                boost::random::mt19937 urng(
+                    static_cast<boost::uint32_t>(std::time(0)));
                 boost::random::uniform_int_distribution<int> dist(1, 1000);
 
                 while (!ready) { /*** wait... ***/ }
@@ -62,8 +62,8 @@ int main()
         threads.emplace_back(
             [&ready, &stm, k, i]
             {
-                boost::random::random_device rd;
-                boost::random::mt19937 urng(rd());
+                boost::random::mt19937 urng(
+                    static_cast<boost::uint32_t>(std::time(0)));
                 boost::random::uniform_int_distribution<int> dist(1, 1000);
 
                 while (!ready) { /*** wait... ***/ }
