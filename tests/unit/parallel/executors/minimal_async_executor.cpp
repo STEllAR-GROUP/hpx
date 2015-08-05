@@ -116,7 +116,7 @@ void test_executor()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_async_executor2
+struct test_async_executor2 : hpx::parallel::executor_tag
 {
     template <typename F>
     hpx::future<typename hpx::util::result_of<

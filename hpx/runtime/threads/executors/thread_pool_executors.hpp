@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/util/date_time_chrono.hpp>
 
 #include <boost/ptr_container/ptr_vector.hpp>
 
