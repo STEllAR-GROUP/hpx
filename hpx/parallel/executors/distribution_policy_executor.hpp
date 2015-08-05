@@ -69,7 +69,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         typename std::enable_if<
             !hpx::traits::is_action<F>::value
         >::type
-        apply_execute(F && f) const
+        apply_execute_impl(F && f) const
         {
             typedef components::server::invoke_function_action<F> action_type;
             policy_.template apply<action_type>(actions::continuation_type(),
@@ -80,7 +80,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         typename std::enable_if<
             hpx::traits::is_action<Action>::value
         >::type
-        apply_execute(Action && act) const
+        apply_execute_impl(Action && /*act*/) const
         {
             policy_.template apply<Action>(actions::continuation_type(),
                 threads::thread_priority_default);
@@ -104,7 +104,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             hpx::traits::is_action<Action>::value,
             hpx::future<typename Action::local_result_type>
         >::type
-        async_execute_impl(Action && act) const
+        async_execute_impl(Action && /*act*/) const
         {
             return policy_.template async<Action>(launch::async);
         }
