@@ -38,7 +38,7 @@ namespace hpx { namespace threads { namespace detail
     public:
         thread_pool(Scheduler& sched,
             threads::policies::callback_notifier& notifier,
-            char const* pool_name);
+            char const* pool_name, bool do_background_work = false);
         ~thread_pool();
 
         std::size_t init(std::size_t num_threads,
@@ -121,7 +121,10 @@ namespace hpx { namespace threads { namespace detail
         void abort_all_suspended_threads();
         bool cleanup_terminated(bool delete_all);
 
-        hpx::state get_state() const { return state_.load(); }
+        hpx::state get_state() const;
+        hpx::state get_state(std::size_t num_thread) const;
+
+        bool has_reached_state(hpx::state s) const;
 
         void do_some_work(std::size_t num_thread);
 
@@ -145,9 +148,6 @@ namespace hpx { namespace threads { namespace detail
         threads::policies::callback_notifier& notifier_;
         std::string pool_name_;
 
-        // thread pool state
-        boost::atomic<hpx::state> state_;
-
         // startup barrier
         boost::scoped_ptr<boost::barrier> startup_;
 
@@ -166,6 +166,10 @@ namespace hpx { namespace threads { namespace detail
         // Stores the mask identifying all processing units used by this
         // thread manager.
         threads::mask_type used_processing_units_;
+
+        // Instruct pool to allow doing background work (parcelport and garbage
+        // collection)
+        bool do_background_work_;
     };
 }}}
 

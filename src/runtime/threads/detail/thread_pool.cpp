@@ -48,13 +48,13 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     thread_pool<Scheduler>::thread_pool(Scheduler& sched,
             threads::policies::callback_notifier& notifier,
-            char const* pool_name)
+            char const* pool_name, bool do_background_work)
       : sched_(sched),
         notifier_(notifier),
         pool_name_(pool_name),
-        state_(state_starting),
         thread_count_(0),
-        used_processing_units_()
+        used_processing_units_(),
+        do_background_work_(do_background_work)
     {
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
@@ -66,14 +66,36 @@ namespace hpx { namespace threads { namespace detail
     thread_pool<Scheduler>::~thread_pool()
     {
         if (!threads_.empty()) {
-            if (state_.load() == state_running)
+            if (!sched_.has_reached_state(state_suspended))
             {
+                // still running
                 lcos::local::no_mutex mtx;
                 boost::unique_lock<lcos::local::no_mutex> l(mtx);
                 stop_locked(l);
             }
             threads_.clear();
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Scheduler>
+    hpx::state thread_pool<Scheduler>::get_state() const
+    {
+        std::size_t num_thread = get_worker_thread_num();
+        HPX_ASSERT(num_thread != std::size_t(-1));
+        return get_state(num_thread);
+    }
+
+    template <typename Scheduler>
+    hpx::state thread_pool<Scheduler>::get_state(std::size_t num_thread) const
+    {
+        return sched_.get_state(num_thread).load();
+    }
+
+    template <typename Scheduler>
+    bool thread_pool<Scheduler>::has_reached_state(hpx::state s) const
+    {
+        return sched_.has_reached_state(s);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -121,7 +143,7 @@ namespace hpx { namespace threads { namespace detail
     void thread_pool<Scheduler>::report_error(std::size_t num,
         boost::exception_ptr const& e)
     {
-        state_.store(state_terminating);
+        sched_.set_all_states(state_terminating);
         notifier_.on_error(num, e);
         sched_.Scheduler::on_error(num, e);
     }
@@ -133,7 +155,7 @@ namespace hpx { namespace threads { namespace detail
         error_code& ec)
     {
         // verify state
-        if ((thread_count_ == 0 && state_.load() != state_running))
+        if (thread_count_ == 0 && !sched_.is_state(state_running))
         {
             // thread-manager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -150,7 +172,7 @@ namespace hpx { namespace threads { namespace detail
         thread_state_enum initial_state, error_code& ec)
     {
         // verify state
-        if ((thread_count_ == 0 && state_.load() != state_running))
+        if (thread_count_ == 0 && !sched_.is_state(state_running))
         {
             // thread-manager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -253,7 +275,7 @@ namespace hpx { namespace threads { namespace detail
             << " timestamp_scale: " << timestamp_scale_; //-V128
 #endif
 
-        if (!threads_.empty() || (state_.load() == state_running))
+        if (!threads_.empty() || sched_.has_reached_state(state_running))
             return true;    // do nothing if already running
 
         executed_threads_.resize(num_threads);
@@ -268,7 +290,7 @@ namespace hpx { namespace threads { namespace detail
             );
 
             // run threads and wait for initialization to complete
-            state_.store(state_running);
+            sched_.set_all_states(state_running);
 
             topology const& topology_ = get_topology();
 
@@ -365,7 +387,7 @@ namespace hpx { namespace threads { namespace detail
 
         if (!threads_.empty()) {
             // set state to stopping
-            state_.store(state_stopping);
+            sched_.set_all_states(state_stopping);
 
             // make sure we're not waiting
             sched_.Scheduler::do_some_work(std::size_t(-1));
@@ -499,17 +521,28 @@ namespace hpx { namespace threads { namespace detail
                         executed_thread_phases_[num_thread],
                         tfunc_times_[num_thread], exec_times_[num_thread]);
 
-                    detail::scheduling_loop(
-                        num_thread, sched_, state_, counters,
-                        util::bind(&policies::scheduler_base::idle_callback,
+                    detail::scheduling_callbacks callbacks(
+                        util::bind(
+                            &policies::scheduler_base::idle_callback,
                             &sched_, num_thread
-                        ));
+                        ),
+                        detail::scheduling_callbacks::callback_type());
+
+                    if (do_background_work_)
+                    {
+                        callbacks.background_ = util::bind(
+                            &policies::scheduler_base::background_callback,
+                            &sched_, num_thread);
+                    }
+
+                    detail::scheduling_loop(num_thread, sched_, counters,
+                        callbacks);
 
                     // the OS thread is allowed to exit only if no more HPX
                     // threads exist or if some other thread has terminated
                     HPX_ASSERT(!sched_.Scheduler::get_thread_count(
-                        unknown, thread_priority_default, num_thread) ||
-                        state_ == state_terminating);
+                            unknown, thread_priority_default, num_thread) ||
+                        sched_.get_state(num_thread) == state_terminating);
                 }
                 catch (hpx::exception const& e) {
                     LFATAL_ //-V128
