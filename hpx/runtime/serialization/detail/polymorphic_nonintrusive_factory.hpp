@@ -67,7 +67,12 @@ namespace hpx { namespace serialization { namespace detail
         static T *create(input_archive& ar)
         {
             T *t = new T;
-            load_polymorphic(t, ar, hpx::traits::is_nonintrusive_polymorphic<T>());
+	    try {
+		load_polymorphic(t, ar, hpx::traits::is_nonintrusive_polymorphic<T>());
+	    } catch (...) {
+		delete t;
+		throw;
+	    }
             return t;
         }
 
