@@ -61,11 +61,13 @@ namespace hpx { namespace serialization
         if(size == 0) return;
         v.clear();
 
-        v.resize(size);
+        v.reserve(size);
         // normal load ... no chance of doing bitwise here ...
         for(size_type i = 0; i != size; ++i)
         {
-            ar >> v[i];
+            bool b = false;
+            ar >> b;
+            v.push_back(b);
         }
     }
     template <typename T, typename Allocator>
@@ -117,7 +119,8 @@ namespace hpx { namespace serialization
         // normal save ... no chance of doing bitwise here ...
         for(size_type i = 0; i < v.size(); ++i)
         {
-            ar << v[i];
+            bool b = v[i];
+            ar << b;
         }
     }
 
