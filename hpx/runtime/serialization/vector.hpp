@@ -23,13 +23,11 @@ namespace hpx { namespace serialization
         ar >> size; //-V128
         if(size == 0) return;
 
-        vs.reserve(size);
+        vs.resize(size);
         typedef typename std::vector<T>::value_type value_type;
         for(size_type i = 0; i != size; ++i)
         {
-            value_type v;
-            ar >> v;
-            vs.push_back(std::move(v));
+            ar >> vs[i];
         }
     }
 
@@ -63,13 +61,11 @@ namespace hpx { namespace serialization
         if(size == 0) return;
         v.clear();
 
-        v.reserve(size);
+        v.resize(size);
         // normal load ... no chance of doing bitwise here ...
         for(size_type i = 0; i != size; ++i)
         {
-            bool b = false;
-            ar >> b;
-            v.push_back(b);
+            ar >> v[i];
         }
     }
     template <typename T, typename Allocator>
@@ -91,7 +87,7 @@ namespace hpx { namespace serialization
     {
         // normal save ...
         typedef typename std::vector<T>::value_type value_type;
-        for(value_type & v : vs)
+        for(const value_type & v : vs)
         {
             ar << v;
         }
@@ -121,8 +117,7 @@ namespace hpx { namespace serialization
         // normal save ... no chance of doing bitwise here ...
         for(size_type i = 0; i < v.size(); ++i)
         {
-            bool b = v[i];
-            ar << b;
+            ar << v[i];
         }
     }
 
