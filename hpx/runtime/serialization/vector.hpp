@@ -23,13 +23,11 @@ namespace hpx { namespace serialization
         ar >> size; //-V128
         if(size == 0) return;
 
-        vs.reserve(size);
+        vs.resize(size);
         typedef typename std::vector<T>::value_type value_type;
         for(size_type i = 0; i != size; ++i)
         {
-            value_type v;
-            ar >> v;
-            vs.push_back(std::move(v));
+            ar >> vs[i];
         }
     }
 
@@ -91,7 +89,7 @@ namespace hpx { namespace serialization
     {
         // normal save ...
         typedef typename std::vector<T>::value_type value_type;
-        for(value_type & v : vs)
+        for(const value_type & v : vs)
         {
             ar << v;
         }
