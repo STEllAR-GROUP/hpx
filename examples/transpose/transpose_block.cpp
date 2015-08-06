@@ -5,8 +5,6 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/lcos/local/detail/invoke_when_ready.hpp>
 
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_numeric.hpp>
@@ -172,8 +170,7 @@ typedef block_component::get_sub_block_action get_sub_block_action;
 HPX_REGISTER_ACTION(get_sub_block_action);
 
 void transpose(hpx::future<sub_block> A, hpx::future<sub_block> B,
-    hpx::future<boost::uint64_t> block_order,
-    hpx::future<boost::uint64_t> tile_size);
+    boost::uint64_t block_order, boost::uint64_t tile_size);
 double test_results(boost::uint64_t order, boost::uint64_t block_order,
     std::vector<block> & trans, boost::uint64_t blocks_start,
     boost::uint64_t blocks_end);
@@ -214,7 +211,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         boost::uint64_t blocks_end = (id + 1) * num_local_blocks;
 
         // Actually allocate the block components in AGAS
-        for(boost::uint64_t b = 0; b < num_blocks; ++b)
+        for(boost::uint64_t b = 0; b != num_blocks; ++b)
         {
             // Allocate block
             if(b >= blocks_start && b < blocks_end)
@@ -247,7 +244,6 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
         using hpx::parallel::for_each;
         using hpx::parallel::par;
-        using hpx::parallel::task;
 
         // Fill the original matrix, set transpose to known garbage value.
         auto range = boost::irange(blocks_start, blocks_end);
@@ -259,9 +255,9 @@ int hpx_main(boost::program_options::variables_map& vm)
                 boost::shared_ptr<block_component> B_ptr =
                     hpx::get_ptr<block_component>(B[b].get_id()).get();
 
-                for(boost::uint64_t i = 0; i < order; ++i)
+                for(boost::uint64_t i = 0; i != order; ++i)
                 {
-                    for(boost::uint64_t j = 0; j < block_order; ++j)
+                    for(boost::uint64_t j = 0; j != block_order; ++j)
                     {
                         double col_val = COL_SHIFT * (b*block_order + j);
                         A_ptr->data_[i * block_order + j] = col_val + ROW_SHIFT * i;
@@ -289,8 +285,10 @@ int hpx_main(boost::program_options::variables_map& vm)
                 [&](boost::uint64_t b)
                 {
                     std::vector<hpx::future<void> > phase_futures;
-                    //phase_futures.resize(num_local_blocks);
-                    auto phase_range = boost::irange(static_cast<boost::uint64_t>(0), num_blocks);
+                    phase_futures.reserve(num_blocks);
+
+                    auto phase_range = boost::irange(
+                        static_cast<boost::uint64_t>(0), num_blocks);
                     for(boost::uint64_t phase: phase_range)
                     {
                         const boost::uint64_t block_size = block_order * block_order;
@@ -298,13 +296,14 @@ int hpx_main(boost::program_options::variables_map& vm)
                         const boost::uint64_t from_phase = b;
                         const boost::uint64_t A_offset = from_phase * block_size;
                         const boost::uint64_t B_offset = phase * block_size;
+
                         phase_futures.push_back(
                             hpx::lcos::local::dataflow(
                                 &transpose
                               , A[from_block].get_sub_block(A_offset, block_size)
                               , B[b].get_sub_block(B_offset, block_size)
-                              , hpx::make_ready_future(block_order)
-                              , hpx::make_ready_future(tile_size)
+                              , block_order
+                              , tile_size
                             )
                         );
                     }
@@ -389,22 +388,23 @@ int main(int argc, char* argv[])
 }
 
 void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
-    hpx::future<boost::uint64_t> block_order_fut,
-    hpx::future<boost::uint64_t> tile_size_fut)
+    boost::uint64_t block_order, boost::uint64_t tile_size)
 {
     const sub_block A(Af.get());
     sub_block B(Bf.get());
-    boost::uint64_t block_order(block_order_fut.get());
-    boost::uint64_t tile_size(tile_size_fut.get());
+
     if(tile_size < block_order)
     {
-        for(boost::uint64_t i = 0; i < block_order; i += tile_size)
+        for(boost::uint64_t i = 0; i != block_order; i += tile_size)
         {
-            for(boost::uint64_t j = 0; j < block_order; j += tile_size)
+            for(boost::uint64_t j = 0; j != block_order; j += tile_size)
             {
-                for(boost::uint64_t it = i; it < (std::min)(block_order, i + tile_size); ++it)
+                boost::uint64_t max_i = (std::min)(block_order, i + tile_size);
+                boost::uint64_t max_j = (std::min)(block_order, j + tile_size);
+
+                for(boost::uint64_t it = i; it != max_i; ++it)
                 {
-                    for(boost::uint64_t jt = j; jt < (std::min)(block_order, j + tile_size); ++jt)
+                    for(boost::uint64_t jt = j; jt != max_j; ++jt)
                     {
                         B[it + block_order * jt] = A[jt + block_order * it];
                     }
@@ -414,9 +414,9 @@ void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
     }
     else
     {
-        for(boost::uint64_t i = 0; i < block_order; ++i)
+        for(boost::uint64_t i = 0; i != block_order; ++i)
         {
-            for(boost::uint64_t j = 0; j < block_order; ++j)
+            for(boost::uint64_t j = 0; j != block_order; ++j)
             {
                 B[i + block_order * j] = A[j + block_order * i];
             }
@@ -428,7 +428,7 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
     std::vector<block> & trans, boost::uint64_t blocks_start,
     boost::uint64_t blocks_end)
 {
-    using hpx::parallel::for_each;
+    using hpx::parallel::transform_reduce;
     using hpx::parallel::par;
 
     // Fill the original matrix, set transpose to known garbage value.
@@ -437,7 +437,8 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
         transform_reduce(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t b) -> double
             {
-                sub_block trans_block = trans[b].get_sub_block(0, order * block_order).get();
+                sub_block trans_block =
+                    trans[b].get_sub_block(0, order * block_order).get();
                 double errsq = 0.0;
                 for(boost::uint64_t i = 0; i < order; ++i)
                 {
@@ -445,7 +446,7 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
                     for(boost::uint64_t j = 0; j < block_order; ++j)
                     {
                         double diff = trans_block[i * block_order + j] -
-                          (col_val + ROW_SHIFT * (b * block_order + j));
+                            (col_val + ROW_SHIFT * (b * block_order + j));
                         errsq += diff * diff;
                     }
                 }

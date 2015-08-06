@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
@@ -165,10 +166,6 @@ namespace hpx { namespace threads { namespace detail
         // Stores the mask identifying all processing units used by this
         // thread manager.
         threads::mask_type used_processing_units_;
-
-        // the TSS holds the number associated with a given OS thread
-        struct tls_tag {};
-        static hpx::util::thread_specific_ptr<std::size_t, tls_tag> thread_num_;
     };
 }}}
 

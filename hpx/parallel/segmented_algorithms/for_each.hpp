@@ -186,6 +186,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return result::get(
                 lcos::local::dataflow(
                     [=](std::vector<hpx::future<local_iterator_type> > && r)
+                        ->  SegIter
                     {
                         // handle any remote exceptions, will throw on error
                         std::list<boost::exception_ptr> errors;

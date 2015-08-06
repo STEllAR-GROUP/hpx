@@ -153,27 +153,27 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Executor, typename T>
+    template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-            sequential_task_execution_policy_shim<Executor>, T>
+            sequential_task_execution_policy_shim<Executor, Parameters>, T>
       : algorithm_result_impl<sequential_task_execution_policy, T>
     {};
 
-    template <typename Executor>
+    template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-            sequential_task_execution_policy_shim<Executor>, void>
+            sequential_task_execution_policy_shim<Executor, Parameters>, void>
       : algorithm_result_impl<sequential_task_execution_policy, void>
     {};
 
-    template <typename Executor, typename T>
+    template <typename Executor, typename Parameters, typename T>
     struct algorithm_result_impl<
-            parallel_task_execution_policy_shim<Executor>, T>
+            parallel_task_execution_policy_shim<Executor, Parameters>, T>
       : algorithm_result_impl<parallel_task_execution_policy, T>
     {};
 
-    template <typename Executor>
+    template <typename Executor, typename Parameters>
     struct algorithm_result_impl<
-            parallel_task_execution_policy_shim<Executor>, void>
+            parallel_task_execution_policy_shim<Executor, Parameters>, void>
       : algorithm_result_impl<parallel_task_execution_policy, void>
     {};
 

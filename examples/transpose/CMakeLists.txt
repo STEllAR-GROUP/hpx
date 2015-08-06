@@ -13,6 +13,12 @@ set(example_programs
   transpose_serial_vector
 )
 
+if(HPX_WITH_AWAIT)
+  set(example_programs
+    ${example_programs}
+    transpose_await)
+endif()
+
 foreach(example_program ${example_programs})
 
   set(sources ${example_program}.cpp)

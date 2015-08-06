@@ -6,25 +6,18 @@
 #if !defined(HPX_PARALLEL_EXCEPTION_LIST_JUN_25_2014_1055PM)
 #define HPX_PARALLEL_EXCEPTION_LIST_JUN_25_2014_1055PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/future.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
+#include <hpx/parallel/execution_policy_fwd.hpp>
+
+#include <boost/throw_exception.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // forward declarations, see execution_policy.hpp
-    struct sequential_task_execution_policy;
-    template <typename Executor> struct sequential_task_execution_policy_shim;
-
-    struct parallel_task_execution_policy;
-    template <typename Executor> struct parallel_task_execution_policy_shim;
-
-    struct parallel_vector_execution_policy;
-
     namespace detail
     {
         /// \cond NOINTERNAL
@@ -76,9 +69,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        template <typename Executor, typename Result>
+        template <typename Executor, typename Parameters, typename Result>
         struct handle_exception<
-                sequential_task_execution_policy_shim<Executor>, Result>
+                sequential_task_execution_policy_shim<
+                    Executor, Parameters>, Result>
           : handle_exception<sequential_task_execution_policy, Result>
         {};
 
@@ -110,9 +104,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
         };
 
-        template <typename Executor, typename Result>
+        template <typename Executor, typename Parameters, typename Result>
         struct handle_exception<
-                parallel_task_execution_policy_shim<Executor>, Result>
+                parallel_task_execution_policy_shim<
+                    Executor, Parameters>, Result>
           : handle_exception<parallel_task_execution_policy, Result>
         {};
 

@@ -33,24 +33,15 @@ namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    hpx::util::thread_specific_ptr<
-            std::size_t, typename thread_pool<Scheduler>::tls_tag
-        > thread_pool<Scheduler>::thread_num_;
-
-    template <typename Scheduler>
     void thread_pool<Scheduler>::init_tss(std::size_t num)
     {
-        // shouldn't be initialized yet
-        HPX_ASSERT(NULL == thread_pool::thread_num_.get());
-
-        thread_pool::thread_num_.reset(new std::size_t);
-        *thread_pool::thread_num_.get() = num;
+        thread_num_tss_.init_tss(num);
     }
 
     template <typename Scheduler>
     void thread_pool<Scheduler>::deinit_tss()
     {
-        thread_pool::thread_num_.reset();
+        thread_num_tss_.deinit_tss();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -198,11 +189,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     std::size_t thread_pool<Scheduler>::get_worker_thread_num() const
     {
-        if (NULL != thread_pool::thread_num_.get())
-            return *thread_pool::thread_num_;
-
-        // some OS threads are not managed by the thread-manager
-        return std::size_t(-1);
+        return thread_num_tss_.get_worker_thread_num();
     }
 
     template <typename Scheduler>
@@ -507,10 +494,13 @@ namespace hpx { namespace threads { namespace detail
                     hpx::util::coroutines::prepare_main_thread main_thread;
 
                     // run main Scheduler loop until terminated
-                    detail::scheduling_loop(num_thread, sched_, state_,
+                    detail::scheduling_counters counters(
                         executed_threads_[num_thread],
                         executed_thread_phases_[num_thread],
-                        tfunc_times_[num_thread], exec_times_[num_thread],
+                        tfunc_times_[num_thread], exec_times_[num_thread]);
+
+                    detail::scheduling_loop(
+                        num_thread, sched_, state_, counters,
                         util::bind(&policies::scheduler_base::idle_callback,
                             &sched_, num_thread
                         ));
@@ -909,6 +899,12 @@ namespace hpx { namespace threads { namespace detail
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<
     hpx::threads::policies::local_queue_scheduler<> >;
+#endif
+
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+#include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::threads::detail::thread_pool<
+    hpx::threads::policies::static_queue_scheduler<> >;
 #endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)

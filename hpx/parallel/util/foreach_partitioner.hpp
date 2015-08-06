@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimates a chunk size based on number of cores used
-                    shape = get_static_shape(policy, inititems, f1,
+                    shape = get_bulk_iteration_shape(policy, inititems, f1,
                         first, count, chunk_size);
 
                     workitems.reserve(shape.size());
@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { namespace util
 
                 try {
                     // estimates a chunk size based on number of cores used
-                    shape = get_static_shape(policy, inititems, f1,
+                    shape = get_bulk_iteration_shape(policy, inititems, f1,
                         first, count, chunk_size);
 
                     workitems.reserve(shape.size());
@@ -144,9 +144,10 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-        template <typename Executor, typename Result>
+        template <typename Executor, typename Parameters, typename Result>
         struct foreach_n_static_partitioner<
-                parallel_task_execution_policy_shim<Executor>, Result>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                Result>
           : foreach_n_static_partitioner<parallel_task_execution_policy, Result>
         {};
 
@@ -185,26 +186,26 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-        template <typename Executor, typename Result>
+        template <typename Executor, typename Parameters, typename Result>
         struct foreach_n_partitioner<
-                parallel_task_execution_policy_shim<Executor>, Result,
-                parallel::traits::static_partitioner_tag>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                Result, parallel::traits::static_partitioner_tag>
           : foreach_n_partitioner<parallel_task_execution_policy, Result,
                 parallel::traits::static_partitioner_tag>
         {};
 
-        template <typename Executor, typename Result>
+        template <typename Executor, typename Parameters, typename Result>
         struct foreach_n_partitioner<
-                parallel_task_execution_policy_shim<Executor>, Result,
-                parallel::traits::auto_partitioner_tag>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                Result, parallel::traits::auto_partitioner_tag>
           : foreach_n_partitioner<parallel_task_execution_policy, Result,
                 parallel::traits::auto_partitioner_tag>
         {};
 
-        template <typename Executor, typename Result>
+        template <typename Executor, typename Parameters, typename Result>
         struct foreach_n_partitioner<
-                parallel_task_execution_policy_shim<Executor>, Result,
-                parallel::traits::default_partitioner_tag>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                Result, parallel::traits::default_partitioner_tag>
           : foreach_n_partitioner<parallel_task_execution_policy, Result,
                 parallel::traits::static_partitioner_tag>
         {};

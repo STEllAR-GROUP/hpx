@@ -86,9 +86,10 @@ int hpx_main(boost::program_options::variables_map& vm)
                     for(boost::uint64_t j = 0; j < order; j += tile_size)
                     {
                         boost::uint64_t i_max = (std::min)(order, i + tile_size);
+                        boost::uint64_t j_max = (std::min)(order, j + tile_size);
+
                         for(boost::uint64_t it = i; it < i_max; ++it)
                         {
-                            boost::uint64_t j_max = (std::min)(order, j + tile_size);
                             for(boost::uint64_t jt = j; jt < j_max; ++jt)
                             {
                                 B[it + order * jt] = A[jt + order * it];
@@ -189,7 +190,8 @@ double test_results(boost::uint64_t order, std::vector<double> const & trans)
                 double errsq = 0.0;
                 for(boost::uint64_t j = 0; j < order; ++j)
                 {
-                    double diff = trans[i * order + j] - (COL_SHIFT*i + ROW_SHIFT * j);
+                    double diff = trans[i * order + j] -
+                        (COL_SHIFT*i + ROW_SHIFT * j);
                     errsq += diff * diff;
                 }
                 return errsq;

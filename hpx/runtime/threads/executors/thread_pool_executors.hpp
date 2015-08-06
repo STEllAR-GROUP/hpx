@@ -21,8 +21,8 @@ namespace hpx { namespace threads { namespace executors
     namespace detail
     {
         //////////////////////////////////////////////////////////////////////
-        template <typename Scheduler>
-        class manage_thread_pool_executor;
+        template <typename ExecutorImpl>
+        class manage_thread_executor;
 
         //////////////////////////////////////////////////////////////////////
         template <typename Scheduler>
@@ -61,7 +61,7 @@ namespace hpx { namespace threads { namespace executors
             boost::uint64_t num_pending_closures(error_code& ec) const;
 
         protected:
-            friend class manage_thread_pool_executor<Scheduler>;
+            friend class manage_thread_executor<thread_pool_executor>;
 
             // Return the requested policy element
             std::size_t get_policy_element(threads::detail::executor_parameter p,
@@ -124,6 +124,16 @@ namespace hpx { namespace threads { namespace executors
         local_queue_executor();
 
         explicit local_queue_executor(std::size_t max_punits,
+            std::size_t min_punits = 1);
+    };
+#endif
+
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+    struct HPX_EXPORT static_queue_executor : public scheduled_executor
+    {
+        static_queue_executor();
+
+        explicit static_queue_executor(std::size_t max_punits,
             std::size_t min_punits = 1);
     };
 #endif

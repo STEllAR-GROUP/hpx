@@ -135,6 +135,14 @@ described in the table below:
     [[`--hpx:list-counter-infos`][list the description of all registered performance counters,
                                    possible values: 'minimal' (prints info for counter name skeletons),
                                   'full' (prints all available counter infos)]]
+    [[`--hpx:print-counter-format`][print the performance counter(s) specified with `--hpx:print-counter`,
+                                 possible formats in csv format with  header or
+                                 without any header (see option `--hpx:no-csv-header`)
+                                 values: 'csv' (prints counter values in CSV format with full names as header)
+                                 'csv-short' (prints counter values in CSV format with shortnames provided with `--hpx:print-counter`
+                                 as `--hpx:print-counter shortname,full-countername`)]]
+    [[`--hpx:no-csv-header`][print the performance counter(s) specified with `--hpx:print-counter` and
+                                `csv` or `csv-short` format specified with `--hpx:print-counter-format` without header]]
 ]
 
 [heading Command Line Argument Shortcuts]

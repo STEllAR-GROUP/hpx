@@ -214,7 +214,7 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE
             void do_await(TupleIter&&, boost::mpl::true_)
             {
-                this->set_result(when_all_result<Tuple>::call(std::move(t_)));
+                this->set_value(when_all_result<Tuple>::call(std::move(t_)));
             }
 
             // Current element is a range (vector) of futures
