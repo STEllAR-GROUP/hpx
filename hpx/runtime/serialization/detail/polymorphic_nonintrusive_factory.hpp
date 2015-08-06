@@ -66,11 +66,18 @@ namespace hpx { namespace serialization { namespace detail
     public:
         static T *create(input_archive& ar)
         {
-            return new T;
+            T *t = new T;
+            load_polymorphic(t, ar, hpx::traits::is_nonintrusive_polymorphic<T>());
+            return t;
         }
 
-        template<typename Pointer>
-        static void load(input_archive& ar, Pointer& t)
+    private:
+        static void load_polymorphic(T *t, input_archive& ar, boost::mpl::true_)
+        {
+            serialize(ar, *t, 0);
+        }
+
+        static void load_polymorphic(T *t, input_archive& ar, boost::mpl::false_)
         {
             ar >> *t;
         }
@@ -266,10 +273,6 @@ namespace hpx { namespace serialization { namespace detail
         {                                                                     \
             return Func(ar);                                                  \
         }                                                                     \
-                                                                              \
-        template<typename Pointer>                                            \
-        static void load(input_archive& ar, Pointer& t)                       \
-        {}                                                                    \
     };                                                                        \
     }}}                                                                       \
 /**/
@@ -284,10 +287,6 @@ namespace hpx { namespace serialization { namespace detail
         {                                                                     \
             return Func(ar, static_cast<HPX_UTIL_STRIP(Template)*>(0));       \
         }                                                                     \
-                                                                              \
-        template<typename Pointer>                                            \
-        static void load(input_archive& ar, Pointer& t)                       \
-        {}                                                                    \
     };                                                                        \
     }}}                                                                       \
 /**/
