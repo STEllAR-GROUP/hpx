@@ -11,42 +11,48 @@ set(all_headers)
 # for each of the found headers, generate a test executable
 foreach(header ${headers})
 
-  # extract relative path of header
-  string(REGEX REPLACE "${PROJECT_SOURCE_DIR}/hpx/" "" relpath "${header}")
+  # skip all headers in directories containing 'detail'
+  set(detail_pos -1)
+  string(FIND "${header}" "detail" detail_pos)
 
-  # .hpp --> .cpp
-  string(REGEX REPLACE ".hpp" ".cpp" full_test_file "${relpath}")
+  if(${detail_pos} EQUAL -1)
+    # extract relative path of header
+    string(REGEX REPLACE "${PROJECT_SOURCE_DIR}/hpx/" "" relpath "${header}")
 
-  # remove extension, '/' --> '_'
-  string(REGEX REPLACE ".hpp" "_hpp" test_file "${relpath}")
-  string(REGEX REPLACE "/" "_" test_name "${test_file}")
+    # .hpp --> .cpp
+    string(REGEX REPLACE ".hpp" ".cpp" full_test_file "${relpath}")
 
-  # generate the test
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}
-    "#include <hpx/${relpath}>\n"
-    "int main() { return 0; }\n")
+    # remove extension, '/' --> '_'
+    string(REGEX REPLACE ".hpp" "_hpp" test_file "${relpath}")
+    string(REGEX REPLACE "/" "_" test_name "${test_file}")
 
-  set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
+    # generate the test
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}
+      "#include <hpx/${relpath}>\n"
+      "int main() { return 0; }\n")
 
-  get_filename_component(header_dir "${relpath}" DIRECTORY)
+    set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
 
-  # add compile only test
-  add_hpx_unit_compile_test(
-    "headers"
-    ${test_name}
-    SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
-    SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
-    FOLDER "Tests/Headers/${header_dir}")
+    get_filename_component(header_dir "${relpath}" DIRECTORY)
 
-  # add a custom target for this example
-  add_hpx_pseudo_target(tests.headers.${test_name})
+    # add compile only test
+    add_hpx_unit_compile_test(
+      "headers"
+      ${test_name}
+      SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
+      SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
+      FOLDER "Tests/Headers/${header_dir}")
 
-  # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
+    # add a custom target for this example
+    add_hpx_pseudo_target(tests.headers.${test_name})
 
-  # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.headers.${test_name}
-                              "tests.unit.headers.${test_name}")
+    # make pseudo-targets depend on master pseudo-target
+    add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
+
+    # add dependencies to pseudo-target
+    add_hpx_pseudo_dependencies(tests.headers.${test_name}
+                                "tests.unit.headers.${test_name}")
+  endif()
 
 endforeach()
 
