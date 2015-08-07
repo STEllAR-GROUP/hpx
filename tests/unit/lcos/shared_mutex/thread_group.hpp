@@ -15,7 +15,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/util/move.hpp>
 
-#include <boost/thread/lock_guard.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <list>
 #include <algorithm>
