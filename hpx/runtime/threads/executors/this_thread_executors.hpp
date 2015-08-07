@@ -10,7 +10,6 @@
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 
-#include <hpx/state.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>

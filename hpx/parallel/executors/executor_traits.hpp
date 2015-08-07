@@ -13,13 +13,11 @@
 #include <hpx/exception.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <type_traits>
@@ -207,9 +205,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
                 for (auto const& elem: shape)
                 {
-                    results.push_back(
-                        exec.async_execute(hpx::util::deferred_call(f, elem))
-                    );
+                    results.push_back(exec.async_execute(
+                        hpx::util::deferred_call(std::forward<F>(f), elem)
+                    ));
                 }
 
                 return results;
@@ -267,9 +265,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
                 for (auto const& elem: shape)
                 {
-                    results.push_back(
-                        exec.async_execute(hpx::util::deferred_call(f, elem))
-                    );
+                    results.push_back(exec.async_execute(
+                        hpx::util::deferred_call(std::forward<F>(f), elem)
+                    ));
                 }
 
                 return hpx::util::unwrapped(results);
