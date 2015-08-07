@@ -724,6 +724,56 @@ namespace hpx { namespace threads { namespace detail
         return boost::uint64_t(((tfunc_total - exec_total) *
                         timestamp_scale_) / num_threads);
     }
+
+    template <typename Scheduler>
+    boost::int64_t thread_pool<Scheduler>::
+        get_cumulative_thread_duration(std::size_t num, bool reset)
+    {
+        if (num != std::size_t(-1)) {
+            double exec_total = static_cast<double>(exec_times_[num]);
+
+            if (reset) {
+                tfunc_times_[num] = boost::uint64_t(-1);
+            }
+            return boost::uint64_t(exec_total * timestamp_scale_);
+        }
+
+        double exec_total = std::accumulate(exec_times_.begin(),
+            exec_times_.end(), 0.);
+
+        if (reset) {
+            std::fill(tfunc_times_.begin(), tfunc_times_.end(),
+                boost::uint64_t(-1));
+        }
+        return boost::uint64_t(exec_total * timestamp_scale_);
+    }
+
+    template <typename Scheduler>
+    boost::int64_t thread_pool<Scheduler>::
+        get_cumulative_thread_overhead(std::size_t num, bool reset)
+    {
+        if (num != std::size_t(-1)) {
+            double exec_total = static_cast<double>(exec_times_[num]);
+            double tfunc_total = static_cast<double>(tfunc_times_[num]);
+
+            if (reset) {
+                tfunc_times_[num] = boost::uint64_t(-1);
+            }
+            return boost::uint64_t((tfunc_total - exec_total) * timestamp_scale_);
+        }
+
+        double exec_total = std::accumulate(exec_times_.begin(),
+            exec_times_.end(), 0.);
+        double tfunc_total = std::accumulate(tfunc_times_.begin(),
+            tfunc_times_.end(), 0.);
+
+        if (reset) {
+            std::fill(executed_threads_.begin(), executed_threads_.end(), 0LL);
+            std::fill(tfunc_times_.begin(), tfunc_times_.end(),
+                boost::uint64_t(-1));
+        }
+        return boost::uint64_t((tfunc_total - exec_total) * timestamp_scale_);
+    }
 #endif
 #endif
 
