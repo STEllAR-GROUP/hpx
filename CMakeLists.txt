@@ -904,8 +904,14 @@ if(MSVC)
     hpx_add_compile_flag(-Zo
       CONFIGURATIONS RelWithDebInfo)
   endif()
+
   # Exceptions
   hpx_add_compile_flag(-EHsc)
+  if(MSVC14)
+    # assume conforming (throwing) operator new implementations
+    hpx_add_compile_flag(-Zc:throwingNew)
+  endif()
+
   # Runtime type information
   hpx_add_compile_flag(-GR)
   # Multiprocessor build
