@@ -415,7 +415,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().set_backtrace(id, bt);
     }
 
-    threads::executors::generic_thread_pool_executor
+    threads::executors::current_executor
         get_executor(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -424,7 +424,7 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::get_executor",
                 "global applier object is not accessible");
-            return threads::executors::generic_thread_pool_executor(0);
+            return threads::executors::current_executor(0);
         }
 
         return app->get_thread_manager().get_executor(id, ec);
@@ -598,7 +598,7 @@ namespace hpx { namespace this_thread
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threads::executors::generic_thread_pool_executor
+    threads::executors::current_executor
         get_executor(error_code& ec)
     {
         return threads::get_executor(threads::get_self_id(), ec);

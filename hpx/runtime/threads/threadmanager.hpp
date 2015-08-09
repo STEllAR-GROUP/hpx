@@ -17,7 +17,7 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -472,7 +472,7 @@ namespace hpx { namespace threads
         virtual mask_cref_type get_used_processing_units() const = 0;
 
         // Return the executor associated with th egiven thread
-        virtual executors::generic_thread_pool_executor
+        virtual executors::current_executor
             get_executor(thread_id_type const& id, error_code& ec) const = 0;
 
         ///////////////////////////////////////////////////////////////////////

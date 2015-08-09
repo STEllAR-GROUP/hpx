@@ -14,7 +14,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -538,20 +538,20 @@ namespace hpx { namespace threads
 
     // Return the executor associated with the given thread
     template <typename SchedulingPolicy>
-    executors::generic_thread_pool_executor threadmanager_impl<SchedulingPolicy>::
+    executors::current_executor threadmanager_impl<SchedulingPolicy>::
         get_executor(thread_id_type const& thrd, error_code& ec) const
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::get_executor",
                 "NULL thread id encountered");
-            return executors::generic_thread_pool_executor(0);
+            return executors::current_executor(0);
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return executors::generic_thread_pool_executor(thrd->get_scheduler_base());
+        return executors::current_executor(thrd->get_scheduler_base());
     }
 
     ///////////////////////////////////////////////////////////////////////////

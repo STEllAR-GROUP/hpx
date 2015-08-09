@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/scheduler_specific_ptr.hpp>
+#include <hpx/runtime/threads/executors.hpp>
 
 #endif
 

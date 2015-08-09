@@ -23,7 +23,7 @@ namespace hpx { namespace threads
 
     namespace executors
     {
-        struct HPX_EXPORT generic_thread_pool_executor;
+        struct HPX_EXPORT current_executor;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -419,7 +419,7 @@ namespace hpx { namespace threads
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT threads::executors::generic_thread_pool_executor
+    HPX_API_EXPORT threads::executors::current_executor
         get_executor(thread_id_type const& id, error_code& ec = throws);
 }}
 
@@ -531,7 +531,7 @@ namespace hpx { namespace this_thread
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_EXPORT threads::executors::generic_thread_pool_executor
+    HPX_EXPORT threads::executors::current_executor
         get_executor(error_code& ec = throws);
 }}
 

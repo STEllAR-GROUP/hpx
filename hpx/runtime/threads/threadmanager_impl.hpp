@@ -556,7 +556,7 @@ namespace hpx { namespace threads
         }
 
         // Return the executor associated with the given thread
-        executors::generic_thread_pool_executor
+        executors::current_executor
             get_executor(thread_id_type const& id, error_code& ec) const;
 
     private:

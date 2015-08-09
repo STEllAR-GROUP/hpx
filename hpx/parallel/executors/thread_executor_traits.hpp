@@ -215,7 +215,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         static bool has_pending_closures(executor_type& sched)
         {
-            return sched.num_pending_closures();
+            return sched.num_pending_closures() != 0;
         }
     };
 }}}
