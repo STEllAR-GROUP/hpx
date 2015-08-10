@@ -638,14 +638,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         }
 #endif
 
-        void handle_tag_recv_completion(uint64_t wr_id, const RdmaClient *client)
+        void handle_tag_recv_completion(uint64_t wr_id, uint32_t tag, const RdmaClient *client)
         {
 #ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
             RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
-            uint32_t tag = *((uint32_t*) (region->getAddress()));
+            tag = *((uint32_t*) (region->getAddress()));
             LOG_DEBUG_MSG("Received 4 byte ack message with tag " << hexuint32(tag));
 #else
-            uint32_t tag = completion.imm_data;
             RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
             LOG_DEBUG_MSG("Received 0 byte ack message with tag " << hexuint32(tag));
 #endif
@@ -787,7 +786,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             //
 
             else if (completion.opcode==IBV_WC_RECV && completion.byte_len<=4) {
-                handle_tag_recv_completion(wr_id, client);
+                handle_tag_recv_completion(wr_id, completion.imm_data, client);
                 return 0;
             }
             //
