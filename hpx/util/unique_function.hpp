@@ -76,11 +76,11 @@
 #define HPX_UTIL_REGISTER_UNIQUE_FUNCTION(Sig, Functor, Name)                 \
     HPX_CONTINUATION_REGISTER_UNIQUE_FUNCTION_FACTORY(                        \
         BOOST_PP_CAT(BOOST_PP_CAT(hpx::util::detail::__,                      \
-            BOOST_PP_CAT(hpx_function_serialization_, Name)), _type)          \
+            BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type)   \
       , Name)                                                                 \
     HPX_DEFINE_GET_UNIQUE_FUNCTION_NAME(                                      \
         BOOST_PP_CAT(BOOST_PP_CAT(hpx::util::detail::__,                      \
-            BOOST_PP_CAT(hpx_function_serialization_, Name)), _type)          \
+            BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type)   \
       , Name)                                                                 \
 /**/
 

@@ -54,8 +54,8 @@ namespace hpx { namespace parcelset
         void init_parcel(parcel& p)
         {
             // ensure the source locality id is set (if no component id is given)
-            if (!p.get_source())
-                p.set_source(naming::id_type(get_locality(), naming::id_type::unmanaged));
+            if (!p.source_id())
+                p.set_source_id(naming::id_type(get_locality(), naming::id_type::unmanaged));
 
             // set the current local time for this locality
             p.set_start_time(get_current_time());

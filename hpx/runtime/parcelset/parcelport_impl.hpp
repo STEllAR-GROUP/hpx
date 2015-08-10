@@ -204,8 +204,8 @@ namespace hpx { namespace parcelset
             for (std::size_t i = 1; i != dests.size(); ++i)
             {
                 HPX_ASSERT(locality_id == dests[i]);
-                HPX_ASSERT(parcels[0].get_destination_locality() ==
-                    parcels[i].get_destination_locality());
+                HPX_ASSERT(parcels[0].destination_locality() ==
+                    parcels[i].destination_locality());
             }
 #endif
 

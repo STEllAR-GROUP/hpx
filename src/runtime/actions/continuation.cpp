@@ -119,7 +119,7 @@ namespace hpx
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
-    void continuation::trigger() const
+    void continuation::trigger()
     {
         if (!gid_) {
             HPX_THROW_EXCEPTION(invalid_status,

@@ -26,6 +26,8 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/cat.hpp>
 
+#include <memory>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 /// \cond NOINTERNAL
@@ -209,7 +211,7 @@ namespace hpx { namespace actions
         ///       thread function for an action which has to be invoked with
         ///       continuations.
         virtual threads::thread_function_type
-            get_thread_function(continuation_type& cont,
+            get_thread_function(std::unique_ptr<continuation> cont,
                 naming::address::address_type lva) = 0;
 
         /// return the id of the locality of the parent thread
@@ -235,7 +237,7 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             threads::thread_state_enum initial_state) = 0;
 
-        virtual void schedule_thread(continuation_type& cont,
+        virtual void schedule_thread(std::unique_ptr<continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_state_enum initial_state) = 0;
 

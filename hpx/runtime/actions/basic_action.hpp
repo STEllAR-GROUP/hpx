@@ -59,9 +59,10 @@ namespace hpx { namespace actions
 
         public:
             template <typename F_, typename ...Ts_>
-            explicit continuation_thread_function(continuation_type cont,
+            explicit continuation_thread_function(std::unique_ptr<continuation> cont,
                 naming::address::address_type lva, F_&& f, Ts_&&... vs)
-              : cont_(std::move(cont)), lva_(lva)
+              : cont_(std::move(cont))
+              , lva_(lva)
               , f_(util::deferred_call(
                     std::forward<F_>(f), std::forward<Ts_>(vs)...))
             {}
@@ -83,7 +84,7 @@ namespace hpx { namespace actions
             }
 
         private:
-            continuation_type cont_;
+            std::unique_ptr<continuation> cont_;
             naming::address::address_type lva_;
             util::detail::deferred_call_impl<
                 typename util::decay<F>::type
@@ -245,7 +246,7 @@ namespace hpx { namespace actions
         // case a continuation has been supplied
         template <typename ...Ts>
         static threads::thread_function_type
-        construct_thread_function(continuation_type& cont,
+        construct_thread_function(std::unique_ptr<continuation> cont,
             naming::address::address_type lva, Ts&&... vs)
         {
             typedef detail::continuation_thread_function<

@@ -21,11 +21,12 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_executor.hpp>
 
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -104,7 +105,6 @@ namespace hpx
 namespace hpx { namespace actions
 {
     class HPX_API_EXPORT continuation;
-    typedef boost::shared_ptr<continuation> continuation_type;
 
     namespace detail
     {
@@ -132,9 +132,10 @@ namespace hpx { namespace actions
     // Parcel continuations are polymorphic objects encapsulating the
     // id_type of the destination where the result has to be sent.
     class HPX_API_EXPORT continuation
-      : public boost::enable_shared_from_this<continuation>
     {
     public:
+        typedef void continuation_tag;
+
         continuation() {}
 
         explicit continuation(naming::id_type const& gid)
@@ -154,10 +155,10 @@ namespace hpx { namespace actions
         virtual ~continuation() {}
 
         //
-        virtual void trigger() const;
+        virtual void trigger();
 
         template <typename Arg0>
-        inline void trigger(Arg0 && arg0) const;
+        inline void trigger(Arg0 && arg0);
 
         //
         virtual void trigger_error(boost::exception_ptr const& e) const;
@@ -367,7 +368,7 @@ namespace hpx { namespace actions
     struct typed_continuation : continuation
     {
     private:
-        typedef util::function<void(naming::id_type, Result)> function_type;
+        typedef util::unique_function<void(naming::id_type, Result)> function_type;
 
     public:
         typed_continuation()
@@ -391,12 +392,18 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        template <typename F>
+        template <typename F,
+            typename Enable
+                = typename std::enable_if<
+                    !std::is_same<
+                        typename util::decay<F>::type, typed_continuation>::value
+                    >::type
+        >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
 
-        virtual void trigger_value(Result && result) const
+        virtual void trigger_value(Result && result)
         {
             LLCO_(info)
                 << "typed_continuation<Result>::trigger_value("
@@ -466,7 +473,7 @@ namespace hpx { namespace actions
     struct typed_continuation<void> : continuation
     {
     private:
-        typedef util::function<void(naming::id_type)> function_type;
+        typedef util::unique_function<void(naming::id_type)> function_type;
 
     public:
         typed_continuation()
@@ -495,7 +502,7 @@ namespace hpx { namespace actions
           : f_(std::forward<F>(f))
         {}
 
-        void trigger() const
+        void trigger()
         {
             LLCO_(info)
                 << "typed_continuation<void>::trigger("
@@ -515,7 +522,7 @@ namespace hpx { namespace actions
             }
         }
 
-        virtual void trigger_value(util::unused_type &&) const
+        virtual void trigger_value(util::unused_type &&)
         {
             this->trigger();
         }
@@ -564,11 +571,11 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
-    void continuation::trigger(Arg0 && arg0) const
+    void continuation::trigger(Arg0 && arg0)
     {
         // The static_cast is safe as we know that Arg0 is the result type
         // of the executed action (see apply.hpp).
-        static_cast<typed_continuation<Arg0> const*>(this)->trigger_value(
+        static_cast<typed_continuation<Arg0> *>(this)->trigger_value(
             std::forward<Arg0>(arg0));
     }
 }}
@@ -639,6 +646,13 @@ namespace hpx
             std::forward<Cont>(cont), target, std::forward<F>(f));
     }
 }
+
+namespace hpx { namespace traits {
+    template <>
+    struct is_continuation<std::unique_ptr<actions::continuation> >
+      : boost::mpl::true_
+    {};
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 

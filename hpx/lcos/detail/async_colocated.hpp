@@ -19,6 +19,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
+#include <hpx/util/unique_function.hpp>
 
 namespace hpx { namespace detail
 {
@@ -44,7 +45,7 @@ namespace hpx { namespace detail
 }}
 
 #define HPX_REGISTER_ASYNC_COLOCATED_DECLARATION(Action, Name)                \
-    HPX_UTIL_REGISTER_FUNCTION_DECLARATION(                                   \
+    HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(                            \
         void (hpx::naming::id_type, hpx::agas::response)                      \
       , (hpx::util::functional::detail::async_continuation_impl<              \
             hpx::util::detail::bound_action<                                  \
@@ -59,7 +60,7 @@ namespace hpx { namespace detail
 /**/
 
 #define HPX_REGISTER_ASYNC_COLOCATED(Action, Name)                            \
-    HPX_UTIL_REGISTER_FUNCTION(                                               \
+    HPX_UTIL_REGISTER_UNIQUE_FUNCTION(                                        \
         void (hpx::naming::id_type, hpx::agas::response)                      \
       , (hpx::util::functional::detail::async_continuation_impl<              \
             hpx::util::detail::bound_action<                                  \
@@ -119,12 +120,16 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
-        >::type>
-    async_colocated(hpx::actions::continuation_type const& cont,
+    template <typename Action, typename Continuation, typename ...Ts>
+    typename std::enable_if<
+        traits::is_continuation<Continuation>::value,
+        lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::remote_result_type
+            >::type
+        >
+    >::type
+    async_colocated(Continuation && cont,
         naming::id_type const& gid, Ts&&... vs)
     {
         // Attach the requested action as a continuation to a resolve_async
@@ -145,23 +150,29 @@ namespace hpx { namespace detail
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
                       , std::forward<Ts>(vs)...)
-                  , cont)
+                  , std::forward<Continuation>(cont))
               , service_target, req);
     }
 
     template <
+        typename Continuation,
         typename Component, typename Signature, typename Derived,
         typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Derived>::remote_result_type
-        >::type>
+    typename std::enable_if<
+        traits::is_continuation<Continuation>::value,
+        lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type
+        >
+    >::type
     async_colocated(
-        hpx::actions::continuation_type const& cont
+        Continuation && cont
       , hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid, Ts&&... vs)
     {
-        return async_colocated<Derived>(cont, gid, std::forward<Ts>(vs)...);
+        return async_colocated<Derived>(std::forward<Continuation>(cont), gid,
+            std::forward<Ts>(vs)...);
     }
 }}
 

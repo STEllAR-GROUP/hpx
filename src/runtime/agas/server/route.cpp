@@ -28,8 +28,8 @@ namespace hpx { namespace agas { namespace server
         error_code ec = throws;
 
         std::size_t size = p.size();
-        naming::id_type const* ids = p.get_destinations();
-        naming::address* addrs = p.get_destination_addrs();
+        naming::id_type const* ids = p.destinations();
+        naming::address* addrs = p.addrs();
         std::vector<resolved_type> cache_addresses;
 
         runtime& rt = get_runtime();
@@ -76,7 +76,7 @@ namespace hpx { namespace agas { namespace server
             }
         }
 
-        naming::id_type source = p.get_source();
+        naming::id_type source = p.source_id();
 
         // either send the parcel on its way or execute actions locally
         if (addrs[0].locality_ == get_locality())

@@ -346,8 +346,8 @@ namespace hpx { namespace parcelset
         // properly initialize parcel
         init_parcel(p);
 
-        naming::id_type const* ids = p.get_destinations();
-        naming::address* addrs = p.get_destination_addrs();
+        naming::id_type const* ids = p.destinations();
+        naming::address* addrs = p.addrs();
 
         bool resolved_locally = true;
 
@@ -375,8 +375,8 @@ namespace hpx { namespace parcelset
         }
 #endif
 
-        if (!p.get_parcel_id())
-            p.set_parcel_id(parcel::generate_unique_id());
+        if (!p.parcel_id())
+            p.parcel_id() = parcel::generate_unique_id();
 
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.

@@ -1195,7 +1195,7 @@ namespace hpx { namespace actions
           : f_(std::forward<F>(f))
         {}
 
-        void deferred_trigger(lcos::future<R> result) const
+        void deferred_trigger(lcos::future<R> result)
         {
             if (f_.empty()) {
                 if (!this->get_id()) {
@@ -1211,7 +1211,7 @@ namespace hpx { namespace actions
             }
         }
 
-        virtual void trigger_value(lcos::future<R> && result) const
+        virtual void trigger_value(lcos::future<R> && result)
         {
             LLCO_(info)
                 << "typed_continuation<lcos::future<R> >::trigger("
@@ -1227,8 +1227,7 @@ namespace hpx { namespace actions
             // once its ready
             result.then(
                 util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(
-                        shared_from_this()),
+                    std::move(*this),
                     util::placeholders::_1));
         }
 
@@ -1323,7 +1322,7 @@ namespace hpx { namespace actions
             }
         }
 
-        virtual void trigger_value(lcos::future<void> && result) const
+        virtual void trigger_value(lcos::future<void> && result)
         {
             LLCO_(info)
                 << "typed_continuation<lcos::future<void> >::trigger("
@@ -1339,8 +1338,7 @@ namespace hpx { namespace actions
             // once its ready
             result.then(
                 util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(
-                        shared_from_this()),
+                    std::move(*this),
                     util::placeholders::_1));
         }
 
@@ -1433,7 +1431,7 @@ namespace hpx { namespace actions
             }
         }
 
-        virtual void trigger_value(lcos::shared_future<R> && result) const
+        virtual void trigger_value(lcos::shared_future<R> && result)
         {
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
@@ -1449,8 +1447,7 @@ namespace hpx { namespace actions
             // once its ready
             result.then(
                 util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(
-                        shared_from_this()),
+                    std::move(*this),
                     util::placeholders::_1));
         }
 
@@ -1545,7 +1542,7 @@ namespace hpx { namespace actions
             }
         }
 
-        virtual void trigger_value(lcos::shared_future<void> && result) const
+        virtual void trigger_value(lcos::shared_future<void> && result)
         {
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
@@ -1561,8 +1558,7 @@ namespace hpx { namespace actions
             // once its ready
             result.then(
                 util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(
-                        shared_from_this()),
+                    std::move(*this),
                     util::placeholders::_1));
         }
 

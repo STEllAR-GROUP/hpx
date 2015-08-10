@@ -23,6 +23,8 @@
 #include <hpx/components/security/signed_type.hpp>
 #endif
 
+#include <memory>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
 {
@@ -439,8 +441,8 @@ namespace hpx { namespace applier
 #else
         std::size_t const size = p.size();
 #endif
-        naming::id_type const* ids = p.get_destinations();
-        naming::address const* addrs = p.get_destination_addrs();
+        naming::id_type const* ids = p.destinations();
+        naming::address const* addrs = p.addrs();
 
         // make sure the target has not been migrated away
         naming::resolver_client& client = hpx::naming::get_agas_client();
@@ -452,7 +454,7 @@ namespace hpx { namespace applier
         }
 
         // decode the action-type in the parcel
-        actions::continuation_type cont = p.get_continuation();
+        std::unique_ptr<actions::continuation> cont = p.get_continuation();
         actions::base_action * act = p.get_action();
 
 #if defined(HPX_HAVE_SECURITY)
@@ -478,7 +480,7 @@ namespace hpx { namespace applier
             caps_sender = cert.get_type().get_capability();
 #endif
         int comptype = act->get_component_type();
-        naming::gid_type dest = p.get_destination_locality();
+        naming::gid_type dest = p.destination_locality();
 
         // if the parcel carries a continuation it should be directed to a
         // single destination
@@ -548,7 +550,7 @@ namespace hpx { namespace applier
                 // which first executes the original thread function as
                 // required by the action and triggers the continuations
                 // afterwards.
-                act->schedule_thread(cont, ids[i], lva, threads::pending);
+                act->schedule_thread(std::move(cont), ids[i], lva, threads::pending);
             }
         }
     }

@@ -10,7 +10,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/shared_ptr.hpp>
+#include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -64,22 +64,23 @@ namespace hpx { namespace util { namespace functional
               : bound_(std::move(bound))
             {}
 
+            template <typename Continuation>
             explicit apply_continuation_impl(
-                    Bound && bound, actions::continuation_type const& c)
+                    Bound && bound, Continuation && c)
               : bound_(std::move(bound)),
-                cont_(c)
+                cont_(new typename util::decay<Continuation>::type(std::forward<Continuation>(c)))
             {}
 
             template <typename T>
             typename util::result_of<bound_type(naming::id_type, T)>::type
-            operator()(naming::id_type lco, T && t) const
+            operator()(naming::id_type lco, T && t)
             {
                 typedef typename util::result_of<
                     bound_type(naming::id_type, T)
                 >::type result_type;
 
                 if (cont_)
-                    bound_.apply_c(cont_, lco, std::forward<T>(t));
+                    bound_.apply_c(std::move(cont_), lco, std::forward<T>(t));
                 else
                     bound_.apply(lco, std::forward<T>(t));
                 return result_type();
@@ -114,7 +115,7 @@ namespace hpx { namespace util { namespace functional
             HPX_SERIALIZATION_SPLIT_MEMBER();
 
             bound_type bound_;
-            actions::continuation_type cont_;
+            std::unique_ptr<actions::continuation> cont_;
         };
     }
 
@@ -126,12 +127,13 @@ namespace hpx { namespace util { namespace functional
             typename util::decay<Bound>::type>(std::forward<Bound>(bound));
     }
 
-    template <typename Bound>
+    template <typename Bound, typename Continuation>
     functional::detail::apply_continuation_impl<typename util::decay<Bound>::type>
-    apply_continuation(Bound && bound, actions::continuation_type const& c)
+    apply_continuation(Bound && bound, Continuation && c)
     {
         return functional::detail::apply_continuation_impl<
-            typename util::decay<Bound>::type>(std::forward<Bound>(bound), c);
+            typename util::decay<Bound>::type>(
+                std::forward<Bound>(bound), std::forward<Continuation>(c));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -156,22 +158,23 @@ namespace hpx { namespace util { namespace functional
               : bound_(std::move(bound))
             {}
 
+            template <typename Continuation>
             explicit async_continuation_impl(
-                    Bound && bound, actions::continuation_type const& c)
+                    Bound && bound, Continuation && c)
               : bound_(std::move(bound)),
-                cont_(c)
+                cont_(new typename util::decay<Continuation>::type(std::forward<Continuation>(c)))
             {}
 
             template <typename T>
             typename util::result_of<bound_type(naming::id_type, T)>::type
-            operator()(naming::id_type lco, T && t) const
+            operator()(naming::id_type lco, T && t)
             {
                 typedef typename util::result_of<
                     bound_type(naming::id_type, T)
                 >::type result_type;
 
                 if (cont_)
-                    bound_.apply_c(cont_, lco, std::forward<T>(t));
+                    bound_.apply_c(std::move(cont_), lco, std::forward<T>(t));
                 else
                     bound_.apply_c(lco, lco, std::forward<T>(t));
                 return result_type();
@@ -206,7 +209,7 @@ namespace hpx { namespace util { namespace functional
             HPX_SERIALIZATION_SPLIT_MEMBER();
 
             bound_type bound_;
-            actions::continuation_type cont_;
+            std::unique_ptr<actions::continuation> cont_;
         };
     }
 
@@ -218,12 +221,13 @@ namespace hpx { namespace util { namespace functional
             typename util::decay<Bound>::type>(std::forward<Bound>(bound));
     }
 
-    template <typename Bound>
+    template <typename Bound, typename Continuation>
     functional::detail::async_continuation_impl<typename util::decay<Bound>::type>
-    async_continuation(Bound && bound, actions::continuation_type const& c)
+    async_continuation(Bound && bound, Continuation && c)
     {
         return functional::detail::async_continuation_impl<
-            typename util::decay<Bound>::type>(std::forward<Bound>(bound), c);
+            typename util::decay<Bound>::type>(
+                std::forward<Bound>(bound), std::forward<Continuation>(c));
     }
 }}}
 

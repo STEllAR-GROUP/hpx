@@ -1769,7 +1769,7 @@ void addressing_service::route(
     )
 {
     // compose request
-    naming::id_type const* ids = p.get_destinations();
+    naming::id_type const* ids = p.destinations();
 
     naming::id_type const target(
         stubs::primary_namespace::get_service_instance(ids[0])
@@ -1783,7 +1783,7 @@ void addressing_service::route(
     {
         // route through the local AGAS service instance
         applier::detail::apply_l_p<action_type>(
-            target, addr, action_priority_, std::move(p));
+            target, std::move(addr), action_priority_, std::move(p));
         f(boost::system::error_code(), parcelset::parcel());      // invoke callback
         return;
     }
@@ -1799,13 +1799,9 @@ void addressing_service::route(
             naming::id_type const route_target(
                 bootstrap_primary_namespace_gid(), naming::id_type::unmanaged);
 
-            std::unique_ptr<actions::base_action> act(
-                new actions::transfer_action<action_type>(action_priority_,
-                    std::move(p)));
-
             parcelset::parcel route_p(
                 route_target, primary_ns_addr_
-              , std::move(act));
+              , action_type(), action_priority_, std::move(p));
 
             // send to the main AGAS instance for routing
             hpx::applier::get_applier().get_parcel_handler().put_parcel(std::move(route_p), f);

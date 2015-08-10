@@ -88,25 +88,25 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp;
-    std::unique_ptr<hpx::actions::base_action> act(
-            new hpx::actions::transfer_action<test_action>(
-                hpx::threads::thread_priority_normal, buffer));
     if (continuation) {
-        outp = hpx::parcelset::parcel(here, addr, std::move(act),
-            new hpx::actions::typed_continuation<int>(here));
+        outp = hpx::parcelset::parcel(here, addr,
+            hpx::actions::typed_continuation<int>(here),
+            test_action(), hpx::threads::thread_priority_normal, buffer
+            );
     }
     else {
-        outp = hpx::parcelset::parcel(here, addr, std::move(act));
+        outp = hpx::parcelset::parcel(here, addr,
+            test_action(), hpx::threads::thread_priority_normal, buffer);
     }
 
-    outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here);
+    outp.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
+    outp.set_source_id(here);
 
     std::vector<hpx::serialization::serialization_chunk>* chunks = 0;
     if (zerocopy)
         chunks = new std::vector<hpx::serialization::serialization_chunk>();
 
-    boost::uint32_t dest_locality_id = outp.get_destination_locality_id();
+    boost::uint32_t dest_locality_id = outp.destination_locality_id();
     hpx::util::high_resolution_timer t;
 
     for (std::size_t i = 0; i != iterations; ++i)
