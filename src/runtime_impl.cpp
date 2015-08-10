@@ -135,10 +135,8 @@ namespace hpx {
             boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         scheduler_(init),
-        notifier_(
-            boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1, ::_2, false),
-            boost::bind(&runtime_impl::deinit_tss, This()),
-            boost::bind(&runtime_impl::report_error, This(), _1, _2)),
+        notifier_(runtime_impl<SchedulingPolicy>::
+            get_notification_policy("worker-thread")),
         thread_manager_(
             new hpx::threads::threadmanager_impl<SchedulingPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
@@ -559,6 +557,16 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy>
+    threads::policies::callback_notifier runtime_impl<SchedulingPolicy>::
+        get_notification_policy(char const* prefix)
+    {
+        return notification_policy_type(
+            boost::bind(&runtime_impl::init_tss, This(), prefix, ::_1, ::_2, false),
+            boost::bind(&runtime_impl::deinit_tss, This()),
+            boost::bind(&runtime_impl::report_error, This(), _1, _2));
+    }
+
     template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::init_tss(
         char const* context, std::size_t num, char const* postfix,
