@@ -75,7 +75,7 @@ hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING
  
   if (RDMAHELPER_WITH_LOGGING)
     set_source_files_properties(
-      "${hpx_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
       PROPERTIES COMPILE_DEFINITIONS "RDMAHELPER_HAVE_LOGGING"
     )
   endif()
@@ -88,7 +88,7 @@ hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING
   find_package(rdmahelper REQUIRED)
   
   set(_parcelport_verbs_SOURCES 
-    "${hpx_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp" 
+    "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp" 
     CACHE INTERNAL "global variable" FORCE)
   set(_parcelport_verbs_INCLUDE_DIRECTORIES 
     "${rdmahelper_INCLUDE_DIRS}" 
@@ -107,7 +107,7 @@ hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING
     add_parcelport(verbs
       STATIC
       SOURCES
-        "${hpx_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
+        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
       INCLUDE_DIRECTORIES
         "${_parcelport_verbs_INCLUDE_DIRECTORIES}"
       HEADERS
