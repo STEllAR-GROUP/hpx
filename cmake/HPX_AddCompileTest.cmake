@@ -27,7 +27,7 @@ macro(add_hpx_compile_test category name)
   add_test(NAME "${category}.${name}"
     COMMAND ${CMAKE_COMMAND}
       --build .
-      --target ${name}_exe
+      --target "${name}_exe"
       --config $<CONFIGURATION>
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
@@ -43,5 +43,9 @@ endmacro()
 
 macro(add_hpx_regression_compile_test category name)
   add_hpx_compile_test("tests.regressions.${category}" ${name} ${ARGN})
+endmacro()
+
+macro(add_hpx_headers_compile_test category name)
+  add_hpx_compile_test("tests.headers.${category}" ${name} ${ARGN})
 endmacro()
 

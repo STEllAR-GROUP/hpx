@@ -36,7 +36,7 @@ foreach(header ${headers})
     get_filename_component(header_dir "${relpath}" DIRECTORY)
 
     # add compile only test
-    add_hpx_unit_compile_test(
+    add_hpx_headers_compile_test(
       "headers"
       ${test_name}
       SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
@@ -50,8 +50,7 @@ foreach(header ${headers})
     add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
 
     # add dependencies to pseudo-target
-    add_hpx_pseudo_dependencies(tests.headers.${test_name}
-                                "tests.unit.headers.${test_name}")
+    add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_exe")
   endif()
 
 endforeach()
@@ -63,7 +62,7 @@ file(WRITE ${all_headers_test_name}
   ${all_headers}
   "int main() { return 0; }\n")
 
-add_hpx_unit_compile_test(
+add_hpx_headers_compile_test(
   "all_headers"
   ${test_name}
   SOURCES "${all_headers_test_name}"
@@ -77,5 +76,4 @@ add_hpx_pseudo_target(tests.headers.${test_name})
 add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
 
 # add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(tests.headers.${test_name}
-                            "tests.unit.headers.${test_name}")
+add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_exe")
