@@ -428,14 +428,7 @@ In __hpx__ we have implemented the following executor types:
   creates groups of parallel execution agents which execute in one of the
   kernel threads associated with a given pool category (I/O, parcel, or timer
   pool, or on the main thread of the application).
-* [classref hpx::parallel::v3::local_priority_queue_executor `hpx::parallel::local_priority_queue_executor`],
-  [classref hpx::parallel::v3::local_queue_executor `hpx::parallel::local_queue_executor`]
-  [classref hpx::parallel::v3::static_priority_queue_executor `hpx::parallel::static_priority_queue_executor`]
-  create executors on top of the corresponding __hpx__ schedulers.
-* [classref hpx::parallel::v3::distribution_policy_executor `hpx::parallel::distribution_policy_executor`]
-  creates executors using any of the existing distribution policies (like
-  [classref hpx::components::colocating_distribution_policy `hpx::components::colocating_distribution_policy]
-  et.al.).
+* [classref hpx::parallel::v3::local_priority_queue_executor `hpx::parallel::local_priority_queue_executor`]
 
 [endsect]
 
