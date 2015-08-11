@@ -75,7 +75,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 
     ~big_boot_barrier()
     {
-        util::function_nonser<void()>* f;
+        util::unique_function_nonser<void()>* f;
         while (thunks.pop(f))
             delete f;
     }
