@@ -551,113 +551,6 @@ include_directories("${PROJECT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
 ################################################################################
-
-##############################################################################
-# Find Our dependencies:
-#   These are all dependencies needed to build the core library. Dependencies
-#   that are only needed by plugins, examples or tests should be found
-#   seperately in the appropriate subdirectory.
-# When a package is found, the necessary include paths are set, and the libraries
-# are added to the HPX_LIBRARIES variables
-
-# Setting up our required Boost libraries. This will find all required boost
-# libraries and add possibly needed boost headers shipped with the hpx source
-include(HPX_SetupBoost)
-
-# Find all allocators which are currently supported.
-include(HPX_SetupAllocator)
-
-# convey selected allocator type to the build configuration
-hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
-
-if(HPX_WITH_HWLOC)
-  find_package(Hwloc)
-  if(NOT HWLOC_FOUND)
-    hpx_error("Hwloc could not be found and HPX_WITH_HWLOC=ON, please specify HWLOC_ROOT to point to the correct location or set HPX_WITH_HWLOC to OFF")
-  endif()
-  hpx_libraries(${HWLOC_LIBRARIES})
-  include_directories(${HWLOC_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_HWLOC)
-endif()
-
-################################################################################
-# Enable integration with Intel Amplifier and Inspector tools
-################################################################################
-if(WITH_AMPLIFIER)
-  find_package(Amplifier)
-  if(NOT AMPLIFIER_FOUND)
-    hpx_error("Intel Amplifier could not be found and WITH_AMPLIFIER=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
-  endif()
-  hpx_libraries(${AMPLIFIER_LIBRARIES})
-  include_directories(${AMPLIFIER_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
-endif()
-
-if(HPX_WITH_TAU)
-  find_package(TAU)
-  if(NOT TAU_FOUND)
-    hpx_error("TAU could not be found and HPX_WITH_TAU=On, please specify TAU_ROOT to point to the root of your TAU installation")
-  endif()
-  hpx_libraries(${TAU_LIBRARIES})
-  include_directories(${TAU_INCLUDE_DIR})
-endif()
-
-################################################################################
-# Enable integration with Apex event counters
-################################################################################
-if(HPX_WITH_APEX)
-  find_package(APEX)
-  if(NOT APEX_FOUND)
-    hpx_error("Apex could not be found and HPX_WITH_APEX=On, please specify APEX_ROOT to point to the root of your Apex installation")
-  endif()
-  hpx_libraries(${APEX_LIBRARIES})
-  include_directories(${APEX_INCLUDE_DIR})
-  if(AMPLIFIER_FOUND)
-    hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
-  endif()
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
-endif()
-
-if(HPX_WITH_GOOGLE_PERFTOOLS)
-  find_package(GooglePerftools)
-  if(NOT GOOGLE_PERFTOOLS_FOUND)
-    hpx_error("Google Perftools could not be found and HPX_WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to the root of your Google Perftools installation")
-  endif()
-  hpx_libraries(${GOOGLE_PERFTOOLS_LIBRARIES})
-  include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-endif()
-
-if(HPX_WITH_VALGRIND)
-  find_package(Valgrind)
-  if(NOT VALGRIND_FOUND)
-    hpx_error("Valgrind could not be found and HPX_WITH_VALGRIND=On, please specify VALGRIND_ROOT to point to the root of your Valgrind installation")
-  endif()
-  include_directories(${VALGRIND_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_VALGRIND)
-endif()
-
-################################################################################
-# Security, libsodium: P(ortable|ackageable) NaCl
-################################################################################
-if(HPX_WITH_SECURITY)
-  find_package(Sodium)
-  if(NOT SODIUM_FOUND)
-    hpx_error("Sodium could not be found and WITH_SODIUM=On, please specify Sodium_ROOT to point to the root of your Sodium installation")
-  endif()
-  hpx_add_config_define(HPX_HAVE_SODIUM)
-
-  include_directories(${SODIUM_INCLUDE_DIR})
-
-  if(MSVC)
-    hpx_add_config_define(SODIUM_STATIC)
-  endif()
-  hpx_libraries(${SODIUM_LIBRARIES})
-
-  hpx_add_config_define(HPX_HAVE_SECURITY)
-endif()
-################################################################################
-
-##############################################################################
 # Check for compiler compatibility
 #
 
@@ -1110,7 +1003,112 @@ else()
   endif()
 endif()
 
-##############################################################################
+################################################################################
+
+################################################################################
+# Find Our dependencies:
+#   These are all dependencies needed to build the core library. Dependencies
+#   that are only needed by plugins, examples or tests should be found
+#   seperately in the appropriate subdirectory.
+# When a package is found, the necessary include paths are set, and the libraries
+# are added to the HPX_LIBRARIES variables
+
+# Setting up our required Boost libraries. This will find all required boost
+# libraries and add possibly needed boost headers shipped with the hpx source
+include(HPX_SetupBoost)
+
+# Find all allocators which are currently supported.
+include(HPX_SetupAllocator)
+
+# convey selected allocator type to the build configuration
+hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
+
+if(HPX_WITH_HWLOC)
+  find_package(Hwloc)
+  if(NOT HWLOC_FOUND)
+    hpx_error("Hwloc could not be found and HPX_WITH_HWLOC=ON, please specify HWLOC_ROOT to point to the correct location or set HPX_WITH_HWLOC to OFF")
+  endif()
+  hpx_libraries(${HWLOC_LIBRARIES})
+  include_directories(${HWLOC_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_HWLOC)
+endif()
+
+################################################################################
+# Enable integration with Intel Amplifier and Inspector tools
+################################################################################
+if(WITH_AMPLIFIER)
+  find_package(Amplifier)
+  if(NOT AMPLIFIER_FOUND)
+    hpx_error("Intel Amplifier could not be found and WITH_AMPLIFIER=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
+  endif()
+  hpx_libraries(${AMPLIFIER_LIBRARIES})
+  include_directories(${AMPLIFIER_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+endif()
+
+if(HPX_WITH_TAU)
+  find_package(TAU)
+  if(NOT TAU_FOUND)
+    hpx_error("TAU could not be found and HPX_WITH_TAU=On, please specify TAU_ROOT to point to the root of your TAU installation")
+  endif()
+  hpx_libraries(${TAU_LIBRARIES})
+  include_directories(${TAU_INCLUDE_DIR})
+endif()
+
+################################################################################
+# Enable integration with Apex event counters
+################################################################################
+if(HPX_WITH_APEX)
+  find_package(APEX)
+  if(NOT APEX_FOUND)
+    hpx_error("Apex could not be found and HPX_WITH_APEX=On, please specify APEX_ROOT to point to the root of your Apex installation")
+  endif()
+  hpx_libraries(${APEX_LIBRARIES})
+  include_directories(${APEX_INCLUDE_DIR})
+  if(AMPLIFIER_FOUND)
+    hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
+  endif()
+  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+endif()
+
+if(HPX_WITH_GOOGLE_PERFTOOLS)
+  find_package(GooglePerftools)
+  if(NOT GOOGLE_PERFTOOLS_FOUND)
+    hpx_error("Google Perftools could not be found and HPX_WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to the root of your Google Perftools installation")
+  endif()
+  hpx_libraries(${GOOGLE_PERFTOOLS_LIBRARIES})
+  include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+endif()
+
+if(HPX_WITH_VALGRIND)
+  find_package(Valgrind)
+  if(NOT VALGRIND_FOUND)
+    hpx_error("Valgrind could not be found and HPX_WITH_VALGRIND=On, please specify VALGRIND_ROOT to point to the root of your Valgrind installation")
+  endif()
+  include_directories(${VALGRIND_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_VALGRIND)
+endif()
+
+################################################################################
+# Security, libsodium: P(ortable|ackageable) NaCl
+################################################################################
+if(HPX_WITH_SECURITY)
+  find_package(Sodium)
+  if(NOT SODIUM_FOUND)
+    hpx_error("Sodium could not be found and WITH_SODIUM=On, please specify Sodium_ROOT to point to the root of your Sodium installation")
+  endif()
+  hpx_add_config_define(HPX_HAVE_SODIUM)
+
+  include_directories(${SODIUM_INCLUDE_DIR})
+
+  if(MSVC)
+    hpx_add_config_define(SODIUM_STATIC)
+  endif()
+  hpx_libraries(${SODIUM_LIBRARIES})
+
+  hpx_add_config_define(HPX_HAVE_SECURITY)
+endif()
+################################################################################
 
 ################################################################################
 # Check Build Options based on the found dependencies. We also check for errors
