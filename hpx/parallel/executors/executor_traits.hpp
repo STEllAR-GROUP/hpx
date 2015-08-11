@@ -206,7 +206,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 for (auto const& elem: shape)
                 {
                     results.push_back(exec.async_execute(
-                        hpx::util::deferred_call(std::forward<F>(f), elem)
+                        hpx::util::deferred_call(f, elem)
                     ));
                 }
 
@@ -266,7 +266,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 for (auto const& elem: shape)
                 {
                     results.push_back(exec.async_execute(
-                        hpx::util::deferred_call(std::forward<F>(f), elem)
+                        hpx::util::deferred_call(f, elem)
                     ));
                 }
 
