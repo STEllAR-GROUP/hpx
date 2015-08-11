@@ -17,6 +17,7 @@
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
+    ///////////////////////////////////////////////////////////////////////////
     struct executor_tag {};
 
     namespace detail
@@ -40,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     {};
 
     template <typename Executor, typename Enable = void>
-    class executor_traits;
+    struct executor_traits;
 }}}
 
 namespace hpx { namespace traits

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //
@@ -36,7 +36,7 @@
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a threadmanager class is the central instance of management for
+    /// The \a thread-manager class is the central instance of management for
     /// all (non-depleted) threads
     template <typename SchedulingPolicy>
     class HPX_EXPORT threadmanager_impl : public threadmanager_base
@@ -506,6 +506,10 @@ namespace hpx { namespace threads
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_thread_overhead(
             std::size_t num = std::size_t(-1), bool reset = false);
+        boost::int64_t get_cumulative_thread_duration(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        boost::int64_t get_cumulative_thread_overhead(
+            std::size_t num = std::size_t(-1), bool reset = false);
 #endif
 #endif
 
@@ -552,7 +556,8 @@ namespace hpx { namespace threads
         }
 
         // Return the executor associated with the given thread
-        executor get_executor(thread_id_type const& id, error_code& ec) const;
+        executors::generic_thread_pool_executor
+            get_executor(thread_id_type const& id, error_code& ec) const;
 
     private:
         // counter creator functions

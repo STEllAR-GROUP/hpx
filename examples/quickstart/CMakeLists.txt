@@ -32,6 +32,7 @@ set(example_programs
     pingpong
     print_to_console
     quicksort
+    shared_mutex
     simple_future_continuation
     simplest_hello_world
     timed_futures
@@ -53,6 +54,7 @@ set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(interval_timer_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simplest_hello_world_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)

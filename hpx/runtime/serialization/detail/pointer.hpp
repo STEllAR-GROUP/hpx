@@ -81,8 +81,7 @@ namespace hpx { namespace serialization
             {
                 static Pointer call(input_archive& ar)
                 {
-                    Pointer t(new referred_type);
-                    ar >> *t;
+                    Pointer t(constructor_selector<referred_type>::create(ar));
                     return t;
                 }
             };

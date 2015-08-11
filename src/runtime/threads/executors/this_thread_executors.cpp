@@ -36,7 +36,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     this_thread_executor<Scheduler>::this_thread_executor()
       : scheduler_(1, false), shutdown_sem_(0),
-        state_(state_initialized), thread_num_(std::size_t(-1)),
+        thread_num_(std::size_t(-1)),
         parent_thread_num_(std::size_t(-1)), orig_thread_num_(std::size_t(-1)),
         tasks_scheduled_(0), tasks_completed_(0), cookie_(0),
         self_(0)
@@ -54,7 +54,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         // if we're still starting up, give this executor a chance of executing
         // its tasks
-        while (state_.load() < state_running)
+        while (scheduler_.get_state(0) < state_running)
             this_thread::suspend();
 
         // Inform the resource manager that this executor is about to be
@@ -72,7 +72,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 #if defined(HPX_DEBUG)
         // all resources should have been stopped at this point (or have never
         // been initialized)
-        hpx::state s = state_.load();
+        hpx::state s = scheduler_.get_state(0);
         HPX_ASSERT(s == state_initialized || s == state_stopped);
 
         // all scheduled tasks should have completed executing
@@ -111,7 +111,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         // if the scheduler was stopped, we need to restart it
         state expected = state_stopped;
-        state_.compare_exchange_strong(expected, state_starting);
+        scheduler_.get_state(0).compare_exchange_strong(expected, state_starting);
 
         // create a new thread
         thread_init_data data(util::bind(
@@ -150,7 +150,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         // if the scheduler was stopped, we need to restart it
         state expected = state_stopped;
-        state_.compare_exchange_strong(expected, state_starting);
+        scheduler_.get_state(0).compare_exchange_strong(expected, state_starting);
 
         // create a new suspended thread
         thread_init_data data(util::bind(
@@ -201,7 +201,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         if (&ec != &throws)
             ec = make_success_code();
-        return (state_.load() < state_stopped) ? 1 : 0;
+        return (scheduler_.get_state(0) < state_stopped) ? 1 : 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -223,8 +223,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // Give invoking context a chance to catch up with its tasks, but only
         // if this scheduler is currently in running state (this scheduler is
         // always in stopping state as it has to exit as early as possible).
-        state expected = state_stopping;
-        if (state_.compare_exchange_strong(expected, state_suspended))
+        boost::atomic<hpx::state>& state = scheduler_.get_state(0);
+        hpx::state expected = state_stopping;
+        if (state.compare_exchange_strong(expected, state_suspended))
         {
             {
                 threads::detail::reset_tss_helper reset_on_exit(
@@ -236,7 +237,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             // reset state to running if current state is still suspended
             expected = state_suspended;
-            state_.compare_exchange_strong(expected, state_stopping);
+            state.compare_exchange_strong(expected, state_stopping);
         }
         else
         {
@@ -275,8 +276,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // Set the state to 'state_stopping' only if it's still in
         // 'state_starting' state, otherwise our destructor is currently being
         // executed, which means we need to still execute all threads.
-        state expected = state_starting;
-        if (state_.compare_exchange_strong(expected, state_stopping))
+        boost::atomic<hpx::state>& state = scheduler_.get_state(0);
+        hpx::state expected = state_starting;
+        if (state.compare_exchange_strong(expected, state_stopping))
         {
             {
                 typename mutex_type::scoped_lock l(mtx_);
@@ -302,17 +304,20 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times);
 
-            threads::detail::scheduling_loop(0, scheduler_,
-                state_, counters, util::function_nonser<void()>(),
+
+            threads::detail::scheduling_callbacks callbacks(
+                threads::detail::scheduling_callbacks::callback_type(),
                 util::bind( //-V107
                     &this_thread_executor::suspend_back_into_calling_context,
                     this));
+
+            threads::detail::scheduling_loop(0, scheduler_, counters, callbacks);
 
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist
             HPX_ASSERT(!scheduler_.get_thread_count(
                 unknown, thread_priority_default, 0) ||
-                state_ == state_terminating);
+                state == state_terminating);
         }
     }
 
@@ -362,8 +367,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_num_ = thread_num;
         orig_thread_num_ = threads::detail::thread_num_tss_.get_worker_thread_num();
 
-        state expected = state_initialized;
-        bool result = state_.compare_exchange_strong(expected, state_starting);
+        boost::atomic<hpx::state>& state = scheduler_.get_state(0);
+        hpx::state expected = state_initialized;
+        bool result = state.compare_exchange_strong(expected, state_starting);
         HPX_ASSERT(result);
     }
 
@@ -376,7 +382,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_ASSERT(std::size_t(-1) != thread_num_);
 
         // inform the scheduler to stop the virtual core
-        state oldstate = state_.exchange(state_stopped);
+        boost::atomic<hpx::state>& state = scheduler_.get_state(0);
+        hpx::state oldstate = state.exchange(state_stopped);
         HPX_ASSERT(oldstate == state_suspended || oldstate == state_stopped);
 
         thread_num_ = std::size_t(-1);

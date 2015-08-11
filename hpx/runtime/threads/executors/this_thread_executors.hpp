@@ -10,7 +10,6 @@
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 
-#include <hpx/state.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
@@ -95,7 +94,7 @@ namespace hpx { namespace threads { namespace executors
             // the scheduler used by this executor
             Scheduler scheduler_;
             lcos::local::counting_semaphore shutdown_sem_;
-            boost::atomic<hpx::state> state_;
+
             std::size_t thread_num_;
             std::size_t parent_thread_num_;
             std::size_t orig_thread_num_;

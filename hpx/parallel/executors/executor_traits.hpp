@@ -416,9 +416,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///       execute().
     ///
     template <typename Executor, typename Enable>
-    class executor_traits
+    struct executor_traits
     {
-    public:
         /// The type of the executor associated with this instance of
         /// \a executor_traits
         typedef Executor executor_type;

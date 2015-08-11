@@ -71,7 +71,7 @@ namespace hpx { namespace parallel { namespace util
                     std::size_t test_chunk_size = count / 100;
 
                     // estimate a chunk size based on number of cores used
-                    shape = get_static_shape(policy, workitems, f1,
+                    shape = get_bulk_iteration_shape(policy, workitems, f1,
                         first, count, chunk_size
                     );
 
@@ -183,7 +183,7 @@ namespace hpx { namespace parallel { namespace util
                     std::size_t test_chunk_size = count / 100;
 
                     // estimate a chunk size based on number of cores used
-                    shape = get_static_shape(policy, workitems, f1,
+                    shape = get_bulk_iteration_shape(policy, workitems, f1,
                         first, count, chunk_size
                     );
 
@@ -267,11 +267,11 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-        template <typename Executor, typename R, typename Result1,
-            typename Result2>
+        template <typename Executor, typename Parameters, typename R,
+            typename Result1, typename Result2>
         struct static_scan_partitioner<
-                parallel_task_execution_policy_shim<Executor>, R, Result1,
-                    Result2>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                    R, Result1, Result2>
           : static_scan_partitioner<parallel_task_execution_policy, R,
               Result1, Result2>
         {};
@@ -326,29 +326,29 @@ namespace hpx { namespace parallel { namespace util
             }
         };
 
-        template <typename Executor, typename R, typename Result1,
-            typename Result2>
+        template <typename Executor, typename Parameters, typename R,
+            typename Result1, typename Result2>
         struct scan_partitioner<
-                parallel_task_execution_policy_shim<Executor>, R, Result1,
-                Result2, parallel::traits::static_partitioner_tag>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                R, Result1, Result2, parallel::traits::static_partitioner_tag>
           : scan_partitioner<parallel_task_execution_policy, R, Result1,
                 Result2, parallel::traits::static_partitioner_tag>
         {};
 
-        template <typename Executor, typename R, typename Result1,
-            typename Result2>
+        template <typename Executor, typename Parameters, typename R,
+            typename Result1, typename Result2>
         struct scan_partitioner<
-                parallel_task_execution_policy_shim<Executor>, R, Result1,
-                Result2, parallel::traits::auto_partitioner_tag>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                R, Result1, Result2, parallel::traits::auto_partitioner_tag>
           : scan_partitioner<parallel_task_execution_policy, R, Result1,
                 Result2, parallel::traits::auto_partitioner_tag>
         {};
 
-        template <typename Executor, typename R, typename Result1,
-            typename Result2>
+        template <typename Executor, typename Parameters, typename R,
+            typename Result1, typename Result2>
         struct scan_partitioner<
-                parallel_task_execution_policy_shim<Executor>, R, Result1,
-                Result2, parallel::traits::default_partitioner_tag>
+                parallel_task_execution_policy_shim<Executor, Parameters>,
+                R, Result1, Result2, parallel::traits::default_partitioner_tag>
           : scan_partitioner<parallel_task_execution_policy, R, Result1,
                 Result2, parallel::traits::static_partitioner_tag>
         {};
