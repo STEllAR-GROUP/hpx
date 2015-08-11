@@ -27,6 +27,7 @@
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_executor.hpp>
 
+#include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -97,14 +98,14 @@ namespace hpx
         }
     }
 
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
+    HPX_EXPORT void set_lco_error(naming::id_type const& id,
         boost::exception_ptr const& e, bool move_credits);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    class HPX_API_EXPORT continuation;
+    class HPX_EXPORT continuation;
 
     namespace detail
     {
@@ -131,7 +132,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     // Parcel continuations are polymorphic objects encapsulating the
     // id_type of the destination where the result has to be sent.
-    class HPX_API_EXPORT continuation
+    class HPX_EXPORT continuation
     {
     public:
         typedef void continuation_tag;
@@ -141,15 +142,11 @@ namespace hpx { namespace actions
         explicit continuation(naming::id_type const& gid)
           : gid_(gid)
         {
-            // continuations with invalid id do not make sense
-            HPX_ASSERT(gid_);
         }
 
         explicit continuation(naming::id_type && gid)
           : gid_(std::move(gid))
         {
-            // continuations with invalid id do not make sense
-            HPX_ASSERT(gid_);
         }
 
         virtual ~continuation() {}
@@ -161,8 +158,8 @@ namespace hpx { namespace actions
         inline void trigger(Arg0 && arg0);
 
         //
-        virtual void trigger_error(boost::exception_ptr const& e) const;
-        virtual void trigger_error(boost::exception_ptr && e) const;
+        virtual void trigger_error(boost::exception_ptr const& e);
+        virtual void trigger_error(boost::exception_ptr && e);
 
         virtual char const* get_continuation_name() const = 0;
 
@@ -401,6 +398,13 @@ namespace hpx { namespace actions
         >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
+        {}
+
+        // This is needed for some gcc versions
+        // replace by typed_continuation(typed_continuation && o) = default;
+        // when all compiler support it
+        typed_continuation(typed_continuation && o)
+          : continuation(std::move(o.gid_)), f_(std::move(o.f_))
         {}
 
         virtual void trigger_value(Result && result)

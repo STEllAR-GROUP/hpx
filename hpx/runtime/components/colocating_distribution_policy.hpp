@@ -224,6 +224,20 @@ namespace hpx { namespace components
                 id_, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
+        template <typename Action, typename Callback, typename ...Ts>
+        bool apply_cb(
+            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
+        {
+            if (!id_)
+            {
+                return hpx::detail::apply_cb_impl<Action>(
+                    hpx::find_here(), priority, std::forward<Callback>(cb),
+                    std::forward<Ts>(vs)...);
+            }
+            return hpx::detail::apply_colocated_cb<Action>(
+                id_, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        }
+
         /// Returns the number of associated localities for this distribution
         /// policy
         ///

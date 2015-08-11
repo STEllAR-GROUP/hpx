@@ -31,6 +31,8 @@
 #include <boost/utility/declval.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace lcos { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -1190,7 +1192,13 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        template <typename F>
+        template <typename F,
+            typename Enable
+                = typename std::enable_if<
+                    !std::is_same<
+                        typename util::decay<F>::type, typed_continuation>::value
+                    >::type
+        >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
@@ -1299,12 +1307,18 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        template <typename F>
+        template <typename F,
+            typename Enable
+                = typename std::enable_if<
+                    !std::is_same<
+                        typename util::decay<F>::type, typed_continuation>::value
+                    >::type
+        >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
 
-        void deferred_trigger(lcos::future<void> result) const
+        void deferred_trigger(lcos::future<void> result)
         {
             if (f_.empty()) {
                 if (!this->get_id()) {
@@ -1410,7 +1424,13 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        template <typename F>
+        template <typename F,
+            typename Enable
+                = typename std::enable_if<
+                    !std::is_same<
+                        typename util::decay<F>::type, typed_continuation>::value
+                    >::type
+        >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
@@ -1519,7 +1539,13 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        template <typename F>
+        template <typename F,
+            typename Enable
+                = typename std::enable_if<
+                    !std::is_same<
+                        typename util::decay<F>::type, typed_continuation>::value
+                    >::type
+        >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}

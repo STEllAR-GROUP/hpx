@@ -339,6 +339,20 @@ namespace hpx { namespace parcelset
         return result;
     }
 
+    namespace detail
+    {
+        void parcel_sent_handler(parcelhandler::write_handler_type f,
+            boost::system::error_code const & ec, parcel const & p)
+        {
+            // invoke the original handler
+            f(ec, p);
+
+            // inform termination detection of a sent message
+            if (!p.does_termination_detection())
+                hpx::detail::dijkstra_make_black();
+        }
+    }
+
     void parcelhandler::put_parcel(parcel p, write_handler_type f)
     {
         HPX_ASSERT(resolver_);
@@ -378,6 +392,11 @@ namespace hpx { namespace parcelset
         if (!p.parcel_id())
             p.parcel_id() = parcel::generate_unique_id();
 
+        using util::placeholders::_1;
+        using util::placeholders::_2;
+        write_handler_type wrapped_f =
+            util::bind(&detail::parcel_sent_handler, std::move(f), _1, _2);
+
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.
         if (resolved_locally)
@@ -393,12 +412,12 @@ namespace hpx { namespace parcelset
                     p.get_message_handler(this, dest.second);
 
                 if (mh) {
-                    mh->put_parcel(dest.second, std::move(p), f);
+                    mh->put_parcel(dest.second, std::move(p), std::move(wrapped_f));
                     return;
                 }
             }
 
-            dest.first->put_parcel(dest.second, std::move(p), f);
+            dest.first->put_parcel(dest.second, std::move(p), std::move(wrapped_f));
             return;
         }
 
@@ -406,7 +425,7 @@ namespace hpx { namespace parcelset
         // to the AGAS managing the destination.
         ++count_routed_;
 
-        resolver_->route(std::move(p), f);
+        resolver_->route(std::move(p), std::move(wrapped_f));
     }
 
     boost::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const

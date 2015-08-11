@@ -564,9 +564,15 @@ void register_worker(registration_header const& header)
           , std::move(hdr));
 #else
         // delay the final response until the runtime system is up and running
-        void (big_boot_barrier::*f)(boost::uint32_t, boost::uint32_t, parcelset::locality const&, notify_worker_action, notification_header&&) =
-            &big_boot_barrier::apply<notify_worker_action, notification_header&&>;
-        util::unique_function_nonser<void()>* thunk = new util::unique_function_nonser<void()>(
+        void (big_boot_barrier::*f)(
+            boost::uint32_t,
+            boost::uint32_t,
+            parcelset::locality const&,
+            notify_worker_action,
+            notification_header&&)
+            = &big_boot_barrier::apply<notify_worker_action, notification_header&&>;
+        util::unique_function_nonser<void()>* thunk
+            = new util::unique_function_nonser<void()>(
             util::bind(
                 util::one_shot(f)
               , boost::ref(get_big_boot_barrier())

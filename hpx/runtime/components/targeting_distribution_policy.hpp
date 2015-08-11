@@ -155,6 +155,15 @@ namespace hpx { namespace components
                 std::forward<Ts>(vs)...);
         }
 
+        template <typename Action, typename ...Ts>
+        bool apply(
+            threads::thread_priority priority, Ts&&... vs) const
+        {
+            return hpx::detail::apply_impl<Action>(
+                id_ ? id_ : hpx::find_here(), priority,
+                std::forward<Ts>(vs)...);
+        }
+
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
@@ -163,6 +172,15 @@ namespace hpx { namespace components
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::apply_cb_impl<Action>(std::forward<Continuation>(c),
+                id_ ? id_ : hpx::find_here(), priority,
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        }
+
+        template <typename Action, typename Callback, typename ...Ts>
+        bool apply_cb(
+            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
+        {
+            return hpx::detail::apply_cb_impl<Action>(
                 id_ ? id_ : hpx::find_here(), priority,
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }

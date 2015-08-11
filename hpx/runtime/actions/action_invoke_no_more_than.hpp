@@ -147,6 +147,10 @@ namespace hpx { namespace actions { namespace detail
           : cont_(std::move(cont))
         {}
 
+        wrapped_continuation(wrapped_continuation && o)
+          : cont_(std::move(o.cont_))
+        {}
+
         void trigger()
         {
             if (cont_) cont_->trigger();
@@ -178,12 +182,12 @@ namespace hpx { namespace actions { namespace detail
                     util::placeholders::_1));
         }
 
-        void trigger_error(boost::exception_ptr const& e) const
+        void trigger_error(boost::exception_ptr const& e)
         {
             if (cont_) cont_->trigger_error(e);
             construct_semaphore_type::get_sem().signal();
         }
-        void trigger_error(boost::exception_ptr && e) const
+        void trigger_error(boost::exception_ptr && e)
         {
             if (cont_) cont_->trigger_error(std::move(e));
             construct_semaphore_type::get_sem().signal();
