@@ -14,6 +14,8 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
 
+#include <memory>
+
 #include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

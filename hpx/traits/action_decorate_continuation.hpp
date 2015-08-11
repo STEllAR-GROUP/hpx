@@ -9,6 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/always_void.hpp>
 
+#include <memory>
+
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////

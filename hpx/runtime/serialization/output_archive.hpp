@@ -18,6 +18,8 @@
 #include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <memory>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace serialization

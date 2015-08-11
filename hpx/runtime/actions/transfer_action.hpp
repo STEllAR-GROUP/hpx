@@ -38,6 +38,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/mpl/bool.hpp>
 
+#include <memory>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace actions
