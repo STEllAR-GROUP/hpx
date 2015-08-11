@@ -176,7 +176,7 @@ struct time_element{
 
 
 
-// Object to store the Fluid seperated in cell and computed by a Time Zone of tie Steps
+// Object to store the Fluid separated in cell and computed by a Time Zone of tie Steps
 // Will store the 2d grid created by the division of the fluid into cells and the computation over time
 // Will be able to Retrieve,remove,add a timestep to the grid
 
