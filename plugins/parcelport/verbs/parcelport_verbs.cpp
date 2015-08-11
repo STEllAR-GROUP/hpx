@@ -22,7 +22,7 @@
 // The memory pool specialization need to be pulled in before encode_parcels
 #include "RdmaMemoryPool.h"
 
-// parcelport
+// parcelport main
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
@@ -33,6 +33,7 @@
 // Local parcelport plugin
 #include "connection_handler_verbs.hpp"
 #include "pointer_wrapper_vector.hpp"
+#include "scheduler.hpp"
 //
 #include <hpx/plugins/parcelport/header.hpp>
 
@@ -48,9 +49,6 @@
 
 #define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
 #define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
-
-// BlueGene IO nodes do not support immediate data
-// #define HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED 1
 
 using namespace hpx::parcelset::policies;
 
@@ -113,7 +111,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
     // them and then we know it is safe to release the memory back to the pool.
     // The tags can have a short lifetime, but must be unique, so we encode the ip address with
     // a counter to generate tags per destination.
-    // The tag is send in immediate data so must be 32bits only : Note that the tag only has a
+    // The tag is sent in immediate data so must be 32bits only : Note that the tag only has a
     // lifetime of the unprocessed parcel, so it can be reused as soon as the parcel has been completed
     // and therefore a 16bit count is sufficient as we only keep a few parcels per locality in flight at a time
     // ----------------------------------------------------------------------------------------------
@@ -262,6 +260,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         verbs::tag_provider       tag_provider_;
         std::atomic_flag          connection_started;
 
+        custom_scheduler          parcelport_scheduler;
+
         // performance_counters::parcels::gatherer& parcels_sent_;
 
         // ----------------------------------------------------------------------------------------------
@@ -318,7 +318,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             // repeat until no more parcels are to be sent
             while (!hpx::is_stopped())
             {
+//                LOG_DEBUG_MSG("Background work thread start loop");
                 hpx_background_work();
+//                LOG_DEBUG_MSG("Background work thread end loop");
             }
             LOG_ERROR_MSG("HPX is now stopped");
             std::cout << "hpx background work thread stopped" << std::endl;
@@ -630,7 +632,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 #ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
         void handle_tag_send_completion(uint64_t wr_id)
         {
-            LOG_DEBUG_MSG("Handle 4 byte completion (hopefully)" << hexpointer(wr_id));
+            LOG_DEBUG_MSG("Handle 4 byte completion" << hexpointer(wr_id));
             RdmaMemoryRegion *region = (RdmaMemoryRegion *)wr_id;
             uint32_t tag = *(uint32_t*) (region->getAddress());
             chunk_pool_->deallocate(region);
@@ -906,8 +908,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             auto completion_function = std::bind( &parcelport::handle_verbs_completion, this, std::placeholders::_1, std::placeholders::_2);
             _rdmaController->setCompletionFunction(completion_function);
 
-            error_code ec(lightweight);
-            hpx::applier::register_thread_nullary(
+            // initialize our custom scheduler
+            parcelport_scheduler.init();
+
+            //
+            hpx::error_code ec(hpx::lightweight);
+            parcelport_scheduler.register_thread_nullary(
                     util::bind(&parcelport::hpx_background_work_thread, this),
                     "hpx_background_work_thread",
                     threads::pending, true, threads::thread_priority_critical,
