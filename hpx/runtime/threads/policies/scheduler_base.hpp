@@ -23,6 +23,9 @@
 
 #include <boost/atomic.hpp>
 
+#include <algorithm>
+#include <utility>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
@@ -174,6 +177,22 @@ namespace hpx { namespace threads { namespace policies
                     return false;
             }
             return true;
+        }
+
+        std::pair<hpx::state, hpx::state> get_minmax_state() const
+        {
+            std::pair<hpx::state, hpx::state> result(
+                last_valid_runtime_state, first_valid_runtime_state);
+
+            typedef boost::atomic<hpx::state> state_type;
+            for (state_type const& state : states_)
+            {
+                hpx::state s = state.load();
+                result.first = (std::min)(result.first, s);
+                result.second = (std::max)(result.second, s);
+            }
+
+            return result;
         }
 
         ///////////////////////////////////////////////////////////////////////

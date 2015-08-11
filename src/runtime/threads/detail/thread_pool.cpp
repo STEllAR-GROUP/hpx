@@ -82,13 +82,15 @@ namespace hpx { namespace threads { namespace detail
     hpx::state thread_pool<Scheduler>::get_state() const
     {
         std::size_t num_thread = get_worker_thread_num();
-        HPX_ASSERT(num_thread != std::size_t(-1));
-        return get_state(num_thread);
+        if (num_thread != std::size_t(-1))
+            return get_state(num_thread);
+        return sched_.get_minmax_state().second;
     }
 
     template <typename Scheduler>
     hpx::state thread_pool<Scheduler>::get_state(std::size_t num_thread) const
     {
+        HPX_ASSERT(num_thread != std::size_t(-1));
         return sched_.get_state(num_thread).load();
     }
 
