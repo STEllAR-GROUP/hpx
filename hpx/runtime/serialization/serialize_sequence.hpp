@@ -6,7 +6,7 @@
 #if !defined(HPX_SERIALIZATION_SERIALIZE_SEQUENCE_MAY_17_2008_0545PM)
 #define HPX_SERIALIZATION_SERIALIZE_SEQUENCE_MAY_17_2008_0545PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/fusion/sequence/intrinsic/begin.hpp>

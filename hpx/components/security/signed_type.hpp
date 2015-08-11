@@ -6,12 +6,16 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_SIGNED_TYPE_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_SIGNED_TYPE_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <hpx/components/security/signature.hpp>
+
+#include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace components { namespace security
 {
@@ -101,8 +105,10 @@ namespace hpx { namespace traits
     template <typename T>
     struct is_bitwise_serializable<
             hpx::components::security::signed_type<T> >
-       : mpl::true_
+       : boost::mpl::true_
     {};
 }}
+
+#endif
 
 #endif

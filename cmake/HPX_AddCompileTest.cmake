@@ -16,18 +16,19 @@ macro(add_hpx_compile_test category name)
     set(expected TRUE)
   endif()
 
-  add_hpx_executable(
+  add_hpx_library(
     ${name}
     SOURCE_ROOT ${${name}_SOURCE_ROOT}
     SOURCES ${${name}_SOURCES}
     EXCLUDE_FROM_ALL
     EXCLUDE_FROM_DEFAULT_BUILD
-    FOLDER ${${name}_FOLDER})
+    FOLDER ${${name}_FOLDER}
+    STATIC)
 
   add_test(NAME "${category}.${name}"
     COMMAND ${CMAKE_COMMAND}
       --build .
-      --target "${name}_exe"
+      --target "${name}_lib"
       --config $<CONFIGURATION>
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 

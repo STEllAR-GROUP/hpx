@@ -6,7 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_VERIFY_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_VERIFY_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
@@ -87,5 +90,7 @@ namespace hpx { namespace components { namespace security
         return true;
     }
 }}}
+
+#endif
 
 #endif

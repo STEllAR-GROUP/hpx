@@ -7,7 +7,9 @@
 #ifndef HPX_SERIALIZATION_UNIQUE_PTR_HPP
 #define HPX_SERIALIZATION_UNIQUE_PTR_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/detail/pointer.hpp>
+
 #include <memory>
 
 namespace hpx { namespace serialization

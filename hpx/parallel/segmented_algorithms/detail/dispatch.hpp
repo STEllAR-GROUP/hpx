@@ -10,6 +10,7 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/colocating_distribution_policy.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>

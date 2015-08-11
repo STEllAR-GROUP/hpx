@@ -6,7 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_SUBORDINATE_CERTIFICATE_AUTHORITY_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_SUBORDINATE_CERTIFICATE_AUTHORITY_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
@@ -46,5 +49,7 @@ namespace hpx { namespace components { namespace security { namespace server
         }
     };
 }}}}
+
+#endif
 
 #endif

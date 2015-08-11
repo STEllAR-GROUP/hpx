@@ -13,6 +13,7 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/functional/segmented_iterator_helpers.hpp>
 #include <hpx/runtime/serialization/serialize_sequence.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/iterator/iterator_facade.hpp>

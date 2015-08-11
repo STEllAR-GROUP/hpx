@@ -11,7 +11,7 @@
 #if !defined(HPX_UTIL_COROUTINE_DETAIL_TSS_MAR_20_2014_0941AM)
 #define HPX_UTIL_COROUTINE_DETAIL_TSS_MAR_20_2014_0941AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/coroutine/exception.hpp>
 #include <hpx/util/move.hpp>
 

@@ -6,7 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_CERTIFICATE_AUTHORITY_BASE_HPP
 #define HPX_COMPONENTS_SECURITY_CERTIFICATE_AUTHORITY_BASE_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
 #include <hpx/include/components.hpp>
 #include <hpx/components/security/stubs/certificate_authority_base.hpp>
 
@@ -53,5 +56,7 @@ namespace hpx { namespace components { namespace security
         }
     };
 }}}
+
+#endif
 
 #endif

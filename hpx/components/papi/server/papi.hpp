@@ -7,12 +7,16 @@
 #if !defined(PERFORMANCE_COUNTERS_PAPI_SERVER_PAPI_201111181426)
 #define PERFORMANCE_COUNTERS_PAPI_SERVER_PAPI_201111181426
 
-#include <vector>
-#include <map>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_PAPI)
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
+
+#include <vector>
+#include <map>
 
 #include <papi.h>
 
@@ -257,5 +261,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         }
     };
 }}}}
+
+#endif
 
 #endif

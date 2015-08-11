@@ -6,7 +6,9 @@
 #ifndef HPX_SERIALIZATION_MULTI_ARRAY_HPP
 #define HPX_SERIALIZATION_MULTI_ARRAY_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/array.hpp>
+
 #include <boost/multi_array.hpp>
 
 namespace hpx { namespace serialization

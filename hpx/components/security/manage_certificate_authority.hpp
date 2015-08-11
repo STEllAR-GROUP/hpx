@@ -6,7 +6,10 @@
 #if !defined(HPX_COMPONENTS_SECURITY_MANAGE_CA_MAY_30_2013_0720PM)
 #define HPX_COMPONENTS_SECURITY_MANAGE_CA_MAY_30_2013_0720PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
 #include <hpx/runtime/naming/name.hpp>
 
 #include <hpx/components/security/key_pair.hpp>
@@ -70,3 +73,4 @@ extern "C"
 
 #endif
 
+#endif

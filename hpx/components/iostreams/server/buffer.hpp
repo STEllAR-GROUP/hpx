@@ -10,6 +10,7 @@
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/components/iostreams/write_functions.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/locks.hpp>

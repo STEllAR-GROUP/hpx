@@ -6,10 +6,14 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_PARCEL_SUFFIX_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_PARCEL_SUFFIX_HPP
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
+#include <hpx/runtime/naming/name.hpp>
+
 #include <boost/cstdint.hpp>
 #include <boost/io/ios_state.hpp>
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/naming/name.hpp>
 
 #include "hash.hpp"
 
@@ -84,5 +88,7 @@ namespace hpx { namespace components { namespace security
 #  pragma pack(pop)
 #endif
 }}}
+
+#endif
 
 #endif

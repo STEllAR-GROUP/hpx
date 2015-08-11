@@ -29,7 +29,7 @@ foreach(header ${headers})
     # generate the test
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}
       "#include <hpx/${relpath}>\n"
-      "int main() { return 0; }\n")
+      "int main(int argc, char* argv[]) { return 0; }\n")
 
     set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
 
@@ -50,7 +50,7 @@ foreach(header ${headers})
     add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
 
     # add dependencies to pseudo-target
-    add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_exe")
+    add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_lib")
   endif()
 
 endforeach()
@@ -60,7 +60,7 @@ set(test_name "all_headers")
 set(all_headers_test_name "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
 file(WRITE ${all_headers_test_name}
   ${all_headers}
-  "int main() { return 0; }\n")
+  "int main(int argc, char* argv[]) { return 0; }\n")
 
 add_hpx_headers_compile_test(
   "all_headers"
@@ -76,4 +76,4 @@ add_hpx_pseudo_target(tests.headers.${test_name})
 add_hpx_pseudo_dependencies(tests.headers tests.headers.${test_name})
 
 # add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_exe")
+add_hpx_pseudo_dependencies(tests.headers.${test_name} "${test_name}_lib")

@@ -9,9 +9,13 @@
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/exception.hpp>
 
 #include <boost/exception_ptr.hpp>
@@ -718,7 +722,8 @@ namespace hpx { namespace applier
     ///
     HPX_API_EXPORT void register_work_plain(
         threads::thread_function_type && func,
-        char const* description = 0, naming::address_type lva = 0,
+        char const* description = 0,
+        boost::uint64_t /*naming::address_type*/ lva = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1),
@@ -729,7 +734,7 @@ namespace hpx { namespace applier
     HPX_API_EXPORT void register_work_plain(
         threads::thread_function_type && func,
         naming::id_type const& target, char const* description = 0,
-        naming::address_type lva = 0,
+        boost::uint64_t /*naming::address_type*/ lva = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1),
@@ -834,7 +839,8 @@ namespace hpx { namespace applier
     ///             \a threads#create_sync.
     HPX_API_EXPORT lcos::future<naming::id_type>
         create(naming::id_type const& targetgid,
-            components::component_type type, std::size_t count = 1);
+            boost::uint32_t /*components::component_type*/ type,
+            std::size_t count = 1);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The \a create_sync function creates a new component instance using the
@@ -851,8 +857,10 @@ namespace hpx { namespace applier
     ///
     /// \note       For asynchronous operation use the function
     ///             \a threads#create.
-    HPX_API_EXPORT naming::id_type create_sync(naming::id_type const& targetgid,
-        components::component_type type, std::size_t count = 1);
+    HPX_API_EXPORT naming::id_type
+        create_sync(naming::id_type const& targetgid,
+            boost::uint32_t /*components::component_type*/ type,
+            std::size_t count = 1);
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

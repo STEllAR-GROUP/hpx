@@ -7,7 +7,9 @@
 #ifndef HPX_SERIALIZATION_SHARED_PTR_HPP
 #define HPX_SERIALIZATION_SHARED_PTR_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/detail/pointer.hpp>
+
 #include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace serialization

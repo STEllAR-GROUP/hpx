@@ -6,7 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_SECRET_KEY_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_SECRET_KEY_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
 #include <hpx/exception.hpp>
 
 #include <boost/array.hpp>
@@ -99,5 +102,7 @@ namespace hpx { namespace components { namespace security
 #  pragma pack(pop)
 #endif
 }}}
+
+#endif
 
 #endif
