@@ -132,8 +132,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         T val = f_accu.get();
                         OutIter dst = get<1>(part_begin.get_iterator_tuple());
+                        // MSVC 2015 fails if op is captured by reference
                         util::loop_n(dst, part_size,
-                            [&op, &val](OutIter it)
+                            [=, &val](OutIter it)
                             {
                                 *it = op(*it, val);
                             });
