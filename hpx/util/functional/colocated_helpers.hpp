@@ -73,6 +73,11 @@ namespace hpx { namespace util { namespace functional
                 cont_(new typename util::decay<Continuation>::type(std::forward<Continuation>(c)))
             {}
 
+            apply_continuation_impl(apply_continuation_impl && o)
+              : bound_(std::move(o.bound_))
+              , cont_(std::move(o.cont_))
+            {}
+
             template <typename T>
             typename util::result_of<bound_type(naming::id_type, T)>::type
             operator()(naming::id_type lco, T && t)
@@ -165,6 +170,11 @@ namespace hpx { namespace util { namespace functional
                     Bound && bound, Continuation && c)
               : bound_(std::move(bound)),
                 cont_(new typename util::decay<Continuation>::type(std::forward<Continuation>(c)))
+            {}
+
+            async_continuation_impl(async_continuation_impl && o)
+              : bound_(std::move(o.bound_))
+              , cont_(std::move(o.cont_))
             {}
 
             template <typename T>
