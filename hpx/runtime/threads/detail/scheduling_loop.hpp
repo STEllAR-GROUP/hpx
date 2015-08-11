@@ -183,11 +183,26 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+    struct scheduling_counters
+    {
+        scheduling_counters(boost::int64_t& executed_threads,
+                boost::int64_t& executed_thread_phases,
+                boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)
+          : executed_threads_(executed_threads),
+            executed_thread_phases_(executed_thread_phases),
+            tfunc_time_(tfunc_time),
+            exec_time_(exec_time)
+        {}
+
+        boost::int64_t& executed_threads_;
+        boost::int64_t& executed_thread_phases_;
+        boost::uint64_t& tfunc_time_;
+        boost::uint64_t& exec_time_;
+    };
+
     template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
-        boost::atomic<hpx::state>& global_state, boost::int64_t& executed_threads,
-        boost::int64_t& executed_thread_phases, boost::uint64_t& tfunc_time,
-        boost::uint64_t& exec_time,
+        boost::atomic<hpx::state>& global_state, scheduling_counters& counters,
         util::function_nonser<void()> const& cb_outer = util::function_nonser<void()>(),
         util::function_nonser<void()> const& cb_inner = util::function_nonser<void()>())
     {
@@ -199,7 +214,7 @@ namespace hpx { namespace threads { namespace detail
         boost::int64_t idle_loop_count = 0;
         boost::int64_t busy_loop_count = 0;
 
-        idle_collect_rate idle_rate(tfunc_time, exec_time);
+        idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
         tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
         scheduler.SchedulingPolicy::start_periodic_maintenance(global_state);
@@ -255,7 +270,7 @@ namespace hpx { namespace threads { namespace detail
                             }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-                            ++executed_thread_phases;
+                            ++counters.executed_thread_phases_;
 #endif
                         }
                         else {
@@ -323,7 +338,7 @@ namespace hpx { namespace threads { namespace detail
                 if (state_val == depleted || state_val == terminated)
                 {
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-                    ++executed_threads;
+                    ++counters.executed_threads_;
 #endif
                     scheduler.SchedulingPolicy::destroy_thread(thrd, busy_loop_count);
                 }
@@ -339,7 +354,14 @@ namespace hpx { namespace threads { namespace detail
                     // clean up terminated threads one more time before existing
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
                     {
-                        // keep idling for some time
+                        // if this is an inner scheduler, exit immediately
+                        if (!cb_inner.empty())
+                        {
+                            global_state.store(state_stopped);
+                            break;
+                        }
+
+                        // otherwise, keep idling for some time
                         if (!may_exit)
                             idle_loop_count = 0;
                         may_exit = true;
@@ -390,7 +412,10 @@ namespace hpx { namespace threads { namespace detail
                 if (may_exit)
                 {
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                    {
+                        global_state.store(state_stopped);
                         break;
+                    }
                     may_exit = false;
                 }
                 else

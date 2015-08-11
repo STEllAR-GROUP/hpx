@@ -130,11 +130,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             return call_sequential(policy, std::forward<Args>(args)...);
         }
 
-        template <typename Executor, typename... Args>
+        template <typename Executor, typename Parameters, typename... Args>
         typename parallel::util::detail::algorithm_result<
-            sequential_task_execution_policy_shim<Executor>, local_result_type
+            sequential_task_execution_policy_shim<Executor, Parameters>,
+            local_result_type
         >::type
-        call(sequential_task_execution_policy_shim<Executor> policy,
+        call(sequential_task_execution_policy_shim<Executor, Parameters> policy,
             boost::mpl::true_, Args&&... args) const
         {
             return call_sequential(policy, std::forward<Args>(args)...);
@@ -151,11 +152,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             return call_sequential(policy, std::forward<Args>(args)...);
         }
 
-        template <typename Executor, typename... Args>
+        template <typename Executor, typename Parameters, typename... Args>
         typename parallel::util::detail::algorithm_result<
-            parallel_task_execution_policy_shim<Executor>, local_result_type
+            parallel_task_execution_policy_shim<Executor, Parameters>,
+            local_result_type
         >::type
-        call(parallel_task_execution_policy_shim<Executor> policy,
+        call(parallel_task_execution_policy_shim<Executor, Parameters> policy,
             boost::mpl::true_, Args&&... args) const
         {
             return call_sequential(policy, std::forward<Args>(args)...);
@@ -204,7 +206,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
                 parallel_task_execution_policy const& t =
                     *policy.get<parallel_task_execution_policy>();
 
-                return call(par(t.get_chunk_size()),
+                return call(par.with(t.parameters()),
                     boost::mpl::false_(), std::forward<Args>(args)...);
             }
 

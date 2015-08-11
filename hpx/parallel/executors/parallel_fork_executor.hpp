@@ -12,7 +12,7 @@
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/parallel/executors/auto_chunk_size.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <type_traits>
@@ -28,6 +28,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///
     struct parallel_fork_executor : executor_tag
     {
+        // Associate the auto_chunk_size executor parameters type as a default
+        // with this executor.
+        typedef auto_chunk_size executor_parameters_type;
+
 #if defined(DOXYGEN)
         /// Create a new parallel fork executor
         parallel_fork_executor() {}
