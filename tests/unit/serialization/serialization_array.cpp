@@ -176,14 +176,14 @@ void test_multi_array(T first)
                 HPX_TEST_EQ(oarray[i][j][k], iarray[i][j][k]);
 }
 
-template <typename T, std::size_t SIZE>
+template <typename T, std::size_t N>
 void test_plain_array()
 {
     std::vector<char> buffer;
-    T iarray[SIZE];
-    T oarray[SIZE];
+    T iarray[N];
+    T oarray[N];
 
-    for(std::size_t i = 0; i < SIZE; ++i) {
+    for(std::size_t i = 0; i < N; ++i) {
         iarray[i] = i * i;
         oarray[i] = -1;
     }
@@ -194,19 +194,19 @@ void test_plain_array()
     hpx::serialization::input_archive iarchive(buffer);
     iarchive >> oarray;
 
-    for(std::size_t i = 0; i < SIZE; ++i) {
+    for(std::size_t i = 0; i < N; ++i) {
         HPX_TEST_EQ(oarray[i], iarray[i]);
     }
 }
 
-template <typename T, std::size_t SIZE>
+template <typename T, std::size_t N>
 void test_array_of_vectors()
 {
     std::vector<char> buffer;
-    std::vector<T> iarray[SIZE];
-    std::vector<T> oarray[SIZE];
+    std::vector<T> iarray[N];
+    std::vector<T> oarray[N];
 
-    for(std::size_t i = 0; i < SIZE; ++i) {
+    for(std::size_t i = 0; i < N; ++i) {
         for (std::size_t j = 0; j < i; ++j) {
             iarray[i].push_back(i * i);
         }
@@ -218,7 +218,7 @@ void test_array_of_vectors()
     hpx::serialization::input_archive iarchive(buffer);
     iarchive >> oarray;
 
-    for(std::size_t i = 0; i < SIZE; ++i) {
+    for(std::size_t i = 0; i < N; ++i) {
         HPX_TEST_EQ(oarray[i].size(), iarray[i].size());
 
         for (std::size_t j = 0; j < i; ++j) {
