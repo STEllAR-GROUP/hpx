@@ -755,7 +755,7 @@ void register_worker_security(registration_header_security const& header)
     {
         // AGAS is starting up; this locality is participating in startup
         // synchronization.
-        util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
+        util::unique_function_nonser<void()>* thunk = new util::unique_function_nonser<void()>(
             util::bind(
                 util::one_shot(&big_boot_barrier::apply)
               , boost::ref(get_big_boot_barrier())
@@ -937,7 +937,7 @@ void big_boot_barrier::trigger()
 {
     if (service_mode_bootstrap == service_type)
     {
-        util::function_nonser<void()>* p;
+        util::unique_function_nonser<void()>* p;
 
         while (thunks.pop(p))
             (*p)();
