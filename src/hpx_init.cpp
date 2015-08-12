@@ -550,21 +550,23 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         std::string get_affinity_domain(util::command_line_handling const& cfg)
         {
+            std::string affinity_domain("pu");
 #if defined(HPX_HAVE_HWLOC)
-            std::string affinity_domain = cfg.vm_["hpx:affinity"].as<std::string>();
-            if (0 != std::string("pu").find(affinity_domain) &&
-                0 != std::string("core").find(affinity_domain) &&
-                0 != std::string("numa").find(affinity_domain) &&
-                0 != std::string("machine").find(affinity_domain))
+            if (0 != cfg.vm_.count("hpx:affinity"))
             {
-                throw detail::command_line_error("Invalid command line option "
-                    "--hpx:affinity, value must be one of: pu, core, numa, "
-                    "or machine.");
+                affinity_domain = cfg.vm_["hpx:affinity"].as<std::string>();
+                if (0 != std::string("pu").find(affinity_domain) &&
+                    0 != std::string("core").find(affinity_domain) &&
+                    0 != std::string("numa").find(affinity_domain) &&
+                    0 != std::string("machine").find(affinity_domain))
+                {
+                    throw detail::command_line_error("Invalid command line option "
+                        "--hpx:affinity, value must be one of: pu, core, numa, "
+                        "or machine.");
+                }
             }
-            return affinity_domain;
-#else
-            return "pu";
 #endif
+            return affinity_domain;
         }
 
         bool get_affinity_description(util::command_line_handling const& cfg,
