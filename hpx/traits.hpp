@@ -163,6 +163,12 @@ namespace hpx { namespace traits
 
     template <typename T, typename Enable = void>
     struct is_executor;
+
+    template <typename T, typename Enable = void>
+    struct is_timed_executor;
+
+    template <typename T, typename Enable = void>
+    struct is_executor_parameters;
 }}
 
 #endif

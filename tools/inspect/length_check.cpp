@@ -86,7 +86,7 @@ namespace boost
                 bool check_not = 0;
                 boost::regex error_note, http_note;
                 error_note = "\\s*#\\s*error";
-                http_note = "http://";
+                http_note = "https?://";
                 boost::smatch m;
                 if (boost::regex_search(someline[p], m, error_note)) //#error
                 {
@@ -95,7 +95,7 @@ namespace boost
                         check_not = 1;
                     }
                 }
-                else if (boost::regex_search(someline[p], m, http_note)) //#error
+                else if (boost::regex_search(someline[p], m, http_note)) //http:://
                 {
                     check_not = 1;
                 }

@@ -139,7 +139,7 @@ namespace hpx { namespace threads
         thread_logger_("threadmanager_impl::register_thread"),
         work_logger_("threadmanager_impl::register_work"),
         set_state_logger_("threadmanager_impl::set_state"),
-        pool_(scheduler, notifier, "main_thread_scheduling_pool"),
+        pool_(scheduler, notifier, "main_thread_scheduling_pool", true),
         notifier_(notifier)
     {}
 
@@ -536,23 +536,21 @@ namespace hpx { namespace threads
             thrd->free_thread_exit_callbacks();
     }
 
-    // Return the executor associated with th egiven thread
+    // Return the executor associated with the given thread
     template <typename SchedulingPolicy>
-    executor threadmanager_impl<SchedulingPolicy>::
+    executors::generic_thread_pool_executor threadmanager_impl<SchedulingPolicy>::
         get_executor(thread_id_type const& thrd, error_code& ec) const
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::get_executor",
                 "NULL thread id encountered");
-            return default_executor();
+            return executors::generic_thread_pool_executor(0);
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        if (0 == thrd)
-            return default_executor();
         return executors::generic_thread_pool_executor(thrd->get_scheduler_base());
     }
 
@@ -997,6 +995,22 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
+            // /threads{locality#%d/total}/time/cumulative
+            // /threads{locality#%d/worker-thread%d}/time/cumulative
+            { "time/cumulative",
+              util::bind(&ti::get_cumulative_thread_duration, this, -1, _1),
+              util::bind(&ti::get_cumulative_thread_duration, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/time/cumulative-overhead
+            // /threads{locality#%d/worker-thread%d}/time/cumulative-overhead
+            { "time/cumulative-overhead",
+              util::bind(&ti::get_cumulative_thread_overhead, this, -1, _1),
+              util::bind(&ti::get_cumulative_thread_overhead, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
 #endif
 #endif
             // /threads{locality#%d/total}/count/instantaneous/all
@@ -1255,6 +1269,18 @@ namespace hpx { namespace threads
               &performance_counters::locality_thread_counter_discoverer,
               "ns"
             },
+            { "/threads/time/cumulative", performance_counters::counter_raw,
+              "returns the cumulative time spent executing HPX-threads",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
+            },
+            { "/threads/time/cumulative-overhead", performance_counters::counter_raw,
+              "returns the cumulative overhead time incurred by executing HPX threads",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "ns"
+            },
 #endif
 #endif
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
@@ -1380,7 +1406,7 @@ namespace hpx { namespace threads
         boost::unique_lock<mutex_type> lk(mtx_);
 
         if (pool_.get_os_thread_count() != 0 ||
-            pool_.get_state() == state_running)
+            pool_.has_reached_state(state_running))
         {
             return true;    // do nothing if already running
         }
@@ -1458,6 +1484,20 @@ namespace hpx { namespace threads
     {
         return pool_.get_thread_overhead(num, reset);
     }
+
+    template <typename SchedulingPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy>::
+        get_cumulative_thread_duration(std::size_t num, bool reset)
+    {
+        return pool_.get_cumulative_thread_duration(num, reset);
+    }
+
+    template <typename SchedulingPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy>::
+        get_cumulative_thread_overhead(std::size_t num, bool reset)
+    {
+        return pool_.get_cumulative_thread_overhead(num, reset);
+    }
 #endif
 #endif
 
@@ -1503,6 +1543,12 @@ namespace hpx { namespace threads
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_queue_scheduler<> >;
+#endif
+
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+#include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
+    hpx::threads::policies::static_queue_scheduler<> >;
 #endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)

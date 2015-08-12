@@ -237,7 +237,7 @@ void function_object_test2()
 
 //
 
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) \
     && !defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING)
 
 struct Z

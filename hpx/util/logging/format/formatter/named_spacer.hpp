@@ -205,8 +205,8 @@ namespace detail {
                 format_base_type> holder;
 
             typedef typename formatter::convert_type formatter_convert_type;
-            // they must share the same type of conversion \
-            - otherwise when trying to prepend we could end up appending or vice versa
+            // they must share the same type of conversion
+            // - otherwise when trying to prepend we could end up appending or vice versa
             BOOST_STATIC_ASSERT( (boost::is_same<formatter_convert_type,
                 convert_type>::value) );
 

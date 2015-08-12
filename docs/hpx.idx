@@ -104,13 +104,35 @@ parallel::parallel_executor                "parallel_executor"             "hpx\
 # hpx/parallel/executors/service_executors.hpp
 parallel::service_executor                 "service_executor"              "hpx\.parallel\.v3\.service_executor.*"
 
-# hpx/parallel/executors/service_executors.hpp
-parallel::service_executor                 "service_executor"              "hpx\.parallel\.v3\.service_executor.*"
+# hpx/parallel/executors/this_thread_executors.hpp
+parallel::this_thread_static_queue_executor          "this_thread_static_queue_executor"    "hpx\.parallel\.v3\.this_thread_static_queue_executor.*"
+parallel::this_thread_static_priority_queue_executor "this_thread_static_priority_queue_executor"  "hpx\.parallel\.v3\.this_thread_static_priority_queue_executor.*"
 
 # hpx/parallel/executors/thread_pool_executors.hpp
-parallel::local_queue_executor           "local_queue_executor"             "hpx\.parallel\.v3\.local_queue_executor.*"
-parallel::local_priority_queue_executor  "local_priority_queue_executor"    "hpx\.parallel\.v3\.local_priority_qu_.*"
-parallel::static_priority_queue_executor "static_priority_queue_executor"   "hpx\.parallel\.v3\.static_priority_q_.*"
+parallel::local_queue_executor              "local_queue_executor"             "hpx\.parallel\.v3\.local_queue_executor.*"
+parallel::local_priority_queue_executor     "local_priority_queue_executor"    "hpx\.parallel\.v3\.local_priority_qu_.*"
+parallel::static_priority_queue_executor    "static_priority_queue_executor"   "hpx\.parallel\.v3\.static_priority_q_.*"
+
+# hpx/parallel/executors/timed_execution_traits.hpp
+parallel::timed_execution_traits            "timed_execution_traits"        "hpx\.parallel\.v3\.timed_execution_traits.*"
+parallel::is_timed_executor                 "is_timed_executor"             "hpx\.parallel\.v3\.is_timed_executor.*"
+
+# hpx/parallel/executors/executor_parameter_traits.hpp
+parallel::executor_parameter_traits      "executor_parameter_traits"        "hpx\.parallel\.v3\.executor_parameter_traits.*"
+parallel::is_executor_parameters         "is_executor_parameters"           "hpx\.parallel\.v3\.is_executor_parameters.*"
+
+# hpx/parallel/executors/static_chunk_size.hpp
+parallel::static_chunk_size                 "static_chunk_size"             "hpx\.parallel\.v3\.static_chunk_size.*"
+
+# hpx/parallel/executors/dynamic_chunk_size.hpp
+parallel::dynamic_chunk_size                "dynamic_chunk_size"            "hpx\.parallel\.v3\.dynamic_chunk_size.*"
+
+# hpx/parallel/executors/guided_chunk_size.hpp
+parallel::guided_chunk_size                 "guided_chunk_size"             "hpx\.parallel\.v3\.guided_chunk_size.*"
+
+# hpx/parallel/executors/auto_chunk_size.hpp
+parallel::auto_chunk_size                   "auto_chunk_size"               "hpx\.parallel\.v3\.auto_chunk_size.*"
+
 
 # hpx/parallel/algorithms/adjacent_difference.hpp
 parallel::adjacent_difference         "adjacent_difference" "hpx\.parallel\.v1\.adjacent_difference.*"
@@ -252,7 +274,6 @@ parallel::uninitialized_copy_n        "uninitialized_copy_n" "hpx\.parallel\.v1\
 # hpx/parallel/algorithms/uninitialized_fill.hpp
 parallel::uninitialized_fill          "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
 parallel::uninitialized_fill_n        "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
-
 
 # hpx/runtime/components/colocating_distribution_policy.hpp
 colocating_distribution_policy        "" "hpx\.components\.colocating_distri_id.*"

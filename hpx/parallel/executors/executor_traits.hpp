@@ -9,17 +9,15 @@
 #if !defined(HPX_PARALLEL_EXECUTOR_TRAITS_MAY_10_2015_1128AM)
 #define HPX_PARALLEL_EXECUTOR_TRAITS_MAY_10_2015_1128AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <type_traits>
@@ -119,8 +117,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename T>
         struct future_type<Executor, T,
             typename hpx::util::always_void<
-                typename Executor::future_type>::type
-            >
+                typename Executor::future_type
+            >::type>
         {
             typedef typename Executor::future_type type;
         };
@@ -207,9 +205,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
                 for (auto const& elem: shape)
                 {
-                    results.push_back(
-                        exec.async_execute(hpx::util::deferred_call(f, elem))
-                    );
+                    results.push_back(exec.async_execute(
+                        hpx::util::deferred_call(f, elem)
+                    ));
                 }
 
                 return results;
@@ -267,9 +265,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
                 for (auto const& elem: shape)
                 {
-                    results.push_back(
-                        exec.async_execute(hpx::util::deferred_call(f, elem))
-                    );
+                    results.push_back(exec.async_execute(
+                        hpx::util::deferred_call(f, elem)
+                    ));
                 }
 
                 return hpx::util::unwrapped(results);
@@ -312,6 +310,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             return os_thread_count_helper::call(0, exec);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        struct has_pending_closures_helper
+        {
+            template <typename Executor>
+            static auto call(wrap_int, Executor& exec) -> bool
+            {
+                return false;   // assume stateless scheduling
+            }
+
+            template <typename Executor>
+            static auto call(int, Executor& exec)
+                ->  decltype(exec.has_pending_closures())
+            {
+                return exec.has_pending_closures();
+            }
+        };
+
+        template <typename Executor>
+        bool call_has_pending_closures(Executor& exec)
+        {
+            return has_pending_closures_helper::call(0, exec);
+        }
         /// \endcond
     }
 
@@ -332,9 +353,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     ///       execute().
     ///
     template <typename Executor, typename Enable>
-    class executor_traits
+    struct executor_traits
     {
-    public:
         /// The type of the executor associated with this instance of
         /// \a executor_traits
         typedef Executor executor_type;
@@ -394,8 +414,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note Executors have to implement only `async_execute()`. All other
         ///       functions will be emulated by this `executor_traits` in terms
         ///       of this single basic primitive. However, some executors will
-        ///       naturally specialize all four operations for maximum
-        ///       efficiency.
+        ///       naturally specialize all operations for maximum efficiency.
         ///
         /// \note This calls exec.async_execute(f)
         ///
@@ -423,7 +442,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
         ///
-        /// \returns f()'s result through a future
+        /// \returns f()'s result
         ///
         /// \note This calls exec.execute(f) if it exists;
         ///       otherwise hpx::async(f).get()
@@ -519,6 +538,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         static std::size_t os_thread_count(executor_type const& exec)
         {
             return detail::call_os_thread_count(exec);
+        }
+
+        /// Retrieve whether this executor has operations pending or not.
+        ///
+        /// \param exec  [in] The executor object to use for scheduling of the
+        ///              function \a f.
+        ///
+        /// \note If the executor does not expose this information, this call
+        ///       will always return \a false
+        ///
+        static bool has_pending_closures(executor_type& exec)
+        {
+            return detail::call_has_pending_closures(exec);
         }
     };
 

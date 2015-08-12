@@ -53,11 +53,39 @@ namespace hpx { namespace serialization { namespace detail
     {
         typedef void (*save_function_type) (output_archive& , const void* base);
         typedef void (*load_function_type) (input_archive& , void* base);
-        typedef void* (*create_function_type) ();
+        typedef void* (*create_function_type) (input_archive&);
 
         save_function_type save_function;
         load_function_type load_function;
         create_function_type create_function;
+    };
+
+    template <class T>
+    class constructor_selector
+    {
+    public:
+        static T *create(input_archive& ar)
+        {
+            T *t = new T;
+            try {
+                load_polymorphic(t, ar, hpx::traits::is_nonintrusive_polymorphic<T>());
+            } catch (...) {
+                delete t;
+                throw;
+            }
+            return t;
+        }
+
+    private:
+        static void load_polymorphic(T *t, input_archive& ar, boost::mpl::true_)
+        {
+            serialize(ar, *t, 0);
+        }
+
+        static void load_polymorphic(T *t, input_archive& ar, boost::mpl::false_)
+        {
+            ar >> *t;
+        }
     };
 
     class HPX_EXPORT polymorphic_nonintrusive_factory: boost::noncopyable
@@ -144,9 +172,9 @@ namespace hpx { namespace serialization { namespace detail
         }
 
         // this function is needed for pointer type serialization
-        static void* create()
+        static void* create(input_archive& ar)
         {
-            return new Derived;
+            return constructor_selector<Derived>::create(ar);
         }
 
         register_class()
@@ -240,5 +268,32 @@ namespace hpx { namespace serialization { namespace detail
     {                                                                         \
         return hpx_register_class_instance;                                   \
     }                                                                         \
+/**/
+#define HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(Class, Func)                \
+    namespace hpx { namespace serialization { namespace detail {              \
+    template<>                                                                \
+    class constructor_selector<HPX_UTIL_STRIP(Class)>                         \
+    {                                                                         \
+    public:                                                                   \
+        static Class *create(input_archive& ar)                               \
+        {                                                                     \
+            return Func(ar);                                                  \
+        }                                                                     \
+    };                                                                        \
+    }}}                                                                       \
+/**/
+#define HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE(                   \
+    Parameters, Template, Func)                                               \
+    namespace hpx { namespace serialization { namespace detail {              \
+    HPX_UTIL_STRIP(Parameters)                                                \
+    class constructor_selector<HPX_UTIL_STRIP(Template)>                      \
+    {                                                                         \
+    public:                                                                   \
+        static HPX_UTIL_STRIP(Template) *create(input_archive& ar)            \
+        {                                                                     \
+            return Func(ar, static_cast<HPX_UTIL_STRIP(Template)*>(0));       \
+        }                                                                     \
+    };                                                                        \
+    }}}                                                                       \
 /**/
 #endif

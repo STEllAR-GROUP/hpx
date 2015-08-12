@@ -19,6 +19,7 @@ namespace hpx
     {
         state_invalid = -1,
         state_initialized = 0,
+        first_valid_runtime_state = state_initialized,
         state_pre_startup = 1,
         state_startup = 2,
         state_pre_main = 3,

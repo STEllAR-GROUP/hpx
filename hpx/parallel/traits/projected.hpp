@@ -45,8 +45,7 @@ namespace hpx { namespace parallel { namespace traits
             template <typename U>
             static char test(typename std::iterator_traits<U>::pointer* x);
 
-            template <typename U>
-            static long test(U* x);
+            static long test(...);
 
             static bool const value =
                 sizeof(test<T>(0)) == sizeof(char);

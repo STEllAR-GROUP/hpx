@@ -40,7 +40,7 @@ This scheduler is enabled at build time by default and will be available always.
 
 [heading Static Priority Scheduling Policy]
 
-* invoke using: [hpx_cmdline `--hpx:queuing=static`] (or `-qs`)
+* invoke using: [hpx_cmdline `--hpx:queuing=static-priority`] (or `-qs`)
 * flag to turn on for build: `HPX_THREAD_SCHEDULERS=all` or
   `HPX_THREAD_SCHEDULERS=static-priority`
 
@@ -56,6 +56,16 @@ robin fashion. There is no thread stealing in this policy.
 
 The local scheduling policy maintains one queue per OS thread from which each
 OS thread pulls its tasks (user threads).
+
+[heading Static Scheduling Policy]
+
+* invoke using: [hpx_cmdline `--hpx:queuing=static`]
+* flag to turn on for build: `HPX_THREAD_SCHEDULERS=all` or
+  `HPX_THREAD_SCHEDULERS=static`
+
+The static scheduling policy maintains one queue per OS thread from which each
+OS thread pulls its tasks (user threads). Threads are distributed in a round
+robin fashion. There is no thread stealing in this policy.
 
 [heading Priority ABP Scheduling Policy]
 

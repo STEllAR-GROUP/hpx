@@ -130,26 +130,22 @@ namespace hpx {
                 ::_1, ::_2, false),
             boost::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
         io_pool_(rtcfg.get_thread_pool_size("io_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "io-thread",
-                ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
             boost::bind(&runtime_impl::init_tss, This(), "timer-thread",
                 ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         scheduler_(init),
-        notifier_(
-            boost::bind(&runtime_impl::init_tss, This(), "worker-thread",
-                ::_1, ::_2, false),
-            boost::bind(&runtime_impl::deinit_tss, This()),
-            boost::bind(&runtime_impl::report_error, This(), _1, _2)),
+        notifier_(runtime_impl<SchedulingPolicy>::
+            get_notification_policy("worker-thread")),
         thread_manager_(
             new hpx::threads::threadmanager_impl<SchedulingPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
         parcel_handler_(rtcfg, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue,
-            boost::bind(&runtime_impl::init_tss, This(),
-                "parcel-thread", ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread",
+                ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(parcel_handler_, ini_, mode_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
@@ -565,6 +561,16 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
+    threads::policies::callback_notifier runtime_impl<SchedulingPolicy>::
+        get_notification_policy(char const* prefix)
+    {
+        return notification_policy_type(
+            boost::bind(&runtime_impl::init_tss, This(), prefix, ::_1, ::_2, false),
+            boost::bind(&runtime_impl::deinit_tss, This()),
+            boost::bind(&runtime_impl::report_error, This(), _1, _2));
+    }
+
+    template <typename SchedulingPolicy>
     void runtime_impl<SchedulingPolicy>::init_tss(
         char const* context, std::size_t num, char const* postfix,
         bool service_thread)
@@ -603,8 +609,7 @@ namespace hpx {
         if (service_thread)
         {
             // FIXME: We don't set the affinity of the service threads on BG/Q,
-            // as this is
-            // causing a hang (needs to be investigated
+            // as this is causing a hang (needs to be investigated)
 #if !defined(__bgq__)
             threads::mask_cref_type used_processing_units =
                 thread_manager_->get_used_processing_units();
@@ -735,6 +740,12 @@ namespace hpx {
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::local_queue_scheduler<> >;
+#endif
+
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+#include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::runtime_impl<
+    hpx::threads::policies::static_queue_scheduler<> >;
 #endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)

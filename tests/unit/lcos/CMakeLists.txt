@@ -20,6 +20,7 @@ set(tests
     broadcast
     broadcast_apply
     condition_variable
+    counting_semaphore
     barrier
     fold
     future
@@ -72,6 +73,7 @@ set(future_then_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
+set(counting_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -163,4 +165,16 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     endif()
   endforeach()
 endif()
+
+#########################################################################################
+set(subdirs
+    shared_mutex
+   )
+
+# add sub directories
+foreach(subdir ${subdirs})
+  add_hpx_pseudo_target(tests.unit.lcos.${subdir}dir)
+  add_subdirectory(${subdir})
+  add_hpx_pseudo_dependencies(tests.unit.lcos tests.unit.lcos.${subdir}dir)
+endforeach()
 

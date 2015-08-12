@@ -3,8 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
-
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
@@ -14,6 +12,8 @@
 #include <hpx/runtime/serialization/output_archive.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
+
+#include <iostream>
 
 // =========================shared_ptr test==============================
 struct A
@@ -25,13 +25,15 @@ struct A
 
   virtual const char* foo() = 0;
 
-  template <class Archive>
-  void serialize(Archive& ar, unsigned)
-  {
-    ar & a;
-  }
-  HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(A);
 };
+
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(A);
+
+template <class Archive>
+void serialize(Archive& ar, A& a, unsigned)
+{
+  ar & a.a;
+}
 
 struct B: A
 {
@@ -44,36 +46,27 @@ struct B: A
     return "B::foo";
   }
 
-  template <class Archive>
-  void load(Archive& ar, unsigned)
-  {
-    ar & hpx::serialization::base_object<A>(*this);
-    ar & b;
-  }
-  template <class Archive>
-  void save(Archive& ar, unsigned) const
-  {
-    ar & hpx::serialization::base_object<A>(*this);
-    ar & b;
-  }
-  HPX_SERIALIZATION_SPLIT_MEMBER();
-  HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(B);
 };
 
-class C: public B
+template <class Archive>
+void load(Archive& ar, B& b, unsigned)
 {
-  friend class hpx::serialization::access;
+  ar & hpx::serialization::base_object<A>(b);
+  ar & b.b;
+}
+template <class Archive>
+void save(Archive& ar, const B& b, unsigned)
+{
+  ar & hpx::serialization::base_object<A>(b);
+  ar & b.b;
+}
+HPX_SERIALIZATION_SPLIT_FREE(B);
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(B);
+
+struct C: public B
+{
   int c;
 
-  template <class Archive>
-  void serialize(Archive& ar, unsigned)
-  {
-    ar & hpx::serialization::base_object<B>(*this);
-    ar & c;
-  }
-  HPX_SERIALIZATION_POLYMORPHIC(C)
-
-public:
   C(int c = 3): c(c) {}
 
   virtual const char* foo()
@@ -86,6 +79,14 @@ public:
     return c;
   }
 };
+
+template <class Archive>
+void serialize(Archive& ar, C& c, unsigned)
+{
+  ar & hpx::serialization::base_object<B>(c);
+  ar & c.c;
+}
+HPX_SERIALIZATION_REGISTER_CLASS(C);
 
 void test_shared()
 {
@@ -126,23 +127,21 @@ struct D
   virtual ~D(){}
 
   virtual const char* foo() = 0;
-
-private:
-  friend class hpx::serialization::access;
-
-  template <class Archive>
-  void load(Archive& ar, unsigned)
-  {
-    ar & a;
-  }
-  template <class Archive>
-  void save(Archive& ar, unsigned) const
-  {
-    ar & a;
-  }
-  HPX_SERIALIZATION_SPLIT_MEMBER();
-  HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT_SPLITTED(D);
 };
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(D);
+
+template <class Archive>
+void load(Archive& ar, D& d, unsigned)
+{
+  ar & d.a;
+}
+template <class Archive>
+void save(Archive& ar, const D& d, unsigned)
+{
+  ar & d.a;
+}
+HPX_SERIALIZATION_SPLIT_FREE(D);
+
 
 void intrusive_ptr_add_ref(D* d)
 {
@@ -168,36 +167,28 @@ struct E: D
     return "E::foo";
   }
 
-  template <class Archive>
-  void load(Archive& ar, unsigned)
-  {
-    ar & hpx::serialization::base_object<D>(*this);
-    ar & b;
-  }
-  template <class Archive>
-  void save(Archive& ar, unsigned) const
-  {
-    ar & hpx::serialization::base_object<D>(*this);
-    ar & b;
-  }
-  HPX_SERIALIZATION_SPLIT_MEMBER();
-  HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(E);
 };
 
-class F: public E
+template <class Archive>
+void load(Archive& ar, E& e, unsigned)
 {
-  friend class hpx::serialization::access;
+  ar & hpx::serialization::base_object<D>(e);
+  ar & e.b;
+}
+template <class Archive>
+void save(Archive& ar, const E& e, unsigned)
+{
+  ar & hpx::serialization::base_object<D>(e);
+  ar & e.b;
+}
+HPX_SERIALIZATION_SPLIT_FREE(E);
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(E);
+
+
+struct F: public E
+{
   int c;
 
-  template <class Archive>
-  void serialize(Archive& ar, unsigned)
-  {
-    ar & hpx::serialization::base_object<E>(*this);
-    ar & c;
-  }
-  HPX_SERIALIZATION_POLYMORPHIC(F)
-
-public:
   F(int c = 3): c(c) {}
 
   virtual const char* foo()
@@ -210,6 +201,14 @@ public:
     return c;
   }
 };
+
+template <class Archive>
+void serialize(Archive& ar, F& f, unsigned)
+{
+  ar & hpx::serialization::base_object<E>(f);
+  ar & f.c;
+}
+HPX_SERIALIZATION_REGISTER_CLASS(F);
 
 void test_intrusive()
 {

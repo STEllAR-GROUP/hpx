@@ -209,6 +209,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return util::detail::algorithm_result<ExPolicy, SegOutIter>::get(
                 lcos::local::dataflow(
                     [=](std::vector<shared_future<local_output_iterator_type> > && r)
+                        ->  SegOutIter
                     {
                         // handle any remote exceptions, will throw on error
                         std::list<boost::exception_ptr> errors;

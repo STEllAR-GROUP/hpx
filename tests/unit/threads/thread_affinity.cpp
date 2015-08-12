@@ -64,8 +64,8 @@ std::size_t thread_affinity_worker(std::size_t desired)
         }
         else
         {
-            HPX_TEST(false && "hwloc_get_cpubind(topo, cpuset,
-                HWLOC_CPUBIND_THREAD) failed!");
+            HPX_TEST(false && "hwloc_get_cpubind(topo, cpuset, \
+                        HWLOC_CPUBIND_THREAD) failed!");
         }
 
         hwloc_bitmap_free(cpuset);

@@ -56,7 +56,7 @@ namespace hpx { namespace lcos { namespace local
             void do_run()
             {
                 try {
-                    this->set_result(f_());
+                    this->set_value(f_());
                 }
                 catch(...) {
                     this->set_exception(boost::current_exception());
@@ -94,7 +94,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 try {
                     f_();
-                    this->set_result(result_type());
+                    this->set_value(result_type());
                 }
                 catch(...) {
                     this->set_exception(boost::current_exception());

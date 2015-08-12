@@ -93,7 +93,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                  OutIter dest, Conv && conv, T && init, Op && op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
-                typedef hpx::util::zip_iterator<FwdIter, T*> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
 
@@ -101,46 +101,52 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     return result::get(std::move(dest));
 
                 difference_type count = std::distance(first, last);
-                boost::shared_array<T> data(new T[count]);
+
+                OutIter final_dest = dest;
+                std::advance(final_dest, count);
 
                 // The overall scan algorithm is performed by executing 2
                 // subsequent parallel steps. The first calculates the scan
                 // results for each partition and the second produces the
                 // overall result
 
+                using hpx::util::get;
                 using hpx::util::make_zip_iterator;
-                return
-                    util::scan_partitioner<ExPolicy, OutIter, T>::call(
-                        policy, make_zip_iterator(first, data.get()), count, init,
-                        // step 1 performs first part of scan algorithm
-                        [=](zip_iterator part_begin, std::size_t part_size) -> T
-                        {
-                            using hpx::util::get;
-                            T part_init = conv(get<0>(*part_begin));
-                            get<1>(*part_begin++) = part_init;
-                            return sequential_transform_inclusive_scan_n(
-                                get<0>(part_begin.get_iterator_tuple()), part_size-1,
-                                get<1>(part_begin.get_iterator_tuple()), conv,
-                                part_init, op);
-                        },
-                        // step 2 propagates the partition results from left
-                        // to right
-                        hpx::util::unwrapped(
-                            [=](T const& prev, T const& curr) -> T
+                return util::scan_partitioner<ExPolicy, OutIter, T>::call(
+                    policy, make_zip_iterator(first, dest), count, init,
+                    // step 1 performs first part of scan algorithm
+                    [op, conv](zip_iterator part_begin, std::size_t part_size)
+                        -> T
+                    {
+                        T part_init = conv(get<0>(*part_begin));
+                        get<1>(*part_begin++) = part_init;
+                        return sequential_transform_inclusive_scan_n(
+                            get<0>(part_begin.get_iterator_tuple()),
+                            part_size-1,
+                            get<1>(part_begin.get_iterator_tuple()),
+                            conv, part_init, op);
+                    },
+                    // step 2 propagates the partition results from left
+                    // to right
+                    hpx::util::unwrapped(op),
+                    // step 3 runs final accumulation on each partition
+                    [op](zip_iterator part_begin, std::size_t part_size,
+                        hpx::shared_future<T> f_accu)
+                    {
+                        T val = f_accu.get();
+                        OutIter dst = get<1>(part_begin.get_iterator_tuple());
+                        util::loop_n(dst, part_size,
+                            [&op, &val](OutIter it)
                             {
-                                return op(prev, curr);
-                            }),
-                        // step 3 runs the remaining operation
-                        [=](std::vector<hpx::shared_future<T> >&& r,
-                            std::vector<std::size_t> const& chunk_sizes)
-                                -> typename result::type
-                        {
-                            // run the final copy step and produce the required
-                            // result
-                            return scan_copy_helper(policy, std::move(r),
-                                data, count, dest, op, chunk_sizes);
-                        }
-                    );
+                                *it = op(*it, val);
+                            });
+                    },
+                    // step 4 use this return value
+                    [final_dest](std::vector<hpx::shared_future<T> > &&,
+                        std::vector<hpx::future<void> > &&)
+                    {
+                        return final_dest;
+                    });
             }
         };
         /// \endcond
