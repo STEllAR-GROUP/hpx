@@ -66,7 +66,13 @@ namespace hpx { namespace serialization
             typedef typename hpx::traits::is_bitwise_serializable<T>::type
                 use_optimized;
 
-            if (ar.disable_array_optimization())
+#ifdef BOOST_BIG_ENDIAN
+            bool archive_endianess_differs = ar.endian_little();
+#else
+            bool archive_endianess_differs = ar.endian_big();
+#endif
+
+            if (ar.disable_array_optimization() || archive_endianess_differs)
                 serialize_optimized(ar, v, boost::mpl::false_());
             else
                 serialize_optimized(ar, v, use_optimized());
