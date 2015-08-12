@@ -199,6 +199,35 @@ void test_plain_array()
     }
 }
 
+template <typename T, std::size_t SIZE>
+void test_array_of_vectors()
+{
+    std::vector<char> buffer;
+    std::vector<T> iarray[SIZE];
+    std::vector<T> oarray[SIZE];
+
+    for(std::size_t i = 0; i < SIZE; ++i) {
+        for (std::size_t j = 0; j < i; ++j) {
+            iarray[i].push_back(i * i);
+        }
+    }
+
+    hpx::serialization::output_archive oarchive(buffer);
+    oarchive << iarray;
+
+    hpx::serialization::input_archive iarchive(buffer);
+    iarchive >> oarray;
+
+    for(std::size_t i = 0; i < SIZE; ++i) {
+        HPX_TEST_EQ(oarray[i].size(), iarray[i].size());
+
+        for (std::size_t j = 0; j < i; ++j) {
+            HPX_TEST_EQ(oarray[i][j], iarray[i][j]);
+        }
+    }
+}
+
+
 int main()
 {
     test<char>((std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
@@ -226,5 +255,9 @@ int main()
 
     test_plain_array<double, 20>();
     test_plain_array<int, 200>();
+
+    test_array_of_vectors<double, 20>();
+    test_array_of_vectors<int, 200>();
+
     return hpx::util::report_errors();
 }
