@@ -22,10 +22,11 @@ namespace hpx { namespace threads { namespace detail
     void thread_num_tss::init_tss(std::size_t num)
     {
         // shouldn't be initialized yet
-        HPX_ASSERT(NULL == thread_num_tss::thread_num_.get());
-
-        thread_num_tss::thread_num_.reset(new std::size_t);
-        *thread_num_tss::thread_num_.get() = num;
+        if (NULL == thread_num_tss::thread_num_.get())
+        {
+            thread_num_tss::thread_num_.reset(new std::size_t);
+            *thread_num_tss::thread_num_.get() = num;
+        }
     }
 
     void thread_num_tss::deinit_tss()

@@ -1,10 +1,10 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_SERIAL_EXECUTOR_JAN_11_2013_0831PM)
-#define HPX_RUNTIME_THREADS_EXECUTORS_SERIAL_EXECUTOR_JAN_11_2013_0831PM
+#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_GENERIC_EXECUTOR_JAN_11_2013_0831PM)
+#define HPX_RUNTIME_THREADS_EXECUTORS_GENERIC_EXECUTOR_JAN_11_2013_0831PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
@@ -22,11 +22,10 @@ namespace hpx { namespace threads { namespace executors
     {
         //////////////////////////////////////////////////////////////////////
         class HPX_EXPORT generic_thread_pool_executor
-          : public threads::detail::executor_base
+          : public threads::detail::scheduled_executor_base
         {
         public:
             generic_thread_pool_executor(policies::scheduler_base* scheduler);
-            ~generic_thread_pool_executor();
 
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
@@ -35,8 +34,27 @@ namespace hpx { namespace threads { namespace executors
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize, error_code& ec);
 
+            // Schedule given function for execution in this executor no sooner
+            // than time abs_time. This call never blocks, and may violate
+            // bounds on the executor's queue size.
+            void add_at(
+                boost::chrono::steady_clock::time_point const& abs_time,
+                closure_type && f, char const* description,
+                threads::thread_stacksize stacksize, error_code& ec);
+
+            // Schedule given function for execution in this executor no sooner
+            // than time rel_time from now. This call never blocks, and may
+            // violate bounds on the executor's queue size.
+            void add_after(
+                boost::chrono::steady_clock::duration const& rel_time,
+                closure_type && f, char const* description,
+                threads::thread_stacksize stacksize, error_code& ec);
+
             // Return an estimate of the number of waiting tasks.
             boost::uint64_t num_pending_closures(error_code& ec) const;
+
+            // Return the runtime status of the underlying scheduler
+            hpx::state get_state() const;
 
         protected:
             static threads::thread_state_enum thread_function_nullary(
@@ -52,9 +70,12 @@ namespace hpx { namespace threads { namespace executors
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT generic_thread_pool_executor : public executor
+    struct HPX_EXPORT generic_thread_pool_executor : public scheduled_executor
     {
-        explicit generic_thread_pool_executor(policies::scheduler_base* scheduler);
+        explicit generic_thread_pool_executor(
+            policies::scheduler_base* scheduler);
+
+        hpx::state get_state() const;
     };
 }}}
 

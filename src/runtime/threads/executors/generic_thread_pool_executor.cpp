@@ -1,10 +1,11 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
+#include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/register_locks.hpp>
@@ -15,9 +16,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     generic_thread_pool_executor::generic_thread_pool_executor(
             policies::scheduler_base* scheduler)
       : scheduler_base_(scheduler)
-    {}
-
-    generic_thread_pool_executor::~generic_thread_pool_executor()
     {}
 
     threads::thread_state_enum
@@ -58,6 +56,44 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             ec = make_success_code();
     }
 
+    void generic_thread_pool_executor::add_at(
+        boost::chrono::steady_clock::time_point const& abs_time,
+        closure_type && f, char const* desc,
+        threads::thread_stacksize stacksize, error_code& ec)
+    {
+        // create a new suspended thread
+        thread_init_data data(util::bind(
+            util::one_shot(&generic_thread_pool_executor::thread_function_nullary),
+            std::move(f)), desc);
+        data.stacksize = threads::get_stack_size(stacksize);
+
+        threads::thread_id_type id = threads::invalid_thread_id;
+        threads::detail::create_thread( //-V601
+            scheduler_base_, data, id, suspended, true, ec);
+        if (ec) return;
+        HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
+
+        // now schedule new thread for execution
+        threads::detail::set_thread_state_timed(
+            *scheduler_base_, abs_time, id, ec);
+        if (ec) return;
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+
+    // Schedule given function for execution in this executor no sooner
+    // than time rel_time from now. This call never blocks, and may
+    // violate bounds on the executor's queue size.
+    void generic_thread_pool_executor::add_after(
+        boost::chrono::steady_clock::duration const& rel_time,
+        closure_type && f, char const* desc,
+        threads::thread_stacksize stacksize, error_code& ec)
+    {
+        return add_at(boost::chrono::steady_clock::now() + rel_time,
+            std::move(f), desc, stacksize, ec);
+    }
+
     // Return an estimate of the number of waiting tasks.
     boost::uint64_t generic_thread_pool_executor::num_pending_closures(
         error_code& ec) const
@@ -85,6 +121,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             "requested value of invalid policy element");
         return std::size_t(-1);
     }
+
+    hpx::state generic_thread_pool_executor::get_state() const
+    {
+        return scheduler_base_->get_state(hpx::get_worker_thread_num());
+    }
 }}}}
 
 namespace hpx { namespace threads { namespace executors
@@ -94,6 +135,13 @@ namespace hpx { namespace threads { namespace executors
     // scheduler outlives the wrapper
     generic_thread_pool_executor::generic_thread_pool_executor(
             policies::scheduler_base* scheduler)
-      : executor(new detail::generic_thread_pool_executor(scheduler))
+      : scheduled_executor(new detail::generic_thread_pool_executor(scheduler))
     {}
+
+    hpx::state generic_thread_pool_executor::get_state() const
+    {
+        return boost::static_pointer_cast<
+                detail::generic_thread_pool_executor
+            >(executor::executor_data_)->get_state();
+    }
 }}}
