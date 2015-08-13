@@ -29,21 +29,21 @@ typedef std::vector<int>::iterator iter;
 struct void_parallel_executor : parallel_executor
 {
     template <typename F, typename Shape>
-    static std::vector<hpx::future<void> >
+    std::vector<hpx::future<void> >
     bulk_async_execute(F && f, Shape const& shape)
     {
         std::vector<hpx::future<void> > results;
         for(auto const& elem: shape)
         {
             results.push_back(
-                parallel_executor::async_execute(deferred_call(f, elem))
+                this->parallel_executor::async_execute(deferred_call(f, elem))
             );
         }
         return results;
     }
 
     template <typename F, typename Shape>
-    static void bulk_execute(F && f, Shape const& shape)
+    void bulk_execute(F && f, Shape const& shape)
     {
         return hpx::util::unwrapped(
             bulk_async_execute(std::forward<F>(f), shape));

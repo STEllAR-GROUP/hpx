@@ -418,12 +418,7 @@ In __hpx__ we have implemented the following executor types:
   in the index space.
 * [classref hpx::parallel::v3::parallel_executor `hpx::parallel::parallel_executor`]:
   creates groups of parallel execution agents which execute in threads
-  implicitly created by the executor. This executor prefers continuing with the
-  creating thread first before executing newly created threads.
-* [classref hpx::parallel::v3::parallel_fork_executor `hpx::parallel::parallel_fork_executor`]:
-  creates groups of parallel execution agents which execute in threads
-  implicitly created by the executor. This executor prefers executing newly
-  created threads first before continuing with the creating thread.
+  implicitly created by the executor. This executor uses a given launch policy.
 * [classref hpx::parallel::v3::service_executor `hpx::parallel::service_executor`]:
   creates groups of parallel execution agents which execute in one of the
   kernel threads associated with a given pool category (I/O, parcel, or timer
