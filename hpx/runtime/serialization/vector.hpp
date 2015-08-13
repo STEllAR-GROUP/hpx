@@ -24,7 +24,6 @@ namespace hpx { namespace serialization
         if(size == 0) return;
 
         vs.resize(size);
-        typedef typename std::vector<T, Allocator>::value_type value_type;
         for(size_type i = 0; i != size; ++i)
         {
             ar >> vs[i];
