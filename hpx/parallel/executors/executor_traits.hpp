@@ -14,13 +14,11 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/unwrapped.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 
 #include <type_traits>
@@ -230,9 +228,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
                 for (auto const& elem: shape)
                 {
-                    results.push_back(
-                        exec.async_execute(hpx::util::deferred_call(f, elem))
-                    );
+                    results.push_back(exec.async_execute(
+                        hpx::util::deferred_call(f, elem)
+                    ));
                 }
 
                 return results;
@@ -477,8 +475,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note Executors have to implement only `async_execute()`. All other
         ///       functions will be emulated by this `executor_traits` in terms
         ///       of this single basic primitive. However, some executors will
-        ///       naturally specialize all four operations for maximum
-        ///       efficiency.
+        ///       naturally specialize all operations for maximum efficiency.
         ///
         /// \note This calls exec.async_execute(f)
         ///
@@ -510,7 +507,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param f    [in] The function which will be scheduled using the
         ///             given executor.
         ///
-        /// \returns f()'s result through a future
+        /// \returns f()'s result
         ///
         /// \note This calls exec.execute(f) if it exists;
         ///       otherwise hpx::async(f).get()

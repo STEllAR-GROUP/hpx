@@ -70,7 +70,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef boost::mpl::false_ non_seq;
 
             parallel_task_execution_policy p =
-                par_task.with(policy.parameters());
+                parallel_task_execution_policy().with(policy.parameters());
 
             detail::reverse r;
             return lcos::local::dataflow(
@@ -197,7 +197,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef boost::mpl::false_ non_seq;
 
             parallel_task_execution_policy p =
-                par_task.with(policy.parameters());
+                parallel_task_execution_policy().with(policy.parameters());
 
             hpx::future<OutIter> f =
                 detail::copy<OutIter>().call(p, non_seq(),

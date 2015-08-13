@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/constant_chunk_size.hpp
+/// \file parallel/executors/auto_chunk_size.hpp
 
 #if !defined(HPX_PARALLEL_AUTO_CHUNK_SIZE_JUL_31_2015_0742PM)
 #define HPX_PARALLEL_AUTO_CHUNK_SIZE_JUL_31_2015_0742PM

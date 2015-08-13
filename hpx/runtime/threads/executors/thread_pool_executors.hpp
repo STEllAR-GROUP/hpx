@@ -6,13 +6,14 @@
 #if !defined(HPX_RUNTIME_THREADS_EXECUTORS_POOL_EXECUTORS_JAN_11_2013_0831PM)
 #define HPX_RUNTIME_THREADS_EXECUTORS_POOL_EXECUTORS_JAN_11_2013_0831PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/state.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/atomic.hpp>
+#include <boost/chrono.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

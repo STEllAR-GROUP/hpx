@@ -9,12 +9,15 @@ set(tests
     executor_parameters
     minimal_async_executor
     minimal_sync_executor
+    minimal_timed_async_executor
+    minimal_timed_sync_executor
     parallel_executor
     parallel_fork_executor
     sequential_executor
     service_executors
     this_thread_executors
     thread_pool_executors
+    timed_parallel_executor
    )
 
 foreach(test ${tests})
