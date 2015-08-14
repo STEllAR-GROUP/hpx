@@ -96,49 +96,49 @@ namespace hpx { namespace performance_counters { namespace io
                 boost::str(boost::format("failed to parse " PROC_IO_PATH) % pid));
     }
 
-    uint64_t get_pio_riss(bool)
+    boost::uint64_t get_pio_riss(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.riss;
     }
 
-    uint64_t get_pio_wiss(bool)
+    boost::uint64_t get_pio_wiss(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.wiss;
     }
 
-    uint64_t get_pio_rsysc(bool)
+    boost::uint64_t get_pio_rsysc(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.rsysc;
     }
 
-    uint64_t get_pio_wsysc(bool)
+    boost::uint64_t get_pio_wsysc(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.wsysc;
     }
 
-    uint64_t get_pio_rstor(bool)
+    boost::uint64_t get_pio_rstor(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.rstor;
     }
 
-    uint64_t get_pio_wstor(bool)
+    boost::uint64_t get_pio_wstor(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
         return pio.wstor;
     }
 
-    uint64_t get_pio_wcanc(bool)
+    boost::uint64_t get_pio_wcanc(bool)
     {
         proc_io pio;
         parse_proc_io(pio);
