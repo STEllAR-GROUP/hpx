@@ -24,9 +24,9 @@ Many thanks to @biddisco and @hkaiser for providing the needed info on how to co
 * e) Open CMake-GUI.exe and set up your *HPX source dir* to the **base dir** of the source code you downloaded from HPX' GitHub pages. <br/>
    Here's an example of my CMake path settings which point to my *Documents/GitHub/hpx* folder.<br/>
    
-   <img src="http://fs2.directupload.net/images/150813/ldi6oedi.png" width="350" height="400">
-   Inside the *Where is the source-code* put in the *ROOT path* of your HPX source directory (do not put the "src" subdir!)<br/>
-   Inside *Where to build the binaries* you should put in the path where all the building process will happen. <br/>
+   <img src="http://fs2.directupload.net/images/150813/ldi6oedi.png" width="350" height="400"><br/>
+   Inside the **Where is the source-code** put in the *ROOT path* of your HPX source directory (do not put the "src" subdir!)<br/>
+   Inside **Where to build the binaries** you should put in the path where all the building process will happen. <br/>
    This is important because the building machinery will do an "out-of-tree" build. <br/><br/>
    CMake is not touching or changing in any way the original source files. Instead, it will generate Visual Studio Solution Files
    which will build HPX packages out of the HPX source tree.<br/>
