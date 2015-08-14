@@ -78,6 +78,12 @@ namespace hpx { namespace util { namespace functional
               , cont_(std::move(o.cont_))
             {}
 
+            apply_continuation_impl &operator=(apply_continuation_impl && o)
+            {
+                bound_ = std::move(o.bound_);
+                cont_ = std::move(o.cont_);
+            }
+
             template <typename T>
             typename util::result_of<bound_type(naming::id_type, T)>::type
             operator()(naming::id_type lco, T && t)
@@ -176,6 +182,12 @@ namespace hpx { namespace util { namespace functional
               : bound_(std::move(o.bound_))
               , cont_(std::move(o.cont_))
             {}
+
+            async_continuation_impl &operator=(async_continuation_impl && o)
+            {
+                bound_ = std::move(o.bound_);
+                cont_ = std::move(o.cont_);
+            }
 
             template <typename T>
             typename util::result_of<bound_type(naming::id_type, T)>::type
