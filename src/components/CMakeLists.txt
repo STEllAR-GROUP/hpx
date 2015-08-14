@@ -8,6 +8,7 @@
 set(subdirs
     component_storage
     containers
+    io_counters
     iostreams
     memory
     papi_counters

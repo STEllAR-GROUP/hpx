@@ -53,7 +53,7 @@ int hpx_main(int argc, char* argv[])
 
     sequential_executor seq_exec;
     parallel_executor par_exec;
-    parallel_fork_executor par_fork_exec;
+    parallel_executor par_fork_exec(hpx::launch::fork);
 
     test_bulk_async(seq_exec, false);
     test_bulk_async(par_exec);

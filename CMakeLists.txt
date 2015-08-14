@@ -651,7 +651,7 @@ hpx_check_for_cxx11_alias_templates(
   DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
 
 hpx_check_for_cxx11_auto(
-  DEFINITIONS HPX_HAVE_CXX11_AUTO)
+  REQUIRED "HPX needs support for C++11 auto")
 
 hpx_check_for_cxx11_constexpr(
   DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)

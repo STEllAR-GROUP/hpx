@@ -18,6 +18,8 @@ set(tests
     this_thread_executors
     thread_pool_executors
     timed_parallel_executor
+    timed_this_thread_executors
+    timed_thread_pool_executors
    )
 
 foreach(test ${tests})
