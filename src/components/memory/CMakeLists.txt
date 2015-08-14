@@ -8,14 +8,12 @@ set(root "${PROJECT_SOURCE_DIR}/hpx/components/memory")
 
 if(HPX_WITH_DEFAULT_TARGETS)
   add_hpx_component(memory
-    FOLDER "Core/Components"
+    FOLDER "Core/Components/Counters"
     HEADER_ROOT ${root}
     AUTOGLOB
     PLUGIN)
 endif()
 
-add_hpx_pseudo_dependencies(components.memory
-                            memory_component)
-add_hpx_pseudo_dependencies(core
-                          components.memory)
+add_hpx_pseudo_dependencies(components.memory memory_component)
+add_hpx_pseudo_dependencies(core components.memory)
 

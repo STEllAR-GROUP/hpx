@@ -8,7 +8,7 @@ set(root "${PROJECT_SOURCE_DIR}/hpx/components/io_counters")
 
 if(HPX_WITH_DEFAULT_TARGETS)
   add_hpx_component(io_counters
-    FOLDER "Core/Components"
+    FOLDER "Core/Components/Counters"
     HEADER_ROOT ${root}
     AUTOGLOB
     PLUGIN)

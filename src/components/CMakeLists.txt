@@ -8,12 +8,17 @@
 set(subdirs
     component_storage
     containers
-    io_counters
     iostreams
     memory
     papi_counters
     security
    )
+
+if(HPX_WITH_IO_COUNTERS)
+  set(subdirs ${subdirs}
+      io_counters
+     )
+endif()
 
 add_hpx_pseudo_target(components)
 
