@@ -775,7 +775,7 @@ namespace hpx { namespace parcelset
         void send_pending_parcels(
             parcelset::locality const & parcel_locality_id,
             boost::shared_ptr<connection> sender_connection,
-            parcel&& p,
+            parcel p,
             write_handler_type&& handler)
         {
             // If we are stopped already, discard the remaining pending parcels
