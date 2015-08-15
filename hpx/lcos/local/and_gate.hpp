@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_LOCAL_AND_GATE_JUL_13_2012_0919AM)
 #define HPX_LCOS_LOCAL_AND_GATE_JUL_13_2012_0919AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/conditional_trigger.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>

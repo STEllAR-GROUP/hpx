@@ -29,7 +29,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {};
 
         template <>
-        struct is_executor<executor_parameters_tag>
+        struct is_executor_parameters<executor_parameters_tag>
           : std::false_type
         {};
         /// \endcond

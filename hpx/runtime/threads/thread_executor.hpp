@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_THREAD_EXECUTOR_JAN_11_2013_0700PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/safe_bool.hpp>

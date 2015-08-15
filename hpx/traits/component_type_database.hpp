@@ -8,6 +8,11 @@
 
 #include <hpx/traits.hpp>
 
+namespace hpx { namespace components
+{
+    typedef boost::int32_t component_type;
+}}
+
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -22,7 +27,8 @@ namespace hpx { namespace traits
 
     template <typename Component, typename Enable>
     components::component_type
-    component_type_database<Component, Enable>::value = components::component_invalid;
+    component_type_database<Component, Enable>::value =
+        components::component_type(-1); //components::component_invalid;
 
     template <typename Component, typename Enable>
     struct component_type_database<Component const, Enable>

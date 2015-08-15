@@ -24,6 +24,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/eval_if.hpp>

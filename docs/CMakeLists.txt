@@ -107,6 +107,8 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_executor_traits.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/get_os_thread_count.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/get_worker_thread_num.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/launch_policy.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/trigger_lco.hpp"

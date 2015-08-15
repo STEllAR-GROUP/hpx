@@ -6,7 +6,7 @@
 #if !defined(HPX_MAIN_SEP_20_2014_1130AM)
 #define HPX_MAIN_SEP_20_2014_1130AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 
 #if defined(HPX_HAVE_STATIC_LINKING)

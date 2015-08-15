@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
@@ -177,7 +178,7 @@ namespace hpx { namespace components
     template <typename Component, typename Wrapper,
         typename CtorPolicy, typename DtorPolicy>
     class managed_component_base
-      : public detail::managed_component_tag, boost::noncopyable
+      : public traits::detail::managed_component_tag, boost::noncopyable
     {
     public:
         typedef typename boost::mpl::if_<

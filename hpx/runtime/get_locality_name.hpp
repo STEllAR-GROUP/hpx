@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file hpx/runtime/get_locality_name.hpp
+
 #if !defined(HPX_RUNTIME_GET_LOCALITY_NAME_SEP_26_2013_0533PM)
 #define HPX_RUNTIME_GET_LOCALITY_NAME_SEP_26_2013_0533PM
 

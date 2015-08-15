@@ -8,12 +8,14 @@
 #if !defined(HPX_RUNTIME_COMPONENTS_NEW_OCT_10_2012_1256PM)
 #define HPX_RUNTIME_COMPONENTS_NEW_OCT_10_2012_1256PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/traits/is_client.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/components/default_distribution_policy.hpp>
+#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/move.hpp>
 

@@ -70,8 +70,6 @@ struct channel
 
     boost::intrusive_ptr<future_data> data_;
 
-    (channel<T>);
-
   public:
     typedef typename future_data::completed_callback_type
         completed_callback_type;

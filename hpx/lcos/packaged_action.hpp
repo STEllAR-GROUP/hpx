@@ -7,7 +7,7 @@
 #if !defined(HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM)
 #define HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/promise.hpp>
@@ -16,6 +16,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/protect.hpp>
 #include <hpx/util/bind.hpp>

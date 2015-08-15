@@ -7,7 +7,8 @@
 #if !defined(HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM)
 #define HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
 #include <boost/mpl/or.hpp>
@@ -39,10 +40,10 @@ namespace hpx
         struct is_simple_or_fixed_component
           : boost::mpl::or_<
                 boost::is_base_and_derived<
-                    components::detail::simple_component_tag, Component
+                    traits::detail::simple_component_tag, Component
                 >,
                 boost::is_base_and_derived<
-                    components::detail::fixed_component_tag, Component
+                    traits::detail::fixed_component_tag, Component
                 >
             >
         {};
@@ -75,10 +76,10 @@ namespace hpx
         struct is_simple_or_fixed_component
           : boost::mpl::or_<
                 boost::is_base_and_derived<
-                    components::detail::simple_component_tag, Component
+                    traits::detail::simple_component_tag, Component
                 >,
                 boost::is_base_and_derived<
-                    components::detail::fixed_component_tag, Component
+                    traits::detail::fixed_component_tag, Component
                 >
             >
         {};

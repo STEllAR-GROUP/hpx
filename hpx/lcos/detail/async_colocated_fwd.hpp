@@ -6,8 +6,9 @@
 #if !defined(HPX_LCOS_ASYNC_COLOCATED_FWD_FEB_01_2014_0107PM)
 #define HPX_LCOS_ASYNC_COLOCATED_FWD_FEB_01_2014_0107PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/lcos/async_fwd.hpp>
 #include <hpx/util/move.hpp>
 
 namespace hpx { namespace detail

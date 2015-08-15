@@ -7,11 +7,12 @@
 #if !defined(HPX_LCOS_LOCAL_CONTINUATION_APR_17_2012_0150PM)
 #define HPX_LCOS_LOCAL_CONTINUATION_APR_17_2012_0150PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/detail/future_data.hpp>

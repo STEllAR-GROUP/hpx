@@ -6,8 +6,9 @@
 #if !defined(HPX_TRAITS_IS_LAUNCH_POLICY_APR_8_2014_0436PM)
 #define HPX_TRAITS_IS_LAUNCH_POLICY_APR_8_2014_0436PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_base_of.hpp>
@@ -15,9 +16,9 @@
 
 namespace hpx { namespace traits
 {
-    template <typename Policy>
+    template <typename Policy, typename Enable>
     struct is_launch_policy
-      : boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>
+      : boost::mpl::false_
     {};
 
     template <typename Policy>

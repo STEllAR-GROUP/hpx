@@ -6,6 +6,10 @@
 #if !defined(HPX_LCOS_ASYNC_IMPLEMENTATIONS_FWD_APR_13_2015_0829AM)
 #define HPX_LCOS_ASYNC_IMPLEMENTATIONS_FWD_APR_13_2015_0829AM
 
+#include <hpx/config.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/lcos/future.hpp>
+
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////

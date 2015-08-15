@@ -6,7 +6,8 @@
 #if !defined(HPX_RUNTIME_COMPONENTS_SERVER_MIGRATE_COMPONENT_JAN_30_2014_0737AM)
 #define HPX_RUNTIME_COMPONENTS_SERVER_MIGRATE_COMPONENT_JAN_30_2014_0737AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/get_ptr.hpp>
@@ -196,6 +197,19 @@ namespace hpx { namespace components { namespace server
           , trigger_migrate_component_action<Component> >
     {};
 }}}
+
+namespace hpx { namespace traits
+{
+    // Managed components are components
+    template <typename Component>
+    struct is_component<Component,
+            typename boost::enable_if<
+                boost::is_base_and_derived<
+                    detail::managed_component_tag, Component
+                > >::type>
+      : boost::mpl::true_
+    {};
+}}
 
 #endif
 

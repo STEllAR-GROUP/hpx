@@ -8,6 +8,9 @@ file(GLOB_RECURSE headers "${PROJECT_SOURCE_DIR}/hpx/*hpp")
 
 set(all_headers)
 
+# make sure #including 'hpx/config/autolink.hpp' does not cause errors
+hpx_add_compile_flag(-DHPX_AUTOLINK_LIB_NAME=hpx)
+
 # for each of the found headers, generate a test executable
 foreach(header ${headers})
 
@@ -29,7 +32,9 @@ foreach(header ${headers})
     # generate the test
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}
       "#include <hpx/${relpath}>\n"
-      "int main(int argc, char* argv[]) { return 0; }\n")
+      "#ifndef HPX_MAIN_DEFINED\n"
+      "int main(int argc, char** argv) { return 0; }\n"
+      "#endif\n")
 
     set(all_headers ${all_headers} "#include <hpx/${relpath}>\n")
 
@@ -60,7 +65,9 @@ set(test_name "all_headers")
 set(all_headers_test_name "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
 file(WRITE ${all_headers_test_name}
   ${all_headers}
-  "int main(int argc, char* argv[]) { return 0; }\n")
+  "#ifndef HPX_MAIN_DEFINED\n"
+  "int main(int argc, char** argv) { return 0; }\n"
+  "#endif\n")
 
 add_hpx_headers_compile_test(
   "all_headers"

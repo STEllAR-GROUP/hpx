@@ -16,6 +16,7 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/lcos/detail/async_colocated_callback_fwd.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>

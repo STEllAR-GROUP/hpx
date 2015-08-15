@@ -6,7 +6,7 @@
 #if !defined(HPX_MAIN_IMPL_SEP_20_2014_1130AM)
 #define HPX_MAIN_IMPL_SEP_20_2014_1130AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 
 #include <vector>
@@ -33,5 +33,8 @@ int main(int argc, char** argv)
 
     return hpx::init(argc, argv, cfg);
 }
+
+// Make sure header testing code does not redefine main()
+#define HPX_MAIN_DEFINED 1
 
 #endif

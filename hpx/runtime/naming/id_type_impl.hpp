@@ -6,8 +6,10 @@
 #if !defined(HPX_NAMING_ID_TYPE_IMPL_OCT_13_2013_0758PM)
 #define HPX_NAMING_ID_TYPE_IMPL_OCT_13_2013_0758PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+
+#include <boost/cstdint.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
