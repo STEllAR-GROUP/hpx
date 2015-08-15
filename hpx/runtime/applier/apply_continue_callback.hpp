@@ -7,7 +7,7 @@
 #if !defined(HPX_RUNTIME_APPLIER_APPLY_CONTINUE_CALLBACK_MAR_09_2014_1207PM)
 #define HPX_RUNTIME_APPLIER_APPLY_CONTINUE_CALLBACK_MAR_09_2014_1207PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/applier/apply.hpp>
@@ -24,9 +24,7 @@ namespace hpx
         typedef typename action_type::result_type result_type;
 
         return apply_cb<Action>(
-            boost::make_shared<
-                hpx::actions::typed_continuation<result_type>
-            >(std::forward<Cont>(cont)),
+            hpx::actions::typed_continuation<result_type>(std::forward<Cont>(cont)),
             gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
@@ -49,9 +47,7 @@ namespace hpx
         typedef typename action_type::result_type result_type;
 
         return apply_cb<Action>(
-            boost::make_shared<
-                hpx::actions::typed_continuation<result_type>
-            >(cont, make_continuation()),
+            hpx::actions::typed_continuation<result_type>(cont, make_continuation()),
             gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 

@@ -15,6 +15,7 @@
 
 #include <list>
 #include <iterator>
+#include <memory>
 
 #include <boost/thread/locks.hpp>
 

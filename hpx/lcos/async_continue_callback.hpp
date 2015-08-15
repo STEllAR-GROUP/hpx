@@ -40,9 +40,8 @@ namespace hpx
 
             lcos::promise<result_type, RemoteResult> p;
             apply_cb<Action>(
-                boost::make_shared<
-                    hpx::actions::typed_continuation<continuation_result_type>
-                >(p.get_id(), std::forward<Cont>(cont))
+                hpx::actions::typed_continuation<continuation_result_type>(
+                    p.get_id(), std::forward<Cont>(cont))
               , target, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
             return p.get_future();
         }

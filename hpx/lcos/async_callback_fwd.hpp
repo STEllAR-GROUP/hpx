@@ -6,6 +6,7 @@
 #if !defined(HPX_LCOS_ASYNC_CALLBACK_FWD_MAR_30_2015_1122AM)
 #define HPX_LCOS_ASYNC_CALLBACK_FWD_MAR_30_2015_1122AM
 
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #ifndef BOOST_MSVC
 #include <boost/utility/enable_if.hpp>
