@@ -13,13 +13,23 @@
 
 #include <type_traits>
 
+#include <boost/type_traits/is_base_of.hpp>
+
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
+    ///////////////////////////////////////////////////////////////////////////
+    struct executor_tag {};
+
     namespace detail
     {
         /// \cond NOINTERNAL
         template <typename T>
         struct is_executor
+          : boost::is_base_of<executor_tag, T>
+        {};
+
+        template <>
+        struct is_executor<executor_tag>
           : std::false_type
         {};
         /// \endcond
@@ -31,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     {};
 
     template <typename Executor, typename Enable = void>
-    class executor_traits;
+    struct executor_traits;
 }}}
 
 namespace hpx { namespace traits

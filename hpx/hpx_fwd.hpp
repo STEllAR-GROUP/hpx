@@ -34,7 +34,6 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
@@ -44,6 +43,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
@@ -160,6 +160,7 @@ namespace hpx
             struct lockfree_fifo;
             struct lockfree_lifo;
 
+            // multi priority scheduler with work-stealing
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
                     , typename StagedQueuing = lockfree_fifo
@@ -167,6 +168,7 @@ namespace hpx
                      >
             class HPX_EXPORT local_priority_queue_scheduler;
 
+            // single priority scheduler with work-stealing
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
                     , typename StagedQueuing = lockfree_fifo
@@ -184,12 +186,23 @@ namespace hpx
 #endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+            // multi priority scheduler with no work-stealing
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
                     , typename StagedQueuing = lockfree_fifo
                     , typename TerminatedQueuing = lockfree_lifo
                      >
             class HPX_EXPORT static_priority_queue_scheduler;
+#endif
+
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+            // single priority scheduler with no work-stealing
+            template <typename Mutex = boost::mutex
+                    , typename PendingQueuing = lockfree_fifo
+                    , typename StagedQueuing = lockfree_fifo
+                    , typename TerminatedQueuing = lockfree_lifo
+                     >
+            class HPX_EXPORT static_queue_scheduler;
 #endif
 
 #if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
@@ -487,15 +500,6 @@ namespace hpx
             struct object_semaphore;
         }
 
-        namespace detail
-        {
-            enum full_empty_state
-            {
-                empty = false,
-                full = true
-            };
-        }
-
         namespace local
         {
             class barrier;
@@ -521,35 +525,6 @@ namespace hpx
     namespace performance_counters
     {
         struct counter_info;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Launch policy for \a hpx::async
-    BOOST_SCOPED_ENUM_START(launch)
-    {
-        async = 0x01,
-        deferred = 0x02,
-        task = 0x04,        // see N3632
-        sync = 0x08,
-        fork = 0x10,        // same as async, but forces continuation stealing
-
-        sync_policies = 0x0a,       // sync | deferred
-        async_policies = 0x15,      // async | task | fork
-        all = 0x1f                  // async | deferred | task | sync | fork
-    };
-    BOOST_SCOPED_ENUM_END
-
-    inline bool
-    operator&(BOOST_SCOPED_ENUM(launch) lhs, BOOST_SCOPED_ENUM(launch) rhs)
-    {
-        return (static_cast<int>(lhs) & static_cast<int>(rhs)) != 0;
-    }
-
-    inline BOOST_SCOPED_ENUM(launch)
-    operator|(BOOST_SCOPED_ENUM(launch) lhs, BOOST_SCOPED_ENUM(launch) rhs)
-    {
-        return static_cast<BOOST_SCOPED_ENUM(launch)>(
-            static_cast<int>(lhs) | static_cast<int>(rhs));
     }
 
     ///////////////////////////////////////////////////////////////////////////

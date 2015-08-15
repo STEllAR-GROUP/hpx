@@ -175,7 +175,7 @@ namespace hpx { namespace lcos
             BOOST_FORCEINLINE
             void do_await(TupleIter&&, boost::mpl::true_)
             {
-                this->set_result(util::unused);     // simply make ourself ready
+                this->set_value(util::unused);     // simply make ourself ready
             }
 
             // Current element is a range (vector) of futures

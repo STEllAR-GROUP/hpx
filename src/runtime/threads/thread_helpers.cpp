@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -415,7 +415,8 @@ namespace hpx { namespace threads
         return app->get_thread_manager().set_backtrace(id, bt);
     }
 
-    threads::executor get_executor(thread_id_type const& id, error_code& ec)
+    threads::executors::generic_thread_pool_executor
+        get_executor(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -423,7 +424,7 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::get_executor",
                 "global applier object is not accessible");
-            return default_executor();
+            return threads::executors::generic_thread_pool_executor(0);
         }
 
         return app->get_thread_manager().get_executor(id, ec);
@@ -594,6 +595,13 @@ namespace hpx { namespace this_thread
             ec = make_success_code();
 
         return statex;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threads::executors::generic_thread_pool_executor
+        get_executor(error_code& ec)
+    {
+        return threads::get_executor(threads::get_self_id(), ec);
     }
 }}
 

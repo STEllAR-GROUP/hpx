@@ -294,6 +294,12 @@ namespace hpx
         ///
         virtual bool unregister_thread() = 0;
 
+        /// Generate a new notification policy instance for the given thread
+        /// name prefix
+        typedef threads::policies::callback_notifier notification_policy_type;
+        virtual notification_policy_type
+            get_notification_policy(char const* prefix) = 0;
+
         /// This function creates anew base_lco_factory (if none is available
         /// for the given type yet), registers this factory with the
         /// runtime_support object and asks the factory for it's heap object

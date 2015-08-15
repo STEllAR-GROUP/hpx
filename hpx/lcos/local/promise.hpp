@@ -111,12 +111,12 @@ namespace hpx { namespace lcos { namespace local
             }
 
             template <typename T>
-            void set_result(T&& value, error_code& ec = throws)
+            void set_value(T&& value, error_code& ec = throws)
             {
                 if (has_result_)
                 {
                     HPX_THROWS_IF(ec, promise_already_satisfied,
-                        "promise_base<R>::set_result",
+                        "promise_base<R>::set_value",
                         "result has already been stored for this promise");
                     return;
                 }
@@ -124,29 +124,41 @@ namespace hpx { namespace lcos { namespace local
                 if (shared_state_ == 0)
                 {
                     HPX_THROWS_IF(ec, no_state,
-                        "promise_base<R>::set_result",
+                        "promise_base<R>::set_value",
                         "this promise has no valid shared state");
                     return;
                 }
 
                 has_result_ = true;
 
-                shared_state_->set_result(std::forward<T>(value), ec);
+                shared_state_->set_value(std::forward<T>(value), ec);
                 if (ec) return;
             }
 
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-            // [N3722, 4.1] asks for this...
-            explicit operator lcos::future<R>()
+            template <typename T>
+            void set_exception(T&& value, error_code& ec = throws)
             {
-                return get_future();
-            }
+                if (has_result_)
+                {
+                    HPX_THROWS_IF(ec, promise_already_satisfied,
+                        "promise_base<R>::set_exception",
+                        "result has already been stored for this promise");
+                    return;
+                }
 
-            explicit operator lcos::shared_future<R>()
-            {
-                return get_future();
+                if (shared_state_ == 0)
+                {
+                    HPX_THROWS_IF(ec, no_state,
+                        "promise_base<R>::set_exception",
+                        "this promise has no valid shared state");
+                    return;
+                }
+
+                has_result_ = true;
+
+                shared_state_->set_exception(std::forward<T>(value), ec);
+                if (ec) return;
             }
-#endif
 
         private:
             boost::intrusive_ptr<shared_state_type> shared_state_;
@@ -231,7 +243,7 @@ namespace hpx { namespace lcos { namespace local
         //   - no_state if *this has no shared state.
         void set_value(R const& r, error_code& ec = throws)
         {
-            base_type::set_result(r, ec);
+            base_type::set_value(r, ec);
         }
 
         // Effects: atomically stores the value r in the shared state and makes
@@ -247,7 +259,7 @@ namespace hpx { namespace lcos { namespace local
         //   - no_state if *this has no shared state.
         void set_value(R&& r, error_code& ec = throws)
         {
-            base_type::set_result(std::move(r), ec);
+            base_type::set_value(std::move(r), ec);
         }
 
         // Effects: atomically stores the exception pointer p in the shared
@@ -260,7 +272,7 @@ namespace hpx { namespace lcos { namespace local
         //   - no_state if *this has no shared state.
         void set_exception(boost::exception_ptr const& e, error_code& ec = throws)
         {
-            base_type::set_result(e, ec);
+            base_type::set_exception(e, ec);
         }
     };
 
@@ -337,7 +349,7 @@ namespace hpx { namespace lcos { namespace local
         //   - no_state if *this has no shared state.
         void set_value(R& r, error_code& ec = throws)
         {
-            base_type::set_result(r, ec);
+            base_type::set_value(r, ec);
         }
 
         // Effects: atomically stores the exception pointer p in the shared
@@ -350,7 +362,7 @@ namespace hpx { namespace lcos { namespace local
         //   - no_state if *this has no shared state.
         void set_exception(boost::exception_ptr const& e, error_code& ec = throws)
         {
-            base_type::set_result(e, ec);
+            base_type::set_exception(e, ec);
         }
     };
 
@@ -429,7 +441,7 @@ namespace hpx { namespace lcos { namespace local
         //   - no_state if *this has no shared state.
         void set_value(error_code& ec = throws)
         {
-            base_type::set_result(hpx::util::unused, ec);
+            base_type::set_value(hpx::util::unused, ec);
         }
 
         // Effects: atomically stores the exception pointer p in the shared
@@ -442,7 +454,7 @@ namespace hpx { namespace lcos { namespace local
         //   - no_state if *this has no shared state.
         void set_exception(boost::exception_ptr const& e, error_code& ec = throws)
         {
-            base_type::set_result(e, ec);
+            base_type::set_exception(e, ec);
         }
     };
 
@@ -452,37 +464,6 @@ namespace hpx { namespace lcos { namespace local
         x.swap(y);
     }
 }}}
-
-#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-namespace hpx { namespace lcos
-{
-    // [N3722, 4.1] asks for this...
-    template <typename R>
-    inline future<R>::future(local::promise<R>& promise)
-    {
-        promise.get_future().swap(*this);
-    }
-
-    template <typename R>
-    inline shared_future<R>::shared_future(local::promise<R>& promise)
-    {
-        shared_future<R>(promise.get_future()).swap(*this);
-    }
-
-    // [N3722, 4.1] asks for this...
-    template <>
-    inline future<void>::future(local::promise<void>& promise)
-    {
-        promise.get_future().swap(*this);
-    }
-
-    template <>
-    inline shared_future<void>::shared_future(local::promise<void>& promise)
-    {
-        shared_future<void>(promise.get_future()).swap(*this);
-    }
-}}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_AWAIT)
@@ -505,7 +486,7 @@ namespace hpx { namespace lcos
         std::experimental::coroutine_handle<Promise> rh)
     {
         // f.then([=](future<T> result) mutable
-        lcos::detail::get_shared_state(f)->set_on_completed(rh);
+        traits::detail::get_shared_state(f)->set_on_completed(rh);
     }
 
     template <typename T>
@@ -590,14 +571,14 @@ namespace std { namespace experimental
                 typename = std::enable_if<!std::is_void<U2>::value>::type>
             void return_value(U && value)
             {
-                this->base_type::set_result(std::forward<U>(value));
+                this->base_type::set_value(std::forward<U>(value));
             }
 
             template <typename U = T,
                 typename = std::enable_if<std::is_void<U>::value>::type>
             void return_value()
             {
-                this->base_type::set_result();
+                this->base_type::set_value();
             }
 
             void set_exception(std::exception_ptr e)

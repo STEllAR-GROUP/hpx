@@ -115,7 +115,7 @@ void test_executor()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_sync_executor2
+struct test_sync_executor2 : hpx::parallel::executor_tag
 {
     typedef hpx::parallel::sequential_execution_tag execution_category;
 

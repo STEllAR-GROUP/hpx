@@ -19,18 +19,15 @@ namespace hpx { namespace serialization
     void load_impl(input_archive & ar, std::vector<T, Allocator> & vs, boost::mpl::false_)
     {
         // normal load ...
-        typedef typename std::vector<T>::size_type size_type;
+        typedef typename std::vector<T, Allocator>::size_type size_type;
         size_type size;
         ar >> size; //-V128
         if(size == 0) return;
 
-        vs.reserve(size);
-        typedef typename std::vector<T>::value_type value_type;
+        vs.resize(size);
         for(size_type i = 0; i != size; ++i)
         {
-            value_type v;
-            ar >> v;
-            vs.push_back(std::move(v));
+            ar >> vs[i];
         }
     }
 
@@ -44,8 +41,8 @@ namespace hpx { namespace serialization
         else
         {
             // bitwise load ...
-            typedef typename std::vector<T>::value_type value_type;
-            typedef typename std::vector<T>::size_type size_type;
+            typedef typename std::vector<T, Allocator>::value_type value_type;
+            typedef typename std::vector<T, Allocator>::size_type size_type;
             size_type size;
             ar >> size; //-V128
             if(size == 0) return;
@@ -58,7 +55,7 @@ namespace hpx { namespace serialization
     template <typename Allocator>
     void serialize(input_archive & ar, std::vector<bool, Allocator> & v, unsigned)
     {
-        typedef typename std::vector<bool>::size_type size_type;
+        typedef typename std::vector<bool, Allocator>::size_type size_type;
         size_type size = 0;
         ar >> size; //-V128
         if(size == 0) return;
@@ -81,7 +78,7 @@ namespace hpx { namespace serialization
             ar
           , v
           , typename traits::is_bitwise_serializable<
-                typename std::vector<T>::value_type
+                typename std::vector<T, Allocator>::value_type
             >::type()
         );
     }
@@ -91,8 +88,8 @@ namespace hpx { namespace serialization
     void save_impl(output_archive & ar, std::vector<T, Allocator> & vs, boost::mpl::false_)
     {
         // normal save ...
-        typedef typename std::vector<T>::value_type value_type;
-        for(value_type & v : vs)
+        typedef typename std::vector<T, Allocator>::value_type value_type;
+        for(const value_type & v : vs)
         {
             ar << v;
         }
@@ -108,7 +105,7 @@ namespace hpx { namespace serialization
         else
         {
             // bitwise save ...
-            typedef typename std::vector<T>::value_type value_type;
+            typedef typename std::vector<T, Allocator>::value_type value_type;
             save_binary(ar, &v[0], v.size() * sizeof(value_type));
         }
     }
@@ -116,7 +113,7 @@ namespace hpx { namespace serialization
     template <typename Allocator>
     void serialize(output_archive & ar, std::vector<bool, Allocator> & v, unsigned)
     {
-        typedef typename std::vector<bool>::size_type size_type;
+        typedef typename std::vector<bool, Allocator>::size_type size_type;
         ar << v.size(); //-V128
         if(v.empty()) return;
         // normal save ... no chance of doing bitwise here ...
@@ -136,7 +133,7 @@ namespace hpx { namespace serialization
             ar
           , v
           , typename traits::is_bitwise_serializable<
-                typename std::vector<T>::value_type
+                typename std::vector<T, Allocator>::value_type
             >::type()
         );
     }

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
@@ -37,7 +38,7 @@ namespace hpx { namespace threads { namespace detail
     public:
         thread_pool(Scheduler& sched,
             threads::policies::callback_notifier& notifier,
-            char const* pool_name);
+            char const* pool_name, bool do_background_work = false);
         ~thread_pool();
 
         std::size_t init(std::size_t num_threads,
@@ -80,6 +81,8 @@ namespace hpx { namespace threads { namespace detail
         boost::int64_t get_thread_duration(std::size_t num, bool reset);
         boost::int64_t get_thread_phase_overhead(std::size_t num, bool reset);
         boost::int64_t get_thread_overhead(std::size_t num, bool reset);
+        boost::int64_t get_cumulative_thread_duration(std::size_t num, bool reset);
+        boost::int64_t get_cumulative_thread_overhead(std::size_t num, bool reset);
 #endif
 #endif
 
@@ -120,7 +123,10 @@ namespace hpx { namespace threads { namespace detail
         void abort_all_suspended_threads();
         bool cleanup_terminated(bool delete_all);
 
-        hpx::state get_state() const { return state_.load(); }
+        hpx::state get_state() const;
+        hpx::state get_state(std::size_t num_thread) const;
+
+        bool has_reached_state(hpx::state s) const;
 
         void do_some_work(std::size_t num_thread);
 
@@ -144,9 +150,6 @@ namespace hpx { namespace threads { namespace detail
         threads::policies::callback_notifier& notifier_;
         std::string pool_name_;
 
-        // thread pool state
-        boost::atomic<hpx::state> state_;
-
         // startup barrier
         boost::scoped_ptr<boost::barrier> startup_;
 
@@ -166,9 +169,9 @@ namespace hpx { namespace threads { namespace detail
         // thread manager.
         threads::mask_type used_processing_units_;
 
-        // the TSS holds the number associated with a given OS thread
-        struct tls_tag {};
-        static hpx::util::thread_specific_ptr<std::size_t, tls_tag> thread_num_;
+        // Instruct pool to allow doing background work (parcelport and garbage
+        // collection)
+        bool do_background_work_;
     };
 }}}
 

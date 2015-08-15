@@ -257,8 +257,9 @@ namespace hpx { namespace threads
         }
 
         void add_at(util::steady_time_point const& abs_time,
-            closure_type && f, char const* desc,
-            threads::thread_stacksize stacksize, error_code& ec)
+            closure_type f, char const* desc = "",
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            error_code& ec = throws)
         {
             return add_at(abs_time.value(), std::move(f), desc,
                 stacksize, ec);
@@ -283,8 +284,9 @@ namespace hpx { namespace threads
         }
 
         void add_after(util::steady_duration const& rel_time,
-            closure_type && f, char const* desc,
-            threads::thread_stacksize stacksize, error_code& ec)
+            closure_type f, char const* desc = "",
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            error_code& ec = throws)
         {
             return add_after(rel_time.value(), std::move(f), desc,
                 stacksize, ec);
