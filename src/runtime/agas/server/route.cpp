@@ -18,18 +18,13 @@
 
 namespace hpx { namespace agas { namespace server
 {
-    response primary_namespace::route(parcelset::parcel && p)
+    response primary_namespace::route(request const& req, error_code& ec)
     { // {{{ route implementation
-        update_time_on_exit update(
-            counter_data_.route_.time_
-        );
-        counter_data_.increment_route_count();
-
-        error_code ec = throws;
+        parcelset::parcel p = req.get_parcel();
 
         std::size_t size = p.size();
-        naming::id_type const* ids = p.destinations();
-        naming::address* addrs = p.addrs();
+        naming::id_type const* ids = p.get_destinations();
+        naming::address* addrs = p.get_destination_addrs();
         std::vector<resolved_type> cache_addresses;
 
         runtime& rt = get_runtime();
@@ -76,23 +71,22 @@ namespace hpx { namespace agas { namespace server
             }
         }
 
-        naming::id_type source = p.source_id();
-
         // either send the parcel on its way or execute actions locally
         if (addrs[0].locality_ == get_locality())
         {
             // destination is local
-            rt.get_applier().schedule_action(std::move(p));
+            rt.get_applier().schedule_action(p);
         }
         else
         {
             // destination is remote
-            rt.get_parcel_handler().put_parcel(std::move(p));
+            rt.get_parcel_handler().put_parcel(p);
         }
 
         if (rt.get_state() < state_pre_shutdown)
         {
             // asynchronously update cache on source locality
+            naming::id_type source = p.get_source();
             for (std::size_t i = 0; i != cache_addresses.size(); ++i)
             {
                 resolved_type const& r = cache_addresses[i];

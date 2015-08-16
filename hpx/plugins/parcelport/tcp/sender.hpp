@@ -88,10 +88,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
         template <typename Handler, typename ParcelPostprocess>
-        void async_write(Handler handler, ParcelPostprocess parcel_postprocess, parcel && p)
+        void async_write(Handler handler, ParcelPostprocess parcel_postprocess)
         {
             HPX_ASSERT(!buffer_.data_.empty());
-            p_ = std::move(p);
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_async_write;
@@ -156,7 +155,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             state_ = state_handle_write;
 #endif
             // just call initial handler
-            boost::get<0>(handler)(e, p_);
+            boost::get<0>(handler)(e, bytes);
             if (e)
             {
                 // inform post-processing handler of error as well
@@ -197,8 +196,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
             boost::get<1>(handler)(e, there_, shared_from_this());
-
-            p_ = parcel();
         }
 
         /// Socket for the parcelport_connection.
@@ -212,8 +209,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         /// Counters and their data containers.
         util::high_resolution_timer timer_;
         performance_counters::parcels::gatherer& parcels_sent_;
-
-        parcel p_;
     };
 }}}}
 

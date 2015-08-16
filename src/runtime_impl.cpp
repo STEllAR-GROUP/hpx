@@ -17,6 +17,7 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
@@ -140,11 +141,13 @@ namespace hpx {
             new hpx::threads::threadmanager_impl<SchedulingPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
         parcel_handler_(rtcfg, thread_manager_.get(),
+            new parcelset::policies::global_parcelhandler_queue,
             boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(parcel_handler_, ini_, mode_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
-        applier_(parcel_handler_, *thread_manager_)
+        applier_(parcel_handler_, *thread_manager_),
+        action_manager_(applier_)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
@@ -161,7 +164,7 @@ namespace hpx {
         agas_client_.initialize(
             parcel_handler_, boost::uint64_t(runtime_support_.get()),
             boost::uint64_t(memory_.get()));
-        parcel_handler_.initialize(agas_client_, &applier_);
+        parcel_handler_.initialize(agas_client_);
 
         applier_.initialize(boost::uint64_t(runtime_support_.get()),
         boost::uint64_t(memory_.get()));

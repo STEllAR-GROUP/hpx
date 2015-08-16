@@ -25,14 +25,14 @@ namespace hpx { namespace detail
         naming::id_type const& gid, Callback&& cb, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Continuation, typename Callback, typename ...Ts>
-    bool apply_colocated_cb(Continuation && cont,
+    template <typename Action, typename Callback, typename ...Ts>
+    bool apply_colocated_cb(hpx::actions::continuation_type const& cont,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs);
 
-    template <typename Continuation, typename Component, typename Signature,
-        typename Derived, typename Callback, typename ...Ts>
+    template <typename Component, typename Signature, typename Derived,
+        typename Callback, typename ...Ts>
     bool apply_colocated_cb(
-        Continuation && cont,
+        hpx::actions::continuation_type const& cont,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs);
 }}

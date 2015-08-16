@@ -9,8 +9,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/always_void.hpp>
 
-#include <memory>
-
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -18,7 +16,7 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable>
     struct action_decorate_continuation
     {
-        static bool call(std::unique_ptr<hpx::actions::continuation>& cont)
+        static bool call(hpx::actions::continuation_type& cont)
         {
             // by default we do nothing
             return false; // continuation has not been modified

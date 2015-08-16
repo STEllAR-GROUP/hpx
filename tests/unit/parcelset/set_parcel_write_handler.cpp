@@ -21,9 +21,10 @@ boost::atomic<std::size_t> write_handler_called(0);
 
 bool is_test_action(hpx::parcelset::parcel const& p)
 {
+    hpx::actions::action_type act = p.get_action();
     return dynamic_cast<
             hpx::actions::transfer_action<test_action>*
-        >(p.get_action()) != 0;
+        >(act.get()) != 0;
 }
 
 void write_handler(boost::system::error_code const&,

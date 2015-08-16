@@ -41,7 +41,7 @@ namespace hpx { namespace plugins { namespace parcel
             parcelset::parcelport* pp, std::size_t num = std::size_t(-1),
             std::size_t interval = std::size_t(-1));
 
-        void put_parcel(parcelset::locality const & dest, parcelset::parcel p, write_handler_type f);
+        void put_parcel(parcelset::locality const & dest, parcelset::parcel& p, write_handler_type const& f);
 
         bool flush(bool stop_buffering = false);
 

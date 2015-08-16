@@ -13,6 +13,7 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_placeholder.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -102,26 +103,24 @@ namespace hpx { namespace util
         {
             typedef bool type;
 
-            template <typename Continuation, std::size_t ...Is>
+            template <std::size_t ...Is>
             static BOOST_FORCEINLINE
             type call(
                 detail::pack_c<std::size_t, Is...>
-              , Continuation && cont
+              , hpx::actions::continuation_type const& cont
               , BoundArgs& bound_args, UnboundArgs&& unbound_args
             )
             {
-                return hpx::apply<Action>(std::forward<Continuation>(cont), bind_eval<Action>(
+                return hpx::apply<Action>(cont, bind_eval<Action>(
                     util::get<Is>(bound_args),
                     std::forward<UnboundArgs>(unbound_args))...);
             }
         };
 
-        template <typename Action, typename Continuation, typename BoundArgs, typename UnboundArgs>
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
         BOOST_FORCEINLINE
-        typename boost::enable_if_c<
-            traits::is_continuation<Continuation>::value, bool
-        >::type
-        bind_action_apply_cont2(Continuation && cont,
+        bool
+        bind_action_apply_cont2(hpx::actions::continuation_type const& cont,
             BoundArgs& bound_args, UnboundArgs&& unbound_args)
         {
             return bind_action_apply_cont_impl2<
@@ -129,7 +128,7 @@ namespace hpx { namespace util
                 >::call(
                     typename detail::make_index_pack<
                         util::tuple_size<BoundArgs>::value
-                    >::type(), std::forward<Continuation>(cont),
+                    >::type(), cont,
                     bound_args, std::forward<UnboundArgs>(unbound_args));
         }
 
@@ -230,14 +229,12 @@ namespace hpx { namespace util
                     _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
             }
 
-            template <typename Continuation, typename ...Us>
+            template <typename ...Us>
             BOOST_FORCEINLINE
-            typename boost::enable_if_c<
-                traits::is_continuation<Continuation>::value, bool
-            >::type
-            apply_c(Continuation && cont, Us&&... us) const
+            bool
+            apply_c(actions::continuation_type const& cont, Us&&... us) const
             {
-                return detail::bind_action_apply_cont2<Action>(std::forward<Continuation>(cont),
+                return detail::bind_action_apply_cont2<Action>(cont,
                     _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
             }
 
@@ -318,6 +315,23 @@ namespace hpx { namespace traits
     struct is_bound_action<util::detail::bound_action<Action, BoundArgs> >
       : boost::mpl::true_
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename BoundArgs>
+    struct serialize_as_future<util::detail::bound_action<Action, BoundArgs> >
+      : serialize_as_future<BoundArgs>
+    {
+        static bool
+        call_if(util::detail::bound_action<Action, BoundArgs>& b)
+        {
+            return serialize_as_future<BoundArgs>::call_if(b._bound_args);
+        }
+
+        static void call(util::detail::bound_action<Action, BoundArgs>& b)
+        {
+            traits::serialize_as_future<BoundArgs>::call(b._bound_args);
+        }
+    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

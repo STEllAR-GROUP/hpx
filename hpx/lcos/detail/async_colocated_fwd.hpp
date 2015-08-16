@@ -7,8 +7,7 @@
 #define HPX_LCOS_ASYNC_COLOCATED_FWD_FEB_01_2014_0107PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/traits/is_continuation.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/traits.hpp>
 #include <hpx/util/move.hpp>
 
 namespace hpx { namespace detail
@@ -33,32 +32,23 @@ namespace hpx { namespace detail
       , naming::id_type const& gid, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Continuation, typename ...Ts>
-    typename std::enable_if<
-        traits::is_continuation<Continuation>::value,
-        lcos::future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type
-        >
-    >::type
-    async_colocated(Continuation && cont,
+    template <typename Action, typename ...Ts>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async_colocated(hpx::actions::continuation_type const& cont,
         naming::id_type const& gid, Ts&&... vs);
 
     template <
-        typename Continuation,
         typename Component, typename Signature, typename Derived,
         typename ...Ts>
-    typename std::enable_if<
-        traits::is_continuation<Continuation>::value,
-        lcos::future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type
-        >
-    >::type
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async_colocated(
-        Continuation && cont
+        hpx::actions::continuation_type const& cont
       , hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid, Ts&&... vs);
 }}

@@ -30,6 +30,7 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_stacksize.hpp>
+#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/tuple.hpp>
@@ -37,8 +38,6 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/mpl/bool.hpp>
-
-#include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -190,19 +189,19 @@ namespace hpx { namespace actions
         template <std::size_t ...Is>
         threads::thread_function_type
         get_thread_function(util::detail::pack_c<std::size_t, Is...>,
-            std::unique_ptr<continuation> cont, naming::address::address_type lva)
+            continuation_type& cont, naming::address::address_type lva)
         {
-            return derived_type::construct_thread_function(std::move(cont), lva,
+            return derived_type::construct_thread_function(cont, lva,
                 util::get<Is>(std::move(arguments_))...);
         }
 
         threads::thread_function_type
-        get_thread_function(std::unique_ptr<continuation> cont,
+        get_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
             return get_thread_function(
                 typename util::detail::make_index_pack<Action::arity>::type(),
-                std::move(cont), lva);
+                cont, lva);
         }
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
@@ -255,6 +254,12 @@ namespace hpx { namespace actions
             return stacksize_;
         }
 
+        /// Wait for embedded futures to become ready
+        void wait_for_futures()
+        {
+            traits::serialize_as_future<arguments_type>::call(arguments_);
+        }
+
         /// Return whether the embedded action is part of termination detection
         bool does_termination_detection() const
         {
@@ -285,10 +290,10 @@ namespace hpx { namespace actions
         }
 
         threads::thread_init_data&
-        get_thread_init_data(std::unique_ptr<continuation> cont, naming::id_type const& target,
+        get_thread_init_data(continuation_type& cont, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_init_data& data)
         {
-            data.func = get_thread_function(std::move(cont), lva);
+            data.func = get_thread_function(cont, lva);
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
             data.lva = lva;
 #endif
@@ -311,12 +316,12 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             threads::thread_state_enum initial_state)
         {
-            std::unique_ptr<continuation> cont;
+            continuation_type cont;
             threads::thread_init_data data;
             if (traits::action_decorate_continuation<derived_type>::call(cont))
             {
                 traits::action_schedule_thread<derived_type>::call(lva,
-                    get_thread_init_data(std::move(cont), target, lva, data), initial_state);
+                    get_thread_init_data(cont, target, lva, data), initial_state);
             }
             else
             {
@@ -325,17 +330,18 @@ namespace hpx { namespace actions
             }
         }
 
-        void schedule_thread(std::unique_ptr<continuation> cont,
+        void schedule_thread(continuation_type& cont,
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_state_enum initial_state)
         {
             // first decorate the continuation
-            traits::action_decorate_continuation<derived_type>::call(cont);
+            continuation_type c(cont);
+            traits::action_decorate_continuation<derived_type>::call(c);
 
             // now, schedule the thread
             threads::thread_init_data data;
             traits::action_schedule_thread<derived_type>::call(lva,
-                get_thread_init_data(std::move(cont), target, lva, data), initial_state);
+                get_thread_init_data(c, target, lva, data), initial_state);
         }
 
         /// Return a pointer to the filter to be used while serializing an

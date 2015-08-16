@@ -18,8 +18,7 @@
 #include <hpx/traits/action_decorate_continuation.hpp>
 
 #include <boost/static_assert.hpp>
-
-#include <memory>
+#include <boost/make_shared.hpp>
 
 namespace hpx { namespace actions { namespace detail
 {
@@ -143,30 +142,26 @@ namespace hpx { namespace actions { namespace detail
         typedef typed_continuation<result_type> base_type;
 
     public:
-        wrapped_continuation(std::unique_ptr<continuation> cont)
-          : cont_(std::move(cont))
+        wrapped_continuation(continuation_type& cont)
+          : cont_(cont)
         {}
 
-        wrapped_continuation(wrapped_continuation && o)
-          : cont_(std::move(o.cont_))
-        {}
-
-        void trigger()
+        void trigger() const
         {
             if (cont_) cont_->trigger();
             construct_semaphore_type::get_sem().signal();
         }
 
-        void deferred_trigger(result_type&& result)
+        void deferred_trigger(result_type&& result) const
         {
             if (cont_) {
-                static_cast<base_type *>(cont_.get())->
+                boost::static_pointer_cast<base_type const>(cont_)->
                     deferred_trigger(std::move(result));
             }
             construct_semaphore_type::get_sem().signal();
         }
 
-        void trigger_value(result_type && result)
+        void trigger_value(result_type && result) const
         {
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {
@@ -178,23 +173,24 @@ namespace hpx { namespace actions { namespace detail
             // once its ready
             result.then(
                 util::bind(&wrapped_continuation::deferred_trigger,
-                    std::move(*this),
+                    boost::static_pointer_cast<wrapped_continuation const>(
+                        this->shared_from_this()),
                     util::placeholders::_1));
         }
 
-        void trigger_error(boost::exception_ptr const& e)
+        void trigger_error(boost::exception_ptr const& e) const
         {
             if (cont_) cont_->trigger_error(e);
             construct_semaphore_type::get_sem().signal();
         }
-        void trigger_error(boost::exception_ptr && e)
+        void trigger_error(boost::exception_ptr && e) const
         {
             if (cont_) cont_->trigger_error(std::move(e));
             construct_semaphore_type::get_sem().signal();
         }
 
     private:
-        std::unique_ptr<continuation> cont_;
+        continuation_type cont_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -223,13 +219,15 @@ namespace hpx { namespace actions { namespace detail
         template <typename Continuation>
         static bool call(Continuation& c, boost::mpl::true_)
         {
-            c = std::unique_ptr<continuation>(
-                new wrapped_continuation<Action, N>(std::move(c)));
+            Continuation cont(
+                boost::make_shared<wrapped_continuation<Action, N> >(c)
+            );
+            c = cont;
             return true;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static bool call(std::unique_ptr<continuation>& cont)
+        static bool call(hpx::actions::continuation_type& cont)
         {
             typedef typename Action::result_type result_type;
             typedef typename traits::is_future<result_type>::type is_future;

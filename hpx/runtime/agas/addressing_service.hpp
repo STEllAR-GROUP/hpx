@@ -1122,7 +1122,7 @@ public:
     ///                   before the parcel has been delivered to its
     ///                   destination.
     void route(
-        parcelset::parcel p
+        parcelset::parcel const& p
       , util::function_nonser<void(boost::system::error_code const&,
             parcelset::parcel const&)> const&
         );

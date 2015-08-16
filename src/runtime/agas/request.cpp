@@ -72,7 +72,8 @@ namespace hpx { namespace agas
           , subtype_iterate_names_function  = 0x9
           , subtype_iterate_types_function  = 0xa
           , subtype_void                    = 0xb
-          , subtype_name_evt_id             = 0xc
+          , subtype_parcel                  = 0xc
+          , subtype_name_evt_id             = 0xd
           // update HPX_AGAS_REQUEST_SUBTYPES above if you add more entries
         };
 
@@ -164,6 +165,11 @@ namespace hpx { namespace agas
           , util::tuple<
             >
             // 0xc
+            // primary_ns_route
+          , util::tuple<
+                parcelset::parcel
+            >
+            // 0xd
             // symbol_ns_on_event
           , util::tuple<
                 std::string
@@ -361,6 +367,16 @@ namespace hpx { namespace agas
 
     request::request(
         namespace_action_code type_
+      , parcelset::parcel const& p
+        )
+      : mc(type_)
+      , data(new request_data(util::make_tuple(p)))
+    {
+        // TODO: verification of namespace_action_code
+    }
+
+    request::request(
+        namespace_action_code type_
         )
       : mc(type_)
       , data(new request_data(util::make_tuple()))
@@ -523,6 +539,13 @@ namespace hpx { namespace agas
         ) const
     {
         return data->get_data<request_data::subtype_iterate_types_function, 0>(ec);
+    }
+
+    parcelset::parcel request::get_parcel(
+        error_code& ec
+        ) const
+    {
+        return data->get_data<request_data::subtype_parcel, 0>(ec);
     }
 
     parcelset::endpoints_type request::get_endpoints(

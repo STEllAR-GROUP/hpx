@@ -146,20 +146,11 @@ namespace hpx { namespace components
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
-        template <typename Action, typename Continuation, typename ...Ts>
-        bool apply(Continuation && c,
-            threads::thread_priority priority, Ts&&... vs) const
-        {
-            return hpx::detail::apply_impl<Action>(std::forward<Continuation>(c),
-                id_ ? id_ : hpx::find_here(), priority,
-                std::forward<Ts>(vs)...);
-        }
-
         template <typename Action, typename ...Ts>
-        bool apply(
+        bool apply(actions::continuation_type const& c,
             threads::thread_priority priority, Ts&&... vs) const
         {
-            return hpx::detail::apply_impl<Action>(
+            return hpx::detail::apply_impl<Action>(c,
                 id_ ? id_ : hpx::find_here(), priority,
                 std::forward<Ts>(vs)...);
         }
@@ -167,20 +158,11 @@ namespace hpx { namespace components
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
-        template <typename Action, typename Continuation, typename Callback, typename ...Ts>
-        bool apply_cb(Continuation && c,
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
-        {
-            return hpx::detail::apply_cb_impl<Action>(std::forward<Continuation>(c),
-                id_ ? id_ : hpx::find_here(), priority,
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
-        }
-
         template <typename Action, typename Callback, typename ...Ts>
-        bool apply_cb(
+        bool apply_cb(actions::continuation_type const& c,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::apply_cb_impl<Action>(
+            return hpx::detail::apply_cb_impl<Action>(c,
                 id_ ? id_ : hpx::find_here(), priority,
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }

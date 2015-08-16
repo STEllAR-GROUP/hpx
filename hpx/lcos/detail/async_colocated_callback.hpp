@@ -57,12 +57,12 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Continuation, typename Callback, typename ...Ts>
+    template <typename Action, typename Callback, typename ...Ts>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async_colocated_cb(Continuation && cont,
+    async_colocated_cb(hpx::actions::continuation_type const& cont,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         // Attach the requested action as a continuation to a resolve_async
@@ -83,12 +83,11 @@ namespace hpx { namespace detail
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Ts>(vs)...)
-              , std::forward<Continuation>(cont)),
+              , cont),
             service_target, std::forward<Callback>(cb), req);
     }
 
     template <
-        typename Continuation,
         typename Component, typename Signature, typename Derived,
         typename Callback, typename ...Ts>
     lcos::future<
@@ -96,11 +95,11 @@ namespace hpx { namespace detail
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
     async_colocated_cb(
-        Continuation && cont
+        hpx::actions::continuation_type const& cont
       , hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
-        return async_colocated_cb<Derived>(std::forward<Continuation>(cont), gid,
+        return async_colocated_cb<Derived>(cont, gid,
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 }}

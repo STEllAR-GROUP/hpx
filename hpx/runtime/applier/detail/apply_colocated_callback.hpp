@@ -55,8 +55,8 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Continuation, typename Callback, typename ...Ts>
-    bool apply_colocated_cb(Continuation && cont,
+    template <typename Action, typename Callback, typename ...Ts>
+    bool apply_colocated_cb(hpx::actions::continuation_type const& cont,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         // Attach the requested action as a continuation to a resolve_async
@@ -74,19 +74,18 @@ namespace hpx { namespace detail
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Ts>(vs)...)
-              , std::forward<Continuation>(cont)),
+              , cont),
             service_target, std::forward<Callback>(cb), req);
     }
 
-    template <typename Continuation,
-        typename Component, typename Signature, typename Derived,
+    template <typename Component, typename Signature, typename Derived,
         typename Callback, typename ...Ts>
     bool apply_colocated_cb(
-        Continuation && cont,
+        hpx::actions::continuation_type const& cont,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
-        return apply_colocated_cb<Derived>(std::forward<Continuation>(cont), gid,
+        return apply_colocated_cb<Derived>(cont, gid,
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 }}
