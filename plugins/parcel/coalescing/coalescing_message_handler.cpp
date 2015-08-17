@@ -79,20 +79,20 @@ namespace hpx { namespace plugins { namespace parcel
     {}
 
     void coalescing_message_handler::put_parcel(
-        parcelset::locality const & dest, parcelset::parcel& p,
-        write_handler_type const& f)
+        parcelset::locality const & dest, parcelset::parcel p,
+        write_handler_type f)
     {
         boost::unique_lock<mutex_type> l(mtx_);
         if (stopped_) {
             l.unlock();
 
             // this instance should not buffer parcels anymore
-            pp_->put_parcel(dest, p, f);
+            pp_->put_parcel(dest, std::move(p), f);
             return;
         }
 
         detail::message_buffer::message_buffer_append_state s =
-            buffer_.append(dest, p, f);
+            buffer_.append(dest, std::move(p), f);
 
         switch(s) {
         case detail::message_buffer::first_message:
