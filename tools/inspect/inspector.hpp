@@ -41,6 +41,9 @@ namespace boost
       virtual const char * name() const = 0; // example: "tab-check"
       virtual const char * desc() const = 0; // example: "verify no tabs"
 
+      //always called:
+      virtual void open_file() { return; };
+
       // always called:
       virtual void inspect(
         const string & /*library_name*/, // "filesystem"
