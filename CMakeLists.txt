@@ -191,8 +191,21 @@ hpx_option(HPX_WITH_COMPILE_ONLY_TESTS BOOL
   "Create build system support for compile time only HPX tests (default ON)"
   ON CATEGORY "Build Targets")
 
+# Enable IO-counters on linux systems only
+set(HPX_WITH_IO_COUNTERS_DEFAULT OFF)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+  set(HPX_WITH_IO_COUNTERS_DEFAULT ON)
+endif()
+
+hpx_option(HPX_WITH_IO_COUNTERS BOOL
+  "Build HPX runtime (default: ${HPX_WITH_IO_COUNTERS_DEFAULT})"
+  ${HPX_WITH_IO_COUNTERS_DEFAULT} ADVANCED CATEGORY "Build Targets")
+if(HPX_WITH_IO_COUNTERS)
+  hpx_add_config_define(HPX_HAVE_IO_COUNTERS)
+endif()
+
 set(HPX_FULL_RPATH_DEFAULT ON)
-if(APPLE)
+if(APPLE OR MSVC)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_WITH_FULL_RPATH BOOL

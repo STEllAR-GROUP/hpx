@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int version)
         {
-            ar & static_cast<boost::uint32_t>(l_);
+            ar & l_;
         }
         /// \endcond
 
