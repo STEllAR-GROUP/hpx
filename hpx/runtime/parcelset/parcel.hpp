@@ -213,7 +213,9 @@ namespace hpx { namespace parcelset
             addrs_(std::move(other.addrs_)),
             cont_(std::move(other.cont_)),
             action_(std::move(other.action_))
-       {}
+       {
+            HPX_ASSERT(action_.get());
+       }
 
         ~parcel() {}
 
@@ -225,11 +227,28 @@ namespace hpx { namespace parcelset
             addrs_ = std::move(other.addrs_);
             cont_ = std::move(other.cont_);
             action_ = std::move(other.action_);
+            HPX_ASSERT(action_.get());
             return *this;
+        }
+
+        void reset()
+        {
+            data_ = data();
+            source_id_ = hpx::naming::invalid_id;
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+            dests_.clear();
+            addrs_.clear();
+#else
+            dests_ = hpx::naming::invalid_id;
+            addrs_ = hpx::naming::address();
+#endif
+            cont_.reset();
+            action_.reset();
         }
 
         actions::base_action *get_action() const
         {
+            HPX_ASSERT(action_.get());
             return action_.get();
         }
 

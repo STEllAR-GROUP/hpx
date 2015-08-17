@@ -157,6 +157,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 #endif
             // just call initial handler
             boost::get<0>(handler)(e, p_);
+            p_.reset();
             if (e)
             {
                 // inform post-processing handler of error as well
@@ -197,8 +198,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
             boost::get<1>(handler)(e, there_, shared_from_this());
-
-            p_ = parcel();
         }
 
         /// Socket for the parcelport_connection.
