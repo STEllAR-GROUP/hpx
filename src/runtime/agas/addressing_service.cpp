@@ -3164,12 +3164,12 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     std::vector<hpx::future<hpx::id_type> >
-        find_all_ids_from_basename(char const* basename, std::size_t num_ids)
+        find_all_from_basename(char const* basename, std::size_t num_ids)
     {
         if (0 == basename)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::find_all_ids_from_basename",
+                "hpx::find_all_from_basename",
                 "no basename specified");
         }
 
@@ -3184,13 +3184,13 @@ namespace hpx
     }
 
     std::vector<hpx::future<hpx::id_type> >
-        find_ids_from_basename(char const* basename,
+        find_from_basename(char const* basename,
             std::vector<std::size_t> const& ids)
     {
         if (0 == basename)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::find_ids_from_basename",
+                "hpx::find_from_basename",
                 "no basename specified");
         }
 
@@ -3204,13 +3204,13 @@ namespace hpx
         return results;
     }
 
-    hpx::future<hpx::id_type> find_id_from_basename(char const* basename,
+    hpx::future<hpx::id_type> find_from_basename(char const* basename,
         std::size_t sequence_nr)
     {
         if (0 == basename)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::find_id_from_basename",
+                "hpx::find_from_basename",
                 "no basename specified");
         }
 
@@ -3221,13 +3221,13 @@ namespace hpx
         return agas::on_symbol_namespace_event(name, agas::symbol_ns_bind, true);
     }
 
-    hpx::future<bool> register_id_with_basename(char const* basename,
+    hpx::future<bool> register_with_basename(char const* basename,
         hpx::id_type id, std::size_t sequence_nr)
     {
         if (0 == basename)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::register_id_with_basename",
+                "hpx::register_with_basename",
                 "no basename specified");
         }
 
@@ -3238,13 +3238,13 @@ namespace hpx
         return agas::register_name(name, id);
     }
 
-    hpx::future<hpx::id_type> unregister_id_with_basename(
+    hpx::future<hpx::id_type> unregister_with_basename(
         char const* basename, std::size_t sequence_nr)
     {
         if (0 == basename)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::unregister_id_with_basename",
+                "hpx::unregister_with_basename",
                 "no basename specified");
         }
 

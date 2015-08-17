@@ -138,7 +138,7 @@ struct block
     block() {}
 
     block(boost::uint64_t id, const char * base_name)
-      : base_type(hpx::find_id_from_basename(base_name, id))
+      : base_type(hpx::find_from_basename(base_name, id))
     {
         get_gid();
     }
@@ -146,7 +146,7 @@ struct block
     block(boost::uint64_t id, boost::uint64_t size, const char * base_name)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size))
     {
-        hpx::register_id_with_basename(base_name, get_gid(), id);
+        hpx::register_with_basename(base_name, get_gid(), id);
     }
 
     hpx::future<sub_block>
