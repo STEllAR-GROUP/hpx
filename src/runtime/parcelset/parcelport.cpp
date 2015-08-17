@@ -8,6 +8,7 @@
 #include <hpx/config/defines.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/state.hpp>
 
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
