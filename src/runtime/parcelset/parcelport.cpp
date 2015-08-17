@@ -7,8 +7,7 @@
 // This is needed to make everything work with the Intel MPI library header
 #include <hpx/config/defines.hpp>
 
-#include <hpx/config.hpp>
-#include <hpx/state.hpp>
+#include <hpx/hpx_fwd.hpp>
 
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
@@ -17,9 +16,6 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/exception.hpp>
-
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
 namespace hpx { namespace parcelset
 {
