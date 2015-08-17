@@ -13,6 +13,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/serialization/detail/future_await_container.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -169,12 +170,41 @@ namespace hpx { namespace parcelset
 
         void put_parcel(locality const & dest, parcel p, write_handler_type f)
         {
+            put_parcel(dest, std::move(p), std::move(f), true);
+        }
+
+        void put_parcel(locality const & dest, parcel p, write_handler_type f, bool trigger)
+        {
             HPX_ASSERT(dest.type() == type());
 
+            hpx::serialization::detail::future_await_container future_await;
+            hpx::serialization::output_archive archive(
+                future_await);
+            archive << p;
+
+            if(future_await.has_futures())
+            {
+                void (parcelport_impl::*awaiter)(locality const &, parcel, write_handler_type, bool)
+                    = &parcelport_impl::put_parcel_impl;
+                future_await(
+                    util::bind(
+                        util::one_shot(awaiter), this,
+                        dest, std::move(p), std::move(f), true)
+                );
+                return;
+            }
+            else
+            {
+                put_parcel_impl(dest, std::move(p), std::move(f), trigger);
+            }
+        }
+
+        void put_parcel_impl(locality const & dest, parcel p, write_handler_type f, bool trigger)
+        {
             // enqueue the outgoing parcel ...
             enqueue_parcel(dest, std::move(p), std::move(f));
 
-            if (enable_parcel_handling_)
+            if (trigger && enable_parcel_handling_)
             {
                 if (hpx::is_running() && async_serialization())
                 {
@@ -211,7 +241,10 @@ namespace hpx { namespace parcelset
 
             // enqueue the outgoing parcels ...
             HPX_ASSERT(parcels.size() == handlers.size());
-            enqueue_parcels(locality_id, std::move(parcels), std::move(handlers));
+            for(std::size_t i = 0; i < parcels.size(); ++i)
+            {
+                put_parcel(locality_id, std::move(parcels[i]), std::move(handlers[i]), false);
+            }
 
             if (enable_parcel_handling_)
             {

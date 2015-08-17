@@ -66,6 +66,16 @@ namespace hpx { namespace serialization
             return buffer_->is_saving();
         }
 
+        bool is_future_awaiting() const
+        {
+            return buffer_->is_future_awaiting();
+        }
+
+        void await_future(hpx::future<void> && f)
+        {
+            buffer_->await_future(std::move(f));
+        }
+
         template <typename T>
         void invoke_impl(T const & t)
         {

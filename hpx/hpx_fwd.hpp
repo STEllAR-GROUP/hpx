@@ -39,6 +39,7 @@
 
 #include <hpx/traits.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
+#include <hpx/lcos_fwd.hpp>
 #include <hpx/util/function.hpp>            // this has to come before the naming/id_type.hpp below
 #include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
@@ -583,51 +584,6 @@ namespace hpx
 
     HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr();
 
-    /// \namespace lcos
-    namespace lcos
-    {
-        class base_lco;
-        template <typename Result, typename RemoteResult = Result>
-        class base_lco_with_value;
-
-        template <typename Result,
-            typename RemoteResult =
-                typename traits::promise_remote_result<Result>::type>
-        class promise;
-
-        template <typename Action,
-            typename Result = typename traits::promise_local_result<
-                typename Action::remote_result_type>::type,
-            typename DirectExecute = typename Action::direct_execution>
-        class packaged_action;
-
-        template <typename R>
-        class future;
-
-        template <typename R>
-        class shared_future;
-
-        template <typename ValueType>
-        struct object_semaphore;
-
-        namespace stubs
-        {
-            template <typename ValueType>
-            struct object_semaphore;
-        }
-
-        namespace server
-        {
-            template <typename ValueType>
-            struct object_semaphore;
-        }
-
-        namespace local
-        {
-            class barrier;
-        }
-    }
-
     /// \namespace util
     namespace util
     {
@@ -680,10 +636,6 @@ namespace hpx
     // Pulling important types into the main namespace
     using naming::id_type;
     using naming::invalid_id;
-
-    using lcos::future;
-    using lcos::shared_future;
-    using lcos::promise;
 
     /// \endcond
 }

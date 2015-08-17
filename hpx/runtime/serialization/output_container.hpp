@@ -25,6 +25,10 @@ namespace hpx { namespace serialization
         struct access_data
         {
             static bool is_saving() { return true; }
+            static bool is_future_awaiting() { return false; }
+
+            static void await_future(Container& cont, hpx::future<void> && f)
+            {}
 
             static void write(Container& cont, std::size_t count,
                 std::size_t current, void const* address)
@@ -134,6 +138,16 @@ namespace hpx { namespace serialization
         bool is_saving() const
         {
             return detail::access_data<Container>::is_saving();
+        }
+
+        bool is_future_awaiting() const
+        {
+            return detail::access_data<Container>::is_future_awaiting();
+        }
+
+        void await_future(hpx::future<void> && f)
+        {
+            return detail::access_data<Container>::await_future(cont_, std::move(f));
         }
 
         void set_filter(binary_filter* filter) // override

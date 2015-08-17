@@ -8,6 +8,7 @@
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos_fwd.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/is_future.hpp>
@@ -42,6 +43,18 @@ namespace hpx { namespace lcos { namespace detail
         has_value = 1,
         has_exception = 2
     };
+
+    template <typename R, typename T>
+    future<R> get_future(T & t)
+    {
+        return t.get_future();
+    }
+
+    template <typename T>
+    void set_value(T & t)
+    {
+        return t.set_value();
+    }
 
     template <typename Archive, typename Future>
     typename boost::disable_if<
@@ -114,17 +127,56 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename traits::future_traits<Future>::result_type value_type;
 
+        if(ar.is_future_awaiting())
+        {
+            if(!f.is_ready())
+            {
+                hpx::lcos::local::promise<void> p;
+                hpx::future<void> awaiter = get_future<void>(p);
+
+                typename hpx::traits::detail::shared_state_ptr_for<Future>::type state
+                    = hpx::traits::future_access<Future>::get_shared_state(f);
+
+                state->execute_deferred();
+                state->set_on_completed(
+                        util::bind(
+                            util::one_shot(
+                                [](hpx::lcos::local::promise<void> && p)
+                                {
+                                    set_value(p);
+                                }
+                            ),
+                            std::move(p)
+                        )
+                    );
+
+                ar.await_future(std::move(awaiter));
+            }
+            return;
+        }
+
+#if defined(HPX_DEBUG)
         if (f.valid())
         {
-            f.wait();
+            HPX_ASSERT(f.is_ready());
         }
+#endif
 
         int state = future_state::invalid;
         if (f.has_value())
         {
             state = future_state::has_value;
-            value_type value = const_cast<Future&>(f).get();
-            ar << state << value;
+            if(ar.is_saving())
+            {
+                value_type value = const_cast<Future &>(f).get();
+                ar << state << value;
+            }
+            else
+            {
+                value_type const & value =
+                    *hpx::traits::future_access<Future>::get_shared_state(f)->get_result();
+                ar << state << value;
+            }
         } else if (f.has_exception()) {
             state = future_state::has_exception;
             boost::exception_ptr exception = f.get_exception_ptr();
@@ -140,10 +192,40 @@ namespace hpx { namespace lcos { namespace detail
         boost::is_void<typename traits::future_traits<Future>::type>
     >::type serialize_future_save(Archive& ar, Future const& f) //-V659
     {
+        if(ar.is_future_awaiting())
+        {
+            if(!f.is_ready())
+            {
+                hpx::lcos::local::promise<void> p;
+                hpx::future<void> awaiter = get_future<void>(p);
+
+                typename hpx::traits::detail::shared_state_ptr_for<Future>::type state
+                    = hpx::traits::future_access<Future>::get_shared_state(f);
+
+                state->execute_deferred();
+                state->set_on_completed(
+                        util::bind(
+                            util::one_shot(
+                                [](hpx::lcos::local::promise<void> && p)
+                                {
+                                    set_value(p);
+                                }
+                            ),
+                            std::move(p)
+                        )
+                    );
+
+                ar.await_future(std::move(awaiter));
+            }
+            return;
+        }
+
+#if defined(HPX_DEBUG)
         if (f.valid())
         {
-            f.wait();
+            HPX_ASSERT(f.is_ready());
         }
+#endif
 
         int state = future_state::invalid;
         if (f.has_value())

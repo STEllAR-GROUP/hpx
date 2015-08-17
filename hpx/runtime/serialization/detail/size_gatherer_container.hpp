@@ -30,6 +30,10 @@ namespace hpx { namespace serialization { namespace detail
     struct access_data<size_gatherer_container>
     {
         static bool is_saving() { return false; }
+        static bool is_future_awaiting() { return false; }
+
+        static void await_future(size_gatherer_container& cont, hpx::future<void> && f)
+        {}
 
         static void
         write(size_gatherer_container& cont, std::size_t count,
