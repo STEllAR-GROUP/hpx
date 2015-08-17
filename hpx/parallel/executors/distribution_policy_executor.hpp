@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         apply_execute(F && f) const
         {
             typedef components::server::invoke_function_action<F> action_type;
-            policy_.template apply<action_type>(actions::continuation_type(),
+            policy_.template apply<action_type>(
                 threads::thread_priority_default, std::forward<F>(f));
         }
 
@@ -83,7 +83,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         >::type
         apply_execute(Action && act) const
         {
-            policy_.template apply<Action>(actions::continuation_type(),
+            policy_.template apply<Action>(
                 threads::thread_priority_default);
         }
 #endif

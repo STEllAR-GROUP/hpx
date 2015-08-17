@@ -10,11 +10,12 @@
 #if !defined(HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM)
 #define HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
@@ -58,9 +59,10 @@ namespace hpx { namespace actions
 
         public:
             template <typename F_, typename ...Ts_>
-            explicit continuation_thread_function(continuation_type cont,
+            explicit continuation_thread_function(std::unique_ptr<continuation> cont,
                 naming::address::address_type lva, F_&& f, Ts_&&... vs)
-              : cont_(std::move(cont)), lva_(lva)
+              : cont_(std::move(cont))
+              , lva_(lva)
               , f_(util::deferred_call(
                     std::forward<F_>(f), std::forward<Ts_>(vs)...))
             {}
@@ -82,7 +84,7 @@ namespace hpx { namespace actions
             }
 
         private:
-            continuation_type cont_;
+            std::unique_ptr<continuation> cont_;
             naming::address::address_type lva_;
             util::detail::deferred_call_impl<
                 typename util::decay<F>::type
@@ -99,13 +101,6 @@ namespace hpx { namespace actions
             >
         {};
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \tparam Component         component type
-    /// \tparam Signature         return type and arguments
-    /// \tparam Derived           derived action class
-    template <typename Component, typename Signature, typename Derived>
-    struct basic_action;
 
     template <typename Component, typename R, typename ...Args, typename Derived>
     struct basic_action<Component, R(Args...), Derived>
@@ -251,7 +246,7 @@ namespace hpx { namespace actions
         // case a continuation has been supplied
         template <typename ...Ts>
         static threads::thread_function_type
-        construct_thread_function(continuation_type& cont,
+        construct_thread_function(std::unique_ptr<continuation> cont,
             naming::address::address_type lva, Ts&&... vs)
         {
             typedef detail::continuation_thread_function<
@@ -557,6 +552,7 @@ namespace hpx { namespace actions
         performance_counter_stop_action_id,
         primary_namespace_bulk_service_action_id,
         primary_namespace_service_action_id,
+        primary_namespace_route_action_id,
         remove_from_connection_cache_action_id,
         set_value_action_agas_bool_response_type_id,
         set_value_action_agas_id_type_response_type_id,

@@ -15,7 +15,6 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/date_time_chrono.hpp>
@@ -31,6 +30,8 @@
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/declval.hpp>
 #include <boost/utility/enable_if.hpp>
+
+#include <type_traits>
 
 namespace hpx { namespace lcos { namespace detail
 {
@@ -113,9 +114,8 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename traits::future_traits<Future>::result_type value_type;
 
-        if(f.valid())
+        if (f.valid())
         {
-            HPX_ASSERT(f.is_ready());
             f.wait();
         }
 
@@ -140,9 +140,8 @@ namespace hpx { namespace lcos { namespace detail
         boost::is_void<typename traits::future_traits<Future>::type>
     >::type serialize_future_save(Archive& ar, Future const& f) //-V659
     {
-        if(f.valid())
+        if (f.valid())
         {
-            HPX_ASSERT(f.is_ready());
             f.wait();
         }
 
@@ -1193,12 +1192,18 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        template <typename F>
+        template <typename F,
+            typename Enable
+                = typename std::enable_if<
+                    !std::is_same<
+                        typename util::decay<F>::type, typed_continuation>::value
+                    >::type
+        >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
 
-        void deferred_trigger(lcos::future<R> result) const
+        void deferred_trigger(lcos::future<R> result)
         {
             if (f_.empty()) {
                 if (!this->get_id()) {
@@ -1214,7 +1219,7 @@ namespace hpx { namespace actions
             }
         }
 
-        virtual void trigger_value(lcos::future<R> && result) const
+        virtual void trigger_value(lcos::future<R> && result)
         {
             LLCO_(info)
                 << "typed_continuation<lcos::future<R> >::trigger("
@@ -1230,19 +1235,8 @@ namespace hpx { namespace actions
             // once its ready
             result.then(
                 util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(
-                        shared_from_this()),
+                    std::move(*this),
                     util::placeholders::_1));
-        }
-
-        virtual bool has_to_wait_for_futures()
-        {
-            return traits::serialize_as_future<function_type>::call_if(f_);
-        }
-
-        virtual void wait_for_futures()
-        {
-            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -1313,12 +1307,18 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        template <typename F>
+        template <typename F,
+            typename Enable
+                = typename std::enable_if<
+                    !std::is_same<
+                        typename util::decay<F>::type, typed_continuation>::value
+                    >::type
+        >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
 
-        void deferred_trigger(lcos::future<void> result) const
+        void deferred_trigger(lcos::future<void> result)
         {
             if (f_.empty()) {
                 if (!this->get_id()) {
@@ -1336,7 +1336,7 @@ namespace hpx { namespace actions
             }
         }
 
-        virtual void trigger_value(lcos::future<void> && result) const
+        virtual void trigger_value(lcos::future<void> && result)
         {
             LLCO_(info)
                 << "typed_continuation<lcos::future<void> >::trigger("
@@ -1352,19 +1352,8 @@ namespace hpx { namespace actions
             // once its ready
             result.then(
                 util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(
-                        shared_from_this()),
+                    std::move(*this),
                     util::placeholders::_1));
-        }
-
-        virtual bool has_to_wait_for_futures()
-        {
-            return traits::serialize_as_future<function_type>::call_if(f_);
-        }
-
-        virtual void wait_for_futures()
-        {
-            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -1435,7 +1424,13 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        template <typename F>
+        template <typename F,
+            typename Enable
+                = typename std::enable_if<
+                    !std::is_same<
+                        typename util::decay<F>::type, typed_continuation>::value
+                    >::type
+        >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
@@ -1456,7 +1451,7 @@ namespace hpx { namespace actions
             }
         }
 
-        virtual void trigger_value(lcos::shared_future<R> && result) const
+        virtual void trigger_value(lcos::shared_future<R> && result)
         {
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
@@ -1472,19 +1467,8 @@ namespace hpx { namespace actions
             // once its ready
             result.then(
                 util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(
-                        shared_from_this()),
+                    std::move(*this),
                     util::placeholders::_1));
-        }
-
-        virtual bool has_to_wait_for_futures()
-        {
-            return traits::serialize_as_future<function_type>::call_if(f_);
-        }
-
-        virtual void wait_for_futures()
-        {
-            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -1555,7 +1539,13 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        template <typename F>
+        template <typename F,
+            typename Enable
+                = typename std::enable_if<
+                    !std::is_same<
+                        typename util::decay<F>::type, typed_continuation>::value
+                    >::type
+        >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
@@ -1578,7 +1568,7 @@ namespace hpx { namespace actions
             }
         }
 
-        virtual void trigger_value(lcos::shared_future<void> && result) const
+        virtual void trigger_value(lcos::shared_future<void> && result)
         {
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
@@ -1594,19 +1584,8 @@ namespace hpx { namespace actions
             // once its ready
             result.then(
                 util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(
-                        shared_from_this()),
+                    std::move(*this),
                     util::placeholders::_1));
-        }
-
-        virtual bool has_to_wait_for_futures()
-        {
-            return traits::serialize_as_future<function_type>::call_if(f_);
-        }
-
-        virtual void wait_for_futures()
-        {
-            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -1665,40 +1644,6 @@ namespace hpx { namespace serialization
     {
         hpx::lcos::detail::serialize_future(ar, f, version);
     }
-}}
-
-namespace hpx { namespace traits
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename R>
-    struct serialize_as_future<lcos::future<R> >
-      : boost::mpl::true_
-    {
-        static bool call_if(lcos::future<R>& f)
-        {
-            return true;
-        }
-
-        static void call(lcos::future<R>& f)
-        {
-            f.wait();
-        }
-    };
-
-    template <typename R>
-    struct serialize_as_future<lcos::shared_future<R> >
-      : boost::mpl::true_
-    {
-        static bool call_if(lcos::shared_future<R>& f)
-        {
-            return true;
-        }
-
-        static void call(lcos::shared_future<R>& f)
-        {
-            f.wait();
-        }
-    };
 }}
 
 #include <hpx/lcos/local/packaged_continuation.hpp>

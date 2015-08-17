@@ -7,7 +7,7 @@
 #if !defined(HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM)
 #define HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>

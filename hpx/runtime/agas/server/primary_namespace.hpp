@@ -320,8 +320,7 @@ struct HPX_EXPORT primary_namespace
         );
 
     response route(
-        request const& req
-      , error_code& ec = throws
+        parcelset::parcel && p
         );
 
     response bind_gid(
@@ -433,6 +432,8 @@ struct HPX_EXPORT primary_namespace
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service,
         bulk_service_action);
 
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route, route_action);
+
     static parcelset::policies::message_handler* get_message_handler(
         parcelset::parcelhandler* ph
       , parcelset::locality const& loc
@@ -454,11 +455,15 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::bulk_service_action,
     primary_namespace_bulk_service_action)
 
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::route_action,
+    primary_namespace_route_action)
+
 namespace hpx { namespace traits
 {
     // Parcel routing forwards the message handler request to the routed action
     template <>
-    struct action_message_handler<agas::server::primary_namespace::service_action>
+    struct action_message_handler<agas::server::primary_namespace::route_action>
     {
         static parcelset::policies::message_handler* call(
             parcelset::parcelhandler* ph
@@ -474,7 +479,7 @@ namespace hpx { namespace traits
     // Parcel routing forwards the binary filter request to the routed action
     template <>
     struct action_serialization_filter<
-        agas::server::primary_namespace::service_action>
+        agas::server::primary_namespace::route_action>
     {
         static serialization::binary_filter* call(parcelset::parcel const& p)
         {

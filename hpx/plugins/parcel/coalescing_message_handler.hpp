@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined \
- (HPX_RUNTIME_PARCELSET_POLICIES_COALESCING_MESSAGE_HANDLER_FEB_24_2013_0302PM)
+#if \
+ !defined(HPX_RUNTIME_PARCELSET_POLICIES_COALESCING_MESSAGE_HANDLER_FEB_24_2013_0302PM)
 #define HPX_RUNTIME_PARCELSET_POLICIES_COALESCING_MESSAGE_HANDLER_FEB_24_2013_0302PM
 
 #include <hpx/hpx_fwd.hpp>
@@ -43,7 +43,7 @@ namespace hpx { namespace plugins { namespace parcel
             std::size_t interval = std::size_t(-1));
 
         void put_parcel(parcelset::locality const & dest,
-            parcelset::parcel& p, write_handler_type const& f);
+            parcelset::parcel p, write_handler_type f);
 
         bool flush(bool stop_buffering = false);
 

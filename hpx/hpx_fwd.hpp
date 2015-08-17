@@ -383,25 +383,6 @@ namespace hpx
             thread_priority priority, thread_state_enum state = unknown);
     }
 
-    /// \namespace actions
-    ///
-    /// The namespace \a actions contains all definitions needed for the
-    /// class \a hpx#action_manager#action_manager and its related
-    /// functionality. This namespace is part of the HPX core module.
-    namespace actions
-    {
-        struct HPX_API_EXPORT base_action;
-        typedef boost::shared_ptr<base_action> action_type;
-
-        class HPX_API_EXPORT continuation;
-        typedef boost::shared_ptr<continuation> continuation_type;
-
-        class HPX_API_EXPORT action_manager;
-
-        template <typename Component, typename Signature, typename Derived>
-        struct basic_action;
-    }
-
     class HPX_API_EXPORT runtime;
     class HPX_API_EXPORT thread;
 
