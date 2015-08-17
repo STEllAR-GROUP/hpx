@@ -52,7 +52,7 @@ You now have a working hwloc installation in $HWLOC_ROOT.
 
 [heading Building __hpx__]
 
-After all the prerequistes have been succesfully installed, we can now start building and
+After all the prerequistes have been successfully installed, we can now start building and
 installing __hpx__. The build procedure is almost the same as for __unix_installation__
 with the sole difference that you have to enable the Xeon Phi in the CMake Build system.
 This is achieved by invoking CMake in the following way:

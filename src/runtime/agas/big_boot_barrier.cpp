@@ -13,8 +13,10 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
@@ -41,8 +43,10 @@
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <sstream>
+#include <cstdlib>
 
 namespace hpx { namespace detail
 {
@@ -173,32 +177,6 @@ namespace hpx { namespace agas
 //        >
 //    >
 //> response_heap_type;
-
-// TODO: Make assertions exceptions
-void early_parcel_sink(
-    parcelset::parcel const& p
-    )
-{ // {{{
-        // decode the action-type in the parcel
-        actions::action_type act = p.get_action();
-
-        // early parcels should only be plain actions
-        HPX_ASSERT(actions::base_action::plain_action == act->get_action_type());
-
-        // early parcels can't have continuations
-        HPX_ASSERT(!p.get_continuation());
-
-        // We should not allow any exceptions to escape the execution of the
-        // action as this would bring down the ASIO thread we execute in.
-        try {
-            act->get_thread_function(0)
-                (threads::thread_state_ex(threads::wait_signaled));
-        }
-        catch (...) {
-            hpx::report_error(boost::current_exception());
-        }
-//     }
-} // }}}
 
 // This structure is used when a locality registers with node zero
 // (first round trip)
@@ -558,9 +536,6 @@ void register_worker(registration_header const& header)
         }
     }
 
-    actions::base_action* p =
-        new actions::transfer_action<notify_worker_action>(hdr);
-
     // TODO: Handle cases where localities try to connect to AGAS while it's
     // shutting down.
     if (agas_client.get_status() != state_starting)
@@ -570,7 +545,9 @@ void register_worker(registration_header const& header)
         get_big_boot_barrier().apply_late(
             0
           , naming::get_locality_id_from_gid(prefix)
-          , dest, p);
+          , dest
+          , notify_worker_action()
+          , std::move(hdr));
     }
 
     else
@@ -582,17 +559,28 @@ void register_worker(registration_header const& header)
         get_big_boot_barrier().apply(
             0
           , naming::get_locality_id_from_gid(prefix)
-          , dest, p);
+          , dest
+          , notify_worker_action()
+          , std::move(hdr));
 #else
         // delay the final response until the runtime system is up and running
-        util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
-            boost::bind(
-                &big_boot_barrier::apply
+        void (big_boot_barrier::*f)(
+            boost::uint32_t,
+            boost::uint32_t,
+            parcelset::locality const&,
+            notify_worker_action,
+            notification_header&&)
+            = &big_boot_barrier::apply<notify_worker_action, notification_header&&>;
+        util::unique_function_nonser<void()>* thunk
+            = new util::unique_function_nonser<void()>(
+            util::bind(
+                util::one_shot(f)
               , boost::ref(get_big_boot_barrier())
               , 0
               , naming::get_locality_id_from_gid(prefix)
               , dest
-              , p));
+              , notify_worker_action()
+              , std::move(hdr)));
         get_big_boot_barrier().add_thunk(thunk);
 #endif
     }
@@ -701,7 +689,8 @@ void notify_worker(notification_header const& header)
         naming::get_locality_id_from_gid(header.prefix)
       , 0
       , header.agas_locality
-      , new actions::transfer_action<register_worker_security_action>(hdr));
+      , register_worker_security_action()
+      , std::move(hdr));
 #endif
 }
 // }}}
@@ -737,10 +726,6 @@ void register_worker_security(registration_header_security const& header)
         rt.get_certificate()
       , rt.sign_certificate_signing_request(header.csr));
 
-    actions::base_action* p =
-        new actions::transfer_action<notify_worker_security_action>(hdr);
-
-
     parcelset::locality dest;
     parcelset::locality here = bbb.here();
     for (parcelset::locality const& loc : header.endpoints)
@@ -761,21 +746,23 @@ void register_worker_security(registration_header_security const& header)
         get_big_boot_barrier().apply(
             0
           , naming::get_locality_id_from_gid(header.prefix)
-          , dest, p);
+          , dest
+          , notify_worker_security_action()
+          , std::move(hdr));
     }
 
     else
     {
         // AGAS is starting up; this locality is participating in startup
         // synchronization.
-        util::function_nonser<void()>* thunk = new util::function_nonser<void()>(
-            boost::bind(
-                &big_boot_barrier::apply
+        util::unique_function_nonser<void()>* thunk = new util::unique_function_nonser<void()>(
+            util::bind(
+                util::one_shot(&big_boot_barrier::apply)
               , boost::ref(get_big_boot_barrier())
               , 0
               , naming::get_locality_id_from_gid(header.prefix)
-              , dest
-              , p));
+              , notify_worker_security_action()
+              , std::move(hdr)));
         get_big_boot_barrier().add_thunk(thunk);
     }
 }
@@ -810,7 +797,7 @@ void notify_worker_security(notification_header_security const& header)
 ///////////////////////////////////////////////////////////////////////////////
 void big_boot_barrier::spin()
 {
-    boost::mutex::scoped_lock lock(mtx);
+    boost::unique_lock<boost::mutex> lock(mtx);
     while (connected)
         cond.wait(lock);
 }
@@ -852,37 +839,7 @@ big_boot_barrier::big_boot_barrier(
     // register all not registered typenames
     if (service_type == service_mode_bootstrap)
         detail::register_unassigned_typenames();
-
-    if(pp_)
-        pp_->register_event_handler(&early_parcel_sink);
 }
-
-void big_boot_barrier::apply(
-    boost::uint32_t source_locality_id
-  , boost::uint32_t target_locality_id
-  , parcelset::locality const & dest
-  , actions::base_action* act
-) { // {{{
-    HPX_ASSERT(pp);
-    naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
-    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
-    if (!p.get_parcel_id())
-        p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
-    pp->send_early_parcel(dest, p);
-} // }}}
-
-void big_boot_barrier::apply_late(
-    boost::uint32_t source_locality_id
-  , boost::uint32_t target_locality_id
-  , parcelset::locality const & dest
-  , actions::base_action* act
-) { // {{{
-    naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
-    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
-    if (!p.get_parcel_id())
-        p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
-    get_runtime().get_parcel_handler().put_parcel(p);
-} // }}}
 
 void big_boot_barrier::wait_bootstrap()
 { // {{{
@@ -954,11 +911,13 @@ void big_boot_barrier::wait_hosted(
         , unassigned
         , suggested_prefix);
 
+    std::srand(static_cast<unsigned>(util::high_resolution_clock::now()));
     apply(
-        naming::invalid_locality_id
+          static_cast<boost::uint32_t>(std::rand()) // random first parcel id
         , 0
         , bootstrap_agas
-        , new actions::transfer_action<register_worker_action>(hdr));
+        , register_worker_action()
+        , std::move(hdr));
 
     // wait for registration to be complete
     spin();
@@ -966,7 +925,7 @@ void big_boot_barrier::wait_hosted(
 
 void big_boot_barrier::notify()
 {
-    boost::mutex::scoped_lock lk(mtx, boost::adopt_lock);
+    boost::lock_guard<boost::mutex> lk(mtx, boost::adopt_lock);
     --connected;
     cond.notify_all();
 }
@@ -978,7 +937,7 @@ void big_boot_barrier::trigger()
 {
     if (service_mode_bootstrap == service_type)
     {
-        util::function_nonser<void()>* p;
+        util::unique_function_nonser<void()>* p;
 
         while (thunks.pop(p))
             (*p)();

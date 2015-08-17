@@ -8,11 +8,12 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/components/iostreams/server/buffer.hpp>
-#include <hpx/util/scoped_unlock.hpp>
-
-#include <map>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <map>
 
 namespace hpx { namespace iostreams { namespace detail
 {
@@ -26,7 +27,7 @@ namespace hpx { namespace iostreams { namespace detail
         void output(boost::uint32_t locality_id, boost::uint64_t count,
             detail::buffer in, F const& write_f, Mutex& mtx)
         {
-            typename Mutex::scoped_lock l(mtx);
+            boost::unique_lock<Mutex> l(mtx);
             data_type& data = output_data_map_[locality_id];
 
             if (count == data.first)
@@ -35,7 +36,7 @@ namespace hpx { namespace iostreams { namespace detail
                 if (!in.empty())
                 {
                     // output the line as requested
-                    util::scoped_unlock<typename Mutex::scoped_lock> ul(l);
+                    util::unlock_guard<boost::unique_lock<Mutex> > ul(l);
                     in.write(write_f, mtx);
                 }
                 ++data.first;
@@ -48,7 +49,7 @@ namespace hpx { namespace iostreams { namespace detail
                     if (!next_in.empty())
                     {
                         // output the next line
-                        util::scoped_unlock<typename Mutex::scoped_lock> ul(l);
+                        util::unlock_guard<boost::unique_lock<Mutex> > ul(l);
                         next_in.write(write_f, mtx);
                     }
                     data.second.erase(next);

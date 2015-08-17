@@ -25,11 +25,12 @@
 #include <hpx/components/security/certificate_store.hpp>
 #endif
 
-#include <hpx/config/warnings_prefix.hpp>
-
 #include <boost/smart_ptr/scoped_ptr.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <memory>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -93,7 +94,7 @@ namespace hpx
         /// \brief Manage list of functions to call on exit
         void on_exit(util::function_nonser<void()> const& f)
         {
-            boost::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<boost::mutex> l(mtx_);
             on_exit_functions_.push_back(f);
         }
 
@@ -110,7 +111,7 @@ namespace hpx
 
             typedef util::function_nonser<void()> value_type;
 
-            boost::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<boost::mutex> l(mtx_);
             for (value_type const& f : on_exit_functions_)
                 f();
         }
@@ -293,6 +294,12 @@ namespace hpx
         ///
         virtual bool unregister_thread() = 0;
 
+        /// Generate a new notification policy instance for the given thread
+        /// name prefix
+        typedef threads::policies::callback_notifier notification_policy_type;
+        virtual notification_policy_type
+            get_notification_policy(char const* prefix) = 0;
+
         /// This function creates anew base_lco_factory (if none is available
         /// for the given type yet), registers this factory with the
         /// runtime_support object and asks the factory for it's heap object
@@ -424,7 +431,7 @@ namespace hpx {
     bool runtime::verify_parcel_suffix(Buffer const& data,
         naming::gid_type& parcel_id, error_code& ec) const
     {
-        lcos::local::spinlock::scoped_lock l(security_mtx_);
+        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
         return components::security::verify(*cert_store(ec), data, parcel_id);
     }
 }

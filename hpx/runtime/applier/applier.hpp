@@ -8,7 +8,7 @@
 #if !defined(HPX_APPLIER_APPLIER_JUN_03_2008_0438PM)
 #define HPX_APPLIER_APPLIER_JUN_03_2008_0438PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -154,7 +154,7 @@ namespace hpx { namespace applier
         }
 
         /// Schedule  threads based on the given parcel
-        void schedule_action(parcelset::parcel const& p);
+        void schedule_action(parcelset::parcel p);
 
 #if defined(HPX_HAVE_SECURITY)
         void enable_verify_capabilities()

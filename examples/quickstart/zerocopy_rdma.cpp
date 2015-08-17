@@ -186,7 +186,7 @@ public:
 
         using hpx::util::placeholders::_1;
         std::size_t buffer_address = reinterpret_cast<std::size_t>(buff.data());
-        return hpx::async(act, this->get_gid(), buff.size(), buffer_address)
+        return hpx::async(act, this->get_id(), buff.size(), buffer_address)
             .then(hpx::util::bind(&zerocopy::transfer_data, buff, _1));
     }
     void get_here_sync(general_buffer_type& buff) const
@@ -198,7 +198,7 @@ public:
     hpx::future<general_buffer_type> get(std::size_t size) const
     {
         zerocopy_get_action act;
-        return hpx::async(act, this->get_gid(), size);
+        return hpx::async(act, this->get_id(), size);
     }
     general_buffer_type get_sync(std::size_t size) const
     {

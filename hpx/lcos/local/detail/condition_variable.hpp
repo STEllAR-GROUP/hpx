@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/intrusive/slist.hpp>
@@ -238,7 +238,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             threads::thread_state_ex_enum reason = threads::wait_unknown;
             {
                 // yield this thread
-                util::scoped_unlock<boost::unique_lock<Mutex> > unlock(lock);
+                util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
                 reason = this_thread::suspend(threads::suspended, description, ec);
                 if (ec) return threads::wait_unknown;
             }
@@ -271,7 +271,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             threads::thread_state_ex_enum reason = threads::wait_unknown;
             {
                 // yield this thread
-                util::scoped_unlock<boost::unique_lock<Mutex> > unlock(lock);
+                util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
                 reason = this_thread::suspend(abs_time, description, ec);
                 if (ec) return threads::wait_unknown;
             }

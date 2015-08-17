@@ -35,7 +35,7 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 
     hpx::id_type call() const
     {
-        return hpx::async<call_action>(this->get_gid()).get();
+        return hpx::async<call_action>(this->get_id()).get();
     }
 };
 

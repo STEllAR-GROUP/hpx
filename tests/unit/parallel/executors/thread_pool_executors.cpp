@@ -83,9 +83,9 @@ int hpx_main(int argc, char* argv[])
 {
     std::size_t num_threads = hpx::get_os_thread_count();
 
-#if defined(HPX_HAVE_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
     {
-        hpx::parallel::local_queue_executor exec(num_threads);
+        hpx::parallel::static_queue_executor exec(num_threads);
         test_thread_pool_executor(exec);
     }
 #endif

@@ -133,7 +133,7 @@ namespace hpx
             // collect argument sizes from parcels
             std::size_t arg_size = 0;
             boost::uint32_t dest_locality_id =
-                ps[0].get_destination_locality_id();
+                ps[0].destination_locality_id();
 
             std::size_t parcels_sent = 0;
 

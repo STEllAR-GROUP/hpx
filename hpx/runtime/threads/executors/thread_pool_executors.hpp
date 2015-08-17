@@ -1,18 +1,19 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_SERIAL_EXECUTOR_JAN_11_2013_0831PM)
-#define HPX_RUNTIME_THREADS_EXECUTORS_SERIAL_EXECUTOR_JAN_11_2013_0831PM
+#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_POOL_EXECUTORS_JAN_11_2013_0831PM)
+#define HPX_RUNTIME_THREADS_EXECUTORS_POOL_EXECUTORS_JAN_11_2013_0831PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/state.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/atomic.hpp>
+#include <boost/chrono.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -21,8 +22,8 @@ namespace hpx { namespace threads { namespace executors
     namespace detail
     {
         //////////////////////////////////////////////////////////////////////
-        template <typename Scheduler>
-        class manage_thread_pool_executor;
+        template <typename ExecutorImpl>
+        class manage_thread_executor;
 
         //////////////////////////////////////////////////////////////////////
         template <typename Scheduler>
@@ -61,7 +62,7 @@ namespace hpx { namespace threads { namespace executors
             boost::uint64_t num_pending_closures(error_code& ec) const;
 
         protected:
-            friend class manage_thread_pool_executor<Scheduler>;
+            friend class manage_thread_executor<thread_pool_executor>;
 
             // Return the requested policy element
             std::size_t get_policy_element(threads::detail::executor_parameter p,
@@ -93,7 +94,6 @@ namespace hpx { namespace threads { namespace executors
             // the scheduler used by this executor
             Scheduler scheduler_;
             lcos::local::counting_semaphore shutdown_sem_;
-            boost::ptr_vector<boost::atomic<hpx::state> > states_;
 
             // collect statistics
             boost::atomic<std::size_t> current_concurrency_;
@@ -124,6 +124,16 @@ namespace hpx { namespace threads { namespace executors
         local_queue_executor();
 
         explicit local_queue_executor(std::size_t max_punits,
+            std::size_t min_punits = 1);
+    };
+#endif
+
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+    struct HPX_EXPORT static_queue_executor : public scheduled_executor
+    {
+        static_queue_executor();
+
+        explicit static_queue_executor(std::size_t max_punits,
             std::size_t min_punits = 1);
     };
 #endif

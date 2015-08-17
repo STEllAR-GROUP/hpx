@@ -17,16 +17,16 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/serialization.hpp>
 
+#include <boost/cstdint.hpp>
+#include <boost/format.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/thread/locks.hpp>
+
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
 #include <sys/times.h>
 #include <vector>
-
-#include <boost/cstdint.hpp>
-#include <boost/format.hpp>
-#include <boost/shared_array.hpp>
-
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -502,7 +502,7 @@ int hpx_main(variables_map& vm)
         hpx::lcos::local::spinlock mtx;
         hpx::lcos::wait_each(futures,
                 hpx::util::unwrapped([&](RESULT r) {
-                    hpx::lcos::local::spinlock::scoped_lock lk(mtx);
+                    boost::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
                     result_vector.push_back(r);
                 }));
 

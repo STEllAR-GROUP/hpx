@@ -99,7 +99,7 @@ namespace hpx
             {
                 value_type v;
                 ar >> v;
-                t.insert(t.end(), v);
+                t.insert(t.end(), std::move(v));
             }
         }
 

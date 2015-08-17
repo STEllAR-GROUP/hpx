@@ -54,9 +54,9 @@ void hpx_test_main(
 
         Client monitor(find_here());
 
-        cout << "id: " << monitor.get_gid() << " "
+        cout << "id: " << monitor.get_id() << " "
              << get_management_type_name
-                    (monitor.get_gid().get_management_type()) << "\n"
+                    (monitor.get_id().get_management_type()) << "\n"
              << flush;
 
         {

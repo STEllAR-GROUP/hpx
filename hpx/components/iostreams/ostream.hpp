@@ -8,22 +8,22 @@
 #define HPX_97FC0FA2_E773_4F83_8477_806EC68C2253
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local/recursive_mutex.hpp>
-
-#include <iterator>
-#include <ios>
-#include <iostream>
-
-#include <boost/swap.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <boost/atomic.hpp>
-
 #include <hpx/state.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/stubs/output_stream.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/lcos/local/recursive_mutex.hpp>
+
+#include <boost/swap.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/atomic.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <iterator>
+#include <ios>
+#include <iostream>
 
 namespace hpx { namespace iostreams
 {
@@ -172,7 +172,7 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_async(get_gid(), hpx::get_locality_id(),
+                this->base_type::write_async(get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
 
@@ -197,7 +197,7 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_sync(get_gid(), hpx::get_locality_id(),
+                this->base_type::write_sync(get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
 
@@ -209,7 +209,7 @@ namespace hpx { namespace iostreams
 
         bool flush()
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             if (!this->detail::buffer::empty())
             {
                 // Create the next buffer, returns the previous buffer
@@ -220,7 +220,7 @@ namespace hpx { namespace iostreams
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
-                this->base_type::write_async(get_gid(), hpx::get_locality_id(),
+                this->base_type::write_async(get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
             return true;
@@ -240,7 +240,7 @@ namespace hpx { namespace iostreams
         // reset this object during runtime system shutdown
         void uninitialize()
         {
-            mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
+            boost::unique_lock<mutex_type> l(mtx_, boost::try_to_lock);
             if (l)
             {
                 streaming_operator_sync(hpx::async_flush, l);   // unlocks l
@@ -259,28 +259,28 @@ namespace hpx { namespace iostreams
         // hpx::flush manipulator
         ostream& operator<<(hpx::iostreams::flush_type const& m)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_sync(m, l);
         }
 
         // hpx::endl manipulator
         ostream& operator<<(hpx::iostreams::endl_type const& m)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_sync(m, l);
         }
 
         // hpx::async_flush manipulator
         ostream& operator<<(hpx::iostreams::async_flush_type const& m)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_async(m, l);
         }
 
         // hpx::async_endl manipulator
         ostream& operator<<(hpx::iostreams::async_endl_type const& m)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             return streaming_operator_async(m, l);
         }
 
@@ -288,14 +288,14 @@ namespace hpx { namespace iostreams
         template <typename T>
         ostream& operator<<(T const& subject)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return streaming_operator_lazy(subject);
         }
 
         ///////////////////////////////////////////////////////////////////////
         ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&))
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return streaming_operator_lazy(manip_fun);
         }
     };

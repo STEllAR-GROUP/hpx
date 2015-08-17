@@ -30,22 +30,22 @@ if(HPX_WITH_PARCELPORT_IBVERBS)
   macro(add_parcelport_ibverbs_module)
     hpx_debug("add_parcelport_ibverbs_module")
     add_parcelport(ibverbs
-        SOURCES "${hpx_SOURCE_DIR}/plugins/parcelport/ibverbs/connection_handler_ibverbs.cpp"
-                "${hpx_SOURCE_DIR}/plugins/parcelport/ibverbs/parcelport_ibverbs.cpp"
+        SOURCES "${PROJECT_SOURCE_DIR}/plugins/parcelport/ibverbs/connection_handler_ibverbs.cpp"
+                "${PROJECT_SOURCE_DIR}/plugins/parcelport/ibverbs/parcelport_ibverbs.cpp"
         HEADERS
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/acceptor.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/allocator.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/client.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/connection_handler.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/context.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/data_buffer.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/helper.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/locality.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/messages.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/receiver.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/sender.hpp"
-              "${hpx_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/server.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/acceptor.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/allocator.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/client.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/connection_handler.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/context.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/data_buffer.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/helper.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/locality.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/messages.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/receiver.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/sender.hpp"
+              "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/ibverbs/server.hpp"
         DEPENDENCIES
               ${IBVERBS_LIBRARIES}
               ${RDMACM_LIBRARIES}

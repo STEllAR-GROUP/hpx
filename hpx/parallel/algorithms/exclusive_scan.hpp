@@ -29,7 +29,6 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
-#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -53,6 +52,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 temp  = init;
             }
             return dest;
+        }
+
+        template <typename InIter, typename OutIter, typename T, typename Op>
+        T sequential_exclusive_scan_n(InIter first, std::size_t count,
+            OutIter dest, T init, Op && op)
+        {
+            T temp = init;
+            for (/* */; count-- != 0; (void) ++first, ++dest)
+            {
+                init  = op(init, *first);
+                *dest = temp;
+                temp  = init;
+            }
+            return init;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -80,69 +93,64 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy policy, FwdIter first, FwdIter last,
                  OutIter dest, T && init, Op && op)
             {
-                typedef util::detail::algorithm_result<
-                        ExPolicy, OutIter
-                    > result;
-                typedef hpx::util::zip_iterator<FwdIter, T*> zip_iterator;
+                typedef util::detail::algorithm_result<ExPolicy, OutIter>
+                    result;
+                typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
 
                 if (first == last)
                     return result::get(std::move(dest));
 
-                typedef typename std::iterator_traits<FwdIter>::difference_type
-                    difference_type;
-                difference_type count = std::distance(first, last) - 1;
+                difference_type count = std::distance(first, last);
 
-                if (count == 0) {
-                  *dest = init;
-                  return result::get(std::move(dest));
-                }
+                OutIter final_dest = dest;
+                std::advance(final_dest, count);
 
-                // The scan may use the same array for output as input
-                // don't write initial value until after sum to avoid trampling on input
-                OutIter iout = dest++;
-                T temp = init;
+                // The overall scan algorithm is performed by executing 3
+                // steps. The first calculates the scan results for each
+                // partition. The second accumulates the result from left to
+                // right to be used by the third step--which operates on the
+                // same partitions the first step operated on.
 
-
-                boost::shared_array<T> data(new T[count]);
-
-                // The overall scan algorithm is performed by executing 2
-                // subsequent parallel steps. The first calculates the scan
-                // results for each partition and the second produces the
-                // overall result
+                using hpx::util::get;
                 using hpx::util::make_zip_iterator;
-                auto ret =
-                    util::scan_partitioner<ExPolicy, OutIter, T>::call(
-                        policy, make_zip_iterator(first, data.get()), count, init,
-                        // step 1 performs first part of scan algorithm
-                        [=](zip_iterator part_begin, std::size_t part_size) -> T
-                        {
-                            using hpx::util::get;
-                            T part_init = get<0>(*part_begin);
-                            get<1>(*part_begin++) = part_init;
-                            return sequential_inclusive_scan_n(
-                                get<0>(part_begin.get_iterator_tuple()), part_size-1,
-                                get<1>(part_begin.get_iterator_tuple()), part_init, op);
-                        },
-                        // step 2 propagates the partition results from left
-                        // to right
-                        hpx::util::unwrapped(
-                            [=](T const& prev, T const& curr) -> T
+                return util::scan_partitioner<ExPolicy, OutIter, T>::call(
+                    policy, make_zip_iterator(first, dest), count, init,
+                    // step 1 performs first part of scan algorithm
+                    [op](zip_iterator part_begin, std::size_t part_size) -> T
+                    {
+                        T part_init = get<0>(*part_begin++);
+                        return sequential_exclusive_scan_n(
+                            get<0>(part_begin.get_iterator_tuple()),
+                            part_size - 1,
+                            get<1>(part_begin.get_iterator_tuple()),
+                            part_init, op);
+                    },
+                    // step 2 propagates the partition results from left
+                    // to right
+                    hpx::util::unwrapped(op),
+                    // step 3 runs final accumulation on each partition
+                    [op](zip_iterator part_begin, std::size_t part_size,
+                        hpx::shared_future<T> f_accu)
+                    {
+                        T val = f_accu.get();
+                        OutIter dst = get<1>(part_begin.get_iterator_tuple());
+                        *dst++ = val;
+                        // MSVC 2015 fails if op is captured by reference
+                        util::loop_n(dst, part_size - 1,
+                            [=, &val](OutIter it)
                             {
-                                return op(prev, curr);
-                            }),
-                        // step 3 runs the remaining operation
-                        [=](std::vector<hpx::shared_future<T> >&& r,
-                            std::vector<std::size_t> const& chunk_sizes)
-                        {
-                            // run the final copy step and produce the required
-                            // result
-                            return scan_copy_helper(policy, std::move(r),
-                                data, count, dest, op, chunk_sizes);
-                        }
-                    );
-                // write output initial value
-                *iout = temp;
-                return ret;
+                                *it = op(*it, val);
+                            });
+                    },
+                    // step 4 use this return value
+                    [final_dest](std::vector<hpx::shared_future<T> > &&,
+                        std::vector<hpx::future<void> > &&)
+                    {
+                        return final_dest;
+                    });
+
             }
         };
         /// \endcond

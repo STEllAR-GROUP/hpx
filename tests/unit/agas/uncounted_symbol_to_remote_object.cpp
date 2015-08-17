@@ -78,9 +78,9 @@ void hpx_test_main(
 
         Client monitor(remote_localities[0]);
 
-        cout << "id: " << monitor.get_gid() << " "
+        cout << "id: " << monitor.get_id() << " "
              << get_management_type_name
-                    (monitor.get_gid().get_management_type()) << "\n"
+                    (monitor.get_id().get_management_type()) << "\n"
              << flush;
 
         // Associate a symbolic name with the object. The symbol namespace

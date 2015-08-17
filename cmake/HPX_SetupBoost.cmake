@@ -86,8 +86,8 @@ endif()
 # If the found Boost installation is < 1.53, we need to include our packaged
 # atomic library
 if(Boost_VERSION LESS 105300)
-  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${hpx_SOURCE_DIR}/external/atomic")
-  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${hpx_SOURCE_DIR}/external/lockfree")
+  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${PROJECT_SOURCE_DIR}/external/atomic")
+  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${PROJECT_SOURCE_DIR}/external/lockfree")
 else()
   find_package(Boost 1.53 QUIET REQUIRED COMPONENTS atomic)
   if(Boost_ATOMIC_FOUND)
@@ -97,21 +97,15 @@ else()
   set(Boost_TMP_LIBRARIES ${Boost_TMP_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
-# If the found Boost installation is < 1.57, we need to include extra
-# serialization headers
-if(Boost_VERSION LESS 105700)
-  set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} "${hpx_SOURCE_DIR}/external/serialization")
-endif()
-
 set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})
-set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${hpx_SOURCE_DIR}/external/cache)
-set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${hpx_SOURCE_DIR}/external/endian)
+set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/external/cache)
+set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/external/endian)
 
 # If we compile natively for the MIC, we need some workarounds for certain
 # Boost headers
 # FIXME: push changes upstream
 if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-  set(Boost_INCLUDE_DIRS ${hpx_SOURCE_DIR}/external/asio ${Boost_INCLUDE_DIRS})
+  set(Boost_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/external/asio ${Boost_INCLUDE_DIRS})
 endif()
 
 # Boost preprocessor definitions
@@ -119,7 +113,7 @@ hpx_add_config_define(BOOST_PARAMETER_MAX_ARITY 7)
 if(MSVC)
   HPX_option(HPX_WITH_BOOST_ALL_DYNAMIC_LINK BOOL "Add BOOST_ALL_DYN_LINK to compile flags" OFF)
   if (HPX_WITH_BOOST_ALL_DYNAMIC_LINK)
-    hpx_add_compile_flag(-DBOOST_ALL_DYN_LINK)
+    hpx_add_config_define(BOOST_ALL_DYN_LINK)
   endif()
 else()
   hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)

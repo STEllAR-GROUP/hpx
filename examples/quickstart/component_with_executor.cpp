@@ -77,7 +77,7 @@ struct hello_world
 
     void print()
     {
-        hpx::async<print_action>(this->get_gid()).get();
+        hpx::async<print_action>(this->get_id()).get();
     }
 };
 

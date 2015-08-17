@@ -18,7 +18,6 @@
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -243,13 +242,6 @@ namespace hpx
             return applier_;
         }
 
-        /// \brief Allow access to the action manager instance used by the HPX
-        ///        runtime.
-        actions::action_manager& get_action_manager()
-        {
-            return action_manager_;
-        }
-
         /// \brief Allow access to the locality endpoints this runtime instance is
         /// associated with.
         ///
@@ -362,6 +354,10 @@ namespace hpx
         /// Unregister an external OS-thread with HPX
         bool unregister_thread();
 
+        /// Generate a new notification policy instance for the given thread
+        /// name prefix
+        notification_policy_type get_notification_policy(char const* prefix);
+
     private:
         void init_tss(char const* context, std::size_t num, char const* postfix,
             bool service_thread);
@@ -382,7 +378,6 @@ namespace hpx
         naming::resolver_client agas_client_;
         util::detail::init_logging init_logging_;
         applier::applier applier_;
-        actions::action_manager action_manager_;
         boost::signals2::scoped_connection default_error_sink_;
 
         boost::mutex mtx_;

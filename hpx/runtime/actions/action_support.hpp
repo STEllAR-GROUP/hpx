@@ -10,7 +10,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM)
 #define HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -25,7 +25,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
+
+#include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -81,11 +82,12 @@ namespace hpx { namespace traits
 /// \endcond
 
 ///////////////////////////////////////////////////////////////////////////////
+/// \namespace actions
 namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
 
-    struct base_action;
+    struct HPX_API_EXPORT base_action;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -151,8 +153,8 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     /// The \a base_action class is an abstract class used as the base class
     /// for all action types. It's main purpose is to allow polymorphic
-    /// serialization of action instances through a shared_ptr.
-    struct base_action
+    /// serialization of action instances through a unique_ptr.
+    struct HPX_API_EXPORT base_action
     {
         /// The type of an action defines whether this action will be executed
         /// directly or by a HPX-threads
@@ -209,7 +211,7 @@ namespace hpx { namespace actions
         ///       thread function for an action which has to be invoked with
         ///       continuations.
         virtual threads::thread_function_type
-            get_thread_function(continuation_type& cont,
+            get_thread_function(std::unique_ptr<continuation> cont,
                 naming::address::address_type lva) = 0;
 
         /// return the id of the locality of the parent thread
@@ -227,22 +229,15 @@ namespace hpx { namespace actions
         /// Return the thread stacksize this action has to be executed with
         virtual threads::thread_stacksize get_thread_stacksize() const = 0;
 
-        /// Return the size of action arguments in bytes
-        /// flags should contain serialization options which affect the space required
-        virtual std::size_t get_type_size(int flags) const = 0;
-
         /// Return whether the embedded action is part of termination detection
         virtual bool does_termination_detection() const = 0;
-
-        /// Wait for embedded futures to become ready
-        virtual void wait_for_futures() = 0;
 
         /// Return all data needed for thread initialization
         virtual void schedule_thread(naming::id_type const& target,
             naming::address::address_type lva,
             threads::thread_state_enum initial_state) = 0;
 
-        virtual void schedule_thread(continuation_type& cont,
+        virtual void schedule_thread(std::unique_ptr<continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_state_enum initial_state) = 0;
 

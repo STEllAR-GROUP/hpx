@@ -22,16 +22,17 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 
-#include <map>
-
+#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/atomic.hpp>
+#include <boost/thread/locks.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
 #include <boost/shared_ptr.hpp>
 #endif
+
+#include <map>
 
 namespace hpx { namespace agas
 {
@@ -241,7 +242,7 @@ struct HPX_EXPORT primary_namespace
       , refcnt_table_type::iterator upper_it
       , naming::gid_type const& lower
       , naming::gid_type const& upper
-      , mutex_type::scoped_lock& l
+      , boost::unique_lock<mutex_type>& l
       , const char* func_name
         );
 #endif
@@ -256,7 +257,7 @@ struct HPX_EXPORT primary_namespace
 
     // helper function
     void wait_for_migration_locked(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , naming::gid_type id
       , error_code& ec);
 
@@ -319,8 +320,7 @@ struct HPX_EXPORT primary_namespace
         );
 
     response route(
-        request const& req
-      , error_code& ec = throws
+        parcelset::parcel && p
         );
 
     response bind_gid(
@@ -385,7 +385,7 @@ struct HPX_EXPORT primary_namespace
     };
 
     void resolve_free_list(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , std::list<refcnt_table_type::iterator> const& free_list
       , std::list<free_entry>& free_entry_list
       , naming::gid_type const& lower
@@ -431,6 +431,8 @@ struct HPX_EXPORT primary_namespace
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service, bulk_service_action);
 
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route, route_action);
+
     static parcelset::policies::message_handler* get_message_handler(
         parcelset::parcelhandler* ph
       , parcelset::locality const& loc
@@ -452,11 +454,15 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::bulk_service_action,
     primary_namespace_bulk_service_action)
 
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::route_action,
+    primary_namespace_route_action)
+
 namespace hpx { namespace traits
 {
     // Parcel routing forwards the message handler request to the routed action
     template <>
-    struct action_message_handler<agas::server::primary_namespace::service_action>
+    struct action_message_handler<agas::server::primary_namespace::route_action>
     {
         static parcelset::policies::message_handler* call(
             parcelset::parcelhandler* ph
@@ -472,7 +478,7 @@ namespace hpx { namespace traits
     // Parcel routing forwards the binary filter request to the routed action
     template <>
     struct action_serialization_filter<
-        agas::server::primary_namespace::service_action>
+        agas::server::primary_namespace::route_action>
     {
         static serialization::binary_filter* call(parcelset::parcel const& p)
         {

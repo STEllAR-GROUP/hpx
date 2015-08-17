@@ -241,6 +241,7 @@ namespace hpx
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
@@ -407,7 +408,7 @@ namespace hpx { namespace lcos
                 if (new_count <= needed_count_)
                 {
                     {
-                        typename mutex_type::scoped_lock l(this->mtx_);
+                        boost::lock_guard<mutex_type> l(this->mtx_);
                         lazy_values_.indices.push_back(idx);
                     }
                     if (new_count == needed_count_) {

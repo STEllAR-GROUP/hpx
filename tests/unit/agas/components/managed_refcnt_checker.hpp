@@ -62,14 +62,14 @@ struct managed_refcnt_monitor
         naming::id_type const& gid
         )
     {
-        return this->base_type::take_reference_async(get_gid(), gid);
+        return this->base_type::take_reference_async(get_id(), gid);
     }
 
     void take_reference(
         naming::id_type const& gid
         )
     {
-        return this->base_type::take_reference(get_gid(), gid);
+        return this->base_type::take_reference(get_id(), gid);
     }
 
     bool is_ready()

@@ -42,7 +42,7 @@ endif()
 ################################################################################
 # project metadata
 ################################################################################
-project(hpx CXX C)
+project(HPX CXX C)
 
 set(HPX_MAJOR_VERSION 0)
 set(HPX_MINOR_VERSION 9)
@@ -50,6 +50,7 @@ set(HPX_PATCH_LEVEL   11)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
+set(HPX_PACKAGE_NAME HPX)
 
 if(MSVC)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -58,7 +59,7 @@ endif()
 ################################################################################
 # CMake configuration
 ################################################################################
-set(CMAKE_MODULE_PATH "${hpx_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # We safe the passed compiler flag to a special variable. This is needed for our
 # build system unit tests. Some flags might influence the created symbols (
@@ -190,8 +191,21 @@ hpx_option(HPX_WITH_COMPILE_ONLY_TESTS BOOL
   "Create build system support for compile time only HPX tests (default ON)"
   ON CATEGORY "Build Targets")
 
+# Enable IO-counters on linux systems only
+set(HPX_WITH_IO_COUNTERS_DEFAULT OFF)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+  set(HPX_WITH_IO_COUNTERS_DEFAULT ON)
+endif()
+
+hpx_option(HPX_WITH_IO_COUNTERS BOOL
+  "Build HPX runtime (default: ${HPX_WITH_IO_COUNTERS_DEFAULT})"
+  ${HPX_WITH_IO_COUNTERS_DEFAULT} ADVANCED CATEGORY "Build Targets")
+if(HPX_WITH_IO_COUNTERS)
+  hpx_add_config_define(HPX_HAVE_IO_COUNTERS)
+endif()
+
 set(HPX_FULL_RPATH_DEFAULT ON)
-if(APPLE)
+if(APPLE OR MSVC)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_WITH_FULL_RPATH BOOL
@@ -367,6 +381,47 @@ hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
   "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)
 
+################################################################################
+# Scheduler configuration
+################################################################################
+hpx_option(HPX_WITH_THREAD_SCHEDULERS STRING
+  "Which thread schedulers are build. Options are: all, abp-priority, local, static-priority, static, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
+  "all"
+  CATEGORY "Thread Manager" ADVANCED)
+
+string(TOUPPER ${HPX_WITH_THREAD_SCHEDULERS} HPX_WITH_THREAD_SCHEDULERS_UC)
+foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
+  if(_scheduler STREQUAL "ALL")
+    set(_all On)
+    set(HPX_HAVE_ALL_SCHEDULERS ON CACHE INTERNAL "")
+  endif()
+  if(_scheduler STREQUAL "ABP-PRIORITY" OR _all)
+    hpx_add_config_define(HPX_HAVE_ABP_SCHEDULER)
+    set(HPX_HAVE_ABP_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  if(_scheduler STREQUAL "LOCAL" OR _all)
+    hpx_add_config_define(HPX_HAVE_LOCAL_SCHEDULER)
+    set(HPX_HAVE_LOCAL_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  if(_scheduler STREQUAL "STATIC-PRIORITY" OR _all)
+    hpx_add_config_define(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+    set(HPX_HAVE_STATIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  if(_scheduler STREQUAL "STATIC" OR _all)
+    hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
+    set(HPX_HAVE_STATIC_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  if(_scheduler STREQUAL "HIERARCHY" OR _all)
+    hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
+    set(HPX_HAVE_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  if(_scheduler STREQUAL "PERIODIC-PRIORITY" OR _all)
+    hpx_add_config_define(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
+    set(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
+  endif()
+  unset(_all)
+endforeach()
+
 ## AGAS related build options
 hpx_option(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES BOOL
   "Enable dumps of the AGAS refcnt tables to logs (default: OFF)"
@@ -505,204 +560,10 @@ endif()
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################
-include_directories("${hpx_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
 ################################################################################
-
-##############################################################################
-# Find Our dependencies:
-#   These are all dependencies needed to build the core library. Dependencies
-#   that are only needed by plugins, examples or tests should be found
-#   seperately in the appropriate subdirectory.
-# When a package is found, the necessary include paths are set, and the libraries
-# are added to the HPX_LIBRARIES variables
-
-# Setting up our required Boost libraries. This will find all required boost
-# libraries and add possibly needed boost headers shipped with the hpx source
-include(HPX_SetupBoost)
-
-# Find all allocators which are currently supported.
-include(HPX_SetupAllocator)
-
-# convey selected allocator type to the build configuration
-hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
-
-if(HPX_WITH_HWLOC)
-  find_package(Hwloc)
-  if(NOT HWLOC_FOUND)
-    hpx_error("Hwloc could not be found and HPX_WITH_HWLOC=ON, please specify HWLOC_ROOT to point to the correct location or set HPX_WITH_HWLOC to OFF")
-  endif()
-  hpx_info("hwloc" "hwloc libraries ${HWLOC_LIBRARIES}")
-  hpx_libraries(${HWLOC_LIBRARIES})
-  include_directories(${HWLOC_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_HWLOC)
-endif()
-
-
-
-################################################################################
-# Enable integration with Intel Amplifier and Inspector tools
-################################################################################
-if(WITH_AMPLIFIER)
-  find_package(Amplifier)
-  if(NOT AMPLIFIER_FOUND)
-    hpx_error("Intel Amplifier could not be found and WITH_AMPLIFIER=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
-  endif()
-  hpx_libraries(${AMPLIFIER_LIBRARIES})
-  include_directories(${AMPLIFIER_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
-endif()
-
-if(HPX_WITH_TAU)
-  find_package(TAU)
-  if(NOT TAU_FOUND)
-    hpx_error("TAU could not be found and HPX_WITH_TAU=On, please specify TAU_ROOT to point to the root of your TAU installation")
-  endif()
-  hpx_libraries(${TAU_LIBRARIES})
-  include_directories(${TAU_INCLUDE_DIR})
-endif()
-
-################################################################################
-# Enable integration with Apex event counters
-################################################################################
-set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES CACHE INTERNAL "")
-if(HPX_WITH_APEX)
-  # handle APEX library
-  include(GitExternal)
-  git_external(apex
-    https://github.com/khuck/xpress-apex.git
-    master
-    NO_UPDATE VERBOSE)
-
-  add_subdirectory(apex/src/apex)
-  if(NOT APEX_FOUND)
-    hpx_error("Apex could not be found and HPX_WITH_APEX=On")
-  endif()
-  if(AMPLIFIER_FOUND)
-    hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
-  endif()
-
-  include_directories(${APEX_SOURCE_DIR})
-  hpx_add_config_define(HPX_HAVE_APEX 1)
-  set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-      ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} apex_lib)
-  if(APEX_WITH_MSR)
-    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
-  endif()
-  if(APEX_WITH_ACTIVEHARMONY)
-    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
-  endif()
-
-  # handle optional ITTNotify library
-  if(HPX_WITH_ITTNOTIFY)
-    add_subdirectory(apex/src/ITTNotify)
-    if(NOT ITTNOTIFY_FOUND)
-      hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
-    endif()
-    include_directories(${ITTNOTIFY_SOURCE_DIR})
-    hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
-    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} ittnotify_lib)
-  endif()
-endif()
-
-if(HPX_WITH_PAPI AND NOT MSVC)
-  find_package(PAPI)
-  if(NOT PAPI_FOUND)
-      hpx_error("PAPI could not be found and HPX_WITH_PAPI=ON, please specify PAPI_ROOT to point to the correct location or set HPX_WITH_PAPI to OFF")
-  endif()
-  hpx_info("PAPI" "PAPI libraries ${PAPI_LIBRARIES}")
-  hpx_libraries(${PAPI_LIBRARIES} ${PAPI_LIBRARIES})
-  include_directories(${PAPI_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_PAPI)
-  set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
-      ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} ${PAPI_LIBRARIES})
-endif()
-
-if(HPX_WITH_GOOGLE_PERFTOOLS)
-  find_package(GooglePerftools)
-  if(NOT GOOGLE_PERFTOOLS_FOUND)
-    hpx_error("Google Perftools could not be found and HPX_WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to the root of your Google Perftools installation")
-  endif()
-  hpx_libraries(${GOOGLE_PERFTOOLS_LIBRARIES})
-  include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-endif()
-
-if(HPX_WITH_VALGRIND)
-  find_package(Valgrind)
-  if(NOT VALGRIND_FOUND)
-    hpx_error("Valgrind could not be found and HPX_WITH_VALGRIND=On, please specify VALGRIND_ROOT to point to the root of your Valgrind installation")
-  endif()
-  include_directories(${VALGRIND_INCLUDE_DIR})
-  hpx_add_config_define(HPX_HAVE_VALGRIND)
-endif()
-
-################################################################################
-# Scheduler configuration
-################################################################################
-hpx_option(HPX_WITH_THREAD_SCHEDULERS STRING
-  "Which thread schedulers are build. Options are: all, abp-priority, local, static-priority, hierarchy, and periodic-priority. For multiple enabled schedulers, separate with a semicolon (default: all)"
-  "all"
-  CATEGORY "Thread Manager" ADVANCED)
-
-string(TOUPPER ${HPX_WITH_THREAD_SCHEDULERS} HPX_WITH_THREAD_SCHEDULERS_UC)
-foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
-  if(_scheduler STREQUAL "ALL")
-    set(_all On)
-    set(HPX_HAVE_ALL_SCHEDULERS ON CACHE INTERNAL "")
-  endif()
-  if(_scheduler STREQUAL "ABP-PRIORITY" OR _all)
-    hpx_add_config_define(HPX_HAVE_ABP_SCHEDULER)
-    set(HPX_HAVE_ABP_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  if(_scheduler STREQUAL "LOCAL" OR _all)
-    hpx_add_config_define(HPX_HAVE_LOCAL_SCHEDULER)
-    set(HPX_HAVE_LOCAL_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  if(_scheduler STREQUAL "STATIC-PRIORITY" OR _all)
-    hpx_add_config_define(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-    set(HPX_HAVE_STATIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  if(_scheduler STREQUAL "HIERARCHY" OR _all)
-    hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
-    set(HPX_HAVE_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  if(_scheduler STREQUAL "PERIODIC-PRIORITY" OR _all)
-    hpx_add_config_define(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
-    set(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  if(HPX_WITH_APEX AND NOT MSVC AND (_scheduler STREQUAL "THROTTLE" OR _all))
-    hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
-    set(HPX_HAVE_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
-  endif()
-  unset(_all)
-endforeach()
-
-################################################################################
-# Security, libsodium: P(ortable|ackageable) NaCl
-################################################################################
-if(HPX_WITH_SECURITY)
-  find_package(Sodium)
-  if(NOT SODIUM_FOUND)
-    hpx_error("Sodium could not be found and WITH_SODIUM=On, please specify Sodium_ROOT to point to the root of your Sodium installation")
-  endif()
-  hpx_add_config_define(HPX_HAVE_SODIUM)
-
-  include_directories(${SODIUM_INCLUDE_DIR})
-
-  if(MSVC)
-    hpx_add_config_define(SODIUM_STATIC)
-  endif()
-  hpx_libraries(${SODIUM_LIBRARIES})
-
-  hpx_add_config_define(HPX_HAVE_SECURITY)
-endif()
-################################################################################
-
-##############################################################################
 # Check for compiler compatibility
 #
 
@@ -736,6 +597,16 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
     hpx_error("HPX on the BG/Q can only be compiled with bgclang")
   endif()
   hpx_info("Compiling for BlueGene/Q")
+endif()
+
+if(MSVC14 AND CMAKE_CL_64)
+  hpx_option(HPX_WITH_AWAIT BOOL
+      "Enable the use of experimental __await functionality"
+      OFF ADVANCED CATEGORY "LCOs")
+  if(HPX_WITH_AWAIT)
+    hpx_add_config_define(HPX_HAVE_AWAIT)
+    hpx_add_compile_flag(-await LANGUAGES CXX)
+  endif()
 endif()
 
 ################################################################################
@@ -793,7 +664,7 @@ hpx_check_for_cxx11_alias_templates(
   DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
 
 hpx_check_for_cxx11_auto(
-  DEFINITIONS HPX_HAVE_CXX11_AUTO)
+  REQUIRED "HPX needs support for C++11 auto")
 
 hpx_check_for_cxx11_constexpr(
   DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
@@ -916,8 +787,13 @@ if(MSVC)
   enable_language(ASM_MASM)
   hpx_add_compile_flag(-Ox
     CONFIGURATIONS Release LANGUAGES CXX C)
-  hpx_add_compile_flag(-RTC1
-    CONFIGURATIONS Debug LANGUAGES CXX C)
+
+  if(NOT HPX_WITH_AWAIT)
+    hpx_add_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
+  else()
+    # /RTC1 is incompatible with /await
+    hpx_remove_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
+  endif()
 
   # VS2012 and above has a special flag for improving the debug experience by
   # adding more symbol information to the build (-d2Zi)
@@ -927,15 +803,21 @@ if(MSVC)
   # VS2013 and above know how to do link time constant data segment folding
   # VS2013 update 2 and above know how to remove debug information for
   #     non-referenced functions and data (-Zc:inline)
-  if(MSVC12 OR MSVC13)
+  if(MSVC12 OR MSVC14)
     hpx_add_compile_flag(-Zc:inline)
     hpx_add_compile_flag(-Gw
       CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
     hpx_add_compile_flag(-Zo
       CONFIGURATIONS RelWithDebInfo)
   endif()
+
   # Exceptions
   hpx_add_compile_flag(-EHsc)
+  if(MSVC14)
+    # assume conforming (throwing) operator new implementations
+    hpx_add_compile_flag(-Zc:throwingNew)
+  endif()
+
   # Runtime type information
   hpx_add_compile_flag(-GR)
   # Multiprocessor build
@@ -989,7 +871,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
     # OpenMPI triggers a lot of forcing value to bool 'true' or 'false'
     # (performance warning)
-    if(MPI_FOUND OR HPX_WITH_APEX)
+    if(MPI_FOUND)
       hpx_add_compile_flag(-wd4800)
     endif()
   else() # Trial and error approach for any other compiler ...
@@ -1080,7 +962,7 @@ else()
   endif()
 
   # Check if our libraries have unresolved symbols
-  if(NOT APPLE AND NOT HPX_WITH_APEX)
+  if(NOT APPLE)
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
 
@@ -1134,7 +1016,112 @@ else()
   endif()
 endif()
 
-##############################################################################
+################################################################################
+
+################################################################################
+# Find Our dependencies:
+#   These are all dependencies needed to build the core library. Dependencies
+#   that are only needed by plugins, examples or tests should be found
+#   seperately in the appropriate subdirectory.
+# When a package is found, the necessary include paths are set, and the libraries
+# are added to the HPX_LIBRARIES variables
+
+# Setting up our required Boost libraries. This will find all required boost
+# libraries and add possibly needed boost headers shipped with the hpx source
+include(HPX_SetupBoost)
+
+# Find all allocators which are currently supported.
+include(HPX_SetupAllocator)
+
+# convey selected allocator type to the build configuration
+hpx_add_config_define(HPX_HAVE_MALLOC "\"${HPX_WITH_MALLOC}\"")
+
+if(HPX_WITH_HWLOC)
+  find_package(Hwloc)
+  if(NOT HWLOC_FOUND)
+    hpx_error("Hwloc could not be found and HPX_WITH_HWLOC=ON, please specify HWLOC_ROOT to point to the correct location or set HPX_WITH_HWLOC to OFF")
+  endif()
+  hpx_libraries(${HWLOC_LIBRARIES})
+  include_directories(${HWLOC_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_HWLOC)
+endif()
+
+################################################################################
+# Enable integration with Intel Amplifier and Inspector tools
+################################################################################
+if(WITH_AMPLIFIER)
+  find_package(Amplifier)
+  if(NOT AMPLIFIER_FOUND)
+    hpx_error("Intel Amplifier could not be found and WITH_AMPLIFIER=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
+  endif()
+  hpx_libraries(${AMPLIFIER_LIBRARIES})
+  include_directories(${AMPLIFIER_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+endif()
+
+if(HPX_WITH_TAU)
+  find_package(TAU)
+  if(NOT TAU_FOUND)
+    hpx_error("TAU could not be found and HPX_WITH_TAU=On, please specify TAU_ROOT to point to the root of your TAU installation")
+  endif()
+  hpx_libraries(${TAU_LIBRARIES})
+  include_directories(${TAU_INCLUDE_DIR})
+endif()
+
+################################################################################
+# Enable integration with Apex event counters
+################################################################################
+if(HPX_WITH_APEX)
+  find_package(APEX)
+  if(NOT APEX_FOUND)
+    hpx_error("Apex could not be found and HPX_WITH_APEX=On, please specify APEX_ROOT to point to the root of your Apex installation")
+  endif()
+  hpx_libraries(${APEX_LIBRARIES})
+  include_directories(${APEX_INCLUDE_DIR})
+  if(AMPLIFIER_FOUND)
+    hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
+  endif()
+  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+endif()
+
+if(HPX_WITH_GOOGLE_PERFTOOLS)
+  find_package(GooglePerftools)
+  if(NOT GOOGLE_PERFTOOLS_FOUND)
+    hpx_error("Google Perftools could not be found and HPX_WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to the root of your Google Perftools installation")
+  endif()
+  hpx_libraries(${GOOGLE_PERFTOOLS_LIBRARIES})
+  include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+endif()
+
+if(HPX_WITH_VALGRIND)
+  find_package(Valgrind)
+  if(NOT VALGRIND_FOUND)
+    hpx_error("Valgrind could not be found and HPX_WITH_VALGRIND=On, please specify VALGRIND_ROOT to point to the root of your Valgrind installation")
+  endif()
+  include_directories(${VALGRIND_INCLUDE_DIR})
+  hpx_add_config_define(HPX_HAVE_VALGRIND)
+endif()
+
+################################################################################
+# Security, libsodium: P(ortable|ackageable) NaCl
+################################################################################
+if(HPX_WITH_SECURITY)
+  find_package(Sodium)
+  if(NOT SODIUM_FOUND)
+    hpx_error("Sodium could not be found and WITH_SODIUM=On, please specify Sodium_ROOT to point to the root of your Sodium installation")
+  endif()
+  hpx_add_config_define(HPX_HAVE_SODIUM)
+
+  include_directories(${SODIUM_INCLUDE_DIR})
+
+  if(MSVC)
+    hpx_add_config_define(SODIUM_STATIC)
+  endif()
+  hpx_libraries(${SODIUM_LIBRARIES})
+
+  hpx_add_config_define(HPX_HAVE_SECURITY)
+endif()
+################################################################################
 
 ################################################################################
 # Check Build Options based on the found dependencies. We also check for errors
@@ -1308,18 +1295,18 @@ endforeach()
 
 # Generate a defines.hpp to be used in the build directory ...
 set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
                @ONLY)
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
-configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp"
                @ONLY)
 
 # Configure hpxrun.py
-configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
+configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
                "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
                @ONLY)
 
@@ -1389,7 +1376,7 @@ install( # install all hpx tests source files
 
 install( # Install all HPX cmake utility files
   DIRECTORY cmake/
-  DESTINATION ${LIB}/cmake/hpx
+  DESTINATION ${LIB}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT core
   PATTERN ".cmake.in" EXCLUDE
   PATTERN ".git" EXCLUDE)
@@ -1487,7 +1474,7 @@ if(Boost_VERSION LESS 105300)
 endif()
 
 install(
-  FILES "${hpx_SOURCE_DIR}/LICENSE_1_0.txt"
+  FILES "${PROJECT_SOURCE_DIR}/LICENSE_1_0.txt"
   DESTINATION share/hpx-${HPX_VERSION}
   COMPONENT license)
 
@@ -1506,19 +1493,19 @@ if(HPX_WITH_DOCUMENTATION)
     PATTERN "*images*" EXCLUDE)
 
   install(
-    FILES "${hpx_SOURCE_DIR}/docs/index.html"
+    FILES "${PROJECT_SOURCE_DIR}/docs/index.html"
     DESTINATION share/hpx-${HPX_VERSION}/
     COMPONENT docs)
 
   install(
-    DIRECTORY "${hpx_SOURCE_DIR}/docs/html/src/"
+    DIRECTORY "${PROJECT_SOURCE_DIR}/docs/html/src/"
     DESTINATION share/hpx-${HPX_VERSION}/docs/html/src
     COMPONENT docs
     FILES_MATCHING PATTERN "*.css"
     PATTERN ".git" EXCLUDE)
 
   install(
-    DIRECTORY "${hpx_SOURCE_DIR}/docs/html/images/"
+    DIRECTORY "${PROJECT_SOURCE_DIR}/docs/html/images/"
     DESTINATION share/hpx-${HPX_VERSION}/docs/html/images
     COMPONENT docs
     FILES_MATCHING PATTERN "*.png"

@@ -18,6 +18,7 @@
 #include <hpx/plugins/parcel/message_buffer.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -40,13 +41,13 @@ namespace hpx { namespace plugins { namespace parcel
             parcelset::parcelport* pp, std::size_t num = std::size_t(-1),
             std::size_t interval = std::size_t(-1));
 
-        void put_parcel(parcelset::locality const & dest, parcelset::parcel& p, write_handler_type const& f);
+        void put_parcel(parcelset::locality const & dest, parcelset::parcel p, write_handler_type f);
 
         bool flush(bool stop_buffering = false);
 
     protected:
         bool timer_flush();
-        bool flush(mutex_type::scoped_lock& l, bool stop_buffering);
+        bool flush(boost::unique_lock<mutex_type>& l, bool stop_buffering);
 
     private:
         mutable mutex_type mtx_;

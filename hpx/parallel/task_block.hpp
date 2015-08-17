@@ -15,7 +15,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/async.hpp>
 
@@ -28,6 +28,7 @@
 #include <boost/utility/addressof.hpp>      // boost::addressof
 
 #include <boost/static_assert.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 {
@@ -175,7 +176,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
             parallel::exception_list errors;
 
             {
-                mutex_type::scoped_lock l(mtx_);
+                boost::lock_guard<mutex_type> l(mtx_);
                 std::swap(tasks_, tasks);
                 std::swap(errors_, errors);
             }
@@ -256,7 +257,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
                 executor_traits<executor_type>::async_execute(
                     policy_.executor(), std::move(f));
 
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             tasks_.push_back(std::move(result));
         }
 
@@ -424,10 +425,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
         if (t == typeid(parallel_task_execution_policy))
         {
-            parallel_task_execution_policy const& t =
+            parallel_task_execution_policy const& task_policy =
                 *policy.get<parallel_task_execution_policy>();
             return define_task_block(
-                par(t.get_chunk_size()), std::forward<F>(f));
+                par.with(task_policy.parameters()), std::forward<F>(f));
         }
 
         if (t == typeid(parallel_vector_execution_policy))
@@ -476,7 +477,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
 
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
-        define_task_block(std::forward<ExPolicy>(policy), std::forward<F>(f));
+        return define_task_block(std::forward<ExPolicy>(policy),
+            std::forward<F>(f));
     }
 
     /// Constructs a \a task_block, tr, and invokes the expression

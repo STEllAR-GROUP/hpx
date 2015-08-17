@@ -20,7 +20,7 @@ macro(add_hpx_config_test variable)
       if(${variable}_ROOT)
         set(test_source "${${variable}_ROOT}/share/hpx-${HPX_VERSION}/${${variable}_SOURCE}")
       else()
-        set(test_source "${hpx_SOURCE_DIR}/${${variable}_SOURCE}")
+        set(test_source "${PROJECT_SOURCE_DIR}/${${variable}_SOURCE}")
       endif()
     else()
       set(test_source

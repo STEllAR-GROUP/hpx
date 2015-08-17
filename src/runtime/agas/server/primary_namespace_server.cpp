@@ -19,13 +19,14 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <list>
-
 #include <boost/fusion/include/at_c.hpp>
+#include <boost/thread/locks.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
 #include <boost/make_shared.hpp>
 #endif
+
+#include <list>
 
 namespace hpx { namespace agas
 {
@@ -55,11 +56,8 @@ response primary_namespace::service(
     {
         case primary_ns_route:
             {
-                update_time_on_exit update(
-                    counter_data_.route_.time_
-                );
-                counter_data_.increment_route_count();
-                return route(req, ec);
+                HPX_ASSERT(false);
+                return response();
             }
         case primary_ns_bind_gid:
             {
@@ -315,18 +313,12 @@ parcelset::policies::message_handler* primary_namespace::get_message_handler(
     )
 {
     typedef hpx::actions::transfer_action<
-        server::primary_namespace::service_action
+        server::primary_namespace::route_action
     > action_type;
 
-    boost::shared_ptr<action_type> act =
-        boost::static_pointer_cast<action_type>(p.get_action());
-    agas::request const& req = hpx::actions::get<0>(*act);
+    action_type * act = static_cast<action_type *>(p.get_action());
 
-    // only routing is handled in a special way
-    if (req.get_action_code() != primary_ns_route)
-        return 0;
-
-    parcelset::parcel routed_p = req.get_parcel();
+    parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
     return routed_p.get_message_handler(ph, loc);
 }
 
@@ -335,18 +327,12 @@ serialization::binary_filter* primary_namespace::get_serialization_filter(
     )
 {
     typedef hpx::actions::transfer_action<
-        server::primary_namespace::service_action
+        server::primary_namespace::route_action
     > action_type;
 
-    boost::shared_ptr<action_type> act =
-        boost::static_pointer_cast<action_type>(p.get_action());
-    agas::request const& req = hpx::actions::get<0>(*act);
+    action_type * act = static_cast<action_type *>(p.get_action());
 
-    // only routing is handled in a special way
-    if (req.get_action_code() != primary_ns_route)
-        return 0;
-
-    parcelset::parcel routed_p = req.get_parcel();
+    parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
     return routed_p.get_serialization_filter();
 }
 
@@ -378,7 +364,7 @@ response primary_namespace::begin_migration(
 
     naming::gid_type id = req.get_gid();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     resolved_type r = resolve_gid_locked(id, ec);
     if (at_c<0>(r) == naming::invalid_gid)
@@ -420,7 +406,7 @@ response primary_namespace::end_migration(
 {
     naming::gid_type id = req.get_gid();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     migration_table_type::iterator it = migrating_objects_.find(id);
     if (it == migrating_objects_.end())
@@ -439,10 +425,12 @@ response primary_namespace::end_migration(
 
 // wait if given object is currently being migrated
 void primary_namespace::wait_for_migration_locked(
-    mutex_type::scoped_lock& l
+    boost::unique_lock<mutex_type>& l
   , naming::gid_type id
   , error_code& ec)
 {
+    HPX_ASSERT(l.owns_lock());
+
     migration_table_type::iterator it = migrating_objects_.find(id);
     if (it != migrating_objects_.end())
     {
@@ -468,7 +456,7 @@ response primary_namespace::bind_gid(
 
     naming::detail::strip_internal_bits_from_gid(id);
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     gva_table_type::iterator it = gvas_.lower_bound(id)
                            , begin = gvas_.begin()
@@ -640,7 +628,7 @@ response primary_namespace::resolve_gid(
     resolved_type r;
 
     {
-        mutex_type::scoped_lock l(mutex_);
+        boost::unique_lock<mutex_type> l(mutex_);
 
         // wait for any migration to be completed
         wait_for_migration_locked(l, id, ec);
@@ -680,7 +668,7 @@ response primary_namespace::unbind_gid(
     naming::gid_type id = req.get_gid();
     naming::detail::strip_internal_bits_from_gid(id);
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     gva_table_type::iterator it = gvas_.find(id)
                            , end = gvas_.end();
@@ -867,7 +855,7 @@ response primary_namespace::allocate(
       , refcnt_table_type::iterator upper_it
       , naming::gid_type const& lower
       , naming::gid_type const& upper
-      , mutex_type::scoped_lock& l
+      , boost::unique_lock<mutex_type>& l
       , const char* func_name
         )
     { // dump_refcnt_matches implementation
@@ -905,7 +893,7 @@ void primary_namespace::increment(
   , error_code& ec
     )
 { // {{{ increment implementation
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     if (LAGAS_ENABLED(debug))
@@ -979,7 +967,7 @@ void primary_namespace::increment(
 
 ///////////////////////////////////////////////////////////////////////////////
 void primary_namespace::resolve_free_list(
-    mutex_type::scoped_lock& l
+    boost::unique_lock<mutex_type>& l
   , std::list<refcnt_table_type::iterator> const& free_list
   , std::list<free_entry>& free_entry_list
   , naming::gid_type const& lower
@@ -987,6 +975,8 @@ void primary_namespace::resolve_free_list(
   , error_code& ec
     )
 {
+    HPX_ASSERT(l.owns_lock());
+
     using boost::fusion::at_c;
 
     typedef refcnt_table_type::iterator iterator;
@@ -1082,7 +1072,7 @@ void primary_namespace::decrement_sweep(
     free_entry_list.clear();
 
     {
-        mutex_type::scoped_lock l(mutex_);
+        boost::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
         if (LAGAS_ENABLED(debug))

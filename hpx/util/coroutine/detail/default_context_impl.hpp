@@ -68,7 +68,7 @@
        A ContextImpl is an initialized ContextImplBase.
 
      - ContextImplBase is Copyable. A copy of a ContextImplBase holds
-       The same informations as the original. Once a ContextImplBase
+       The same information as the original. Once a ContextImplBase
        is used as an argument to swap_context, all its copies become stale.
        (that is, only one copy of ContextImplBase can be used).
        A ContextImpl cannot be sliced by copying it to a ContextImplBase.

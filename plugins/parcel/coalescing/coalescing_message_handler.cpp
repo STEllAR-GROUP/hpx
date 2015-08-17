@@ -7,11 +7,13 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace traits
 {
@@ -77,20 +79,20 @@ namespace hpx { namespace plugins { namespace parcel
     {}
 
     void coalescing_message_handler::put_parcel(
-        parcelset::locality const & dest, parcelset::parcel& p,
-        write_handler_type const& f)
+        parcelset::locality const & dest, parcelset::parcel p,
+        write_handler_type f)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (stopped_) {
             l.unlock();
 
             // this instance should not buffer parcels anymore
-            pp_->put_parcel(dest, p, f);
+            pp_->put_parcel(dest, std::move(p), f);
             return;
         }
 
         detail::message_buffer::message_buffer_append_state s =
-            buffer_.append(dest, p, f);
+            buffer_.append(dest, std::move(p), f);
 
         switch(s) {
         case detail::message_buffer::first_message:
@@ -118,7 +120,7 @@ namespace hpx { namespace plugins { namespace parcel
     bool coalescing_message_handler::timer_flush()
     {
         // adjust timer if needed
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         if (!buffer_.empty())
             flush(l, false);
 
@@ -128,16 +130,20 @@ namespace hpx { namespace plugins { namespace parcel
 
     bool coalescing_message_handler::flush(bool stop_buffering)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         return flush(l, stop_buffering);
     }
 
-    bool coalescing_message_handler::flush(mutex_type::scoped_lock& l,
+    bool coalescing_message_handler::flush(
+        boost::unique_lock<mutex_type>& l,
         bool stop_buffering)
     {
+        HPX_ASSERT(l.owns_lock());
+
         if (!stopped_ && stop_buffering) {
             stopped_ = true;
-            l.unlock();
+
+            util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
             timer_.stop();              // interrupt timer
         }
 

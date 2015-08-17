@@ -142,18 +142,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             HPX_ASSERT(dests.size() == handlers.size());
             for(std::size_t i = 0; i != dests.size(); ++i)
             {
-                put_parcel(dests[i], parcels[i], handlers[i]);
+                put_parcel(dests[i], std::move(parcels[i]), std::move(handlers[i]));
             }
         }
 
-        void send_early_parcel(parcelset::locality const & dest, parcel& p)
+        void send_early_parcel(parcelset::locality const & dest, parcel p)
         {
-            put_parcel(dest, p
-              , boost::bind(
+            put_parcel(dest, std::move(p)
+              , util::bind(
                     &parcelport::early_write_handler
                   , this
-                  , ::_1
-                  , p
+                  , util::placeholders::_1
+                  , util::placeholders::_2
                 )
             );
         }
@@ -176,6 +176,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool run(bool blocking = true)
         {
             receiver_.run();
+            sender_.run();
             receive_early_parcels_thread_ =
                 boost::thread(&parcelport::receive_early_parcels, this,
                     hpx::get_runtime_ptr());
@@ -211,7 +212,32 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
         }
 
-        void wait_for_enabled_put_parcel(parcelset::locality const & dest, parcel p,
+        void put_parcel(parcelset::locality const & dest, parcel p,
+            write_handler_type f)
+        {
+            if(hpx::is_running())
+            {
+                std::size_t thread_num = get_worker_thread_num();
+                hpx::applier::register_thread_nullary(
+                    util::bind(
+                        util::one_shot(&parcelport::put_parcel_async)
+                      , this
+                      , dest
+                      , std::move(p)
+                      , std::move(f)
+                    )
+                  , "mpi::parcelport::put_parcel"
+                  , threads::pending, true, threads::thread_priority_boost,
+                    thread_num, threads::thread_stacksize_default
+                );
+            }
+            else
+            {
+                put_parcel_async(dest, std::move(p), f);
+            }
+        }
+
+        void put_parcel_async(parcelset::locality const & dest, parcel p,
             write_handler_type f)
         {
             while(!enable_parcel_handling_)
@@ -220,48 +246,33 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     hpx::this_thread::suspend(hpx::threads::pending,
                         "mpi::parcelport::put_parcel");
             }
-
-            put_parcel(dest, p, f);
-        }
-
-        void put_parcel(parcelset::locality const & dest, parcel p,
-            write_handler_type f)
-        {
-            handles_parcels h(this);
-
-            if(!enable_parcel_handling_)
             {
-                hpx::threads::register_thread(
-                    util::bind(&parcelport::wait_for_enabled_put_parcel, this, dest, p, f)
-                  , "mpi::parcelport::put_parcel");
-                return;
+                handles_parcels h(this);
+
+                allocator_type alloc(chunk_pool_);
+                snd_buffer_type buffer(alloc);
+                encode_parcels(&p, std::size_t(-1), buffer, archive_flags_,
+                    this->get_max_outbound_message_size());
+
+                buffer.data_point_.time_ = util::high_resolution_clock::now();
+
+                int dest_rank = dest.get<locality>().rank();
+                HPX_ASSERT(dest_rank != util::mpi_environment::rank());
+
+                sender_.send(
+                    dest_rank
+                  , std::move(p)
+                  , std::move(f)
+                  , std::move(buffer)
+                  , parcels_sent_
+                );
+
+                std::size_t num_thread(0);
+                if(threads::get_self_ptr())
+                    num_thread = hpx::get_worker_thread_num();
+
+                do_background_work(num_thread);
             }
-
-            util::high_resolution_timer timer;
-
-            allocator_type alloc(chunk_pool_);
-            snd_buffer_type buffer(alloc);
-            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_,
-                this->get_max_outbound_message_size());
-
-            buffer.data_point_.time_ = timer.elapsed_nanoseconds();
-
-            int dest_rank = dest.get<locality>().rank();
-            HPX_ASSERT(dest_rank != util::mpi_environment::rank());
-
-            sender_.send(
-                dest_rank
-              , buffer
-              , hpx::util::bind(&receiver::receive, boost::ref(receiver_), false)
-            );
-
-            error_code ec;
-            f(ec, p);
-            buffer.data_point_.time_ =
-                timer.elapsed_nanoseconds() - buffer.data_point_.time_;
-            parcels_sent_.add_data(buffer.data_point_);
-
-            //do_background_work();
         }
 
         bool do_background_work(std::size_t num_thread)
@@ -273,7 +284,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(!enable_parcel_handling_)
                 return false;
 
-            return receiver_.receive();
+            bool has_work = sender_.background_work(num_thread);
+            has_work = receiver_.background_work(num_thread) || has_work;
+            return has_work;
         }
 
     private:
@@ -296,7 +309,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         mutex_type connections_mtx_;
         lcos::local::detail::condition_variable connections_cond_;
-        sender sender_;
+        sender<snd_buffer_type> sender_;
         receiver receiver_;
 
         boost::thread receive_early_parcels_thread_;
@@ -389,7 +402,7 @@ namespace hpx { namespace traits
                         "MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE"
                     "}\n"
 #endif
-                "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:1}\n"
+                "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}\n"
                 "max_connections = ${HPX_HAVE_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"
                 ;
         }

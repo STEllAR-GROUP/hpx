@@ -27,6 +27,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -332,105 +333,79 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
               : copy_if::algorithm("copy_if")
             {}
 
-            template <typename ExPolicy, typename InIter, typename F>
+            template <typename ExPolicy, typename InIter, typename Pred>
             static Iter
             sequential(ExPolicy, InIter first, InIter last, Iter dest,
-                F && f)
+                Pred && pred)
             {
-                return std::copy_if(first, last, dest, std::forward<F>(f));
+                return std::copy_if(first, last, dest,
+                    std::forward<Pred>(pred));
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F>
+            template <typename ExPolicy, typename FwdIter, typename Pred>
             static typename util::detail::algorithm_result<ExPolicy, Iter>::type
             parallel(ExPolicy policy, FwdIter first, FwdIter last,
-                Iter dest, F && f)
+                Iter dest, Pred && pred)
             {
-                typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter, bool*> zip_iterator;
                 typedef util::detail::algorithm_result<ExPolicy, Iter> result;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
-                typedef typename util::detail::algorithm_result<
-                        ExPolicy, Iter
-                    >::type result_type;
 
                 if (first == last)
                     return result::get(std::move(dest));
 
                 difference_type count = std::distance(first, last);
 
-                boost::shared_array<char> flags(new char[count]);
+                boost::shared_array<bool> flags(new bool[count]);
                 std::size_t init = 0;
 
+                using hpx::util::get;
+                using hpx::util::make_zip_iterator;
                 typedef util::scan_partitioner<ExPolicy, Iter, std::size_t>
                     scan_partitioner_type;
                 return scan_partitioner_type::call(
-                    policy,
-                    hpx::util::make_zip_iterator(first, flags.get()),
-                    count,
-                    init,
-                    // Flag the elements to be copied
-                    [f](zip_iterator part_begin, std::size_t part_size)
+                    policy, make_zip_iterator(first, flags.get()),
+                    count, init,
+                    // step 1 performs first part of scan algorithm
+                    [pred](zip_iterator part_begin, std::size_t part_size)
                         -> std::size_t
                     {
                         std::size_t curr = 0;
                         util::loop_n(part_begin, part_size,
-                            [&f, &curr](zip_iterator d) mutable
+                            [&pred, &curr](zip_iterator it) mutable
                             {
-                                using hpx::util::get;
-                                get<1>(*d) = (f(get<0>(*d)) != 0) ? 1 : 0;
-                                curr += get<1>(*d);
+                                if((get<1>(*it) = pred(get<0>(*it))))
+                                {
+                                    ++curr;
+                                }
                             });
                         return curr;
                     },
-                    // Determine how far to advance the  dest iterator for each
-                    // partition
-                    hpx::util::unwrapped(
-                        [](std::size_t const& prev, std::size_t const& curr)
-                        {
-                            return prev + curr;
-                        }),
-                    // Copy the elements into dest in parallel
-                    [=](std::vector<hpx::shared_future<std::size_t> >&& r,
-                        std::vector<std::size_t> const& chunk_sizes) mutable
-                            -> result_type
+                    // step 2 propagates the partition results from left
+                    // to right
+                    hpx::util::unwrapped(std::plus<std::size_t>()),
+                    // step 3 runs final accumulation on each partition
+                    [dest, flags](
+                        zip_iterator part_begin, std::size_t part_size,
+                        hpx::shared_future<std::size_t> f_accu) mutable
                     {
-                        HPX_ASSERT(!r.empty());
-                        std::size_t last_index = r[r.size()-1].get();
-
-                        typedef util::partitioner<ExPolicy, Iter, void>
-                            partitioner_type;
-
-                        // capturing 'flags' below keeps the array alive
-                        return partitioner_type::call_with_data(
-                            policy,
-                            hpx::util::make_zip_iterator(first, flags.get()),
-                            count,
-                            [dest, flags](
-                                hpx::shared_future<std::size_t>&& pos,
-                                zip_iterator part_begin, std::size_t part_count)
+                        std::advance(dest, f_accu.get());
+                        util::loop_n(part_begin, part_size,
+                            [&dest](zip_iterator it) mutable
                             {
-                                Iter iter = dest;
-                                std::size_t next_pos = pos.get();
-                                std::advance(iter, next_pos);
-                                util::loop_n(part_begin, part_count,
-                                    [&iter](zip_iterator d)
-                                    {
-                                        using hpx::util::get;
-                                        if(get<1>(*d))
-                                            *iter++ = get<0>(*d);
-                                    });
-                            },
-                            [=](std::vector<hpx::future<void> >&&) mutable
-                                -> Iter
-                            {
-                                std::advance(dest, last_index);
-                                return dest;
-                            },
-                            chunk_sizes,
-                            std::move(r)
-                        );
-                    }
-                );
+                                if(get<1>(*it))
+                                    *dest++ = get<0>(*it);
+                            });
+                    },
+                    // step 4 use this return value
+                    [dest, flags](
+                        std::vector<hpx::shared_future<std::size_t> > && items,
+                        std::vector<hpx::future<void> > &&) mutable -> Iter
+                    {
+                        std::advance(dest, items.back().get());
+                        return dest;
+                    });
             }
         };
         /// \endcond

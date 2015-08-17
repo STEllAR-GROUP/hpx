@@ -68,7 +68,7 @@ namespace hpx { namespace components { namespace security { namespace server
         capability capability(0x54);
 
         return key_pair_.sign(certificate_signing_request(
-            get_gid().get_gid(), key_pair_.get_public_key(), capability));
+            get_id().get_gid(), key_pair_.get_public_key(), capability));
     }
 
     signed_type<certificate>
@@ -104,7 +104,7 @@ namespace hpx { namespace components { namespace security { namespace server
         signed_type<certificate> signed_certificate;
 
         signed_certificate = key_pair_.sign(certificate(
-            get_gid().get_gid(), csr));
+            get_id().get_gid(), csr));
 
         return signed_certificate;
     }

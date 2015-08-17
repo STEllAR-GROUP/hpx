@@ -3,15 +3,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <algorithm>
-#include <iterator>
-#include <fstream>
-
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+
+#include <algorithm>
+#include <iterator>
+#include <fstream>
 
 #include <boost/format.hpp>
 
@@ -21,6 +21,18 @@ int test_function(hpx::serialization::serialize_buffer<double> const& b)
     return 42;
 }
 HPX_PLAIN_ACTION(test_function, test_action)
+
+std::size_t get_archive_size(hpx::parcelset::parcel const& p,
+    boost::uint32_t flags,
+    std::vector<hpx::serialization::serialization_chunk>* chunks)
+{
+    // gather the required size for the archive
+    hpx::serialization::detail::size_gatherer_container gather_size;
+    hpx::serialization::output_archive archive(
+        gather_size, flags, 0, chunks);
+    archive << p;
+    return gather_size.size();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 double benchmark_serialization(std::size_t data_size, std::size_t iterations,
@@ -78,29 +90,28 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     hpx::parcelset::parcel outp;
     if (continuation) {
         outp = hpx::parcelset::parcel(here, addr,
-            new hpx::actions::transfer_action<test_action>(
-                hpx::threads::thread_priority_normal, buffer),
-            new hpx::actions::typed_continuation<int>(here));
+            hpx::actions::typed_continuation<int>(here),
+            test_action(), hpx::threads::thread_priority_normal, buffer
+            );
     }
     else {
         outp = hpx::parcelset::parcel(here, addr,
-            new hpx::actions::transfer_action<test_action>(
-                hpx::threads::thread_priority_normal, buffer));
+            test_action(), hpx::threads::thread_priority_normal, buffer);
     }
 
-    outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here);
+    outp.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
+    outp.set_source_id(here);
 
     std::vector<hpx::serialization::serialization_chunk>* chunks = 0;
     if (zerocopy)
         chunks = new std::vector<hpx::serialization::serialization_chunk>();
 
-    boost::uint32_t dest_locality_id = outp.get_destination_locality_id();
+    boost::uint32_t dest_locality_id = outp.destination_locality_id();
     hpx::util::high_resolution_timer t;
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        std::size_t arg_size = hpx::traits::get_type_size(outp, out_archive_flags);
+        std::size_t arg_size = get_archive_size(outp, out_archive_flags, chunks);
         std::vector<char> out_buffer;
 
         out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);

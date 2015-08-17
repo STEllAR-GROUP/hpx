@@ -29,7 +29,7 @@ std::size_t pass_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::async<Action>(test.get_gid(), obj).get();
+    return hpx::async<Action>(test.get_id(), obj).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ std::size_t move_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::async<Action>(test.get_gid(), std::move(obj)).get();
+    return hpx::async<Action>(test.get_id(), std::move(obj)).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ std::size_t return_object(hpx::naming::id_type id)
 
     action_move_semantics test = action_move_semantics::create(id);
 
-    Object obj(hpx::async<Action>(test.get_gid()).get());
+    Object obj(hpx::async<Action>(test.get_id()).get());
     return obj.get_count();
 }
 
@@ -66,7 +66,7 @@ std::size_t return_move_object(hpx::naming::id_type id)
 
     action_move_semantics test = action_move_semantics::create(id);
 
-    Object obj(std::move(hpx::async<Action>(test.get_gid()).move_out()));
+    Object obj(std::move(hpx::async<Action>(test.get_id()).move_out()));
     return obj.get_count();
 }
 
@@ -160,7 +160,7 @@ void test_actions()
                 return_object<
                     action_move_semantics::return_test_non_movable_action, non_movable_object
                 >(id)
-            ), 1u, 5u); // ?call + value_or_error(w) + ?return
+            ), 1u, 5u); // ?call + set_value + ?return
         } else {
             //FIXME: bumped number for intel compiler
             HPX_TEST_RANGE((
@@ -168,7 +168,7 @@ void test_actions()
                     action_move_semantics::return_test_non_movable_action, non_movable_object
                 >(id)
             ), 4u, 8u); // transfer_action + bind + function + ?call +
-                    // value_or_error(w) + ?return
+                    // set_value + ?return
         }
     }
 }
@@ -262,7 +262,7 @@ void test_direct_actions()
                 return_object<
                     action_move_semantics::return_test_non_movable_direct_action, non_movable_object
                 >(id)
-            ), 1u, 3u); // ?call + value_or_error(w) + ?return
+            ), 1u, 3u); // ?call + set_value + ?return
         } else {
             //FIXME: bumped number for intel compiler
             HPX_TEST_RANGE((
@@ -270,7 +270,7 @@ void test_direct_actions()
                     action_move_semantics::return_test_non_movable_direct_action, non_movable_object
                 >(id)
             ), 4u, 8u); // transfer_action + bind + function + ?call +
-                    // value_or_error(w) + ?return
+                    // set_value + ?return
         }
     }
 }

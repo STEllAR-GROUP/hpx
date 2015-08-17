@@ -19,40 +19,40 @@ endforeach()
 
 # libhpx sources
 add_hpx_library_sources(hpx
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/*.cpp"
+  GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/*.cpp"
   EXCLUDE "(.*(hpx_main|hpx_user).*[.]cpp)|main.cpp")
 add_hpx_library_sources(hpx
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/pre_main.cpp"
+  GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/pre_main.cpp"
   APPEND)
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/runtime/*.cpp"
   APPEND)
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/performance_counters/*.cpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/performance_counters/*.cpp"
   APPEND)
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/util/*.cpp"
   APPEND)
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/lcos/*.cpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/src/lcos/*.cpp"
   APPEND)
 
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/hpx_*.cpp"
+  GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_*.cpp"
   EXCLUDE "hpx_init[.]cpp")
 add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/util/lightweight_test.cpp"
+  GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/util/lightweight_test.cpp"
   APPEND)
 add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/main.cpp" APPEND)
+  GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/main.cpp" APPEND)
 
 set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
 
 if(MSVC)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
-    set(switch_to_fiber_source "${hpx_SOURCE_DIR}/src/util/coroutine/switch_to_fiber.asm")
+    set(switch_to_fiber_source "${PROJECT_SOURCE_DIR}/src/util/coroutine/switch_to_fiber.asm")
     add_hpx_library_sources(hpx_external_objects
       GLOB GLOBS "${switch_to_fiber_source}")
     add_custom_command(
@@ -74,78 +74,78 @@ endif()
 
 # libhpx headers
 add_hpx_library_headers(hpx
-  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/*.hpp"
+  GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/*.hpp"
   EXCLUDE ".*hpx_main.*[.]hpp")
 add_hpx_library_headers(hpx
-  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/preprocessed/*.hpp"
+  GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/preprocessed/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/runtime/*.hpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/runtime/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/config/*.hpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/config/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/include/*.hpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/include/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/lcos/*.hpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/lcos/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/performance_counters/*.hpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/performance_counters/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/traits/*.hpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/traits/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*.h*"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/util/*.h*"
   EXCLUDE "(.*_binary_.*|[io]chunk_.*)[.]hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/plugins/*.hpp"
+  GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/plugins/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/parallel/*.hpp"
+  GLOB_RECURSE GLOBS "${PROJECT_SOURCE_DIR}/hpx/parallel/*.hpp"
   APPEND)
 
 if(HPX_WITH_STATIC_LINKING)
   add_hpx_library_headers(hpx
-    GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/components/*.hpp"
+    GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/components/*.hpp"
     APPEND)
 endif()
 
 # libhpx_init headers
 add_hpx_library_headers(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_main*.hpp")
+  GLOB GLOBS "${PROJECT_SOURCE_DIR}/hpx/hpx_main*.hpp")
 
 ################################################################################
 # make source groups
 add_hpx_source_group(
   NAME hpx CLASS "Source Files"
-  ROOT "${hpx_SOURCE_DIR}/src"
+  ROOT "${PROJECT_SOURCE_DIR}/src"
   TARGETS ${hpx_SOURCES})
 
 add_hpx_source_group(
   NAME hpx CLASS "External Source Files"
-  ROOT "${hpx_SOURCE_DIR}/external"
+  ROOT "${PROJECT_SOURCE_DIR}/external"
   TARGETS ${hpx_external_SOURCES})
 
 add_hpx_source_group(
   NAME hpx
   CLASS "Header Files"
-  ROOT "${hpx_SOURCE_DIR}/hpx"
+  ROOT "${PROJECT_SOURCE_DIR}/hpx"
   TARGETS ${hpx_HEADERS})
 
 add_hpx_source_group(
   NAME hpx_init
   CLASS "Source Files"
-  ROOT "${hpx_SOURCE_DIR}/src"
+  ROOT "${PROJECT_SOURCE_DIR}/src"
   TARGETS ${hpx_init_SOURCES})
 
 add_hpx_source_group(
   NAME hpx_init
   CLASS "Header Files"
-  ROOT "${hpx_SOURCE_DIR}/hpx"
+  ROOT "${PROJECT_SOURCE_DIR}/hpx"
   TARGETS ${hpx_init_HEADERS})
 
 if(NOT HPX_WITH_STATIC_LINKING)

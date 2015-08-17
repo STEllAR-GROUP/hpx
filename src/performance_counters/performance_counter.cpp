@@ -36,57 +36,57 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     future<counter_info> performance_counter::get_info() const
     {
-        return stubs::performance_counter::get_info_async(get_gid());
+        return stubs::performance_counter::get_info_async(get_id());
     }
     counter_info performance_counter::get_info_sync(error_code& ec)
     {
-        return stubs::performance_counter::get_info(get_gid(), ec);
+        return stubs::performance_counter::get_info(get_id(), ec);
     }
 
     future<counter_value> performance_counter::get_counter_value(bool reset)
     {
-        return stubs::performance_counter::get_value_async(get_gid(), reset);
+        return stubs::performance_counter::get_value_async(get_id(), reset);
     }
     counter_value performance_counter::get_counter_value_sync(bool reset,
         error_code& ec)
     {
-        return stubs::performance_counter::get_value(get_gid(), reset, ec);
+        return stubs::performance_counter::get_value(get_id(), reset, ec);
     }
 
     future<counter_value> performance_counter::get_counter_value() const
     {
-        return stubs::performance_counter::get_value_async(get_gid(), false);
+        return stubs::performance_counter::get_value_async(get_id(), false);
     }
     counter_value performance_counter::get_counter_value_sync(error_code& ec) const
     {
-        return stubs::performance_counter::get_value(get_gid(), false, ec);
+        return stubs::performance_counter::get_value(get_id(), false, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     future<bool> performance_counter::start()
     {
-        return stubs::performance_counter::start_async(get_gid());
+        return stubs::performance_counter::start_async(get_id());
     }
     bool performance_counter::start_sync(error_code& ec)
     {
-        return stubs::performance_counter::start(get_gid(), ec);
+        return stubs::performance_counter::start(get_id(), ec);
     }
 
     future<bool> performance_counter::stop()
     {
-        return stubs::performance_counter::stop_async(get_gid());
+        return stubs::performance_counter::stop_async(get_id());
     }
     bool performance_counter::stop_sync(error_code& ec)
     {
-        return stubs::performance_counter::stop(get_gid(), ec);
+        return stubs::performance_counter::stop(get_id(), ec);
     }
 
     future<void> performance_counter::reset()
     {
-        return stubs::performance_counter::reset_async(get_gid());
+        return stubs::performance_counter::reset_async(get_id());
     }
     void performance_counter::reset_sync(error_code& ec)
     {
-        stubs::performance_counter::reset(get_gid(), ec);
+        stubs::performance_counter::reset(get_id(), ec);
     }
 }}

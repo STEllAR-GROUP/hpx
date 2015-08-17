@@ -90,7 +90,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             return
                 detail::algorithm_result_helper<R>::call(
                     algo.call(policy, boost::mpl::true_(),
-                            segmented_local_iterator_traits<Args>::local(args)...
+                        segmented_local_iterator_traits<Args>::local(args)...
                     )
                 );
         }
