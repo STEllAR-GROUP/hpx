@@ -10,7 +10,8 @@
 #include <hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp>
 #include <hpx/util/spinlock.hpp>
 
-namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { namespace detail {
+namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
+    namespace detail {
     struct client
     {
         client()
@@ -24,10 +25,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { n
           , id_(0)
         {
             int ret = 0;
-            ret = posix_memalign(reinterpret_cast<void **>(&server_msg_), EXEC_PAGESIZE, sizeof(message));
+            ret = posix_memalign(reinterpret_cast<void **>(&server_msg_),
+                EXEC_PAGESIZE, sizeof(message));
             if(ret != 0)
                 throw std::bad_alloc();
-            ret = posix_memalign(reinterpret_cast<void **>(&client_msg_), EXEC_PAGESIZE, sizeof(message));
+            ret = posix_memalign(reinterpret_cast<void **>(&client_msg_),
+                EXEC_PAGESIZE, sizeof(message));
             if(ret != 0)
                 throw std::bad_alloc();
         }
@@ -106,7 +109,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { n
         void on_preconnect(rdma_cm_id * id, ibv_pd * pd, boost::system::error_code &ec)
         {
             close();
-            server_msg_mr_ = ibv_reg_mr(pd, server_msg_, sizeof(message), IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE);
+            server_msg_mr_ = ibv_reg_mr(pd, server_msg_, sizeof(message),
+                IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE);
             if(!server_msg_mr_)
             {
                 int verrno = errno;
@@ -118,7 +122,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { n
                 return;
             }
 
-            client_msg_mr_ = ibv_reg_mr(pd, client_msg_, sizeof(message), IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE);
+            client_msg_mr_ = ibv_reg_mr(pd, client_msg_, sizeof(message),
+                IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE);
             if(!client_msg_mr_)
             {
                 int verrno = errno;
@@ -138,7 +143,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { n
             id_ = id;
         }
 
-        void write_remote(char * buffer, ibv_mr *mr, std::size_t size, boost::system::error_code &ec)
+        void write_remote(char * buffer, ibv_mr *mr, std::size_t size,
+            boost::system::error_code &ec)
         {
             if(!id_)
             {
@@ -190,7 +196,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { n
             }
         }
 
-        void send_message(message_type m, boost::system::error_code &ec, bool payload = false)
+        void send_message(message_type m, boost::system::error_code &ec,
+            bool payload = false)
         {
             if(!id_)
             {
@@ -242,7 +249,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { n
             send_message(MSG_SIZE, ec);
         }
 
-        void send_small_msg(char * data, std::size_t size, boost::system::error_code & ec)
+        void send_small_msg(char * data, std::size_t size,
+            boost::system::error_code & ec)
         {
             HPX_ASSERT(client_msg_);
             HPX_ASSERT(client_msg_mr_);

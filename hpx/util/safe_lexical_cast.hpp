@@ -35,9 +35,11 @@ namespace hpx { namespace util
     }
 
     template <class DestType, class Config>
-    DestType get_entry_as(const Config& config, const std::string& key, const std::string& dflt)
+    DestType get_entry_as(const Config& config, const std::string& key,
+        const std::string& dflt)
     {
-        return safe_lexical_cast(config.get_entry(key, dflt), safe_lexical_cast<DestType>(dflt));
+        return safe_lexical_cast(config.get_entry(key, dflt),
+            safe_lexical_cast<DestType>(dflt));
     }
 
 }}

@@ -38,7 +38,8 @@ namespace hpx { namespace naming
           : locality_(l), type_(t), address_(0), offset_(0)
         {}
 
-        address(gid_type const& l, component_type t, void* lva, boost::uint64_t offset = 0)
+        address(gid_type const& l, component_type t, void* lva,
+            boost::uint64_t offset = 0)
           : locality_(l), type_(t),
             address_(reinterpret_cast<address_type>(lva)),
             offset_(offset)

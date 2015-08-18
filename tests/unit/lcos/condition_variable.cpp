@@ -119,7 +119,8 @@ struct wait_for_flag
     void relative_wait_until_with_predicate()
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(mutex);
-        if(cond_var.wait_for(lock,boost::chrono::milliseconds(5),check_flag(flag)) && flag)
+        if(cond_var.wait_for(lock,boost::chrono::milliseconds(5),
+            check_flag(flag)) && flag)
         {
             ++woken;
         }
@@ -194,7 +195,8 @@ void test_condition_notify_one_wakes_from_relative_wait_until_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(&wait_for_flag::relative_wait_until_with_predicate, boost::ref(data));
+    hpx::thread thread(&wait_for_flag::relative_wait_until_with_predicate,
+        boost::ref(data));
 
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
@@ -245,7 +247,8 @@ void test_condition_notify_all_wakes_from_wait()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(&wait_for_flag::wait_without_predicate, boost::ref(data)));
+            group.push_back(hpx::thread(&wait_for_flag::wait_without_predicate,
+                boost::ref(data)));
         }
 
         {
@@ -274,7 +277,8 @@ void test_condition_notify_all_wakes_from_wait_with_predicate()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(&wait_for_flag::wait_with_predicate, boost::ref(data)));
+            group.push_back(hpx::thread(&wait_for_flag::wait_with_predicate,
+                boost::ref(data)));
         }
 
         {
@@ -303,7 +307,8 @@ void test_condition_notify_all_wakes_from_wait_until()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(&wait_for_flag::wait_until_without_predicate, boost::ref(data)));
+            group.push_back(hpx::thread(&wait_for_flag::wait_until_without_predicate,
+                boost::ref(data)));
         }
 
         {
@@ -332,7 +337,8 @@ void test_condition_notify_all_wakes_from_wait_until_with_predicate()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(&wait_for_flag::wait_until_with_predicate, boost::ref(data)));
+            group.push_back(hpx::thread(&wait_for_flag::wait_until_with_predicate,
+                boost::ref(data)));
         }
 
         {
@@ -361,7 +367,8 @@ void test_condition_notify_all_wakes_from_relative_wait_until_with_predicate()
     {
         for(unsigned i=0;i<5;++i)
         {
-            group.push_back(hpx::thread(&wait_for_flag::relative_wait_until_with_predicate, boost::ref(data)));
+            group.push_back(hpx::thread(&wait_for_flag
+                ::relative_wait_until_with_predicate, boost::ref(data)));
         }
 
         {

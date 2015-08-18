@@ -65,11 +65,16 @@ void test_sorted_until1()
     test_sorted_until1_async(seq(task), IteratorTag());//calls sequential and gets future
     test_sorted_until1_async(par(task), IteratorTag());//calls parallel and gets future
 
-    test_sorted_until1(execution_policy(seq), IteratorTag());//calls sequential and gets iter
-    test_sorted_until1(execution_policy(par), IteratorTag());//calls parallel and gets iter
-    test_sorted_until1(execution_policy(par_vec), IteratorTag());//calls parallel and gets iter
-    test_sorted_until1(execution_policy(seq(task)), IteratorTag());//calls sequential and gets iter
-    test_sorted_until1(execution_policy(par(task)), IteratorTag());//calls parallel and gets iter
+    test_sorted_until1(execution_policy(seq), IteratorTag());
+    //calls sequential and gets iter
+    test_sorted_until1(execution_policy(par), IteratorTag());
+    //calls parallel and gets iter
+    test_sorted_until1(execution_policy(par_vec), IteratorTag());
+    //calls parallel and gets iter
+    test_sorted_until1(execution_policy(seq(task)), IteratorTag());
+    //calls sequential and gets iter
+    test_sorted_until1(execution_policy(par(task)), IteratorTag());
+    //calls parallel and gets iter
 }
 
 void sorted_until_test1()

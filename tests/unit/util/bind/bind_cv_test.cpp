@@ -95,42 +95,50 @@ struct X
         return -(x1+x2+x3+x4+x5);
     }
 
-    int operator()(int x1, int x2, int x3, int x4, int x5, int x6)
+    int operator()(int x1, int x2, int x3, int x4, int x5,
+        int x6)
     {
         return x1+x2+x3+x4+x5+x6;
     }
 
-    int operator()(int x1, int x2, int x3, int x4, int x5, int x6) const
+    int operator()(int x1, int x2, int x3, int x4, int x5,
+        int x6) const
     {
         return -(x1+x2+x3+x4+x5+x6);
     }
 
-    int operator()(int x1, int x2, int x3, int x4, int x5, int x6, int x7)
+    int operator()(int x1, int x2, int x3, int x4, int x5,
+        int x6, int x7)
     {
         return x1+x2+x3+x4+x5+x6+x7;
     }
 
-    int operator()(int x1, int x2, int x3, int x4, int x5, int x6, int x7) const
+    int operator()(int x1, int x2, int x3, int x4, int x5,
+        int x6, int x7) const
     {
         return -(x1+x2+x3+x4+x5+x6+x7);
     }
 
-    int operator()(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8)
+    int operator()(int x1, int x2, int x3, int x4, int x5,
+        int x6, int x7, int x8)
     {
         return x1+x2+x3+x4+x5+x6+x7+x8;
     }
 
-    int operator()(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8) const
+    int operator()(int x1, int x2, int x3, int x4, int x5,
+        int x6, int x7, int x8) const
     {
         return -(x1+x2+x3+x4+x5+x6+x7+x8);
     }
 
-    int operator()(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8, int x9)
+    int operator()(int x1, int x2, int x3, int x4, int x5,
+        int x6, int x7, int x8, int x9)
     {
         return x1+x2+x3+x4+x5+x6+x7+x8+x9;
     }
 
-    int operator()(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8, int x9) const
+    int operator()(int x1, int x2, int x3, int x4, int x5,
+        int x6, int x7, int x8, int x9) const
     {
         return -(x1+x2+x3+x4+x5+x6+x7+x8+x9);
     }

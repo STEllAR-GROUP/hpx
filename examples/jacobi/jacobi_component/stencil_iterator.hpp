@@ -29,7 +29,8 @@ namespace jacobi
           , std::size_t ny_
           , std::size_t l
         );
-        hpx::lcos::future<void> setup_boundary(stencil_iterator const & top, stencil_iterator const & bottom);
+        hpx::lcos::future<void> setup_boundary(stencil_iterator const & top,
+            stencil_iterator const & bottom);
 
         hpx::lcos::future<void> step();
 

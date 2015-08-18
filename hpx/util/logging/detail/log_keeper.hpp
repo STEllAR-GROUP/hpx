@@ -36,9 +36,11 @@ namespace detail {
 
 
 /**
-    @brief Allows using a log without knowing its full type yet. Even if the log is not fully @b defined, you can still use it.
+    @brief Allows using a log without knowing its full type yet.
+    Even if the log is not fully @b defined, you can still use it.
 
-    This will allow you to log messages even if you don't know the full type of the log (which can aid compilation time).
+    This will allow you to log messages even if you don't know the full type of the log
+    (which can aid compilation time).
 
     This is a base class. Use logger_holder_by_value or logger_holder_by_ptr instead
 */
@@ -68,7 +70,8 @@ protected:
         m_base = m_log->common_base();
     }
 private:
-    // note: I have a pointer to the log, as opposed to having it by value, because the whole purpose of this class
+    // note: I have a pointer to the log, as opposed to having it by value,
+    // because the whole purpose of this class
     // is to be able to use a log without knowing its full type
     type *m_log;
     logger_base_type * m_base;
@@ -77,12 +80,15 @@ private:
 
 
 /**
-    @brief Allows using a log without knowing its full type yet. Even if the log is not fully @b defined, you can still use it.
+    @brief Allows using a log without knowing its full type yet.
+    Even if the log is not fully @b defined, you can still use it.
 
-    This will allow you to log messages even if you don't know the full type of the log (which can aid compilation time).
+    This will allow you to log messages even if you don't know the full type of the log
+    (which can aid compilation time).
 
     This keeps the logger by value, so that the after_being_destroyed stuff works.
-    More specifically, in case the logger is used after it's been destroyed, the logger_holder instances CAN ONLY BE GLOBAL.
+    More specifically, in case the logger is used after it's been destroyed,
+    the logger_holder instances CAN ONLY BE GLOBAL.
 */
 template<class type> struct logger_holder_by_value : logger_holder<type> {
     typedef logger_holder<type> base_type;
@@ -93,21 +99,26 @@ private:
         base_type::init( &m_log_value);
     }
 private:
-    // VERY IMPORTANT: we keep this BY VALUE, because, at destruction, we don't want the memory to be freed
-    // (in order for the after_being_destroyed to work, for global instances of this type)
+    // VERY IMPORTANT: we keep this BY VALUE, because,
+    // at destruction, we don't want the memory to be freed
+    // (in order for the after_being_destroyed to work,
+    //  for global instances of this type)
     type m_log_value;
 };
 
 
 /**
-    @brief Allows using a log without knowing its full type yet. Even if the log is not fully @b defined, you can still use it.
+    @brief Allows using a log without knowing its full type yet.
+    Even if the log is not fully @b defined, you can still use it.
 
-    This will allow you to log messages even if you don't know the full type of the log (which can aid compilation time).
+    This will allow you to log messages even if you don't know the full type of
+    the log (which can aid compilation time).
 */
 template<class type> struct logger_holder_by_ptr : logger_holder<type> {
     typedef logger_holder<type> base_type;
 
-    HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW_AND_INIT(logger_holder_by_ptr, m_log_ptr, type, init)
+    HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW_AND_INIT \
+        (logger_holder_by_ptr, m_log_ptr, type, init)
     ~logger_holder_by_ptr() {
         delete m_log_ptr;
     }
@@ -128,8 +139,10 @@ private:
 /**
     @brief Ensures the log is created before main(), even if not used before main
 
-    We need this, so that we won't run into multi-threaded issues while the log is created
-    (in other words, if the log is created before main(), we can safely assume there's only one thread running,
+    We need this, so that we won't run into multi-threaded issues while
+    the log is created
+    (in other words, if the log is created before main(),
+    we can safely assume there's only one thread running,
     thus no multi-threaded issues)
 */
 struct ensure_early_log_creation {
@@ -143,7 +156,8 @@ struct ensure_early_log_creation {
         // we need to force the compiler to force creation of the log
         if ( time(0) < 0)
             if ( time(0) < (time_t)ignore) {
-                printf("LOGGING LIB internal error - should NEVER happen. Please report this to the author of the lib");
+                printf("LOGGING LIB internal error - should NEVER happen. \
+                    Please report this to the author of the lib");
                 exit(0);
             }
     }
@@ -153,24 +167,30 @@ struct ensure_early_log_creation {
 /**
     @brief Ensures the filter is created before main(), even if not used before main
 
-    We need this, so that we won't run into multi-threaded issues while the filter is created
-    (in other words, if the filter is created before main(), we can safely assume there's only one thread running,
+    We need this, so that we won't run into multi-threaded issues while
+    the filter is created
+    (in other words, if the filter is created before main(),
+    we can safely assume there's only one thread running,
     thus no multi-threaded issues)
 */
 typedef ensure_early_log_creation ensure_early_filter_creation;
 
 /**
-    Useful for logger_holder - to get the logger' base (so that we can use it even without knowing the full log's definition).
+    Useful for logger_holder - to get the logger' base
+    (so that we can use it even without knowing the full log's definition).
 
     If used on a logger, it just returns it .
 */
 template<class logger> inline logger* get_logger_base(logger * l) { return l; }
-template<class logger> inline const logger* get_logger_base(const logger * l) { return l; }
+template<class logger> inline const logger*
+    get_logger_base(const logger * l) { return l; }
 
-template<class type> inline typename logger_holder<type>::logger_base_type* get_logger_base(logger_holder<type> & l) {
+template<class type> inline typename logger_holder<type>::logger_base_type*
+    get_logger_base(logger_holder<type> & l) {
     return l.base();
 }
-template<class type> inline const typename logger_holder<type>::logger_base_type* get_logger_base(const logger_holder<type> & l) {
+template<class type> inline const typename logger_holder<type>::logger_base_type*
+    get_logger_base(const logger_holder<type> & l) {
     return l.base();
 }
 

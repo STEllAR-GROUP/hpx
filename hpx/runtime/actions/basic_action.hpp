@@ -776,7 +776,8 @@ namespace hpx { namespace actions
 ///
 ///              // Component actions need to be declared, this also defines the
 ///              // type 'print_greeting_action' representing the action.
-///              HPX_DEFINE_COMPONENT_ACTION(server, print_greeting, print_greeting_action);
+///              HPX_DEFINE_COMPONENT_ACTION(server,
+///                  print_greeting, print_greeting_action);
 ///          };
 ///      }
 ///

@@ -104,13 +104,15 @@ int
     hpx::util::function_nonser<void()> fv;
     alloc_count = 0;
     dealloc_count = 0;
-    fv.assign( DoNothing<disable_small_object_optimization>(), counting_allocator<int>() );
+    fv.assign( DoNothing<disable_small_object_optimization>(),
+        counting_allocator<int>() );
     fv.clear();
     HPX_CHECK(alloc_count == 1);
     HPX_CHECK(dealloc_count == 1);
     alloc_count = 0;
     dealloc_count = 0;
-    fv.assign( DoNothing<enable_small_object_optimization>(), counting_allocator<int>() );
+    fv.assign( DoNothing<enable_small_object_optimization>(),
+        counting_allocator<int>() );
     fv.clear();
     HPX_CHECK(alloc_count == 0);
     HPX_CHECK(dealloc_count == 0);

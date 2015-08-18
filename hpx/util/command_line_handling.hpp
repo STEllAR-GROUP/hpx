@@ -20,7 +20,8 @@ namespace hpx { namespace util
     struct command_line_handling
     {
         command_line_handling(hpx::runtime_mode mode,
-                util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+                util::function_nonser<int(boost::program_options::variables_map& vm)>
+                    const& f,
                 std::vector<std::string> const& ini_config,
                 char const* argv0)
           : rtcfg_(argv0),
@@ -44,7 +45,8 @@ namespace hpx { namespace util
 
         hpx::runtime_mode mode_;
         std::vector<std::string> ini_config_;
-        util::function_nonser<int(boost::program_options::variables_map& vm)> hpx_main_f_;
+        util::function_nonser<int(boost::program_options
+            ::variables_map& vm)> hpx_main_f_;
 
         std::size_t node_;
         std::size_t num_threads_;

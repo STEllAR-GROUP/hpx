@@ -46,8 +46,10 @@ namespace writer {
 
 /** @brief Allows profiling your application
 
-If you want to profile your application (find out how much time is spent logging), all you need to do is to surround your logger and filter class(es)
-by profile::compute_for_logger and with profile::compute_for_filter, like shown below:
+If you want to profile your application (find out how much time is spent logging),
+all you need to do is to surround your logger and filter class(es)
+by profile::compute_for_logger and with profile::compute_for_filter,
+like shown below:
 
 Your code:
 @code
@@ -69,8 +71,10 @@ typedef bl::filter::no_ts raw_filter_type;
 typedef bl::profile::compute_for_filter<raw_filter_type>::type filter_type;
 @endcode
 
-In addition to the above, you'll need to set a place where to dump the profile information (which will be dumped at end of the program).
-This is just a functor that takes a <tt>const std::string&</tt> argument. Thus, it can be any destination class. For instance:
+In addition to the above, you'll need to set a place where to dump
+the profile information (which will be dumped at end of the program).
+This is just a functor that takes a <tt>const std::string&</tt> argument.
+Thus, it can be any destination class. For instance:
 
 @code
 // where shall the profile results be outputted?
@@ -117,7 +121,8 @@ struct compute {
     }
 
     void add_period(const ::boost::int64_t & mcs, type t) {
-        // note : this will work even after this object has been destroyed (since it's a global)
+        // note : this will work even after this object has been destroyed
+        // (since it's a global)
         m_cpu_times[t] += mcs;
     }
 
@@ -135,13 +140,17 @@ private:
     void dump_results() {
         std::ostringstream out;
         out << "gather time:      "
-            << (m_cpu_times[gather] / 1000000) << "." << (m_cpu_times[gather] % 1000000) << " seconds " << std::endl;
+            << (m_cpu_times[gather] / 1000000) << "."
+            << (m_cpu_times[gather] % 1000000) << " seconds " << std::endl;
         out << "write time:       "
-            << (m_cpu_times[writer] / 1000000) << "." << (m_cpu_times[writer] % 1000000) << " seconds " << std::endl;
+            << (m_cpu_times[writer] / 1000000) << "."
+            << (m_cpu_times[writer] % 1000000) << " seconds " << std::endl;
         out << "filter time:      "
-            << (m_cpu_times[filter] / 1000000) << "." << (m_cpu_times[filter] % 1000000) << " seconds " << std::endl;
+            << (m_cpu_times[filter] / 1000000) << "."
+            << (m_cpu_times[filter] % 1000000) << " seconds " << std::endl;
         out << "otherthread time: "
-            << (m_cpu_times[on_other_thread] / 1000000) << "." << (m_cpu_times[on_other_thread] % 1000000) << " seconds " << std::endl;
+            << (m_cpu_times[on_other_thread] / 1000000) << "."
+            << (m_cpu_times[on_other_thread] % 1000000) << " seconds " << std::endl;
         m_log( out.str() );
     }
 
@@ -152,7 +161,8 @@ private:
 private:
     // the CPU time taken for each activity
     //
-    // note: we don't use std::vector; we want this to be available even after destruction
+    // note: we don't use std::vector;
+    // we want this to be available even after destruction
     // (if logs are used after they've been destroyed
     boost::int64_t m_cpu_times[ last_ + 1];
 
@@ -182,7 +192,8 @@ struct scoped_compute {
 
 template<class gather_msg> struct compute_gather : gather_msg {
     compute_gather() : m_lk( get_compute(), compute::gather) {}
-    compute_gather(const compute_gather& other) : m_lk( get_compute(), compute::gather), gather_msg(other) {}
+    compute_gather(const compute_gather& other) : m_lk( get_compute(), compute::gather),
+        gather_msg(other) {}
 
     compute& get_compute() const { return compute::inst(); }
 private:
@@ -203,7 +214,8 @@ template<class writer_msg> struct compute_write : writer_msg {
         write_array_impl( this);
     }
 private:
-    template<class msg_type, class base_type> void write_array_impl(const ::hpx::util::logging::writer::on_dedicated_thread<msg_type,base_type> *) const {
+    template<class msg_type, class base_type> void write_array_impl(const
+        ::hpx::util::logging::writer::on_dedicated_thread<msg_type,base_type> *) const {
         // call base class's implementation
         writer_msg::write_array();
     }
@@ -233,15 +245,19 @@ template<class filter_msg> struct compute_filter : filter_msg {
         scoped_compute lk( get_compute(), compute::filter );
         return filter_msg::is_enabled(v1, v2);
     }
-    template<class p1, class p2, class p3> bool is_enabled(const p1 & v1, const p2 &v2, const p3 & v3) const {
+    template<class p1, class p2, class p3> bool is_enabled(const p1 & v1, const p2 &v2,
+        const p3 & v3) const {
         scoped_compute lk( get_compute(), compute::filter );
         return filter_msg::is_enabled(v1, v2, v3);
     }
-    template<class p1, class p2, class p3, class p4> bool is_enabled(const p1 & v1, const p2 &v2, const p3 & v3, const p4 & v4) const {
+    template<class p1, class p2, class p3, class p4> bool is_enabled(const p1 & v1,
+        const p2 &v2, const p3 & v3, const p4 & v4) const {
         scoped_compute lk( get_compute(), compute::filter );
         return filter_msg::is_enabled(v1, v2, v3, v4);
     }
-    template<class p1, class p2, class p3, class p4, class p5> bool is_enabled(const p1 & v1, const p2 &v2, const p3 & v3, const p4 & v4, const p5 & v5) const {
+    template<class p1, class p2, class p3, class p4, class p5>
+    bool is_enabled(const p1 & v1, const p2 &v2, const p3 & v3,
+        const p4 & v4, const p5 & v5) const {
         scoped_compute lk( get_compute(), compute::filter );
         return filter_msg::is_enabled(v1, v2, v3, v4, v5);
     }
@@ -251,20 +267,25 @@ template<class filter_msg> struct compute_filter : filter_msg {
 
 
 
-/** @brief given the logger type, gets the write_msg part, without needing to know the logger's definition (a typedef is enough)
+/** @brief given the logger type, gets the write_msg part,
+without needing to know the logger's definition (a typedef is enough)
 
 */
 template<class> struct logger_to_write {};
-template<class gather_msg, class write_msg> struct logger_to_write< logger<gather_msg,write_msg> > {
+template<class gather_msg, class write_msg>
+struct logger_to_write< logger<gather_msg,write_msg> > {
     // ... the easy part
     typedef write_msg write_type;
 };
 
 // specialize for logger_format_write
-template<class format_base, class destination_base, class thread_safety, class gather, class lock_resource>
-        struct logger_to_write< logger_format_write<format_base, destination_base, thread_safety, gather, lock_resource> > {
+template<class format_base, class destination_base,
+class thread_safety, class gather, class lock_resource>
+        struct logger_to_write< logger_format_write<format_base,
+            destination_base, thread_safety, gather, lock_resource> > {
 
-    typedef typename detail::format_find_writer<format_base, destination_base, lock_resource, thread_safety>::type write_type;
+    typedef typename detail::format_find_writer<format_base,
+        destination_base, lock_resource, thread_safety>::type write_type;
 };
 
 

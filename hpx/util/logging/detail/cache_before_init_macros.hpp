@@ -44,7 +44,7 @@ namespace hpx { namespace util { namespace logging {
 
 
 #if defined( HPX_LOG_BEFORE_INIT_USE_CACHE_FILTER)
-/////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 // Messages that were logged before initializing the log - cache the message & the filter
 
 #define HPX_LOG_USE_LOG(l, do_func, is_log_enabled) \
@@ -58,22 +58,27 @@ namespace hpx { namespace util { namespace logging {
             if ( ::hpx::util::logging::get_logger_base( l )->is_cache_turned_off() )\
                 ; \
             else \
-                ::hpx::util::logging::get_logger_base( l )->cache().set_callback( &is_enabled_callback ); \
+                ::hpx::util::logging::get_logger_base( l )->cache().set_callback \
+                  ( &is_enabled_callback ); \
         }                                                                           \
-    } param = ( !(is_log_enabled) ) ? (void*)0 : ::hpx::util::logging::get_logger_base( l )-> do_func
+    } param = ( !(is_log_enabled) ) ? (void*)0 : \
+                ::hpx::util::logging::get_logger_base( l )-> do_func
 
 
 #elif defined( HPX_LOG_BEFORE_INIT_USE_LOG_ALL)
-/////////////////////////////////////////////////////////////////////////////////////////////
-// Messages that were logged before initializing the log - cache the message (and I'll write it even if the filter is turned off)
+///////////////////////////////////////////////////////////////////////////////////
+// Messages that were logged before initializing the log
+// - cache the message (and I'll write it even if the filter is turned off)
 
-#define HPX_LOG_USE_LOG(l, do_func, is_log_enabled) if ( !(is_log_enabled) ) ; else ::hpx::util::logging::get_logger_base(l)-> do_func
+#define HPX_LOG_USE_LOG(l, do_func, is_log_enabled) if ( !(is_log_enabled) ) ; \
+        else ::hpx::util::logging::get_logger_base(l)-> do_func
 
 #elif defined( HPX_LOG_BEFORE_INIT_USE_IGNORE_BEFORE_INIT)
-/////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
 // Messages that were logged before initializing the log - ignore them completely
 
-#define HPX_LOG_USE_LOG(l, do_func, is_log_enabled) if ( !(is_log_enabled) ) ; else ::hpx::util::logging::get_logger_base(l)-> do_func
+#define HPX_LOG_USE_LOG(l, do_func, is_log_enabled) if ( !(is_log_enabled) ) ; \
+        else ::hpx::util::logging::get_logger_base(l)-> do_func
 
 #else
 #error Internal error.

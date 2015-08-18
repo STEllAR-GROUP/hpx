@@ -280,7 +280,8 @@ namespace hpx { namespace util
                     get_number_of_default_cores(env));
             }
 
-            std::size_t num_cores = cfgmap.get_value<std::size_t>("hpx.cores", num_threads);
+            std::size_t num_cores = cfgmap.get_value<std::size_t>("hpx.cores",
+                num_threads);
             if (vm.count("hpx:cores")) {
                 cores_str = vm["hpx:cores"].as<std::string>();
                 if ("all" == cores_str)

@@ -31,7 +31,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef
             receiver_connection
             connection_type;
-#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
+#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) \
+ || HPX_INTEL_VERSION < 1400)
         typedef boost::shared_ptr<connection_type> connection_ptr;
 #else
         typedef std::unique_ptr<connection_type> connection_ptr;
@@ -138,7 +139,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 {
                     connections_.insert(
                         connections_.end()
-#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
+#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) \
+           || HPX_INTEL_VERSION < 1400)
                       , connections.begin()
                       , connections.end()
 #else

@@ -580,7 +580,8 @@ namespace hpx { namespace naming
             HPX_ASSERT(0 == (log2credits & ~gid_type::credit_base_mask));
 
             id.set_msb((id.get_msb() & ~gid_type::credit_mask) |
-                ((boost::int32_t(log2credits) << gid_type::credit_shift) & gid_type::credit_mask) |
+                ((boost::int32_t(log2credits) << gid_type::credit_shift)
+                    & gid_type::credit_mask) |
                 gid_type::has_credits_mask);
         }
 
@@ -636,7 +637,8 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT gid_type split_gid_if_needed(gid_type& id);
-        HPX_EXPORT gid_type split_gid_if_needed_locked(gid_type::mutex_type::scoped_try_lock &l, gid_type& gid);
+        HPX_EXPORT gid_type split_gid_if_needed_locked(gid_type::mutex_type
+            ::scoped_try_lock &l, gid_type& gid);
         HPX_EXPORT gid_type replenish_new_gid_if_needed(gid_type const& id);
 
         HPX_EXPORT gid_type move_gid(gid_type& id);
@@ -700,8 +702,10 @@ namespace hpx { namespace naming
 //             detail::strip_internal_bits_and_locality_from_gid(lhs.id_msb_) -
 //             detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
 //
-//         boost::uint32_t lhs_locality_id = naming::get_locality_id_from_gid(lhs.id_msb_);
-//         boost::uint32_t rhs_locality_id = naming::get_locality_id_from_gid(rhs.id_msb_);
+//         boost::uint32_t lhs_locality_id =
+//             naming::get_locality_id_from_gid(lhs.id_msb_);
+//         boost::uint32_t rhs_locality_id =
+//             naming::get_locality_id_from_gid(rhs.id_msb_);
 //         if (rhs_locality_id != naming::invalid_locality_id)
 //         {
 //             HPX_ASSERT(lhs_locality_id == rhs_locality_id);
@@ -848,7 +852,8 @@ namespace hpx { namespace naming
 
     inline id_type get_id_from_locality_id(boost::uint32_t locality_id)
     {
-        return id_type(boost::uint64_t(locality_id+1) << 32, 0, id_type::unmanaged); //-V112
+        return id_type(boost::uint64_t(locality_id+1) << 32, 0, id_type::unmanaged);
+        //-V112
     }
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;

@@ -193,7 +193,8 @@ namespace hpx { namespace serialization
 
         void save_binary_chunk(void const* address, std::size_t count) // override
         {
-            if (filter_ || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
+            if (filter_ || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
+            {
                 // fall back to serialization_chunk-less archive
                 this->output_container::save_binary(address, count);
             }

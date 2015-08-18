@@ -28,8 +28,10 @@
 
 #include <hpx/util/logging/detail/manipulator.hpp> // is_generic
 #include <hpx/util/logging/format/formatter/tags.hpp> // uses_tag
-#include <hpx/util/logging/format/formatter/high_precision_time.hpp> // high_precision_time_t
-#include <hpx/util/logging/format/formatter/convert_format.hpp> // do_convert_format
+#include <hpx/util/logging/format/formatter/high_precision_time.hpp>
+// high_precision_time_t
+#include <hpx/util/logging/format/formatter/convert_format.hpp>
+// do_convert_format
 
 
 namespace hpx { namespace util { namespace logging {
@@ -54,24 +56,30 @@ struct high_precision_time {
 
 namespace formatter { namespace tag {
 
-/** @brief Dumps current high_precision_time information (corresponds to hpx::util::logging::tag::high_precision_time tag class)
+/** @brief Dumps current high_precision_time information
+(corresponds to hpx::util::logging::tag::high_precision_time tag class)
 
 @code
 #include <hpx/util/logging/tag/high_precision_time.hpp>
 @endcode
 
-Similar to hpx::util::logging::formatter::high_precision_time_t class - only that this one uses tags.
+Similar to hpx::util::logging::formatter::high_precision_time_t class
+- only that this one uses tags.
 
 See @ref hpx::util::logging::tag "how to use tags".
 */
-template<class convert = do_convert_format::prepend> struct high_precision_time_t : is_generic, uses_tag< high_precision_time_t<convert>, ::hpx::util::logging::tag::high_precision_time > {
+template<class convert = do_convert_format::prepend>
+struct high_precision_time_t : is_generic, uses_tag< high_precision_time_t<convert>,
+    ::hpx::util::logging::tag::high_precision_time > {
     typedef convert convert_type;
-    typedef hpx::util::logging::formatter::high_precision_time_t<convert> high_precision_time_write_type;
+    typedef hpx::util::logging::formatter::high_precision_time_t<convert>
+        high_precision_time_write_type;
     high_precision_time_write_type m_writer;
 
     high_precision_time_t(const hold_string_type & format) : m_writer(format) {}
 
-    template<class msg_type, class tag_type> void write_tag(msg_type & str, const tag_type & tag) const {
+    template<class msg_type, class tag_type>
+    void write_tag(msg_type & str, const tag_type & tag) const {
         m_writer.write_high_precision_time(str, tag.val);
     }
 

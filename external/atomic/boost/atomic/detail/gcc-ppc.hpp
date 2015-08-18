@@ -309,7 +309,8 @@ private:
 #endif
 
 template<typename T>
-class platform_atomic_integral<T, 4> : public build_atomic_from_typical<build_exchange<atomic_ppc_32<T> > > {
+class platform_atomic_integral<T, 4>
+    : public build_atomic_from_typical<build_exchange<atomic_ppc_32<T> > > {
 public:
     typedef build_atomic_from_typical<build_exchange<atomic_ppc_32<T> > > super;
     explicit platform_atomic_integral(T v) : super(v) {}
@@ -317,7 +318,8 @@ public:
 };
 
 template<typename T>
-class platform_atomic_integral<T, 1>: public build_atomic_from_larger_type<atomic_ppc_32<uint32_t>, T> {
+class platform_atomic_integral<T, 1>
+    : public build_atomic_from_larger_type<atomic_ppc_32<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_ppc_32<uint32_t>, T> super;
 
@@ -326,7 +328,8 @@ public:
 };
 
 template<typename T>
-class platform_atomic_integral<T, 2>: public build_atomic_from_larger_type<atomic_ppc_32<uint32_t>, T> {
+class platform_atomic_integral<T, 2>
+    : public build_atomic_from_larger_type<atomic_ppc_32<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_ppc_32<uint32_t>, T> super;
 
@@ -336,7 +339,8 @@ public:
 
 #if defined(__powerpc64__)
 template<typename T>
-class platform_atomic_integral<T, 8> : public build_atomic_from_typical<build_exchange<atomic_ppc_64<T> > > {
+class platform_atomic_integral<T, 8>
+    : public build_atomic_from_typical<build_exchange<atomic_ppc_64<T> > > {
 public:
     typedef build_atomic_from_typical<build_exchange<atomic_ppc_64<T> > > super;
     explicit platform_atomic_integral(T v) : super(v) {}

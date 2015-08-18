@@ -139,7 +139,8 @@ namespace hpx { namespace util { namespace detail
             return !empty();
         }
 #       else
-        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
+        operator typename util::safe_bool<function_base>
+            ::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }

@@ -62,7 +62,8 @@ namespace hpx { namespace plugins { namespace compression
         };
     }
 
-    struct HPX_LIBRARY_EXPORT bzip2_serialization_filter : public serialization::binary_filter
+    struct HPX_LIBRARY_EXPORT bzip2_serialization_filter
+        : public serialization::binary_filter
     {
         bzip2_serialization_filter()
           : current_(0)

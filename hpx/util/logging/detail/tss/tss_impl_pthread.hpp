@@ -69,7 +69,8 @@ inline unsigned int slot_idx() {
 
     mutex::scoped_lock lk(cs);
 
-    // note: if the Logging Lib is used with TLS, I'm guaranteed this will be called before main(),
+    // note: if the Logging Lib is used with TLS,
+    //       I'm guaranteed this will be called before main(),
     //       and that this will work
     if ( !idx)
         init_tss_data();

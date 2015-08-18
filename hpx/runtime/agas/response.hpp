@@ -381,14 +381,16 @@ struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::resp
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<std::pair<naming::id_type, naming::address>, agas::response>::call",
+            "get_remote_result<std::pair<naming::id_type, naming::address>,"
+            " agas::response>::call",
             "unexpected action code in result conversion");
         return std::pair<naming::id_type, naming::address>();
     }
 };
 
 template <>
-struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>, agas::response>
+struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>,
+    agas::response>
 {
     static std::map<naming::gid_type, parcelset::endpoints_type> call(
         agas::response const& rep

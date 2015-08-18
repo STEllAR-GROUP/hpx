@@ -160,8 +160,8 @@ namespace hpx { namespace actions
         /// directly or by a HPX-threads
         enum action_type
         {
-            plain_action = 0,   ///< The action will be executed by a newly created thread
-            direct_action = 1   ///< The action needs to be executed directly
+            plain_action = 0, ///< The action will be executed by a newly created thread
+            direct_action = 1 ///< The action needs to be executed directly
         };
 
         /// Destructor

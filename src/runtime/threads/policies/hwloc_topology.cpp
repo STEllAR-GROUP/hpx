@@ -1012,7 +1012,8 @@ namespace hpx { namespace threads
         return mask;
     }
 
-    mask_type hwloc_topology::get_cpubind_mask(boost::thread & handle, error_code& ec) const
+    mask_type hwloc_topology::get_cpubind_mask(boost::thread & handle,
+        error_code& ec) const
     {
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 

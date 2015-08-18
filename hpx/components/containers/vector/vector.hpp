@@ -1326,11 +1326,14 @@ namespace hpx
 //             // clear should modified (clear each partition_vector one by one).
 // //            void clear()
 // //            {
-// //                //It is keeping one gid hence iterator does not go in an invalid state
+// //                //It is keeping one gid hence iterator does not go
+// //                //in an invalid state
 // //                partitions_.erase(partitions_.begin() + 1,
 // //                                           partitions_.end()-1);
-// //                partition_vector_stub::clear_async((partitions_[0].second).get()).get();
-// //                HPX_ASSERT(partitions_.size() > 1); //As this function changes the size we should have LAST always.
+// //                partition_vector_stub::clear_async((partitions_[0].second).get())
+// //                        .get();
+// //                HPX_ASSERT(partitions_.size() > 1);
+// //                //As this function changes the size we should have LAST always.
 // //            }
 
         ///////////////////////////////////////////////////////////////////////
