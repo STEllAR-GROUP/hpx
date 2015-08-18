@@ -77,7 +77,8 @@ int check(int fd)
                 { // this is complete line; extract counter value
                     size_t cpos = out.rfind(',', pos);
                     std::cerr << out.substr(0, pos+1);
-                    cnt.push_back(boost::lexical_cast<double>(out.substr(cpos+1, pos-cpos-1)));
+                    cnt.push_back(boost::lexical_cast<double>
+                        (out.substr(cpos+1, pos-cpos-1)));
                     if (cnt.size() == 5) break;
                     out.erase(0, pos+1);
                 }

@@ -240,11 +240,13 @@ namespace hpx { namespace util { namespace coroutines
             typedef boost::atomic<boost::int64_t> counter_type;
 
             HPX_COROUTINE_EXPORT static counter_type& get_stack_unbind_counter();
-            HPX_COROUTINE_EXPORT static boost::uint64_t get_stack_unbind_count(bool reset);
+            HPX_COROUTINE_EXPORT static boost::uint64_t get_stack_unbind_count(bool
+                reset);
             HPX_COROUTINE_EXPORT static boost::uint64_t increment_stack_unbind_count();
 
             HPX_COROUTINE_EXPORT static counter_type& get_stack_recycle_counter();
-            HPX_COROUTINE_EXPORT static boost::uint64_t get_stack_recycle_count(bool reset);
+            HPX_COROUTINE_EXPORT static boost::uint64_t get_stack_recycle_count(bool
+                reset);
             HPX_COROUTINE_EXPORT static boost::uint64_t increment_stack_recycle_count();
 
         private:

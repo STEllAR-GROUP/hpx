@@ -381,7 +381,8 @@ namespace hpx { namespace applier
         error_code& ec) const
     {
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_localities(raw_prefixes, components::component_invalid, ec))
+        if (!parcel_handler_.get_raw_localities(raw_prefixes,
+            components::component_invalid, ec))
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)
@@ -449,7 +450,8 @@ namespace hpx { namespace applier
         if (client.was_object_migrated(ids, size))
         {
             client.route(std::move(p), util::bind(&detail::parcel_sent_handler,
-                std::ref(parcel_handler_), util::placeholders::_1, util::placeholders::_2));
+                std::ref(parcel_handler_), util::placeholders::_1,
+                util::placeholders::_2));
             return;
         }
 

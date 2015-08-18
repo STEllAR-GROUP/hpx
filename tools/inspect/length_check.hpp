@@ -1,4 +1,4 @@
-//  extra_whitespace_check header  ------------------------------------------//
+//  character_length_check header  ------------------------------------------//
 
 //  Copyright (c) 2015 Brandon Cordes
 //  Based on the apple_macro_check checker by Marshall Clow
@@ -6,8 +6,8 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_EXTRA_WHITESPACE_CHECK_HPP
-#define BOOST_EXTRA_WHITESPACE_CHECK_HPP
+#ifndef BOOST_EIGHTY_CHECK_HPP
+#define BOOST_EIGHTY_CHECK_HPP
 
 #include "inspector.hpp"
 
@@ -15,14 +15,15 @@ namespace boost
 {
     namespace inspect
     {
-        class whitespace_check : public inspector
+        class length_check : public inspector
         {
             long m_files_with_errors;
         public:
 
-            whitespace_check();
-            std::string a = "*Endline Whitespace*";
-            std::string b = "Unnecessary whitespace at end of line";
+            length_check(size_t setting);
+
+            std::string a = "*Character Limit*";
+            std::string b = "The line is larger than the character limit";
             virtual const char * name() const { return a.c_str(); }
             virtual const char * desc() const { return b.c_str(); }
 
@@ -33,11 +34,11 @@ namespace boost
 
             virtual void print_summary(std::ostream& out)
             {
-                string c = " files with endline whitespace";
+                string c = " files exceeding the character limit";
                 out << "  " << m_files_with_errors << c << line_break();
             }
 
-            virtual ~whitespace_check() {}
+            virtual ~length_check() {}
         };
     }
 }

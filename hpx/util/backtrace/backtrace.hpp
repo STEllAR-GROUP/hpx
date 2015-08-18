@@ -41,9 +41,11 @@ namespace hpx { namespace util
     namespace stack_trace
     {
         HPX_BACKTRACE_DECL std::size_t trace(void **addresses, std::size_t size);
-        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses, std::size_t size,std::ostream &);
+        HPX_BACKTRACE_DECL void write_symbols(void *const *addresses,
+            std::size_t size,std::ostream &);
         HPX_BACKTRACE_DECL std::string get_symbol(void *address);
-        HPX_BACKTRACE_DECL std::string get_symbols(void * const *address, std::size_t size);
+        HPX_BACKTRACE_DECL std::string get_symbols(void * const *address,
+            std::size_t size);
     } // stack_trace
 
     class backtrace {

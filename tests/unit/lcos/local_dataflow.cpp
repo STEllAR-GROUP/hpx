@@ -123,14 +123,18 @@ void function_pointers()
 boost::atomic<boost::uint32_t> future_void_f1_count;
 boost::atomic<boost::uint32_t> future_void_f2_count;
 
-void future_void_f1(future<void> f1) { HPX_TEST(f1.is_ready()); ++future_void_f1_count;}
-void future_void_sf1(shared_future<void> f1) { HPX_TEST(f1.is_ready()); ++future_void_f1_count;}
-void future_void_f2(future<void> f1, future<void> f2) { HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready()); ++future_void_f2_count;}
+void future_void_f1(future<void> f1)
+    { HPX_TEST(f1.is_ready()); ++future_void_f1_count;}
+void future_void_sf1(shared_future<void> f1)
+    { HPX_TEST(f1.is_ready());++future_void_f1_count;}
+void future_void_f2(future<void> f1, future<void> f2)
+    { HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready()); ++future_void_f2_count;}
 
 boost::atomic<boost::uint32_t> future_int_f1_count;
 boost::atomic<boost::uint32_t> future_int_f2_count;
 
-int future_int_f1(future<void> f1) { HPX_TEST(f1.is_ready()); ++future_int_f1_count; return 1;}
+int future_int_f1(future<void> f1) { HPX_TEST(f1.is_ready());
+    ++future_int_f1_count; return 1;}
 int future_int_f2(future<int> f1, future<int> f2)
 {
     HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready());
@@ -158,7 +162,8 @@ void future_function_pointers()
 
     future<void> f1
         = dataflow(
-            &future_void_f1, async(&future_void_sf1, shared_future<void>(make_ready_future()))
+            &future_void_f1, async(&future_void_sf1,
+                shared_future<void>(make_ready_future()))
         );
 
     f1.wait();

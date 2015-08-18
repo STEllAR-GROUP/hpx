@@ -5,34 +5,55 @@
 
 Namespace: hpx::performance_counters
 
-API Component:                                  File:                                                           Comments:
+Format:
+API Component
+    File
+    Comments
 
 * functions
-server::locality_results                        hpx/components/server/distributing_factory.hpp
+server::locality_results
+    hpx/components/server/distributing_factory.hpp
 
-remote_object::new_<>                           hpx/components/remote_object/new.hpp
-server::remote_object::apply<>                  hpx/components/remote_object/server/remote_object.hpp
+remote_object::new_<>
+    hpx/components/remote_object/new.hpp
+server::remote_object::apply<>
+    hpx/components/remote_object/server/remote_object.hpp
 
 * classes
-distributing_factory                            hpx/components/distributing_factory.hpp
+distributing_factory
+    hpx/components/distributing_factory.hpp
 
-server::remote_locality_result                  hpx/components/server/distributing_factory.hpp
-server::locality_result                         hpx/components/server/distributing_factory.hpp
-server::partition_info                          hpx/components/server/distributing_factory.hpp
-server::distributing_factory                    hpx/components/server/distributing_factory.hpp
-server::locality_result_iterator                hpx/components/server/distributing_factory.hpp
+server::remote_locality_result
+    hpx/components/server/distributing_factory.hpp
+server::locality_result
+    hpx/components/server/distributing_factory.hpp
+server::partition_info
+    hpx/components/server/distributing_factory.hpp
+server::distributing_factory
+    hpx/components/server/distributing_factory.hpp
+server::locality_result_iterator
+    hpx/components/server/distributing_factory.hpp
 
-server::remote_object                           hpx/components/remote_object/server/remote_object.hpp
-server::remote_object_apply_action<>            hpx/components/remote_object/server/remote_object.hpp
-server::remote_object_apply_action              hpx/components/remote_object/server/remote_object.hpp
+server::remote_object
+    hpx/components/remote_object/server/remote_object.hpp
+server::remote_object_apply_action<>
+    hpx/components/remote_object/server/remote_object.hpp
+server::remote_object_apply_action
+    hpx/components/remote_object/server/remote_object.hpp
 
-stubs::distributing_factory                     hpx/components/stub/distributing_factory.hpp
-stubs::remote_object                            hpx/components/remote_object/stubs/remote_object.hpp
+stubs::distributing_factory
+    hpx/components/stub/distributing_factory.hpp
+stubs::remote_object
+    hpx/components/remote_object/stubs/remote_object.hpp
 
-remote_object::ctor_fun<>                       hpx/components/remote_object/ctor_fun.hpp
-remote_object::dtor_fun<>                       hpx/components/remote_object/new.hpp
-remote_object::invoke_apply_fun<>               hpx/components/remote_object/object.hpp
-remote_object::object<>                         hpx/components/remote_object/object.hpp
+remote_object::ctor_fun<>
+    hpx/components/remote_object/ctor_fun.hpp
+remote_object::dtor_fun<>
+    hpx/components/remote_object/new.hpp
+remote_object::invoke_apply_fun<>
+    hpx/components/remote_object/object.hpp
+remote_object::object<>
+    hpx/components/remote_object/object.hpp
 
 * macros
 
@@ -40,40 +61,75 @@ remote_object::object<>                         hpx/components/remote_object/obj
 Other namespaces:
 
 * functions
-boost::serialization::serialize<Archive>        hpx/components/server/distributing_factory.hpp
-hpx::lcos::wait<>                               hpx/components/dataflow/async_dataflow_wait.hpp
-hpx::iostreams::operator<<                      hpx/components/iostreams/manipulators.hpp
-hpx::iostreams::create_cout                     hpx/components/iostreams/standard_streams.hpp
-hpx::iostreams::create_cerr                     hpx/components/iostreams/standard_streams.hpp
-hpx::iostreams::cout                            hpx/components/iostreams/standard_streams.hpp
-hpx::iostreams::cerr                            hpx/components/iostreams/standard_streams.hpp
-hpx::iostreams::iterator_write_function<>       hpx/components/iostreams/write_functions.hpp
-hpx::iostreams::make_iterator_write_function<>  hpx/components/iostreams/write_functions.hpp
-hpx::iostreams::std_ostream_write_function      hpx/components/iostreams/write_functions.hpp
-hpx::iostreams::make_std_ostream_write_function hpx/components/iostreams/write_functions.hpp
+boost::serialization::serialize<Archive>
+    hpx/components/server/distributing_factory.hpp
+hpx::lcos::wait<>
+    hpx/components/dataflow/async_dataflow_wait.hpp
+hpx::iostreams::operator<<
+    hpx/components/iostreams/manipulators.hpp
+hpx::iostreams::create_cout
+    hpx/components/iostreams/standard_streams.hpp
+hpx::iostreams::create_cerr
+    hpx/components/iostreams/standard_streams.hpp
+hpx::iostreams::cout
+    hpx/components/iostreams/standard_streams.hpp
+hpx::iostreams::cerr
+    hpx/components/iostreams/standard_streams.hpp
+hpx::iostreams::iterator_write_function<>
+     hpx/components/iostreams/write_functions.hpp
+hpx::iostreams::make_iterator_write_function<>
+    hpx/components/iostreams/write_functions.hpp
+hpx::iostreams::std_ostream_write_function
+    hpx/components/iostreams/write_functions.hpp
+hpx::iostreams::make_std_ostream_write_function
+    hpx/components/iostreams/write_functions.hpp
 
 * classes
-hpx::traits::get_remote_result                  hpx/components/server/distributing_factory.hpp
-hpx::traits::promise_remote_result<>            hpx/components/remote_object/object.hpp
-hpx::traits::component_type_database<>          hpx/components/remote_object/object.hpp
-hpx::lcos::dataflow<>                           hpx/components/dataflow/dataflow.hpp
-hpx::lcos::dataflow_base<>                      hpx/components/dataflow/dataflow_base.hpp
-hpx::lcos::dataflow_base                        hpx/components/dataflow/dataflow_base_void.hpp
-hpx::lcos::dataflow_trigger                     hpx/components/dataflow/dataflow_trigger.hpp
-hpx::traits::is_dataflow<>                      hpx/components/dataflow/is_dataflow.hpp
-hpx::lcos::server::dataflow                     hpx/components/dataflow/server/dataflow.hpp
-hpx::lcos::server::dataflow_trigger             hpx/components/dataflow/server/dataflow_trigger.hpp
-hpx::lcos::stubs::dataflow                      hpx/components/dataflow/stubs/dataflow.hpp
-hpx::lcos::stubs::dataflow_trigger              hpx/components/dataflow/stubs/dataflow_trigger.hpp
-hpx::iostreams::lazy_ostream                    hpx/components/iostreams/lazy_ostream.hpp
-hpx::iostreams::sync_flush_type                 hpx/components/iostreams/manipulators.hpp
-hpx::iostreams::sync_endl_type                  hpx/components/iostreams/manipulators.hpp
-hpx::iostreams::flush_type                      hpx/components/iostreams/manipulators.hpp
-hpx::iostreams::endl_type                       hpx/components/iostreams/manipulators.hpp
-hpx::iostreams::async_flush_type                hpx/components/iostreams/manipulators.hpp
-hpx::iostreams::async_endl_type                 hpx/components/iostreams/manipulators.hpp
-hpx::iostreams::local_flush_type                hpx/components/iostreams/manipulators.hpp
-hpx::iostreams::local_endl_type                 hpx/components/iostreams/manipulators.hpp
-hpx::iostreams::buffer                          hpx/components/iostreams/server/output_stream.hpp
-hpx::iostreams::server::output_stream           hpx/components/iostreams/server/output_stream.hpp
-hpx::iostreams::stubs::output_stream            hpx/components/iostreams/stubs/output_stream.hpp
+hpx::traits::get_remote_result
+    hpx/components/server/distributing_factory.hpp
+hpx::traits::promise_remote_result<>
+    hpx/components/remote_object/object.hpp
+hpx::traits::component_type_database<>
+    hpx/components/remote_object/object.hpp
+hpx::lcos::dataflow<>
+    hpx/components/dataflow/dataflow.hpp
+hpx::lcos::dataflow_base<>
+    hpx/components/dataflow/dataflow_base.hpp
+hpx::lcos::dataflow_base
+    hpx/components/dataflow/dataflow_base_void.hpp
+hpx::lcos::dataflow_trigger
+    hpx/components/dataflow/dataflow_trigger.hpp
+hpx::traits::is_dataflow<>
+    hpx/components/dataflow/is_dataflow.hpp
+hpx::lcos::server::dataflow
+    hpx/components/dataflow/server/dataflow.hpp
+hpx::lcos::server::dataflow_trigger
+    hpx/components/dataflow/server/dataflow_trigger.hpp
+hpx::lcos::stubs::dataflow
+    hpx/components/dataflow/stubs/dataflow.hpp
+hpx::lcos::stubs::dataflow_trigger
+    hpx/components/dataflow/stubs/dataflow_trigger.hpp
+hpx::iostreams::lazy_ostream
+    hpx/components/iostreams/lazy_ostream.hpp
+hpx::iostreams::sync_flush_type
+    hpx/components/iostreams/manipulators.hpp
+hpx::iostreams::sync_endl_type
+    hpx/components/iostreams/manipulators.hpp
+hpx::iostreams::flush_type
+    hpx/components/iostreams/manipulators.hpp
+hpx::iostreams::endl_type
+    hpx/components/iostreams/manipulators.hpp
+hpx::iostreams::async_flush_type
+    hpx/components/iostreams/manipulators.hpp
+hpx::iostreams::async_endl_type
+    hpx/components/iostreams/manipulators.hpp
+hpx::iostreams::local_flush_type
+    hpx/components/iostreams/manipulators.hpp
+hpx::iostreams::local_endl_type
+    hpx/components/iostreams/manipulators.hpp
+hpx::iostreams::buffer
+    hpx/components/iostreams/server/output_stream.hpp
+hpx::iostreams::server::output_stream
+    hpx/components/iostreams/server/output_stream.hpp
+hpx::iostreams::stubs::output_stream
+    hpx/components/iostreams/stubs/output_stream.hpp

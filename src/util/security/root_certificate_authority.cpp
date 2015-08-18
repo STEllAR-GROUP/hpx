@@ -51,11 +51,13 @@ namespace hpx { namespace util { namespace security
 
     components::security::signed_certificate
         root_certificate_authority::sign_certificate_signing_request(
-            components::security::signed_certificate_signing_request const & signed_csr) const
+            components::security::signed_certificate_signing_request
+            const & signed_csr) const
     {
         HPX_ASSERT(0 != root_certificate_authority_);
 
-        // Bind the certificate_authority_sign_certificate_signing_request symbol dynamically and invoke it.
+        // Bind the certificate_authority_sign_certificate_signing_request
+        //  symbol dynamically and invoke it.
         typedef void (*function_type)(
             components::security::server::certificate_authority_base*
           , components::security::signed_certificate_signing_request const &
@@ -90,7 +92,8 @@ namespace hpx { namespace util { namespace security
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        // Bind the certificate_authority_get_certificate symbol dynamically and invoke it.
+        // Bind the certificate_authority_get_certificate symbol dynamically and
+        // invoke it.
         typedef void (*function_type)(
             components::security::server::certificate_authority_base*
           , components::security::signed_certificate*);

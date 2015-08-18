@@ -23,7 +23,8 @@ namespace hpx { namespace components { namespace security { namespace stubs
           , signed_type<certificate_signing_request> const & signed_csr)
         {
             return hpx::async<
-                server::certificate_authority_base::sign_certificate_signing_request_action
+                server::certificate_authority_base
+                      ::sign_certificate_signing_request_action
             >(gid, signed_csr).get();
         }
 

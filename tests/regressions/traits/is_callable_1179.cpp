@@ -29,7 +29,8 @@ int main(int argc, char* argv[])
     HPX_TEST_MSG((is_callable<mem_fun_ptr(p)>::value == false), "mem-fun-ptr");
 
     typedef int (s::*const_mem_fun_ptr)() const;
-    HPX_TEST_MSG((is_callable<const_mem_fun_ptr(p)>::value == true), "const-mem-fun-ptr");
+    HPX_TEST_MSG((is_callable<const_mem_fun_ptr(p)>::value == true),
+        "const-mem-fun-ptr");
 
     HPX_TEST(invoke(&s::f, p()) == 42);
 

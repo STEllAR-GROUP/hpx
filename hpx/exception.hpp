@@ -562,7 +562,8 @@ namespace hpx
     /// temporarily reversed by constructing an instance of
     /// \a hpx::this_thread::restore_interruption, passing in the
     /// \a hpx::this_thread::disable_interruption object in question. This will restore
-    /// the interruption state to what it was when the \a hpx::this_thread::disable_interruption
+    /// the interruption state to what it was when the
+    /// \a hpx::this_thread::disable_interruption
     /// object was constructed, and then disable interruption again when the
     /// \a hpx::this_thread::restore_interruption object is destroyed.
     ///

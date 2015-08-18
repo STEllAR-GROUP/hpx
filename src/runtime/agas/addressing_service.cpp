@@ -575,7 +575,8 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 if (0 == threads::get_self_ptr())
                 {
                     // this should happen only during bootstrap
-                    // FIXME: Disabled this assert cause it fires. It should not, but doesn't do any harm
+                    // FIXME: Disabled this assert cause it fires.
+                    // It should not, but doesn't do any harm
                     //HPX_ASSERT(hpx::is_starting());
 
                     while(!endpoints_future.is_ready())
@@ -1804,7 +1805,8 @@ void addressing_service::route(
               , action_type(), action_priority_, std::move(p));
 
             // send to the main AGAS instance for routing
-            hpx::applier::get_applier().get_parcel_handler().put_parcel(std::move(route_p), f);
+            hpx::applier::get_applier().get_parcel_handler()
+                .put_parcel(std::move(route_p), f);
             return;
         }
     }
@@ -2822,7 +2824,8 @@ void addressing_service::register_counter_types()
 
         boost::uint32_t locality_id =
             naming::get_locality_id_from_gid(get_local_locality());
-        std::string str("locality#" + boost::lexical_cast<std::string>(locality_id) + "/");
+        std::string str("locality#"
+            + boost::lexical_cast<std::string>(locality_id) + "/");
         hosted->register_server_instance(str.c_str(), locality_id);
     }
 } // }}}

@@ -33,7 +33,8 @@ namespace hpx
         namespace detail
         {
             template <class Key, class Value>
-            void load_pair_impl(input_archive& ar, std::pair<Key, Value>& t, boost::mpl::false_)
+            void load_pair_impl(input_archive& ar, std::pair<Key, Value>& t,
+                boost::mpl::false_)
             {
                 ar >> const_cast<
                     typename boost::add_reference<
@@ -43,7 +44,8 @@ namespace hpx
             }
 
             template <class Key, class Value>
-            void load_pair_impl(input_archive& ar, std::pair<Key, Value>& t, boost::mpl::true_)
+            void load_pair_impl(input_archive& ar, std::pair<Key, Value>& t,
+                boost::mpl::true_)
             {
                 if (!has_array_optimization(ar))
                     load_pair_impl(ar, t, boost::mpl::false_());
@@ -52,14 +54,16 @@ namespace hpx
             }
 
             template <class Key, class Value>
-            void save_pair_impl(output_archive& ar, std::pair<Key, Value>& t, boost::mpl::false_)
+            void save_pair_impl(output_archive& ar, std::pair<Key, Value>& t,
+                boost::mpl::false_)
             {
                 ar << t.first;
                 ar << t.second;
             }
 
             template <class Key, class Value>
-            void save_pair_impl(output_archive& ar, std::pair<Key, Value>& t, boost::mpl::true_)
+            void save_pair_impl(output_archive& ar, std::pair<Key, Value>& t,
+                boost::mpl::true_)
             {
                 if (!has_array_optimization(ar))
                     save_pair_impl(ar, t, boost::mpl::false_());
@@ -104,7 +108,8 @@ namespace hpx
         }
 
         template <class Key, class Value, class Comp, class Alloc>
-        void serialize(output_archive& ar, std::map<Key, Value, Comp, Alloc>& t, unsigned)
+        void serialize(output_archive& ar,
+            std::map<Key, Value, Comp, Alloc>& t, unsigned)
         {
             typedef typename std::map<Key, Value, Comp, Alloc>::value_type value_type;
 

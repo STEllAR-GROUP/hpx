@@ -291,7 +291,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
     private:
         typedef util::memory_chunk_pool<> memory_pool_type;
-        typedef util::detail::memory_chunk_pool_allocator<char, util::memory_chunk_pool<>> allocator_type;
+        typedef util::detail::memory_chunk_pool_allocator<char,
+            util::memory_chunk_pool<>> allocator_type;
         typedef
             std::vector<char, allocator_type>
             data_type;

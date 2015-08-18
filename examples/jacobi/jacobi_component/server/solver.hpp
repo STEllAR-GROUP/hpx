@@ -51,7 +51,8 @@ namespace jacobi
                 }
             }
 
-            solver(component_type * back_ptr, grid const & g, std::size_t nx, std::size_t line_block)
+            solver(component_type * back_ptr, grid const & g,
+                std::size_t nx, std::size_t line_block)
                 : base_type(back_ptr)
                 , ny(g.rows.size())
                 , nx(nx)
@@ -134,7 +135,8 @@ namespace jacobi
 
                 double time_elapsed = t.elapsed();
                 hpx::cout << nx << "x" << ny << " "
-                     << ((double((nx-2)*(ny-2) * max_iterations)/1e6)/time_elapsed) << " MLUPS\n" << hpx::flush;
+                     << ((double((nx-2)*(ny-2) * max_iterations)/1e6)/time_elapsed)
+                     << " MLUPS\n" << hpx::flush;
             }
 
             HPX_DEFINE_COMPONENT_ACTION(solver, run, run_action);

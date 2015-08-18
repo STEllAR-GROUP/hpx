@@ -67,7 +67,8 @@ struct time {
 
 
 
-/** @brief tag that holds module context information (note: you need to specify the module yourself)
+/** @brief tag that holds module context information
+(note: you need to specify the module yourself)
 
 See @ref hpx::util::logging::tag "how to use tags".
 */

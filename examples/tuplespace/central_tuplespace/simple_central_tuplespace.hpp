@@ -50,17 +50,22 @@ namespace examples
         {
             if(!symbol_name_.empty())
             {
-                hpx::cerr<<"simple_central_tuplespace::create() : ERROR! current instance not empty!\n";
+                hpx::cerr<<"simple_central_tuplespace::create() "
+                    <<": ERROR! current instance not empty!\n";
                 return false;
             }
             if(symbol_name_ == symbol_name) // itself
             {
-                hpx::cerr<<"simple_central_tuplespace::create() : ERROR! current instance already attached to "<< symbol_name <<"\n";
+                hpx::cerr<<"simple_central_tuplespace::create() "
+                    <<": ERROR! current instance already attached to "
+                    << symbol_name <<"\n";
                 return false;
             }
 
             // request gid;
-            *this = simple_central_tuplespace(hpx::components::new_<examples::server::simple_central_tuplespace>(locality));
+            *this = simple_central_tuplespace
+                (hpx::components::new_<examples::server::simple_central_tuplespace>
+                    (locality));
             bool rc = hpx::agas::register_name(symbol_name, this->get_id()).get();
 
             if(rc)
@@ -75,7 +80,9 @@ namespace examples
         {
             if(symbol_name_ == symbol_name)
             {
-                hpx::cerr<<"simple_central_tuplespace::connect() : ERROR! current instance already attached to "<< symbol_name <<"\n";
+                hpx::cerr<<"simple_central_tuplespace::connect()"
+                    <<" : ERROR! current instance already attached to "
+                    << symbol_name <<"\n";
                 return false;
             }
 
@@ -117,7 +124,8 @@ namespace examples
         /// \note This function has fire-and-forget semantics. It will not wait
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
-        hpx::lcos::future<tuple_type> read_async(const tuple_type& tp, long const timeout)
+        hpx::lcos::future<tuple_type>
+            read_async(const tuple_type& tp, long const timeout)
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::read_async(this->get_id(), tp, timeout);
@@ -143,7 +151,8 @@ namespace examples
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
         //[simple_central_tuplespace_client_take_async
-        hpx::lcos::future<tuple_type> take_async(const tuple_type& tp, long const timeout)
+        hpx::lcos::future<tuple_type>
+            take_async(const tuple_type& tp, long const timeout)
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::take_async(this->get_id(), tp, timeout);

@@ -246,7 +246,8 @@ namespace hpx { namespace serialization
     };
 
     BOOST_FORCEINLINE
-    void register_pointer(input_archive & ar, boost::uint64_t pos, detail::ptr_helper_ptr helper)
+    void register_pointer(input_archive & ar, boost::uint64_t pos,
+        detail::ptr_helper_ptr helper)
     {
         ar.register_pointer(pos, std::move(helper));
     }

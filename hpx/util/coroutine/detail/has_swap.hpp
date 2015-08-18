@@ -54,7 +54,8 @@ namespace has_swap_
 
 #if defined(BOOST_MSVC)
 # pragma warning(push)
-# pragma warning(disable: 4675) // function found through argument dependent lookup -- duh!
+# pragma warning(disable: 4675)
+// function found through argument dependent lookup -- duh!
 #endif
   template <class T>
   struct has_swap_impl

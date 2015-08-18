@@ -27,7 +27,8 @@
 #include <utility>
 
 // The technique implemented here was devised by Eric Niebler, see:
-// http://www.boost.org/doc/libs/1_54_0/doc/html/proto/appendices.html#boost_proto.appendices.implementation.function_arity
+// http://www.boost.org/doc/libs/1_54_0/doc/html/proto/appendices.html
+// #boost_proto.appendices.implementation.function_arity
 namespace hpx { namespace traits
 {
     namespace detail

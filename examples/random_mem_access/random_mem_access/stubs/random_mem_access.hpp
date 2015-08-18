@@ -65,7 +65,8 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// Initialize the simple_accumulator value of the server#simple_accumulator instance
+        /// Initialize the simple_accumulator
+        /// value of the server#simple_accumulator instance
         /// with the given \a gid
         static void init(naming::id_type gid,int i)
         {

@@ -70,7 +70,8 @@ public:
         memory_order failure_order) volatile
     {
         T prev=expected;
-        expected=(T)BOOST_INTERLOCKED_COMPARE_EXCHANGE((long *)(&i), (long)desired, (long)expected);
+        expected=(T)BOOST_INTERLOCKED_COMPARE_EXCHANGE((long *)(&i),
+            (long)desired, (long)expected);
         bool success=(prev==expected);
         return success;
     }
@@ -112,9 +113,12 @@ private:
 
 #else
 
-extern "C" boost::int64_t __cdecl _InterlockedExchangeAdd64(boost::int64_t volatile *, boost::int64_t);
-extern "C" boost::int64_t __cdecl _InterlockedExchange64(boost::int64_t volatile *, boost::int64_t);
-extern "C" boost::int64_t __cdecl _InterlockedCompareExchange64(boost::int64_t volatile *, boost::int64_t, boost::int64_t);
+extern "C" boost::int64_t __cdecl _InterlockedExchangeAdd64(boost::int64_t volatile *,
+    boost::int64_t);
+extern "C" boost::int64_t __cdecl _InterlockedExchange64(boost::int64_t volatile *,
+    boost::int64_t);
+extern "C" boost::int64_t __cdecl _InterlockedCompareExchange64(
+    boost::int64_t volatile *, boost::int64_t, boost::int64_t);
 
 # pragma intrinsic( _InterlockedExchangeAdd64 )
 # pragma intrinsic( _InterlockedExchange64 )
@@ -154,7 +158,8 @@ public:
         memory_order failure_order) volatile
     {
         T prev=expected;
-        expected=(T)BOOST_INTERLOCKED_COMPARE_EXCHANGE64((boost::int64_t *)(&i), (boost::int64_t)desired, (boost::int64_t)expected);
+        expected=(T)BOOST_INTERLOCKED_COMPARE_EXCHANGE64((boost::int64_t *)(&i),
+            (boost::int64_t)desired, (boost::int64_t)expected);
         bool success=(prev==expected);
         return success;
     }
@@ -272,7 +277,8 @@ public:
 
         do {
             desired = _mm_add_epi32(*(__m128i*)(&expected), *(__m128i*)(&c));
-        } while (!compare_exchange_strong(expected, *(T*)(&desired), order, memory_order_relaxed));
+        } while (!compare_exchange_strong(expected, *(T*)(&desired),
+            order, memory_order_relaxed));
 
         return expected;
     }
@@ -293,7 +299,8 @@ private:
 namespace boost { namespace detail { namespace atomic {
 
 template<typename T>
-class platform_atomic_integral<T, 4> : public build_atomic_from_add<atomic_interlocked_32<T> > {
+class platform_atomic_integral<T, 4>
+    : public build_atomic_from_add<atomic_interlocked_32<T> > {
 public:
     typedef build_atomic_from_add<atomic_interlocked_32<T> > super;
     explicit platform_atomic_integral(T v) : super(v) {}
@@ -301,7 +308,8 @@ public:
 };
 
 template<typename T>
-class platform_atomic_integral<T, 1>: public build_atomic_from_larger_type<atomic_interlocked_32<uint32_t>, T> {
+class platform_atomic_integral<T, 1>
+    : public build_atomic_from_larger_type<atomic_interlocked_32<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_interlocked_32<uint32_t>, T> super;
 
@@ -310,7 +318,8 @@ public:
 };
 
 template<typename T>
-class platform_atomic_integral<T, 2>: public build_atomic_from_larger_type<atomic_interlocked_32<uint32_t>, T> {
+class platform_atomic_integral<T, 2>
+    : public build_atomic_from_larger_type<atomic_interlocked_32<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_interlocked_32<uint32_t>, T> super;
 

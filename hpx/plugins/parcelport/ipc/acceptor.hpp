@@ -326,7 +326,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         }
 
         template <typename Service>
-        bool try_accept(basic_data_window<Service>& window, boost::system::error_code &ec)
+        bool try_accept(basic_data_window<Service>& window,
+            boost::system::error_code &ec)
         {
             if (close_operation_.load() || !mq_) {
                 HPX_IPC_THROWS_IF(ec, boost::asio::error::not_connected);

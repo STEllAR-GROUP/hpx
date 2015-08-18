@@ -11,7 +11,8 @@
 //
 // D^2 U / Dt^2 = c^2  D^2 U / Dx^2
 //
-// The parameter alpha = c*dt/dx must be less than 1 to ensure the stability of the algorithm.
+// The parameter alpha = c*dt/dx must be less than 1 to ensure the stability
+//     of the algorithm.
 // Discretizing the equation and solving for U(t+dt,x) yields
 // alpha^2 * (U(t,x+dx)+U(t,x-dx))+2(1-alpha^2)*U(t,x) - U(t-dt,x)
 //
@@ -203,7 +204,8 @@ int hpx_main(variables_map& vm)
   // check that alpha_squared satisfies the stability condition
   if (0.25 < alpha_squared)
     {
-      cout << (("alpha^2 = (c*dt/dx)^2 should be less than 0.25 for stability!\n"))<< flush;
+      cout << (("alpha^2 = (c*dt/dx)^2 should be less than 0.25 for stability!\n"))
+          << flush;
     }
 
   u = std::vector<std::vector<data> >(nt, std::vector<data>(nx));

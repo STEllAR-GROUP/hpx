@@ -13,7 +13,8 @@
 
 namespace jacobi_smp {
 
-    void jacobi_kernel_wrap(range const & y_range, std::size_t n, std::vector<double> & dst, std::vector<double> const & src)
+    void jacobi_kernel_wrap(range const & y_range, std::size_t n,
+        std::vector<double> & dst, std::vector<double> const & src)
     {
         for(std::size_t y = y_range.begin(); y < y_range.end(); ++y)
         {
