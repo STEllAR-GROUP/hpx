@@ -383,7 +383,7 @@ of requesting agents from an executor is mediated via the
 API, which is analogous to the interaction between containers and
 allocator_traits.
 
-With executor_traits, clients manipulate all types of executors uniformly:
+With `executor_traits`, clients manipulate all types of executors uniformly:
 
     executor_traits<my_executor_t>::execute(my_executor,
         [](size_t i){ // perform task i },
@@ -418,17 +418,103 @@ In __hpx__ we have implemented the following executor types:
   in the index space.
 * [classref hpx::parallel::v3::parallel_executor `hpx::parallel::parallel_executor`]:
   creates groups of parallel execution agents which execute in threads
-  implicitly created by the executor. This executor prefers continuing with the
-  creating thread first before executing newly created threads.
-* [classref hpx::parallel::v3::parallel_fork_executor `hpx::parallel::parallel_fork_executor`]:
-  creates groups of parallel execution agents which execute in threads
-  implicitly created by the executor. This executor prefers executing newly
-  created threads first before continuing with the creating thread.
+  implicitly created by the executor. This executor uses a given launch policy.
 * [classref hpx::parallel::v3::service_executor `hpx::parallel::service_executor`]:
   creates groups of parallel execution agents which execute in one of the
   kernel threads associated with a given pool category (I/O, parcel, or timer
   pool, or on the main thread of the application).
-* [classref hpx::parallel::v3::local_priority_queue_executor `hpx::parallel::local_priority_queue_executor`]
+* [classref hpx::parallel::v3::local_priority_queue_executor `hpx::parallel::local_priority_queue_executor`],
+  [classref hpx::parallel::v3::local_queue_executor `hpx::parallel::local_queue_executor`]
+  [classref hpx::parallel::v3::static_priority_queue_executor `hpx::parallel::static_priority_queue_executor`]
+  create executors on top of the corresponding __hpx__ schedulers.
+* [classref hpx::parallel::v3::distribution_policy_executor `hpx::parallel::distribution_policy_executor`]
+  creates executors using any of the existing distribution policies (like
+  [classref hpx::components::colocating_distribution_policy `hpx::components::colocating_distribution_policy]
+  et.al.).
+
+[endsect]
+
+[//////////////////////////////////////////////////////////////////////////////]
+[section:executor_parameters Executor Parameters and Executor Parameter Traits]
+
+Executors as described in the previous section add a powerful customization
+capability to any facility which exposes management of parallel execution.
+However, sometimes it is necessary to be able to customize certain parameters
+of the execution as well. In __hpx__ we introduce the notion of execution
+parameters and execution parameter traits. At this point, the only parameter
+which can be customized is the size of the chunks of work executed on a single
+__hpx__-thread (such as the number of loop iterations combined to run as a
+single task).
+
+An executor parameter object is responsible for exposing the calculation of the
+size of the chunks scheduled. It abstracts the (potentiall platform-specific)
+algorithms of determining those chunks sizes.
+
+The way executor parameters are implemented is aligned with the way executors
+are implemented. All functionalities of concrete executior parameter types are
+exposed and accessible through a corresponding
+[classref hpx::parallel::v3::executor_parameter_traits `hpx::parallel::executor_parameter_traits`]
+type.
+
+With `executor_parameter_traits,` clients access all types of executor
+parameters uniformly:
+
+    std::size_t chunk_size =
+        executor_parameter_traits<my_parameter_t>::get_chunk_size(my_parameter,
+            my_executor, [](){ return 0; }, num_tasks);
+
+This call synchronously retrieves the size of a single chunk of loop iterations
+(or similar) to combine for execution on a single __hpx__-thread if the overall
+number of tasks to schedule is given by `num_tasks`. The lambda
+function exposes a means of test-probing the execution of a single iteration
+for performance measurment purposes (the execution parameter type might
+dynamically determine the execution time of one or more tasks in order to
+calculate the chunk size, see
+[classref hpx::parallel::v3::auto_chunk_size `hpx::parallel::auto_chunk_size`]
+for an example of such a executor parameter type).
+
+Other functions in the interface exist to discover whether a executor parameter
+type should be invoked once (i.e. returns a static chunk size, see
+[classref hpx::parallel::v3::static_chunk_size `hpx::parallel::static_chunk_size`])
+or whether it should be invoked for each scheduled chunk of work (i.e. it
+returns a variable chunk size, for an example, see
+[classref hpx::parallel::v3::guided_chunk_size `hpx::parallel::guided_chunk_size`]).
+
+Though this interface appears to require executor parameter type authors to
+implement all different basic operations, there is really none required. In
+practice, all operations have sensible defaults. However, some executor
+parameter types will naturally specialize all operations for maximum efficiency.
+
+In __hpx__ we have implemented the following executor parameter types:
+
+* [classref hpx::parallel::v3::auto_chunk_size `hpx::parallel::auto_chunk_size`]:
+  Loop iterations are divided into pieces and then assigned to threads. The
+  number of loop iterations combined is determined based on measurements of how
+  long the execution of 1% of the overall number of iterations takes.
+  This executor parameters type makes sure that as many loop iterations
+  are combined as necessary to run for the amount of time specified.
+* [classref hpx::parallel::v3::static_chunk_size `hpx::parallel::static_chunk_size`]:
+  Loop iterations are divided into pieces of a given size and then assigned to
+  threads. If the size is not specified, the iterations are evenly (if
+  possible) divided contiguously among the threads. This executor parameters
+  type is equivalent to OpenMP's STATIC scheduling directive.
+* [classref hpx::parallel::v3::dynamic_chunk_size `hpx::parallel::dynamic_chunk_size`]:
+  Loop iterations are divided into pieces of a given size and then dynamically
+  scheduled among the cores; when an core finishes one chunk, it is dynamically
+  assigned another If the size is not specified, the default chunk size is 1.
+  This executor parameters type is equivalent to OpenMP's DYNAMIC scheduling
+  directive.
+* [classref hpx::parallel::v3::guided_chunk_size `hpx::parallel::guided_chunk_size`]:
+  Iterations are dynamically assigned to cores in blocks as cores request them
+  until no blocks remain to be assigned. Similar to `dynamic_chunk_size` except
+  that the block size decreases each time a number of loop iterations is given
+  to a thread. The size of the initial block is proportional to
+  `number_of_iterations / number_of_cores`.
+  Subsequent blocks are proportional to
+  `number_of_iterations_remaining / number_of_cores`. The optional chunk size
+  parameter defines the minimum block size. The default minimal chunk size is 1.
+  This executor parameters type is equivalent to OpenMP's GUIDED scheduling
+  directive.
 
 [endsect]
 

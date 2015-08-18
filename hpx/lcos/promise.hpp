@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_PROMISE_FULL_EMPTY_FEB_03_2009_0841AM)
-#define HPX_LCOS_PROMISE_FULL_EMPTY_FEB_03_2009_0841AM
+#if !defined(HPX_LCOS_PROMISE_FEB_03_2009_0841AM)
+#define HPX_LCOS_PROMISE_FEB_03_2009_0841AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -272,11 +272,11 @@ namespace hpx { namespace lcos { namespace detail
 
         Result get_value(error_code& ec = throws)
         {
-            typedef typename future_data_type::data_type data_type;
-            data_type& data = this->get_result();
+            typedef typename future_data_type::result_type result_type;
+            result_type* result = this->get_result();
 
             // no error has been reported, return the result
-            return data.move_value();
+            return std::move(*result);
         }
 
         void add_ref()

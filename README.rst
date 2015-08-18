@@ -22,7 +22,7 @@ functionalities and converging onto a stable API which will provide a
 smooth migration path for developers. The API exposed by HPX is modelled
 after the interfaces defined by the C++11/14 ISO standard and adheres to the
 programming guidelines used by the Boost collection of C++ libraries. We
-aim improve the scalability of today's applications and to expose new 
+aim improve the scalability of today's applications and to expose new
 levels of parallelism which are necessary to take advantage
 of the exascale systems of the future.
 
@@ -39,7 +39,7 @@ What's so special about HPX?
   synchronization.
 * It implements a rich set of runtime services supporting a broad range of
   use cases.
-* HPX exposes a uniform, flexible, and extendable performance counter 
+* HPX exposes a uniform, flexible, and extendable performance counter
   framework which can enable runtime adaptivity
 * It is designed to solve problems conventionally considered to be
   scaling-impaired.
@@ -396,8 +396,8 @@ continuous integration of external projects.
 
 The following images are currently available:
 
-* ``stellargroup/hpx:dev``		(HEAD, updated on every commit to master which 
-  builds successfully, see 
+* ``stellargroup/hpx:dev``		(HEAD, updated on every commit to master which
+  builds successfully, see
   `here <https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master>`_ for the
   build status)
 * ``stellargroup/hpx:latest``	(latest release)
@@ -419,10 +419,10 @@ steps that explain how to use a docker image::
     # dockerfile via '-v'.
     # Also, make /hpx the current working directory with '-w'.
     docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev <command> <arguments>
-    
+
     # For example, build the binary "example" from "example.cpp" using
     # the built-in hpx compilation script "hpxcxx". Note that hpx libraries
-    # other than the core library have to be linked explicitely (like hpx_iostreams).
+    # other than the core library have to be linked explicitly (like hpx_iostreams).
     docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev \
         hpxcxx example.cpp --exe=example -lhpx_iostreams
 
@@ -430,7 +430,7 @@ steps that explain how to use a docker image::
     docker run -v $PWD:/hpx -w /hpx stellargroup/hpx:dev ./example
 
 
-    
+
 
 ******************
  Acknowledgements
@@ -470,4 +470,3 @@ HPX is currently funded by
 
 * The Bavarian Research Foundation (Bayerische Forschungsstfitung) through
   the grant AZ-987-11.
-

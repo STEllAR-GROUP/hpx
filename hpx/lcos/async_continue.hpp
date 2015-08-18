@@ -18,8 +18,6 @@
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/async_continue_fwd.hpp>
 
-#include <boost/make_shared.hpp>
-
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -49,9 +47,8 @@ namespace hpx
 
             lcos::promise<result_type, RemoteResult> p;
             apply<Action>(
-                boost::make_shared<
-                    hpx::actions::typed_continuation<continuation_result_type>
-                >(p.get_id(), std::forward<Cont>(cont))
+                hpx::actions::typed_continuation<continuation_result_type>(
+                    p.get_id(), std::forward<Cont>(cont))
               , target, std::forward<Ts>(vs)...);
             return p.get_future();
         }
@@ -67,7 +64,7 @@ namespace hpx
     async_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs)
     {
         typedef
-            typename traits::promise_local_result<
+            typename traits::promise_remote_result<
                 typename detail::result_of_async_continue<Action, Cont>::type
             >::type
         result_type;
@@ -105,7 +102,7 @@ namespace hpx
     async_continue(Cont&& cont, DistPolicy const& policy, Ts&&... vs)
     {
         typedef
-            typename traits::promise_local_result<
+            typename traits::promise_remote_result<
                 typename detail::result_of_async_continue<Action, Cont>::type
             >::type
         result_type;

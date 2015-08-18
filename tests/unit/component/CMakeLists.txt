@@ -6,6 +6,7 @@
 set(tests
     action_invoke_no_more_than
     copy_component
+    distribution_policy_executor
     get_gid
     get_ptr
     inheritance_2_classes_abstract
@@ -33,6 +34,10 @@ set(action_invoke_no_more_than_PARAMETERS
     THREADS_PER_LOCALITY 4)
 set(action_invoke_no_more_than_FLAGS
     DEPENDENCIES iostreams_component)
+
+set(colocated_distribution_policy_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 2)
 
 set(copy_component_PARAMETERS
     LOCALITIES 2

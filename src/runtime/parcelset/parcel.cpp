@@ -6,8 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/serialization/intrusive_ptr.hpp>
-#include <hpx/runtime/serialization/shared_ptr.hpp>
+#include <hpx/runtime/serialization/unique_ptr.hpp>
 
 #include <sstream>
 
@@ -31,187 +30,48 @@ namespace hpx { namespace parcelset
         return result;
     }
 
-    namespace detail
+    void parcel::serialize(serialization::input_archive & ar, unsigned)
     {
-        ///////////////////////////////////////////////////////////////////////
-        void parcel_data::save(serialization::output_archive& ar,
-            bool has_source_id, bool has_continuation) const
+        ar & data_;
+        if(data_.has_source_id_)
         {
-            // If we have a source id, serialize it.
-            if (has_source_id)
-                ar << source_id_;
-
-            ar << action_;
-
-            // If we have a continuation, serialize it.
-            if (has_continuation) {
-                ar << continuation_;
-            }
-        }
-
-        void parcel_data::load(serialization::input_archive& ar,
-            bool has_source_id, bool has_continuation)
-        {
-            // Check for a source id.
-            if (has_source_id)
-                ar >> source_id_;
-
-            ar >> action_;
-
-            // handle continuation.
-            if (has_continuation) {
-                ar >> continuation_;
-            }
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        void single_destination_parcel_data::save(
-            serialization::output_archive& ar) const
-        {
-            data_.has_source_id_ = source_id_ != naming::invalid_id;
-
-            ar << data_;
-            ar << dest_ << addr_;
-
-            this->parcel_data::save(ar, data_.has_source_id_ != 0,
-                data_.has_continuation_ != 0);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        void single_destination_parcel_data::load(
-            serialization::input_archive & ar)
-        {
-            ar >> data_;
-            ar >> dest_ >> addr_;
-
-            this->parcel_data::load(ar, data_.has_source_id_ != 0,
-                data_.has_continuation_ != 0);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        void multi_destination_parcel_data::save(
-            serialization::output_archive& ar) const
-        {
-            data_.has_source_id_ = source_id_ != naming::invalid_id;
-
-            ar << data_;
-            ar << dests_ << addrs_;
-
-            this->parcel_data::save(ar, data_.has_source_id_ != 0,
-                data_.has_continuation_ != 0);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        void multi_destination_parcel_data::load(
-            serialization::input_archive& ar)
-        {
-            ar >> data_;
-            ar >> dests_ >> addrs_;
-
-            this->parcel_data::load(ar, data_.has_source_id_ != 0,
-                data_.has_continuation_ != 0);
-        }
-#endif
-
-        ///////////////////////////////////////////////////////////////////////
-        std::ostream& operator<< (std::ostream& os,
-            single_destination_parcel_data const& p)
-        {
-            os << "(" << p.dest_ << ":" << p.addr_ << ":";
-            os << p.action_->get_action_name() << ")";
-            return os;
-        }
-
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        std::ostream& operator<< (std::ostream& os,
-            multi_destination_parcel_data const& p)
-        {
-            os << "(";
-            if (!p.dests_.empty())
-                os << p.dests_[0] << ":" << p.addrs_[0] << ":";
-
-            os << p.action_->get_action_name() << ")";
-            return os;
-        }
-#endif
-    }
-
-    void parcel::save(serialization::output_archive& ar,
-        const unsigned int version) const
-    {
-        HPX_ASSERT(data_.get() != 0);
-
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        bool is_multi_destination = data_->is_multi_destination();
-        ar.save(is_multi_destination);
-
-        if (is_multi_destination) {
-            boost::static_pointer_cast<
-                detail::multi_destination_parcel_data
-            >(data_)->save(ar);
+            ar & source_id_;
         }
         else
-#endif
         {
-            boost::static_pointer_cast<
-                detail::single_destination_parcel_data
-            >(data_)->save(ar);
+            source_id_ = naming::invalid_id;
         }
+        ar & dests_;
+        ar & addrs_;
+        ar & cont_;
+        ar & action_;
     }
 
-    void parcel::load(serialization::input_archive& ar,
-        const unsigned int version)
+    void parcel::serialize(serialization::output_archive & ar, unsigned)
     {
-        if (version > HPX_PARCEL_VERSION)
+        ar & data_;
+        if(data_.has_source_id_)
         {
-            HPX_THROW_EXCEPTION(version_too_new,
-                "parcel::load",
-                "trying to load parcel with unknown version");
+            ar & source_id_;
         }
-
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        bool is_multi_destination;
-        ar.load(is_multi_destination);
-
-        if (is_multi_destination) {
-            boost::intrusive_ptr<detail::parcel_data> data(
-                new detail::multi_destination_parcel_data);
-
-            boost::static_pointer_cast<
-                detail::multi_destination_parcel_data
-            >(data)->load(ar);
-            std::swap(data_, data);
-        }
-        else
-#endif
-        {
-            boost::intrusive_ptr<detail::parcel_data> data(
-                new detail::single_destination_parcel_data);
-
-            boost::static_pointer_cast<
-                detail::single_destination_parcel_data
-            >(data)->load(ar);
-            std::swap(data_, data);
-        }
+        ar & dests_;
+        ar & addrs_;
+        ar & cont_;
+        ar & action_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     std::ostream& operator<< (std::ostream& os, parcel const& p)
     {
-        HPX_ASSERT(p.data_.get() != 0);
-
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        if (p.data_->is_multi_destination()) {
-            os << *static_cast<detail::multi_destination_parcel_data const*>(
-                p.data_.get());
-        }
-        else
+        os << "(";
+        if (!p.dests_.empty())
+            os << p.dests_[0] << ":" << p.addrs_[0] << ":";
+#else
+        os << "(" << p.dests_ << ":" << p.addrs_ << ":";
 #endif
-        {
-            os << *static_cast<detail::single_destination_parcel_data const*>(
-                p.data_.get());
-        }
+        os << p.action_->get_action_name() << ")";
+
         return os;
     }
 

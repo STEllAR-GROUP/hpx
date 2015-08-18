@@ -17,13 +17,11 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 
 // The number of types that the request's variant can represent.
-#define HPX_AGAS_REQUEST_SUBTYPES 14
+#define HPX_AGAS_REQUEST_SUBTYPES 13
 
 namespace hpx { namespace agas
 {
@@ -112,11 +110,6 @@ struct HPX_EXPORT request
       , iterate_types_function_type const& f_
         );
 
-    request(
-        namespace_action_code type_
-      , parcelset::parcel const& p
-        );
-
     explicit request(
         namespace_action_code type_
         );
@@ -178,10 +171,6 @@ struct HPX_EXPORT request
         ) const;
 
     iterate_types_function_type get_iterate_types_function(
-        error_code& ec = throws
-        ) const;
-
-    parcelset::parcel get_parcel(
         error_code& ec = throws
         ) const;
 
@@ -254,29 +243,6 @@ struct HPX_EXPORT request
     boost::shared_ptr<request_data> data;
 };
 
-}}
-
-namespace hpx { namespace traits
-{
-    template <>
-    struct serialize_as_future<hpx::agas::request>
-      : boost::mpl::false_
-    {
-        static bool call_if(hpx::agas::request& r)
-        {
-            return r.get_action_code() == hpx::agas::primary_ns_route;
-        }
-
-        static void call(hpx::agas::request& r)
-        {
-            // routed parcels need to be checked for embedded future objects
-            if (r.get_action_code() == hpx::agas::primary_ns_route)
-            {
-                hpx::parcelset::parcel p = r.get_parcel();
-                serialize_as_future<hpx::parcelset::parcel>::call(p);
-            }
-        }
-    };
 }}
 
 HPX_UTIL_REGISTER_FUNCTION_DECLARATION(

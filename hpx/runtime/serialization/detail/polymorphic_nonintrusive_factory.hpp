@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2015 Andreas Schaefer
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
@@ -27,33 +28,64 @@
 namespace hpx { namespace serialization { namespace detail
 {
         template <typename T>
-        char const* get_serialization_name()
+        struct get_serialization_name
 #ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
         ;
 #else
         {
-            /// If you encounter this assert while compiling code, that means that
-            /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
-            /// but the header in which the action is defined misses a
-            /// HPX_REGISTER_ACTION_DECLARATION
-            BOOST_MPL_ASSERT_MSG(
-                traits::needs_automatic_registration<T>::value
-              , HPX_REGISTER_ACTION_DECLARATION_MISSING
-              , (T)
-            );
-            return util::type_id<T>::typeid_.type_id();
-        }
+            const char *operator()()
+            {
+                /// If you encounter this assert while compiling code, that means that
+                /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
+                /// but the header in which the action is defined misses a
+                /// HPX_REGISTER_ACTION_DECLARATION
+                BOOST_MPL_ASSERT_MSG(
+                    traits::needs_automatic_registration<T>::value
+                  , HPX_REGISTER_ACTION_DECLARATION_MISSING
+                  , (T)
+                );
+                return util::type_id<T>::typeid_.type_id();
+            }
+        };
 #endif
 
     struct function_bunch_type
     {
         typedef void (*save_function_type) (output_archive& , const void* base);
         typedef void (*load_function_type) (input_archive& , void* base);
-        typedef void* (*create_function_type) ();
+        typedef void* (*create_function_type) (input_archive&);
 
         save_function_type save_function;
         load_function_type load_function;
         create_function_type create_function;
+    };
+
+    template <class T>
+    class constructor_selector
+    {
+    public:
+        static T *create(input_archive& ar)
+        {
+            T *t = new T;
+            try {
+                load_polymorphic(t, ar, hpx::traits::is_nonintrusive_polymorphic<T>());
+            } catch (...) {
+                delete t;
+                throw;
+            }
+            return t;
+        }
+
+    private:
+        static void load_polymorphic(T *t, input_archive& ar, boost::mpl::true_)
+        {
+            serialize(ar, *t, 0);
+        }
+
+        static void load_polymorphic(T *t, input_archive& ar, boost::mpl::false_)
+        {
+            ar >> *t;
+        }
     };
 
     class HPX_EXPORT polymorphic_nonintrusive_factory: boost::noncopyable
@@ -139,9 +171,9 @@ namespace hpx { namespace serialization { namespace detail
         }
 
         // this function is needed for pointer type serialization
-        static void* create()
+        static void* create(input_archive& ar)
         {
-            return new Derived;
+            return constructor_selector<Derived>::create(ar);
         }
 
         register_class()
@@ -158,7 +190,7 @@ namespace hpx { namespace serialization { namespace detail
             polymorphic_nonintrusive_factory::instance().
                 register_class(
                     typeid(Derived),
-                    get_serialization_name<Derived>(),
+                    get_serialization_name<Derived>()(),
                     bunch
                 );
         }
@@ -175,8 +207,8 @@ namespace hpx { namespace serialization { namespace detail
 
 #define HPX_SERIALIZATION_REGISTER_CLASS_DECLARATION(Class)                   \
     namespace hpx { namespace serialization { namespace detail {              \
-        template <> HPX_ALWAYS_EXPORT                                         \
-        char const* get_serialization_name<Class>();                          \
+        template <>                                                           \
+        struct HPX_ALWAYS_EXPORT get_serialization_name<Class>;               \
     }}}                                                                       \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
@@ -185,19 +217,82 @@ namespace hpx { namespace serialization { namespace detail
         {};                                                                   \
     }}                                                                        \
     HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class);                               \
-
+/**/
 #define HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, Name)                    \
     namespace hpx { namespace serialization { namespace detail {              \
-        template <> HPX_ALWAYS_EXPORT                                         \
-        char const* get_serialization_name<Class>()                           \
+        template <>                                                           \
+        struct HPX_ALWAYS_EXPORT get_serialization_name<Class>                \
         {                                                                     \
-            return Name;                                                      \
-        }                                                                     \
+            char const* operator()()                                          \
+            {                                                                 \
+                return Name;                                                  \
+            }                                                                 \
+        };                                                                    \
     }}}                                                                       \
     template hpx::serialization::detail::register_class<Class>                \
         hpx::serialization::detail::register_class<Class>::instance;          \
 /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                       \
+        Parameters, Template, Name)                                           \
+    namespace hpx { namespace serialization { namespace detail {              \
+        HPX_UTIL_STRIP(Parameters)                                            \
+        struct HPX_ALWAYS_EXPORT get_serialization_name<HPX_UTIL_STRIP(       \
+            Template)>                                                        \
+        {                                                                     \
+            char const* operator()()                                          \
+            {                                                                 \
+                return Name;                                                  \
+            }                                                                 \
+        };                                                                    \
+    }}}                                                                       \
+/**/
 #define HPX_SERIALIZATION_REGISTER_CLASS(Class)                               \
     HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, BOOST_PP_STRINGIZE(Class))   \
-
+/**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(Parameters, Template)       \
+    HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                           \
+        Parameters, Template,                                                 \
+        hpx::util::type_id<HPX_UTIL_STRIP(Template) >::typeid_.type_id())     \
+    HPX_UTIL_STRIP(Parameters) hpx::serialization::detail::register_class<    \
+        HPX_UTIL_STRIP(Template)>                                             \
+        HPX_UTIL_STRIP(Template)::hpx_register_class_instance;                \
+/**/
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SEMIINTRUSIVE(Template)        \
+    static hpx::serialization::detail::register_class<Template>               \
+    hpx_register_class_instance;                                              \
+                                                                              \
+    virtual hpx::serialization::detail::register_class<Template>&             \
+    hpx_get_register_class_instance(                                          \
+        hpx::serialization::detail::register_class<Template>*) const          \
+    {                                                                         \
+        return hpx_register_class_instance;                                   \
+    }                                                                         \
+/**/
+#define HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(Class, Func)                \
+    namespace hpx { namespace serialization { namespace detail {              \
+    template<>                                                                \
+    class constructor_selector<HPX_UTIL_STRIP(Class)>                         \
+    {                                                                         \
+    public:                                                                   \
+        static Class *create(input_archive& ar)                               \
+        {                                                                     \
+            return Func(ar);                                                  \
+        }                                                                     \
+    };                                                                        \
+    }}}                                                                       \
+/**/
+#define HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE(                   \
+    Parameters, Template, Func)                                               \
+    namespace hpx { namespace serialization { namespace detail {              \
+    HPX_UTIL_STRIP(Parameters)                                                \
+    class constructor_selector<HPX_UTIL_STRIP(Template)>                      \
+    {                                                                         \
+    public:                                                                   \
+        static HPX_UTIL_STRIP(Template) *create(input_archive& ar)            \
+        {                                                                     \
+            return Func(ar, static_cast<HPX_UTIL_STRIP(Template)*>(0));       \
+        }                                                                     \
+    };                                                                        \
+    }}}                                                                       \
+/**/
 #endif

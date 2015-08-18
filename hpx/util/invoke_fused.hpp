@@ -117,6 +117,33 @@ namespace hpx { namespace util
             typename detail::make_index_pack<sizeof...(Ts)>::type(),
             std::forward<F>(f), std::move(args));
     }
+
+    namespace functional
+    {
+        struct invoke_fused
+        {
+            template <typename F, typename Tuple>
+            typename invoke_fused_result_of<F(Tuple)>::type
+            operator()(F && f, Tuple && args)
+            {
+                return util::invoke_fused(
+                    std::forward<F>(f),
+                    std::forward<Tuple>(args));
+            }
+        };
+
+        template <typename R>
+        struct invoke_fused_r
+        {
+            template <typename F, typename Tuple>
+            R operator()(F && f, Tuple && args)
+            {
+                return util::invoke_fused_r<R>(
+                    std::forward<F>(f),
+                    std::forward<Tuple>(args));
+            }
+        };
+    }
 }}
 
 #endif

@@ -120,7 +120,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::vector<std::size_t>::iterator it =
             std::unique(cores.begin(), cores.end());
 
-        return std::distance(cores.begin(), it);
+        std::size_t num_unique_cores = std::distance(cores.begin(), it);
+        return (std::max)(num_unique_cores, max_cores);
     }
 
     // means of adding a processing unit after initialization

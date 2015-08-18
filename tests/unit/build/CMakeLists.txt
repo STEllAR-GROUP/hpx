@@ -27,7 +27,7 @@ macro(create_cmake_test name hpx_dir)
   add_custom_target(${name}.make_configure
     COMMAND
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}"
-      "${hpx_SOURCE_DIR}/tests/unit/build/src"
+      "${PROJECT_SOURCE_DIR}/tests/unit/build/src"
       -DHPX_DIR=${hpx_dir}
       ${ADDITIONAL_CMAKE_OPTIONS}
       -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
@@ -67,8 +67,8 @@ macro(create_pkgconfig_test name hpx_dir)
   add_custom_target(${name}.make_compile
     COMMAND
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" make
-      -f "${hpx_SOURCE_DIR}/tests/unit/build/src/Makefile"
-      SRC_DIR=${hpx_SOURCE_DIR}/tests/unit/build/src
+      -f "${PROJECT_SOURCE_DIR}/tests/unit/build/src/Makefile"
+      SRC_DIR=${PROJECT_SOURCE_DIR}/tests/unit/build/src
       HPX_DIR=${hpx_dir}
       CXX=${CMAKE_CXX_COMPILER}
       CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
@@ -89,11 +89,11 @@ endmacro()
 
 create_cmake_test(
   cmake_build_dir_test
-  "${CMAKE_BINARY_DIR}/lib/cmake/hpx")
+  "${CMAKE_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}")
 
 create_cmake_test(
   cmake_install_dir_test
-  "${CMAKE_INSTALL_PREFIX}/lib/cmake/hpx"
+  "${CMAKE_INSTALL_PREFIX}/lib/cmake/${HPX_PACKAGE_NAME}"
 )
 
 find_package(PkgConfig)

@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
@@ -73,10 +72,6 @@ namespace hpx { namespace util { namespace detail
         char const* name;
         typename serializable_vtable<IAr, OAr>::save_object_t save_object;
         typename serializable_vtable<IAr, OAr>::load_object_t load_object;
-        typename serializable_vtable<IAr, OAr>::wait_for_future_t
-            wait_for_future;
-        typename serializable_vtable<IAr, OAr>::has_to_wait_for_futures_t
-            has_to_wait_for_futures;
 
         template <typename T>
         function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
@@ -84,10 +79,6 @@ namespace hpx { namespace util { namespace detail
           , name("empty")
           , save_object(&serializable_vtable<IAr, OAr>::template save_object<T>)
           , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
-          , wait_for_future(
-                &serializable_vtable<IAr, OAr>::template wait_for_future<T>)
-          , has_to_wait_for_futures(
-                &serializable_vtable<IAr, OAr>::template has_to_wait_for_futures<T>)
         {
             if(!this->empty)
                 name = get_function_name<std::pair<function_vtable_ptr, T> >();
@@ -133,8 +124,6 @@ namespace hpx { namespace util
           , Sig
         >
     {
-        friend struct traits::serialize_as_future<function>;
-
         typedef detail::function_vtable_ptr<Sig, IArchive, OArchive> vtable_ptr;
         typedef detail::basic_function<vtable_ptr, Sig> base_type;
 

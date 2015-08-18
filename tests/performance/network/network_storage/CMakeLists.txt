@@ -25,7 +25,7 @@ add_hpx_pseudo_dependencies(
 
 hpx_option(HPX_WITH_BENCHMARK_SCRIPTS_PATH PATH
   "Directory to place batch scripts in"
-  "${hpx_BINARY_DIR}/scripts"
+  "${PROJECT_BINARY_DIR}/scripts"
   ADVANCED)
 
 # our windows batch script needs to know the lib path for boost/hpx

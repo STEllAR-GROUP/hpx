@@ -162,7 +162,7 @@ void test_actions()
                 return_object<
                     action_move_semantics::return_test_non_movable_action, non_movable_object
                 >(id)
-            ), 1u, 5u); // ?call + value_or_error(w) + ?return
+            ), 1u, 5u); // ?call + set_value + ?return
         } else {
             //FIXME: bumped number for intel compiler
             HPX_TEST_RANGE((
@@ -170,7 +170,7 @@ void test_actions()
                     action_move_semantics::return_test_non_movable_action, non_movable_object
                 >(id)
             ), 4u, 8u); // transfer_action + bind + function + ?call +
-                    // value_or_error(w) + ?return
+                    // set_value + ?return
         }
     }
 }
@@ -264,7 +264,7 @@ void test_direct_actions()
                 return_object<
                     action_move_semantics::return_test_non_movable_direct_action, non_movable_object
                 >(id)
-            ), 1u, 3u); // ?call + value_or_error(w) + ?return
+            ), 1u, 3u); // ?call + set_value + ?return
         } else {
             //FIXME: bumped number for intel compiler
             HPX_TEST_RANGE((
@@ -272,7 +272,7 @@ void test_direct_actions()
                     action_move_semantics::return_test_non_movable_direct_action, non_movable_object
                 >(id)
             ), 4u, 8u); // transfer_action + bind + function + ?call +
-                    // value_or_error(w) + ?return
+                    // set_value + ?return
         }
     }
 }

@@ -22,8 +22,8 @@ macro(add_snappy_module)
 
     add_hpx_library(compress_snappy
       PLUGIN
-      SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/snappy/snappy_serialization_filter.cpp"
-      HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/snappy_serialization_filter.hpp"
+      SOURCES "${PROJECT_SOURCE_DIR}/plugins/binary_filter/snappy/snappy_serialization_filter.cpp"
+      HEADERS "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/snappy_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${SNAPPY_LIBRARY})
 

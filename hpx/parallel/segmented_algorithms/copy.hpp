@@ -72,7 +72,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     local_output_iterator_type out = dispatch(
                             traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
+                            algo, policy, true_(),
                             beg, end, traits::local(dest));
 
                     dest = output_traits::compose(sdest, out);
@@ -87,8 +87,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                      out = dispatch(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, true_(),
-                        beg, end, out);
+                        algo, policy, true_(), beg, end, out);
                 }
 
                 // handle all of the full partitions
@@ -101,8 +100,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         out = dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, out);
+                            algo, policy, true_(), beg, end, out);
                     }
                 }
 
@@ -112,8 +110,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     out = dispatch(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, true_(),
-                        beg, end, traits::begin(sdest));
+                        algo, policy, true_(), beg, end, traits::begin(sdest));
                 }
 
                 dest = output_traits::compose(sdest, out);
@@ -166,7 +163,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, forced_seq(),
+                        algo, policy, forced_seq(),
                         beg, end, traits::local(dest)));
                 }
             }
@@ -179,8 +176,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, forced_seq(),
-                        beg, end, out));
+                        algo, policy, forced_seq(), beg, end, out));
                 }
 
                 // handle all of the full partitions
@@ -193,8 +189,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         segments.push_back(dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, out));
+                            algo, policy, forced_seq(), beg, end, out));
                     }
                 }
 
@@ -205,7 +200,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, forced_seq(),
+                        algo, policy, forced_seq(),
                         beg, end, traits::begin(sdest)));
                 }
             }
@@ -214,10 +209,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return util::detail::algorithm_result<ExPolicy, SegOutIter>::get(
                 lcos::local::dataflow(
                     [=](std::vector<shared_future<local_output_iterator_type> > && r)
+                        ->  SegOutIter
                     {
+                        // handle any remote exceptions, will throw on error
+                        std::list<boost::exception_ptr> errors;
+                        parallel::util::detail::handle_remote_exceptions<
+                            ExPolicy
+                        >::call(r, errors);
                         return output_traits::compose(sdest, r.back().get());
                     },
-                    segments));
+                    std::move(segments)));
         }
 
         ///////////////////////////////////////////////////////////////////////
