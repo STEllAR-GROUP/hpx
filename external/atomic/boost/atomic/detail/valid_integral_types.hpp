@@ -34,7 +34,7 @@ template<> struct is_integral_type<boost::long_long_type> {typedef int test;};
 template<> struct is_integral_type<__uint128_t> {typedef int test;};
 template<> struct is_integral_type<__int128_t> {typedef int test;};
 #endif
-#if BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) &&
+#if BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) && \
     defined(BOOST_ATOMIC_HAVE_SSE2)
 #include <emmintrin.h>
 template<> struct is_integral_type<__m128i> {typedef int test;};
