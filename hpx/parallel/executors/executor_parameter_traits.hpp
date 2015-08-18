@@ -49,6 +49,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         ///////////////////////////////////////////////////////////////////////
+        struct processing_units_count_parameter_helper
+        {
+            template <typename Parameters>
+            static std::size_t call(wrap_int, Parameters& params)
+            {
+                return hpx::get_os_thread_count();
+            }
+
+            template <typename Parameters>
+            static auto call(int, Parameters& params)
+            ->  decltype(params.processing_units_count())
+            {
+                return params.processing_units_count();
+            }
+        };
+
+        template <typename Parameters>
+        std::size_t call_processing_units_parameter_count(Parameters& params)
+        {
+            return processing_units_count_parameter_helper::call(0, params);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         struct variable_chunk_size_helper
         {
             template <typename Parameters, typename Executor>
@@ -152,6 +175,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             return detail::call_get_chunk_size(params, exec,
                 std::forward<F>(f), num_tasks);
+        }
+
+        /// Retrieve the number of (kernel-)threads used by the associated
+        /// executor.
+        ///
+        /// \param exec  [in] The executor object to use for scheduling of the
+        ///              function \a f.
+        /// \param params [in] The executor parameters object to use as a
+        ///              fallback if the executor does not expose
+        ///
+        /// \note This calls exec.processing_units_count() if it exists;
+        ///       otherwise it forwards teh request to the executor parameters
+        ///       object.
+        ///
+        static std::size_t processing_units_count(
+            executor_parameters_type& params)
+        {
+            return detail::call_processing_units_parameter_count(params);
         }
     };
 

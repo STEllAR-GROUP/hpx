@@ -85,8 +85,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             new buffer_type[combiner(len1, len2)]);
 
         typedef typename ExPolicy::executor_type executor_type;
-        std::size_t cores = executor_traits<executor_type>::os_thread_count(
-            policy.executor());
+        std::size_t cores = executor_traits<executor_type>::
+            processing_units_count(policy.executor(), policy.parameters());
+
         std::size_t step = (len1 + cores - 1) / cores;
         boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
 

@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         typedef typename ExPolicy::executor_type executor_type;
         std::size_t const cores = executor_traits<executor_type>::
-            os_thread_count(policy.executor());
+            processing_units_count(policy.executor(), policy.parameters());
 
         bool variable_chunk_sizes = traits::variable_chunk_size(
             policy.parameters(), policy.executor());
