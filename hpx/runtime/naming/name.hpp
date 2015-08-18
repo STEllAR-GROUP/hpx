@@ -25,6 +25,7 @@
 #include <ios>
 #include <iomanip>
 #include <iostream>
+#include <list>
 #include <sstream>
 #include <cstddef>
 
@@ -635,9 +636,9 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT gid_type split_gid_if_needed(gid_type& id);
-        HPX_EXPORT gid_type split_gid_if_needed_locked(gid_type::mutex_type::scoped_try_lock &l, gid_type& gid);
-        HPX_EXPORT gid_type replenish_new_gid_if_needed(gid_type const& id);
+        HPX_EXPORT hpx::future<gid_type> split_gid_if_needed(gid_type& id);
+        HPX_EXPORT hpx::future<gid_type> split_gid_if_needed_locked(gid_type::mutex_type::scoped_lock &l, gid_type& gid);
+        HPX_EXPORT hpx::future<gid_type> replenish_new_gid_if_needed(gid_type const& id);
 
         HPX_EXPORT gid_type move_gid(gid_type& id);
         HPX_EXPORT gid_type move_gid_locked(gid_type& gid);
@@ -768,6 +769,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
         {
+            HPX_MOVABLE_BUT_NOT_COPYABLE(id_type_impl);
         private:
             typedef void (*deleter_type)(detail::id_type_impl*);
             static deleter_type get_deleter(id_type_management t);
@@ -776,6 +778,11 @@ namespace hpx { namespace naming
             id_type_impl()
               : count_(0), type_(unknown_deleter)
             {}
+
+//             ~id_type_impl()
+//             {
+//                 HPX_ASSERT(new_gids_.empty());
+//             }
 
             explicit id_type_impl (boost::uint64_t lsb_id, id_type_management t)
               : gid_type(0, lsb_id), count_(0), type_(t)
@@ -806,7 +813,7 @@ namespace hpx { namespace naming
         private:
             // credit management (called during serialization), this function
             // has to be 'const' as save() above has to be 'const'.
-            naming::gid_type preprocess_gid() const;
+            void preprocess_gid(serialization::output_archive& ar) const;
 
             // reference counting
             friend HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
@@ -814,6 +821,8 @@ namespace hpx { namespace naming
 
             boost::detail::atomic_count count_;
             id_type_management type_;
+
+            mutable std::list<naming::gid_type> new_gids_;
         };
     }
 

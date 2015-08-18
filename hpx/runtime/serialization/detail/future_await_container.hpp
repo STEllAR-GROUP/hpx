@@ -46,7 +46,7 @@ namespace hpx { namespace serialization { namespace detail
         template <typename F>
         void operator()(F f)
         {
-            HPX_ASSERT(!hpx::is_starting());
+//             HPX_ASSERT(!hpx::is_starting());
             hpx::lcos::local::dataflow(//hpx::launch::sync,
                 util::unwrapped(std::move(f)), futures_);
         }
