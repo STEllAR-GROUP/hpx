@@ -265,8 +265,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 namespace hpx { namespace performance_counters
 {
     ///
-    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex} \
-           /countername#parameters
+    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}
+    ///       /countername#parameters
     ///    /objectname{parentinstancename#*/instancename#*}/countername#parameters
     ///    /objectname{/basecounter}/countername,parameters
     ///
@@ -311,8 +311,8 @@ namespace hpx { namespace performance_counters
     /// \brief Fill the given \a counter_path_elements instance from the given
     ///        full name of a counter
     ///
-    ///    /objectname{parentinstancename#parentindex \
-           /instancename#instanceindex}/countername
+    ///    /objectname{parentinstancename#parentindex
+    ///       /instancename#instanceindex}/countername
     ///
     counter_status get_counter_path_elements(std::string const& name,
         counter_path_elements& path, error_code& ec)
