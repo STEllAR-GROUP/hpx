@@ -520,6 +520,12 @@ if(HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF)
   hpx_add_config_define(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
 endif()
 
+# If APEX is defined, the action timers need thread debug info.
+if(HPX_WITH_APEX)
+    hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
+    set(HPX_HAVE_THREAD_DESCRIPTION ON CACHE INTERNAL "")
+endif()
+
 if(HPX_WITH_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
   hpx_add_config_define(HPX_HAVE_THREAD_PHASE_INFORMATION)
@@ -871,7 +877,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
     # OpenMPI triggers a lot of forcing value to bool 'true' or 'false'
     # (performance warning)
-    if(MPI_FOUND)
+    if(MPI_FOUND OR HPX_WITH_APEX)
       hpx_add_compile_flag(-wd4800)
     endif()
   else() # Trial and error approach for any other compiler ...
@@ -962,7 +968,7 @@ else()
   endif()
 
   # Check if our libraries have unresolved symbols
-  if(NOT APPLE)
+  if(NOT APPLE AND NOT HPX_WITH_APEX)
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
 
@@ -1072,16 +1078,48 @@ endif()
 # Enable integration with Apex event counters
 ################################################################################
 if(HPX_WITH_APEX)
-  find_package(APEX)
+  # handle APEX library
+  include(GitExternal)
+  git_external(apex
+    https://github.com/khuck/xpress-apex.git
+    master
+    NO_UPDATE VERBOSE)
+
+  LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
+  add_subdirectory(apex/src/apex)
   if(NOT APEX_FOUND)
-    hpx_error("Apex could not be found and HPX_WITH_APEX=On, please specify APEX_ROOT to point to the root of your Apex installation")
+    hpx_error("Apex could not be found and HPX_WITH_APEX=On")
   endif()
-  hpx_libraries(${APEX_LIBRARIES})
-  include_directories(${APEX_INCLUDE_DIR})
   if(AMPLIFIER_FOUND)
     hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
   endif()
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+
+  include_directories(${APEX_SOURCE_DIR})
+  hpx_add_config_define(HPX_HAVE_APEX 1)
+  set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+      ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} apex_lib)
+  if(APEX_WITH_MSR)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
+  endif()
+  if(APEX_WITH_ACTIVEHARMONY)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+  endif()
+
+  # handle optional ITTNotify library
+  if(HPX_WITH_ITTNOTIFY)
+    add_subdirectory(apex/src/ITTNotify)
+    if(NOT ITTNOTIFY_FOUND)
+      hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
+    endif()
+    include_directories(${ITTNOTIFY_SOURCE_DIR})
+    hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} ittnotify_lib)
+  endif()
+else()
+hpx_error("APEX not being used!")
 endif()
 
 if(HPX_WITH_GOOGLE_PERFTOOLS)

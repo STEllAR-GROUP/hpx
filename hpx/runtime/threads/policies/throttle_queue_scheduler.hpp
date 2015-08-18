@@ -35,11 +35,6 @@
 
 static bool apex_init = false;
 static boost::shared_mutex init_mutex;
-static int foo1 = 0;
-static volatile int64_t ** energy;
-static int64_t * savedEnergy;
-static struct timeval startts, curts;
-static int64_t maxThreads, minThreads;
 
 #define VALUE_THROTTLING "/threadqueue{locality#0/total}/length"
 
@@ -47,7 +42,7 @@ static int64_t maxThreads, minThreads;
 /* Notes on building and running Throttling scheduler
 
 
-add -DHPX_THROTTLE_SCHEDULER=1 to cmake to include the throttling during the HPX build.
+add -DHPX_HAVE_THROTTLE_SCHEDULER=1 to cmake to include the throttling during the HPX build.
 I haven't tested but the flag to include all schedulers should also work.
 
 APEX also needs to be available (-DTAU_ROOT=... -DHPX_HAVE_APEX=1 needed)
@@ -78,7 +73,7 @@ namespace hpx { namespace threads { namespace policies
     // startup code
     extern bool minimal_deadlock_detection;
 #endif
-    static int apex_current_desired_active_threads = INT_MAX;
+    static std::size_t apex_current_desired_active_threads = INT_MAX;
     ///////////////////////////////////////////////////////////////////////////
     /// The local_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
@@ -145,7 +140,7 @@ namespace hpx { namespace threads { namespace policies
             steals_in_numa_domain_(init.num_queues_),
             steals_outside_numa_domain_(init.num_queues_),
 #endif
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || defined(HPX_MAX_CPU_COUNT)
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || defined(HPX_HAVE_MAX_CPU_COUNT)
             numa_domain_masks_(init.num_queues_),
             outside_numa_domain_masks_(init.num_queues_)
 #else
@@ -199,9 +194,9 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-        std::size_t get_num_pending_misses(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
-            std::size_t num_pending_misses = 0;
+            boost::int64_t num_pending_misses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -216,9 +211,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_misses;
         }
 
-        std::size_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        boost::uint64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
         {
-            std::size_t num_pending_accesses = 0;
+            boost::uint64_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -233,9 +228,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_accesses;
         }
 
-        std::size_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -247,9 +242,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -261,9 +256,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -275,9 +270,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -337,10 +332,13 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool TTthrottle(std::size_t num_thread, int add_thread){
+            /* Usage commented out, below */
+            /*
             mask_cref_type this_numa_domain = numa_domain_masks_[num_thread];
             std::size_t count_this_numa_domain = 0;
             std::size_t count_other_numa_domain = 0;
             std::size_t queues_size = queues_.size();
+            */
 
 #ifndef VALUE_THROTTLING
             if (HPX_UNLIKELY(apex_init == false)) {
@@ -364,7 +362,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
             // check if we should throttle
-            const int desired_active_threads = apex::get_thread_cap();
+            std::size_t desired_active_threads = apex::get_thread_cap();
             if(num_thread < desired_active_threads) {
                 return true;
             }
@@ -378,7 +376,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        virtual bool get_next_thread(std::size_t num_thread, bool running,
+        virtual bool get_next_thread(std::size_t num_thread,
             boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
         {
             std::size_t queues_size = queues_.size();
@@ -419,7 +417,7 @@ namespace hpx { namespace threads { namespace policies
 
                     HPX_ASSERT(idx != num_thread);
 
-                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx))
+                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) //-V560 //-V600 //-V111
                         continue;
 
                     thread_queue_type* q = queues_[idx];
@@ -521,6 +519,7 @@ namespace hpx { namespace threads { namespace policies
                 case thread_priority_default:
                 case thread_priority_low:
                 case thread_priority_normal:
+                case thread_priority_boost:
                 case thread_priority_critical:
                     return queues_[num_thread]->get_thread_count(state);
 
@@ -541,6 +540,7 @@ namespace hpx { namespace threads { namespace policies
             case thread_priority_default:
             case thread_priority_low:
             case thread_priority_normal:
+            case thread_priority_boost:
             case thread_priority_critical:
                 {
                     for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -799,7 +799,7 @@ namespace hpx { namespace threads { namespace policies
         bool apex_current_threads;
         bool numa_sensitive_;
 
-      //#if defined (HPX_THROTTLE_SCHEDULER)
+      //#if defined (HPX_HAVE_THROTTLE_SCHEDULER)
         mask_type active_;
       //#endif
 

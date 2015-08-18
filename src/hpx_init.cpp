@@ -738,13 +738,13 @@ namespace hpx
 #endif
         }
 
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // local scheduler (one queue for each OS threads)
         int run_throttle(startup_function_type const& startup,
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
             ensure_high_priority_compatibility(cfg.vm_);
             ensure_hierarchy_arity_compatibility(cfg.vm_);
 
@@ -836,9 +836,13 @@ namespace hpx
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
-        }
+#else
+            throw detail::command_line_error("Command line option "
+                "--hpx:queuing=throttle "
+                "is not configured in this build. Please rebuild with "
+                "'cmake -DHPX_THREAD_SCHEDULERS=throttle'.");
 #endif
->>>>>>> Consolidate all changes for integrating APEX with HPX
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // local static scheduler with priority queue (one queue for each OS
@@ -1158,7 +1162,7 @@ namespace hpx
                 }
                 else if (0 == std::string("throttle").find(cfg.queuing_)) {
                     cfg.queuing_ = "throttle";
-                    result = detail::run_throttle(startup, shutdown, cfg, blocking);
+                    result = run_throttle(startup, shutdown, cfg, blocking);
                 }
                 else {
                     throw detail::command_line_error(

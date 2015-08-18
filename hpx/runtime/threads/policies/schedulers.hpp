@@ -8,6 +8,9 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
+#endif
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #endif
