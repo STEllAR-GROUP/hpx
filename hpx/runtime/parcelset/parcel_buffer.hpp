@@ -18,7 +18,8 @@
 
 namespace hpx { namespace parcelset
 {
-    template <typename BufferType, typename ChunkType = serialization::serialization_chunk>
+    template <typename BufferType,
+        typename ChunkType = serialization::serialization_chunk>
     struct parcel_buffer
     {
         typedef std::pair<
@@ -40,7 +41,8 @@ namespace hpx { namespace parcelset
           , size_(0), data_size_(0)
         {}
 
-        explicit parcel_buffer(BufferType && data, allocator_type allocator = allocator_type())
+        explicit parcel_buffer(BufferType && data,
+            allocator_type allocator = allocator_type())
           : data_(std::move(data), allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)

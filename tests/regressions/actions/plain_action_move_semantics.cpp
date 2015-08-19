@@ -471,19 +471,23 @@ void test_object_direct_actions()
         if (is_local)
         {
             HPX_TEST_EQ((
-                pass_object<pass_non_movable_object_direct_action, non_movable_object>(id)
+                pass_object<pass_non_movable_object_direct_action,
+                non_movable_object>(id)
             ), 0u);
 
             HPX_TEST_EQ((
-                move_object<pass_non_movable_object_direct_action, non_movable_object>(id)
+                move_object<pass_non_movable_object_direct_action,
+                non_movable_object>(id)
             ), 0u);
         } else {
             HPX_TEST_EQ((
-                pass_object<pass_non_movable_object_direct_action, non_movable_object>(id)
+                pass_object<pass_non_movable_object_direct_action,
+                non_movable_object>(id)
             ), 3u); // transfer_action + bind + function
 
             HPX_TEST_EQ((
-                move_object<pass_non_movable_object_direct_action, non_movable_object>(id)
+                move_object<pass_non_movable_object_direct_action,
+                non_movable_object>(id)
             ), 3u); // transfer_action + bind + function
         }
 
@@ -511,19 +515,23 @@ void test_object_direct_actions()
         if (is_local)
         {
             HPX_TEST_EQ((
-                pass_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
+                pass_object<pass_non_movable_object_value_direct_action,
+                non_movable_object>(id)
             ), 1u); // call
 
             HPX_TEST_EQ((
-                move_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
+                move_object<pass_non_movable_object_value_direct_action,
+                non_movable_object>(id)
             ), 1u); // call
         } else {
             HPX_TEST_EQ((
-                pass_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
+                pass_object<pass_non_movable_object_value_direct_action,
+                non_movable_object>(id)
             ), 4u); // transfer_action + bind + function + call
 
             HPX_TEST_EQ((
-                move_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
+                move_object<pass_non_movable_object_value_direct_action,
+                non_movable_object>(id)
             ), 4u); // transfer_action + bind + function + call
         }
 

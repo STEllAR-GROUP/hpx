@@ -292,7 +292,8 @@ namespace hpx { namespace lcos
 
                 typedef typename detail::is_future_or_shared_state<future_type>::type
                     is_future;
-                typedef typename detail::is_future_or_shared_state_range<future_type>::type
+                typedef typename detail::is_future_or_shared_state_range<future_type>
+                      ::type
                     is_range;
 
                 await_next(std::forward<TupleIter>(iter), is_future(), is_range());

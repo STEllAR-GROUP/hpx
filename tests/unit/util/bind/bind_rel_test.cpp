@@ -73,21 +73,31 @@ int main()
     // bind op placeholder
 
     HPX_TEST( ( hpx::util::bind( f, placeholders::_1 ) == placeholders::_2 )( x, y ) );
-    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) != placeholders::_2 )( x, y ) ) );
-    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) < placeholders::_2 )( x, y ) ) );
-    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) > placeholders::_2 )( x, y ) ) );
+    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) !=
+        placeholders::_2 )( x, y ) ) );
+    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) <
+        placeholders::_2 )( x, y ) ) );
+    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) >
+        placeholders::_2 )( x, y ) ) );
     HPX_TEST( ( hpx::util::bind( f, placeholders::_1 ) <= placeholders::_2 )( x, y ) );
     HPX_TEST( ( hpx::util::bind( f, placeholders::_1 ) >= placeholders::_2 )( x, y ) );
 
     // bind op bind
 
-    // important: hpx::util::bind( f, placeholders::_1 ) and hpx::util::bind( g, placeholders::_1 ) have the same type
-    HPX_TEST( ( hpx::util::bind( f, placeholders::_1 ) == hpx::util::bind( g, placeholders::_1 ) )( x ) );
-    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) != hpx::util::bind( g, placeholders::_1 ) )( x ) ) );
-    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) < hpx::util::bind( g, placeholders::_1 ) )( x ) ) );
-    HPX_TEST( ( hpx::util::bind( f, placeholders::_1 ) <= hpx::util::bind( g, placeholders::_1 ) )( x ) );
-    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) > hpx::util::bind( g, placeholders::_1 ) )( x ) ) );
-    HPX_TEST( ( hpx::util::bind( f, placeholders::_1 ) >= hpx::util::bind( g, placeholders::_1 ) )( x ) );
+    // important: hpx::util::bind( f, placeholders::_1 ) and
+    // hpx::util::bind( g, placeholders::_1 ) have the same type
+    HPX_TEST( ( hpx::util::bind( f, placeholders::_1 ) ==
+        hpx::util::bind( g, placeholders::_1 ) )( x ) );
+    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) !=
+        hpx::util::bind( g, placeholders::_1 ) )( x ) ) );
+    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) <
+        hpx::util::bind( g, placeholders::_1 ) )( x ) ) );
+    HPX_TEST( ( hpx::util::bind( f, placeholders::_1 ) <=
+        hpx::util::bind( g, placeholders::_1 ) )( x ) );
+    HPX_TEST( !( ( hpx::util::bind( f, placeholders::_1 ) >
+        hpx::util::bind( g, placeholders::_1 ) )( x ) ) );
+    HPX_TEST( ( hpx::util::bind( f, placeholders::_1 ) >=
+        hpx::util::bind( g, placeholders::_1 ) )( x ) );
 
     return hpx::util::report_errors();
 }

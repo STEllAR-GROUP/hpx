@@ -88,7 +88,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
         template <typename Handler, typename ParcelPostprocess>
-        void async_write(Handler handler, ParcelPostprocess parcel_postprocess, parcel && p)
+        void async_write(Handler handler, ParcelPostprocess parcel_postprocess,
+            parcel && p)
         {
             HPX_ASSERT(!buffer_.data_.empty());
             p_ = std::move(p);

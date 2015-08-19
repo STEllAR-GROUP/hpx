@@ -107,7 +107,8 @@ public:
     {
         fence_before(success_order);
         T prev=expected;
-        __asm__ __volatile__("lock; cmpxchgb %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
+        __asm__ __volatile__("lock; cmpxchgb %1, %2\n" : "=a" (prev)
+            : "q" (desired), "m" (i), "a" (expected) : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
@@ -176,7 +177,8 @@ public:
     {
         fence_before(success_order);
         T prev=expected;
-        __asm__ __volatile__("lock; cmpxchgw %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
+        __asm__ __volatile__("lock; cmpxchgw %1, %2\n" : "=a" (prev)
+            : "q" (desired), "m" (i), "a" (expected) : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
@@ -245,7 +247,8 @@ public:
     {
         fence_before(success_order);
         T prev=expected;
-        __asm__ __volatile__("lock; cmpxchgl %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
+        __asm__ __volatile__("lock; cmpxchgl %1, %2\n" : "=a" (prev)
+            : "q" (desired), "m" (i), "a" (expected) : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
@@ -315,7 +318,8 @@ public:
     {
         fence_before(success_order);
         T prev=expected;
-        __asm__ __volatile__("lock; cmpxchgq %1, %2\n" : "=a" (prev) : "q" (desired), "m" (i), "a" (expected) : "memory");
+        __asm__ __volatile__("lock; cmpxchgq %1, %2\n" : "=a" (prev)
+            : "q" (desired), "m" (i), "a" (expected) : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
@@ -395,7 +399,8 @@ public:
             "lock; cmpxchg8b 0(%4)\n"
             "movl %1, %%ebx\n"
             : "=A" (prev), "=m" (scratch)
-            : "D" ((long)desired), "c" ((long)((boost::uint64_t)desired>>32)), "S" (&i), "0" (prev)
+            : "D" ((long)desired), "c" ((long)((boost::uint64_t)desired>>32)),
+              "S" (&i), "0" (prev)
             : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
@@ -426,7 +431,8 @@ public:
         compare_exchange requires write access to the memory
         area */
         T expected=i;
-        do { } while(!const_cast<this_type *>(this)->compare_exchange_strong(expected, expected, order, memory_order_relaxed));
+        do { } while(!const_cast<this_type *>(this)->compare_exchange_strong(expected,
+            expected, order, memory_order_relaxed));
         return expected;
     }
     void store(T v, memory_order order=memory_order_seq_cst) volatile
@@ -438,7 +444,8 @@ public:
         T expected=i, desired;;
         do {
             desired=expected+c;
-        } while(!compare_exchange_strong(expected, desired, order, memory_order_relaxed));
+        } while(!compare_exchange_strong(expected, desired,
+            order, memory_order_relaxed));
         return expected;
     }
 

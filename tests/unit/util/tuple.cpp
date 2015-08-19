@@ -69,7 +69,8 @@ public:
 // ----------------------------------------------------------------------------
 
 typedef hpx::util::tuple<int> t1;
-typedef hpx::util::tuple<double&, const double&, const double, double*, const double*> t2;
+typedef hpx::util::tuple<double&, const double&, const double,
+    double*, const double*> t2;
 typedef hpx::util::tuple<A, int(*)(char, int), C> t3;
 typedef hpx::util::tuple<std::string, std::pair<A, B> > t4;
 typedef hpx::util::tuple<A*, hpx::util::tuple<const A*, const B&, C>, bool, void*> t5;
@@ -178,11 +179,15 @@ void element_access_test()
     ++hpx::util::get<0>(t);
     HPX_TEST(hpx::util::get<0>(t) == 6);
 
-    HPX_TEST((boost::is_const<hpx::util::tuple_element<0, hpx::util::tuple<int, float> >::type>::value != true));
-    HPX_TEST((boost::is_const<hpx::util::tuple_element<0, const hpx::util::tuple<int, float> >::type>::value));
+    HPX_TEST((boost::is_const<hpx::util::tuple_element<0, hpx::util::tuple<int,
+        float> >::type>::value != true));
+    HPX_TEST((boost::is_const<hpx::util::tuple_element<0, const hpx::util::tuple<int,
+        float> >::type>::value));
 
-    HPX_TEST((boost::is_const<hpx::util::tuple_element<1, hpx::util::tuple<int, float> >::type>::value != true));
-    HPX_TEST((boost::is_const<hpx::util::tuple_element<1, const hpx::util::tuple<int, float> >::type>::value));
+    HPX_TEST((boost::is_const<hpx::util::tuple_element<1, hpx::util::tuple<int,
+        float> >::type>::value != true));
+    HPX_TEST((boost::is_const<hpx::util::tuple_element<1, const hpx::util::tuple<int,
+        float> >::type>::value));
 
     dummy(i); dummy(i2); dummy(j); dummy(e); // avoid warns for unused variables
 }
@@ -295,7 +300,8 @@ void tie_test()
     HPX_TEST(b == 'a');
     HPX_TEST(c == foo(3));
 
-    hpx::util::tie(a, hpx::util::ignore, c) = hpx::util::make_tuple((short int)5, false, foo(5));
+    hpx::util::tie(a, hpx::util::ignore, c) = hpx::util::make_tuple((short int)5,
+        false, foo(5));
     HPX_TEST(a == 5);
     HPX_TEST(b == 'a');
     HPX_TEST(c == foo(5));

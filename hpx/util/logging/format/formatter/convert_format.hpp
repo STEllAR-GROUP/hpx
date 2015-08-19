@@ -45,10 +45,13 @@ namespace formatter {
 
 
 /**
-    @brief Allows format convertions - In case you're using a formatter that does not match your string type
+    @brief Allows format convertions
+    - In case you're using a formatter that does not match your string type
 
-    In case you want to use a formatter developed by someone else (for instance, a formatter provided by this lib),
-    perhaps you're using another type of string to hold the message - thus, you need to provide a conversion function
+    In case you want to use a formatter developed by someone else
+    (for instance, a formatter provided by this lib),
+    perhaps you're using another type of string to hold the message
+    - thus, you need to provide a conversion function
 
     Example:
     FIXME
@@ -56,7 +59,8 @@ namespace formatter {
     --> convert_format::prepend
 
     explain that you can extend the following - since they're namespaces!!!
-    so that you can "inject" your own write function in the convert_format::prepend/orwhatever namespace, and
+    so that you can "inject" your own write function
+    in the convert_format::prepend/orwhatever namespace, and
     then it'll be automatically used!
 */
 namespace convert {
@@ -69,20 +73,27 @@ namespace convert {
         typedef string original_type ;
         static const type& get(const original_type & str) { return str; }
     };
-    template<class string> struct string_finder< ::hpx::util::logging::optimize::cache_string_one_str<string> > {
+    template<class string> struct string_finder<
+        ::hpx::util::logging::optimize::cache_string_one_str<string> > {
         typedef string type;
-        typedef ::hpx::util::logging::optimize::cache_string_one_str<string> original_type ;
+        typedef ::hpx::util::logging::optimize::cache_string_one_str<string>
+            original_type ;
         static const type& get(const original_type & str) { return str; }
     };
-    template<class string> struct string_finder< ::hpx::util::logging::optimize::cache_string_several_str<string> > {
+    template<class string> struct string_finder<
+        ::hpx::util::logging::optimize::cache_string_several_str<string> > {
         typedef string type;
-        typedef ::hpx::util::logging::optimize::cache_string_several_str<string> original_type;
+        typedef ::hpx::util::logging::optimize::cache_string_several_str<string>
+            original_type;
         static const type& get(const original_type & str) { return str; }
     };
-    template<class string, class p1, class p2, class p3, class p4, class p5, class p6, class p7, class p8, class p9, class p10>
-            struct string_finder< ::hpx::util::logging::tag::holder<string,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> > {
+    template<class string, class p1, class p2, class p3, class p4, class p5,
+    class p6, class p7, class p8, class p9, class p10>
+            struct string_finder< ::hpx::util::logging::tag::holder<string,
+                p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> > {
         typedef typename string_finder< string>::type type;
-        typedef ::hpx::util::logging::tag::holder<string,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> original_type;
+        typedef ::hpx::util::logging::tag::holder<string,p1,p2,p3,p4,p5,p6,
+            p7,p8,p9,p10> original_type;
 
         // note: this needs 2 conversions - to string, and then to cache string
         static const type& get(const original_type & str) { return str; }
@@ -101,28 +112,38 @@ namespace convert {
         inline void write(const string_type & src, string_type & dest) {
             dest.insert( dest.begin(), src.begin(), src.end() );
         }
-        template<class string> void write(const string_type & src, hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
+        template<class string> void write(const string_type & src,
+            hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
             dest.prepend_string(src);
         }
-        template<class string> void write(const string_type & src, hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
+        template<class string> void write(const string_type & src,
+            hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
             dest.prepend_string(src);
         }
 
-        template<class string_, class p1, class p2, class p3, class p4, class p5, class p6, class p7, class p8, class p9, class p10> void write(const string_type & src, ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> & dest) {
+        template<class string_, class p1, class p2, class p3, class p4, class p5,
+        class p6, class p7, class p8, class p9, class p10> void write(const string_type
+            & src, ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,
+            p9,p10> & dest) {
             typedef typename use_default<string_, hold_string_type>::type string;
             write(src, static_cast<string&>(dest) );
         }
 
 
 
-        template<class string> void write(char_array src, hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
+        template<class string> void write(char_array src,
+            hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
             dest.prepend_string(src);
         }
-        template<class string> void write(char_array src, hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
+        template<class string> void write(char_array src,
+            hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
             dest.prepend_string(src);
         }
 
-        template<class string_, class p1, class p2, class p3, class p4, class p5, class p6, class p7, class p8, class p9, class p10> void write(char_array src, ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> & dest) {
+        template<class string_, class p1, class p2, class p3, class p4, class p5,
+        class p6, class p7, class p8, class p9, class p10> void write(char_array src,
+            ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10>
+            & dest) {
             typedef typename use_default<string_, hold_string_type>::type string;
             write(src, static_cast<string&>(dest) );
         }
@@ -134,13 +155,19 @@ namespace convert {
         inline void write(const string_type & src, string_type & dest) {
             dest += src;
         }
-        template<class string> void write(const string_type & src, hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
+        template<class string> void write(const string_type & src,
+            hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
             dest.append_string(src);
         }
-        template<class string> void write(const string_type & src, hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
+        template<class string> void write(const string_type & src,
+            hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
             dest.append_string(src);
         }
-        template<class string_, class p1, class p2, class p3, class p4, class p5, class p6, class p7, class p8, class p9, class p10> void write(const string_type & src, ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> & dest) {
+        template<class string_, class p1, class p2, class p3, class p4,
+        class p5, class p6, class p7, class p8, class p9, class p10>
+            void write(const string_type & src,
+                ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10>
+                & dest) {
             typedef typename use_default<string_, hold_string_type>::type string;
             write(src, static_cast<string&>(dest) );
         }
@@ -149,13 +176,18 @@ namespace convert {
         inline void write(char_array src, string_type & dest ) {
             dest += src;
         }
-        template<class string> void write(char_array src, hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
+        template<class string> void write(char_array src,
+            hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
             dest.append_string(src);
         }
-        template<class string> void write(char_array src, hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
+        template<class string> void write(char_array src,
+            hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
             dest.append_string(src);
         }
-        template<class string_, class p1, class p2, class p3, class p4, class p5, class p6, class p7, class p8, class p9, class p10> void write(char_array src, ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> & dest) {
+        template<class string_, class p1, class p2, class p3, class p4, class p5,
+        class p6, class p7, class p8, class p9, class p10> void write(char_array src,
+            ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10>
+            & dest) {
             typedef typename use_default<string_, hold_string_type>::type string;
             write(src, static_cast<string&>(dest) );
         }
@@ -168,16 +200,22 @@ namespace convert {
         inline void write(const string_type & src, string_type & dest) {
             dest = src;
         }
-        template<class string> void write(const string_type & src, hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
+        template<class string> void write(const string_type & src,
+            hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
             dest.set_string(src);
         }
-        template<class string> void write(const string_type & src, hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
+        template<class string> void write(const string_type & src,
+            hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
             dest.set_string(src);
         }
-        template<class string> void write(string_type & src, hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
+        template<class string> void write(string_type & src,
+            hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
             dest.set_string_swap(src);
         }
-        template<class string_, class p1, class p2, class p3, class p4, class p5, class p6, class p7, class p8, class p9, class p10> void write(const string_type & src, ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> & dest) {
+        template<class string_, class p1, class p2, class p3, class p4, class p5,
+        class p6, class p7, class p8, class p9, class p10> void write(const string_type
+            & src, ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,
+            p8,p9,p10> & dest) {
             typedef typename use_default<string_, hold_string_type>::type string;
             write(src, static_cast<string&>(dest) );
         }
@@ -187,13 +225,18 @@ namespace convert {
         inline void write(char_array src, string_type & dest ) {
             dest = src;
         }
-        template<class string> void write(char_array src, hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
+        template<class string> void write(char_array src,
+            hpx::util::logging::optimize::cache_string_one_str<string> & dest) {
             dest.set_string(src);
         }
-        template<class string> void write(char_array src, hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
+        template<class string> void write(char_array src,
+            hpx::util::logging::optimize::cache_string_several_str<string> & dest) {
             dest.set_string(src);
         }
-        template<class string_, class p1, class p2, class p3, class p4, class p5, class p6, class p7, class p8, class p9, class p10> void write(char_array src, ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> & dest) {
+        template<class string_, class p1, class p2, class p3, class p4, class p5,
+        class p6, class p7, class p8, class p9, class p10> void write(char_array src,
+            ::hpx::util::logging::tag::holder<string_,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10>
+            & dest) {
             typedef typename use_default<string_, hold_string_type>::type string;
             write(src, static_cast<string&>(dest) );
         }
@@ -206,7 +249,8 @@ struct do_convert_format {
 
     struct prepend {
         template<class string>
-                static inline const typename convert::string_finder<string>::type & get_underlying_string(const string & str) {
+                static inline const typename convert::string_finder<string>
+                    ::type & get_underlying_string(const string & str) {
             return convert::string_finder<string>::get(str);
         }
 
@@ -214,17 +258,20 @@ struct do_convert_format {
             convert::prepend::write(src, dest);
         }
 
-        template<class src_type, class string> static void write(const src_type & src, string & dest) {
+        template<class src_type, class string> static void write(const src_type & src,
+            string & dest) {
             convert::prepend::write(src, dest);
         }
-        template<class src_type, class string> static void write(src_type & src, string & dest) {
+        template<class src_type, class string> static void write(src_type & src,
+            string & dest) {
             convert::prepend::write(src, dest);
         }
     };
 
     struct append {
         template<class string>
-                static inline const typename convert::string_finder<string>::type & get_underlying_string(const string & str) {
+                static inline const typename convert::string_finder<string>
+                    ::type & get_underlying_string(const string & str) {
             return convert::string_finder<string>::get(str);
         }
 
@@ -232,17 +279,20 @@ struct do_convert_format {
             convert::append::write(src, dest);
         }
 
-        template<class src_type, class string> static void write(const src_type & src, string & dest) {
+        template<class src_type, class string> static void write(const src_type & src,
+            string & dest) {
             convert::append::write(src, dest);
         }
-        template<class src_type, class string> static void write(src_type & src, string & dest) {
+        template<class src_type, class string> static void write(src_type & src,
+            string & dest) {
             convert::append::write(src, dest);
         }
     };
 
     struct modify {
         template<class string>
-                static inline const typename convert::string_finder<string>::type & get_underlying_string(const string & str) {
+                static inline const typename convert::string_finder<string>
+                    ::type & get_underlying_string(const string & str) {
             return convert::string_finder<string>::get(str);
         }
 
@@ -250,10 +300,12 @@ struct do_convert_format {
             convert::modify::write(src, dest);
         }
 
-        template<class src_type, class string> static void write(const src_type & src, string & dest) {
+        template<class src_type, class string> static void write(const src_type & src,
+            string & dest) {
             convert::modify::write(src, dest);
         }
-        template<class src_type, class string> static void write(src_type & src, string & dest) {
+        template<class src_type, class string> static void write(src_type & src,
+            string & dest) {
             convert::modify::write(src, dest);
         }
     };

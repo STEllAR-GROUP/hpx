@@ -56,7 +56,8 @@ namespace hpx { namespace util { namespace coroutines
             }
         }
 
-        fcontext_context_impl::counter_type& fcontext_context_impl::get_stack_unbind_counter()
+        fcontext_context_impl::counter_type& fcontext_context_impl
+            ::get_stack_unbind_counter()
         {
             static counter_type counter(0);
             return counter;
@@ -70,7 +71,8 @@ namespace hpx { namespace util { namespace coroutines
             return ++get_stack_unbind_counter();
         }
 
-        fcontext_context_impl::counter_type& fcontext_context_impl::get_stack_recycle_counter()
+        fcontext_context_impl::counter_type& fcontext_context_impl
+            ::get_stack_recycle_counter()
         {
             static counter_type counter(0);
             return counter;

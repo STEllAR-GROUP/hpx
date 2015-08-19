@@ -27,7 +27,8 @@ namespace hpx { namespace util
     query_counters::query_counters(std::vector<std::string> const& names,
             boost::int64_t interval, std::string const& dest, std::string const& form,
             std::vector<std::string> const& shortnames, bool csv_header)
-      : names_(names), destination_(dest), format_(form), counter_shortnames_(shortnames), csv_header_(csv_header),
+      : names_(names), destination_(dest), format_(form),
+            counter_shortnames_(shortnames), csv_header_(csv_header),
         timer_(boost::bind(&query_counters::evaluate, this_()),
             boost::bind(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)

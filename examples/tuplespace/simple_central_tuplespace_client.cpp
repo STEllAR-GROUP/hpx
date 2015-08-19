@@ -40,7 +40,8 @@ void print_tuple(const tuple_type& tuple)
 
 
 
-void simple_central_tuplespace_test(const std::string& tuplespace_symbol_name, const tuple_type tuple)
+void simple_central_tuplespace_test(const std::string& tuplespace_symbol_name,
+    const tuple_type tuple)
 {
    examples::simple_central_tuplespace central_tuplespace;
 

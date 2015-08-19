@@ -101,7 +101,8 @@ int hpx_main()
         HPX_TEST_EQ(f3_res.size(), localities.size());
         for(std::size_t i = 0; i < f3_res.size(); ++i)
         {
-            HPX_TEST_EQ(f3_res[i], hpx::naming::get_locality_id_from_id(localities[i]) + 1);
+            HPX_TEST_EQ(f3_res[i],
+                hpx::naming::get_locality_id_from_id(localities[i]) + 1);
         }
 
         hpx::lcos::broadcast<f4_action>(localities, 0).get();
@@ -124,7 +125,8 @@ int hpx_main()
         HPX_TEST_EQ(f3_res.size(), localities.size());
         for(std::size_t i = 0; i < f3_res.size(); ++i)
         {
-            HPX_TEST_EQ(f3_res[i], hpx::naming::get_locality_id_from_id(localities[i]) + 1);
+            HPX_TEST_EQ(f3_res[i],
+                hpx::naming::get_locality_id_from_id(localities[i]) + 1);
         }
 
         hpx::lcos::broadcast_with_index<f4_idx_action>(localities, 0).get();

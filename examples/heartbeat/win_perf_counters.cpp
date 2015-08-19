@@ -45,7 +45,8 @@ void install_windows_counters()
         return;
     }
 
-    avg_queue_counter = PerfCreateInstance(HPXHeartBeat, &QueueLengthGuid, L"Instance_2", 0);
+    avg_queue_counter = PerfCreateInstance
+        (HPXHeartBeat, &QueueLengthGuid, L"Instance_2", 0);
     if (avg_queue_counter == NULL) {
         std::cerr << "PerfCreateInstance for 'avg_queue_counter' failed"
                      "with error code: "
@@ -58,7 +59,8 @@ void install_windows_counters()
 void update_windows_counters(boost::uint64_t value)
 {
     // Set raw counter data for queue length.
-    ULONG status = PerfSetULongCounterValue(HPXHeartBeat, queue_counter, 1, ULONG(value));
+    ULONG status = PerfSetULongCounterValue
+        (HPXHeartBeat, queue_counter, 1, ULONG(value));
     if (status != ERROR_SUCCESS) {
         std::cerr << "PerfSetCounterRefValue for 'sum_queue_counter' failed "
                      "with error code: "

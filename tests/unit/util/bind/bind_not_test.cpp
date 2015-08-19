@@ -47,7 +47,8 @@ int main()
     test( !hpx::util::bind( f, true ), 0, !f( true ) );
     test( !hpx::util::bind( g, placeholders::_1 ), 5, !g( 5 ) );
     test( hpx::util::bind( f, !hpx::util::bind( f, true ) ), 0, f( !f( true ) ) );
-    test( hpx::util::bind( f, !hpx::util::bind( f, placeholders::_1 ) ), true, f( !f( true ) ) );
+    test( hpx::util::bind( f, !hpx::util::bind( f, placeholders::_1 ) ),
+        true, f( !f( true ) ) );
 
     return hpx::util::report_errors();
 }

@@ -54,7 +54,8 @@ private:
 };
 
 template<>
-class atomic<void *> : private detail::atomic::internal_atomic<void *, sizeof(void *), int> {
+class atomic<void *> : private detail::atomic
+    ::internal_atomic<void *, sizeof(void *), int> {
 public:
     typedef detail::atomic::internal_atomic<void *, sizeof(void *), int> super;
 
@@ -78,7 +79,8 @@ private:
 /* FIXME: pointer arithmetic still missing */
 
 template<typename T>
-class atomic<T *> : private detail::atomic::internal_atomic<void *, sizeof(void *), int> {
+class atomic<T *>
+    : private detail::atomic::internal_atomic<void *, sizeof(void *), int> {
 public:
     typedef detail::atomic::internal_atomic<void *, sizeof(void *), int> super;
 
@@ -98,14 +100,16 @@ public:
         T * desired,
         memory_order order=memory_order_seq_cst) volatile
     {
-        return compare_exchange_strong(expected, desired, order, detail::atomic::calculate_failure_order(order));
+        return compare_exchange_strong(expected, desired, order,
+            detail::atomic::calculate_failure_order(order));
     }
     bool compare_exchange_weak(
         T * &expected,
         T *desired,
         memory_order order=memory_order_seq_cst) volatile
     {
-        return compare_exchange_weak(expected, desired, order, detail::atomic::calculate_failure_order(order));
+        return compare_exchange_weak(expected, desired, order,
+            detail::atomic::calculate_failure_order(order));
     }
     bool compare_exchange_weak(
         T * &expected,
@@ -115,7 +119,8 @@ public:
     {
         void * expected_=static_cast<void *>(expected);
         void * desired_=static_cast<void *>(desired);
-        bool success=super::compare_exchange_weak(expected_, desired_, success_order, failure_order);
+        bool success=super::compare_exchange_weak(expected_, desired_,
+            success_order, failure_order);
         expected=static_cast<T*>(expected_);
         return success;
     }
@@ -127,7 +132,8 @@ public:
     {
         void * expected_=static_cast<void *>(expected);
         void * desired_=static_cast<void *>(desired);
-        bool success=super::compare_exchange_strong(expected_, desired_, success_order, failure_order);
+        bool success=super::compare_exchange_strong(expected_, desired_,
+            success_order, failure_order);
         expected=static_cast<T*>(expected_);
         return success;
     }
@@ -201,7 +207,8 @@ typedef atomic<boost::long_long_type> atomic_llong;
 typedef atomic<__uint128_t> atomic_uint128_t;
 typedef atomic<__int128_t> atomic_int128_t;
 #endif
-#if BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) && defined(BOOST_ATOMIC_HAVE_SSE2)
+#if BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64))
+    && defined(BOOST_ATOMIC_HAVE_SSE2)
 typedef atomic<__m128i> atomic_uint128_t;
 typedef atomic<__m128i> atomic_int128_t;
 #endif

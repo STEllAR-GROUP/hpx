@@ -48,7 +48,8 @@ namespace sheneos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_shutdown(hpx::util::function_nonser<void()>& shutdown_func, bool& pre_shutdown)
+    bool get_shutdown(hpx::util::function_nonser<void()>& shutdown_func,
+        bool& pre_shutdown)
     {
         shutdown_func = shutdown;
         pre_shutdown = false;       // run this as late as possible
@@ -240,7 +241,8 @@ namespace sheneos
         // Create the config object locally.
         hpx::naming::id_type config_id =
             hpx::find_locality(configuration::get_component_type());
-        cfg_ = configuration(config_id, datafilename, symbolic_name_base, num_localities);
+        cfg_ = configuration(config_id, datafilename, symbolic_name_base,
+            num_localities);
         hpx::agas::register_name(symbolic_name_base, cfg_.get_id());
 
         if (symbolic_name_base[symbolic_name_base.size() - 1] != '/')

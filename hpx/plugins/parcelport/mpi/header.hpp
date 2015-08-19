@@ -47,12 +47,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             set<pos_size>(static_cast<value_type>(size));
             set<pos_numbytes>(static_cast<value_type>(numbytes));
             set<pos_numchunks_first>(static_cast<value_type>(buffer.num_chunks_.first));
-            set<pos_numchunks_second>(static_cast<value_type>(buffer.num_chunks_.second));
+            set<pos_numchunks_second>(static_cast<value_type>
+                (buffer.num_chunks_.second));
 
             if(buffer.data_.size() <= (data_size_ - pos_piggy_back_data))
             {
                 data_[pos_piggy_back_flag] = 1;
-                std::memcpy(&data_[pos_piggy_back_data], &buffer.data_[0], buffer.data_.size());
+                std::memcpy(&data_[pos_piggy_back_data], &buffer.data_[0],
+                    buffer.data_.size());
             }
             else
             {
@@ -107,7 +109,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         std::pair<value_type, value_type> num_chunks() const
         {
-            return std::make_pair(get<pos_numchunks_first>(), get<pos_numchunks_second>());
+            return std::make_pair(get<pos_numchunks_first>(),
+                get<pos_numchunks_second>());
         }
 
         char * piggy_back()

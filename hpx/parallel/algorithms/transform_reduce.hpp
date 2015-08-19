@@ -139,7 +139,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ..., conv_op(*(first + (last - first) - 1))).
+    /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
+    /// conv_op(*(first + (last - first) - 1))).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicates \a red_op and \a conv_op.

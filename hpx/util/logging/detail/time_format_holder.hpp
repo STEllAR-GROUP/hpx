@@ -60,7 +60,9 @@ public:
     /**
         constructs a time format holder object
     */
-    time_format_holder(const hold_string_type & format) : m_day(-1), m_month(-1), m_yy(-1), m_yyyy(-1), m_hour(-1), m_min(-1), m_sec(-1),m_millisec(-1),m_microsec(-1),m_nanosec(-1) {
+    time_format_holder(const hold_string_type & format) : m_day(-1),
+        m_month(-1), m_yy(-1), m_yyyy(-1), m_hour(-1), m_min(-1),
+        m_sec(-1),m_millisec(-1),m_microsec(-1),m_nanosec(-1) {
         set_format(format);
     }
 
@@ -69,7 +71,8 @@ public:
         HPX_ASSERT( format.size() < 64);
         m_format.clear();
 
-        m_day = -1; m_month = -1; m_yy = -1; m_yyyy = -1; m_hour = -1; m_min = -1; m_sec = -1;m_millisec = -1;m_microsec = -1;m_nanosec = -1;
+        m_day = -1; m_month = -1; m_yy = -1; m_yyyy = -1; m_hour = -1;
+        m_min = -1; m_sec = -1;m_millisec = -1;m_microsec = -1;m_nanosec = -1;
 
         typedef hold_string_type::size_type uint;
         uint day_idx    = format.find(HPX_LOG_STR("$dd"));
@@ -104,7 +107,8 @@ public:
         if ( sec_idx != hold_string_type::npos)
             indexes.push_back( index_info(sec_idx, &m_sec) );
         if ( millisec_idx != hold_string_type::npos)
-            indexes.push_back( index_info(millisec_idx, &m_millisec, 4, 3) ); //-V112 //-V525
+            indexes.push_back( index_info(millisec_idx, &m_millisec, 4, 3) );
+            //-V112 //-V525
         if ( microsec_idx != hold_string_type::npos)
             indexes.push_back( index_info(microsec_idx, &m_microsec, 5, 6) );
         if ( nanosec_idx != hold_string_type::npos)
@@ -115,20 +119,26 @@ public:
         // create the format string, that we can actually pass to sprintf
         uint prev_idx = 0;
         int idx = 0;
-        for ( array::iterator begin = indexes.begin(), end = indexes.end(); begin != end; ++begin) {
+        for ( array::iterator begin = indexes.begin(), end = indexes.end();
+        begin != end; ++begin) {
             m_format += format.substr( prev_idx, begin->src_idx - prev_idx);
             *begin->format_idx = idx;
             std::basic_ostringstream<char_type> cur_sprintf_format;
             cur_sprintf_format << HPX_LOG_STR("%0") << begin->size << HPX_LOG_STR("d");
             m_format += cur_sprintf_format.str();
-            prev_idx = static_cast<hpx::util::logging::detail::time_format_holder::index_info::uint>(begin->src_idx + static_cast<hpx::util::logging::detail::time_format_holder::index_info::uint>(begin->advance_size) + 1ul);
+            prev_idx = static_cast<hpx::util::logging::detail
+                ::time_format_holder::index_info::uint>(begin->src_idx +
+                    static_cast<hpx::util::logging::detail::time_format_holder
+                    ::index_info::uint>(begin->advance_size) + 1ul);
             ++idx;
         }
 
         m_format += format.substr(prev_idx);
     }
 
-    void write_time(char_type buffer[], int day, int month, int year, int hour, int min, int sec, int millisec, int microsec, int nanosec) const {
+    void write_time(char_type buffer[], int day, int month,
+        int year, int hour, int min, int sec, int millisec, int microsec,
+        int nanosec) const {
         int vals[11];
         vals[m_day + 1]      = day;
         vals[m_month + 1]    = month;
@@ -141,15 +151,19 @@ public:
         vals[m_microsec + 1]        = microsec;
         vals[m_nanosec + 1]         = nanosec;
 
-        // ignore value at index 0 - it's there so that I don't have to test for an index being -1
+        // ignore value at index 0
+        // - it's there so that I don't have to test for an index being -1
     #ifdef HPX_LOG_USE_WCHAR_T
-        swprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], vals[8], vals[9], vals[10] );
+        swprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3],
+            vals[4], vals[5], vals[6], vals[7], vals[8], vals[9], vals[10] );
     #else
-        sprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], vals[8], vals[9], vals[10] );
+        sprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3],
+            vals[4], vals[5], vals[6], vals[7], vals[8], vals[9], vals[10] );
     #endif
     }
 
-    void write_time(char_type buffer[], int day, int month, int year, int hour, int min, int sec) const {
+    void write_time(char_type buffer[], int day, int month, int year,
+        int hour, int min, int sec) const {
         int vals[8];
         vals[m_day + 1]      = day;
         vals[m_month + 1]    = month;
@@ -159,17 +173,21 @@ public:
         vals[m_min + 1]      = min;
         vals[m_sec + 1]      = sec;
 
-        // ignore value at index 0 - it's there so that I don't have to test for an index being -1
+        // ignore value at index 0
+        // - it's there so that I don't have to test for an index being -1
     #ifdef HPX_LOG_USE_WCHAR_T
-        swprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7]);
+        swprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3],
+            vals[4], vals[5], vals[6], vals[7]);
     #else
-        sprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7] );
+        sprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3],
+            vals[4], vals[5], vals[6], vals[7] );
     #endif
     }
 
 private:
     // the indexes of each escape sequence within the format string
-    int m_day, m_month, m_yy, m_yyyy, m_hour, m_min, m_sec, m_millisec, m_microsec, m_nanosec;
+    int m_day, m_month, m_yy, m_yyyy, m_hour, m_min, m_sec, m_millisec,
+        m_microsec, m_nanosec;
     hold_string_type m_format;
 };
 

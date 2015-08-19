@@ -27,6 +27,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <limits>
 
 #include "boost/shared_ptr.hpp"
 #include "boost/lexical_cast.hpp"
@@ -62,6 +63,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "minmax_check.hpp"
 #include "unnamed_namespace_check.hpp"
 #include "endline_whitespace_check.hpp"
+#include "length_check.hpp"
 #include "preferred_namespace_check.hpp"
 
 //#include "cvs_iterator.hpp"
@@ -817,6 +819,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     bool minmax_ck = false;
     bool unnamed_ck = false;
     bool whitespace_ck = false;
+    bool length_ck = false;
     bool pref_name_ck = false;
 
     desc_commandline.add_options()
@@ -825,6 +828,7 @@ int cpp_main( int argc_param, char * argv_param[] )
             "the filename to write the output to (default: stdout)")
         ("text,t", "write a text file (default: html)")
         ("brief,b", "write a short report only (default: comprehensive)")
+        ("limit,l", value<std::size_t>(), "set limit to the length check tool (default: 90)")
 
         ("license", value<bool>(&license_ck)->implicit_value(false),
             "check for Boost license violations (default: off)")
@@ -855,6 +859,8 @@ int cpp_main( int argc_param, char * argv_param[] )
             "check for unnamed namespace usage violations (default: off)")
         ("whitespace", value<bool>(&whitespace_ck)->implicit_value(false),
             "check for endline whitespace violations (default: off)")
+        ("length", value<bool>(&length_ck)->implicit_value(false),
+            "check for exceeding character limit (default: off)")
         ("prefspace", value<bool>(&pref_name_ck)->implicit_value(false),
             "check for namespace violations (default: off)")
 
@@ -880,6 +886,17 @@ int cpp_main( int argc_param, char * argv_param[] )
             .run()
         );
     store(opts, vm);
+
+    std::size_t limit;
+
+    if (vm.count("limit"))
+    {
+        limit = vm["limit"].as<std::size_t>();
+    }
+    else
+    {
+        limit = 90;
+    }
 
     if (vm.count("help"))
     {
@@ -920,6 +937,7 @@ int cpp_main( int argc_param, char * argv_param[] )
         minmax_ck = true;
         unnamed_ck = true;
         whitespace_ck = true;
+        length_ck = true;
         pref_name_ck = true;
     }
 
@@ -960,6 +978,8 @@ int cpp_main( int argc_param, char * argv_param[] )
       inspectors.push_back( inspector_element( new boost::inspect::unnamed_namespace_check ) );
   if ( whitespace_ck )
       inspectors.push_back( inspector_element( new boost::inspect::whitespace_check) );
+  if ( length_ck)
+      inspectors.push_back(inspector_element ( new boost::inspect::length_check(limit)) );
   if (pref_name_ck)
       inspectors.push_back(inspector_element(new boost::inspect::preferred_namespace_check));
 

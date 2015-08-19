@@ -82,7 +82,8 @@ namespace hpx { namespace performance_counters { namespace server
             {
                 // gather current base values
                 counter_value value;
-                if (!evaluate_base_counter(base_counter_ids_[i], base_counter_names_[i], value))
+                if (!evaluate_base_counter(base_counter_ids_[i],
+                    base_counter_names_[i], value))
                 {
                     return value;
                 }
@@ -354,7 +355,8 @@ namespace hpx { namespace performance_counters { namespace detail
                         {
                             HPX_THROWS_IF(ec, bad_parameter,
                                 "arithmetics_counter_creator",
-                                "the given (expanded) counter name is not a validly formed "
+                                "the given (expanded) counter name is not \
+                                 a validly formed "
                                 "performance counter name: " + name);
                             return naming::invalid_gid;
                         }

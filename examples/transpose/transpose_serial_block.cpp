@@ -88,7 +88,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                 const boost::uint64_t from_phase = b;
                 const boost::uint64_t A_offset = from_phase * block_size;
                 const boost::uint64_t B_offset = phase * block_size;
-                transpose(&A[from_block][A_offset], &B[b][B_offset], block_order, tile_size);
+                transpose(&A[from_block][A_offset], &B[b][B_offset],
+                    block_order, tile_size);
             }
         }
 
@@ -110,7 +111,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     if(errsq < epsilon)
     {
         std::cout << "Solution validates\n";
-        avgtime = avgtime/static_cast<double>((std::max)(iterations-1, static_cast<boost::uint64_t>(1)));
+        avgtime = avgtime/static_cast<double>((std::max)
+            (iterations-1, static_cast<boost::uint64_t>(1)));
         std::cout
           << "Rate (MB/s): " << 1.e-6 * bytes/mintime << ", "
           << "Avg time (s): " << avgtime << ", "

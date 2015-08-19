@@ -334,7 +334,8 @@ namespace hpx { namespace threads { namespace detail
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
-                        scheduler.SchedulingPolicy::schedule_thread_last(thrd, num_thread);
+                        scheduler.SchedulingPolicy::schedule_thread_last(thrd,
+                            num_thread);
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
                 }
