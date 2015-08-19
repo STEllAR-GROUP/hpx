@@ -70,12 +70,14 @@ void print_data(double elapsed, std::size_t size, std::size_t iterations)
 }
 
 inline std::pair<std::size_t, std::vector<hpx::util::remote_locality_result> >
-distribute_component(std::vector<hpx::id_type> localities, hpx::components::component_type type);
+distribute_component(std::vector<hpx::id_type> localities,
+    hpx::components::component_type type);
 
 HPX_PLAIN_ACTION(distribute_component);
 
 inline std::pair<std::size_t, std::vector<hpx::util::remote_locality_result> >
-distribute_component(std::vector<hpx::id_type> localities, hpx::components::component_type type)
+distribute_component(std::vector<hpx::id_type> localities,
+    hpx::components::component_type type)
 {
     typedef hpx::util::remote_locality_result value_type;
     typedef std::pair<std::size_t, std::vector<value_type> > result_type;
@@ -106,8 +108,10 @@ distribute_component(std::vector<hpx::id_type> localities, hpx::components::comp
     if(localities.size() > 1)
     {
         std::size_t half = (localities.size() / 2) + 1;
-        std::vector<hpx::id_type> locs_first(localities.begin() + 1, localities.begin() + half);
-        std::vector<hpx::id_type> locs_second(localities.begin() + half, localities.end());
+        std::vector<hpx::id_type> locs_first(localities.begin()
+            + 1, localities.begin() + half);
+        std::vector<hpx::id_type> locs_second(localities.begin() + half,
+            localities.end());
 
 
         if(locs_first.size() > 0)

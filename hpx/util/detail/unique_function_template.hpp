@@ -253,7 +253,8 @@ namespace hpx { namespace util
     };
 
     template <typename Sig, typename IArchive, typename OArchive>
-    static bool is_empty_function(unique_function<Sig, IArchive, OArchive> const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(unique_function<Sig, IArchive,
+        OArchive> const& f) BOOST_NOEXCEPT
     {
         return f.empty();
     }

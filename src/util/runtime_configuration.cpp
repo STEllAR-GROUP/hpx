@@ -55,8 +55,10 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__) || defined(__APPLE__)
-namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix
+#if defined(__linux) || defined(linux) || defined(__linux__)\
+         || defined(__FreeBSD__) || defined(__APPLE__)
+namespace hpx { namespace util { namespace coroutines
+{ namespace detail { namespace posix
 {
     ///////////////////////////////////////////////////////////////////////////
     // this global (urghhh) variable is used to control whether guard pages
@@ -497,7 +499,8 @@ namespace hpx { namespace util
             if(NULL != sec)
             {
                 return hpx::util::get_entry_as<std::size_t>(
-                    *sec, "data_buffer_cache_size", HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE);
+                    *sec, "data_buffer_cache_size",
+                    HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE);
             }
         }
         return HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE;
@@ -600,7 +603,8 @@ namespace hpx { namespace util
         return cache_size;
     }
 
-    std::size_t runtime_configuration::get_agas_local_cache_size_per_thread(std::size_t dflt) const
+    std::size_t runtime_configuration
+        ::get_agas_local_cache_size_per_thread(std::size_t dflt) const
     {
         std::size_t cache_size = dflt;
 
@@ -648,7 +652,8 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return hpx::util::get_entry_as<std::size_t>(
-                    *sec, "max_pending_refcnt_requests", HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS);
+                    *sec, "max_pending_refcnt_requests",
+                    HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS);
             }
         }
         return HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS;

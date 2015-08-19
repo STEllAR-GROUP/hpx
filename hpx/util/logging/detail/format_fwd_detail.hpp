@@ -39,7 +39,8 @@ namespace writer {
         struct no_ts {};
         /** @brief thread-safe write. All writes are protected by a lock */
         struct ts_write {};
-        /** @brief thread-safe write on a dedicated thread. Very efficient. Formatting & writing to destinations happens on the dedicated thread */
+        /** @brief thread-safe write on a dedicated thread. Very efficient.
+            Formatting & writing to destinations happens on the dedicated thread */
         struct on_dedicated_thread {};
     }
 }
@@ -92,7 +93,8 @@ template<
 /**
     dumps the default levels
 
-    Has a static function : dump, which dumps the level as string (works only for the default levels; for any other level, returns "")
+    Has a static function : dump, which dumps the level as string
+    (works only for the default levels; for any other level, returns "")
 */
 struct dump_default_levels {
     static const char_type * dump(::hpx::util::logging::level::type lvl) {
@@ -123,14 +125,17 @@ namespace detail {
 
         // FIXME in the future, I might provide gather as a specific class!
         typedef typename formatter::msg_type<override_>::type msg_type;
-        typedef typename ::hpx::util::logging::gather::find<override_>::template from_msg_type<msg_type>::type type;
+        typedef typename ::hpx::util::logging::gather::find<override_>
+            ::template from_msg_type<msg_type>::type type;
     };
 }
 
 
 // specialize for logger_format_write
-template<class format_base, class destination_base, class thread_safety, class gather, class lock_resource>
-        struct logger_to_gather< logger_format_write<format_base, destination_base, thread_safety, gather, lock_resource> > {
+template<class format_base, class destination_base, class thread_safety, class gather,
+         class lock_resource>
+        struct logger_to_gather< logger_format_write<format_base, destination_base,
+                                 thread_safety, gather, lock_resource> > {
 
     typedef typename detail::format_find_gather<gather>::type gather_type;
 };
@@ -139,7 +144,8 @@ namespace writer {
     template<class format_write_ = default_ > struct named_write ;
 }
 
-/** @brief named_logger<...>::type finds a logger that uses @ref writer::named_write<> "Named Formatters and Destinations"
+/** @brief named_logger<...>::type finds a logger that uses @ref writer::named_write<>
+    "Named Formatters and Destinations"
 
 @code
 #include <hpx/util/logging/format/named_write.hpp>
@@ -154,7 +160,8 @@ Setting the formatters and destinations to write to is extremely simple:
 
 @code
 // first param - the formatter(s) , second param : the destination(s)
-g_l()->writer().write("%time%($hh:$mm.$ss.$mili) [%idx%] |\n", "cout file(out.txt) debug");
+g_l()->writer().write("%time%($hh:$mm.$ss.$mili) [%idx%] |\n",
+      "cout file(out.txt) debug");
 @endcode
 
 To see the syntax, see writer::named_write

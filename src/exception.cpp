@@ -86,7 +86,8 @@ namespace hpx { namespace detail
         std::size_t len = get_arraylen(_environ);
         env.reserve(len);
         std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
-#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__FreeBSD__) || defined(__AIX__)
+#elif defined(linux) || defined(__linux) || defined(__linux__) \
+                     || defined(__FreeBSD__) || defined(__AIX__)
         std::size_t len = get_arraylen(environ);
         env.reserve(len);
         std::copy(&environ[0], &environ[len], std::back_inserter(env));

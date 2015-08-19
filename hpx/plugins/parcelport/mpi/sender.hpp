@@ -27,7 +27,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     {
         typedef util::memory_chunk_pool<> memory_pool_type;
         typedef
-            util::detail::memory_chunk_pool_allocator<char, util::memory_chunk_pool<>>
+            util::detail::memory_chunk_pool_allocator<
+                char, util::memory_chunk_pool<>
+            >
             allocator_type;
         typedef
             std::vector<char, allocator_type>
@@ -53,7 +55,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         connection_ptr create_connection(int dest,
             performance_counters::parcels::gatherer & parcels_sent)
         {
-            return boost::make_shared<connection_type>(this, dest, chunk_pool_, parcels_sent);
+            return
+                boost::make_shared<connection_type>(
+                    this, dest, chunk_pool_, parcels_sent);
         }
 
         void add(connection_ptr const & ptr)

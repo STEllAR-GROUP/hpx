@@ -243,7 +243,8 @@ boost::uint32_t get_num_overall_threads_sync(
 //     std::transform(ids.begin(), ids.end(), std::back_inserter(gids), convert_to_gid);
 //
 //     addrs.resize(count);
-//     return naming::get_agas_client().is_local_address(gids.data(), addrs.data(), count, locals, ec);
+//     return naming::get_agas_client().is_local_address(gids.data(),
+//            addrs.data(), count, locals, ec);
 // }
 
 bool is_local_address_cached(

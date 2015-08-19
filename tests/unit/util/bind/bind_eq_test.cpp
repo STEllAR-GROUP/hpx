@@ -179,7 +179,8 @@ template<class F, class V> void test_1_(F f, V v1, V v2)
 
 template<class F> void test_1(F f)
 {
-    test_eq( hpx::util::bind(f, placeholders::_1), hpx::util::bind(f, placeholders::_1) );
+    test_eq( hpx::util::bind(f, placeholders::_1),
+        hpx::util::bind(f, placeholders::_1) );
 
     test_1_( f, X(1), X(2) );
 
@@ -198,7 +199,8 @@ template<class F, class V> void test_2_(F f, V v1, V v2)
 
 template<class F> void test_2(F f)
 {
-    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2), hpx::util::bind(f, placeholders::_1, placeholders::_2) );
+    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2),
+        hpx::util::bind(f, placeholders::_1, placeholders::_2) );
 
     test_2_( f, X(1), X(2) );
 
@@ -218,7 +220,9 @@ template<class F, class V> void test_3_(F f, V v1, V v2)
 
 template<class F> void test_3(F f)
 {
-    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3), hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3) );
+    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2,
+        placeholders::_3), hpx::util::bind(f, placeholders::_1, placeholders::_2,
+            placeholders::_3) );
 
     test_3_( f, X(1), X(2) );
 
@@ -230,16 +234,23 @@ template<class F> void test_3(F f)
 
 template<class F, class V> void test_4_(F f, V v1, V v2)
 {
-    test_eq( hpx::util::bind(f, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v2) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v2, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1), hpx::util::bind(f, v1, v2, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1), hpx::util::bind(f, v2, v1, v1, v1) );
+    test_eq( hpx::util::bind(f, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v2) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v2, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v2, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1),
+        hpx::util::bind(f, v2, v1, v1, v1) );
 }
 
 template<class F> void test_4(F f)
 {
-    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4), hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4) );
+    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2,
+        placeholders::_3, placeholders::_4), hpx::util::bind(f, placeholders::_1,
+            placeholders::_2, placeholders::_3, placeholders::_4) );
 
     test_4_( f, X(1), X(2) );
 
@@ -251,17 +262,26 @@ template<class F> void test_4(F f)
 
 template<class F, class V> void test_5_(F f, V v1, V v2)
 {
-    test_eq( hpx::util::bind(f, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v2) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v2, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v2, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v2, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1), hpx::util::bind(f, v2, v1, v1, v1, v1) );
+    test_eq( hpx::util::bind(f, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v2) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v2, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v2, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v2, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v2, v1, v1, v1, v1) );
 }
 
 template<class F> void test_5(F f)
 {
-    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5), hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5) );
+    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2,
+        placeholders::_3, placeholders::_4, placeholders::_5),
+        hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3,
+            placeholders::_4, placeholders::_5) );
 
     test_5_( f, X(1), X(2) );
 
@@ -273,18 +293,28 @@ template<class F> void test_5(F f)
 
 template<class F, class V> void test_6_(F f, V v1, V v2)
 {
-    test_eq( hpx::util::bind(f, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v2) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v2, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v2, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v2, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v2, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v2, v1, v1, v1, v1, v1) );
+    test_eq( hpx::util::bind(f, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v2) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v2, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v2, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v2, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v2, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v2, v1, v1, v1, v1, v1) );
 }
 
 template<class F> void test_6(F f)
 {
-    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6), hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6) );
+    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2,
+        placeholders::_3, placeholders::_4, placeholders::_5,
+        placeholders::_6), hpx::util::bind(f, placeholders::_1, placeholders::_2,
+            placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6) );
 
     test_6_( f, X(1), X(2) );
 
@@ -296,19 +326,31 @@ template<class F> void test_6(F f)
 
 template<class F, class V> void test_7_(F f, V v1, V v2)
 {
-    test_eq( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v2) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v2, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v2, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v2, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v2, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v2, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v2, v1, v1, v1, v1, v1, v1) );
+    test_eq( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v2) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v2, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v2, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v2, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v2, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v2, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v2, v1, v1, v1, v1, v1, v1) );
 }
 
 template<class F> void test_7(F f)
 {
-    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6, placeholders::_7), hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6, placeholders::_7) );
+    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2,
+        placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6,
+        placeholders::_7), hpx::util::bind(f, placeholders::_1, placeholders::_2,
+            placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6,
+            placeholders::_7) );
 
     test_7_( f, X(1), X(2) );
 
@@ -320,20 +362,34 @@ template<class F> void test_7(F f)
 
 template<class F, class V> void test_8_(F f, V v1, V v2)
 {
-    test_eq( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v2) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v2, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v2, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v2, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v2, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v2, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v2, v1, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v2, v1, v1, v1, v1, v1, v1, v1) );
+    test_eq( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v2) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v2, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v2, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v2, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v2, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v2, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v2, v1, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v2, v1, v1, v1, v1, v1, v1, v1) );
 }
 
 template<class F> void test_8(F f)
 {
-    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6, placeholders::_7, placeholders::_8), hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6, placeholders::_7, placeholders::_8) );
+    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2,
+        placeholders::_3, placeholders::_4, placeholders::_5,
+        placeholders::_6, placeholders::_7, placeholders::_8),
+        hpx::util::bind(f, placeholders::_1, placeholders::_2,
+            placeholders::_3, placeholders::_4, placeholders::_5,
+            placeholders::_6, placeholders::_7, placeholders::_8) );
 
     test_8_( f, X(1), X(2) );
 
@@ -345,21 +401,36 @@ template<class F> void test_8(F f)
 
 template<class F, class V> void test_9_(F f, V v1, V v2)
 {
-    test_eq( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v2) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v2, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v2, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v1, v2, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v1, v2, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v1, v2, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v1, v2, v1, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v1, v2, v1, v1, v1, v1, v1, v1, v1) );
-    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1), hpx::util::bind(f, v2, v1, v1, v1, v1, v1, v1, v1, v1) );
+    test_eq( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v2) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v2, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v2, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v1, v2, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v1, v2, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v1, v2, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v1, v2, v1, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v1, v2, v1, v1, v1, v1, v1, v1, v1) );
+    test_ne( hpx::util::bind(f, v1, v1, v1, v1, v1, v1, v1, v1, v1),
+        hpx::util::bind(f, v2, v1, v1, v1, v1, v1, v1, v1, v1) );
 }
 
 template<class F> void test_9(F f)
 {
-    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6, placeholders::_7, placeholders::_8, placeholders::_9), hpx::util::bind(f, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6, placeholders::_7, placeholders::_8, placeholders::_9) );
+    test_eq( hpx::util::bind(f, placeholders::_1, placeholders::_2,
+        placeholders::_3, placeholders::_4, placeholders::_5, placeholders::_6,
+        placeholders::_7, placeholders::_8, placeholders::_9),
+        hpx::util::bind(f, placeholders::_1, placeholders::_2,
+            placeholders::_3, placeholders::_4, placeholders::_5,
+            placeholders::_6, placeholders::_7, placeholders::_8, placeholders::_9) );
 
     test_9_( f, X(1), X(2) );
 

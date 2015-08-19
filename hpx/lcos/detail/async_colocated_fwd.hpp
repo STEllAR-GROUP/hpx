@@ -9,6 +9,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/promise_local_result.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/move.hpp>
 
 namespace hpx { namespace detail
@@ -33,6 +35,8 @@ namespace hpx { namespace detail
       , naming::id_type const& gid, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
+    // MSVC complains about ambiguities if it sees this forward declaration
+#if !defined(BOOST_MSVC)
     template <typename Action, typename Continuation, typename ...Ts>
     typename std::enable_if<
         traits::is_continuation<Continuation>::value,
@@ -61,6 +65,7 @@ namespace hpx { namespace detail
         Continuation && cont
       , hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid, Ts&&... vs);
+#endif
 }}
 
 #if defined(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)

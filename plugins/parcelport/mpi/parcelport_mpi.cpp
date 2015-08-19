@@ -21,8 +21,6 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
-// #include <hpx/runtime/parcelset/parcel_buffer.hpp>
-// #include <hpx/runtime/parcelset/encode_parcels.hpp>
 
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
@@ -208,7 +206,10 @@ namespace hpx { namespace parcelset
 
         private:
             typedef util::memory_chunk_pool<> memory_pool_type;
-            typedef util::detail::memory_chunk_pool_allocator<char, util::memory_chunk_pool<>> allocator_type;
+            typedef
+                util::detail::memory_chunk_pool_allocator<
+                    char, util::memory_chunk_pool<>
+                > allocator_type;
             typedef
                 std::vector<char, allocator_type>
                 data_type;

@@ -62,7 +62,8 @@ namespace hpx { namespace parcelset
         > read_handler_type;
 
         /// Construct the parcelport on the given locality.
-        parcelport(util::runtime_configuration const& ini, locality const & here, std::string const& type);
+        parcelport(util::runtime_configuration const& ini, locality const & here,
+            std::string const& type);
 
         /// Virtual destructor
         virtual ~parcelport() {}
@@ -112,7 +113,8 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcel(locality const & dest, parcel p, write_handler_type f) = 0;
+        virtual void put_parcel(locality const & dest, parcel p,
+            write_handler_type f) = 0;
 
         /// Queues a list of parcels for transmission to another locality
         ///
@@ -129,7 +131,8 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcels(std::vector<locality> dests, std::vector<parcel> parcels,
+        virtual void put_parcels(std::vector<locality> dests,
+            std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers) = 0;
 
         /// Send an early parcel through the TCP parcelport
@@ -182,7 +185,8 @@ namespace hpx { namespace parcelset
 
         virtual locality create_locality() const = 0;
 
-        virtual locality agas_locality(util::runtime_configuration const & ini) const = 0;
+        virtual locality agas_locality(util::runtime_configuration const & ini)
+            const = 0;
 
         /// Performance counter data
 

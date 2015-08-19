@@ -77,13 +77,15 @@ namespace hpx { namespace parcelset
                 ini, key + ".max_connections", HPX_PARCEL_MAX_CONNECTIONS);
         }
 
-        static std::size_t max_connections_per_loc(util::runtime_configuration const& ini)
+        static
+            std::size_t max_connections_per_loc(util::runtime_configuration const& ini)
         {
             std::string key("hpx.parcel.");
             key += connection_handler_type();
 
             return hpx::util::get_entry_as<std::size_t>(
-                ini, key + ".max_connections_per_locality", HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
+                ini, key + ".max_connections_per_locality",
+                HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
         }
 
     public:
@@ -716,7 +718,8 @@ namespace hpx { namespace parcelset
                     new_send_thread =
                         hpx::applier::register_thread_nullary(
                             hpx::util::bind(
-                                hpx::util::one_shot(&parcelport_impl::send_pending_parcels)
+                                hpx::util::one_shot(&parcelport_impl
+                                    ::send_pending_parcels)
                               , this
                               , locality_id
                               , sender_connection

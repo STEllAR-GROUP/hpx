@@ -21,7 +21,8 @@
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class random_mem_access random_mem_access.hpp hpx/components/random_mem_access.hpp
+    /// \class random_mem_access random_mem_access.hpp
+    /// hpx/components/random_mem_access.hpp
     ///
     /// The random_mem_access is a small example components demonstrating
     /// the main principles of writing your own components. It exposes 4

@@ -56,7 +56,8 @@ typedef struct HINSTANCE__* HMODULE;
 
 ///////////////////////////////////////////////////////////////////////////////
 #define MyFreeLibrary(x)      dlclose (x)
-#define MyLoadLibrary(x)      reinterpret_cast<HMODULE>(dlopen(x, RTLD_GLOBAL | RTLD_LAZY))
+#define MyLoadLibrary(x) \
+      reinterpret_cast<HMODULE>(dlopen(x, RTLD_GLOBAL | RTLD_LAZY))
 #define MyGetProcAddress(x,y) dlsym   (x, y)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -204,7 +205,8 @@ namespace hpx { namespace util { namespace plugin {
         std::pair<SymbolType, Deleter>
         get(std::string const& symbol_name, error_code& ec = throws) const
         {
-            const_cast<dll&>(*this).LoadLibrary(ec);      // make sure everything is initialized
+            const_cast<dll&>(*this).LoadLibrary(ec);
+            // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
             initialize_mutex();
@@ -330,7 +332,8 @@ namespace hpx { namespace util { namespace plugin {
 
                         // If the handle is the same as what was passed in
                         // (modulo mode bits), return this image name
-                        if (((intptr_t)dll_handle & (-4)) == ((intptr_t)probe_handle & (-4)))
+                        if (((intptr_t)dll_handle & (-4)) ==
+                            ((intptr_t)probe_handle & (-4)))
                         {
                             result = path(image_name).parent_path().string();
                             std::cout << "found directory: " << result << std::endl;

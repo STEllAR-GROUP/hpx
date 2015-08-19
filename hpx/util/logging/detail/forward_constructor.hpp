@@ -36,18 +36,30 @@ namespace hpx { namespace util { namespace logging {
 #define HPX_LOGGING_FORWARD_CONSTRUCTOR(class_name,forward_to) \
         class_name() {} \
         template<class p1> class_name(const p1 & a1 ) : forward_to(a1) {} \
-        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2) : forward_to(a1,a2) {} \
-        template<class p1, class p2, class p3> class_name(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(a1,a2,a3) {} \
-        template<class p1, class p2, class p3, class p4> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4) : forward_to(a1,a2,a3,a4) {} \
-        template<class p1, class p2, class p3, class p4, class p5> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5) : forward_to(a1,a2,a3,a4,a5) {}
+        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2)\
+ : forward_to(a1,a2) {} \
+        template<class p1, class p2, class p3> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(a1,a2,a3) {} \
+        template<class p1, class p2, class p3, class p4> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4)\
+ : forward_to(a1,a2,a3,a4) {} \
+        template<class p1, class p2, class p3, class p4, class p5> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5)\
+ : forward_to(a1,a2,a3,a4,a5) {}
 
 #define HPX_LOGGING_FORWARD_CONSTRUCTOR_INIT(class_name,forward_to,init) \
         class_name() { init (); } \
         template<class p1> class_name(const p1 & a1 ) : forward_to(a1) { init(); } \
-        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2) : forward_to(a1,a2) { init(); } \
-        template<class p1, class p2, class p3> class_name(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(a1,a2,a3) { init(); } \
-        template<class p1, class p2, class p3, class p4> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4) : forward_to(a1,a2,a3,a4) { init(); } \
-        template<class p1, class p2, class p3, class p4, class p5> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5) : forward_to(a1,a2,a3,a4,a5) { init(); }
+        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2)\
+ : forward_to(a1,a2) { init(); } \
+        template<class p1, class p2, class p3> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(a1,a2,a3) { init(); } \
+        template<class p1, class p2, class p3, class p4> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4)\
+ : forward_to(a1,a2,a3,a4) { init(); } \
+        template<class p1, class p2, class p3, class p4, class p5>\
+ class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5)\
+ : forward_to(a1,a2,a3,a4,a5) { init(); }
 
 #ifdef BOOST_MSVC
 // workaround for VS - problem with copy constructor
@@ -55,54 +67,90 @@ namespace hpx { namespace util { namespace logging {
 #define HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW(class_name,forward_to,type) \
         class_name() : forward_to(new type) {} \
         template<class p1> class_name(const p1 & a1 ) { \
-            see_if_copy_constructor( a1, forward_to, boost::is_base_of<class_name,p1>() ); \
+            see_if_copy_constructor\
+( a1, forward_to, boost::is_base_of<class_name,p1>() ); \
         } \
-        template<class p1, class forward_type> void see_if_copy_constructor(const p1 & a1, forward_type&, const boost::true_type& ) { \
-            forward_to = a1.forward_to; \
+        template<class p1, class forward_type>\
+ void see_if_copy_constructor(const p1 & a1, forward_type&, const boost::true_type& )\
+ { forward_to = a1.forward_to; \
         } \
-        template<class p1, class forward_type> void see_if_copy_constructor(const p1 & a1, forward_type&, const boost::false_type& ) { \
+        template<class p1, class forward_type> void see_if_copy_constructor\
+(const p1 & a1, forward_type&, const boost::false_type& ) { \
             forward_to = forward_type(new type(a1)); \
         } \
-        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2) : forward_to(new type(a1,a2)) {} \
-        template<class p1, class p2, class p3> class_name(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(new type(a1,a2,a3)) {} \
-        template<class p1, class p2, class p3, class p4> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4) : forward_to(new type(a1,a2,a3,a4)) {} \
-        template<class p1, class p2, class p3, class p4, class p5> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5) : forward_to(new type(a1,a2,a3,a4,a5)) {}
+        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2)\
+ : forward_to(new type(a1,a2)) {} \
+        template<class p1, class p2, class p3>\
+ class_name(const p1 & a1 , const p2 & a2, const p3 & a3)\
+ : forward_to(new type(a1,a2,a3)) {} \
+        template<class p1, class p2, class p3, class p4> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4)\
+ : forward_to(new type(a1,a2,a3,a4)) {} \
+        template<class p1, class p2, class p3, class p4, class p5>\
+ class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5)\
+ : forward_to(new type(a1,a2,a3,a4,a5)) {}
 
-#define HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW_AND_INIT(class_name,forward_to,type, init) \
+#define HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW_AND_INIT\
+(class_name,forward_to,type, init) \
         class_name() : forward_to(new type) { init (); } \
         template<class p1> class_name(const p1 & a1 ) { \
-            see_if_copy_constructor( a1, forward_to, boost::is_base_of<class_name,p1>() ); \
+            see_if_copy_constructor\
+( a1, forward_to, boost::is_base_of<class_name,p1>() ); \
         } \
-        template<class p1, class forward_type> void see_if_copy_constructor(const p1 & a1, forward_type&, const boost::true_type& ) { \
-            forward_to = a1.forward_to; \
+        template<class p1, class forward_type>\
+ void see_if_copy_constructor(const p1 & a1, forward_type&, const boost::true_type& )\
+ { forward_to = a1.forward_to; \
             init (); \
         } \
-        template<class p1, class forward_type> void see_if_copy_constructor(const p1 & a1, forward_type&, const boost::false_type& ) { \
-            forward_to = forward_type(new type(a1)); \
+        template<class p1, class forward_type>\
+ void see_if_copy_constructor(const p1 & a1, forward_type&, const boost::false_type& )\
+ { forward_to = forward_type(new type(a1)); \
             init (); \
         } \
-        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2) : forward_to(new type(a1,a2)) { init (); } \
-        template<class p1, class p2, class p3> class_name(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(new type(a1,a2,a3)) { init (); } \
-        template<class p1, class p2, class p3, class p4> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4) : forward_to(new type(a1,a2,a3,a4)) { init (); } \
-        template<class p1, class p2, class p3, class p4, class p5> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5) : forward_to(new type(a1,a2,a3,a4,a5)) { init (); }
+        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2)\
+ : forward_to(new type(a1,a2)) { init (); } \
+        template<class p1, class p2, class p3> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(new type(a1,a2,a3))\
+ { init (); } \
+        template<class p1, class p2, class p3, class p4> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4)\
+ : forward_to(new type(a1,a2,a3,a4)) { init (); } \
+        template<class p1, class p2, class p3, class p4, class p5> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5)\
+ : forward_to(new type(a1,a2,a3,a4,a5)) { init (); }
 
 #else
 #define HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW(class_name,forward_to,type) \
         class_name() : forward_to(new type) {} \
         template<class p1> class_name(const p1 & a1 ) : forward_to(new type(a1)) {} \
-        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2) : forward_to(new type(a1,a2)) {} \
-        template<class p1, class p2, class p3> class_name(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(new type(a1,a2,a3)) {} \
-        template<class p1, class p2, class p3, class p4> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4) : forward_to(new type(a1,a2,a3,a4)) {} \
-        template<class p1, class p2, class p3, class p4, class p5> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5) : forward_to(new type(a1,a2,a3,a4,a5)) {}
+        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2)\
+ : forward_to(new type(a1,a2)) {} \
+        template<class p1, class p2, class p3> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(new type(a1,a2,a3)) {} \
+        template<class p1, class p2, class p3, class p4> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4)\
+ : forward_to(new type(a1,a2,a3,a4)) {} \
+        template<class p1, class p2, class p3, class p4, class p5>\
+ class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5)\
+ : forward_to(new type(a1,a2,a3,a4,a5)) {}
 
 
-#define HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW_AND_INIT(class_name,forward_to,type, init) \
+#define HPX_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW_AND_INIT\
+(class_name,forward_to,type, init) \
         class_name() : forward_to(new type) { init (); } \
-        template<class p1> class_name(const p1 & a1 ) : forward_to(new type(a1)) { init (); } \
-        template<class p1, class p2> class_name(const p1 & a1 , const p2 & a2) : forward_to(new type(a1,a2)) { init (); } \
-        template<class p1, class p2, class p3> class_name(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(new type(a1,a2,a3)) { init (); } \
-        template<class p1, class p2, class p3, class p4> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4) : forward_to(new type(a1,a2,a3,a4)) { init (); } \
-        template<class p1, class p2, class p3, class p4, class p5> class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5) : forward_to(new type(a1,a2,a3,a4,a5)) { init (); }
+        template<class p1> class_name(const p1 & a1 )\
+ : forward_to(new type(a1)) { init (); } \
+        template<class p1, class p2> class_name\
+(const p1 & a1 , const p2 & a2) : forward_to(new type(a1,a2)) { init (); } \
+        template<class p1, class p2, class p3> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3) : forward_to(new type(a1,a2,a3))\
+ { init (); } \
+        template<class p1, class p2, class p3, class p4> class_name\
+(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4)\
+ : forward_to(new type(a1,a2,a3,a4)) { init (); } \
+        template<class p1, class p2, class p3, class p4, class p5>\
+ class_name(const p1 & a1 , const p2 & a2, const p3 & a3, const p4 & a4, const p5 & a5)\
+ : forward_to(new type(a1,a2,a3,a4,a5)) { init (); }
 
 #endif
 

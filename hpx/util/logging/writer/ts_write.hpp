@@ -39,7 +39,8 @@ namespace hpx { namespace util { namespace logging { namespace writer {
 <tt>\#include <hpx/util/logging/format.hpp> </tt>
 
 Performs all writes in a thread-safe manner.
-In other words, makes sure that all operator() calls of base_type are called in a thread-safe manner.
+In other words, makes sure that all operator() calls of base_type are called
+in a thread-safe manner.
 
 To transform a writer into thread-safe writer, simply surround the writer with ts_write:
 
@@ -68,8 +69,10 @@ Depending on your scenario, you could prefer on_dedicated_thread class.
 
 @sa on_dedicated_thread
 */
-    template<class base_type> struct ts_write : base_type, ::hpx::util::logging::manipulator::non_const_context<detail::ts_write_context> {
-        typedef ::hpx::util::logging::manipulator::non_const_context<detail::ts_write_context> non_const_context_base;
+    template<class base_type> struct ts_write : base_type,
+        ::hpx::util::logging::manipulator::non_const_context<detail::ts_write_context> {
+        typedef ::hpx::util::logging::manipulator::non_const_context<detail
+            ::ts_write_context> non_const_context_base;
 
         HPX_LOGGING_FORWARD_CONSTRUCTOR(ts_write,base_type)
 

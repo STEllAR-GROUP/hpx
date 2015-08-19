@@ -53,7 +53,8 @@ namespace hpx { namespace threads { namespace detail
                 get_thread_pool("timer-thread")->get_io_service(),
                 boost::chrono::milliseconds(1000));
 
-            void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&, boost::mpl::true_) =
+            void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&,
+                boost::mpl::true_) =
                 &periodic_maintenance_handler<SchedulingPolicy>;
 
             t.async_wait(boost::bind(handler, boost::ref(scheduler),
@@ -83,7 +84,8 @@ namespace hpx { namespace threads { namespace detail
             get_thread_pool("io-thread")->get_io_service(),
             boost::chrono::milliseconds(1000));
 
-        void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&, boost::mpl::true_) =
+        void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&,
+            boost::mpl::true_) =
             &periodic_maintenance_handler<SchedulingPolicy>;
 
         t.async_wait(util::bind(handler, boost::ref(scheduler),

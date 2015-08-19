@@ -359,7 +359,8 @@ namespace hpx { namespace actions
 
         cont_type cont_;        // continuation type
         hpx::id_type target_;
-        function_type f_;       // set_value action  (default: set_lco_value_continuation)
+        function_type f_;
+        // set_value action  (default: set_lco_value_continuation)
     };
 
     ///////////////////////////////////////////////////////////////////////////

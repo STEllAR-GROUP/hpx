@@ -111,7 +111,8 @@ int main(int argc, char ** argv)
         ("principal", value<double>()->default_value(1000), "The principal [$]")
         ("rate", value<double>()->default_value(7), "The interest rate [%]")
         ("cp", value<int>()->default_value(12), "The compound period [months]")
-        ("time", value<int>()->default_value(12*30), "The time money is invested [months]")
+        ("time", value<int>()->default_value(12*30),
+            "The time money is invested [months]")
     ;
 
     return hpx::init(cmdline, argc, argv);

@@ -61,7 +61,8 @@ inline DWORD& tss_data_native_key () {
 inline void init_tss_data() {
     //Allocate tls slot
 
-    // if you get an assertion here, this function was called twice - should never happen!
+    // if you get an assertion here, this function was called twice
+    // - should never happen!
     HPX_ASSERT( tss_data_native_key() == TLS_OUT_OF_INDEXES);
     // now, allocate it
     tss_data_native_key() = TlsAlloc();
@@ -77,7 +78,8 @@ inline unsigned long slot_idx() {
 
     mutex::scoped_lock lk(cs);
 
-    // note: if the Logging Lib is used with TLS, I'm guaranteed this will be called before main(),
+    // note: if the Logging Lib is used with TLS,
+    // I'm guaranteed this will be called before main(),
     //       and that this will work
     if ( !idx)
         init_tss_data();

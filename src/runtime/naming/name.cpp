@@ -263,7 +263,8 @@ namespace hpx { namespace naming
             return split_gid_if_needed_locked(l, gid);
         }
 
-        hpx::future<gid_type> split_gid_if_needed_locked(gid_type::mutex_type::scoped_lock &l, gid_type& gid)
+        hpx::future<gid_type> split_gid_if_needed_locked(
+            gid_type::mutex_type::scoped_lock &l, gid_type& gid)
         {
             typedef gid_type::mutex_type::scoped_lock scoped_lock;
             naming::gid_type new_gid;
@@ -279,10 +280,12 @@ namespace hpx { namespace naming
                 // Scenario that might happen:
                 // An id_type which needs to splitted is being split concurrently while
                 // we unlock the lock to ask for more credit:
-                //     This might lead to an overlow in the credit mask and needs to be accounted with
+                //     This might lead to an overlow in the credit mask and
+                //     needs to be accounted with
                 //     by sending a decref with the excessive credit.
                 //
-                // An early decref can't happen as the id_type with the new credit is garuanteed to
+                // An early decref can't happen as the id_type with the new credit
+                // is garuanteed to
                 // arrive only after we incremented the credit successfully in agas.
 
                 boost::int16_t src_log2credits = get_log2credit_from_gid(gid);
@@ -307,7 +310,8 @@ namespace hpx { namespace naming
                             set_credit_split_mask_for_gid(new_gid);
 
                             // Fill the new gid with our new credit
-                            naming::detail::set_log2credit_for_gid(new_gid, gid_type::credit_base_mask);
+                            naming::detail::set_log2credit_for_gid(
+                                new_gid, gid_type::credit_base_mask);
 
                             // Another concurrent split operation might have happened, we need
                             // to add the new split credits to the old and account
@@ -316,16 +320,19 @@ namespace hpx { namespace naming
                             boost::int64_t src_credit = get_credit_from_gid(gid);
                             boost::int64_t split_credit = HPX_GLOBALCREDIT_INITIAL - 2;
                             boost::int64_t new_credit = src_credit + split_credit;
-                            boost::int64_t overflow_credit = new_credit - HPX_GLOBALCREDIT_INITIAL;
+                            boost::int64_t overflow_credit = new_credit
+                                - HPX_GLOBALCREDIT_INITIAL;
 
                             new_credit
-                                = (std::min)(static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL)
-                                        , new_credit);
+                                = (std::min)(
+                                    static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL)
+                                  , new_credit);
                             naming::detail::set_credit_for_gid(gid, new_credit);
                             // Account for a possible overflow ...
                             if(overflow_credit > 0)
                             {
-                                HPX_ASSERT(overflow_credit <= HPX_GLOBALCREDIT_INITIAL-1);
+                                HPX_ASSERT(
+                                    overflow_credit <= HPX_GLOBALCREDIT_INITIAL-1);
                                 util::unlock_guard<scoped_lock> ul(ll);
                                 agas::decref(new_gid, overflow_credit);
                             }

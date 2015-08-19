@@ -43,7 +43,8 @@ public:
         boost::uint8_t _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_strong(_expected, _desired, success_order,
+            failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -56,7 +57,8 @@ public:
         boost::uint8_t _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_weak(_expected, _desired, success_order,
+            failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -115,7 +117,8 @@ public:
         boost::uint16_t _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_strong(_expected, _desired, success_order,
+            failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -128,7 +131,8 @@ public:
         boost::uint16_t _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_weak(_expected, _desired, success_order,
+            failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -187,7 +191,8 @@ public:
         boost::uint32_t _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_strong(_expected, _desired, success_order,
+            failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -200,7 +205,8 @@ public:
         boost::uint32_t _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_weak(_expected, _desired, success_order,
+            failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -259,7 +265,8 @@ public:
         boost::uint64_t _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_strong(_expected, _desired, success_order,
+            failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -272,7 +279,8 @@ public:
         boost::uint64_t _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_weak(_expected, _desired, success_order,
+            failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -339,7 +347,8 @@ public:
         __uint128_t _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_strong(_expected, _desired,
+            success_order, failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -352,7 +361,8 @@ public:
         __uint128_t _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_weak(_expected, _desired,
+            success_order, failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -381,7 +391,8 @@ protected:
     }
 };
 
-#elif BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) && defined(BOOST_ATOMIC_HAVE_SSE2)
+#elif BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) && \
+      defined(BOOST_ATOMIC_HAVE_SSE2)
 
 #define BOOST_ATOMIC_HAVE_128BIT_SUPPORT
 
@@ -421,7 +432,8 @@ public:
         __m128i _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_strong(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_strong(_expected, _desired,
+            success_order, failure_order);
         expected=from_integral(_expected);
         return success;
     }
@@ -434,7 +446,8 @@ public:
         __m128i _expected, _desired;
         _expected=to_integral(expected);
         _desired=to_integral(desired);
-        bool success=super::compare_exchange_weak(_expected, _desired, success_order, failure_order);
+        bool success=super::compare_exchange_weak(_expected, _desired,
+            success_order, failure_order);
         expected=from_integral(_expected);
         return success;
     }

@@ -195,7 +195,8 @@ namespace hpx { namespace components
         // lifetime of the managed_component
         BOOST_STATIC_ASSERT((
             boost::is_same<ctor_policy, traits::construct_without_back_ptr>::value ||
-            boost::is_same<dtor_policy, traits::managed_object_controls_lifetime>::value));
+            boost::is_same<dtor_policy,
+            traits::managed_object_controls_lifetime>::value));
 
         managed_component_base()
           : back_ptr_(0)

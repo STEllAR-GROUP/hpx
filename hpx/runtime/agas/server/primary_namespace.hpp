@@ -429,7 +429,8 @@ struct HPX_EXPORT primary_namespace
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service, bulk_service_action);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service,
+        bulk_service_action);
 
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route, route_action);
 
