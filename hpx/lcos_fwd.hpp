@@ -10,6 +10,11 @@ namespace hpx
     /// \namespace lcos
     namespace lcos
     {
+        namespace detail
+        {
+            struct future_data_refcnt_base;
+        }
+
         class base_lco;
         template <typename Result, typename RemoteResult = Result>
         class base_lco_with_value;

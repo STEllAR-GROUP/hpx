@@ -9,6 +9,7 @@
 #define HPX_SERIALIZATION_OUTPUT_CONTAINER_HPP
 
 #include <hpx/util/assert.hpp>
+#include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>
@@ -27,7 +28,9 @@ namespace hpx { namespace serialization
             static bool is_saving() { return true; }
             static bool is_future_awaiting() { return false; }
 
-            static void await_future(Container& cont, hpx::future<void> && f)
+            static void await_future(
+                Container& cont
+              , hpx::lcos::detail::future_data_refcnt_base & future_data)
             {}
 
             static void write(Container& cont, std::size_t count,
@@ -145,9 +148,10 @@ namespace hpx { namespace serialization
             return detail::access_data<Container>::is_future_awaiting();
         }
 
-        void await_future(hpx::future<void> && f)
+        void await_future(
+            hpx::lcos::detail::future_data_refcnt_base & future_data)
         {
-            return detail::access_data<Container>::await_future(cont_, std::move(f));
+            return detail::access_data<Container>::await_future(cont_, future_data);
         }
 
         void set_filter(binary_filter* filter) // override

@@ -131,26 +131,12 @@ namespace hpx { namespace lcos { namespace detail
         {
             if(!f.is_ready())
             {
-                hpx::lcos::local::promise<void> p;
-                hpx::future<void> awaiter = get_future<void>(p);
-
                 typename hpx::traits::detail::shared_state_ptr_for<Future>::type state
                     = hpx::traits::future_access<Future>::get_shared_state(f);
 
                 state->execute_deferred();
-                state->set_on_completed(
-                        util::bind(
-                            util::one_shot(
-                                [](hpx::lcos::local::promise<void> && p)
-                                {
-                                    set_value(p);
-                                }
-                            ),
-                            std::move(p)
-                        )
-                    );
 
-                ar.await_future(std::move(awaiter));
+                ar.await_future(f);
             }
             return;
         }
@@ -196,26 +182,12 @@ namespace hpx { namespace lcos { namespace detail
         {
             if(!f.is_ready())
             {
-                hpx::lcos::local::promise<void> p;
-                hpx::future<void> awaiter = get_future<void>(p);
-
                 typename hpx::traits::detail::shared_state_ptr_for<Future>::type state
                     = hpx::traits::future_access<Future>::get_shared_state(f);
 
                 state->execute_deferred();
-                state->set_on_completed(
-                        util::bind(
-                            util::one_shot(
-                                [](hpx::lcos::local::promise<void> && p)
-                                {
-                                    set_value(p);
-                                }
-                            ),
-                            std::move(p)
-                        )
-                    );
 
-                ar.await_future(std::move(awaiter));
+                ar.await_future(f);
             }
             return;
         }

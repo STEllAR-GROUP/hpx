@@ -13,7 +13,11 @@
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/locks.hpp>
+
 #include <vector>
+
 namespace hpx
 {
     bool is_starting();
@@ -25,34 +29,79 @@ namespace hpx { namespace serialization { namespace detail
     struct access_data;
 
     class future_await_container
+        : public boost::enable_shared_from_this<future_await_container>
     {
+        typedef hpx::lcos::local::spinlock mutex_type;
     public:
-        future_await_container() {}
+        future_await_container()
+          : done_(false)
+          , num_futures_(0)
+          , triggered_futures_(0)
+        {}
 
         std::size_t size() const { return 0; }
         void resize(std::size_t size) { }
 
-        void await_future(hpx::future<void> && f)
+        void trigger()
         {
-            if(f.is_ready()) return;
-            futures_.push_back(std::move(f));
+            boost::lock_guard<mutex_type> l(mtx_);
+            ++triggered_futures_;
+            if(done_ && num_futures_ == triggered_futures_)
+            {
+                promise_.set_value();
+            }
         }
 
-        bool has_futures() const
+        void await_future(hpx::lcos::detail::future_data_refcnt_base & future_data)
         {
-            return !futures_.empty();
+            {
+                boost::lock_guard<mutex_type> l(mtx_);
+                ++num_futures_;
+            }
+            future_data.set_on_completed(
+                [this]()
+                {
+                    trigger();
+                }
+            );
+        }
+
+        bool has_futures()
+        {
+            if(num_futures_ == 0)
+            {
+                promise_.set_value();
+            }
+            return num_futures_ > 0;
         }
 
         template <typename F>
         void operator()(F f)
         {
-//             HPX_ASSERT(!hpx::is_starting());
+            {
+                boost::lock_guard<mutex_type> l(mtx_);
+                done_ = true;
+                if(num_futures_ == triggered_futures_)
+                {
+                    promise_.set_value();
+                }
+            }
+
             hpx::lcos::local::dataflow(//hpx::launch::sync,
-                util::unwrapped(std::move(f)), futures_);
+                [](future<void>&&, boost::shared_ptr<future_await_container>, F f)
+                {
+                    f();
+                }
+              , promise_.get_future(), shared_from_this(), std::move(f));
         }
 
     private:
-        std::vector<future<void>> futures_;
+        mutex_type mtx_;
+        bool done_;
+        std::size_t num_futures_;
+        std::size_t triggered_futures_;
+
+        hpx::lcos::local::promise<void> promise_;
     };
 
     template <>
@@ -61,9 +110,11 @@ namespace hpx { namespace serialization { namespace detail
         static bool is_saving() { return false; }
         static bool is_future_awaiting() { return true; }
 
-        static void await_future(future_await_container& cont, hpx::future<void> && f)
+        static void await_future(
+            future_await_container& cont
+          , hpx::lcos::detail::future_data_refcnt_base & future_data)
         {
-            cont.await_future(std::move(f));
+            cont.await_future(future_data);
         }
 
         static void

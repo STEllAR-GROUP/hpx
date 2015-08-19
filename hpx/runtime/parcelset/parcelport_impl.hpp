@@ -179,16 +179,17 @@ namespace hpx { namespace parcelset
         {
             HPX_ASSERT(dest.type() == type());
 
-            hpx::serialization::detail::future_await_container future_await;
+            boost::shared_ptr<hpx::serialization::detail::future_await_container>
+                future_await(new hpx::serialization::detail::future_await_container());
             hpx::serialization::output_archive archive(
-                future_await);
+                *future_await);
             archive << p;
 
-            if(future_await.has_futures())
+            if(future_await->has_futures())
             {
                 void (parcelport_impl::*awaiter)(locality const &, parcel, write_handler_type, bool)
                     = &parcelport_impl::put_parcel_impl;
-                future_await(
+                (*future_await)(
                     util::bind(
                         util::one_shot(awaiter), this,
                         dest, std::move(p), std::move(f), true)
@@ -752,22 +753,21 @@ namespace hpx { namespace parcelset
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             client_connection->set_state(parcelport_connection::state_scheduled_thread);
 #endif
+            if (!ec)
+            {
+                // Give this connection back to the cache as it's not
+                // needed anymore.
+                connection_cache_.reclaim(locality_id, sender_connection);
+            }
+            else
+            {
+                // remove this connection from cache
+                connection_cache_.clear(locality_id, sender_connection);
+            }
             {
                 boost::lock_guard<lcos::local::spinlock> l(mtx_);
 
                 HPX_ASSERT(locality_id == sender_connection->destination());
-                if (!ec)
-                {
-                    // Give this connection back to the cache as it's not
-                    // needed anymore.
-                    connection_cache_.reclaim(locality_id, sender_connection);
-                }
-                else
-                {
-                    // remove this connection from cache
-                    connection_cache_.clear(locality_id, sender_connection);
-                }
-
                 pending_parcels_map::iterator it = pending_parcels_.find(locality_id);
                 if (it == pending_parcels_.end() || it->second.first.empty())
                     return;

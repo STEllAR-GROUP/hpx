@@ -20,7 +20,8 @@ namespace hpx { namespace serialization
 
         virtual bool is_saving() const { return false; }
         virtual bool is_future_awaiting() const = 0;
-        virtual void await_future(hpx::future<void> && f) = 0;
+        virtual void await_future(
+            hpx::lcos::detail::future_data_refcnt_base & future_data) = 0;
         virtual void set_filter(binary_filter* filter) = 0;
         virtual void save_binary(void const* address, std::size_t count) = 0;
         virtual void save_binary_chunk(void const* address, std::size_t count) = 0;

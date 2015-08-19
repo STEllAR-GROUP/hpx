@@ -8,6 +8,7 @@
 
 // This 'container' is used to gather the required archive size for a given
 // type before it is serialized.
+#include <hpx/lcos_fwd.hpp>
 
 namespace hpx { namespace serialization { namespace detail
 {
@@ -32,7 +33,9 @@ namespace hpx { namespace serialization { namespace detail
         static bool is_saving() { return false; }
         static bool is_future_awaiting() { return false; }
 
-        static void await_future(size_gatherer_container& cont, hpx::future<void> && f)
+        static void await_future(
+            size_gatherer_container& cont
+          , hpx::lcos::detail::future_data_refcnt_base & future_data)
         {}
 
         static void

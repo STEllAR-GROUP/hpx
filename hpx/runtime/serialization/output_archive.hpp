@@ -71,9 +71,11 @@ namespace hpx { namespace serialization
             return buffer_->is_future_awaiting();
         }
 
-        void await_future(hpx::future<void> && f)
+        template <typename Future>
+        void await_future(Future const & f)
         {
-            buffer_->await_future(std::move(f));
+            buffer_->await_future(
+                *hpx::traits::future_access<Future>::get_shared_state(f));
         }
 
         template <typename T>
