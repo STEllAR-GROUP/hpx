@@ -177,7 +177,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     chunks.data()
                   , static_cast<int>(
                         chunks.size()
-                      * sizeof(typename parcel_buffer_type::transmission_chunk_type)
+                      * sizeof(parcel_buffer_type::transmission_chunk_type)
                     )
                   , MPI_BYTE
                   , dst_

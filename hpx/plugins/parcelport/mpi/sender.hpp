@@ -102,7 +102,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         )
         {
             std::size_t k = 0;
-            typename connection_list::iterator it = connections.begin();
+            connection_list::iterator it = connections.begin();
 
             // We try to handle all receives within 1 secone
             while(it != connections.end())
