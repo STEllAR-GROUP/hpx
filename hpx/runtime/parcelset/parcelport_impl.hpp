@@ -276,9 +276,9 @@ namespace hpx { namespace parcelset
         bool do_background_work(std::size_t num_thread)
         {
             bool did_some_work = false;
+            did_some_work = do_background_work_impl<ConnectionHandler>(num_thread);
             if(num_thread == 0)
             {
-                did_some_work = do_background_work_impl<ConnectionHandler>();
                 trigger_pending_work();
             }
             return did_some_work;
@@ -451,9 +451,9 @@ namespace hpx { namespace parcelset
             >::do_background_work,
             bool
         >::type
-        do_background_work_impl()
+        do_background_work_impl(std::size_t num_thread)
         {
-            return connection_handler().background_work();
+            return connection_handler().background_work(num_thread);
         }
 
         template <typename ConnectionHandler_>
@@ -463,7 +463,7 @@ namespace hpx { namespace parcelset
             >::do_background_work,
             bool
         >::type
-        do_background_work_impl()
+        do_background_work_impl(std::size_t)
         {
             return false;
         }
@@ -809,9 +809,9 @@ namespace hpx { namespace parcelset
                 ++operations_in_flight_;
                 // send all of the parcels
                 sender_connection->async_write(
-                    call_for_each(std::move(handlers)),
+                    call_for_each(std::move(handlers), std::move(parcels)),
                     util::bind(&parcelport_impl::send_pending_parcels_trampoline,
-                        this, _1, _2, _3), std::move(parcels[0]));
+                        this, _1, _2, _3));
             }
             else
             {
@@ -824,11 +824,17 @@ namespace hpx { namespace parcelset
                 std::move(handlers.begin(), handlers.begin()+num_parcels,
                     std::back_inserter(handled_handlers));
 
+                std::vector<parcel> handled_parcels;
+                handled_parcels.reserve(num_parcels);
+
+                std::move(parcels.begin(), parcels.begin()+num_parcels,
+                    std::back_inserter(handled_parcels));
+
                 // send only part of the parcels
                 sender_connection->async_write(
-                    call_for_each(std::move(handled_handlers)),
+                    call_for_each(std::move(handled_handlers), std::move(handled_parcels)),
                     util::bind(&parcelport_impl::send_pending_parcels_trampoline,
-                        this, _1, _2, _3), std::move(parcels[0]));
+                        this, _1, _2, _3));
 
                 // give back unhandled parcels
                 parcels.erase(parcels.begin(), parcels.begin()+num_parcels);
@@ -838,7 +844,10 @@ namespace hpx { namespace parcelset
                     std::move(handlers));
             }
 
-            do_background_work_impl<ConnectionHandler>();
+            std::size_t num_thread(0);
+            if(threads::get_self_ptr())
+                num_thread = hpx::get_worker_thread_num();
+            do_background_work_impl<ConnectionHandler>(num_thread);
         }
 
     protected:

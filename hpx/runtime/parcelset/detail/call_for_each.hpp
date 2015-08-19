@@ -17,34 +17,40 @@ namespace hpx { namespace parcelset
     {
         struct call_for_each
         {
+            BOOST_MOVABLE_BUT_NOT_COPYABLE(call_for_each);
             typedef void result_type;
 
-            typedef std::vector<parcelport::write_handler_type> data_type;
-            data_type fv_;
+            typedef std::vector<parcelport::write_handler_type> handlers_type;
+            typedef std::vector<parcel> parcels_type;
+            handlers_type handlers_;
+            parcels_type parcels_;
 
-            call_for_each(data_type&& fv)
-              : fv_(std::move(fv))
+            call_for_each(handlers_type&& handlers, parcels_type && parcels)
+              : handlers_(std::move(handlers))
+              , parcels_(std::move(parcels))
             {}
 
-            result_type operator()(
-                boost::system::error_code const& e,
-                parcel const& p) const
+            call_for_each(call_for_each &&other)
+              : handlers_(std::move(other.handlers_))
+              , parcels_(std::move(other.parcels_))
+            {}
+
+            call_for_each& operator=(call_for_each &&other)
             {
-                for (parcelport::write_handler_type const& f : fv_)
-                {
-                    f(e, p);
-                }
+                handlers_ = std::move(other.handlers_);
+                parcels_ = std::move(other.parcels_);
+
+                return *this;
             }
 
-//             result_type operator()(
-//                 boost::system::error_code const& e,
-//                 std::size_t) const
-//             {
-//                 for (parcelport::write_handler_type const& f : fv_)
-//                 {
-//                     f(e, p_);
-//                 }
-//             }
+            result_type operator()(boost::system::error_code const& e) const
+            {
+                HPX_ASSERT(parcels_.size() == handlers_.size());
+                for(std::size_t i = 0; i < parcels_.size(); ++i)
+                {
+                    handlers_[i](e, parcels_[i]);
+                }
+            }
         };
     }
 }}
