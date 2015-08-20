@@ -18,6 +18,7 @@ namespace hpx { namespace parcelset
         struct call_for_each
         {
             BOOST_MOVABLE_BUT_NOT_COPYABLE(call_for_each);
+        public:
             typedef void result_type;
 
             typedef std::vector<parcelport::write_handler_type> handlers_type;
