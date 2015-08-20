@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_IS_LAUNCH_POLICY_APR_8_2014_0436PM)
 #define HPX_TRAITS_IS_LAUNCH_POLICY_APR_8_2014_0436PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 
 #include <boost/type_traits/is_same.hpp>
