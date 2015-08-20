@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -357,7 +357,14 @@ namespace hpx { namespace parcelset
         hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+        typedef std::pair<
+            boost::shared_ptr<std::vector<parcel>>
+          , std::vector<write_handler_type>
+        >
+#else
         typedef std::pair<std::vector<parcel>, std::vector<write_handler_type> >
+#endif
             map_second_type;
         typedef std::map<locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;

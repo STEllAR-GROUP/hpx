@@ -12,6 +12,7 @@
 #include <hpx/util/detail/function_template.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 
 #include <boost/preprocessor/cat.hpp>
@@ -21,10 +22,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_CONTINUATION_REGISTER_FUNCTION_FACTORY(VTable, Name)              \
     static ::hpx::util::detail::function_registration<                        \
-        VTable::first_type, VTable::second_type                               \
+        ::hpx::util::tuple_element<0, VTable>::type                           \
+      , ::hpx::util::tuple_element<1, VTable>::type                           \
     > const BOOST_PP_CAT(Name, _function_factory_registration) =              \
             ::hpx::util::detail::function_registration<                       \
-                VTable::first_type, VTable::second_type                       \
+                ::hpx::util::tuple_element<0, VTable>::type                   \
+              , ::hpx::util::tuple_element<1, VTable>::type                   \
             >();                                                              \
 /**/
 
@@ -38,7 +41,7 @@
 #define HPX_UTIL_REGISTER_FUNCTION_DECLARATION(Sig, Functor, Name)            \
     namespace hpx { namespace util { namespace detail {                       \
         typedef                                                               \
-            std::pair<                                                        \
+            hpx::util::tuple<                                                 \
                 function_vtable_ptr<                                          \
                     Sig                                                       \
                   , ::hpx::serialization::input_archive                       \

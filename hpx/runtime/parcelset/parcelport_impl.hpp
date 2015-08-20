@@ -536,7 +536,13 @@ namespace hpx { namespace parcelset
             > il(&l);
 
             mapped_type& e = pending_parcels_[locality_id];
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+            if(!e.first)
+                e.first = boost::make_shared<std::vector<parcel>>();
+            e.first->push_back(std::move(p));
+#else
             e.first.push_back(std::move(p));
+#endif
             e.second.push_back(std::move(f));
 
             parcel_destinations_.insert(locality_id);
@@ -559,6 +565,15 @@ namespace hpx { namespace parcelset
             HPX_ASSERT(parcels.size() == handlers.size());
 
             mapped_type& e = pending_parcels_[locality_id];
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+            if(!e.first)
+            {
+                e.first = boost::make_shared<std::vector<parcel>>();
+                HPX_ASSERT(e.second.empty());
+                std::swap(*e.first, parcels);
+                std::swap(e.second, handlers);
+            }
+#else
             if (e.first.empty())
             {
                 HPX_ASSERT(e.second.empty());
@@ -571,15 +586,25 @@ namespace hpx { namespace parcelset
                 std::swap(e.second, handlers);
 #endif
             }
+#endif
             else
             {
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+                HPX_ASSERT(e.first->size() == e.second.size());
+                std::size_t new_size = e.first->size() + parcels.size();
+                e.first->reserve(new_size);
+
+                std::move(parcels.begin(), parcels.end(),
+                    std::back_inserter(*e.first));
+#else
                 HPX_ASSERT(e.first.size() == e.second.size());
                 std::size_t new_size = e.first.size() + parcels.size();
                 e.first.reserve(new_size);
-                e.second.reserve(new_size);
 
                 std::move(parcels.begin(), parcels.end(),
                     std::back_inserter(e.first));
+#endif
+                e.second.reserve(new_size);
                 std::move(handlers.begin(), handlers.end(),
                     std::back_inserter(e.second));
             }
@@ -603,11 +628,19 @@ namespace hpx { namespace parcelset
 
                 // do nothing if parcels have already been picked up by
                 // another thread
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+                if (it != pending_parcels_.end() && !it->second.first->empty())
+#else
                 if (it != pending_parcels_.end() && !it->second.first.empty())
+#endif
                 {
                     HPX_ASSERT(it->first == locality_id);
                     HPX_ASSERT(handlers.size() == parcels.size());
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+                    std::swap(parcels, *it->second.first);
+#else
                     std::swap(parcels, it->second.first);
+#endif
                     std::swap(handlers, it->second.second);
 
                     HPX_ASSERT(!handlers.empty());
@@ -772,7 +805,12 @@ namespace hpx { namespace parcelset
 
                 HPX_ASSERT(locality_id == sender_connection->destination());
                 pending_parcels_map::iterator it = pending_parcels_.find(locality_id);
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+                if (it == pending_parcels_.end() ||
+                    (it->second.first && it->second.first->empty()))
+#else
                 if (it == pending_parcels_.end() || it->second.first.empty())
+#endif
                     return;
             }
 

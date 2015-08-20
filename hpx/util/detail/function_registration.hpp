@@ -81,7 +81,7 @@ namespace hpx { namespace util { namespace detail
         {
             hpx::serialization::detail::polymorphic_intrusive_factory::instance().
                 register_class(
-                    detail::get_function_name<std::pair<VTable, T> >()
+                    detail::get_function_name<util::tuple<VTable, T> >()
                   , &function_registration::create
                 );
         }
@@ -109,8 +109,8 @@ namespace hpx { namespace util { namespace detail
         automatic_function_registration()
         {
             function_registration<
-                typename VTablePair::first_type
-              , typename VTablePair::second_type
+                typename util::tuple_element<0, VTablePair>::type
+              , typename util::tuple_element<1, VTablePair>::type
             > auto_register;
         }
 

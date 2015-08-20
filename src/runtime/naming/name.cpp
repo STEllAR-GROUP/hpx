@@ -299,7 +299,7 @@ namespace hpx { namespace naming
                     new_gid = gid;
                     HPX_ASSERT(new_gid != invalid_gid);
                     return agas::incref_async(new_gid, new_credit).then(
-                        [&gid](future<boost::int64_t>&&) mutable
+                        [&gid](future<boost::int64_t>&&) mutable -> gid_type
                         {
                             typedef gid_type::mutex_type::scoped_lock scoped_lock;
                             scoped_lock ll(gid.get_mutex());
@@ -383,7 +383,7 @@ namespace hpx { namespace naming
                 HPX_ASSERT(new_gid != invalid_gid);
                 return
                     agas::incref_async(new_gid, added_credit).then(
-                        [new_gid](future<boost::int64_t>&&)
+                        [new_gid](future<boost::int64_t>&&) -> gid_type
                         {
                             HPX_ASSERT(new_gid != invalid_gid);
                             return new_gid;
