@@ -103,10 +103,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             std::size_t k = 0;
             connection_list::iterator it = connections.begin();
+            hpx::util::high_resolution_timer timer;
 
-            // We try to handle all receives within 1 secone
+            // We try to handle all receives within 1 second
             while(it != connections.end())
             {
+                if(timer.elapsed() > 1.0) break;
+
                 connection_type & sender = **it;
                 if(sender.send())
                 {
