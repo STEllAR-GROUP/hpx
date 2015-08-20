@@ -98,7 +98,8 @@ C<T> *c_factory(hpx::serialization::input_archive& ar, C<T> */*unused*/)
 
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE((template <class T>), C<T>)
 HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(template<class T>, C<T>)
-HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE((template<typename T>), (C<T>), c_factory);
+HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE((template<typename T>),
+    (C<T>), c_factory);
 
 template<typename T>
 struct E : public A
@@ -134,7 +135,8 @@ E<T> *e_factory(hpx::serialization::input_archive& ar, E<T> */*unused*/)
 
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE((template <class T>), E<T>)
 HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(template<class T>, E<T>)
-HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE((template<typename T>), (E<T>), e_factory);
+HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE((template<typename T>),
+    (E<T>), e_factory);
 
 void test_basic()
 {

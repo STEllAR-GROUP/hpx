@@ -525,7 +525,8 @@ namespace hpx { namespace performance_counters
             switch (complemented_info.type_) {
             case counter_elapsed_time:
                 {
-                    typedef components::managed_component<server::elapsed_time_counter> counter_t;
+                    typedef components::managed_component<server::elapsed_time_counter>
+                        counter_t;
                     id = components::server::construct<counter_t>(complemented_info);
                 }
                 break;
@@ -584,7 +585,8 @@ namespace hpx { namespace performance_counters
             counter_aggregating != info.type_)
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_statistics_counter",
-                "invalid counter type requested (only counter_aggregating is supported)");
+                "invalid counter type requested \
+                 (only counter_aggregating is supported)");
             return status_counter_type_unknown;
         }
 
@@ -710,7 +712,8 @@ namespace hpx { namespace performance_counters
             counter_aggregating != info.type_)
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_arithmetics_counter",
-                "invalid counter type requested (only counter_aggregating is supported)");
+                "invalid counter type requested \
+                 (only counter_aggregating is supported)");
             return status_counter_type_unknown;
         }
 

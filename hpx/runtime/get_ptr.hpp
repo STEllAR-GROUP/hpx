@@ -116,7 +116,8 @@ namespace hpx
     }
     /// \endcond
 
-    /// \brief Returns a future referring to a the pointer to the underlying memory of a component
+    /// \brief Returns a future referring to a the pointer to the
+    ///  underlying memory of a component
     ///
     /// The function hpx::get_ptr can be used to extract a future
     /// referring to the pointer to the underlying memory of a given component.

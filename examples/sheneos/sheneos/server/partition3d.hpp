@@ -65,7 +65,8 @@ namespace sheneos { namespace server
 #if SHENEOS_SUPPORT_FULL_API
             // Chemical potentials.
             muhat = 0x00000100,     ///< mu_n - mu_p
-            mu_e = 0x00000200,      ///< electron chemical potential including electron rest mass
+            mu_e = 0x00000200,      ///< electron chemical potential
+                                    ///< including electron rest mass
             mu_p = 0x00000400,      ///< proton chemical potential
             mu_n = 0x00000800,      ///< neutron chemical potential
             // Compositions.

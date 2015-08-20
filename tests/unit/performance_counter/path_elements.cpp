@@ -53,7 +53,7 @@ namespace test
         },
         {   "/objectname{parentinstancename#*/instancename#*}/countername@parameter",
             "/objectname/countername",
-            hpx::performance_counters::counter_path_elements(
+               hpx::performance_counters::counter_path_elements(
                 "objectname",
                 "countername",
                 "parameter",
@@ -61,7 +61,8 @@ namespace test
                 "instancename#*",
                 -1, -1, false)
         },
-        {   "/objectname{/objectname{parentinstancename#2/instancename#1}/countername}/countername",
+        {   "/objectname{/objectname{parentinstancename#2/instancename#1}"
+            "/countername}/countername",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -71,7 +72,8 @@ namespace test
                 "",
                 -1, -1, true)
         },
-        {   "/objectname{/objectname{parentinstancename#2/instancename#1}/countername}/countername@parameter",
+        {   "/objectname{/objectname{parentinstancename#2/instancename#1}"
+            "/countername}/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -81,7 +83,8 @@ namespace test
                 "",
                 -1, -1, false)
         },
-        {   "/objectname{parentinstancename#2/instancename#1}/countername/morecountername",
+        {   "/objectname{parentinstancename#2/instancename#1}"
+            "/countername/morecountername",
             "/objectname/countername/morecountername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -91,7 +94,8 @@ namespace test
                 "instancename",
                 2, 1, false)
         },
-        {   "/objectname{parentinstancename#*/instancename#*}/countername/morecountername",
+        {   "/objectname{parentinstancename#*/instancename#*}"
+            "/countername/morecountername",
             "/objectname/countername/morecountername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -101,7 +105,8 @@ namespace test
                 "instancename#*",
                 -1, -1, false)
         },
-        {   "/objectname{parentinstancename#2/instancename#1}/countername/morecountername@parameter",
+        {   "/objectname{parentinstancename#2/instancename#1}"
+            "/countername/morecountername@parameter",
             "/objectname/countername/morecountername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -111,7 +116,8 @@ namespace test
                 "instancename",
                 2, 1, false)
         },
-        {   "/objectname{parentinstancename#*/instancename#*}/countername/morecountername@parameter",
+        {   "/objectname{parentinstancename#*/instancename#*}"
+            "/countername/morecountername@parameter",
             "/objectname/countername/morecountername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -161,7 +167,8 @@ namespace test
                 "moreparent/instancename#*",
                 -1, -1, false)
         },
-        {   "/objectname{parentinstancename/moreparent/instancename#1}/countername@parameter",
+        {   "/objectname{parentinstancename/moreparent/instancename#1}"
+            "/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -171,7 +178,8 @@ namespace test
                 "moreparent/instancename",
                 -1, 1, false)
         },
-        {   "/objectname{parentinstancename/moreparent/instancename#*}/countername@parameter",
+        {   "/objectname{parentinstancename/moreparent/instancename#*}"
+            "/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -191,7 +199,8 @@ namespace test
                 "instancename",
                 -1, -1, false)
         },
-        {   "/objectname{parentinstancename/instancename}/countername@parameter",
+        {   "/objectname{parentinstancename/instancename}"
+            "/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -201,7 +210,8 @@ namespace test
                 "instancename",
                 -1, -1, false)
         },
-        {   "/objectname{parentinstancename/moreparent/instancename}/countername",
+        {   "/objectname{parentinstancename/moreparent"
+            "/instancename}/countername",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -211,7 +221,8 @@ namespace test
                 "moreparent/instancename",
                 -1, -1, false)
         },
-        {   "/objectname{parentinstancename/moreparent/instancename}/countername@parameter",
+        {   "/objectname{parentinstancename/moreparent/instancename}"
+            "/countername@parameter",
             "/objectname/countername",
             hpx::performance_counters::counter_path_elements(
                 "objectname",
@@ -317,13 +328,15 @@ namespace test
             HPX_TEST(fullname == t->fullname_);
 
             std::string type_name;
-            HPX_TEST(status_valid_data == get_counter_type_name(t->path_, type_name, ec));
+            HPX_TEST(status_valid_data ==
+                get_counter_type_name(t->path_, type_name, ec));
             HPX_TEST(ec.value() == hpx::success);
             HPX_TEST(type_name == t->typename_);
 
             counter_path_elements p;
 
-            HPX_TEST(status_valid_data == get_counter_path_elements(t->fullname_, p, ec));
+            HPX_TEST(status_valid_data ==
+                get_counter_path_elements(t->fullname_, p, ec));
             HPX_TEST(ec.value() == hpx::success);
             HPX_TEST(p.objectname_ == t->path_.objectname_);
             HPX_TEST(p.parentinstancename_ == t->path_.parentinstancename_);
@@ -338,7 +351,8 @@ namespace test
 
             counter_type_path_elements tp1, tp2;
 
-            HPX_TEST(status_valid_data == get_counter_type_path_elements(t->fullname_, tp1, ec));
+            HPX_TEST(status_valid_data ==
+                get_counter_type_path_elements(t->fullname_, tp1, ec));
             HPX_TEST(ec.value() == hpx::success);
             HPX_TEST(tp1.objectname_ == t->path_.objectname_);
             HPX_TEST(tp1.countername_ == t->path_.countername_);
@@ -349,7 +363,8 @@ namespace test
             HPX_TEST(type_name == t->typename_);
 
             type_name.erase();
-            HPX_TEST(status_valid_data == get_full_counter_type_name(tp1, type_name, ec));
+            HPX_TEST(status_valid_data ==
+                get_full_counter_type_name(tp1, type_name, ec));
             HPX_TEST(ec.value() == hpx::success);
             if (t->path_.parameters_.empty()) {
                 HPX_TEST(type_name == t->typename_);
@@ -358,7 +373,8 @@ namespace test
                 HPX_TEST(type_name == t->typename_ + '@' + t->path_.parameters_);
             }
 
-            HPX_TEST(status_valid_data == get_counter_type_path_elements(t->typename_, tp2, ec));
+            HPX_TEST(status_valid_data ==
+                get_counter_type_path_elements(t->typename_, tp2, ec));
             HPX_TEST(ec.value() == hpx::success);
             HPX_TEST(tp2.objectname_ == t->path_.objectname_);
             HPX_TEST(tp2.countername_ == t->path_.countername_);

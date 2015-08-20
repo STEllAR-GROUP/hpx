@@ -170,7 +170,8 @@ namespace hpx { namespace util { namespace coroutines
         if (0 >= m_stack_size)
         {
             throw std::runtime_error(
-                boost::str(boost::format("stack size of %1% is invalid") % m_stack_size));
+                boost::str(boost::format("stack size of %1% is invalid") %
+                    m_stack_size));
         }
 
         m_stack = posix::alloc_stack(static_cast<std::size_t>(m_stack_size));

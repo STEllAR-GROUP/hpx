@@ -43,7 +43,8 @@ namespace hpx { namespace serialization
                     t.serialize(ar, 0);
                 }
 
-                static void call(hpx::serialization::output_archive& ar, const T& t, unsigned)
+                static void call(hpx::serialization::output_archive& ar,
+                    const T& t, unsigned)
                 {
                     t.serialize(ar, 0);
                 }

@@ -8,7 +8,8 @@
 
 #if !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
-#if (defined(__linux) || defined(linux) || defined(__linux__)) && !defined(__bgq__) && !defined(__powerpc__)
+#if (defined(__linux) || defined(linux) || defined(__linux__)) \
+ && !defined(__bgq__) && !defined(__powerpc__)
 
 #if defined(__x86_64__) || defined(__amd64__)
 #include "swapcontext64.ipp"

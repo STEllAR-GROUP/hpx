@@ -42,7 +42,8 @@ namespace hpx { namespace performance_counters { namespace parcels
                                       ///< security work timestamp after
                                       ///< processing holds elapsed security time
 #endif
-        std::size_t num_parcels_;     ///< The number of parcels processed by this message
+        std::size_t num_parcels_;
+        ///^ The number of parcels processed by this message
         std::size_t raw_bytes_;       ///< number of bytes processed for the action in
                                       ///< this parcel (uncompressed)
 

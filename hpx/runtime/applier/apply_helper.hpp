@@ -132,16 +132,28 @@ namespace hpx { namespace applier { namespace detail
         template <typename Continuation, typename ...Ts>
         static void
         call (Continuation && c, naming::id_type const& target,
+            naming::address::address_type lva, threads::thread_priority priority,
+            Ts&&... vs)
+        {
+            std::unique_ptr<actions::continuation> cont(
+                new typename util::decay<Continuation>::type(
+                    std::forward<Continuation>(c)));
+            call(std::move(cont), target, lva, priority, std::forward<Ts>(vs)...);
+        }
+
+        template <typename ...Ts>
+        static void
+        call (std::unique_ptr<actions::continuation> cont, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_priority,
             Ts&&... vs)
         {
             try {
-                c.trigger(Action::execute_function(lva,
+                cont->trigger(Action::execute_function(lva,
                     std::forward<Ts>(vs)...));
             }
             catch (hpx::exception const& /*e*/) {
                 // make sure hpx::exceptions are propagated back to the client
-                c.trigger_error(boost::current_exception());
+                cont->trigger_error(boost::current_exception());
             }
         }
     };

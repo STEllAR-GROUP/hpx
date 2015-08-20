@@ -21,7 +21,8 @@
 
 #ifdef _MSC_VER
 
-#define BOOST_LOCKFREE_CACHELINE_ALIGNMENT __declspec(align(BOOST_LOCKFREE_CACHELINE_BYTES))
+#define BOOST_LOCKFREE_CACHELINE_ALIGNMENT \
+ __declspec(align(BOOST_LOCKFREE_CACHELINE_BYTES))
 
 #if defined(_M_IX86)
     #define BOOST_LOCKFREE_DCAS_ALIGNMENT
@@ -34,7 +35,8 @@
 
 #ifdef __GNUC__
 
-#define BOOST_LOCKFREE_CACHELINE_ALIGNMENT __attribute__((aligned(BOOST_LOCKFREE_CACHELINE_BYTES)))
+#define BOOST_LOCKFREE_CACHELINE_ALIGNMENT \
+ __attribute__((aligned(BOOST_LOCKFREE_CACHELINE_BYTES)))
 
 #if defined(__i386__) || defined(__ppc__)
     #define BOOST_LOCKFREE_DCAS_ALIGNMENT
@@ -42,7 +44,8 @@
     #define BOOST_LOCKFREE_PTR_COMPRESSION 1
     #define BOOST_LOCKFREE_DCAS_ALIGNMENT __attribute__((aligned(16)))
 #elif defined(__alpha__)
-    // LATER: alpha may benefit from pointer compression. but what is the maximum size of the address space?
+    // LATER: alpha may benefit from pointer compression.
+    //  but what is the maximum size of the address space?
     #define BOOST_LOCKFREE_DCAS_ALIGNMENT
 #endif
 #endif /* __GNUC__ */

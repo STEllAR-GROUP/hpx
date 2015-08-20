@@ -76,7 +76,8 @@ int main(int argc, char** argv)
     ;
 
     store(
-        command_line_parser(argc, argv).options(desc_cmdline).allow_unregistered().run(), vm);
+        command_line_parser(argc,
+            argv).options(desc_cmdline).allow_unregistered().run(),vm);
 
     notify(vm);
 

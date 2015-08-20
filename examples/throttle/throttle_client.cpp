@@ -34,7 +34,8 @@ int hpx_main(variables_map& vm)
         // Try to connect to existing throttle instance, create a new one if
         // this fails.
         char const* throttle_component_name = "/throttle/0";
-        hpx::naming::id_type gid = hpx::agas::resolve_name(throttle_component_name).get();
+        hpx::naming::id_type gid =
+            hpx::agas::resolve_name(throttle_component_name).get();
         throttle::throttle t;
         if (!t.get_id()) {
             std::vector<hpx::naming::id_type> localities =

@@ -24,9 +24,12 @@ void register_counter_type()
 {
     // Call the HPX API function to register the counter type.
     hpx::performance_counters::install_counter_type(
-        "/test/data",                                   // counter type name
-        &some_performance_data,                         // function providing counter data
-        "returns a linearly increasing counter value"   // description text
+        "/test/data",
+        // counter type name
+        &some_performance_data,
+        // function providing counter data
+        "returns a linearly increasing counter value"
+        // description text
     );
 }
 

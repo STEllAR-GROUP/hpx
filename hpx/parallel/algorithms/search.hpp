@@ -400,7 +400,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    /// Searches the range [first, first+count) for any elements in the range [s_first, s_last).
+    /// Searches the range [first, first+count) for any elements in the range
+    /// [s_first, s_last).
     /// Uses the operator== to compare elements.
     ///
     /// \note   Complexity: at most (S*N) comparisons where
@@ -447,7 +448,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a search_n algorithm returns an iterator to the beginning of
     ///           the first subsequence [s_first, s_last) in range [first, first+count).
     ///           If the length of the subsequence [s_first, s_last) is greater
-    ///           than the length of the range [first, first+count), \a first is returned.
+    ///           than the length of the range [first, first+count),
+    ///           \a first is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a first is also returned.
     ///
@@ -545,7 +547,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a search_n algorithm returns an iterator to the beginning of
     ///           the last subsequence [s_first, s_last) in range [first, first+count).
     ///           If the length of the subsequence [s_first, s_last) is greater
-    ///           than the length of the range [first, first+count), \a first is returned.
+    ///           than the length of the range [first, first+count),
+    ///           \a first is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a first is also returned.
     ///

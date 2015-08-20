@@ -37,18 +37,24 @@ It has 2 function overloads:
 FIXME
 */
 namespace convert {
-    template<class obj, class char_traits, class char_type> void write(const obj & m, std::basic_ostream<char_type, char_traits> & out) {
+    template<class obj, class char_traits, class char_type> void write(const obj & m,
+        std::basic_ostream<char_type, char_traits> & out) {
         out << m;
     }
 
-    template<class char_traits, class char_type> void write(const char_type* m, std::basic_ostream<char_type, char_traits> & out) {
+    template<class char_traits, class char_type> void write(const char_type* m,
+        std::basic_ostream<char_type, char_traits> & out) {
         out << m;
     }
 
-    inline const char_type * do_convert(const char_type * c, const into<const char_type*> &) { return c; }
-    inline const char_type * do_convert(const std::basic_string<char_type> & s, const into<const char_type* > &) { return s.c_str(); }
+    inline const char_type * do_convert(const char_type * c,
+        const into<const char_type*> &) { return c; }
+    inline const char_type * do_convert(const std::basic_string<char_type> & s,
+        const into<const char_type* > &) { return s.c_str(); }
 
-    inline const std::basic_string<char_type> & do_convert(const std::basic_string<char_type> & s, const into< std::basic_string<char_type> > &) {
+    inline const std::basic_string<char_type> &
+        do_convert(const std::basic_string<char_type> & s,
+            const into< std::basic_string<char_type> > &) {
         return s;
     }
 }
@@ -58,7 +64,8 @@ struct do_convert_destination {
         convert::write(m, d);
     }
 
-    template<class msg, class dest> static dest do_convert(const msg & m, const into<dest> &) {
+    template<class msg, class dest> static dest do_convert(const msg & m,
+        const into<dest> &) {
         return convert::do_convert(m, into<dest>() );
     }
 

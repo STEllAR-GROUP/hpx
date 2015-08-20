@@ -78,7 +78,8 @@ namespace hpx { namespace util { namespace coroutines
 #if _WIN32_WINNT < 0x0600
     /*
      * This number (0x1E00) has been sighted in the wild (at least on windows XP systems)
-     * as return value from GetCurrentFiber() on non fibrous threads. This is somehow related
+     * as return value from GetCurrentFiber() on non fibrous threads.
+     * This is somehow related
      * to OS/2 where the current fiber pointer is overloaded as a version field.
      * On non-NT systems, 0 is returned.
      */

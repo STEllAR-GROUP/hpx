@@ -115,7 +115,8 @@ void run_benchmark(boost::program_options::variables_map & vm)
     {
         std::vector<hpx::future<double> > benchmarks;
 
-        for (boost::uint32_t locality_id = 0; locality_id != localities.size(); ++locality_id)
+        for (boost::uint32_t locality_id = 0; locality_id !=
+            localities.size(); ++locality_id)
         {
             ireceive_action receive;
 
@@ -126,7 +127,8 @@ void run_benchmark(boost::program_options::variables_map & vm)
                 partner = locality_id - pairs;
 
             benchmarks.push_back(hpx::async(receive,
-                localities[locality_id], localities[partner], size, vm["window-size"].as<std::size_t>()));
+                localities[locality_id], localities[partner], size,
+                vm["window-size"].as<std::size_t>()));
         }
 
         double total_latency = 0;

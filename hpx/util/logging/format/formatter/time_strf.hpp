@@ -31,12 +31,15 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
 
 
 /**
-@brief Prefixes the message with the time, by using strftime function. You pass the format string at construction.
+@brief Prefixes the message with the time, by using strftime function.
+You pass the format string at construction.
 
 @param msg_type The type that holds your logged message.
 
-@param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
+@param convert [optional] In case there needs to be a conversion between
+std::(w)string and the string that holds your logged message. See convert_format.
+For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
+"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
 template<class convert = do_convert_format::prepend> struct time_strf_t : is_generic {
     typedef convert convert_type;

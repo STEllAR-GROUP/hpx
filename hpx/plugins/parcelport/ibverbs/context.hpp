@@ -60,7 +60,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                     int err = errno;
                     if(err != EAGAIN)
                     {
-                        HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::connection_aborted);
+                        HPX_IBVERBS_THROWS_IF(ec,
+                            boost::asio::error::connection_aborted);
                         return MSG_INVALID;
                     }
                 }
@@ -79,7 +80,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                     {
                         if(wc[i].status == IBV_WC_SUCCESS)
                         {
-                            if(this_->connection_.on_completion(&wc[i], ec) == MSG_SHUTDOWN)
+                            if(this_->connection_.on_completion(&wc[i],
+                                ec) == MSG_SHUTDOWN)
                             {
                                 return MSG_SHUTDOWN;
                             }
@@ -91,7 +93,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                     }
                     else
                     {
-                        HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::connection_aborted);
+                        HPX_IBVERBS_THROWS_IF(ec,
+                            boost::asio::error::connection_aborted);
                         return MSG_INVALID;
                     }
                 }
@@ -218,7 +221,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             return true;
         }
 
-        void register_buffer(char * buffer, std::size_t size, boost::system::error_code & ec)
+        void register_buffer(char * buffer, std::size_t size,
+            boost::system::error_code & ec)
         {
             connection_.register_buffer(pd_, buffer, size, ec);
         }
@@ -301,7 +305,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         }
 
         template <typename Parcelport>
-        void connect(Parcelport & parcelport, boost::asio::ip::tcp::endpoint const & there, boost::system::error_code &ec)
+        void connect(Parcelport & parcelport,
+            boost::asio::ip::tcp::endpoint const & there, boost::system::error_code &ec)
         {
             if(ctx_)
             {
@@ -317,7 +322,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 {
                     int verrno = errno;
                     close(ec);
-                    boost::system::error_code err(verrno, boost::system::system_category());
+                    boost::system::error_code err(verrno,
+                        boost::system::system_category());
                     HPX_IBVERBS_THROWS_IF(
                         ec
                       , err
@@ -338,7 +344,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 {
                     int verrno = errno;
                     close(ec);
-                    boost::system::error_code err(verrno, boost::system::system_category());
+                    boost::system::error_code err(verrno,
+                        boost::system::system_category());
                     HPX_IBVERBS_THROWS_IF(
                         ec
                       , err
@@ -371,7 +378,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 {
                     int verrno = errno;
                     close(ec);
-                    boost::system::error_code err(verrno, boost::system::system_category());
+                    boost::system::error_code err(verrno,
+                        boost::system::system_category());
                     HPX_IBVERBS_THROWS_IF(
                         ec
                       , err
@@ -414,7 +422,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                     {
                         int verrno = errno;
                         close(ec);
-                        boost::system::error_code err(verrno, boost::system::system_category());
+                        boost::system::error_code err(verrno,
+                            boost::system::system_category());
                         HPX_IBVERBS_THROWS_IF(
                             ec
                           , err
@@ -440,7 +449,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                         {
                             int verrno = errno;
                             close(ec);
-                            boost::system::error_code err(verrno, boost::system::system_category());
+                            boost::system::error_code err(verrno,
+                                boost::system::system_category());
                             HPX_IBVERBS_THROWS_IF(
                                 ec
                               , err
@@ -482,7 +492,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         }
 
         template <typename Parcelport>
-        void build_connection(Parcelport & parcelport, rdma_cm_id * id, boost::system::error_code &ec)
+        void build_connection(Parcelport & parcelport, rdma_cm_id * id,
+            boost::system::error_code &ec)
         {
             ibv_qp_init_attr qp_attr;
             build_context(parcelport, id->verbs, ec);
@@ -519,13 +530,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         ibv_pd * pd_;
     private:
         template <typename Parcelport>
-        void build_context(Parcelport & parcelport, ibv_context *verbs, boost::system::error_code &ec)
+        void build_context(Parcelport & parcelport, ibv_context *verbs,
+            boost::system::error_code &ec)
         {
             if(ctx_)
             {
                 if(ctx_ != verbs)
                 {
-                    HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::operation_not_supported);
+                    HPX_IBVERBS_THROWS_IF(ec,
+                        boost::asio::error::operation_not_supported);
                     return;
                 }
             }

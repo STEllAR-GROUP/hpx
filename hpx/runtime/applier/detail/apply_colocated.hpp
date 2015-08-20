@@ -52,7 +52,11 @@ namespace hpx { namespace detail
     }
 
     template <typename Action, typename Continuation, typename ...Ts>
-    bool apply_colocated(Continuation && cont,
+    typename std::enable_if<
+        traits::is_continuation<Continuation>::value
+      , bool
+    >::type
+    apply_colocated(Continuation && cont,
         naming::id_type const& gid, Ts&&... vs)
     {
         // Attach the requested action as a continuation to a resolve_async
