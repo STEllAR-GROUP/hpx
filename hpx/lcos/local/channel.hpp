@@ -1,300 +1,80 @@
-////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2012 Hartmut Kaiser
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_725569E7_7AF4_4276_AF43_5713635DD598)
-#define HPX_725569E7_7AF4_4276_AF43_5713635DD598
+#if !defined(HPX_LCOS_LOCAL_CHANNEL_AUG_19_2015_0513PM)
+#define HPX_LCOS_LOCAL_CHANNEL_AUG_19_2015_0513PM
 
-#include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/config.hpp>
+#include <hpx/lcos/local/gate.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/thread/locks.hpp>
 
-namespace hpx { namespace lcos { namespace detail
+namespace hpx { namespace lcos { namespace local
 {
-
-template <typename Result>
-struct channel_future_data : future_data<Result>
-{
-  public:
-    typedef typename future_data<Result>::mutex_type mutex_type;
-    typedef typename future_data<Result>::result_type result_type;
-
-  public:
-    result_type move_data(error_code& ec = throws)
+    template <typename T>
+    class channel
     {
-        typedef typename future_data<Result>::data_type data_type;
-        // yields control if needed
-        data_type d;
+    private:
+        typedef lcos::local::spinlock mutex_type;
+
+        T on_get_ready(future<void> && f)
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
-            // moves the data from the store
-            this->data_.read_and_empty(d, l, ec);
-            if (ec) return result_type();
+            f.get();       // propagate any exceptions
+
+            boost::unique_lock<mutex_type> l(mtx_);
+            return std::move(data_);
         }
 
-        if (d.is_empty()) {
-            // the value has already been moved out of this future
-            HPX_THROWS_IF(ec, no_state,
-                "future_data::move_data",
-                "this future has not been initialized");
-            return result_type();
-        }
+    public:
+        channel()
+          : generation_(0)
+        {}
 
-        // the thread has been re-activated by one of the actions
-        // supported by this promise (see \a promise::set_event
-        // and promise::set_exception).
-        if (d.stores_error())
-            return handle_error(d, ec);
-
-        // no error has been reported, return the result
-        return d.move_value();
-    }
-};
-
-} // namespace detail
-
-namespace local
-{
-
-/// An asynchronous, single value channel
-template <typename T>
-struct channel
-{
-  private:
-    typedef hpx::lcos::detail::channel_future_data<T> future_data;
-
-    boost::intrusive_ptr<future_data> data_;
-
-    (channel<T>);
-
-  public:
-    typedef typename future_data::completed_callback_type
-        completed_callback_type;
-
-    channel() : data_(new future_data()) {}
-
-    channel(channel const& other) : data_(other.data_) {}
-
-    channel(channel && other) : data_(std::move(other.data_)) {}
-
-    explicit channel(T && init) : data_(new future_data())
-    {
-        data_->set_data(init);
-    }
-
-    explicit channel(T const& init) : data_(new future_data())
-    {
-        data_->set_data(init);
-    }
-
-    ~channel()
-    {}
-
-    channel& operator=(channel const & other)
-    {
-        HPX_ASSERT(data_);
-
-        if (this != &other)
+        hpx::future<T> get_future()
         {
-            data_ = other.data_;
+            boost::unique_lock<mutex_type> l(mtx_);
+
+            using util::placeholders::_1;
+            future<void> f = gate_.get_future();
+
+            if (!f.is_ready())
+            {
+                l.unlock();
+                return f.then(util::bind(&channel::on_get_ready, this, _1));
+            }
+
+            return make_ready_future(std::move(data_));
         }
 
-        return *this;
-    }
-
-    channel& operator=(channel && other)
-    {
-        HPX_ASSERT(data_);
-
-        if (this != &other)
+        void set_value(T const& t)
         {
-            data_ = std::move(other.data_);
-            other.data_.reset();
+            boost::unique_lock<mutex_type> l(mtx_);
+            gate_.synchronize(++generation_, l);
+            data_ = t;
+            gate_.set(l);
         }
 
-        return *this;
-    }
-
-    void swap(channel& other)
-    {
-        data_.swap(other.data_);
-    }
-
-    void reset()
-    {
-        HPX_ASSERT(data_);
-
-        data_->reset();
-   }
-
-    hpx::future<T> get_future()
-    {
-        HPX_ASSERT(data_);
-
-        using traits::future_access;
-        return future_access<hpx::future<T> >::create(data_);
-    }
-
-    T get(hpx::error_code& ec = hpx::throws) const
-    {
-        HPX_ASSERT(data_);
-        T tmp = data_->get_data(ec);
-        return tmp;
-    }
-
-    T move(hpx::error_code& ec = hpx::throws) const
-    {
-        HPX_ASSERT(data_);
-        T tmp = data_->move_data(ec);
-        return tmp;
-    }
-
-    void post(T && result)
-    {
-        HPX_ASSERT(data_);
-        //if (data_->is_ready())
-        //    data_->move_data();
-        data_->set_data(result);
-    }
-
-    void post(T const& result)
-    {
-        HPX_ASSERT(data_);
-        //if (data_->is_ready())
-        //    data_->move_data();
-        data_->set_data(result);
-    }
-
-    template <typename F>
-    hpx::future<typename util::result_of<F(hpx::future<T>)>::type>
-    then(F && f)
-    {
-        HPX_ASSERT(data_);
-
-        using traits::future_access;
-        return future_access<hpx::future<T> >::create(data_).then
-            (std::forward<F>(f));
-    }
-
-    bool is_ready() const
-    {
-        HPX_ASSERT(data_);
-        return data_->is_ready();
-    }
-};
-
-template <>
-struct channel<void>
-{
-  private:
-    typedef hpx::lcos::detail::channel_future_data<void> future_data;
-
-    boost::intrusive_ptr<future_data> data_;
-
-    (channel<void>);
-
-  public:
-    typedef future_data::completed_callback_type
-        completed_callback_type;
-
-    channel() : data_(new future_data()) {}
-
-    channel(channel const& other) : data_(other.data_) {}
-
-    channel(channel && other) : data_(std::move(other.data_)) {}
-
-    ~channel()
-    {}
-
-    channel& operator=(channel const & other)
-    {
-        HPX_ASSERT(data_);
-
-        if (this != &other)
+        void set_value(T && t)
         {
-            data_ = other.data_;
+            boost::unique_lock<mutex_type> l(mtx_);
+            gate_.synchronize(++generation_, l);
+            data_ = std::move(t);
+            gate_.set(l);
         }
 
-        return *this;
-    }
-
-    channel& operator=(channel && other)
-    {
-        HPX_ASSERT(data_);
-
-        if (this != &other)
-        {
-            data_ = std::move(other.data_);
-            other.data_.reset();
-        }
-
-        return *this;
-    }
-
-    void swap(channel& other)
-    {
-        data_.swap(other.data_);
-    }
-
-    void reset()
-    {
-        HPX_ASSERT(data_);
-
-        data_->reset();
-   }
-
-    hpx::future<void> get_future()
-    {
-        HPX_ASSERT(data_);
-
-        using traits::future_access;
-        return future_access<hpx::future<void> >::create(data_);
-    }
-
-    void get(hpx::error_code& ec = hpx::throws) const
-    {
-        HPX_ASSERT(data_);
-        hpx::util::unused_type tmp = data_->get_data(ec);
-    }
-
-    void move(hpx::error_code& ec = hpx::throws) const
-    {
-        HPX_ASSERT(data_);
-        hpx::util::unused_type tmp = data_->move_data(ec);
-    }
-
-    void post()
-    {
-        HPX_ASSERT(data_);
-        //if (data_->is_ready())
-        //    data_->move_data();
-        data_->set_data(hpx::util::unused);
-    }
-
-    template <typename F>
-    hpx::future<typename util::result_of<F(hpx::future<void>)>::type>
-    then(F && f)
-    {
-        HPX_ASSERT(data_);
-
-        using traits::future_access;
-        return future_access<hpx::future<void> >::create(data_).then
-            (std::forward<completed_callback_type>(f));
-    }
-
-    bool is_ready() const
-    {
-        HPX_ASSERT(data_);
-        return data_->is_ready();
-    }
-};
-
+    private:
+        mutex_type mtx_;
+        std::size_t generation_;
+        lcos::local::gate gate_;
+        T data_;
+    };
 }}}
 
-#endif // HPX_725569E7_7AF4_4276_AF43_5713635DD598
+#endif
 
