@@ -240,7 +240,7 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 #if defined(BOOST_INTEL_STDCXX0X) && (BOOST_INTEL_CXX_VERSION > 1200)
 #  undef  BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
 // std::nullptr seems to be enabled starting with gcc 4.4.7
-#if defined(_MSC_VER) || (defined(__GNUC__) && !(__GNUC__ == 4
+#if defined(_MSC_VER) || (defined(__GNUC__) && !(__GNUC__ == 4                  \
    && __GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ <= 7))
 #  undef  BOOST_NO_CXX11_NULLPTR
 #endif
