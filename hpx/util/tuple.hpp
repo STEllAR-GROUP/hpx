@@ -14,7 +14,6 @@
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/array.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/type_traits/integral_constant.hpp>
 
 #include <algorithm>
@@ -136,12 +135,12 @@ namespace hpx { namespace util
                     call(util::get<Is>(std::declval<UTuple>())...)
                 ) == sizeof(yes_type);
 
-            typedef boost::mpl::bool_<value> type;
+            typedef std::integral_constant<bool, value> type;
         };
 
         template <typename TTuple, typename UTuple, typename Enable = void>
         struct are_tuples_compatible
-          : boost::mpl::false_
+          : std::false_type
         {};
 
         template <typename ...Ts, typename UTuple>
@@ -164,7 +163,7 @@ namespace hpx { namespace util
                 std::is_same<
                     typename std::decay<TTuple>::type, typename std::decay<UTuple>::type
                 >::value
-              , boost::mpl::false_
+              , std::false_type
               , are_tuples_compatible<TTuple, UTuple>
             >::type
         {};
