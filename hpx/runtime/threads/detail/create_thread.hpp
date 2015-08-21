@@ -73,6 +73,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         // create the new thread
+        std::size_t num_thread = data.num_os_thread;
         scheduler->create_thread(data, &id, initial_state, run_now, ec,
             data.num_os_thread);
 
@@ -85,7 +86,7 @@ namespace hpx { namespace threads { namespace detail
                    << ")";
 
         // potentially wake up waiting thread
-        scheduler->do_some_work(data.num_os_thread);
+        scheduler->do_some_work(num_thread);
     }
 }}}
 
