@@ -137,12 +137,18 @@ namespace hpx { namespace parcelset
             /// Stop the handling of connectons.
             void do_stop()
             {
+                while(do_background_work(0))
+                {
+                    if(threads::get_self_ptr())
+                        hpx::this_thread::suspend(hpx::threads::pending,
+                            "mpi::parcelport::do_stop");
+                }
                 stopped_ = true;
                 while(handles_parcels_ != 0)
                 {
                     if(threads::get_self_ptr())
                         hpx::this_thread::suspend(hpx::threads::pending,
-                            "mpi::parcelport::enable");
+                            "mpi::parcelport::do_stop");
                 }
                 MPI_Barrier(util::mpi_environment::communicator());
             }
