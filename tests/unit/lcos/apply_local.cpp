@@ -54,7 +54,7 @@ struct increment_type
     }
 };
 
-#if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
+#if defined(HPX_HAVE_CXX11_LAMBDAS) && defined(HPX_HAVE_CXX11_AUTO)
 auto increment_lambda = [](boost::int32_t i){ accumulator += i; };
 #endif
 
@@ -112,7 +112,7 @@ int hpx_main()
         hpx::apply(hpx::util::bind(obj, _1), 1);
     }
 
-#   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
+#   if defined(HPX_HAVE_CXX11_LAMBDAS) && defined(HPX_HAVE_CXX11_AUTO)
     {
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
@@ -125,7 +125,7 @@ int hpx_main()
 
     hpx::lcos::local::no_mutex result_mutex;
     boost::unique_lock<hpx::lcos::local::no_mutex> l(result_mutex);
-#   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
+#   if defined(HPX_HAVE_CXX11_LAMBDAS) && defined(HPX_HAVE_CXX11_AUTO)
     result_cv.wait_for(l, boost::chrono::seconds(1),
         hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 18));
 

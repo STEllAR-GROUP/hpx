@@ -8,10 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
-#error HPX needs variadic templates support
-#endif
-
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_same.hpp>
 

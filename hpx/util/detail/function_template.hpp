@@ -327,7 +327,7 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#   ifndef BOOST_NO_CXX11_TEMPLATE_ALIASES
+#   ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
 
     template <typename Sig>
     using function_nonser = function<Sig, void, void>;
@@ -390,7 +390,7 @@ namespace hpx { namespace util
         return f.empty();
     }
 
-#   endif /*BOOST_NO_CXX11_TEMPLATE_ALIASES*/
+#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 #endif

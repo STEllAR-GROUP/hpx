@@ -133,7 +133,7 @@ namespace hpx { namespace util { namespace detail
             return vptr->empty;
         }
 
-#       ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#       ifdef HPX_HAVE_CXX11_EXPLICIT_CONVERSION_OPERATORS
         explicit operator bool() const BOOST_NOEXCEPT
         {
             return !empty();
