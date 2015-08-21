@@ -10,6 +10,8 @@
 #  error Do not directly include hpx/hpx_start_impl.hpp, use hpx/hpx_start.hpp instead!
 #endif
 
+#include <hpx/util/find_prefix.hpp>
+
 namespace hpx
 {
     /// \cond NOINTERNAL
