@@ -8,7 +8,9 @@
 
 namespace hpx { namespace serialization
 {
-    void output_archive::add_gid(naming::gid_type const & gid, naming::gid_type const & splitted_gid)
+    void output_archive::add_gid(
+        naming::gid_type const & gid,
+        naming::gid_type const & splitted_gid)
     {
         if(new_gids_)
             (*new_gids_)[gid].push_back(splitted_gid);

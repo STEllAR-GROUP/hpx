@@ -148,7 +148,8 @@ namespace hpx { namespace lcos { namespace detail
             else
             {
                 value_type const & value =
-                    *hpx::traits::future_access<Future>::get_shared_state(f)->get_result();
+                    *hpx::traits::future_access<Future>::
+                        get_shared_state(f)->get_result();
                 ar << state << value;
             }
         } else if (f.has_exception()) {
@@ -170,7 +171,8 @@ namespace hpx { namespace lcos { namespace detail
         {
             if(!f.is_ready())
             {
-                typename hpx::traits::detail::shared_state_ptr_for<Future>::type state
+                typename
+                    hpx::traits::detail::shared_state_ptr_for<Future>::type state
                     = hpx::traits::future_access<Future>::get_shared_state(f);
 
                 state->execute_deferred();
