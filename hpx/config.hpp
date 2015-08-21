@@ -30,11 +30,10 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-// On Windows, include winsock2.h as early as possible to work around a known
-// include-order issue causing trouble if winsock.h is included before
-// winsock2.h.
 #if defined(BOOST_MSVC)
-#include <WinSock2.h>
+// On Windows, make sure winsock.h is not included even if windows.h is
+// included before winsock2.h
+#define _WINSOCKAPI_
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
