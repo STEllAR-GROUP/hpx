@@ -688,6 +688,9 @@ hpx_check_for_cxx11_explicit_cvt_ops(
 hpx_check_for_cxx11_function_template_default_args(
   REQUIRED "HPX needs support for C++11 defaulted function template arguments")
 
+hpx_check_for_cxx11_initializer_list(
+  DEFINITIONS HPX_HAVE_CXX11_INITIALIZER_LIST)
+
 hpx_check_for_cxx11_inline_namespaces(
   DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
 
