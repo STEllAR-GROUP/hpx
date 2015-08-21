@@ -1118,8 +1118,6 @@ if(HPX_WITH_APEX)
     set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} ittnotify_lib)
   endif()
-else()
-hpx_error("APEX not being used!")
 endif()
 
 if(HPX_WITH_GOOGLE_PERFTOOLS)
