@@ -221,8 +221,6 @@ namespace hpx { namespace naming
             // unmanaged gids do not require any special handling
             if (unmanaged == type_)
             {
-                scoped_lock l(this->get_mutex());
-                new_gids_.push_back(*this);
                 return;
             }
 
@@ -234,25 +232,15 @@ namespace hpx { namespace naming
             {
                 ar.await_future(
                     split_gid_if_needed(const_cast<id_type_impl&>(*this)).then(
-                        [this](hpx::future<gid_type> && gid_future)
+                        [&ar, this](hpx::future<gid_type> && gid_future)
                         {
-                            gid_type new_gid = gid_future.get();
-                            scoped_lock l(this->get_mutex());
-                            new_gids_.push_back(new_gid);
+                            ar.add_gid(*this, gid_future.get());
                         }
                     )
                 );
                 return;
             }
 
-            // all credits will be moved to the returned gid
-            HPX_ASSERT(managed_move_credit == type_);
-            gid_type new_gid = move_gid(const_cast<id_type_impl&>(*this));
-            {
-                scoped_lock l(this->get_mutex());
-                new_gids_.push_back(new_gid);
-                return;
-            }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -261,6 +249,45 @@ namespace hpx { namespace naming
             typedef gid_type::mutex_type::scoped_lock scoped_lock;
             scoped_lock l(gid.get_mutex());
             return split_gid_if_needed_locked(l, gid);
+        }
+
+        gid_type postprocess_incref(gid_type &gid)
+        {
+            typedef gid_type::mutex_type::scoped_lock scoped_lock;
+            scoped_lock ll(gid.get_mutex());
+            gid_type new_gid = gid;
+            HPX_ASSERT(new_gid != invalid_gid);
+            // Mark the gids as being split
+            set_credit_split_mask_for_gid(gid);
+            set_credit_split_mask_for_gid(new_gid);
+
+            // Fill the new gid with our new credit
+            naming::detail::set_log2credit_for_gid(
+                new_gid, gid_type::credit_base_mask);
+
+            // Another concurrent split operation might have happened, we
+            // need to add the new split credits to the old and account
+            // for overflow
+            // Get the current credit for our new gid
+            boost::int64_t src_credit = get_credit_from_gid(gid);
+            boost::int64_t split_credit = HPX_GLOBALCREDIT_INITIAL - 2;
+            boost::int64_t new_credit = src_credit + split_credit;
+            boost::int64_t overflow_credit = new_credit - HPX_GLOBALCREDIT_INITIAL;
+
+            new_credit
+                = (std::min)(
+                    static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL), new_credit);
+            naming::detail::set_credit_for_gid(gid, new_credit);
+            // Account for a possible overflow ...
+            if(overflow_credit > 0)
+            {
+                HPX_ASSERT(
+                    overflow_credit <= HPX_GLOBALCREDIT_INITIAL-1);
+                util::unlock_guard<scoped_lock> ul(ll);
+                agas::decref(new_gid, overflow_credit);
+            }
+
+            return new_gid;
         }
 
         hpx::future<gid_type> split_gid_if_needed_locked(
@@ -299,46 +326,7 @@ namespace hpx { namespace naming
                     new_gid = gid;
                     HPX_ASSERT(new_gid != invalid_gid);
                     return agas::incref_async(new_gid, new_credit).then(
-                        [&gid](future<boost::int64_t>&&) mutable -> gid_type
-                        {
-                            typedef gid_type::mutex_type::scoped_lock scoped_lock;
-                            scoped_lock ll(gid.get_mutex());
-                            gid_type new_gid = gid;
-                            HPX_ASSERT(new_gid != invalid_gid);
-                            // Mark the gids as being split
-                            set_credit_split_mask_for_gid(gid);
-                            set_credit_split_mask_for_gid(new_gid);
-
-                            // Fill the new gid with our new credit
-                            naming::detail::set_log2credit_for_gid(
-                                new_gid, gid_type::credit_base_mask);
-
-                            // Another concurrent split operation might have happened, we need
-                            // to add the new split credits to the old and account
-                            // for overflow
-                            // Get the current credit for our new gid
-                            boost::int64_t src_credit = get_credit_from_gid(gid);
-                            boost::int64_t split_credit = HPX_GLOBALCREDIT_INITIAL - 2;
-                            boost::int64_t new_credit = src_credit + split_credit;
-                            boost::int64_t overflow_credit = new_credit
-                                - HPX_GLOBALCREDIT_INITIAL;
-
-                            new_credit
-                                = (std::min)(
-                                    static_cast<boost::int64_t>(HPX_GLOBALCREDIT_INITIAL)
-                                  , new_credit);
-                            naming::detail::set_credit_for_gid(gid, new_credit);
-                            // Account for a possible overflow ...
-                            if(overflow_credit > 0)
-                            {
-                                HPX_ASSERT(
-                                    overflow_credit <= HPX_GLOBALCREDIT_INITIAL-1);
-                                util::unlock_guard<scoped_lock> ul(ll);
-                                agas::decref(new_gid, overflow_credit);
-                            }
-
-                            return new_gid;
-                        }
+                        hpx::util::bind(postprocess_incref, boost::ref(gid))
                     );
                 }
 
@@ -461,20 +449,20 @@ namespace hpx { namespace naming
                 id_type_management type = type_;
                 if (managed_move_credit == type)
                     type = managed;
-                typedef gid_type::mutex_type::scoped_lock scoped_lock;
                 gid_type new_gid;
+                if (unmanaged == type_)
                 {
-                    scoped_lock l(this->get_mutex());
-                    if(new_gids_.empty())
-                    {
-                        new_gid = *this;
-                    }
-                    else
-                    {
-                        new_gid = new_gids_.front();
-                        HPX_ASSERT(new_gid != invalid_gid);
-                        new_gids_.pop_front();
-                    }
+                    new_gid = *this;
+                }
+                else if(managed_move_credit == type_)
+                {
+                    // all credits will be moved to the returned gid
+                    new_gid = move_gid(const_cast<id_type_impl&>(*this));
+                }
+                else
+                {
+                    new_gid = ar.get_new_gid(*this);
+                    HPX_ASSERT(new_gid != invalid_gid);
                 }
 
                 gid_serialization_data data { new_gid, type };

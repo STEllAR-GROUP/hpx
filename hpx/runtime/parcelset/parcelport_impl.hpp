@@ -177,37 +177,54 @@ namespace hpx { namespace parcelset
             put_parcel(dest, std::move(p), std::move(f), true);
         }
 
-        void put_parcel(locality const & dest, parcel p, write_handler_type f, bool trigger)
+        void put_parcel(locality const & dest, parcel p, write_handler_type f,
+            bool trigger)
         {
             HPX_ASSERT(dest.type() == type());
 
             boost::shared_ptr<hpx::serialization::detail::future_await_container>
                 future_await(new hpx::serialization::detail::future_await_container());
-            hpx::serialization::output_archive archive(
-                *future_await);
-            archive << p;
+            boost::shared_ptr<hpx::serialization::output_archive>
+                archive(
+                    new hpx::serialization::output_archive(
+                        *future_await, 0, 0, 0, 0, &future_await->new_gids_)
+                );
+            (*archive) << p;
 
             if(future_await->has_futures())
             {
-                void (parcelport_impl::*awaiter)(locality const &, parcel, write_handler_type, bool)
+                void (parcelport_impl::*awaiter)(
+                    locality const &, parcel, write_handler_type, bool
+                  , boost::shared_ptr<hpx::serialization::output_archive> const &
+                  , boost::shared_ptr<
+                        hpx::serialization::detail::future_await_container> const &
+                )
                     = &parcelport_impl::put_parcel_impl;
                 (*future_await)(
                     util::bind(
                         util::one_shot(awaiter), this,
-                        dest, std::move(p), std::move(f), true)
+                        dest, std::move(p), std::move(f), true,
+                        archive, future_await)
                 );
                 return;
             }
             else
             {
-                put_parcel_impl(dest, std::move(p), std::move(f), trigger);
+                put_parcel_impl(
+                    dest, std::move(p), std::move(f), trigger, archive, future_await);
             }
         }
 
-        void put_parcel_impl(locality const & dest, parcel p, write_handler_type f, bool trigger)
+        void put_parcel_impl(
+            locality const & dest, parcel p, write_handler_type f, bool trigger
+          , boost::shared_ptr<hpx::serialization::output_archive> const &
+          , boost::shared_ptr<
+                hpx::serialization::detail::future_await_container
+            > const & future_await)
         {
             // enqueue the outgoing parcel ...
-            enqueue_parcel(dest, std::move(p), std::move(f));
+            enqueue_parcel(
+                dest, std::move(p), std::move(f), std::move(future_await->new_gids_));
 
             if (trigger && enable_parcel_handling_)
             {
@@ -248,7 +265,9 @@ namespace hpx { namespace parcelset
             HPX_ASSERT(parcels.size() == handlers.size());
             for(std::size_t i = 0; i < parcels.size(); ++i)
             {
-                put_parcel(locality_id, std::move(parcels[i]), std::move(handlers[i]), false);
+                put_parcel(
+                    locality_id, std::move(parcels[i]), std::move(handlers[i]),
+                    false);
             }
 
             if (enable_parcel_handling_)
@@ -353,7 +372,7 @@ namespace hpx { namespace parcelset
             return connection_handler().get_locality_name();
         }
 
-        /////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // Return the given connection cache statistic
         boost::int64_t get_connection_cache_statistics(
             connection_cache_statistics_type t, bool reset)
@@ -395,7 +414,7 @@ namespace hpx { namespace parcelset
             return static_cast<ConnectionHandler const &>(*this);
         }
 
-        ///////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // the code below is needed to bootstrap the parcel layer
         void early_pending_parcel_handler(
             boost::system::error_code const& ec, parcel const & p)
@@ -521,9 +540,26 @@ namespace hpx { namespace parcelset
             return sender_connection;
         }
 
+        void merge_gids(new_gids_map & gids, new_gids_map && new_gids)
+        {
+            for(auto & v : new_gids)
+            {
+                new_gids_map::iterator it = gids.find(v.first);
+                if(it == gids.end())
+                {
+                    gids.insert(v);
+                }
+                else
+                {
+                    it->second.insert(
+                        it->second.end(), v.second.begin(), v.second.end());
+                }
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////////
         void enqueue_parcel(locality const& locality_id,
-            parcel&& p, write_handler_type&& f)
+            parcel&& p, write_handler_type&& f, new_gids_map && new_gids)
         {
             typedef pending_parcels_map::mapped_type mapped_type;
 
@@ -537,20 +573,22 @@ namespace hpx { namespace parcelset
 
             mapped_type& e = pending_parcels_[locality_id];
 #if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
-            if(!e.first)
-                e.first = boost::make_shared<std::vector<parcel>>();
-            e.first->push_back(std::move(p));
+            if(!util::get<0>(e))
+                util::get<0>(e) = boost::make_shared<std::vector<parcel> >();
+            util::get<0>(e)->push_back(std::move(p));
 #else
-            e.first.push_back(std::move(p));
+            util::get<0>(e).push_back(std::move(p));
 #endif
-            e.second.push_back(std::move(f));
+            util::get<1>(e).push_back(std::move(f));
+
+            merge_gids(util::get<2>(e), std::move(new_gids));
 
             parcel_destinations_.insert(locality_id);
         }
 
         void enqueue_parcels(locality const& locality_id,
             std::vector<parcel>&& parcels,
-            std::vector<write_handler_type>&& handlers)
+            std::vector<write_handler_type>&& handlers, new_gids_map && new_gids)
         {
             typedef pending_parcels_map::mapped_type mapped_type;
 
@@ -566,55 +604,62 @@ namespace hpx { namespace parcelset
 
             mapped_type& e = pending_parcels_[locality_id];
 #if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
-            if(!e.first)
+            if(!util::get<0>(e))
             {
-                e.first = boost::make_shared<std::vector<parcel>>();
-                HPX_ASSERT(e.second.empty());
-                std::swap(*e.first, parcels);
-                std::swap(e.second, handlers);
+                util::get<0>(e) = boost::make_shared<std::vector<parcel> >();
+                HPX_ASSERT(util::get<1>(e).empty());
+                std::swap(*util::get<0>(e), parcels);
+                std::swap(util::get<1>(e), handlers);
             }
 #else
-            if (e.first.empty())
+            if (util::get<0>(e).empty())
             {
-                HPX_ASSERT(e.second.empty());
+                HPX_ASSERT(util::get<1>(e).empty());
 #if HPX_GCC_VERSION < 40700
                 // GCC4.6 gets incredibly confused
-                std::swap(e.first, static_cast<std::vector<parcel>&>(parcels));
-                std::swap(e.second, static_cast<std::vector<write_handler_type>&>(handlers));
+                std::swap(
+                    util::get<0>(e),
+                    static_cast<std::vector<parcel>&>(parcels));
+                std::swap(
+                    util::get<1>(e),
+                    static_cast<std::vector<write_handler_type>&>(handlers));
 #else
-                std::swap(e.first, parcels);
-                std::swap(e.second, handlers);
+                std::swap(util::get<0>(e), parcels);
+                std::swap(util::get<1>(e), handlers);
 #endif
             }
 #endif
             else
             {
 #if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
-                HPX_ASSERT(e.first->size() == e.second.size());
-                std::size_t new_size = e.first->size() + parcels.size();
-                e.first->reserve(new_size);
+                HPX_ASSERT(util::get<0>(e)->size() == util::get<1>(e).size());
+                std::size_t new_size = util::get<0>(e)->size() + parcels.size();
+                util::get<0>(e)->reserve(new_size);
 
                 std::move(parcels.begin(), parcels.end(),
-                    std::back_inserter(*e.first));
+                    std::back_inserter(*util::get<0>(e)));
 #else
-                HPX_ASSERT(e.first.size() == e.second.size());
-                std::size_t new_size = e.first.size() + parcels.size();
-                e.first.reserve(new_size);
+                HPX_ASSERT(util::get<0>(e).size() == util::get<1>(e).size());
+                std::size_t new_size = util::get<0>(e).size() + parcels.size();
+                util::get<0>(e).reserve(new_size);
 
                 std::move(parcels.begin(), parcels.end(),
-                    std::back_inserter(e.first));
+                    std::back_inserter(util::get<0>(e)));
 #endif
-                e.second.reserve(new_size);
+                util::get<1>(e).reserve(new_size);
                 std::move(handlers.begin(), handlers.end(),
-                    std::back_inserter(e.second));
+                    std::back_inserter(util::get<1>(e)));
             }
+
+            merge_gids(util::get<2>(e), std::move(new_gids));
 
             parcel_destinations_.insert(locality_id);
         }
 
         bool dequeue_parcels(locality const& locality_id,
             std::vector<parcel>& parcels,
-            std::vector<write_handler_type>& handlers)
+            std::vector<write_handler_type>& handlers,
+            new_gids_map & new_gids)
         {
             typedef pending_parcels_map::iterator iterator;
 
@@ -629,25 +674,27 @@ namespace hpx { namespace parcelset
                 // do nothing if parcels have already been picked up by
                 // another thread
 #if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
-                if (it != pending_parcels_.end() && !it->second.first->empty())
+                if (it != pending_parcels_.end() && !util::get<0>(it->second)->empty())
 #else
-                if (it != pending_parcels_.end() && !it->second.first.empty())
+                if (it != pending_parcels_.end() && !util::get<0>(it->second).empty())
 #endif
                 {
                     HPX_ASSERT(it->first == locality_id);
                     HPX_ASSERT(handlers.size() == parcels.size());
 #if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
-                    std::swap(parcels, *it->second.first);
+                    std::swap(parcels, *util::get<0>(it->second));
 #else
-                    std::swap(parcels, it->second.first);
+                    std::swap(parcels, util::get<0>(it->second));
 #endif
-                    std::swap(handlers, it->second.second);
+                    std::swap(handlers, util::get<1>(it->second));
+
+                    std::swap(new_gids, util::get<2>(it->second));
 
                     HPX_ASSERT(!handlers.empty());
                 }
                 else
                 {
-                    HPX_ASSERT(it->second.second.empty());
+                    HPX_ASSERT(util::get<1>(it->second).empty());
                     return false;
                 }
 
@@ -717,8 +764,9 @@ namespace hpx { namespace parcelset
             {
                 std::vector<parcel> parcels;
                 std::vector<write_handler_type> handlers;
+                new_gids_map new_gids;
 
-                if(!dequeue_parcels(locality_id, parcels, handlers))
+                if(!dequeue_parcels(locality_id, parcels, handlers, new_gids))
                     break;
 
                 // If one of the sending threads are in suspended state, we
@@ -733,7 +781,7 @@ namespace hpx { namespace parcelset
                 {
                     // give the parcels back to the queues for later
                     enqueue_parcels(locality_id, std::move(parcels),
-                        std::move(handlers));
+                        std::move(handlers), std::move(new_gids));
 
                     // We can safely return if no connection is available
                     // at this point. As soon as a connection becomes
@@ -758,6 +806,7 @@ namespace hpx { namespace parcelset
                               , sender_connection
                               , std::move(parcels)
                               , std::move(handlers)
+                              , std::move(new_gids)
                             )
                           , "parcelport_impl::send_pending_parcels"
                           , threads::pending, true, threads::thread_priority_boost,
@@ -769,7 +818,7 @@ namespace hpx { namespace parcelset
                     send_pending_parcels(
                         locality_id,
                         sender_connection, std::move(parcels),
-                        std::move(handlers));
+                        std::move(handlers), std::move(new_gids));
                 }
 
                 // We yield here for a short amount of time to give another
@@ -807,9 +856,9 @@ namespace hpx { namespace parcelset
                 pending_parcels_map::iterator it = pending_parcels_.find(locality_id);
 #if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
                 if (it == pending_parcels_.end() ||
-                    (it->second.first && it->second.first->empty()))
+                    (util::get<0>(it->second) && util::get<0>(it->second)->empty()))
 #else
-                if (it == pending_parcels_.end() || it->second.first.empty())
+                if (it == pending_parcels_.end() || util::get<0>(it->second).empty())
 #endif
                     return;
             }
@@ -823,7 +872,8 @@ namespace hpx { namespace parcelset
             parcelset::locality const & parcel_locality_id,
             boost::shared_ptr<connection> sender_connection,
             std::vector<parcel>&& parcels,
-            std::vector<write_handler_type>&& handlers)
+            std::vector<write_handler_type>&& handlers,
+            new_gids_map new_gids)
         {
             // If we are stopped already, discard the remaining pending parcels
             if (hpx::is_stopped()) return;
@@ -841,7 +891,8 @@ namespace hpx { namespace parcelset
             std::size_t num_parcels = encode_parcels(&parcels[0],
                     parcels.size(), sender_connection->buffer_,
                     archive_flags_,
-                    this->get_max_outbound_message_size());
+                    this->get_max_outbound_message_size(),
+                    &new_gids);
 
             using hpx::parcelset::detail::call_for_each;
             using namespace hpx::util::placeholders;
@@ -873,7 +924,8 @@ namespace hpx { namespace parcelset
 
                 // send only part of the parcels
                 sender_connection->async_write(
-                    call_for_each(std::move(handled_handlers), std::move(handled_parcels)),
+                    call_for_each(
+                        std::move(handled_handlers), std::move(handled_parcels)),
                     util::bind(&parcelport_impl::send_pending_parcels_trampoline,
                         this, _1, _2, _3));
 
@@ -882,7 +934,7 @@ namespace hpx { namespace parcelset
                 handlers.erase(handlers.begin(), handlers.begin()+num_parcels);
 
                 enqueue_parcels(parcel_locality_id, std::move(parcels),
-                    std::move(handlers));
+                    std::move(handlers), std::move(new_gids));
             }
 
             std::size_t num_thread(0);

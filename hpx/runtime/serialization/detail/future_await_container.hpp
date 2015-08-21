@@ -32,6 +32,8 @@ namespace hpx { namespace serialization { namespace detail
         : public boost::enable_shared_from_this<future_await_container>
     {
         typedef hpx::lcos::local::spinlock mutex_type;
+        typedef std::list<naming::gid_type> new_gids_type;
+        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
     public:
         future_await_container()
           : done_(false)
@@ -88,12 +90,11 @@ namespace hpx { namespace serialization { namespace detail
             }
 
             hpx::lcos::local::dataflow(//hpx::launch::sync,
-                [](future<void>&&, boost::shared_ptr<future_await_container>, F f)
-                {
-                    f();
-                }
-              , promise_.get_future(), shared_from_this(), std::move(f));
+                util::unwrapped(std::move(f))
+              , promise_.get_future());
         }
+
+        new_gids_map new_gids_;
 
     private:
         mutex_type mtx_;

@@ -357,13 +357,20 @@ namespace hpx { namespace parcelset
         hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
+        typedef std::list<naming::gid_type> new_gids_type;
+        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
 #if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
-        typedef std::pair<
-            boost::shared_ptr<std::vector<parcel>>
+        typedef util::tuple<
+            boost::shared_ptr<std::vector<parcel> >
           , std::vector<write_handler_type>
+          , new_gids_map
         >
 #else
-        typedef std::pair<std::vector<parcel>, std::vector<write_handler_type> >
+        typedef util::tuple<
+            std::vector<parcel>
+          , std::vector<write_handler_type>
+          , new_gids_map
+        >
 #endif
             map_second_type;
         typedef std::map<locality, map_second_type> pending_parcels_map;

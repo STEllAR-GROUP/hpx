@@ -106,9 +106,9 @@ namespace hpx { namespace parcelset
             }
         public:
             parcelport(util::runtime_configuration const& ini,
-                util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-                util::function_nonser<void()> const& on_stop_thread)
-              : base_type(ini, here(), on_start_thread, on_stop_thread)
+                util::function_nonser<void(std::size_t, char const*)> const& on_start,
+                util::function_nonser<void()> const& on_stop)
+              : base_type(ini, here(), on_start, on_stop)
               , stopped_(false)
               , chunk_pool_(4096, max_connections(ini))
               , sender_(chunk_pool_)
@@ -149,7 +149,6 @@ namespace hpx { namespace parcelset
 
             void enable_parcel_handling(bool new_state)
             {
-                enable_parcel_handling_ = new_state;
                 if(!new_state)
                 {
                     while(handles_parcels_ != 0)
@@ -171,10 +170,12 @@ namespace hpx { namespace parcelset
                 parcelset::locality const& l, error_code& ec)
             {
                 int dest_rank = l.get<locality>().rank();
-                return sender_.create_connection(dest_rank, parcels_sent_);
+                return sender_.create_connection(
+                    dest_rank, enable_parcel_handling_, parcels_sent_);
             }
 
-            parcelset::locality agas_locality(util::runtime_configuration const & ini) const
+            parcelset::locality agas_locality(
+                util::runtime_configuration const & ini) const
             {
                 return
                     parcelset::locality(

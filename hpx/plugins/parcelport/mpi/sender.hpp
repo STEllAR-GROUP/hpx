@@ -53,11 +53,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
 
         connection_ptr create_connection(int dest,
+            boost::atomic<bool> & enable,
             performance_counters::parcels::gatherer & parcels_sent)
         {
             return
                 boost::make_shared<connection_type>(
-                    this, dest, chunk_pool_, parcels_sent);
+                    this, dest, chunk_pool_, enable, parcels_sent);
         }
 
         void add(connection_ptr const & ptr)
@@ -65,32 +66,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             boost::unique_lock<mutex_type> l(connections_mtx_);
             connections_.push_back(ptr);
         }
-//         template <typename Handler>
-//         void send(
-//             int dest
-//           , parcel && p
-//           , Handler && handler
-//           , Buffer && buffer
-//           , performance_counters::parcels::gatherer & parcels_sent
-//         )
-//         {
-//             connection_ptr sender(
-//                 new connection_type(
-//                     tag_provider_.acquire()
-//                   , dest
-//                   , std::move(p)
-//                   , std::move(buffer)
-//                   , std::forward<Handler>(handler)
-//                   , parcels_sent
-//                 )
-//             );
-//
-//             if(!sender->send())
-//             {
-//                 boost::unique_lock<mutex_type> l(connections_mtx_);
-//                 connections_.push_back(std::move(sender));
-//             }
-//         }
 
         int acquire_tag()
         {

@@ -9,7 +9,7 @@
 #define HPX_UTIL_DETAIL_FUNCTION_TEMPLATE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/access.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/basic_function.hpp>

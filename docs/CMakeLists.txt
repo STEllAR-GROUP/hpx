@@ -123,6 +123,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/new.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_enums.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/fold.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/reduce.hpp"

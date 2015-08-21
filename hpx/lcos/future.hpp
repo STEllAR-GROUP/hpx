@@ -44,18 +44,6 @@ namespace hpx { namespace lcos { namespace detail
         has_exception = 2
     };
 
-    template <typename R, typename T>
-    future<R> get_future(T & t)
-    {
-        return t.get_future();
-    }
-
-    template <typename T>
-    void set_value(T & t)
-    {
-        return t.set_value();
-    }
-
     template <typename Archive, typename Future>
     typename boost::disable_if<
         boost::is_void<typename traits::future_traits<Future>::type>

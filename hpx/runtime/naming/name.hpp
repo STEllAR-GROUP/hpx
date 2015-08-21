@@ -12,7 +12,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/register_locks_globally.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
@@ -784,11 +784,6 @@ namespace hpx { namespace naming
               : count_(0), type_(unknown_deleter)
             {}
 
-//             ~id_type_impl()
-//             {
-//                 HPX_ASSERT(new_gids_.empty());
-//             }
-
             explicit id_type_impl (boost::uint64_t lsb_id, id_type_management t)
               : gid_type(0, lsb_id), count_(0), type_(t)
             {}
@@ -826,8 +821,6 @@ namespace hpx { namespace naming
 
             boost::detail::atomic_count count_;
             id_type_management type_;
-
-            mutable std::list<naming::gid_type> new_gids_;
         };
     }
 
