@@ -572,7 +572,7 @@ namespace hpx { namespace parcelset
             > il(&l);
 
             mapped_type& e = pending_parcels_[locality_id];
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
             if(!util::get<0>(e))
                 util::get<0>(e) = boost::make_shared<std::vector<parcel> >();
             util::get<0>(e)->push_back(std::move(p));
@@ -603,13 +603,23 @@ namespace hpx { namespace parcelset
             HPX_ASSERT(parcels.size() == handlers.size());
 
             mapped_type& e = pending_parcels_[locality_id];
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
             if(!util::get<0>(e))
             {
                 util::get<0>(e) = boost::make_shared<std::vector<parcel> >();
                 HPX_ASSERT(util::get<1>(e).empty());
+#if HPX_GCC_VERSION < 40700
+                // GCC4.6 gets incredibly confused
+                std::swap(
+                    *util::get<0>(e),
+                    static_cast<std::vector<parcel>&>(parcels));
+                std::swap(
+                    util::get<1>(e),
+                    static_cast<std::vector<write_handler_type>&>(handlers));
+#else
                 std::swap(*util::get<0>(e), parcels);
                 std::swap(util::get<1>(e), handlers);
+#endif
             }
 #else
             if (util::get<0>(e).empty())
@@ -631,7 +641,7 @@ namespace hpx { namespace parcelset
 #endif
             else
             {
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
                 HPX_ASSERT(util::get<0>(e)->size() == util::get<1>(e).size());
                 std::size_t new_size = util::get<0>(e)->size() + parcels.size();
                 util::get<0>(e)->reserve(new_size);
@@ -673,7 +683,7 @@ namespace hpx { namespace parcelset
 
                 // do nothing if parcels have already been picked up by
                 // another thread
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
                 if (it != pending_parcels_.end() && !util::get<0>(it->second)->empty())
 #else
                 if (it != pending_parcels_.end() && !util::get<0>(it->second).empty())
@@ -681,7 +691,7 @@ namespace hpx { namespace parcelset
                 {
                     HPX_ASSERT(it->first == locality_id);
                     HPX_ASSERT(handlers.size() == parcels.size());
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
                     std::swap(parcels, *util::get<0>(it->second));
 #else
                     std::swap(parcels, util::get<0>(it->second));
@@ -854,7 +864,7 @@ namespace hpx { namespace parcelset
 
                 HPX_ASSERT(locality_id == sender_connection->destination());
                 pending_parcels_map::iterator it = pending_parcels_.find(locality_id);
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
                 if (it == pending_parcels_.end() ||
                     (util::get<0>(it->second) && util::get<0>(it->second)->empty()))
 #else

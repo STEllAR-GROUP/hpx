@@ -28,6 +28,12 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
+#elif defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700
+#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace agas
 {
@@ -359,7 +365,7 @@ namespace hpx { namespace parcelset
         /// The cache for pending parcels
         typedef std::list<naming::gid_type> new_gids_type;
         typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
         typedef util::tuple<
             boost::shared_ptr<std::vector<parcel> >
           , std::vector<write_handler_type>
