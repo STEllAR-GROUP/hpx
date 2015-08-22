@@ -5,6 +5,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/config.hpp>
+#include <hpx/version.hpp>
 #include <hpx/util/batch_environment.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/sed_transform.hpp>
