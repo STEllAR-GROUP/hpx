@@ -47,8 +47,6 @@ namespace hpx { namespace lcos
 namespace hpx { namespace lcos
 {
 
-namespace local { template <typename T> struct channel; }
-
 namespace detail
 {
     template <typename Result> struct future_data;

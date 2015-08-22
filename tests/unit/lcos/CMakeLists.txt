@@ -19,6 +19,7 @@ set(tests
     async_remote
     broadcast
     broadcast_apply
+    channel
     condition_variable
     counting_semaphore
     barrier
@@ -67,6 +68,8 @@ set(async_cb_remote_PARAMETERS LOCALITIES 2)
 
 set(broadcast_PARAMETERS LOCALITIES 2)
 set(broadcast_apply_PARAMETERS LOCALITIES 2)
+
+set(channel_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(future_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_then_PARAMETERS THREADS_PER_LOCALITY 4)
