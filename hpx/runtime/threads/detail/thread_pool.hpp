@@ -61,8 +61,11 @@ namespace hpx { namespace threads { namespace detail
         void create_work(thread_init_data& data,
             thread_state_enum initial_state, error_code& ec);
 
-        thread_id_type
-        set_state(util::steady_time_point const& abs_time,
+        thread_state set_state(thread_id_type const& id,
+            thread_state_enum new_state, thread_state_ex_enum new_state_ex,
+            thread_priority priority, error_code& ec);
+
+        thread_id_type set_state(util::steady_time_point const& abs_time,
             thread_id_type const& id, thread_state_enum newstate,
             thread_state_ex_enum newstate_ex, thread_priority priority,
             error_code& ec);

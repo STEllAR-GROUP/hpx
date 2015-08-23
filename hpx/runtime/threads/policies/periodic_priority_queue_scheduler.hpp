@@ -57,6 +57,11 @@ namespace hpx { namespace threads { namespace policies
           : base_type(init, deferred_initialization)
         {}
 
+        static std::string get_scheduler_name()
+        {
+            return "periodic_priority_queue_scheduler";
+        }
+
         bool periodic_maintenance(bool running)
         {
             // periodic maintenance redistributes work and is responsible that

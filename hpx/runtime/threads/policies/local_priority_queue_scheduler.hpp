@@ -147,6 +147,11 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
+        static std::string get_scheduler_name()
+        {
+            return "local_priority_queue_scheduler";
+        }
+
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         boost::uint64_t get_creation_time(bool reset)
         {

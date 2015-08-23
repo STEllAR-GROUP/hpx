@@ -218,8 +218,7 @@ namespace hpx { namespace threads
             thread_state_ex_enum new_state_ex, thread_priority priority,
             error_code& ec)
     {
-        return detail::set_thread_state(id, new_state, //-V107
-            new_state_ex, priority, get_worker_thread_num(), ec);
+        return pool_.set_state(id, new_state, new_state_ex, priority, ec); //-V107
     }
 
     /// The get_state function is part of the thread related API. It

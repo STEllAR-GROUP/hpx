@@ -187,6 +187,16 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
+    thread_state thread_pool<Scheduler>::set_state(
+        thread_id_type const& id, thread_state_enum new_state,
+        thread_state_ex_enum new_state_ex, thread_priority priority,
+        error_code& ec)
+    {
+        return detail::set_thread_state(id, new_state, //-V107
+            new_state_ex, priority, get_worker_thread_num(), ec);
+    }
+
+    template <typename Scheduler>
     thread_id_type thread_pool<Scheduler>::set_state(
         util::steady_time_point const& abs_time,
         thread_id_type const& id, thread_state_enum newstate,

@@ -180,6 +180,11 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
+        static std::string get_scheduler_name()
+        {
+            return "hierarchy_scheduler";
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
         boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
