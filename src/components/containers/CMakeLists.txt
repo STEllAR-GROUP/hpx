@@ -7,7 +7,7 @@
 
 set(subdirs
     unordered
-    vector
+    partitioned_vector
    )
 
 foreach(subdir ${subdirs})

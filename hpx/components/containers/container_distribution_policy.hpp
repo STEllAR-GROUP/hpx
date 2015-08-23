@@ -21,8 +21,9 @@ namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     // This class specifies the block chunking policy parameters to use for the
-    // partitioning of the data in a hpx::vector
-    struct container_distribution_policy : components::default_distribution_policy
+    // partitioning of the data in a hpx::partitioned_vector
+    struct container_distribution_policy
+      : components::default_distribution_policy
     {
     public:
         container_distribution_policy()

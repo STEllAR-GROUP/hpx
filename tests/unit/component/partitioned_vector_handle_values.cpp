@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/vector.hpp>
+#include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
@@ -15,14 +15,14 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
-HPX_REGISTER_VECTOR(double);
-HPX_REGISTER_VECTOR(int);
+HPX_REGISTER_PARTITIONED_VECTOR(double);
+HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void fill_vector(hpx::vector<T>& v, T const& val)
+void fill_vector(hpx::partitioned_vector<T>& v, T const& val)
 {
-    typename hpx::vector<T>::iterator it = v.begin(), end = v.end();
+    typename hpx::partitioned_vector<T>::iterator it = v.begin(), end = v.end();
     for (/**/; it != end; ++it)
         *it = val;
 }
@@ -64,7 +64,7 @@ void compare_vectors(Vector const& v1, Vector const& v2,
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void handle_values_tests(hpx::vector<T>& v)
+void handle_values_tests(hpx::partitioned_vector<T>& v)
 {
     fill_vector(v, T(42));
 
@@ -81,7 +81,7 @@ void handle_values_tests(hpx::vector<T>& v)
 }
 
 template <typename T>
-void handle_values_tests_distributed_access(hpx::vector<T>& v)
+void handle_values_tests_distributed_access(hpx::partitioned_vector<T>& v)
 {
     fill_vector (v, T(42));
 
@@ -110,12 +110,12 @@ void handle_values_tests_with_policy(std::size_t size, std::size_t localities,
     DistPolicy const& policy)
 {
     {
-        hpx::vector<T> v(size, policy);
+        hpx::partitioned_vector<T> v(size, policy);
         handle_values_tests(v);
     }
 
     {
-        hpx::vector<T> v(size, policy);
+        hpx::partitioned_vector<T> v(size, policy);
         handle_values_tests_distributed_access(v);
     }
 }
@@ -127,15 +127,15 @@ void handle_values_tests()
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     {
-        hpx::vector<T> v(length);
+        hpx::partitioned_vector<T> v(length);
         handle_values_tests(v);
     }
     {
-        hpx::vector<T> v(length);
+        hpx::partitioned_vector<T> v(length);
         handle_values_tests_distributed_access(v);
     }
     {
-        hpx::vector<T> v(length, T(42));
+        hpx::partitioned_vector<T> v(length, T(42));
         handle_values_tests(v);
     }
 

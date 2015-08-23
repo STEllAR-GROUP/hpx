@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/vector.hpp>
+#include <hpx/include/partitioned_vector.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -16,9 +16,10 @@
 
 bool verbose = false;
 
-double test_results(boost::uint64_t order, hpx::vector<double> const & trans);
+double test_results(boost::uint64_t order,
+    hpx::partitioned_vector<double> const & trans);
 
-HPX_REGISTER_VECTOR(double);
+HPX_REGISTER_PARTITIONED_VECTOR(double);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
@@ -35,8 +36,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t bytes =
         static_cast<boost::uint64_t>(2.0 * sizeof(double) * order * order);
 
-    hpx::vector<double> A(order * order);
-    hpx::vector<double> B(order * order);
+    hpx::partitioned_vector<double> A(order * order);
+    hpx::partitioned_vector<double> B(order * order);
 
     std::cout
         << "Serial Matrix transpose: B = A^T\n"
@@ -160,7 +161,8 @@ int main(int argc, char* argv[])
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
 
-double test_results(boost::uint64_t order, hpx::vector<double> const & trans)
+double test_results(boost::uint64_t order,
+    hpx::partitioned_vector<double> const & trans)
 {
     double errsq = 0.0;
 
