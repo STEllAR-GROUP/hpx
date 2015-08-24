@@ -75,7 +75,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 void register_policy(void) {
     apex::register_periodic_policy(1000, [](apex_context const& context) {
         std::cout << "Periodic policy!" << std::endl;
-        return true;
+        return APEX_NOERROR;
     });
 }
 

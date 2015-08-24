@@ -117,15 +117,16 @@ bool test_function(apex_context const& context) {
         //id_type id = get_counter_id();
         counter_value value1 = performance_counter::get_value(counter_id);
         if (value1.get_value<int>() % 2 == 1) {
-          return true;
+          return APEX_NOERROR;
         } else {
-          return false;
+          std::cerr << "Expecting an error message..." << std::endl;
+          return APEX_ERROR;
         }
     }
     catch(hpx::exception const& e) {
         std::cerr << "apex_policy_engine_active_thread_count: caught exception: "
             << e.what() << std::endl;
-        return false;
+        return APEX_ERROR;
     }
 }
 

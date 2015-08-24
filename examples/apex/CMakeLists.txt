@@ -9,6 +9,7 @@ set(example_programs
     apex_policy_engine_events
     apex_policy_engine_active_thread_count
     apex_balance
+    apex_fibonacci
    )
 
 foreach(example_program ${example_programs})
