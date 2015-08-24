@@ -9,6 +9,7 @@
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>

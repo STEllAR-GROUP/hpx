@@ -62,10 +62,14 @@ namespace detail
     ///////////////////////////////////////////////////////////////////////
     struct future_data_refcnt_base
     {
+    private:
+        typedef util::unique_function_nonser<void()> completed_callback_type;
     public:
         typedef void has_future_data_refcnt_base;
 
         virtual ~future_data_refcnt_base() {}
+
+        virtual void set_on_completed(completed_callback_type) = 0;
 
         virtual bool requires_delete()
         {

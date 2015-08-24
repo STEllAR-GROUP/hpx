@@ -50,6 +50,8 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound>
         struct apply_continuation_impl
         {
+            HPX_MOVABLE_BUT_NOT_COPYABLE(apply_continuation_impl);
+        public:
             typedef typename util::decay<Bound>::type bound_type;
 
             template <typename T>
@@ -156,6 +158,8 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound>
         struct async_continuation_impl
         {
+            HPX_MOVABLE_BUT_NOT_COPYABLE(async_continuation_impl);
+        public:
             typedef typename util::decay<Bound>::type bound_type;
 
             template <typename T>
