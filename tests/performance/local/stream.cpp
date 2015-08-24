@@ -17,8 +17,6 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_transform.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/tuple.hpp>
-#include <hpx/util/zip_iterator.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
@@ -194,26 +192,22 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // Add
         {
-            auto zip_begin = hpx::util::make_zip_iterator(a.begin(), b.begin());
-            auto zip_end = hpx::util::make_zip_iterator(a.end(), b.end());
             hpx::parallel::transform(hpx::parallel::par,
-                zip_begin, zip_end, c.begin(),
-                [](hpx::util::tuple<STREAM_TYPE, STREAM_TYPE> v)
+                a.begin(), a.end(), b.begin(), b.end(), c.begin(),
+                [](STREAM_TYPE val_a, STREAM_TYPE val_b)
                 {
-                    return hpx::util::get<0>(v) + hpx::util::get<1>(v);
+                    return val_a + val_b;
                 }
             );
         }
 
         // Triad
         {
-            auto zip_begin = hpx::util::make_zip_iterator(b.begin(), c.begin());
-            auto zip_end = hpx::util::make_zip_iterator(b.end(), c.end());
             hpx::parallel::transform(hpx::parallel::par,
-                zip_begin, zip_end, a.begin(),
-                [scalar](hpx::util::tuple<STREAM_TYPE, STREAM_TYPE> v)
+                b.begin(), b.end(), c.begin(), c.end(), a.begin(),
+                [scalar](STREAM_TYPE val_a, STREAM_TYPE val_b)
                 {
-                    return hpx::util::get<0>(v) + scalar * hpx::util::get<1>(v);
+                    return val_a + scalar * val_b;
                 }
             );
         }
@@ -297,7 +291,7 @@ void check_results(
         epsilon = 1.e-13;
     }
     else {
-        printf("WEIRD: sizeof(STREAM_TYPE) = %lu\n",sizeof(STREAM_TYPE));
+        printf("WEIRD: sizeof(STREAM_TYPE) = %zu\n", sizeof(STREAM_TYPE));
         epsilon = 1.e-6;
     }
 
