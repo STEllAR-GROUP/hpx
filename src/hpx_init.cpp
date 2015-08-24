@@ -545,9 +545,9 @@ namespace hpx
         {
             std::string affinity_domain("pu");
 #if defined(HPX_HAVE_HWLOC)
-            if (0 != cfg.vm_.count("hpx:affinity"))
+            if (!cfg.affinity_domain_.empty())
             {
-                affinity_domain = cfg.vm_["hpx:affinity"].as<std::string>();
+                affinity_domain = cfg.affinity_domain_;
                 if (0 != std::string("pu").find(affinity_domain) &&
                     0 != std::string("core").find(affinity_domain) &&
                     0 != std::string("numa").find(affinity_domain) &&
@@ -566,12 +566,11 @@ namespace hpx
             std::string& affinity_desc)
         {
 #if defined(HPX_HAVE_HWLOC)
-            if (0 == cfg.vm_.count("hpx:bind"))
+            if (cfg.affinity_bind_.empty())
                 return 0 != cfg.vm_.count("hpx:numa-sensitive");
 
-            if (cfg.vm_.count("hpx:pu-offset") ||
-                cfg.vm_.count("hpx:pu-step") ||
-                cfg.vm_.count("hpx:affinity"))
+            if (cfg.pu_offset_ != 0 || cfg.pu_step_ != 1 ||
+                !cfg.affinity_domain_.empty())
             {
                 throw detail::command_line_error(
                     "Command line option --hpx:bind "
@@ -579,15 +578,7 @@ namespace hpx
                     "or --hpx:affinity.");
             }
 
-            std::vector<std::string> bind_affinity =
-                cfg.vm_["hpx:bind"].as<std::vector<std::string> >();
-            for (std::string const& s : bind_affinity)
-            {
-                if (!affinity_desc.empty())
-                    affinity_desc += ";";
-                affinity_desc += s;
-            }
-
+            affinity_desc = cfg.affinity_bind_;
             return true;
 #else
             return 0 != cfg.vm_.count("hpx:numa-sensitive");
@@ -596,10 +587,10 @@ namespace hpx
 
         std::size_t get_pu_offset(util::command_line_handling const& cfg)
         {
-            std::size_t pu_offset = std::size_t(-1);
+            std::size_t pu_offset = 0;
 #if defined(HPX_HAVE_HWLOC)
-            if (cfg.vm_.count("hpx:pu-offset")) {
-                pu_offset = cfg.vm_["hpx:pu-offset"].as<std::size_t>();
+            if (cfg.pu_offset_ != 0) {
+                pu_offset = cfg.pu_offset_;
                 if (pu_offset >= hpx::threads::hardware_concurrency()) {
                     throw detail::command_line_error(
                         "Invalid command line option "
@@ -615,8 +606,8 @@ namespace hpx
         {
             std::size_t pu_step = 1;
 #if defined(HPX_HAVE_HWLOC)
-            if (cfg.vm_.count("hpx:pu-step")) {
-                pu_step = cfg.vm_["hpx:pu-step"].as<std::size_t>();
+            if (cfg.pu_step_ != 1) {
+                pu_step = cfg.pu_step_;
                 if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency())
                 {
                     throw detail::command_line_error(

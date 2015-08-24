@@ -15,12 +15,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         os_thread_(std::size_t(-1))
     {}
 
-    default_executor::default_executor(thread_stacksize stacksize)
-      : stacksize_(stacksize),
-        priority_(thread_priority_default),
-        os_thread_(std::size_t(-1))
-    {}
-
     default_executor::default_executor(thread_priority priority,
         thread_stacksize stacksize, std::size_t os_thread)
       : stacksize_(stacksize),

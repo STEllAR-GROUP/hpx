@@ -148,6 +148,9 @@ namespace hpx { namespace util
             "first_pu = 0",
             "runtime_mode = console",
             "scheduler = local-priority",
+            "affinity = pu",
+            "pu_step = 1",
+            "pu_offset = 0",
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
@@ -174,7 +177,7 @@ namespace hpx { namespace util
             // enable aliasing
             "aliasing = ${HPX_COMMANDLINE_ALIASING:1}",
 
-            // allow for unknown options to passes through
+            // allow for unknown options to passed through
             "allow_unknown = ${HPX_COMMANDLINE_ALLOW_UNKNOWN:0}",
 
             // predefine command line aliases

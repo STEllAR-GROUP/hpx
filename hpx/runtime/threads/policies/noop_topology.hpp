@@ -160,6 +160,16 @@ public:
 #endif
     }
 
+    std::size_t get_number_of_sockets() const
+    {
+        return 1;
+    }
+
+    std::size_t get_number_of_numa_domains() const
+    {
+        return 1;
+    }
+
     std::size_t get_number_of_cores() const
     {
         return noop_topology::hardware_concurrency();
@@ -173,6 +183,16 @@ public:
     std::size_t get_number_of_core_pus(std::size_t core) const
     {
         return ~std::size_t(0);
+    }
+
+    std::size_t get_number_of_numa_node_cores(std::size_t numa) const
+    {
+        return noop_topology::hardware_concurrency();
+    }
+
+    std::size_t get_number_of_numa_node_pus(std::size_t numa) const
+    {
+        return noop_topology::hardware_concurrency();
     }
 
     std::size_t get_core_number(std::size_t num_thread, error_code& ec = throws) const

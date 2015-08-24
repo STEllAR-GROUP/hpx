@@ -8,6 +8,7 @@
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/timed_executor_traits.hpp>
+#include <hpx/parallel/executors/thread_executor_traits.hpp>
 #include <hpx/parallel/executors/timed_thread_executor_traits.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
 
@@ -17,5 +18,7 @@
 #include <hpx/parallel/executors/service_executors.hpp>
 #include <hpx/parallel/executors/this_thread_executors.hpp>
 #include <hpx/parallel/executors/thread_pool_executors.hpp>
+#include <hpx/parallel/executors/thread_pool_os_executors.hpp>
+#include <hpx/parallel/executors/default_executor.hpp>
 
 #endif

@@ -55,7 +55,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         pool_(scheduler_, notifier_, executor_name_.c_str(), false),
         num_threads_(num_punits)
     {
-        if (num_punits > hpx::get_os_thread_count())
+        if (num_punits > hpx::threads::hardware_concurrency())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "thread_pool_os_executor<Scheduler>::thread_pool_os_executor",

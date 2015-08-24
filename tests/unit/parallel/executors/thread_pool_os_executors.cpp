@@ -107,7 +107,7 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    // By default this test should run on one core (the schedulers create more
+    // By default this test should run on one core (the executors create more
     // threads)
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=1");

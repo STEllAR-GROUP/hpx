@@ -299,11 +299,23 @@ namespace hpx { namespace threads
         ///                   the function will throw on error instead.
         virtual bool reduce_thread_priority(error_code& ec = throws) const;
 
+        /// \brief Return the number of available NUMA domains
+        virtual std::size_t get_number_of_sockets() const = 0;
+
+        /// \brief Return the number of available NUMA domains
+        virtual std::size_t get_number_of_numa_nodes() const = 0;
+
         /// \brief Return the number of available cores
         virtual std::size_t get_number_of_cores() const = 0;
 
         /// \brief Return the number of available hardware processing units
         virtual std::size_t get_number_of_pus() const = 0;
+
+        /// \brief Return number of cores in given numa domain
+        virtual std::size_t get_number_of_numa_node_cores(std::size_t numa) const = 0;
+
+        /// \brief Return number of processing units in given numa domain
+        virtual std::size_t get_number_of_numa_node_pus(std::size_t numa) const = 0;
 
         /// \brief Return number of processing units in given core
         virtual std::size_t get_number_of_core_pus(std::size_t core) const = 0;
