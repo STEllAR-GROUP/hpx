@@ -545,7 +545,7 @@ namespace hpx
         {
             std::string affinity_domain("pu");
 #if defined(HPX_HAVE_HWLOC)
-            if (!cfg.affinity_domain_.empty())
+            if (cfg.affinity_domain_ != "pu")
             {
                 affinity_domain = cfg.affinity_domain_;
                 if (0 != std::string("pu").find(affinity_domain) &&
@@ -570,7 +570,7 @@ namespace hpx
                 return 0 != cfg.vm_.count("hpx:numa-sensitive");
 
             if (cfg.pu_offset_ != 0 || cfg.pu_step_ != 1 ||
-                !cfg.affinity_domain_.empty())
+                cfg.affinity_domain_ != "pu")
             {
                 throw detail::command_line_error(
                     "Command line option --hpx:bind "

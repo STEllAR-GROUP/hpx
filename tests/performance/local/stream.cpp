@@ -102,18 +102,25 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     std::cout
         << "-------------------------------------------------------------\n"
-        << "Modified STREAM bechmark based on HPX version " << hpx::build_string() << "\n"
+        << "Modified STREAM bechmark based on HPX version "
+            << hpx::build_string() << "\n"
         << "-------------------------------------------------------------\n"
-        << "This system uses " << sizeof(STREAM_TYPE) << " bytes per array element.\n"
+        << "This system uses " << sizeof(STREAM_TYPE)
+            << " bytes per array element.\n"
         << "-------------------------------------------------------------\n"
-        << "Array size = " << vector_size << " (elements), Offset = " << offset << " (elements)\n"
-        << "Memory per array = " << sizeof(STREAM_TYPE) * (vector_size / 1024. / 1024.) << " MiB "
-        << "(= " <<  sizeof(STREAM_TYPE) * (vector_size / 1024. / 1024. / 1024.) << " GiB).\n"
+        << "Array size = " << vector_size << " (elements), "
+           "Offset = " << offset << " (elements)\n"
+        << "Memory per array = "
+            << sizeof(STREAM_TYPE) * (vector_size / 1024. / 1024.) << " MiB "
+        << "(= "
+            <<  sizeof(STREAM_TYPE) * (vector_size / 1024. / 1024. / 1024.)
+            << " GiB).\n"
         << "Each kernel will be executed " << iterations << " times.\n"
         << " The *best* time for each kernel (excluding the first iteration)\n"
         << " will be used to compute the reported bandwidth.\n"
         << "-------------------------------------------------------------\n"
-        << "Number of Threads requested = " << hpx::threads::hardware_concurrency() << "\n"
+        << "Number of Threads requested = "
+            << hpx::threads::hardware_concurrency() << "\n"
         << "-------------------------------------------------------------\n"
         ;
 
@@ -247,21 +254,21 @@ void check_results(
   , vector_type const & b
   , vector_type const & c)
 {
-	STREAM_TYPE aj,bj,cj,scalar;
-	STREAM_TYPE aSumErr,bSumErr,cSumErr;
-	STREAM_TYPE aAvgErr,bAvgErr,cAvgErr;
-	double epsilon;
-	int	ierr,err;
+    STREAM_TYPE aj,bj,cj,scalar;
+    STREAM_TYPE aSumErr,bSumErr,cSumErr;
+    STREAM_TYPE aAvgErr,bAvgErr,cAvgErr;
+    double epsilon;
+    int	ierr,err;
 
     /* reproduce initialization */
-	aj = 1.0;
-	bj = 2.0;
-	cj = 0.0;
+    aj = 1.0;
+    bj = 2.0;
+    cj = 0.0;
     /* a[] is modified during timing check */
-	aj = 2.0E0 * aj;
+    aj = 2.0E0 * aj;
     /* now execute timing loop */
-	scalar = 3.0;
-	for (std::size_t k=0; k<iterations; k++)
+    scalar = 3.0;
+    for (std::size_t k=0; k<iterations; k++)
         {
             cj = aj;
             bj = scalar*cj;
@@ -270,94 +277,105 @@ void check_results(
         }
 
     /* accumulate deltas between observed and expected results */
-	aSumErr = 0.0;
-	bSumErr = 0.0;
-	cSumErr = 0.0;
-	for (std::size_t j=0; j<a.size(); j++) {
-		aSumErr += std::abs(a[j] - aj);
-		bSumErr += std::abs(b[j] - bj);
-		cSumErr += std::abs(c[j] - cj);
-		// if (j == 417) printf("Index 417: c[j]: %f, cj: %f\n",c[j],cj);	// MCCALPIN
-	}
-	aAvgErr = aSumErr / (STREAM_TYPE) a.size();
-	bAvgErr = bSumErr / (STREAM_TYPE) a.size();
-	cAvgErr = cSumErr / (STREAM_TYPE) a.size();
+    aSumErr = 0.0;
+    bSumErr = 0.0;
+    cSumErr = 0.0;
+    for (std::size_t j=0; j<a.size(); j++) {
+        aSumErr += std::abs(a[j] - aj);
+        bSumErr += std::abs(b[j] - bj);
+        cSumErr += std::abs(c[j] - cj);
+        // if (j == 417) printf("Index 417: c[j]: %f, cj: %f\n",c[j],cj);   // MCCALPIN
+    }
+    aAvgErr = aSumErr / (STREAM_TYPE) a.size();
+    bAvgErr = bSumErr / (STREAM_TYPE) a.size();
+    cAvgErr = cSumErr / (STREAM_TYPE) a.size();
 
-	if (sizeof(STREAM_TYPE) == 4) {
-		epsilon = 1.e-6;
-	}
-	else if (sizeof(STREAM_TYPE) == 8) {
-		epsilon = 1.e-13;
-	}
-	else {
-		printf("WEIRD: sizeof(STREAM_TYPE) = %lu\n",sizeof(STREAM_TYPE));
-		epsilon = 1.e-6;
-	}
+    if (sizeof(STREAM_TYPE) == 4) {
+        epsilon = 1.e-6;
+    }
+    else if (sizeof(STREAM_TYPE) == 8) {
+        epsilon = 1.e-13;
+    }
+    else {
+        printf("WEIRD: sizeof(STREAM_TYPE) = %lu\n",sizeof(STREAM_TYPE));
+        epsilon = 1.e-6;
+    }
 
-	err = 0;
-	if (std::abs(aAvgErr/aj) > epsilon) {
-		err++;
-		printf ("Failed Validation on array a[], AvgRelAbsErr > epsilon (%e)\n",epsilon);
-		printf ("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n",aj,aAvgErr,std::abs(aAvgErr)/aj);
-		ierr = 0;
-		for (std::size_t j=0; j<a.size(); j++) {
-			if (std::abs(a[j]/aj-1.0) > epsilon) {
-				ierr++;
+    err = 0;
+    if (std::abs(aAvgErr/aj) > epsilon) {
+        err++;
+        printf ("Failed Validation on array a[], AvgRelAbsErr > epsilon (%e)\n",
+            epsilon);
+        printf ("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n",
+            aj,aAvgErr,std::abs(aAvgErr)/aj);
+        ierr = 0;
+        for (std::size_t j=0; j<a.size(); j++) {
+            if (std::abs(a[j]/aj-1.0) > epsilon) {
+                ierr++;
 #ifdef VERBOSE
-				if (ierr < 10) {
-					printf("         array a: index: %ld, expected: %e, observed: %e, relative error: %e\n",
-						j,aj,a[j],std::abs((aj-a[j])/aAvgErr));
-				}
+                if (ierr < 10) {
+                    printf("         array a: index: %ld, expected: %e, "
+                        "observed: %e, relative error: %e\n",
+                        j,aj,a[j],std::abs((aj-a[j])/aAvgErr));
+                }
 #endif
-			}
-		}
-		printf("     For array a[], %d errors were found.\n",ierr);
-	}
-	if (std::abs(bAvgErr/bj) > epsilon) {
-		err++;
-		printf ("Failed Validation on array b[], AvgRelAbsErr > epsilon (%e)\n",epsilon);
-		printf ("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n",bj,bAvgErr,std::abs(bAvgErr)/bj);
-		printf ("     AvgRelAbsErr > Epsilon (%e)\n",epsilon);
-		ierr = 0;
-		for (std::size_t j=0; j<a.size(); j++) {
-			if (std::abs(b[j]/bj-1.0) > epsilon) {
-				ierr++;
+            }
+        }
+        printf("     For array a[], %d errors were found.\n",ierr);
+    }
+    if (std::abs(bAvgErr/bj) > epsilon) {
+        err++;
+        printf ("Failed Validation on array b[], AvgRelAbsErr > epsilon (%e)\n",
+            epsilon);
+        printf ("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n",
+            bj,bAvgErr,std::abs(bAvgErr)/bj);
+        printf ("     AvgRelAbsErr > Epsilon (%e)\n",epsilon);
+        ierr = 0;
+        for (std::size_t j=0; j<a.size(); j++) {
+            if (std::abs(b[j]/bj-1.0) > epsilon) {
+                ierr++;
 #ifdef VERBOSE
-				if (ierr < 10) {
-					printf("         array b: index: %ld, expected: %e, observed: %e, relative error: %e\n",
-						j,bj,b[j],std::abs((bj-b[j])/bAvgErr));
-				}
+                if (ierr < 10) {
+                    printf("         array b: index: %ld, expected: %e, "
+                        "observed: %e, relative error: %e\n",
+                        j,bj,b[j],std::abs((bj-b[j])/bAvgErr));
+                }
 #endif
-			}
-		}
-		printf("     For array b[], %d errors were found.\n",ierr);
-	}
-	if (std::abs(cAvgErr/cj) > epsilon) {
-		err++;
-		printf ("Failed Validation on array c[], AvgRelAbsErr > epsilon (%e)\n",epsilon);
-		printf ("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n",cj,cAvgErr,std::abs(cAvgErr)/cj);
-		printf ("     AvgRelAbsErr > Epsilon (%e)\n",epsilon);
-		ierr = 0;
-		for (std::size_t j=0; j<a.size(); j++) {
-			if (std::abs(c[j]/cj-1.0) > epsilon) {
-				ierr++;
+            }
+        }
+        printf("     For array b[], %d errors were found.\n",ierr);
+    }
+    if (std::abs(cAvgErr/cj) > epsilon) {
+        err++;
+        printf ("Failed Validation on array c[], AvgRelAbsErr > epsilon (%e)\n",
+            epsilon);
+        printf ("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n",
+            cj,cAvgErr,std::abs(cAvgErr)/cj);
+        printf ("     AvgRelAbsErr > Epsilon (%e)\n",epsilon);
+        ierr = 0;
+        for (std::size_t j=0; j<a.size(); j++) {
+            if (std::abs(c[j]/cj-1.0) > epsilon) {
+                ierr++;
 #ifdef VERBOSE
-				if (ierr < 10) {
-					printf("         array c: index: %ld, expected: %e, observed: %e, relative error: %e\n",
-						j,cj,c[j],std::abs((cj-c[j])/cAvgErr));
-				}
+                if (ierr < 10) {
+                    printf("         array c: index: %ld, expected: %e, "
+                        "observed: %e, relative error: %e\n",
+                        j,cj,c[j],std::abs((cj-c[j])/cAvgErr));
+                }
 #endif
-			}
-		}
-		printf("     For array c[], %d errors were found.\n",ierr);
-	}
-	if (err == 0) {
-		printf ("Solution Validates: avg error less than %e on all three arrays\n",epsilon);
-	}
+            }
+        }
+        printf("     For array c[], %d errors were found.\n",ierr);
+    }
+    if (err == 0) {
+        printf ("Solution Validates: avg error less than %e on all three arrays\n",
+            epsilon);
+    }
 #ifdef VERBOSE
-	printf ("Results Validation Verbose Results: \n");
-	printf ("    Expected a(1), b(1), c(1): %f %f %f \n",aj,bj,cj);
-	printf ("    Observed a(1), b(1), c(1): %f %f %f \n",a[1],b[1],c[1]);
-	printf ("    Rel Errors on a, b, c:     %e %e %e \n",std::abs(aAvgErr/aj),std::abs(bAvgErr/bj),std::abs(cAvgErr/cj));
+    printf ("Results Validation Verbose Results: \n");
+    printf ("    Expected a(1), b(1), c(1): %f %f %f \n",aj,bj,cj);
+    printf ("    Observed a(1), b(1), c(1): %f %f %f \n",a[1],b[1],c[1]);
+    printf ("    Rel Errors on a, b, c:     %e %e %e \n",std::abs(aAvgErr/aj),
+        std::abs(bAvgErr/bj),std::abs(cAvgErr/cj));
 #endif
 }

@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
     //
     // The benchmark itself spawns one HPX-thread for each of those kernel
     // threads. Each HPX thread creates a new local_priority os_executor which
-    // is the used to run the actual measurements.
+    // is then used to run the actual measurements.
 
     // create one kernel thread per available NUMA domain
     std::vector<std::string> cfg;
