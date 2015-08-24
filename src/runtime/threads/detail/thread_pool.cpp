@@ -770,7 +770,7 @@ namespace hpx { namespace threads { namespace detail
             if (reset) {
                 tfunc_times_[num] = boost::uint64_t(-1);
             }
-            return boost::uint64_t(exec_total * timestamp_scale_ * 1e-9);
+            return boost::uint64_t(exec_total * timestamp_scale_);
         }
 
         double exec_total = std::accumulate(exec_times_.begin(),
@@ -780,7 +780,7 @@ namespace hpx { namespace threads { namespace detail
             std::fill(tfunc_times_.begin(), tfunc_times_.end(),
                 boost::uint64_t(-1));
         }
-        return boost::uint64_t(exec_total * timestamp_scale_ * 1e-9);
+        return boost::uint64_t(exec_total * timestamp_scale_);
     }
 
     template <typename Scheduler>
@@ -794,8 +794,7 @@ namespace hpx { namespace threads { namespace detail
             if (reset) {
                 tfunc_times_[num] = boost::uint64_t(-1);
             }
-            return boost::uint64_t(
-                (tfunc_total - exec_total) * timestamp_scale_ * 1e-9);
+            return boost::uint64_t((tfunc_total - exec_total) * timestamp_scale_);
         }
 
         double exec_total = std::accumulate(exec_times_.begin(),
@@ -808,8 +807,7 @@ namespace hpx { namespace threads { namespace detail
             std::fill(tfunc_times_.begin(), tfunc_times_.end(),
                 boost::uint64_t(-1));
         }
-        return boost::uint64_t(
-            (tfunc_total - exec_total) * timestamp_scale_ * 1e-9);
+        return boost::uint64_t((tfunc_total - exec_total) * timestamp_scale_);
     }
 #endif
 #endif

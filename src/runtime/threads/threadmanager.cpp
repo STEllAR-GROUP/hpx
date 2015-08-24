@@ -1273,13 +1273,13 @@ namespace hpx { namespace threads
               "returns the cumulative time spent executing HPX-threads",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
-              "s"
+              "ns"
             },
             { "/threads/time/cumulative-overhead", performance_counters::counter_raw,
               "returns the cumulative overhead time incurred by executing HPX threads",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
-              "s"
+              "ns"
             },
 #endif
 #endif
