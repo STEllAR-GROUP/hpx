@@ -57,6 +57,12 @@ namespace hpx { namespace serialization
           , alloc_(alloc)
         {}
 
+        explicit serialize_buffer(std::size_t size, allocator_type const& alloc = allocator_type())
+          : data_(alloc.allocate(size))
+          , size_(size)
+          , alloc_(alloc)
+        {}
+
         // The default mode is 'copy' which is consistent with the constructor
         // taking a T const * below.
         serialize_buffer (T* data, std::size_t size, init_mode mode = copy,
@@ -216,6 +222,9 @@ namespace hpx { namespace serialization
         T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
 
+        T* begin() { return data(); }
+        T* end() { return data() + size_; }
+
         T& operator[](std::size_t idx) { return data_[idx]; }
         T operator[](std::size_t idx) const { return data_[idx]; }
 
@@ -297,6 +306,11 @@ namespace hpx { namespace serialization
 
         serialize_buffer()
           : size_(0)
+        {}
+
+        explicit serialize_buffer(std::size_t size)
+          : data_(new T[size])
+          , size_(size)
         {}
 
         // The default mode is 'copy' which is consistent with the constructor
@@ -396,6 +410,9 @@ namespace hpx { namespace serialization
         // accessors enabling data access
         T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
+
+        T* begin() { return data(); }
+        T* end() { return data() + size_; }
 
         T& operator[](std::size_t idx) { return data_[idx]; }
         T operator[](std::size_t idx) const { return data_[idx]; }
