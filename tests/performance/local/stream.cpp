@@ -289,17 +289,34 @@ void check_results(std::size_t iterations,
 }
 
 template <typename Vector>
-double numa_domain_worker(std::size_t domain, hpx::lcos::local::latch& l,
+std::vector<std::vector<double> >
+numa_domain_worker(std::size_t domain, hpx::lcos::local::latch& l,
     std::size_t part_size, std::size_t offset, std::size_t iterations,
     int quantum, Vector& a, Vector& b, Vector& c)
 {
     hpx::threads::topology const& topo = retrieve_topology();
-    std::size_t pus = topo.get_number_of_numa_node_pus(domain);
+    std::size_t numa_nodes = topo.get_number_of_numa_nodes();
+    std::size_t pus = 0;
+    std::string bind_desc;
 
-    std::string bind_desc = boost::str(
+    // If we don't have NUMA support, go by the number of sockets...
+    if(numa_nodes == 0)
+    {
+        pus = topo.get_number_of_socket_pus(domain);
+        bind_desc = boost::str(
+            boost::format("thread:0-%d=socket:%d.pu:0-%d") %
+               (pus-1) % domain % (pus-1)
+        );
+    }
+    else
+    {
+        pus = topo.get_number_of_numa_node_pus(domain);
+        bind_desc = boost::str(
             boost::format("thread:0-%d=numanode:%d.pu:0-%d") %
                (pus-1) % domain % (pus-1)
         );
+    }
+
 
     // create executor for this NUMA domain
     hpx::threads::executors::local_priority_queue_os_executor exec(
@@ -353,15 +370,18 @@ double numa_domain_worker(std::size_t domain, hpx::lcos::local::latch& l,
 
     ///////////////////////////////////////////////////////////////////////////
     // Main Loop
-    t = mysecond();
+    std::vector<std::vector<double> > timing(4, std::vector<double>(iterations));
 
     double scalar = 3.0;
     for(std::size_t iteration = 0; iteration != iterations; ++iteration)
     {
         // Copy
+        timing[0][iteration] = mysecond();
         hpx::parallel::copy(policy, a_begin, a_end, c_begin);
+        timing[0][iteration] = mysecond() - timing[0][iteration];
 
         // Scale
+        timing[1][iteration] = mysecond();
         hpx::parallel::transform(policy,
             c_begin, c_end, b_begin,
             [scalar](STREAM_TYPE val)
@@ -369,8 +389,10 @@ double numa_domain_worker(std::size_t domain, hpx::lcos::local::latch& l,
                 return scalar * val;
             }
         );
+        timing[1][iteration] = mysecond() - timing[1][iteration];
 
         // Add
+        timing[2][iteration] = mysecond();
         hpx::parallel::transform(policy,
             a_begin, a_end, b_begin, b_end, c_begin,
             [](STREAM_TYPE val1, STREAM_TYPE val2)
@@ -378,8 +400,10 @@ double numa_domain_worker(std::size_t domain, hpx::lcos::local::latch& l,
                 return val1 + val2;
             }
         );
+        timing[2][iteration] = mysecond() - timing[2][iteration];
 
         // Triad
+        timing[3][iteration] = mysecond();
         hpx::parallel::transform(policy,
             b_begin, b_end, c_begin, c_end, a_begin,
             [scalar](STREAM_TYPE val1, STREAM_TYPE val2)
@@ -387,11 +411,10 @@ double numa_domain_worker(std::size_t domain, hpx::lcos::local::latch& l,
                 return val1 + scalar * val2;
             }
         );
+        timing[3][iteration] = mysecond() - timing[3][iteration];
     }
 
-    t = mysecond() - t;
-
-    return t;
+    return timing;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -400,7 +423,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     // extract hardware topology
     hpx::threads::topology const& topo = retrieve_topology();
     std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    std::size_t pus_per_numa_node = topo.get_number_of_numa_node_pus(0);
+    if(numa_nodes == 0)
+    {
+        numa_nodes = topo.get_number_of_sockets();
+    }
 
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     std::size_t offset = vm["offset"].as<std::size_t>();
@@ -464,7 +490,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     // perform benchmark
     hpx::lcos::local::latch l(numa_nodes);
 
-    std::vector<hpx::future<double> > workers;
+    double time_total = mysecond();
+    std::vector<hpx::future<std::vector<std::vector<double> > > > workers;
     workers.reserve(numa_nodes);
 
     std::size_t part_size = vector_size/numa_nodes;
@@ -479,7 +506,76 @@ int hpx_main(boost::program_options::variables_map& vm)
         );
     }
 
-    hpx::wait_all(workers);
+    std::cout << "finished timing ...\n";
+
+    std::vector<std::vector<std::vector<double> > > timings_all = hpx::util::unwrapped(workers);
+    time_total = mysecond() - time_total;
+
+    /*	--- SUMMARY --- */
+    const char *label[4] = {
+        "Copy:      ",
+        "Scale:     ",
+        "Add:       ",
+        "Triad:     "
+    };
+
+    const double bytes[4] = {
+        2 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
+        2 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
+        3 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
+        3 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size)
+    };
+    std::vector<std::vector<double> > timing(4, std::vector<double>(iterations, 0.0));
+
+    for(auto const & times : timings_all)
+    {
+        for(std::size_t iteration = 0; iteration != iterations; ++iteration)
+        {
+            timing[0][iteration] += times[0][iteration];
+            timing[1][iteration] += times[1][iteration];
+            timing[2][iteration] += times[2][iteration];
+            timing[3][iteration] += times[3][iteration];
+        }
+    }
+    for(std::size_t iteration = 0; iteration != iterations; ++iteration)
+    {
+        timing[0][iteration] /= numa_nodes;
+        timing[1][iteration] /= numa_nodes;
+        timing[2][iteration] /= numa_nodes;
+        timing[3][iteration] /= numa_nodes;
+    }
+    // Note: skip first iteration
+    std::vector<double> avgtime(4, 0.0);
+    std::vector<double> mintime(4, std::numeric_limits<double>::max());
+    std::vector<double> maxtime(4, 0.0);
+    for(std::size_t iteration = 1; iteration != iterations; ++iteration)
+	{
+        for (std::size_t j=0; j<4; j++)
+	    {
+            avgtime[j] = avgtime[j] + timing[j][iteration];
+            mintime[j] = (std::min)(mintime[j], timing[j][iteration]);
+            maxtime[j] = (std::max)(maxtime[j], timing[j][iteration]);
+	    }
+	}
+
+    printf("Function    Best Rate MB/s  Avg time     Min time     Max time\n");
+    for (std::size_t j=0; j<4; j++) {
+		avgtime[j] = avgtime[j]/(double)(iterations-1);
+
+		printf("%s%12.1f  %11.6f  %11.6f  %11.6f\n", label[j],
+	       1.0E-06 * bytes[j]/mintime[j],
+	       avgtime[j],
+	       mintime[j],
+	       maxtime[j]);
+    }
+
+    std::cout
+        << "\nTotal time: " << time_total
+        << " (per iteration: " << time_total/iterations << ")\n";
+
+    std::cout
+        << "-------------------------------------------------------------\n"
+        ;
 
     // Check Results ...
     check_results(iterations, a, b, c);
@@ -496,7 +592,18 @@ int main(int argc, char* argv[])
     // extract hardware topology
     hpx::threads::topology const& topo = retrieve_topology();
     std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    std::size_t pus_per_numa_node = topo.get_number_of_numa_node_pus(0);
+    std::size_t pus_per_numa_node = 0;
+
+    // If we don't have NUMA support, go by the number of sockets...
+    if(numa_nodes == 0)
+    {
+        numa_nodes = topo.get_number_of_sockets();
+        pus_per_numa_node = topo.get_number_of_socket_pus(0);
+    }
+    else
+    {
+        pus_per_numa_node = topo.get_number_of_numa_node_pus(0);
+    }
 
     // The idea of this benchmark is to create as many base-threads as we have
     // NUMA domains. Each of those kernel threads are bound to one of the

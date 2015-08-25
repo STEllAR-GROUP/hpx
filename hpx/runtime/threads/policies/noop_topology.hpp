@@ -195,6 +195,11 @@ public:
         return noop_topology::hardware_concurrency();
     }
 
+    std::size_t get_number_of_socket_pus(std::size_t socket) const
+    {
+        return noop_topology::hardware_concurrency();
+    }
+
     std::size_t get_core_number(std::size_t num_thread, error_code& ec = throws) const
     {
         return 0;
