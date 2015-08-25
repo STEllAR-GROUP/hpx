@@ -309,7 +309,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times);
 
-
             threads::detail::scheduling_callbacks callbacks(
                 threads::detail::scheduling_callbacks::callback_type(),
                 util::bind( //-V107
@@ -317,7 +316,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                     this, virt_core));
 
             threads::detail::scheduling_loop(virt_core, scheduler_,
-                counters, callbacks);
+                counters, callbacks, policies::fast_idle_mode);
 
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist

@@ -117,7 +117,6 @@ if(HPX_WITH_CXX11_LAMBDAS)
       spinlock_overhead2
       stencil3_iterators
       stream
-      stream_for_each
       transform_reduce_scaling
       vector_foreach
      )

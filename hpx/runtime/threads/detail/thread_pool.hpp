@@ -37,8 +37,8 @@ namespace hpx { namespace threads { namespace detail
     {
     public:
         thread_pool(Scheduler& sched,
-            threads::policies::callback_notifier& notifier,
-            char const* pool_name, bool do_background_work = false);
+            threads::policies::callback_notifier& notifier, char const* pool_name,
+            policies::scheduler_mode m = policies::nothing_special);
         ~thread_pool();
 
         std::size_t init(std::size_t num_threads,
@@ -172,9 +172,8 @@ namespace hpx { namespace threads { namespace detail
         // thread manager.
         threads::mask_type used_processing_units_;
 
-        // Instruct pool to allow doing background work (parcelport and garbage
-        // collection)
-        bool do_background_work_;
+        // Mode of operation of the pool
+        policies::scheduler_mode mode_;
     };
 }}}
 

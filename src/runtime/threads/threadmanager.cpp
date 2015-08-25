@@ -139,7 +139,10 @@ namespace hpx { namespace threads
         thread_logger_("threadmanager_impl::register_thread"),
         work_logger_("threadmanager_impl::register_work"),
         set_state_logger_("threadmanager_impl::set_state"),
-        pool_(scheduler, notifier, "main_thread_scheduling_pool", true),
+        pool_(scheduler, notifier, "main_thread_scheduling_pool",
+            policies::scheduler_mode(
+                policies::do_background_work | policies::reduce_thread_priority |
+                policies::delay_exit)),
         notifier_(notifier)
     {}
 

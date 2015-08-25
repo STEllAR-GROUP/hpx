@@ -48,13 +48,13 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     thread_pool<Scheduler>::thread_pool(Scheduler& sched,
             threads::policies::callback_notifier& notifier,
-            char const* pool_name, bool do_background_work)
+            char const* pool_name, policies::scheduler_mode m)
       : sched_(sched),
         notifier_(notifier),
         pool_name_(pool_name),
         thread_count_(0),
         used_processing_units_(),
-        do_background_work_(do_background_work)
+        mode_(m)
     {
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
@@ -497,7 +497,8 @@ namespace hpx { namespace threads { namespace detail
 
         // Setting priority of worker threads to a lower priority, this needs to
         // be done in order to give the parcel pool threads higher priority
-        if (any(mask & used_processing_units_))
+        if ((mode_ & policies::reduce_thread_priority) &&
+            any(mask & used_processing_units_))
         {
             topology.reduce_thread_priority(ec);
             if (ec)
@@ -540,7 +541,7 @@ namespace hpx { namespace threads { namespace detail
                         ),
                         detail::scheduling_callbacks::callback_type());
 
-                    if (do_background_work_)
+                    if (mode_ & policies::do_background_work)
                     {
                         callbacks.background_ = util::bind(
                             &policies::scheduler_base::background_callback,
@@ -548,7 +549,7 @@ namespace hpx { namespace threads { namespace detail
                     }
 
                     detail::scheduling_loop(num_thread, sched_, counters,
-                        callbacks);
+                        callbacks, mode_);
 
                     // the OS thread is allowed to exit only if no more HPX
                     // threads exist or if some other thread has terminated

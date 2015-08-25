@@ -225,7 +225,8 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
-        scheduling_counters& counters, scheduling_callbacks& callbacks)
+        scheduling_counters& counters, scheduling_callbacks& callbacks,
+        policies::scheduler_mode mode)
     {
         boost::atomic<hpx::state>& this_state = scheduler.get_state(num_thread);
 
@@ -256,6 +257,7 @@ namespace hpx { namespace threads { namespace detail
 
                 idle_loop_count = 0;
                 ++busy_loop_count;
+
                 may_exit = false;
 
                 // Only pending HPX threads will be executed.
@@ -379,7 +381,7 @@ namespace hpx { namespace threads { namespace detail
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
                     {
                         // if this is an inner scheduler, exit immediately
-                        if (!callbacks.inner_.empty())
+                        if (!(mode & policies::delay_exit))
                         {
                             this_state.store(state_stopped);
                             break;
@@ -396,7 +398,7 @@ namespace hpx { namespace threads { namespace detail
                 if (!callbacks.background_.empty())
                 {
                     if (callbacks.background_())
-                    idle_loop_count = 0;
+                        idle_loop_count = 0;
                 }
 
                 // call back into invoking context
@@ -416,17 +418,19 @@ namespace hpx { namespace threads { namespace detail
                 if (!callbacks.background_.empty())
                 {
                     if (callbacks.background_())
-                    idle_loop_count = 0;
+                        idle_loop_count = 0;
                 }
             }
-            else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+            else if ((mode & policies::fast_idle_mode) ||
+                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
             {
+                // clean up terminated threads
+                if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+                    idle_loop_count = 0;
+
                 // call back into invoking context
                 if (!callbacks.outer_.empty())
                     callbacks.outer_();
-
-                // clean up terminated threads
-                idle_loop_count = 0;
 
                 // break if we were idling after 'may_exit'
                 if (may_exit)
