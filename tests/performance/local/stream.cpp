@@ -290,35 +290,12 @@ void check_results(std::size_t iterations,
 
 template <typename Vector>
 std::vector<std::vector<double> >
-numa_domain_worker(std::size_t domain, std::size_t pus, hpx::lcos::local::latch& l,
+numa_domain_worker(std::size_t domain,
+    hpx::threads::executors::local_priority_queue_os_executor & exec,
+    hpx::lcos::local::latch& l,
     std::size_t part_size, std::size_t offset, std::size_t iterations,
     Vector& a, Vector& b, Vector& c)
 {
-    hpx::threads::topology const& topo = retrieve_topology();
-    std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    std::string bind_desc;
-
-    // If we don't have NUMA support, go by the number of sockets...
-    if(numa_nodes == 0)
-    {
-        bind_desc = boost::str(
-            boost::format("thread:0-%d=socket:%d.pu:0-%d") %
-               (pus-1) % domain % (pus-1)
-        );
-    }
-    else
-    {
-        bind_desc = boost::str(
-            boost::format("thread:0-%d=numanode:%d.pu:0-%d") %
-               (pus-1) % domain % (pus-1)
-        );
-    }
-
-
-    // create executor for this NUMA domain
-    hpx::threads::executors::local_priority_queue_os_executor exec(
-        pus, bind_desc);
-
     typedef typename Vector::iterator iterator;
     iterator a_begin = a.begin() + offset;
     iterator b_begin = b.begin() + offset;
@@ -510,13 +487,32 @@ int hpx_main(boost::program_options::variables_map& vm)
     workers.reserve(numa_nodes);
 
     std::size_t part_size = vector_size/numa_nodes;
+    std::vector<hpx::threads::executors::local_priority_queue_os_executor> execs;
+    execs.reserve(numa_nodes);
     for (std::size_t i = 0; i != numa_nodes; ++i)
     {
-        // create one worker per NUMA domain with part of the data to work on
-        hpx::threads::executors::default_executor exec(i);
+        std::string bind_desc;
+        if(numa_nodes == 0)
+        {
+            bind_desc = boost::str(
+                boost::format("thread:0-%d=socket:%d.pu:0-%d") %
+                   (pus-1) % i % (pus-1)
+            );
+        }
+        else
+        {
+            bind_desc = boost::str(
+                boost::format("thread:0-%d=numanode:%d.pu:0-%d") %
+                   (pus-1) % i % (pus-1)
+            );
+        }
+
+        // create executor for this NUMA domain
+        execs.emplace_back(pus, bind_desc);
+
         workers.push_back(
-            hpx::async(exec, &numa_domain_worker<vector_type>,
-                i, pus, boost::ref(l), part_size, part_size*i, iterations,
+            hpx::async(execs.back(), &numa_domain_worker<vector_type>,
+                i, boost::ref(execs.back()), boost::ref(l), part_size, part_size*i, iterations,
                 boost::ref(a), boost::ref(b), boost::ref(c))
         );
     }
