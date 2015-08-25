@@ -245,6 +245,12 @@ namespace hpx { namespace threads { namespace detail
         return sched_.Scheduler::get_thread_count(state, priority, num, reset);
     }
 
+    template <typename Scheduler>
+    void thread_pool<Scheduler>::reset_thread_distribution()
+    {
+        return sched_.Scheduler::reset_thread_distribution();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     bool thread_pool<Scheduler>::run(boost::unique_lock<boost::mutex>& l,

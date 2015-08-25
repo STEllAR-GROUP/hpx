@@ -1158,6 +1158,11 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_error(num_thread, e);
         }
 
+        void reset_thread_distribution()
+        {
+            curr_queue_.store(0);
+        }
+
     protected:
         std::size_t max_queue_thread_count_;
         std::vector<thread_queue_type*> queues_;

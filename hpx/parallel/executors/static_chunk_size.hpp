@@ -56,10 +56,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             if (chunk_size_ != 0)
                 return chunk_size_;
 
+            typedef executor_traits<Executor> traits;
+
             // by default use static work distribution over number of
             // available compute resources
-            std::size_t const cores = executor_traits<Executor>::
-                os_thread_count(exec);
+            std::size_t const cores = traits::os_thread_count(exec);
+
+            // Make sure the internal round robin counter of the executor is
+            // reset
+            traits::reset_thread_distribution(exec);
 
             return (num_tasks + cores - 1) / cores;
         }

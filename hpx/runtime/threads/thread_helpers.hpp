@@ -422,6 +422,9 @@ namespace hpx { namespace threads
     ///
     HPX_API_EXPORT threads::executors::generic_thread_pool_executor
         get_executor(thread_id_type const& id, error_code& ec = throws);
+
+    /// Reset internal (round robin) thread distribution scheme
+    HPX_API_EXPORT void reset_thread_distribution();
 }}
 
 namespace hpx { namespace this_thread

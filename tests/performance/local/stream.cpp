@@ -489,6 +489,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::size_t part_size = vector_size/numa_nodes;
     std::vector<hpx::threads::executors::local_priority_queue_os_executor> execs;
     execs.reserve(numa_nodes);
+
     for (std::size_t i = 0; i != numa_nodes; ++i)
     {
         std::string bind_desc;
@@ -512,7 +513,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         workers.push_back(
             hpx::async(execs.back(), &numa_domain_worker<vector_type>,
-                i, boost::ref(execs.back()), boost::ref(l), part_size, part_size*i, iterations,
+                i, boost::ref(execs.back()), boost::ref(l),
+                part_size, part_size*i, iterations,
                 boost::ref(a), boost::ref(b), boost::ref(c))
         );
     }
@@ -556,27 +558,27 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
     // Note: skip first iteration
     std::vector<double> avgtime(4, 0.0);
-    std::vector<double> mintime(4, std::numeric_limits<double>::max());
+    std::vector<double> mintime(4, (std::numeric_limits<double>::max)());
     std::vector<double> maxtime(4, 0.0);
     for(std::size_t iteration = 1; iteration != iterations; ++iteration)
-	{
+    {
         for (std::size_t j=0; j<4; j++)
-	    {
+        {
             avgtime[j] = avgtime[j] + timing[j][iteration];
             mintime[j] = (std::min)(mintime[j], timing[j][iteration]);
             maxtime[j] = (std::max)(maxtime[j], timing[j][iteration]);
-	    }
-	}
+        }
+    }
 
     printf("Function    Best Rate MB/s  Avg time     Min time     Max time\n");
     for (std::size_t j=0; j<4; j++) {
-		avgtime[j] = avgtime[j]/(double)(iterations-1);
+        avgtime[j] = avgtime[j]/(double)(iterations-1);
 
-		printf("%s%12.1f  %11.6f  %11.6f  %11.6f\n", label[j],
-	       1.0E-06 * bytes[j]/mintime[j],
-	       avgtime[j],
-	       mintime[j],
-	       maxtime[j]);
+        printf("%s%12.1f  %11.6f  %11.6f  %11.6f\n", label[j],
+           1.0E-06 * bytes[j]/mintime[j],
+           avgtime[j],
+           mintime[j],
+           maxtime[j]);
     }
 
     std::cout

@@ -277,6 +277,8 @@ namespace hpx { namespace threads { namespace policies
             boost::atomic<hpx::state>& global_state)
         {}
 
+        virtual void reset_thread_distribution() {}
+
     protected:
         topology const& topology_;
         detail::affinity_data affinity_data_;

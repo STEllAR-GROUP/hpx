@@ -212,6 +212,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         return scheduler_.get_queue_length();
     }
 
+
+    // Reset internal (round robin) thread distribution scheme
+    template <typename Scheduler>
+    void thread_pool_executor<Scheduler>::reset_thread_distribution()
+    {
+        scheduler_.reset_thread_distribution();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     struct on_self_reset
     {

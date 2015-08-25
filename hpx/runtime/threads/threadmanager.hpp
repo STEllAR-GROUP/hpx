@@ -196,6 +196,8 @@ namespace hpx { namespace threads
 
         ///////////////////////////////////////////////////////////////////////
         virtual std::size_t get_worker_thread_num(bool* numa_sensitive = 0) = 0;
+
+        virtual void reset_thread_distribution() = 0;
     };
 }}
 

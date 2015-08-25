@@ -93,6 +93,9 @@ namespace hpx { namespace threads
             // Return an estimate of the number of waiting closures.
             virtual boost::uint64_t num_pending_closures(error_code& ec) const = 0;
 
+            // Reset internal (round robin) thread distribution scheme
+            virtual void reset_thread_distribution() {}
+
             // Return the requested policy element
             virtual std::size_t get_policy_element(
                 threads::detail::executor_parameter p, error_code& ec) const = 0;
@@ -198,6 +201,12 @@ namespace hpx { namespace threads
         boost::uint64_t num_pending_closures(error_code& ec = throws) const
         {
             return executor_data_->num_pending_closures(ec);
+        }
+
+        /// Return an estimate of the number of waiting closures.
+        void reset_thread_distribution() const
+        {
+            executor_data_->reset_thread_distribution();
         }
 
         operator util::safe_bool<executor>::result_type() const

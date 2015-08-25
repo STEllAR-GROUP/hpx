@@ -207,6 +207,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             return hpx::get_os_thread_count(sched);
         }
 
+        /// Reset the internal round robin thread distribution scheme for the
+        /// given executor.
+        ///
+        /// \param exec  [in] The executor object to use for scheduling of the
+        ///              function \a f.
+        ///
+        /// \note This calls exec.reset_thread_distribution() if it exists;
+        ///       otherwise it does nothing.
+        ///
+        static void reset_thread_distribution(executor_type& sched)
+        {
+            sched.reset_thread_distribution();
+        }
+
         /// Retrieve whether this executor has operations pending or not.
         /// All threads::executors invoke sched.num_pending_closures().
         ///

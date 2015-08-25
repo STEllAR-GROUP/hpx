@@ -204,6 +204,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         return (scheduler_.get_state(0) < state_stopped) ? 1 : 0;
     }
 
+    // Reset internal (round robin) thread distribution scheme
+    template <typename Scheduler>
+    void this_thread_executor<Scheduler>::reset_thread_distribution()
+    {
+        scheduler_.Scheduler::reset_thread_distribution();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     struct on_self_reset
     {

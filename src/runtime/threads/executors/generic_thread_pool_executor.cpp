@@ -102,6 +102,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                     scheduler_base_->get_thread_count(terminated);
     }
 
+    // Reset internal (round robin) thread distribution scheme
+    void generic_thread_pool_executor::reset_thread_distribution()
+    {
+        scheduler_base_->reset_thread_distribution();
+    }
+
     // Return the requested policy element
     std::size_t generic_thread_pool_executor::get_policy_element(
         threads::detail::executor_parameter p, error_code& ec) const

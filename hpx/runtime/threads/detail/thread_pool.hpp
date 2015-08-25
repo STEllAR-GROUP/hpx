@@ -90,9 +90,9 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-    ///////////////////////////////////////////////////////////////////////////
-    boost::int64_t avg_idle_rate(bool reset);
-    boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
+        ///////////////////////////////////////////////////////////////////////
+        boost::int64_t avg_idle_rate(bool reset);
+        boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
         boost::int64_t avg_creation_idle_rate(bool reset);
@@ -121,6 +121,8 @@ namespace hpx { namespace threads { namespace detail
 
         boost::int64_t get_thread_count(thread_state_enum state,
             thread_priority priority, std::size_t num_thread, bool reset) const;
+
+        void reset_thread_distribution();
 
         //
         void abort_all_suspended_threads();

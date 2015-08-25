@@ -166,7 +166,7 @@ namespace hpx { namespace threads
         return id->get_thread_data();
     }
 
-    std::size_t set_thread_data(thread_id_type const& id, std::size_t d,
+    std::size_t set_thread_data(thread_id_type const& id, std::size_t data,
         error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {

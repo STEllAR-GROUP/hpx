@@ -276,6 +276,11 @@ namespace hpx { namespace threads
             return pool_.get_used_processing_units();
         }
 
+        void reset_thread_distribution()
+        {
+            pool_.reset_thread_distribution();
+        }
+
     private:
         // counter creator functions
         naming::gid_type queue_length_counter_creator(

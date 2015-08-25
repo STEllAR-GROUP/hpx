@@ -373,6 +373,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         ///////////////////////////////////////////////////////////////////////
+        struct reset_thread_distribution_helper
+        {
+            template <typename Executor>
+            static void call(wrap_int, Executor& exec)
+            {
+            }
+
+            template <typename Executor>
+            static auto call(int, Executor& exec)
+            ->  decltype(exec.os_thread_count())
+            {
+                exec.reset_thread_distribution();
+            }
+        };
+
+        template <typename Executor>
+        std::size_t call_reset_thread_distribution(Executor& exec)
+        {
+            return reset_thread_distribution_helper::call(0, exec);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         struct has_pending_closures_helper
         {
             template <typename Executor>
@@ -618,6 +640,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         static std::size_t os_thread_count(executor_type const& exec)
         {
             return detail::call_os_thread_count(exec);
+        }
+
+        /// Reset the internal round robin thread distribution scheme for the
+        /// given executor.
+        ///
+        /// \param exec  [in] The executor object to use for scheduling of the
+        ///              function \a f.
+        ///
+        /// \note This calls exec.reset_thread_distribution() if it exists;
+        ///       otherwise it does nothing.
+        ///
+        static void reset_thread_distribution(executor_type& exec)
+        {
+            detail::call_reset_thread_distribution(exec);
         }
 
         /// Retrieve whether this executor has operations pending or not.

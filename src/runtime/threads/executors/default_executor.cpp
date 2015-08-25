@@ -65,6 +65,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         return get_thread_count() - get_thread_count(terminated);
     }
 
+    // Reset internal (round robin) thread distribution scheme
+    void default_executor::reset_thread_distribution()
+    {
+        threads::reset_thread_distribution();
+    }
+
     // Return the requested policy element
     std::size_t default_executor::get_policy_element(
         threads::detail::executor_parameter p, error_code& ec) const

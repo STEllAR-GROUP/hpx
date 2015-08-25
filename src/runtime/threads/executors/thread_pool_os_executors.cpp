@@ -222,6 +222,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         return pool_.get_thread_count(unknown, thread_priority_default,
             std::size_t(-1), false);
     }
+
+    // Reset internal (round robin) thread distribution scheme
+    template <typename Scheduler>
+    void thread_pool_os_executor<Scheduler>::reset_thread_distribution()
+    {
+        pool_.reset_thread_distribution();
+    }
 }}}}
 
 namespace hpx { namespace threads { namespace executors

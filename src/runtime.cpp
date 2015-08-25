@@ -1218,6 +1218,11 @@ namespace hpx { namespace threads
     {
         return get_runtime().get_config().get_stack_size(stacksize);
     }
+
+    void reset_thread_distribution()
+    {
+        get_runtime().get_thread_manager().reset_thread_distribution();
+    }
 }}
 
 namespace hpx { namespace components { namespace detail
