@@ -321,10 +321,10 @@ struct stepper_server : hpx::components::simple_component_base<stepper_server>
     stepper_server() {}
 
     stepper_server(std::size_t nl)
-      : left_(hpx::find_id_from_basename
-          (stepper_basename, idx(hpx::get_locality_id(), -1, nl))),
-        right_(hpx::find_id_from_basename
-            (stepper_basename, idx(hpx::get_locality_id(), +1, nl))),
+      : left_(hpx::find_from_basename(
+            stepper_basename, idx(hpx::get_locality_id(), -1, nl))),
+        right_(hpx::find_from_basename(
+            stepper_basename, idx(hpx::get_locality_id(), +1, nl))),
         U_(2)
     {
     }
@@ -416,8 +416,8 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
       : base_type(hpx::new_<stepper_server>
           (hpx::find_here(), hpx::get_num_localities_sync()))
     {
-        hpx::register_id_with_basename
-            (stepper_basename, get_id(), hpx::get_locality_id());
+        hpx::register_with_basename(
+            stepper_basename, get_id(), hpx::get_locality_id());
     }
 
     stepper(hpx::future<hpx::id_type> && id)

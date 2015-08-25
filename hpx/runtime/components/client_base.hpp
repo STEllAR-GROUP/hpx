@@ -378,24 +378,24 @@ namespace hpx { namespace components
                 agas::symbol_ns_bind, true).share();
         }
 
-//     protected:
-//         template <typename F>
-//         static typename lcos::detail::future_then_result<client_base, F>::cont_result
-//         on_ready(future_type fut, F && f)
-//         {
-//             return f(Derived(fut));
-//         }
-//
-//     public:
-//         template <typename F>
-//         typename lcos::detail::future_then_result<client_base, F>::type
-//         then(F && f)
-//         {
-//             typedef typename util::decay<F>::type func_type;
-//             return gid_.then(util::bind(
-//                 util::one_shot(&client_base::on_ready<func_type>),
-//                 std::forward<F>(f)));
-//         }
+    protected:
+        template <typename F>
+        static typename lcos::detail::future_then_result<client_base, F>::cont_result
+        on_ready(future_type && fut, F f)
+        {
+            return f(client_base(std::move(fut)));
+        }
+
+    public:
+        template <typename F>
+        typename lcos::detail::future_then_result<client_base, F>::type
+        then(F && f)
+        {
+            typedef typename util::decay<F>::type func_type;
+            return gid_.then(util::bind(
+                util::one_shot(&client_base::template on_ready<func_type>),
+                util::placeholders::_1, std::forward<F>(f)));
+        }
 
     private:
         friend class hpx::serialization::access;
@@ -481,7 +481,7 @@ namespace hpx { namespace components
         result.reserve(ids.size());
         for (hpx::future<hpx::id_type>& id: ids)
         {
-            result.push_back(Client(id));
+            result.push_back(Client(std::move(id)));
         }
         return result;
     }

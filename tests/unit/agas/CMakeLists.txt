@@ -7,6 +7,7 @@ add_subdirectory(components)
 
 set(tests
     credit_exhaustion
+    find_clients_from_prefix
     find_ids_from_prefix
     get_colocation_id
     gid_type
@@ -24,8 +25,8 @@ set(tests
     uncounted_symbol_to_remote_object
    )
 
-set(find_ids_from_prefix_PARAMETERS
-    LOCALITIES 2)
+set(find_ids_from_prefix_PARAMETERS LOCALITIES 2)
+set(find_clients_from_prefix_PARAMETERS LOCALITIES 2)
 
 set(get_colocation_id_PARAMETERS
     LOCALITIES 2)

@@ -106,6 +106,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/static_chunk_size.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_executor_traits.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/launch_policy.hpp"
