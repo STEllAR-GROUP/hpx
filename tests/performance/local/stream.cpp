@@ -290,19 +290,17 @@ void check_results(std::size_t iterations,
 
 template <typename Vector>
 std::vector<std::vector<double> >
-numa_domain_worker(std::size_t domain, hpx::lcos::local::latch& l,
+numa_domain_worker(std::size_t domain, std::size_t pus, hpx::lcos::local::latch& l,
     std::size_t part_size, std::size_t offset, std::size_t iterations,
-    int quantum, Vector& a, Vector& b, Vector& c)
+    Vector& a, Vector& b, Vector& c)
 {
     hpx::threads::topology const& topo = retrieve_topology();
     std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    std::size_t pus = 0;
     std::string bind_desc;
 
     // If we don't have NUMA support, go by the number of sockets...
     if(numa_nodes == 0)
     {
-        pus = topo.get_number_of_socket_pus(domain);
         bind_desc = boost::str(
             boost::format("thread:0-%d=socket:%d.pu:0-%d") %
                (pus-1) % domain % (pus-1)
@@ -310,7 +308,6 @@ numa_domain_worker(std::size_t domain, hpx::lcos::local::latch& l,
     }
     else
     {
-        pus = topo.get_number_of_numa_node_pus(domain);
         bind_desc = boost::str(
             boost::format("thread:0-%d=numanode:%d.pu:0-%d") %
                (pus-1) % domain % (pus-1)
@@ -348,6 +345,23 @@ numa_domain_worker(std::size_t domain, hpx::lcos::local::latch& l,
 
     if (domain == 0)
     {
+        // Get initial value for system clock.
+        int quantum = checktick();
+        if(quantum >= 1)
+        {
+            std::cout
+                << "Your clock granularity/precision appears to be " << quantum
+                << " microseconds.\n"
+                ;
+        }
+        else
+        {
+            std::cout
+                << "Your clock granularity appears to be less than one microsecond.\n"
+                ;
+            quantum = 1;
+        }
+
         std::cout
             << "Each test below will take on the order"
             << " of " << (int) t << " microseconds.\n"
@@ -423,30 +437,31 @@ int hpx_main(boost::program_options::variables_map& vm)
     // extract hardware topology
     hpx::threads::topology const& topo = retrieve_topology();
     std::size_t numa_nodes = topo.get_number_of_numa_nodes();
+    std::size_t pus = 0;
     if(numa_nodes == 0)
     {
         numa_nodes = topo.get_number_of_sockets();
+        pus = topo.get_number_of_socket_pus(0);
+    }
+    else
+    {
+        pus = topo.get_number_of_numa_node_pus(0);
     }
 
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     std::size_t offset = vm["offset"].as<std::size_t>();
     std::size_t iterations = vm["iterations"].as<std::size_t>();
 
-    // Get initial value for system clock.
-    int quantum = checktick();
-    if(quantum >= 1)
+    std::string num_threads_str = vm["stream-threads"].as<std::string>();
+    std::string num_numa_domains_str = vm["stream-numa-domains"].as<std::string>();
+
+    if(num_numa_domains_str != "all")
     {
-        std::cout
-            << "Your clock granularity/precision appears to be " << quantum
-            << " microseconds.\n"
-            ;
+        numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
     }
-    else
+    if(num_threads_str != "all")
     {
-        std::cout
-            << "Your clock granularity appears to be less than one microsecond.\n"
-            ;
-        quantum = 1;
+        pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
     }
 
     std::cout
@@ -469,7 +484,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         << " will be used to compute the reported bandwidth.\n"
         << "-------------------------------------------------------------\n"
         << "Number of Threads requested = "
-            << hpx::threads::hardware_concurrency() << "\n"
+            << numa_nodes * pus << "\n"
         << "-------------------------------------------------------------\n"
         ;
 
@@ -501,14 +516,13 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::threads::executors::default_executor exec(i);
         workers.push_back(
             hpx::async(exec, &numa_domain_worker<vector_type>,
-                i, boost::ref(l), part_size, part_size*i, iterations, quantum,
+                i, pus, boost::ref(l), part_size, part_size*i, iterations,
                 boost::ref(a), boost::ref(b), boost::ref(c))
         );
     }
 
-    std::cout << "finished timing ...\n";
-
-    std::vector<std::vector<std::vector<double> > > timings_all = hpx::util::unwrapped(workers);
+    std::vector<std::vector<std::vector<double> > >
+        timings_all = hpx::util::unwrapped(workers);
     time_total = mysecond() - time_total;
 
     /*	--- SUMMARY --- */
@@ -647,6 +661,12 @@ int main(int argc, char* argv[])
         (   "iterations",
             boost::program_options::value<std::size_t>()->default_value(10),
             "number of iterations to repeat each test. (default: 10)")
+        (   "stream-threads",
+            boost::program_options::value<std::string>()->default_value("all"),
+            "number of threads per NUMA domain to use. (default: all)")
+        (   "stream-numa-domains",
+            boost::program_options::value<std::string>()->default_value("all"),
+            "number of NUMA domains to use. (default: all)")
         ;
 
     return hpx::init(cmdline, argc, argv, cfg);
