@@ -57,7 +57,8 @@ namespace hpx { namespace serialization
           , alloc_(alloc)
         {}
 
-        explicit serialize_buffer(std::size_t size, allocator_type const& alloc = allocator_type())
+        explicit serialize_buffer(std::size_t size,
+                allocator_type const& alloc = allocator_type())
           : data_(alloc.allocate(size))
           , size_(size)
           , alloc_(alloc)
