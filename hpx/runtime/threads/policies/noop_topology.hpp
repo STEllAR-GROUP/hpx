@@ -90,7 +90,7 @@ public:
 
     mask_cref_type get_thread_affinity_mask(
         std::size_t thread_num
-      , bool numa_sensitive
+      , bool numa_sensitive = false
       , error_code& ec = throws
         ) const
     {
@@ -213,6 +213,19 @@ public:
     struct noop_topology_tag {};
 
     void write_to_log() const {}
+
+    /// This is equivalent to malloc(), except that it tries to allocate
+    /// page-aligned memory from the OS.
+    void* allocate(std::size_t len)
+    {
+        return ::operator new(len);
+    }
+
+    /// Free memory that was previously allocated by allocate
+    void deallocate(void* addr, std::size_t len)
+    {
+        ::operator delete(addr/*, len*/);
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////

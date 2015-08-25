@@ -30,6 +30,13 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+hpx::threads::topology& retrieve_topology()
+{
+    static hpx::threads::topology& topo = hpx::threads::create_topology();
+    return topo;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename ExPolicy>
 class numa_allocator
 {
@@ -74,23 +81,35 @@ public:
         typename std::allocator<void>::const_pointer = 0)
     {
         // allocate memory
-        pointer p = reinterpret_cast<pointer>(::operator new(cnt * sizeof(T)));
+        hpx::threads::topology& t = retrieve_topology();
+
+        pointer p = reinterpret_cast<pointer>(t.allocate(cnt * sizeof(T)));
 
         // first touch policy, letting execution policy do the right thing
         hpx::parallel::for_each(policy_, p, p + cnt,
-            [](T& val)
+            [&t](T& val)
             {
                 // touch first byte of every object
                 *reinterpret_cast<char*>(&val) = 0;
+
+#if defined(_DEBUG)
+                hpx::threads::mask_cref_type mem_mask =
+                    t.get_thread_affinity_mask_from_lva(
+                        reinterpret_cast<hpx::naming::address_type>(&val));
+                hpx::threads::mask_cref_type thread_mask =
+                    t.get_thread_affinity_mask(hpx::get_worker_thread_num());
+                HPX_ASSERT(mem_mask & thread_mask);
+#endif
             });
 
         // return the overall memory block
         return p;
     }
 
-    void deallocate(pointer p, size_type)
+    void deallocate(pointer p, size_type cnt)
     {
-        ::operator delete(p);
+        hpx::threads::topology& t = retrieve_topology();
+        t.deallocate(p, cnt * sizeof(T));
     }
 
     // size
@@ -121,12 +140,6 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::threads::topology const& retrieve_topology()
-{
-    static hpx::threads::topology const& topo = hpx::threads::create_topology();
-    return topo;
-}
-
 double mysecond()
 {
     return hpx::util::high_resolution_clock::now() * 1e-9;

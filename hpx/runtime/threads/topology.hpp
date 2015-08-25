@@ -250,7 +250,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_thread_affinity_mask(std::size_t num_thread,
-            bool numa_sensitive, error_code& ec = throws) const = 0;
+            bool numa_sensitive = false, error_code& ec = throws) const = 0;
 
         /// \brief Use the given bit mask to set the affinity of the given
         ///        thread. Each set bit corresponds to a processing unit the
@@ -331,6 +331,13 @@ namespace hpx { namespace threads
             error_code& ec = throws) const = 0;
 
         virtual void write_to_log() const = 0;
+
+        /// This is equivalent to malloc(), except that it tries to allocate
+        /// page-aligned memory from the OS.
+        virtual void* allocate(std::size_t len) = 0;
+
+        /// Free memory that was previously allocated by allocate
+        virtual void deallocate(void* addr, std::size_t len) = 0;
     };
 
     HPX_API_EXPORT std::size_t hardware_concurrency();
