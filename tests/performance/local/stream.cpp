@@ -37,7 +37,7 @@ hpx::threads::topology& retrieve_topology()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename T, typename ExPolicy>
+template <typename T, typename Executors>
 class numa_allocator
 {
 public:
@@ -55,21 +55,21 @@ public:
     template <typename U>
     struct rebind
     {
-        typedef numa_allocator<U, ExPolicy> other;
+        typedef numa_allocator<U, Executors> other;
     };
 
 public:
-    numa_allocator(ExPolicy const& policy)
-      : policy_(policy)
+    numa_allocator(Executors const& executors)
+      : executors_(executors)
     {}
 
     explicit numa_allocator(numa_allocator const& rhs)
-      : policy_(rhs.policy_)
+      : executors_(rhs.executors_)
     {}
 
     template <typename U>
-    explicit numa_allocator(numa_allocator<U, ExPolicy> const& rhs)
-      : policy_(rhs.policy_)
+    explicit numa_allocator(numa_allocator<U, Executors> const& rhs)
+      : executors_(rhs.executors_)
     {}
 
     // address
@@ -85,25 +85,39 @@ public:
 
         pointer p = reinterpret_cast<pointer>(t.allocate(cnt * sizeof(T)));
 
-        // first touch policy, letting execution policy do the right thing
-        hpx::parallel::for_each(policy_, p, p + cnt,
-            [&t](T& val)
-            {
-                // touch first byte of every object
-                *reinterpret_cast<char*>(&val) = 0;
+        // first touch policy, distribute evenly onto executors
+        std::size_t part_size = cnt/executors_.size();
+        std::vector<hpx::future<void> > first_touch;
+        first_touch.reserve(executors_.size());
+        for (std::size_t i = 0; i != executors_.size(); ++i)
+        {
+            pointer begin = p + i * part_size;
+            pointer end = begin + part_size;
+            first_touch.push_back(
+                hpx::parallel::for_each(
+                    hpx::parallel::par(hpx::parallel::task).on(executors_[i]).
+                        with(hpx::parallel::static_chunk_size()),
+                    begin, end,
+                    [this, &t, i](T& val)
+                    {
+                        // touch first byte of every object
+                        *reinterpret_cast<char*>(&val) = 0;
 
 #if defined(HPX_DEBUG)
-                hpx::threads::mask_cref_type mem_mask =
-                    t.get_thread_affinity_mask_from_lva(
-                        reinterpret_cast<hpx::naming::address_type>(&val));
+                        hpx::threads::mask_cref_type mem_mask =
+                            t.get_thread_affinity_mask_from_lva(
+                                reinterpret_cast<hpx::naming::address_type>(&val));
 
-                std::size_t i = hpx::get_worker_thread_num();
-                hpx::threads::mask_type thread_mask =
-                    hpx::threads::get_thread_manager().get_pu_mask(t, i);
+                        std::size_t j = hpx::get_worker_thread_num();
+                        hpx::threads::mask_type thread_mask =
+                            executors_[i].get_pu_mask(t, j);
 
-                HPX_ASSERT(mem_mask & thread_mask);
+                        HPX_ASSERT(mem_mask & thread_mask);
 #endif
-            });
+                })
+            );
+        }
+        hpx::wait_all(first_touch);
 
         // return the overall memory block
         return p;
@@ -139,7 +153,7 @@ private:
     template <typename, typename>
     friend class numa_allocator;
 
-    ExPolicy policy_;
+    Executors executors_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -321,12 +335,6 @@ numa_domain_worker(std::size_t domain,
     iterator b_end = b_begin + part_size;
     iterator c_end = c_begin + part_size;
 
-#if defined(HPX_DEBUG)
-    hpx::threads::mask_cref_type mem_mask =
-        retrieve_topology().get_thread_affinity_mask_from_lva(
-            reinterpret_cast<hpx::naming::address_type>(&*a_begin));
-#endif
-
     // Initialize arrays
     auto policy = hpx::parallel::par.on(exec);
     hpx::parallel::fill(policy, a_begin, a_end, 1.0);
@@ -335,9 +343,21 @@ numa_domain_worker(std::size_t domain,
 
     double t = mysecond();
     hpx::parallel::for_each(policy, a_begin, a_end,
-        [](STREAM_TYPE & v)
+        [&policy](STREAM_TYPE & v)
         {
             v = 2.0 * v;
+#if defined(HPX_DEBUG)
+            hpx::threads::topology& t = retrieve_topology();
+            hpx::threads::mask_cref_type mem_mask =
+                t.get_thread_affinity_mask_from_lva(
+                    reinterpret_cast<hpx::naming::address_type>(&v));
+
+            std::size_t i = hpx::get_worker_thread_num();
+            hpx::threads::mask_type thread_mask =
+                policy.executor().get_pu_mask(t, i);
+
+            HPX_ASSERT(mem_mask & thread_mask);
+#endif
         });
     t = 1.0E6 * (mysecond() - t);
 
@@ -488,29 +508,14 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     using namespace hpx::parallel;
 
-    // allocate data
-    hpx::threads::executors::default_executor exec;
-    auto numa_policy = par.on(exec).with(static_chunk_size());
+    typedef
+        std::vector<hpx::threads::executors::local_priority_queue_os_executor>
+        executors_vector;
 
-    typedef numa_allocator<STREAM_TYPE, decltype(numa_policy)> allocator_type;
-    allocator_type alloc(numa_policy);
-
-    typedef std::vector<STREAM_TYPE, allocator_type> vector_type;
-    vector_type a(vector_size, STREAM_TYPE(), alloc);
-    vector_type b(vector_size, STREAM_TYPE(), alloc);
-    vector_type c(vector_size, STREAM_TYPE(), alloc);
-
-    // perform benchmark
-    hpx::lcos::local::latch l(numa_nodes);
-
-    double time_total = mysecond();
-    std::vector<hpx::future<std::vector<std::vector<double> > > > workers;
-    workers.reserve(numa_nodes);
-
-    std::size_t part_size = vector_size/numa_nodes;
-    std::vector<hpx::threads::executors::local_priority_queue_os_executor> execs;
+    executors_vector execs;
     execs.reserve(numa_nodes);
 
+    // creating our executors ....
     for (std::size_t i = 0; i != numa_nodes; ++i)
     {
         std::string bind_desc;
@@ -531,10 +536,31 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // create executor for this NUMA domain
         execs.emplace_back(pus, bind_desc);
+    }
 
+    // allocate data
+    typedef numa_allocator<STREAM_TYPE, executors_vector> allocator_type;
+    allocator_type alloc(execs);
+
+    typedef std::vector<STREAM_TYPE, allocator_type> vector_type;
+    vector_type a(vector_size, STREAM_TYPE(), alloc);
+    vector_type b(vector_size, STREAM_TYPE(), alloc);
+    vector_type c(vector_size, STREAM_TYPE(), alloc);
+
+    // perform benchmark
+    hpx::lcos::local::latch l(numa_nodes);
+
+    double time_total = mysecond();
+    std::vector<hpx::future<std::vector<std::vector<double> > > > workers;
+    workers.reserve(numa_nodes);
+
+    std::size_t part_size = vector_size/numa_nodes;
+
+    for (std::size_t i = 0; i != numa_nodes; ++i)
+    {
         workers.push_back(
-            hpx::async(execs.back(), &numa_domain_worker<vector_type>,
-                i, boost::ref(execs.back()), boost::ref(l),
+            hpx::async(execs[i], &numa_domain_worker<vector_type>,
+                i, boost::ref(execs[i]), boost::ref(l),
                 part_size, part_size*i, iterations,
                 boost::ref(a), boost::ref(b), boost::ref(c))
         );
