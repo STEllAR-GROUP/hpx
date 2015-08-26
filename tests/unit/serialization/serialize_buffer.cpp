@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2015 Andreas Schäfer
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,21 +24,6 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     buffer_plain_type, serialization_buffer_char);
 HPX_REGISTER_BASE_LCO_WITH_VALUE(
     buffer_plain_type, serialization_buffer_char);
-
-///////////////////////////////////////////////////////////////////////////////
-typedef hpx::serialization::serialize_buffer<char, std::allocator<char> >
-    buffer_allocator_type;
-
-buffer_allocator_type bounce_allocator(buffer_allocator_type const& receive_buffer)
-{
-    return receive_buffer;
-}
-HPX_PLAIN_ACTION(bounce_allocator);
-
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    buffer_allocator_type, serialization_buffer_char_allocator);
-HPX_REGISTER_BASE_LCO_WITH_VALUE(
-    buffer_allocator_type, serialization_buffer_char_allocator);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Buffer, typename Action>
@@ -69,13 +55,13 @@ template <typename Allocator>
 void test_stateful_allocator(hpx::id_type dest, char* send_buffer,
     std::size_t size, Allocator const& alloc)
 {
-    typedef buffer_allocator_type buffer_type;
+    typedef buffer_plain_type buffer_type;
     buffer_type recv_buffer;
 
     std::vector<hpx::future<buffer_type> > recv_buffers;
     recv_buffers.reserve(10);
 
-    bounce_allocator_action act;
+    bounce_plain_action act;
     for(std::size_t j = 0; j != 10; ++j)
     {
         recv_buffers.push_back(hpx::async(act, dest,
@@ -124,8 +110,6 @@ int hpx_main(int argc, char* argv[])
         for (std::size_t size = 1; size <= max_size; size *= 2)
         {
             test<buffer_plain_type, bounce_plain_action>(
-                loc, send_buffer.get(), size);
-            test<buffer_allocator_type, bounce_allocator_action>(
                 loc, send_buffer.get(), size);
             test_stateful_allocator(
                 loc, send_buffer.get(), size, std::allocator<char>());
