@@ -68,7 +68,7 @@ namespace hpx { namespace threads
 
         std::size_t get_index(hwloc_obj_t obj)
         {
-            // on Windows os_index is always -1
+            // on Windows logical_index is always -1
             if (obj->logical_index == ~0x0u)
                 return static_cast<std::size_t>(obj->os_index);
 
@@ -367,7 +367,8 @@ namespace hpx { namespace threads
 
                     if(idx == i)
                     {
-                        hwloc_bitmap_set(cpuset, static_cast<unsigned int>(pu_obj->os_index));
+                        hwloc_bitmap_set(cpuset,
+                            static_cast<unsigned int>(pu_obj->os_index));
                         break;
                     }
                 }
@@ -443,8 +444,7 @@ namespace hpx { namespace threads
                 {
                     hwloc_obj_t const pu_obj =
                         hwloc_get_obj_by_depth(topo, pu_depth, i);
-                    unsigned idx =
-                        static_cast<unsigned>(detail::get_index(pu_obj));
+                    unsigned idx = static_cast<unsigned>(pu_obj->os_index);
                     if (hwloc_bitmap_isset(cpuset, idx) != 0)
                         set(mask, detail::get_index(pu_obj));
                 }
