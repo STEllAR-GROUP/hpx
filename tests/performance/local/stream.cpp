@@ -359,6 +359,10 @@ numa_domain_worker(std::size_t domain,
                 topo.get_thread_affinity_mask_from_lva(
                     reinterpret_cast<hpx::naming::address_type>(&v));
 
+            typedef typename Policy::executor_type executor_type;
+            typedef hpx::parallel::executor_information_traits<
+                executor_type> traits;
+
             std::size_t thread_num = hpx::get_worker_thread_num();
             hpx::threads::mask_cref_type thread_mask =
                 traits::get_pu_mask(policy.executor(), topo, thread_num);
