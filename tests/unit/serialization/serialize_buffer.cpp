@@ -99,6 +99,29 @@ void test_fixed_size_initialization_for_persistent_buffers(std::size_t max_size)
     }
 }
 
+template <typename T>
+void test_initialization_from_vector(std::size_t max_size)
+{
+    for (std::size_t size = 1; size <= max_size; size *= 2)
+    {
+        std::vector<T> send_vec;
+        std::vector<T> recv_vec;
+        send_vec.reserve(size);
+        for (std::size_t i = 0; i < size; ++i) {
+            send_vec.push_back(size - i);
+        }
+
+        // default init mode is "copy"
+        hpx::serialization::serialize_buffer<T> send_buffer(send_vec[0], send_vec.size());
+        hpx::serialization::serialize_buffer<T> recv_buffer;
+        std::copy(send_vec.begin(), send_vec.end(), send_buffer.begin());
+        recv_buffer = send_buffer;
+
+        std::copy(recv_buffer.begin(), recv_buffer.end(), std::back_inserter(recv_vec));
+        HPX_TEST(send_vec == recv_vec);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
