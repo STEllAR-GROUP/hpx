@@ -105,17 +105,22 @@ public:
                         *reinterpret_cast<char*>(&val) = 0;
 
 #if defined(HPX_DEBUG)
+                        // make sure memory was placed appropriately
                         hpx::threads::mask_cref_type mem_mask =
                             topo_.get_thread_affinity_mask_from_lva(
                                 reinterpret_cast<hpx::naming::address_type>(&val));
 
-                        std::size_t j = hpx::get_worker_thread_num();
-                        hpx::threads::mask_type thread_mask =
-                            executors_[i].get_pu_mask(topo_, j);
+                        typedef typename Executors::value_type executor_type;
+                        typedef hpx::parallel::executor_information_traits<
+                            executor_type> traits;
+
+                        std::size_t thread_num = hpx::get_worker_thread_num();
+                        hpx::threads::mask_cref_type thread_mask =
+                            traits::get_pu_mask(executors_[i], topo_, thread_num);
 
                         HPX_ASSERT(mem_mask & thread_mask);
 #endif
-                })
+                    })
             );
         }
         hpx::wait_all(first_touch);
@@ -346,15 +351,17 @@ numa_domain_worker(std::size_t domain,
         [&policy](STREAM_TYPE & v)
         {
             v = 2.0 * v;
+
 #if defined(HPX_DEBUG)
+            // make sure memory was placed appropriately
             hpx::threads::topology& t = retrieve_topology();
             hpx::threads::mask_cref_type mem_mask =
                 t.get_thread_affinity_mask_from_lva(
                     reinterpret_cast<hpx::naming::address_type>(&v));
 
-            std::size_t i = hpx::get_worker_thread_num();
+            std::size_t thread_num = hpx::get_worker_thread_num();
             hpx::threads::mask_type thread_mask =
-                policy.executor().get_pu_mask(t, i);
+                policy.executor().get_pu_mask(t, thread_num);
 
             HPX_ASSERT(mem_mask & thread_mask);
 #endif
@@ -505,6 +512,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         << "-------------------------------------------------------------\n"
         << "Number of Threads requested = "
             << numa_nodes * pus << "\n"
+        << "Chunking policy requested: " << chunker << "\n"
         << "-------------------------------------------------------------\n"
         ;
 
@@ -556,53 +564,51 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::vector<hpx::future<std::vector<std::vector<double> > > > workers;
     workers.reserve(numa_nodes);
 
-    std::size_t part_size = vector_size/numa_nodes;
+    std::size_t part_size = vector_size / numa_nodes;
 
     for (std::size_t i = 0; i != numa_nodes; ++i)
     {
         if(chunker == "dynamic")
         {
-            auto policy = hpx::parallel::par.on(execs[i]).
-                with(hpx::parallel::dynamic_chunk_size());
+            auto policy = par.on(execs[i]).with(dynamic_chunk_size());
             workers.push_back(
                 hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
                     i, policy, boost::ref(l),
                     part_size, part_size*i, iterations,
                     boost::ref(a), boost::ref(b), boost::ref(c))
             );
-            continue;
         }
-        if(chunker == "auto")
+        else if(chunker == "auto")
         {
-            auto policy = hpx::parallel::par.on(execs[i]).
-                with(hpx::parallel::auto_chunk_size());
+            auto policy = par.on(execs[i]).with(auto_chunk_size());
             workers.push_back(
                 hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
                     i, policy, boost::ref(l),
                     part_size, part_size*i, iterations,
                     boost::ref(a), boost::ref(b), boost::ref(c))
             );
-            continue;
         }
-        if(chunker == "guided")
+        else if(chunker == "guided")
         {
-            auto policy = hpx::parallel::par.on(execs[i]).
-                with(hpx::parallel::guided_chunk_size());
+            auto policy = par.on(execs[i]).with(guided_chunk_size());
             workers.push_back(
                 hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
                     i, policy, boost::ref(l),
                     part_size, part_size*i, iterations,
                     boost::ref(a), boost::ref(b), boost::ref(c))
             );
-            continue;
         }
-        auto policy = hpx::parallel::par.on(execs[i]);
-        workers.push_back(
-            hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
-                i, policy, boost::ref(l),
-                part_size, part_size*i, iterations,
-                boost::ref(a), boost::ref(b), boost::ref(c))
-        );
+        else
+        {
+            // default
+            auto policy = par.on(execs[i]);
+            workers.push_back(
+                hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
+                    i, policy, boost::ref(l),
+                    part_size, part_size*i, iterations,
+                    boost::ref(a), boost::ref(b), boost::ref(c))
+            );
+        }
     }
 
     std::vector<std::vector<std::vector<double> > >
@@ -737,8 +743,8 @@ int main(int argc, char* argv[])
 
     cmdline.add_options()
         (   "vector_size",
-            boost::program_options::value<std::size_t>()->default_value(1000),
-            "size of vector (default: 1000)")
+            boost::program_options::value<std::size_t>()->default_value(1024),
+            "size of vector (default: 1024)")
         (   "offset",
             boost::program_options::value<std::size_t>()->default_value(0),
             "offset (default: 0)")

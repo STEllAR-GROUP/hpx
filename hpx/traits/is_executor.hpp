@@ -42,6 +42,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
     template <typename Executor, typename Enable = void>
     struct executor_traits;
+
+    template <typename Executor, typename Enable = void>
+    struct executor_information_traits;
 }}}
 
 namespace hpx { namespace traits

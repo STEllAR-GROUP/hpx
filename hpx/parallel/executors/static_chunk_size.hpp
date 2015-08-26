@@ -13,6 +13,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/executor_information_traits.hpp>
 
 #include <cstddef>
 
@@ -56,15 +57,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             if (chunk_size_ != 0)
                 return chunk_size_;
 
-            typedef executor_traits<Executor> traits;
-
             // by default use static work distribution over number of
             // available compute resources
-            std::size_t const cores = traits::os_thread_count(exec);
+            typedef executor_information_traits<Executor> infotraits;
+            std::size_t const cores = infotraits::os_thread_count(exec);
 
             // Make sure the internal round robin counter of the executor is
             // reset
-            traits::reset_thread_distribution(exec);
+            typedef executor_parameter_traits<static_chunk_size> traits;
+            traits::reset_thread_distribution(*this, exec);
 
             return (num_tasks + cores - 1) / cores;
         }
