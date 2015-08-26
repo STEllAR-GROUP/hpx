@@ -52,8 +52,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
       : scheduler_(num_punits),
         executor_name_(get_unique_name()),
         notifier_(get_notification_policy(executor_name_.c_str())),
-        pool_(scheduler_, notifier_, executor_name_.c_str(),
-            policies::fast_idle_mode),
+        pool_(scheduler_, notifier_, executor_name_.c_str()),
         num_threads_(num_punits)
     {
         if (num_punits > hpx::threads::hardware_concurrency())

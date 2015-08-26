@@ -283,7 +283,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
-                num_thread = ++curr_queue_ % queue_size;
+                num_thread = curr_queue_++ % queue_size;
 
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
@@ -373,7 +373,7 @@ namespace hpx { namespace threads { namespace policies
             thread_priority priority = thread_priority_normal)
         {
             if (std::size_t(-1) == num_thread)
-                num_thread = ++curr_queue_ % queues_.size();
+                num_thread = curr_queue_++ % queues_.size();
 
             HPX_ASSERT(num_thread < queues_.size());
             queues_[num_thread]->schedule_thread(thrd);
@@ -384,7 +384,7 @@ namespace hpx { namespace threads { namespace policies
             thread_priority priority = thread_priority_normal)
         {
             if (std::size_t(-1) == num_thread)
-                num_thread = ++curr_queue_ % queues_.size();
+                num_thread = curr_queue_++ % queues_.size();
 
             HPX_ASSERT(num_thread < queues_.size());
             queues_[num_thread]->schedule_thread(thrd, true);

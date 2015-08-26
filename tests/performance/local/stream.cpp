@@ -92,12 +92,15 @@ public:
                 // touch first byte of every object
                 *reinterpret_cast<char*>(&val) = 0;
 
-#if defined(_DEBUG)
+#if defined(HPX_DEBUG)
                 hpx::threads::mask_cref_type mem_mask =
                     t.get_thread_affinity_mask_from_lva(
                         reinterpret_cast<hpx::naming::address_type>(&val));
-                hpx::threads::mask_cref_type thread_mask =
-                    t.get_thread_affinity_mask(hpx::get_worker_thread_num());
+
+                std::size_t i = hpx::get_worker_thread_num();
+                hpx::threads::mask_type thread_mask =
+                    hpx::threads::get_thread_manager().get_pu_mask(t, i);
+
                 HPX_ASSERT(mem_mask & thread_mask);
 #endif
             });
@@ -318,6 +321,11 @@ numa_domain_worker(std::size_t domain,
     iterator b_end = b_begin + part_size;
     iterator c_end = c_begin + part_size;
 
+#if defined(HPX_DEBUG)
+    hpx::threads::mask_cref_type mem_mask =
+        retrieve_topology().get_thread_affinity_mask_from_lva(
+            reinterpret_cast<hpx::naming::address_type>(&*a_begin));
+#endif
 
     // Initialize arrays
     auto policy = hpx::parallel::par.on(exec);

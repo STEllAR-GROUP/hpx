@@ -446,7 +446,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
-                num_thread = ++curr_queue_ % queue_size;
+                num_thread = curr_queue_++ % queue_size;
 
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
@@ -594,7 +594,7 @@ namespace hpx { namespace threads { namespace policies
             thread_priority priority = thread_priority_normal)
         {
             if (std::size_t(-1) == num_thread)
-                num_thread = ++curr_queue_ % queues_.size();
+                num_thread = curr_queue_++ % queues_.size();
 
             if (priority == thread_priority_critical ||
                 priority == thread_priority_boost)
@@ -616,7 +616,7 @@ namespace hpx { namespace threads { namespace policies
             thread_priority priority = thread_priority_normal)
         {
             if (std::size_t(-1) == num_thread)
-                num_thread = ++curr_queue_ % queues_.size();
+                num_thread = curr_queue_++ % queues_.size();
 
             if (priority == thread_priority_critical ||
                 priority == thread_priority_boost)
