@@ -354,14 +354,14 @@ numa_domain_worker(std::size_t domain,
 
 #if defined(HPX_DEBUG)
             // make sure memory was placed appropriately
-            hpx::threads::topology& t = retrieve_topology();
+            hpx::threads::topology& topo = retrieve_topology();
             hpx::threads::mask_cref_type mem_mask =
-                t.get_thread_affinity_mask_from_lva(
+                topo.get_thread_affinity_mask_from_lva(
                     reinterpret_cast<hpx::naming::address_type>(&v));
 
             std::size_t thread_num = hpx::get_worker_thread_num();
-            hpx::threads::mask_type thread_mask =
-                policy.executor().get_pu_mask(t, thread_num);
+            hpx::threads::mask_cref_type thread_mask =
+                traits::get_pu_mask(policy.executor(), topo, thread_num);
 
             HPX_ASSERT(mem_mask & thread_mask);
 #endif

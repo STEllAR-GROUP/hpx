@@ -74,7 +74,7 @@ namespace hpx { namespace threads
         void intrusive_ptr_add_ref(executor_base* p);
         void intrusive_ptr_release(executor_base* p);
 
-        class executor_base
+        class HPX_EXPORT executor_base
         {
         public:
             typedef util::unique_function_nonser<void()> closure_type;
