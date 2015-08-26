@@ -408,29 +408,36 @@ namespace hpx { namespace threads
         hwloc_nodeset_t nodeset = hwloc_bitmap_alloc();
 
         {
-             scoped_lock lk(topo_mtx);
-             int ret = hwloc_get_area_membind_nodeset(topo,
-                 reinterpret_cast<void const*>(lva), 1, nodeset, &policy, 0);
+            scoped_lock lk(topo_mtx);
+            int ret = hwloc_get_area_membind_nodeset(topo,
+                reinterpret_cast<void const*>(lva), 1, nodeset, &policy, 0);
 
-             if (-1 != ret)
-             {
-                 hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
-                 hwloc_cpuset_from_nodeset(topo, cpuset, nodeset);
-                 lk.unlock();
+            if (-1 != ret)
+            {
+                hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
+                hwloc_cpuset_from_nodeset(topo, cpuset, nodeset);
+                lk.unlock();
 
-                 hwloc_bitmap_free(nodeset);
+                hwloc_bitmap_free(nodeset);
 
-                 mask_type mask = mask_type();
-                 resize(mask, get_number_of_pus());
+                mask_type mask = mask_type();
+                resize(mask, get_number_of_pus());
 
-                 for (unsigned int i = 0; i != num_of_pus_; ++i)
-                 {
-                     set(mask, hwloc_bitmap_isset(cpuset, i) != 0);
-                 }
+                int const pu_depth =
+                    hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
+                for (unsigned int i = 0; i != num_of_pus_; ++i)
+                {
+                    hwloc_obj_t const pu_obj =
+                        hwloc_get_obj_by_depth(topo, pu_depth, i);
+                    unsigned idx =
+                        static_cast<unsigned>(detail::get_index(pu_obj));
+                    if (hwloc_bitmap_isset(cpuset, idx) != 0)
+                        set(mask, detail::get_index(pu_obj));
+                }
 
-                 hwloc_bitmap_free(cpuset);
-                 return mask;
-             }
+                hwloc_bitmap_free(cpuset);
+                return mask;
+            }
         }
 
         hwloc_bitmap_free(nodeset);
