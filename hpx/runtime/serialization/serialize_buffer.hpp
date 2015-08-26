@@ -59,7 +59,10 @@ namespace hpx { namespace serialization
           , size_(size)
           , alloc_(alloc)
         {
-            data_.reset(alloc_.allocate(size));
+            using util::placeholders::_1;
+            data_.reset(alloc_.allocate(size),
+                        util::bind(&serialize_buffer::deleter<allocator_type>,
+                                   _1, alloc_, size_));
         }
 
         // The default mode is 'copy' which is consistent with the constructor
