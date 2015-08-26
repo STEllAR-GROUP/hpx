@@ -201,6 +201,7 @@ namespace hpx { namespace serialization
           , alloc_(alloc)
         {
             if (mode == copy) {
+                using util::placeholders::_1;
                 data_.reset(alloc_.allocate(size),
                     util::bind(&serialize_buffer::deleter<allocator_type>,
                         _1, alloc_, size_));
