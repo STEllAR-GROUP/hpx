@@ -13,6 +13,7 @@
 #include <hpx/exception_list.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/result_of.hpp>
@@ -23,6 +24,14 @@
 
 #include <type_traits>
 #include <utility>
+
+///////////////////////////////////////////////////////////////////////////////
+// forward declaration only
+namespace hpx { namespace threads
+{
+    HPX_API_EXPORT threads::mask_cref_type get_pu_mask(threads::topology& topo,
+        std::size_t thread_num);
+}}
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -63,7 +72,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor>
             static auto call(int, Executor const& exec)
-                ->  decltype(exec.has_pending_closures())
+            ->  decltype(exec.has_pending_closures())
             {
                 return exec.has_pending_closures();
             }
@@ -79,9 +88,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct get_pu_mask_helper
         {
             template <typename Executor>
-            static threads::mask_cref_type call(wrap_int, Executor const& exec,
+            static threads::mask_cref_type call(wrap_int, Executor const&,
                 threads::topology& topo, std::size_t thread_num)
             {
+                return hpx::threads::get_pu_mask(topo, thread_num);
             }
 
             template <typename Executor>

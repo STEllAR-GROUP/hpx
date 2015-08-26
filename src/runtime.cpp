@@ -1219,9 +1219,15 @@ namespace hpx { namespace threads
         return get_runtime().get_config().get_stack_size(stacksize);
     }
 
-    void reset_thread_distribution()
+    HPX_API_EXPORT void reset_thread_distribution()
     {
         get_runtime().get_thread_manager().reset_thread_distribution();
+    }
+
+    HPX_API_EXPORT threads::mask_cref_type get_pu_mask(
+        threads::topology& topo, std::size_t thread_num)
+    {
+        return get_runtime().get_thread_manager().get_pu_mask(topo, thread_num);
     }
 }}
 
