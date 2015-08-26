@@ -62,6 +62,14 @@ namespace hpx { namespace threads { namespace executors
             // Reset internal (round robin) thread distribution scheme
             void reset_thread_distribution();
 
+            /// Return the mask for processing units the given thread is allowed
+            /// to run on.
+            mask_cref_type get_pu_mask(topology const& topology,
+                    std::size_t num_thread) const
+            {
+                return pool_.get_pu_mask(topology, num_thread);
+            }
+
         protected:
             // Return the requested policy element
             std::size_t get_policy_element(

@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_THREAD_EXECUTOR_JAN_11_2013_0700PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/safe_bool.hpp>
@@ -99,6 +100,11 @@ namespace hpx { namespace threads
             // Return the requested policy element
             virtual std::size_t get_policy_element(
                 threads::detail::executor_parameter p, error_code& ec) const = 0;
+
+            /// Return the mask for processing units the given thread is allowed
+            /// to run on.
+            virtual mask_cref_type get_pu_mask(topology const& topology,
+                    std::size_t num_thread) const;
 
         private:
             // reference counting
@@ -207,6 +213,14 @@ namespace hpx { namespace threads
         void reset_thread_distribution() const
         {
             executor_data_->reset_thread_distribution();
+        }
+
+        /// Return the mask for processing units the given thread is allowed
+        /// to run on.
+        mask_cref_type get_pu_mask(topology const& topology,
+                std::size_t num_thread) const
+        {
+            return executor_data_->get_pu_mask(topology, num_thread);
         }
 
         operator util::safe_bool<executor>::result_type() const
