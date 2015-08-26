@@ -59,17 +59,17 @@ public:
     };
 
 public:
-    numa_allocator(Executors const& executors)
-      : executors_(executors)
+    numa_allocator(Executors const& executors, hpx::threads::topology& topo)
+      : executors_(executors), topo_(topo)
     {}
 
     explicit numa_allocator(numa_allocator const& rhs)
-      : executors_(rhs.executors_)
+      : executors_(rhs.executors_), topo_(rhs.topo_)
     {}
 
     template <typename U>
     explicit numa_allocator(numa_allocator<U, Executors> const& rhs)
-      : executors_(rhs.executors_)
+      : executors_(rhs.executors_), topo_(rhs.topo_)
     {}
 
     // address
@@ -81,36 +81,36 @@ public:
         typename std::allocator<void>::const_pointer = 0)
     {
         // allocate memory
-        hpx::threads::topology& t = retrieve_topology();
-
-        pointer p = reinterpret_cast<pointer>(t.allocate(cnt * sizeof(T)));
+        pointer p = reinterpret_cast<pointer>(topo_.allocate(cnt * sizeof(T)));
 
         // first touch policy, distribute evenly onto executors
-        std::size_t part_size = cnt/executors_.size();
+        std::size_t part_size = cnt / executors_.size();
         std::vector<hpx::future<void> > first_touch;
         first_touch.reserve(executors_.size());
+
         for (std::size_t i = 0; i != executors_.size(); ++i)
         {
+            using namespace hpx::parallel;
+
             pointer begin = p + i * part_size;
             pointer end = begin + part_size;
             first_touch.push_back(
-                hpx::parallel::for_each(
-                    hpx::parallel::par(hpx::parallel::task).on(executors_[i]).
-                        with(hpx::parallel::static_chunk_size()),
+                for_each(
+                    par(task).on(executors_[i]).with(static_chunk_size()),
                     begin, end,
-                    [this, &t, i](T& val)
+                    [this, i](T& val)
                     {
                         // touch first byte of every object
                         *reinterpret_cast<char*>(&val) = 0;
 
 #if defined(HPX_DEBUG)
                         hpx::threads::mask_cref_type mem_mask =
-                            t.get_thread_affinity_mask_from_lva(
+                            topo_.get_thread_affinity_mask_from_lva(
                                 reinterpret_cast<hpx::naming::address_type>(&val));
 
                         std::size_t j = hpx::get_worker_thread_num();
                         hpx::threads::mask_type thread_mask =
-                            executors_[i].get_pu_mask(t, j);
+                            executors_[i].get_pu_mask(topo_, j);
 
                         HPX_ASSERT(mem_mask & thread_mask);
 #endif
@@ -125,8 +125,7 @@ public:
 
     void deallocate(pointer p, size_type cnt)
     {
-        hpx::threads::topology& t = retrieve_topology();
-        t.deallocate(p, cnt * sizeof(T));
+        topo_.deallocate(p, cnt * sizeof(T));
     }
 
     // size
@@ -153,7 +152,8 @@ private:
     template <typename, typename>
     friend class numa_allocator;
 
-    Executors executors_;
+    Executors const& executors_;
+    hpx::threads::topology& topo_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -540,7 +540,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // allocate data
     typedef numa_allocator<STREAM_TYPE, executors_vector> allocator_type;
-    allocator_type alloc(execs);
+    allocator_type alloc(execs, retrieve_topology());
 
     typedef std::vector<STREAM_TYPE, allocator_type> vector_type;
     vector_type a(vector_size, STREAM_TYPE(), alloc);
