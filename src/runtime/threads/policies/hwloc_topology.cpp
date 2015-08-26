@@ -356,7 +356,21 @@ namespace hpx { namespace threads
         {
             if (test(mask, i))
             {
-                hwloc_bitmap_set(cpuset, static_cast<unsigned int>(i));
+                int const pu_depth =
+                    hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
+                for (unsigned int j = 0; j != num_of_pus_; ++j)
+                {
+                    hwloc_obj_t const pu_obj =
+                        hwloc_get_obj_by_depth(topo, pu_depth, j);
+                    unsigned idx =
+                        static_cast<unsigned>(detail::get_index(pu_obj));
+
+                    if(idx == i)
+                    {
+                        hwloc_bitmap_set(cpuset, static_cast<unsigned int>(pu_obj->os_index));
+                        break;
+                    }
+                }
             }
         }
 
@@ -1005,7 +1019,7 @@ namespace hpx { namespace threads
             for (unsigned int i = 0; i != num_of_pus_; ++i) //-V104
             {
                 hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(topo, pu_depth, i);
-                unsigned idx = static_cast<unsigned>(detail::get_index(pu_obj));
+                unsigned idx = static_cast<unsigned>(pu_obj->os_index);
                 if (hwloc_bitmap_isset(cpuset, idx) != 0)
                     set(mask, detail::get_index(pu_obj));
             }
@@ -1043,7 +1057,7 @@ namespace hpx { namespace threads
             for (unsigned int i = 0; i != num_of_pus_; ++i) //-V104
             {
                 hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(topo, pu_depth, i);
-                unsigned idx = static_cast<unsigned>(detail::get_index(pu_obj));
+                unsigned idx = static_cast<unsigned>(pu_obj->os_index);
                 if (hwloc_bitmap_isset(cpuset, idx) != 0)
                     set(mask, detail::get_index(pu_obj));
             }
