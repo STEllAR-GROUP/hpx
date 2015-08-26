@@ -389,7 +389,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         template <typename Executor>
-        std::size_t call_reset_thread_distribution(Executor& exec)
+        void call_reset_thread_distribution(Executor& exec)
         {
             reset_thread_distribution_helper::call(0, exec);
         }
