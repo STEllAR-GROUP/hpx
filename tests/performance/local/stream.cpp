@@ -16,6 +16,7 @@
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_transform.hpp>
+#include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/lexical_cast.hpp>
@@ -318,10 +319,10 @@ void check_results(std::size_t iterations,
 #endif
 }
 
-template <typename Vector>
+template <typename Vector, typename Policy>
 std::vector<std::vector<double> >
 numa_domain_worker(std::size_t domain,
-    hpx::threads::executors::local_priority_queue_os_executor & exec,
+    Policy policy,
     hpx::lcos::local::latch& l,
     std::size_t part_size, std::size_t offset, std::size_t iterations,
     Vector& a, Vector& b, Vector& c)
@@ -336,7 +337,6 @@ numa_domain_worker(std::size_t domain,
     iterator c_end = c_begin + part_size;
 
     // Initialize arrays
-    auto policy = hpx::parallel::par.on(exec);
     hpx::parallel::fill(policy, a_begin, a_end, 1.0);
     hpx::parallel::fill(policy, b_begin, b_end, 2.0);
     hpx::parallel::fill(policy, c_begin, c_end, 0.0);
@@ -473,6 +473,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::string num_threads_str = vm["stream-threads"].as<std::string>();
     std::string num_numa_domains_str = vm["stream-numa-domains"].as<std::string>();
 
+    std::string chunker = vm["chunker"].as<std::string>();
+
     if(num_numa_domains_str != "all")
     {
         numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
@@ -558,9 +560,46 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     for (std::size_t i = 0; i != numa_nodes; ++i)
     {
+        if(chunker == "dynamic")
+        {
+            auto policy = hpx::parallel::par.on(execs[i]).
+                with(hpx::parallel::dynamic_chunk_size());
+            workers.push_back(
+                hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
+                    i, policy, boost::ref(l),
+                    part_size, part_size*i, iterations,
+                    boost::ref(a), boost::ref(b), boost::ref(c))
+            );
+            continue;
+        }
+        if(chunker == "auto")
+        {
+            auto policy = hpx::parallel::par.on(execs[i]).
+                with(hpx::parallel::auto_chunk_size());
+            workers.push_back(
+                hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
+                    i, policy, boost::ref(l),
+                    part_size, part_size*i, iterations,
+                    boost::ref(a), boost::ref(b), boost::ref(c))
+            );
+            continue;
+        }
+        if(chunker == "guided")
+        {
+            auto policy = hpx::parallel::par.on(execs[i]).
+                with(hpx::parallel::guided_chunk_size());
+            workers.push_back(
+                hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
+                    i, policy, boost::ref(l),
+                    part_size, part_size*i, iterations,
+                    boost::ref(a), boost::ref(b), boost::ref(c))
+            );
+            continue;
+        }
+        auto policy = hpx::parallel::par.on(execs[i]);
         workers.push_back(
-            hpx::async(execs[i], &numa_domain_worker<vector_type>,
-                i, boost::ref(execs[i]), boost::ref(l),
+            hpx::async(execs[i], &numa_domain_worker<vector_type, decltype(policy)>,
+                i, policy, boost::ref(l),
                 part_size, part_size*i, iterations,
                 boost::ref(a), boost::ref(b), boost::ref(c))
         );
@@ -712,6 +751,10 @@ int main(int argc, char* argv[])
         (   "stream-numa-domains",
             boost::program_options::value<std::string>()->default_value("all"),
             "number of NUMA domains to use. (default: all)")
+        (   "chunker",
+            boost::program_options::value<std::string>()->default_value("default"),
+            "Which chunker to use for the parallel algorithms. "
+            "possible values: dynamic, auto, guided. (default: default)")
         ;
 
     return hpx::init(cmdline, argc, argv, cfg);
