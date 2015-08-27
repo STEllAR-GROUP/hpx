@@ -194,7 +194,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls exec.set_scheduler_mode(mode) if it exists;
         ///       otherwise it does nothing.
         ///
-        template <typename Executor, typename Mode>
+        template <typename Mode>
         static void set_scheduler_mode(executor_type& exec, Mode const& mode)
         {
             detail::call_set_scheduler_mode(exec, mode);
