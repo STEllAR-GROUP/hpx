@@ -100,7 +100,7 @@ int hpx_main()
     {
         auto id = hpx::new_<server::ViewRegistrationListener>(
             hpx::find_here(), string("A")).get();
-        bool result = hpx::register_id_with_basename("Listener", id).get();
+        bool result = hpx::register_with_basename("Listener", id).get();
         HPX_TEST(result);
         if (result)
             ++num_expected_ids;
@@ -109,7 +109,7 @@ int hpx_main()
     {
         auto id = hpx::new_<server::ViewRegistrationListener>(
             hpx::find_here(), string("B")).get();
-        bool result = hpx::register_id_with_basename("Listener", id).get();
+        bool result = hpx::register_with_basename("Listener", id).get();
         HPX_TEST(!result);
         if (result)
             ++num_expected_ids;
@@ -118,14 +118,14 @@ int hpx_main()
     {
         auto id = hpx::new_<server::ViewRegistrationListener>(
             hpx::find_here(), string("C")).get();
-        bool result = hpx::register_id_with_basename("Listener", id).get();
+        bool result = hpx::register_with_basename("Listener", id).get();
         HPX_TEST(!result);
         if (result)
             ++num_expected_ids;
     }
 
     {
-        auto ids = hpx::find_all_ids_from_basename("Listener", num_expected_ids);
+        auto ids = hpx::find_all_from_basename("Listener", num_expected_ids);
 
         for (auto &f : ids)
         {

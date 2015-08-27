@@ -12,7 +12,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/register_locks_globally.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
@@ -25,6 +25,7 @@
 #include <ios>
 #include <iomanip>
 #include <iostream>
+#include <list>
 #include <sstream>
 #include <cstddef>
 
@@ -636,10 +637,11 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT gid_type split_gid_if_needed(gid_type& id);
-        HPX_EXPORT gid_type split_gid_if_needed_locked(gid_type::mutex_type
-            ::scoped_try_lock &l, gid_type& gid);
-        HPX_EXPORT gid_type replenish_new_gid_if_needed(gid_type const& id);
+        HPX_EXPORT hpx::future<gid_type> split_gid_if_needed(gid_type& id);
+        HPX_EXPORT hpx::future<gid_type> split_gid_if_needed_locked(
+            gid_type::mutex_type::scoped_lock &l, gid_type& gid);
+        HPX_EXPORT hpx::future<gid_type> replenish_new_gid_if_needed(
+            gid_type const& id);
 
         HPX_EXPORT gid_type move_gid(gid_type& id);
         HPX_EXPORT gid_type move_gid_locked(gid_type& gid);
@@ -772,6 +774,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
         {
+            HPX_MOVABLE_BUT_NOT_COPYABLE(id_type_impl);
         private:
             typedef void (*deleter_type)(detail::id_type_impl*);
             static deleter_type get_deleter(id_type_management t);
@@ -810,7 +813,7 @@ namespace hpx { namespace naming
         private:
             // credit management (called during serialization), this function
             // has to be 'const' as save() above has to be 'const'.
-            naming::gid_type preprocess_gid() const;
+            void preprocess_gid(serialization::output_archive& ar) const;
 
             // reference counting
             friend HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
