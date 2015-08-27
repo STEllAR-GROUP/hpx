@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2014-2015 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,9 @@
 
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_numeric.hpp>
+#include <hpx/include/serialization.hpp>
+
+#include <hpx/util/numa_allocator.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -16,6 +19,13 @@
 
 #define COL_SHIFT 1000.00           // Constant to shift column index
 #define ROW_SHIFT 0.001             // Constant to shift row index
+
+///////////////////////////////////////////////////////////////////////////////
+hpx::threads::topology& retrieve_topology()
+{
+    static hpx::threads::topology& topo = hpx::threads::create_topology();
+    return topo;
+}
 
 bool verbose = false;
 
@@ -111,13 +121,32 @@ struct sub_block
     HPX_MOVABLE_BUT_NOT_COPYABLE(sub_block);
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// dirty workaround to avoid serialization of executors
+typedef
+    hpx::threads::executors::local_priority_queue_os_executor
+    executor_type;
+typedef
+    std::vector<executor_type>
+    executors_vector;
+typedef
+    hpx::util::numa_allocator<double, executors_vector> allocator_type;
+
+executors_vector execs;
+
 struct block_component
   : hpx::components::simple_component_base<block_component>
 {
-    block_component() {}
+    block_component()
+      : data_(0, allocator_type(execs_, retrieve_topology()))
+    {
+        // This ctor should never be called.
+        HPX_ASSERT(false);
+    }
 
-    block_component(boost::uint64_t size)
-      : data_(size)
+    block_component(boost::uint64_t size, std::size_t numa_domain)
+      : execs_(1, execs[numa_domain])
+      , data_(size, allocator_type(execs_, retrieve_topology()))
     {}
 
     sub_block get_sub_block(boost::uint64_t offset, boost::uint64_t size)
@@ -128,12 +157,14 @@ struct block_component
 
     HPX_DEFINE_COMPONENT_DIRECT_ACTION(block_component, get_sub_block);
 
-    std::vector<double> data_;
+    executors_vector execs_;
+    std::vector<double, allocator_type> data_;
 };
 
 struct block
   : hpx::components::client_base<block, block_component>
 {
+
     typedef hpx::components::client_base<block, block_component> base_type;
     block() {}
 
@@ -143,8 +174,11 @@ struct block
         get_id();
     }
 
-    block(boost::uint64_t id, boost::uint64_t size, const char * base_name)
-      : base_type(hpx::new_<block_component>(hpx::find_here(), size))
+    block(
+        boost::uint64_t id, boost::uint64_t size, const char * base_name,
+        std::size_t numa_domain)
+      : base_type(hpx::new_<block_component>(hpx::find_here(), size, numa_domain))
+      , exec_(execs[numa_domain])
     {
         hpx::register_id_with_basename(base_name, get_id(), id);
     }
@@ -154,6 +188,8 @@ struct block
         block_component::get_sub_block_action act;
         return hpx::async(act, get_id(), offset, size);
     }
+
+    executor_type exec_;
 };
 
 // The macros below are necessary to generate the code required for exposing
@@ -169,16 +205,42 @@ HPX_REGISTER_COMPONENT(block_component_type, block_component);
 typedef block_component::get_sub_block_action get_sub_block_action;
 HPX_REGISTER_ACTION(get_sub_block_action);
 
-void transpose(hpx::future<sub_block> A, hpx::future<sub_block> B,
-    boost::uint64_t block_order, boost::uint64_t tile_size);
+void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
+    boost::uint64_t block_order, boost::uint64_t tile_size, boost::uint64_t domain);
 double test_results(boost::uint64_t order, boost::uint64_t block_order,
     std::vector<block> & trans, boost::uint64_t blocks_start,
-    boost::uint64_t blocks_end);
+    boost::uint64_t blocks_end, boost::uint64_t domain);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     {
+        // extract hardware topology
+        hpx::threads::topology const& topo = retrieve_topology();
+        std::size_t numa_nodes = topo.get_number_of_numa_nodes();
+        std::size_t pus = 0;
+        if(numa_nodes == 0)
+        {
+            numa_nodes = topo.get_number_of_sockets();
+            pus = topo.get_number_of_socket_pus(0);
+        }
+        else
+        {
+            pus = topo.get_number_of_numa_node_pus(0);
+        }
+
+        std::string num_threads_str = vm["transpose-threads"].as<std::string>();
+        std::string num_numa_domains_str = vm["transpose-numa-domains"].as<std::string>();
+
+        if(num_numa_domains_str != "all")
+        {
+            numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
+        }
+        if(num_threads_str != "all")
+        {
+            pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
+        }
+
         hpx::id_type here = hpx::find_here();
         bool root = here == hpx::find_root_locality();
 
@@ -194,10 +256,38 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         verbose = vm.count("verbose") ? true : false;
 
+
+        execs.reserve(numa_nodes);
+
+        // creating our executors ....
+        for (std::size_t i = 0; i != numa_nodes; ++i)
+        {
+            std::string bind_desc;
+            if(numa_nodes == 0)
+            {
+                bind_desc = boost::str(
+                    boost::format("thread:0-%d=socket:%d.pu:0-%d") %
+                       (pus-1) % i % (pus-1)
+                );
+            }
+            else
+            {
+                bind_desc = boost::str(
+                    boost::format("thread:0-%d=numanode:%d.pu:0-%d") %
+                       (pus-1) % i % (pus-1)
+                );
+            }
+
+            // create executor for this NUMA domain
+            execs.emplace_back(pus, bind_desc);
+        }
+
+
         boost::uint64_t bytes =
             static_cast<boost::uint64_t>(2.0 * sizeof(double) * order * order);
 
         boost::uint64_t num_blocks = num_localities * num_local_blocks;
+        boost::uint64_t num_numa_blocks = num_local_blocks / numa_nodes;
 
         boost::uint64_t block_order = order / num_blocks;
         boost::uint64_t col_block_size = order * block_order;
@@ -210,14 +300,29 @@ int hpx_main(boost::program_options::variables_map& vm)
         boost::uint64_t blocks_start = id * num_local_blocks;
         boost::uint64_t blocks_end = (id + 1) * num_local_blocks;
 
+        std::vector<boost::integer_range<boost::uint64_t> > numa_ranges;
+        numa_ranges.reserve(numa_nodes);
+
         // Actually allocate the block components in AGAS
+        boost::uint64_t numa_block_begin = 0;
+        boost::uint64_t block_numa_node = 0;
+        boost::uint64_t numa_blocks_allocated = 0;
         for(boost::uint64_t b = 0; b != num_blocks; ++b)
         {
             // Allocate block
             if(b >= blocks_start && b < blocks_end)
             {
-                A[b] = block(b, col_block_size, A_block_basename);
-                B[b] = block(b, col_block_size, B_block_basename);
+                A[b] = block(b, col_block_size, A_block_basename, block_numa_node);
+                B[b] = block(b, col_block_size, B_block_basename, block_numa_node);
+                ++numa_blocks_allocated;
+                if(numa_blocks_allocated == num_numa_blocks)
+                {
+                    std::cout << block_numa_node << ": " << numa_block_begin << " " << b + 1 << "\n";
+                    numa_ranges.push_back(boost::irange(numa_block_begin, b + 1));
+                    numa_block_begin = b + 1;
+                    ++block_numa_node;
+                    numa_blocks_allocated = 0;
+                }
             }
             // Retrieve the block by it's symbolic name
             else
@@ -267,72 +372,109 @@ int hpx_main(boost::program_options::variables_map& vm)
             }
         );
 
-        double errsq = 0.0;
         double avgtime = 0.0;
         double maxtime = 0.0;
         double mintime = 366.0 * 24.0*3600.0; // set the minimum time to a large value;
                                               // one leap year should be enough
-        for(boost::uint64_t iter = 0; iter < iterations; ++iter)
+
+        hpx::lcos::local::barrier b(numa_ranges.size());
+
+        std::vector<hpx::future<double> > numa_workers;
+        numa_workers.reserve(numa_ranges.size());
+        for(boost::uint64_t domain = 0; domain < numa_ranges.size(); ++domain)
         {
-            hpx::util::high_resolution_timer t;
-
-            auto range = boost::irange(blocks_start, blocks_end);
-
-            std::vector<hpx::shared_future<void> > block_futures;
-            block_futures.resize(num_local_blocks);
-
-            for_each(par, boost::begin(range), boost::end(range),
-                [&](boost::uint64_t b)
-                {
-                    std::vector<hpx::future<void> > phase_futures;
-                    phase_futures.reserve(num_blocks);
-
-                    auto phase_range = boost::irange(
-                        static_cast<boost::uint64_t>(0), num_blocks);
-                    for(boost::uint64_t phase: phase_range)
+            auto range = numa_ranges[domain];
+            numa_workers.push_back(
+                hpx::async(
+                    execs[domain],
+                    [&, domain]()
                     {
-                        const boost::uint64_t block_size = block_order * block_order;
-                        const boost::uint64_t from_block = phase;
-                        const boost::uint64_t from_phase = b;
-                        const boost::uint64_t A_offset = from_phase * block_size;
-                        const boost::uint64_t B_offset = phase * block_size;
+                        double errsq = 0.0;
+                        for(boost::uint64_t iter = 0; iter < iterations; ++iter)
+                        {
+                            b.wait();
+                            hpx::util::high_resolution_timer t;
 
-                        phase_futures.push_back(
-                            hpx::lcos::local::dataflow(
-                                &transpose
-                              , A[from_block].get_sub_block(A_offset, block_size)
-                              , B[b].get_sub_block(B_offset, block_size)
-                              , block_order
-                              , tile_size
-                            )
-                        );
+                            auto range = numa_ranges[domain];
+
+                            boost::uint64_t block_start = *boost::begin(range);
+                            boost::uint64_t block_end = *boost::end(range);
+                            boost::uint64_t blocks_size = block_end - block_start;
+
+                            std::vector<hpx::future<void> > block_futures;
+                            block_futures.resize(blocks_size);
+
+                            for_each(par.on(execs[domain]),
+                                boost::begin(range), boost::end(range),
+                                [domain, &block_futures, num_blocks, block_start, block_order, tile_size, &A, &B]
+                                (boost::uint64_t b)
+                                {
+                                    std::vector<hpx::future<void> > phase_futures;
+                                    phase_futures.reserve(num_blocks);
+
+                                    auto phase_range = boost::irange(
+                                        static_cast<boost::uint64_t>(0), num_blocks);
+                                    for(boost::uint64_t phase: phase_range)
+                                    {
+                                        const boost::uint64_t block_size = block_order * block_order;
+                                        const boost::uint64_t from_block = phase;
+                                        const boost::uint64_t from_phase = b;
+                                        const boost::uint64_t A_offset = from_phase * block_size;
+                                        const boost::uint64_t B_offset = phase * block_size;
+
+                                        phase_futures.push_back(
+                                            hpx::lcos::local::dataflow(
+                                                execs[domain]
+                                              , &transpose
+                                              , A[from_block].get_sub_block(A_offset, block_size)
+                                              , B[b].get_sub_block(B_offset, block_size)
+                                              , block_order
+                                              , tile_size
+                                              , domain
+                                            )
+                                        );
+                                    }
+
+                                    block_futures[b - block_start] =
+                                        hpx::when_all(phase_futures);
+                                }
+                            );
+
+                            hpx::wait_all(block_futures);
+
+                            b.wait();
+                            double elapsed = t.elapsed();
+
+                            if(domain == 0)
+                            {
+                                if(iter > 0 || iterations == 1) // Skip the first iteration
+                                {
+                                    avgtime = avgtime + elapsed;
+                                    maxtime = (std::max)(maxtime, elapsed);
+                                    mintime = (std::min)(mintime, elapsed);
+                                }
+                            }
+
+                            if(root)
+                            {
+                                errsq +=
+                                    test_results(order, block_order, B, block_start, block_end, domain);
+                            }
+                        }
+                        return errsq;
                     }
-
-                    block_futures[b - blocks_start] =
-                        hpx::when_all(phase_futures).share();
-                }
+                )
             );
+        }
+        std::vector<double> errsqs = hpx::util::unwrapped(numa_workers);
 
-            hpx::wait_all(block_futures);
-
-            double elapsed = t.elapsed();
-
-            if(iter > 0 || iterations == 1) // Skip the first iteration
-            {
-                avgtime = avgtime + elapsed;
-                maxtime = (std::max)(maxtime, elapsed);
-                mintime = (std::min)(mintime, elapsed);
-            }
-
-            if(root)
-                errsq += test_results(order, block_order, B, blocks_start, blocks_end);
-        } // end of iter loop
 
         // Analyze and output results
 
         double epsilon = 1.e-8;
         if(root)
         {
+            double errsq = std::accumulate(errsqs.begin(), errsqs.end(), 0.0);
             if(errsq < epsilon)
             {
                 std::cout << "Solution validates\n";
@@ -377,25 +519,68 @@ int main(int argc, char* argv[])
          "Number of blocks to divide the individual matrix blocks for "
          "improved cache and TLB performance")
         ( "verbose", "Verbose output")
+        ("transpose-threads",
+         boost::program_options::value<std::string>()->default_value("all"),
+         "number of threads per NUMA domain to use. (default: all)")
+        ("transpose-numa-domains",
+         boost::program_options::value<std::string>()->default_value("all"),
+         "number of NUMA domains to use. (default: all)")
     ;
+
+    // extract hardware topology
+    hpx::threads::topology const& topo = retrieve_topology();
+    std::size_t numa_nodes = topo.get_number_of_numa_nodes();
+    std::size_t pus_per_numa_node = 0;
+
+    // If we don't have NUMA support, go by the number of sockets...
+    if(numa_nodes == 0)
+    {
+        numa_nodes = topo.get_number_of_sockets();
+        pus_per_numa_node = topo.get_number_of_socket_pus(0);
+    }
+    else
+    {
+        pus_per_numa_node = topo.get_number_of_numa_node_pus(0);
+    }
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
     std::vector<std::string> cfg;
     cfg.push_back("hpx.run_hpx_main!=1");
 
+    cfg.push_back("hpx.os_threads=" +
+        boost::lexical_cast<std::string>(numa_nodes));
+
+    // use full machine
+    cfg.push_back("hpx.cores=all");
+
+    // run the static_priority scheduler
+    cfg.push_back("hpx.scheduler=static-priority");
+
+    // set affinity domain for the base scheduler threads to 'numa'
+    cfg.push_back("hpx.affinity=numa");
+
+    // make sure each of the base kernel-threads run on separate NUMA domain
+    cfg.push_back("hpx.pu_step=" +
+        boost::lexical_cast<std::string>(pus_per_numa_node));
+
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
 
 void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
-    boost::uint64_t block_order, boost::uint64_t tile_size)
+    boost::uint64_t block_order, boost::uint64_t tile_size, boost::uint64_t domain)
 {
-    const sub_block A(Af.get());
-    sub_block B(Bf.get());
+    using hpx::parallel::for_each;
+    using hpx::parallel::par;
+    using hpx::parallel::task;
+    using hpx::util::placeholders::_1;
+
+    sub_block A = Af.get();
+    sub_block B = Bf.get();
 
     if(tile_size < block_order)
     {
-        for(boost::uint64_t i = 0; i != block_order; i += tile_size)
+        for(boost::uint64_t i = 0; i != block_order; ++i)
         {
             for(boost::uint64_t j = 0; j != block_order; j += tile_size)
             {
@@ -426,7 +611,7 @@ void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
 
 double test_results(boost::uint64_t order, boost::uint64_t block_order,
     std::vector<block> & trans, boost::uint64_t blocks_start,
-    boost::uint64_t blocks_end)
+    boost::uint64_t blocks_end, boost::uint64_t domain)
 {
     using hpx::parallel::transform_reduce;
     using hpx::parallel::par;
@@ -434,7 +619,7 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
     // Fill the original matrix, set transpose to known garbage value.
     auto range = boost::irange(blocks_start, blocks_end);
     double errsq =
-        transform_reduce(par, boost::begin(range), boost::end(range),
+        transform_reduce(par.on(execs[domain]), boost::begin(range), boost::end(range),
             [&](boost::uint64_t b) -> double
             {
                 sub_block trans_block =
