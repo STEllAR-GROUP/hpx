@@ -305,7 +305,7 @@ namespace hpx { namespace serialization
           : data_(), size_(size)
         {
             if (mode == copy) {
-                data_ = boost::shared_array<T>(data,
+                data_.reset(new T[size],
                     &serialize_buffer::array_delete);
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
