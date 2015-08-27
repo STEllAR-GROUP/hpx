@@ -20,7 +20,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
 
-#include <hpx/util/numa_allocator.hpp>
+#include <hpx/parallel/util/numa_allocator.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
@@ -431,7 +431,9 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     // allocate data
-    typedef hpx::util::numa_allocator<STREAM_TYPE, executors_vector> allocator_type;
+    typedef hpx::parallel::util::numa_allocator<
+            STREAM_TYPE, executors_vector
+        > allocator_type;
     allocator_type alloc(execs, retrieve_topology());
 
     typedef std::vector<STREAM_TYPE, allocator_type> vector_type;
@@ -492,6 +494,17 @@ int hpx_main(boost::program_options::variables_map& vm)
             );
         }
     }
+
+    // Set new scheduling mode for main scheduler, make sure it does not get in
+    // the way of the os_executors created. Those will take over all of the work.
+    //
+    // This is a workaround for the still missing underlying thread-resource
+    // manager. This explicit will not be necessary anymore once it is in place.
+    auto this_exec = hpx::this_thread::get_executor();
+    typedef hpx::parallel::executor_information_traits<decltype(this_exec)> traits;
+    traits::set_scheduler_mode(this_exec,
+        hpx::threads::policies::fast_idle_mode |
+        hpx::threads::policies::delay_exit);
 
     std::vector<std::vector<std::vector<double> > >
         timings_all = hpx::util::unwrapped(workers);

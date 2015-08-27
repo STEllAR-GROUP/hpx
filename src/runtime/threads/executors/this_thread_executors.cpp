@@ -206,6 +206,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     // Reset internal (round robin) thread distribution scheme
     template <typename Scheduler>
+    void this_thread_executor<Scheduler>::set_scheduler_mode(
+        threads::policies::scheduler_mode mode)
+    {
+        scheduler_.set_scheduler_mode(mode);
+    }
+
+    template <typename Scheduler>
     void this_thread_executor<Scheduler>::reset_thread_distribution()
     {
         scheduler_.Scheduler::reset_thread_distribution();
@@ -317,8 +324,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                     &this_thread_executor::suspend_back_into_calling_context,
                     this));
 
-            threads::detail::scheduling_loop(0, scheduler_, counters, callbacks,
-                policies::fast_idle_mode);
+            scheduler_.set_scheduler_mode(policies::fast_idle_mode);
+            threads::detail::scheduling_loop(0, scheduler_, counters, callbacks);
 
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist

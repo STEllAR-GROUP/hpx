@@ -97,7 +97,7 @@ namespace hpx { namespace util
 
     template <typename F, typename ...Ts>
     struct result_of<F(Ts...)>
-      : detail::result_of_impl<typename util::decay<F>::type, F(Ts...)>
+      : detail::result_of_impl<typename hpx::util::decay<F>::type, F(Ts...)>
     {};
 
     namespace detail

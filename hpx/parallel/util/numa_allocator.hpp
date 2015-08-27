@@ -24,8 +24,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-namespace hpx { namespace util {
+namespace hpx { namespace parallel { namespace util
+{
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Executors>
     class numa_allocator
@@ -150,6 +150,6 @@ namespace hpx { namespace util {
         Executors const& executors_;
         hpx::threads::topology& topo_;
     };
-}}
+}}}
 
 #endif

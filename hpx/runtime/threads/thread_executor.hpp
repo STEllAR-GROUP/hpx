@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/safe_bool.hpp>
@@ -104,7 +105,11 @@ namespace hpx { namespace threads
             /// Return the mask for processing units the given thread is allowed
             /// to run on.
             virtual mask_cref_type get_pu_mask(topology const& topology,
-                    std::size_t num_thread) const;
+                std::size_t num_thread) const;
+
+            /// Set the new scheduler mode
+            virtual void set_scheduler_mode(
+                threads::policies::scheduler_mode mode) {}
 
         private:
             // reference counting
@@ -221,6 +226,12 @@ namespace hpx { namespace threads
                 std::size_t num_thread) const
         {
             return executor_data_->get_pu_mask(topology, num_thread);
+        }
+
+        /// Set the new scheduler mode
+        void set_scheduler_mode(threads::policies::scheduler_mode mode)
+        {
+            return executor_data_->set_scheduler_mode(mode);
         }
 
         operator util::safe_bool<executor>::result_type() const

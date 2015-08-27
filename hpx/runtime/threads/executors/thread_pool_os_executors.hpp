@@ -65,9 +65,15 @@ namespace hpx { namespace threads { namespace executors
             /// Return the mask for processing units the given thread is allowed
             /// to run on.
             mask_cref_type get_pu_mask(topology const& topology,
-                    std::size_t num_thread) const
+                std::size_t num_thread) const
             {
                 return pool_.get_pu_mask(topology, num_thread);
+            }
+
+            /// Set the new scheduler mode
+            void set_scheduler_mode(threads::policies::scheduler_mode mode)
+            {
+                pool_.set_scheduler_mode(mode);
             }
 
         protected:

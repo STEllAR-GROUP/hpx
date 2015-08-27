@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
@@ -131,6 +132,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     hpx::state generic_thread_pool_executor::get_state() const
     {
         return scheduler_base_->get_state(hpx::get_worker_thread_num());
+    }
+
+    void generic_thread_pool_executor::set_scheduler_mode(
+        threads::policies::scheduler_mode mode)
+    {
+        return scheduler_base_->set_scheduler_mode(mode);
     }
 }}}}
 

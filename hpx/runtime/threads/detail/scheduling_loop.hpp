@@ -225,8 +225,7 @@ namespace hpx { namespace threads { namespace detail
 
     template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
-        scheduling_counters& counters, scheduling_callbacks& callbacks,
-        policies::scheduler_mode mode)
+        scheduling_counters& counters, scheduling_callbacks& callbacks)
     {
         boost::atomic<hpx::state>& this_state = scheduler.get_state(num_thread);
 
@@ -381,7 +380,7 @@ namespace hpx { namespace threads { namespace detail
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
                     {
                         // if this is an inner scheduler, exit immediately
-                        if (!(mode & policies::delay_exit))
+                        if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
                         {
                             this_state.store(state_stopped);
                             break;
@@ -395,7 +394,8 @@ namespace hpx { namespace threads { namespace detail
                 }
 
                 // do background work in parcel layer and in agas
-                if (!callbacks.background_.empty())
+                if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
+                    !callbacks.background_.empty())
                 {
                     if (callbacks.background_())
                         idle_loop_count = 0;
@@ -415,13 +415,14 @@ namespace hpx { namespace threads { namespace detail
                 busy_loop_count = 0;
 
                 // do background work in parcel layer and in agas
-                if (!callbacks.background_.empty())
+                if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
+                    !callbacks.background_.empty())
                 {
                     if (callbacks.background_())
                         idle_loop_count = 0;
                 }
             }
-            else if ((mode & policies::fast_idle_mode) ||
+            else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
                 idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
             {
                 // clean up terminated threads

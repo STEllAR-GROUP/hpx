@@ -323,8 +323,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                     &thread_pool_executor::suspend_back_into_calling_context,
                     this, virt_core));
 
+            scheduler_.set_scheduler_mode(policies::fast_idle_mode);
             threads::detail::scheduling_loop(virt_core, scheduler_,
-                counters, callbacks, policies::fast_idle_mode);
+                counters, callbacks);
 
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist

@@ -9,6 +9,7 @@
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>
@@ -425,6 +426,9 @@ namespace hpx { namespace threads
 
     /// Reset internal (round robin) thread distribution scheme
     HPX_API_EXPORT void reset_thread_distribution();
+
+    /// Set the new scheduler mode
+    HPX_API_EXPORT void set_scheduler_mode(threads::policies::scheduler_mode);
 }}
 
 namespace hpx { namespace this_thread

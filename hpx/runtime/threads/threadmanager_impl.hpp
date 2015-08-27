@@ -17,6 +17,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/spinlock.hpp>
@@ -279,6 +280,11 @@ namespace hpx { namespace threads
         void reset_thread_distribution()
         {
             pool_.reset_thread_distribution();
+        }
+
+        void set_scheduler_mode(threads::policies::scheduler_mode mode)
+        {
+            pool_.set_scheduler_mode(mode);
         }
 
     private:

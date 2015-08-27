@@ -183,7 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///                 resetting the thread distribution scheme.
         /// \param exec     [in] The executor object to use.
         ///
-        /// \note This calls exec.reset_thread_distribution() if it exists;
+        /// \note This calls params.reset_thread_distribution(exec) if it exists;
         ///       otherwise it does nothing.
         ///
         template <typename Executor>

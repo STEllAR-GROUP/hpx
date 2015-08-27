@@ -124,6 +124,8 @@ namespace hpx { namespace threads { namespace detail
 
         void reset_thread_distribution();
 
+        void set_scheduler_mode(threads::policies::scheduler_mode mode);
+
         //
         void abort_all_suspended_threads();
         bool cleanup_terminated(bool delete_all);

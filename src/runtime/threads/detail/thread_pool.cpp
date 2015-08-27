@@ -251,6 +251,13 @@ namespace hpx { namespace threads { namespace detail
         return sched_.Scheduler::reset_thread_distribution();
     }
 
+    template <typename Scheduler>
+    void thread_pool<Scheduler>::set_scheduler_mode(
+        threads::policies::scheduler_mode mode)
+    {
+        return sched_.set_scheduler_mode(mode);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     bool thread_pool<Scheduler>::run(boost::unique_lock<boost::mutex>& l,
@@ -557,8 +564,9 @@ namespace hpx { namespace threads { namespace detail
                             &sched_, num_thread);
                     }
 
+                    sched_.set_scheduler_mode(mode_);
                     detail::scheduling_loop(num_thread, sched_, counters,
-                        callbacks, mode_);
+                        callbacks);
 
                     // the OS thread is allowed to exit only if no more HPX
                     // threads exist or if some other thread has terminated

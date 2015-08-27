@@ -10,7 +10,7 @@
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
 
-#include <hpx/util/numa_allocator.hpp>
+#include <hpx/parallel/util/numa_allocator.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -130,7 +130,8 @@ typedef
     std::vector<executor_type>
     executors_vector;
 typedef
-    hpx::util::numa_allocator<double, executors_vector> allocator_type;
+    hpx::parallel::util::numa_allocator<double, executors_vector>
+    allocator_type;
 
 executors_vector execs;
 
@@ -138,7 +139,7 @@ struct block_component
   : hpx::components::simple_component_base<block_component>
 {
     block_component()
-      : data_(0, allocator_type(execs_, retrieve_topology()))
+      : data_(0, 0.0, allocator_type(execs_, retrieve_topology()))
     {
         // This ctor should never be called.
         HPX_ASSERT(false);
@@ -146,7 +147,7 @@ struct block_component
 
     block_component(boost::uint64_t size, std::size_t numa_domain)
       : execs_(1, execs[numa_domain])
-      , data_(size, allocator_type(execs_, retrieve_topology()))
+      , data_(size, 0.0, allocator_type(execs_, retrieve_topology()))
     {}
 
     sub_block get_sub_block(boost::uint64_t offset, boost::uint64_t size)

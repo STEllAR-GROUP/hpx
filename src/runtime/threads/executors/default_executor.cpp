@@ -71,6 +71,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         threads::reset_thread_distribution();
     }
 
+    // Set the new scheduler mode
+    void default_executor::set_scheduler_mode(threads::policies::scheduler_mode mode)
+    {
+        threads::set_scheduler_mode(mode);
+    }
+
+
     // Return the requested policy element
     std::size_t default_executor::get_policy_element(
         threads::detail::executor_parameter p, error_code& ec) const

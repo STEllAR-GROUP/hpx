@@ -141,7 +141,7 @@ namespace hpx { namespace threads
         pool_(scheduler, notifier, "main_thread_scheduling_pool",
             policies::scheduler_mode(
                 policies::do_background_work | policies::reduce_thread_priority |
-                policies::delay_exit | policies::fast_idle_mode)),
+                policies::delay_exit)),
         notifier_(notifier)
     {}
 

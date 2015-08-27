@@ -109,6 +109,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             return get_pu_mask_helper::call(0, exec, topo, thread_num);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        struct set_scheduler_mode_helper
+        {
+            template <typename Executor, typename Mode>
+            static void call(wrap_int, Executor& exec, Mode const& mode)
+            {
+            }
+
+            template <typename Executor, typename Mode>
+            static auto call(int, Executor& exec, Mode const& mode)
+            ->  decltype(exec.set_scheduler_mode(mode))
+            {
+                exec.set_scheduler_mode(mode);
+            }
+        };
+
+        template <typename Executor, typename Mode>
+        void call_set_scheduler_mode(Executor& exec, Mode const& mode)
+        {
+            set_scheduler_mode_helper::call(0, exec, mode);
+        }
         /// \endcond
     }
 
@@ -154,13 +176,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// thread is allowed to run on
         /// All threads::executors invoke sched.get_pu_mask().
         ///
-        /// \param sched  [in] The executor object to use for querying the
+        /// \param exec  [in] The executor object to use for querying the
         ///               number of pending tasks.
         ///
         static threads::mask_type get_pu_mask(executor_type const& exec,
             threads::topology& topo, std::size_t thread_num)
         {
             return detail::call_get_pu_mask(exec, topo, thread_num);
+        }
+
+        /// Set various modes of operation on the scheduler underneath the
+        /// given executor.
+        ///
+        /// \param exec     [in] The executor object to use.
+        /// \param mode     [in] The new mode for the scheduler to pick up
+        ///
+        /// \note This calls exec.set_scheduler_mode(mode) if it exists;
+        ///       otherwise it does nothing.
+        ///
+        template <typename Executor, typename Mode>
+        static void set_scheduler_mode(executor_type& exec, Mode const& mode)
+        {
+            detail::call_set_scheduler_mode(exec, mode);
         }
     };
 }}}

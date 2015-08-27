@@ -37,7 +37,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         /// \param params   [in] The executor parameters object to use for
         ///                 determining whether the chunk size is variable.
-        /// \param exec     [in] The executor object which will be used for
+        /// \param sched    [in] The executor object which will be used for
         ///                 scheduling of the tasks.
         ///
         /// \note This calls params.variable_chunk_size(exec), if available,
@@ -45,9 +45,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         template <typename Executor>
         static bool variable_chunk_size(executor_parameters_type& params,
-            Executor& exec)
+            Executor& sched)
         {
-            return detail::call_variable_chunk_size(params, exec);
+            return detail::call_variable_chunk_size(params, sched);
         }
 
         /// Return the number of invocations of the given function \a f which
@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param params   [in] The executor parameters object to use for
         ///                 determining the chunk size for the given number of
         ///                 tasks \a num_tasks.
-        /// \param exec     [in] The executor object which will be used used
+        /// \param sched    [in] The executor object which will be used used
         ///                 for scheduling of the the loop iterations.
         /// \param f        [in] The function which will be optionally scheduled
         ///                 using the given executor.
@@ -70,9 +70,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         template <typename Executor, typename F>
         static std::size_t get_chunk_size(executor_parameters_type& params,
-            Executor& exec, F && f, std::size_t num_tasks)
+            Executor& sched, F && f, std::size_t num_tasks)
         {
-            return detail::call_get_chunk_size(params, exec,
+            return detail::call_get_chunk_size(params, sched,
                 std::forward<F>(f), num_tasks);
         }
 
@@ -81,34 +81,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///
         /// \param params   [in] The executor parameters object to use for
         ///                 resetting the thread distribution scheme.
-        /// \param exec     [in] The executor object to use.
-        ///
-        /// \note This calls exec.reset_thread_distribution() if it exists;
-        ///       otherwise it does nothing.
+        /// \param sched    [in] The executor object to use.
         ///
         template <typename Executor>
         static void reset_thread_distribution(executor_parameters_type&,
-            Executor& exec)
+            Executor& sched)
         {
-            exec.reset_thread_distribution();
+            sched.reset_thread_distribution();
         }
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    // defined in hpx/traits/is_executor_parameters.hpp
-    ///
-    /// 1. The type is_executor_parameters can be used to detect executor
-    ///    parameters types for the purpose of excluding function signatures
-    ///    from otherwise ambiguous overload resolution participation.
-    /// 2. If T is the type of a standard or implementation-defined executor,
-    ///    is_executor_parameters<T> shall be publicly derived from
-    ///    integral_constant<bool, true>, otherwise from
-    ///    integral_constant<bool, false>.
-    /// 3. The behavior of a program that adds specializations for
-    ///    is_executor_parameters is undefined.
-    ///
-    template <typename T>
-    struct is_executor_parameters;
 }}}
 
 #endif

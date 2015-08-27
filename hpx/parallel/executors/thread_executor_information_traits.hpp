@@ -12,6 +12,7 @@
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/unwrapped.hpp>
@@ -36,15 +37,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// The type of the executor associated with this instance of
         /// \a executor_traits
         typedef Executor executor_type;
+
         /// Retrieve the number of (kernel-)threads used by the associated
         /// executor. All threads::executors invoke
         /// hpx::get_os_thread_count(sched).
         ///
         /// \param sched  [in] The executor object to use for the number of
         ///               os-threads used to schedule tasks.
-        ///
-        /// \note This calls exec.os_thread_count() if it exists;
-        ///       otherwise it executes hpx::get_os_thread_count().
         ///
         static std::size_t os_thread_count(executor_type const& sched)
         {
@@ -73,6 +72,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             threads::topology& topo, std::size_t thread_num)
         {
             return sched.get_pu_mask(topo, thread_num);
+        }
+
+        /// Set various modes of operation on the scheduler underneath the
+        /// given executor.
+        ///
+        /// \param params   [in] The executor parameters object to use for
+        ///                 resetting the thread distribution scheme.
+        /// \param sched    [in] The executor object to use.
+        ///
+        template <typename Mode>
+        static void set_scheduler_mode(executor_type& sched, Mode mode)
+        {
+            sched.set_scheduler_mode(
+                static_cast<threads::policies::scheduler_mode>(mode)
+            );
         }
     };
 }}}
