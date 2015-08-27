@@ -55,7 +55,7 @@ namespace hpx { namespace naming
 
         id_type(id_type const & o) : gid_(o.gid_) {}
         id_type(id_type && o)
-          : gid_(o.gid_)
+          : gid_(std::move(o.gid_))
         {
             o.gid_.reset();
         }
