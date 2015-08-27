@@ -304,7 +304,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         numa_ranges.reserve(numa_nodes);
 
         // Actually allocate the block components in AGAS
-        boost::uint64_t numa_block_begin = 0;
+        boost::uint64_t numa_block_begin = blocks_start;
         boost::uint64_t block_numa_node = 0;
         boost::uint64_t numa_blocks_allocated = 0;
         for(boost::uint64_t b = 0; b != num_blocks; ++b)
