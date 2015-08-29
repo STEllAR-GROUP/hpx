@@ -344,15 +344,15 @@ int hpx_main(boost::program_options::variables_map& vm)
     // extract hardware topology
     hpx::threads::topology const& topo = retrieve_topology();
     std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    std::size_t pus = 0;
+    std::size_t numa_pus = 0;
     if(numa_nodes == 0)
     {
         numa_nodes = topo.get_number_of_sockets();
-        pus = topo.get_number_of_socket_pus(0);
+        numa_pus = topo.get_number_of_socket_pus(0);
     }
     else
     {
-        pus = topo.get_number_of_numa_node_pus(0);
+        numa_pus = topo.get_number_of_numa_node_pus(0);
     }
 
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
@@ -368,6 +368,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     {
         numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
     }
+
+    std::size_t pus = numa_pus;
     if(num_threads_str != "all")
     {
         pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
@@ -400,9 +402,9 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     using namespace hpx::parallel;
 
-    typedef
-        std::vector<hpx::threads::executors::local_priority_queue_os_executor>
-        executors_vector;
+    typedef hpx::threads::executors::local_priority_queue_attached_executor
+        executor_type;
+    typedef std::vector<executor_type> executors_vector;
 
     executors_vector execs;
     execs.reserve(numa_nodes);
@@ -410,24 +412,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     // creating our executors ....
     for (std::size_t i = 0; i != numa_nodes; ++i)
     {
-        std::string bind_desc;
-        if(numa_nodes == 0)
-        {
-            bind_desc = boost::str(
-                boost::format("thread:0-%d=socket:%d.pu:0-%d") %
-                   (pus-1) % i % (pus-1)
-            );
-        }
-        else
-        {
-            bind_desc = boost::str(
-                boost::format("thread:0-%d=numanode:%d.pu:0-%d") %
-                   (pus-1) % i % (pus-1)
-            );
-        }
-
         // create executor for this NUMA domain
-        execs.emplace_back(pus, bind_desc);
+        execs.emplace_back(i * numa_pus, pus);
     }
 
     // allocate data
@@ -494,17 +480,6 @@ int hpx_main(boost::program_options::variables_map& vm)
             );
         }
     }
-
-    // Set new scheduling mode for main scheduler, make sure it does not get in
-    // the way of the os_executors created. Those will take over all of the work.
-    //
-    // This is a workaround for the still missing underlying thread-resource
-    // manager. This explicit will not be necessary anymore once it is in place.
-    auto this_exec = hpx::this_thread::get_executor();
-    typedef hpx::parallel::executor_information_traits<decltype(this_exec)> traits;
-    traits::set_scheduler_mode(this_exec,
-        hpx::threads::policies::fast_idle_mode |
-        hpx::threads::policies::delay_exit);
 
     std::vector<std::vector<std::vector<double> > >
         timings_all = hpx::util::unwrapped(workers);
@@ -586,6 +561,12 @@ int hpx_main(boost::program_options::variables_map& vm)
     return hpx::finalize();
 }
 
+
+// Launch with something like:
+//
+// --hpx:bind=thread:0-5=numanode:0.core:0-5.pu:0;thread:6-11=numanode:1.core:0-5.pu:0
+// --hpx:threads=12 --stream-numa-domains=2 --stream-threads=6
+//
 int main(int argc, char* argv[])
 {
     // extract hardware topology
@@ -603,35 +584,6 @@ int main(int argc, char* argv[])
     {
         pus_per_numa_node = topo.get_number_of_numa_node_pus(0);
     }
-
-    // The idea of this benchmark is to create as many base-threads as we have
-    // NUMA domains. Each of those kernel threads are bound to one of the
-    // domains such that they can wander between the cores of this domain.
-    //
-    // The benchmark uses the static_priority scheduler for this which prevents
-    // HPX threads from being stolen across the NUMA domain boundaries.
-    //
-    // The benchmark itself spawns one HPX-thread for each of those kernel
-    // threads. Each HPX thread creates a new local_priority os_executor which
-    // is then used to run the actual measurements.
-
-    // create one kernel thread per available NUMA domain
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(numa_nodes));
-
-    // use full machine
-    cfg.push_back("hpx.cores=all");
-
-    // run the static_priority scheduler
-    cfg.push_back("hpx.scheduler=static-priority");
-
-    // set affinity domain for the base scheduler threads to 'numa'
-    cfg.push_back("hpx.affinity=numa");
-
-    // make sure each of the base kernel-threads run on separate NUMA domain
-    cfg.push_back("hpx.pu_step=" +
-        boost::lexical_cast<std::string>(pus_per_numa_node));
 
     boost::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
@@ -657,6 +609,9 @@ int main(int argc, char* argv[])
             "Which chunker to use for the parallel algorithms. "
             "possible values: dynamic, auto, guided. (default: default)")
         ;
+
+    std::vector<std::string> cfg;
+    cfg.push_back("hpx.numa_sensitive=2");  // no-cross NUMA stealing
 
     return hpx::init(cmdline, argc, argv, cfg);
 }

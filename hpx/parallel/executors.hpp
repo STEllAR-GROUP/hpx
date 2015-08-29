@@ -23,6 +23,7 @@
 #include <hpx/parallel/executors/this_thread_executors.hpp>
 #include <hpx/parallel/executors/thread_pool_executors.hpp>
 #include <hpx/parallel/executors/thread_pool_os_executors.hpp>
+#include <hpx/parallel/executors/thread_pool_attached_executors.hpp>
 #include <hpx/parallel/executors/default_executor.hpp>
 
 #endif

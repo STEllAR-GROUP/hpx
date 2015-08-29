@@ -151,6 +151,7 @@ namespace hpx { namespace util
             "affinity = pu",
             "pu_step = 1",
             "pu_offset = 0",
+            "numa_sensitive = 0",
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"

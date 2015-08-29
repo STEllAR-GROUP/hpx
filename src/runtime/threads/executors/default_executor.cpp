@@ -62,6 +62,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Return an estimate of the number of waiting tasks.
     boost::uint64_t default_executor::num_pending_closures(error_code& ec) const
     {
+        if (&ec != &throws)
+            ec = make_success_code();
+
         return get_thread_count() - get_thread_count(terminated);
     }
 
@@ -93,7 +96,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         }
 
         HPX_THROWS_IF(ec, bad_parameter,
-            "thread_pool_executor::get_policy_element",
+            "default_executor::get_policy_element",
             "requested value of invalid policy element");
         return std::size_t(-1);
     }

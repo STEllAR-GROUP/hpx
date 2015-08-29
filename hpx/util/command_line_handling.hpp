@@ -33,7 +33,8 @@ namespace hpx { namespace util
             num_cores_(1),
             num_localities_(1),
             pu_step_(1),
-            pu_offset_(0)
+            pu_offset_(0),
+            numa_sensitive_(0)
         {
             for (std::string const& e : ini_config)
                 rtcfg_.parse("<user supplied config>", e, true, false);
@@ -59,6 +60,7 @@ namespace hpx { namespace util
         std::string queuing_;
         std::string affinity_domain_;
         std::string affinity_bind_;
+        std::size_t numa_sensitive_;
 
     protected:
         bool handle_arguments(util::manage_config& cfgmap,

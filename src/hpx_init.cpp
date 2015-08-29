@@ -562,12 +562,12 @@ namespace hpx
             return affinity_domain;
         }
 
-        bool get_affinity_description(util::command_line_handling const& cfg,
-            std::string& affinity_desc)
+        std::size_t get_affinity_description(
+            util::command_line_handling const& cfg, std::string& affinity_desc)
         {
 #if defined(HPX_HAVE_HWLOC)
             if (cfg.affinity_bind_.empty())
-                return 0 != cfg.vm_.count("hpx:numa-sensitive");
+                return cfg.numa_sensitive_;
 
             if (cfg.pu_offset_ != 0 || cfg.pu_step_ != 1 ||
                 cfg.affinity_domain_ != "pu")
@@ -579,10 +579,8 @@ namespace hpx
             }
 
             affinity_desc = cfg.affinity_bind_;
-            return true;
-#else
-            return 0 != cfg.vm_.count("hpx:numa-sensitive");
 #endif
+            return cfg.numa_sensitive_;
         }
 
         std::size_t get_pu_offset(util::command_line_handling const& cfg)
@@ -706,7 +704,8 @@ namespace hpx
             std::size_t pu_step = get_pu_step(cfg);
             std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
-            bool numa_sensitive = get_affinity_description(cfg, affinity_desc);
+            std::size_t numa_sensitive =
+                get_affinity_description(cfg, affinity_desc);
 
             // scheduling policy
             typedef hpx::threads::policies::local_queue_scheduler<>
@@ -829,7 +828,8 @@ namespace hpx
             std::size_t pu_step = get_pu_step(cfg);
             std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
-            bool numa_sensitive = get_affinity_description(cfg, affinity_desc);
+            std::size_t numa_sensitive =
+                get_affinity_description(cfg, affinity_desc);
 
             // scheduling policy
             typedef hpx::threads::policies:: local_priority_queue_scheduler<>
@@ -863,16 +863,12 @@ namespace hpx
             std::size_t num_high_priority_queues =
                 get_num_high_priority_queues(cfg);
 
-            bool numa_sensitive = false;
-            if (cfg.vm_.count("hpx:numa-sensitive"))
-                numa_sensitive = true;
-
             // scheduling policy
             typedef hpx::threads::policies::abp_fifo_priority_queue_scheduler
                 abp_priority_queue_policy;
             abp_priority_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
-                numa_sensitive);
+                cfg.numa_sensitive_);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
@@ -936,15 +932,11 @@ namespace hpx
             std::size_t num_high_priority_queues =
                 get_num_high_priority_queues(cfg);
 
-            bool numa_sensitive = false;
-            if (cfg.vm_.count("hpx:numa-sensitive"))
-                numa_sensitive = true;
-
             // scheduling policy
             typedef hpx::threads::policies::periodic_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(cfg.num_threads_,
-                num_high_priority_queues, 1000, numa_sensitive);
+                num_high_priority_queues, 1000, cfg.numa_sensitive_);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;

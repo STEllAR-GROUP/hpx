@@ -431,7 +431,7 @@ namespace hpx { namespace util
                   "the detailed affinity description for the OS threads, see "
                   "the documentation for a detailed description of possible "
                   "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
-                  "--hpx:affinity options. Implies --hpx:numa-sensitive "
+                  "--hpx:affinity options. Implies --hpx:numa-sensitive=1"
                   "(--hpx:bind=none disables defining thread affinities).")
                 ("hpx:print-bind",
                   "print to the console the bit masks calculated from the "
@@ -459,8 +459,11 @@ namespace hpx { namespace util
                   "priority queue (default: number of OS threads), valid for "
                   "--hpx:queuing=local-priority,--hpx:queuing=static-priority, "
                   " and --hpx:queuing=abp-priority only)")
-                ("hpx:numa-sensitive",
-                  "makes the local-priority scheduler NUMA sensitive")
+                ("hpx:numa-sensitive", value<std::size_t>()->default_value(0),
+                  "makes the local-priority scheduler NUMA sensitive ("
+                  "allowed values: 0 - no NUMA sensitivity, 1 - allow only for "
+                  "boundary cores to steal across NUMA domains, 2 - "
+                  "no cross boundary stealing is allowed (default value: 0)")
             ;
 
             options_description config_options("HPX configuration options");

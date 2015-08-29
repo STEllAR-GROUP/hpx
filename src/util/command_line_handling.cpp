@@ -250,6 +250,26 @@ namespace hpx { namespace util
             return cfgmap.get_value<std::size_t>("hpx.pu_offset", default_);
         }
 
+        std::size_t handle_numa_sensitive(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm, std::size_t default_)
+        {
+            if (vm.count("hpx:numa-sensitive") != 0)
+            {
+                std::size_t numa_sensitive =
+                    vm["hpx:numa-sensitive"].as<std::size_t>();
+                if (numa_sensitive > 2)
+                {
+                    throw hpx::detail::command_line_error("Invaid argument "
+                        "value for --hpx:numa-sensitive. Allowed values are "
+                        "0, 1, or 2");
+                }
+                return numa_sensitive;
+            }
+
+            // use either cfgmap value or default
+            return cfgmap.get_value<std::size_t>("hpx.numa_sensitive", default_);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         std::size_t handle_num_threads(util::manage_config& cfgmap,
             boost::program_options::variables_map& vm,
@@ -618,7 +638,8 @@ namespace hpx { namespace util
         ini_config += "hpx.affinity=" + affinity_domain_;
 
         affinity_bind_ = detail::handle_affinity_bind(cfgmap, vm, "");
-        ini_config += "hpx.bind!=" + affinity_bind_;
+        if (!affinity_bind_.empty())
+            ini_config += "hpx.bind!=" + affinity_bind_;
 
         pu_step_ = detail::handle_pu_step(cfgmap, vm, 1);
         ini_config += "hpx.pu_step=" +
@@ -627,6 +648,11 @@ namespace hpx { namespace util
         pu_offset_ = detail::handle_pu_offset(cfgmap, vm, 0);
         ini_config += "hpx.pu_offset=" +
             hpx::util::safe_lexical_cast<std::string>(pu_offset_);
+
+        numa_sensitive_ = detail::handle_numa_sensitive(cfgmap, vm,
+            affinity_bind_.empty() ? 0 : 1);
+        ini_config += "hpx.numa_sensitive=" +
+            hpx::util::safe_lexical_cast<std::string>(numa_sensitive_);
 
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);
