@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config/defines.hpp>
+#include <hpx/version.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <mpi.h>

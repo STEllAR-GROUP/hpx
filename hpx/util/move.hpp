@@ -10,10 +10,6 @@
 
 #include <hpx/util/decay.hpp>
 
-#if defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
-#error HPX needs rvalue reference support
-#endif
-
 #include <utility>
 
 #if !defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)

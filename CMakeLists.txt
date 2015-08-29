@@ -688,6 +688,9 @@ hpx_check_for_cxx11_explicit_cvt_ops(
 hpx_check_for_cxx11_function_template_default_args(
   REQUIRED "HPX needs support for C++11 defaulted function template arguments")
 
+hpx_check_for_cxx11_initializer_list(
+  DEFINITIONS HPX_HAVE_CXX11_INITIALIZER_LIST)
+
 hpx_check_for_cxx11_inline_namespaces(
   DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
 
@@ -728,11 +731,17 @@ hpx_check_for_cxx11_std_chrono(
 hpx_check_for_cxx11_std_initializer_list(
   DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
 
+hpx_check_for_cxx11_std_is_bind_expression(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION)
+
 hpx_check_for_cxx11_std_is_final(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_FINAL)
 
 hpx_check_for_cxx11_std_is_null_pointer(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_NULL_POINTER)
+
+hpx_check_for_cxx11_std_is_placeholder(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
 
 hpx_check_for_cxx11_std_unique_ptr(
   REQUIRED "HPX needs support for C++11 std::unique_ptr")
