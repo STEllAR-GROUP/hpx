@@ -8,7 +8,6 @@
 
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/version.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>

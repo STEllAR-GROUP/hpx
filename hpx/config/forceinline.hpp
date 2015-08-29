@@ -6,9 +6,8 @@
 #ifndef HPX_CONFIG_FORCEINLINE_HPP
 #define HPX_CONFIG_FORCEINLINE_HPP
 
+#include <boost/config/suffix.hpp>
 #include <hpx/config/compiler_specific.hpp>
-
-#include <boost/config.hpp>
 
 #if !defined(BOOST_FORCEINLINE)
 #   if defined(_MSC_VER)

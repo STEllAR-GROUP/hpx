@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/find_prefix.hpp>
 
 #if defined(BOOST_WINDOWS)
 #  include <windows.h>

@@ -17,8 +17,6 @@
 #include <memory>
 #endif
 
-#include <boost/cstdint.hpp>
-
 namespace hpx { namespace serialization
 {
     namespace detail

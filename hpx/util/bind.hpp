@@ -474,13 +474,13 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename BoundArgs>
     struct is_bind_expression<util::detail::bound<F, BoundArgs> >
-      : boost::true_type
+      : boost::mpl::true_
     {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t I>
     struct is_placeholder<util::detail::placeholder<I> >
-      : boost::integral_constant<int, I>
+      : util::detail::placeholder<I>
     {};
 }}
 
