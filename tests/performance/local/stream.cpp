@@ -569,22 +569,6 @@ int hpx_main(boost::program_options::variables_map& vm)
 //
 int main(int argc, char* argv[])
 {
-    // extract hardware topology
-    hpx::threads::topology const& topo = retrieve_topology();
-    std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    std::size_t pus_per_numa_node = 0;
-
-    // If we don't have NUMA support, go by the number of sockets...
-    if(numa_nodes == 0)
-    {
-        numa_nodes = topo.get_number_of_sockets();
-        pus_per_numa_node = topo.get_number_of_socket_pus(0);
-    }
-    else
-    {
-        pus_per_numa_node = topo.get_number_of_numa_node_pus(0);
-    }
-
     boost::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 

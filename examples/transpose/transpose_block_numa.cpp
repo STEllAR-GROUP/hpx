@@ -124,7 +124,7 @@ struct sub_block
 ///////////////////////////////////////////////////////////////////////////////
 // dirty workaround to avoid serialization of executors
 typedef
-    hpx::threads::executors::local_priority_queue_os_executor
+    hpx::threads::executors::local_priority_queue_attached_executor
     executor_type;
 typedef
     std::vector<executor_type>
@@ -165,8 +165,8 @@ struct block_component
 struct block
   : hpx::components::client_base<block, block_component>
 {
-
     typedef hpx::components::client_base<block, block_component> base_type;
+
     block() {}
 
     block(boost::uint64_t id, const char * base_name)
@@ -179,7 +179,6 @@ struct block
         boost::uint64_t id, boost::uint64_t size, const char * base_name,
         std::size_t numa_domain)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size, numa_domain))
-      , exec_(execs[numa_domain])
     {
         hpx::register_with_basename(base_name, get_id(), id);
     }
@@ -189,8 +188,6 @@ struct block
         block_component::get_sub_block_action act;
         return hpx::async(act, get_id(), offset, size);
     }
-
-    executor_type exec_;
 };
 
 // The macros below are necessary to generate the code required for exposing
@@ -219,25 +216,30 @@ int hpx_main(boost::program_options::variables_map& vm)
         // extract hardware topology
         hpx::threads::topology const& topo = retrieve_topology();
         std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-        std::size_t pus = 0;
+        std::size_t numa_pus = 0;
         if(numa_nodes == 0)
         {
             numa_nodes = topo.get_number_of_sockets();
-            pus = topo.get_number_of_socket_pus(0);
+            numa_pus = topo.get_number_of_socket_pus(0);
         }
         else
         {
-            pus = topo.get_number_of_numa_node_pus(0);
+            numa_pus = topo.get_number_of_numa_node_pus(0);
         }
 
-        std::string num_threads_str = vm["transpose-threads"].as<std::string>();
-        std::string num_numa_domains_str = vm["transpose-numa-domains"].as<std::string>();
+        std::string num_threads_str =
+            vm["transpose-threads"].as<std::string>();
+        std::string num_numa_domains_str =
+            vm["transpose-numa-domains"].as<std::string>();
 
-        if(num_numa_domains_str != "all")
+        if (num_numa_domains_str != "all")
         {
-            numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
+            numa_nodes =
+                hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
         }
-        if(num_threads_str != "all")
+
+        std::size_t pus = numa_pus;
+        if (num_threads_str != "all")
         {
             pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
         }
@@ -257,33 +259,16 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         verbose = vm.count("verbose") ? true : false;
 
-
         execs.reserve(numa_nodes);
 
         // creating our executors ....
         for (std::size_t i = 0; i != numa_nodes; ++i)
         {
-            std::string bind_desc;
-            if(numa_nodes == 0)
-            {
-                bind_desc = boost::str(
-                    boost::format("thread:0-%d=socket:%d.pu:0-%d") %
-                       (pus-1) % i % (pus-1)
-                );
-            }
-            else
-            {
-                bind_desc = boost::str(
-                    boost::format("thread:0-%d=numanode:%d.pu:0-%d") %
-                       (pus-1) % i % (pus-1)
-                );
-            }
-
             // create executor for this NUMA domain
-            execs.emplace_back(pus, bind_desc);
+            execs.emplace_back(i * numa_pus, pus);
         }
 
-
+        ///////////////////////////////////////////////////////////////////////
         boost::uint64_t bytes =
             static_cast<boost::uint64_t>(2.0 * sizeof(double) * order * order);
 
@@ -318,7 +303,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                 ++numa_blocks_allocated;
                 if(numa_blocks_allocated == num_numa_blocks)
                 {
-                    std::cout << block_numa_node << ": " << numa_block_begin << " " << b + 1 << "\n";
+                    std::cout << block_numa_node << ": "
+                        << numa_block_begin << " " << b + 1 << "\n";
                     numa_ranges.push_back(boost::irange(numa_block_begin, b + 1));
                     numa_block_begin = b + 1;
                     ++block_numa_node;
@@ -408,7 +394,7 @@ int hpx_main(boost::program_options::variables_map& vm)
                             for_each(par.on(execs[domain]),
                                 boost::begin(range), boost::end(range),
                                 [domain, &block_futures, num_blocks, block_start, block_order, tile_size, &A, &B]
-                                (boost::uint64_t b)
+                                    (boost::uint64_t b)
                                 {
                                     std::vector<hpx::future<void> > phase_futures;
                                     phase_futures.reserve(num_blocks);
@@ -448,7 +434,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
                             if(domain == 0)
                             {
-                                if(iter > 0 || iterations == 1) // Skip the first iteration
+                                // Skip the first iteration
+                                if(iter > 0 || iterations == 1)
                                 {
                                     avgtime = avgtime + elapsed;
                                     maxtime = (std::max)(maxtime, elapsed);
@@ -458,8 +445,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 
                             if(root)
                             {
-                                errsq +=
-                                    test_results(order, block_order, B, block_start, block_end, domain);
+                                errsq += test_results(order, block_order, B,
+                                    block_start, block_end, domain);
                             }
                         }
                         return errsq;
@@ -469,9 +456,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
         std::vector<double> errsqs = hpx::util::unwrapped(numa_workers);
 
-
+        ///////////////////////////////////////////////////////////////////////
         // Analyze and output results
-
         double epsilon = 1.e-8;
         if(root)
         {
@@ -503,6 +489,11 @@ int hpx_main(boost::program_options::variables_map& vm)
     return hpx::finalize();
 }
 
+// Launch with something like:
+//
+// --hpx:bind=thread:0-5=numanode:0.core:0-5.pu:0;thread:6-11=numanode:1.core:0-5.pu:0
+// --hpx:threads=12 --transpose-numa-domains=2 --transpose-threads=6
+//
 int main(int argc, char* argv[])
 {
     using namespace boost::program_options;
@@ -528,48 +519,20 @@ int main(int argc, char* argv[])
          "number of NUMA domains to use. (default: all)")
     ;
 
-    // extract hardware topology
-    hpx::threads::topology const& topo = retrieve_topology();
-    std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    std::size_t pus_per_numa_node = 0;
-
-    // If we don't have NUMA support, go by the number of sockets...
-    if(numa_nodes == 0)
-    {
-        numa_nodes = topo.get_number_of_sockets();
-        pus_per_numa_node = topo.get_number_of_socket_pus(0);
-    }
-    else
-    {
-        pus_per_numa_node = topo.get_number_of_numa_node_pus(0);
-    }
-
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
     std::vector<std::string> cfg;
     cfg.push_back("hpx.run_hpx_main!=1");
 
-    cfg.push_back("hpx.os_threads=" +
-        boost::lexical_cast<std::string>(numa_nodes));
-
-    // use full machine
-    cfg.push_back("hpx.cores=all");
-
-    // run the static_priority scheduler
-    cfg.push_back("hpx.scheduler=static-priority");
-
-    // set affinity domain for the base scheduler threads to 'numa'
-    cfg.push_back("hpx.affinity=numa");
-
-    // make sure each of the base kernel-threads run on separate NUMA domain
-    cfg.push_back("hpx.pu_step=" +
-        boost::lexical_cast<std::string>(pus_per_numa_node));
+    // no-cross NUMA stealing
+    cfg.push_back("hpx.numa_sensitive=2");
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
 
 void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
-    boost::uint64_t block_order, boost::uint64_t tile_size, boost::uint64_t domain)
+    boost::uint64_t block_order, boost::uint64_t tile_size,
+    boost::uint64_t domain)
 {
     using hpx::parallel::for_each;
     using hpx::parallel::par;
