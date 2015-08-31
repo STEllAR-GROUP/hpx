@@ -344,16 +344,11 @@ int hpx_main(boost::program_options::variables_map& vm)
     // extract hardware topology
     hpx::threads::topology const& topo = retrieve_topology();
     std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-    std::size_t numa_pus = 0;
     if(numa_nodes == 0)
     {
         numa_nodes = topo.get_number_of_sockets();
-        numa_pus = topo.get_number_of_socket_pus(0);
     }
-    else
-    {
-        numa_pus = topo.get_number_of_numa_node_pus(0);
-    }
+    std::size_t numa_pus = hpx::get_os_thread_count() / numa_nodes;
 
     std::size_t vector_size = vm["vector_size"].as<std::size_t>();
     std::size_t offset = vm["offset"].as<std::size_t>();
