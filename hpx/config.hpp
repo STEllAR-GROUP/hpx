@@ -24,6 +24,10 @@
 
 #include <boost/version.hpp>
 
+#if BOOST_VERSION == 105400
+#include <cstdint> // Boost.Atomic has trouble finding [u]intptr_t
+#endif
+
 #if BOOST_VERSION < 105600
 #include <boost/exception/detail/attribute_noreturn.hpp>
 #endif
