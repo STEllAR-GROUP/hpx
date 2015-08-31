@@ -5,6 +5,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 
+#include <hpx/runtime/threads/threadmanager_impl.hpp>
+
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #endif
@@ -39,7 +41,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         num_threads_(num_threads),
         os_thread_(0),
         priority_(priority),
-        stacksize_(stacksize)
+        stacksize_(stacksize),
+        thread_manager_(
+            static_cast<threadmanager_impl<Scheduler> &>(
+                get_thread_manager()
+            )
+        )
     {
 //         if (first_thread + num_threads > hpx::get_os_thread_count())
 //         {
@@ -50,6 +57,17 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 //                 "available OS-threads");
 //             return;
 //         }
+    }
+
+    template <typename Scheduler>
+    threads::thread_state_enum
+    thread_pool_attached_executor<Scheduler>::thread_function_nullary(
+        closure_type func)
+    {
+        // execute the actual thread function
+        func();
+
+        return threads::terminated;
     }
 
     // Schedule the specified function for execution in this executor.
@@ -63,8 +81,24 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (stacksize == threads::thread_stacksize_default)
             stacksize = stacksize_;
 
-        register_thread_nullary(std::move(f), desc, initial_state, run_now,
-            priority_, get_next_thread_num(), stacksize, ec);
+//         register_thread_nullary(std::move(f), desc, initial_state, run_now,
+//             priority_, get_next_thread_num(), stacksize, ec);
+
+        // create a new thread
+        thread_init_data data(util::bind(
+            util::one_shot(&thread_pool_attached_executor::thread_function_nullary),
+            std::move(f)), desc);
+        data.stacksize = threads::get_stack_size(stacksize);
+        data.num_os_thread = get_next_thread_num();
+
+        threads::thread_id_type id = threads::invalid_thread_id;
+        thread_manager_.register_thread(data, id, initial_state, true, ec);
+        if (ec) return;
+
+        HPX_ASSERT(invalid_thread_id != id || !run_now);
+
+        if (&ec != &throws)
+            ec = make_success_code();
     }
 
     // Schedule given function for execution in this executor no sooner
