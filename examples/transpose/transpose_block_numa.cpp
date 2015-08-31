@@ -210,39 +210,51 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
     boost::uint64_t blocks_end, boost::uint64_t domain);
 
 ///////////////////////////////////////////////////////////////////////////////
+std::size_t get_num_numa_nodes(hpx::threads::topology const& topo,
+    boost::program_options::variables_map& vm)
+{
+    std::size_t numa_nodes = topo.get_number_of_numa_nodes();
+    if (numa_nodes == 0)
+        numa_nodes = topo.get_number_of_sockets();
+
+    std::string num_numa_domains_str =
+        vm["transpose-numa-domains"].as<std::string>();
+
+    if (num_numa_domains_str != "all")
+    {
+        numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
+    }
+
+    return numa_nodes;
+}
+
+std::pair<std::size_t, std::size_t> get_num_numa_pus(
+    hpx::threads::topology const& topo, std::size_t numa_nodes,
+    boost::program_options::variables_map& vm)
+{
+    std::size_t numa_pus = hpx::get_os_thread_count() / numa_nodes;
+
+    std::string num_threads_str = vm["transpose-threads"].as<std::string>();
+    std::size_t pus = numa_pus;
+
+    if(num_threads_str != "all")
+    {
+        pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
+    }
+
+    return std::make_pair(numa_pus, pus);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     {
         // extract hardware topology
         hpx::threads::topology const& topo = retrieve_topology();
-        std::size_t numa_nodes = topo.get_number_of_numa_nodes();
-        std::size_t numa_pus = 0;
-        if(numa_nodes == 0)
-        {
-            numa_nodes = topo.get_number_of_sockets();
-            numa_pus = topo.get_number_of_socket_pus(0);
-        }
-        else
-        {
-            numa_pus = topo.get_number_of_numa_node_pus(0);
-        }
 
-        std::string num_threads_str =
-            vm["transpose-threads"].as<std::string>();
-        std::string num_numa_domains_str =
-            vm["transpose-numa-domains"].as<std::string>();
-
-        if (num_numa_domains_str != "all")
-        {
-            numa_nodes =
-                hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
-        }
-
-        std::size_t pus = numa_pus;
-        if (num_threads_str != "all")
-        {
-            pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
-        }
+        std::size_t numa_nodes = get_num_numa_nodes(topo, vm);
+        std::pair<std::size_t, std::size_t> pus =
+            get_num_numa_pus(topo, numa_nodes, vm);
 
         hpx::id_type here = hpx::find_here();
         bool root = here == hpx::find_root_locality();
@@ -265,7 +277,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         for (std::size_t i = 0; i != numa_nodes; ++i)
         {
             // create executor for this NUMA domain
-            execs.emplace_back(i * numa_pus, pus);
+            execs.emplace_back(i * pus.first, pus.second);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -491,8 +503,9 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 // Launch with something like:
 //
-// --hpx:bind=thread:0-5=numanode:0.core:0-5.pu:0;thread:6-11=numanode:1.core:0-5.pu:0
-// --hpx:threads=12 --transpose-numa-domains=2 --transpose-threads=6
+// --transpose-numa-domains=2 --transpose-threads=6
+//
+// Don't use --hpx:threads or --hpx:bind, those are computed internally.
 //
 int main(int argc, char* argv[])
 {
@@ -519,13 +532,52 @@ int main(int argc, char* argv[])
          "number of NUMA domains to use. (default: all)")
     ;
 
+    // parse command line here to extract the necessary settings for HPX
+    parsed_options opts =
+        command_line_parser(argc, argv)
+            .allow_unregistered()
+            .options(desc_commandline)
+            .style(command_line_style::unix_style)
+            .run();
+
+    variables_map vm;
+    store(opts, vm);
+
+    hpx::threads::topology const& topo = retrieve_topology();
+    std::size_t numa_nodes = get_num_numa_nodes(topo, vm);
+    std::pair<std::size_t, std::size_t> pus =
+        get_num_numa_pus(topo, numa_nodes, vm);
+
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
     std::vector<std::string> cfg;
     cfg.push_back("hpx.run_hpx_main!=1");
 
-    // no-cross NUMA stealing
-    cfg.push_back("hpx.numa_sensitive=2");
+    cfg.push_back("hpx.numa_sensitive=2");  // no-cross NUMA stealing
+    cfg.push_back("hpx.cores=all");         // use all cores
+    cfg.push_back(boost::str(
+        boost::format("hpx.os_threads=%d") % (numa_nodes * pus.second)
+    ));
+
+    std::string node_name("numanode");
+    if (topo.get_number_of_numa_nodes() == 0)
+        node_name = "socket";
+
+    std::string bind_desc("hpx.bind!=");
+    for (std::size_t i = 0; i != numa_nodes; ++i)
+    {
+        if (i != 0)
+            bind_desc += ";";
+
+        std::size_t base_thread = i * pus.second;
+        bind_desc += boost::str(
+            boost::format("thread:%d-%d=%s:%d.core:0-%d.pu:0")
+              % base_thread % (base_thread+pus.second-1)  // thread:%d-%d
+              % node_name % i                             // %s:%d
+              % (pus.second-1)                            // core:0-%d
+        );
+    }
+    cfg.push_back(bind_desc);
 
     return hpx::init(desc_commandline, argc, argv, cfg);
 }

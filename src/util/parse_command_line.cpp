@@ -459,7 +459,7 @@ namespace hpx { namespace util
                   "priority queue (default: number of OS threads), valid for "
                   "--hpx:queuing=local-priority,--hpx:queuing=static-priority, "
                   " and --hpx:queuing=abp-priority only)")
-                ("hpx:numa-sensitive", value<std::size_t>(),
+                ("hpx:numa-sensitive", value<std::size_t>()->implicit_value(0),
                   "makes the local-priority scheduler NUMA sensitive ("
                   "allowed values: 0 - no NUMA sensitivity, 1 - allow only for "
                   "boundary cores to steal across NUMA domains, 2 - "
