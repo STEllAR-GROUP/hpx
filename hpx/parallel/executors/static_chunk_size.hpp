@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             // by default use static work distribution over number of
             // available compute resources
             std::size_t const cores = executor_traits<Executor>::
-                os_thread_count(exec);
+                processing_units_count(exec, *this);
 
             return (num_tasks + cores - 1) / cores;
         }
