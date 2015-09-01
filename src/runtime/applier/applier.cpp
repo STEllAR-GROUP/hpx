@@ -540,26 +540,57 @@ namespace hpx { namespace applier
                     strm.str());
             }
 
-            // dispatch action, register work item either with or without
-            // continuation support
-            if (!cont) {
-                // No continuation is to be executed, register the plain
-                // action and the local-virtual address.
-                act->schedule_thread(ids[i], lva, threads::pending);
+            if (act->get_action_type() == actions::base_action::direct_action)
+            {
+                // execute this action directly
+                if (!cont) {
+                    // We should not allow any exceptions to escape the
+                    // execution of the action.
+                    try {
+                        // No continuation has to be executed, execute the
+                        // action.
+                        act->get_thread_function(lva)(
+                            threads::thread_state_ex(threads::wait_signaled));
+                    }
+                    catch (...) {
+                        // report any errors locally
+                        hpx::report_error(boost::current_exception());
+                    }
+                }
+                else {
+                    // This parcel carries a continuation, retrieve a wrapper
+                    // which first executes the original thread function as
+                    // required by the action and triggers the continuations
+                    // afterwards. Does exception handling.
+                    act->get_thread_function(std::move(cont), lva)(
+                        threads::thread_state_ex(threads::wait_signaled));
+                }
             }
-            else {
-                // This parcel carries a continuation, register a wrapper
-                // which first executes the original thread function as
-                // required by the action and triggers the continuations
-                // afterwards.
-                act->schedule_thread(std::move(cont), ids[i], lva, threads::pending);
+            else
+            {
+                // dispatch action, register work item either with or without
+                // continuation support
+                if (!cont) {
+                    // No continuation is to be executed, register the plain
+                    // action and the local-virtual address.
+                    act->schedule_thread(ids[i], lva, threads::pending);
+                }
+                else {
+                    // This parcel carries a continuation, register a wrapper
+                    // which first executes the original thread function as
+                    // required by the action and triggers the continuations
+                    // afterwards.
+                    act->schedule_thread(std::move(cont), ids[i], lva,
+                        threads::pending);
+                }
             }
         }
     }
 
     applier& get_applier()
     {
-        HPX_ASSERT(NULL != applier::applier_.get());   // should have been initialized
+        // should have been initialized
+        HPX_ASSERT(NULL != applier::applier_.get());
         return **applier::applier_;
     }
 
