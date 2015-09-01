@@ -13,6 +13,9 @@
 #include <utility>
 #include <memory>
 #include <string>
+#include <vector>
+#include <deque>
+#include <list>
 
 #include <boost/move/move.hpp>
 #include <boost/lexical_cast.hpp>
@@ -25,10 +28,11 @@ int make_int_slowly()
     return 42;
 }
 
+template <template <class...> class Container>
 void test_wait_for_all_from_list()
 {
     unsigned const count = 10;
-    std::vector<hpx::lcos::future<int> > futures;
+    Container<hpx::lcos::future<int> > futures;
     for (unsigned j = 0; j < count; ++j)
     {
         hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
@@ -36,23 +40,25 @@ void test_wait_for_all_from_list()
         task.apply();
     }
 
-    hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
+    hpx::lcos::future<Container<hpx::lcos::future<int> > > r =
         hpx::when_all(futures);
 
-    std::vector<hpx::lcos::future<int> > result = r.get();
+    Container<hpx::lcos::future<int> > result = r.get();
 
     HPX_TEST_EQ(futures.size(), result.size());
-    for (unsigned j = 0; j < count; ++j)
-    {
-        HPX_TEST(!futures[j].valid());
-        HPX_TEST(result[j].is_ready());
-    }
+    for (const auto& f : futures)
+        HPX_TEST(!f.valid());
+    for (const auto& r : result)
+        HPX_TEST(r.is_ready());
 }
 
+template <template <class...> class Container>
 void test_wait_for_all_from_list_iterators()
 {
+    typedef Container<hpx::lcos::future<int> > container;
     unsigned const count = 10;
-    std::vector<hpx::lcos::future<int> > futures;
+
+    container futures;
     for (unsigned j = 0; j < count; ++j)
     {
         hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
@@ -60,17 +66,17 @@ void test_wait_for_all_from_list_iterators()
         task.apply();
     }
 
-    hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
-        hpx::when_all(futures.begin(), futures.end());
+    hpx::lcos::future<container> r =
+        hpx::when_all<typename container::iterator,
+            container>(futures.begin(), futures.end());
 
-    std::vector<hpx::lcos::future<int> > result = r.get();
+    Container<hpx::lcos::future<int> > result = r.get();
 
     HPX_TEST_EQ(futures.size(), result.size());
-    for (unsigned j = 0; j < count; ++j)
-    {
-        HPX_TEST(!futures[j].valid());
-        HPX_TEST(result[j].is_ready());
-    }
+    for (const auto& f : futures)
+        HPX_TEST(!f.valid());
+    for (const auto& r : result)
+        HPX_TEST(r.is_ready());
 }
 
 void test_wait_for_all_two_futures()
@@ -257,8 +263,12 @@ using boost::program_options::options_description;
 int hpx_main(variables_map&)
 {
     {
-        test_wait_for_all_from_list();
-        test_wait_for_all_from_list_iterators();
+        test_wait_for_all_from_list<std::vector>();
+        test_wait_for_all_from_list<std::list>();
+        test_wait_for_all_from_list<std::deque>();
+        test_wait_for_all_from_list_iterators<std::vector>();
+        test_wait_for_all_from_list_iterators<std::list>();
+        test_wait_for_all_from_list_iterators<std::deque>();
         test_wait_for_all_two_futures();
         test_wait_for_all_three_futures();
         test_wait_for_all_four_futures();
