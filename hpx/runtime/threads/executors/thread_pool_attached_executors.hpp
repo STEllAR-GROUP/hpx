@@ -72,17 +72,12 @@ namespace hpx { namespace threads { namespace executors
                 return first_thread_ + (os_thread_++ % num_threads_);
             }
 
-            static threads::thread_state_enum thread_function_nullary(
-                closure_type func);
-
         private:
             std::size_t first_thread_;
             std::size_t num_threads_;
             boost::atomic<std::size_t> os_thread_;
             thread_priority priority_;
             thread_stacksize stacksize_;
-
-            threadmanager_impl<Scheduler> & thread_manager_;
         };
     }
 
