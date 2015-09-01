@@ -91,7 +91,7 @@ namespace hpx { namespace traits
         // iterator type of the given range allow calculating the size on O(1).
         template <typename Future, typename Range>
         BOOST_FORCEINLINE
-        void reserve_if_random_access(std::vector<Future>& v, Range const& r,
+        void reserve_if_random_access(std::vector<Future>&, Range const&,
             boost::mpl::false_)
         {
         }
@@ -102,6 +102,13 @@ namespace hpx { namespace traits
             boost::mpl::true_)
         {
             v.reserve(boost::size(r));
+        }
+
+        template <typename Range1, typename Range2>
+        BOOST_FORCEINLINE
+        void reserve_if_random_access(Range1&, Range2 const&)
+        {
+            // do nothing if it's not a vector
         }
 
         template <typename Future, typename Range>
@@ -127,23 +134,19 @@ namespace hpx { namespace traits
         typedef typename traits::future_range_traits<Range>::future_type
             future_type;
 
-        typedef std::vector<future_type> type;
+        typedef Range type;
 
-        template <typename Future>
-        BOOST_FORCEINLINE
-        typename boost::enable_if<
-            traits::is_future<Future>, std::vector<Future>
-        >::type
-        operator()(std::vector<Future>&& futures) const
+        BOOST_FORCEINLINE Range
+        operator()(Range&& futures) const
         {
             return std::move(futures);
         }
 
-        template <typename Range_>
-        BOOST_FORCEINLINE std::vector<future_type>
+        template <class Range_>
+        BOOST_FORCEINLINE Range
         operator()(Range_&& futures) const
         {
-            std::vector<future_type> values;
+            Range values;
             detail::reserve_if_random_access(values, futures);
 
             std::transform(boost::begin(futures), boost::end(futures),
