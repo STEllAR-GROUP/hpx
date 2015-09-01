@@ -8,6 +8,7 @@
 
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_range.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
@@ -26,7 +27,7 @@ namespace hpx { namespace traits
     template <typename Range>
     struct is_future_range<Range,
         typename boost::enable_if<is_range<Range> >::type>
-      : is_future<typename Range::value_type>
+      : is_future<typename util::decay<Range>::type::value_type>
     {};
 
     template <typename Iterator>
