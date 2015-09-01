@@ -591,14 +591,14 @@ void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
     using hpx::parallel::task;
     using hpx::util::placeholders::_1;
 
-    sub_block A = Af.get();
+    sub_block const A = Af.get();
     sub_block B = Bf.get();
 
     if(tile_size < block_order)
     {
-        for(boost::uint64_t i = 0; i != block_order; ++i)
+        for(boost::uint64_t i = 0; i < block_order; i += tile_size)
         {
-            for(boost::uint64_t j = 0; j != block_order; j += tile_size)
+            for(boost::uint64_t j = 0; j < block_order; j += tile_size)
             {
                 boost::uint64_t max_i = (std::min)(block_order, i + tile_size);
                 boost::uint64_t max_j = (std::min)(block_order, j + tile_size);
