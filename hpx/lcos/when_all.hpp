@@ -26,20 +26,21 @@ namespace hpx
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to \a when_all.
-    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///           - future<Container<future<R>>>: If the input cardinality is
     ///             unknown at compile time and the futures are all of the
-    ///             same type. The order of the futures in the output vector
+    ///             same type. The order of the futures in the output container
     ///             will be the same as given by the input iterator.
     ///
     /// \note Calling this version of \a when_all where first == last, returns
-    ///       a future with an empty vector that is immediately ready.
+    ///       a future with an empty container that is immediately ready.
     ///       Each future and shared_future is waited upon and then copied into
     ///       the collection of the output (returned) future, maintaining the
     ///       order of the futures in the input collection.
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
-    template <typename InputIter>
-    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    template <typename InputIter, typename Container =
+        std::vector<typename std::iterator_traits<InputIter>::value_type>>
+    future<Container>
     when_all(InputIter first, InputIter last);
 
     /// The function \a when_all is an operator allowing to join on the result
@@ -125,8 +126,9 @@ namespace hpx
     ///           hpx::exception.
     ///
     /// \note     None of the futures in the input sequence are invalidated.
-    template <typename InputIter>
-    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    template <typename InputIter, typename Container =
+        std::vector<typename std::iterator_traits<InputIter>::value_type>>
+    future<Container<future<typename std::iterator_traits<InputIter>::value_type>>>
     when_all_n(InputIter begin, std::size_t count);
 }
 
@@ -217,7 +219,7 @@ namespace hpx { namespace lcos
                 this->set_value(when_all_result<Tuple>::call(std::move(t_)));
             }
 
-            // Current element is a range (vector) of futures
+            // Current element is a range of futures
             template <typename TupleIter, typename Iter>
             void await_range(TupleIter iter, Iter next, Iter end)
             {
@@ -352,12 +354,13 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future>
-    lcos::future<std::vector<Future> > //-V659
-    when_all(std::vector<Future>&& values)
+    template <typename Range>
+    typename boost::enable_if<traits::is_future_range<Range>,
+        lcos::future<typename util::decay<Range>::type> >::type //-V659
+    when_all(Range&& values)
     {
         typedef detail::when_all_frame<
-                hpx::util::tuple<std::vector<Future> >
+                hpx::util::tuple<Range>
             > frame_type;
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
@@ -368,34 +371,21 @@ namespace hpx { namespace lcos
         return future_access<typename frame_type::type>::create(std::move(p));
     }
 
-    template <typename Future>
-    lcos::future<std::vector<Future> >
-    when_all(std::vector<Future>& values)
+    template <typename Range>
+    typename boost::enable_if<traits::is_future_range<Range>,
+        lcos::future<typename util::decay<Range>::type> >::type
+    when_all(Range& values)
     {
-        typedef Future future_type;
-        typedef std::vector<future_type> result_type;
-
-        result_type values_;
-        values_.reserve(values.size());
-
-        std::transform(boost::begin(values), boost::end(values),
-            std::back_inserter(values_),
-            traits::acquire_future_disp());
-
+        Range values_ = traits::acquire_future<Range>()(values);
         return lcos::when_all(std::move(values_));
     }
 
-    template <typename Iterator>
-    lcos::future<std::vector<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    > >
+    template <typename Iterator, typename Container =
+        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+    lcos::future<Container>
     when_all(Iterator begin, Iterator end)
     {
-        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
-            future_type;
-        typedef std::vector<future_type> result_type;
-
-        result_type values;
+        Container values;
         std::transform(begin, end, std::back_inserter(values),
             traits::acquire_future_disp());
 
@@ -410,18 +400,13 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator>
-    lcos::future<std::vector<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    > >
+    template <typename Iterator, typename Container =
+        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+    lcos::future<Container>
     when_all_n(Iterator begin, std::size_t count)
     {
-        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
-            future_type;
-        typedef std::vector<future_type> result_type;
-
-        result_type values;
-        values.reserve(count);
+        Container values;
+        //values.reserve(count); //TODO:
 
         traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)
