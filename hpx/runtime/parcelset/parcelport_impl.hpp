@@ -180,6 +180,7 @@ namespace hpx { namespace parcelset
                 connection_cache_.clear();
                 io_service_pool_.clear();
             }
+
         }
 
         void put_parcel(locality const & dest, parcel p, write_handler_type f)
@@ -238,14 +239,7 @@ namespace hpx { namespace parcelset
 
             if (trigger && enable_parcel_handling_)
             {
-                if (hpx::is_running() && async_serialization())
-                {
-                    trigger_sending_parcels(dest);
-                }
-                else
-                {
-                    get_connection_and_send_parcels(dest);
-                }
+                get_connection_and_send_parcels(dest);
             }
         }
 
@@ -282,14 +276,7 @@ namespace hpx { namespace parcelset
 
             if (enable_parcel_handling_)
             {
-                if (hpx::is_running() && async_serialization())
-                {
-                    trigger_sending_parcels(locality_id);
-                }
-                else
-                {
-                    get_connection_and_send_parcels(locality_id);
-                }
+                get_connection_and_send_parcels(locality_id);
             }
         }
 
@@ -309,10 +296,7 @@ namespace hpx { namespace parcelset
         {
             bool did_some_work = false;
             did_some_work = do_background_work_impl<ConnectionHandler>(num_thread);
-            if(num_thread == 0)
-            {
-                trigger_pending_work();
-            }
+            trigger_pending_work();
             return did_some_work;
         }
 
@@ -726,25 +710,6 @@ namespace hpx { namespace parcelset
             }
         }
 
-
-        ///////////////////////////////////////////////////////////////////////
-        bool trigger_sending_parcels(locality const& loc,
-            bool background = false)
-        {
-            if (!enable_parcel_handling_)
-                return true;         // do not schedule sending parcels
-
-            error_code ec(lightweight);
-            hpx::applier::register_thread_nullary(
-                util::bind(
-                    &parcelport_impl::get_connection_and_send_parcels,
-                    this, loc, background),
-                "get_connection_and_send_parcels",
-                threads::pending, true, threads::thread_priority_boost,
-                get_next_num_thread(), threads::thread_stacksize_default, ec);
-            return ec ? false : true;
-        }
-
         bool trigger_pending_work()
         {
             if(hpx::is_stopped()) return true;
@@ -770,8 +735,7 @@ namespace hpx { namespace parcelset
             // pending.
             for (locality const& loc : destinations)
             {
-                if (!trigger_sending_parcels(loc, true))
-                    return false;
+                get_connection_and_send_parcels(loc);
             }
 
             return true;
@@ -789,7 +753,9 @@ namespace hpx { namespace parcelset
                 new_gids_map new_gids;
 
                 if(!dequeue_parcels(locality_id, parcels, handlers, new_gids))
+                {
                     break;
+                }
 
                 // If one of the sending threads are in suspended state, we
                 // need to force a new connection to avoid deadlocks.
@@ -812,27 +778,25 @@ namespace hpx { namespace parcelset
                     return;
                 }
 
-                threads::thread_id_type new_send_thread;
                 // send parcels if they didn't get sent by another connection
                 if (!hpx::is_starting() && threads::get_self_ptr() == 0)
                 {
                     // Re-schedule if this is not executed by an HPX thread
-                    new_send_thread =
-                        hpx::applier::register_thread_nullary(
-                            hpx::util::bind(
-                                hpx::util::one_shot(&parcelport_impl
-                                    ::send_pending_parcels)
-                              , this
-                              , locality_id
-                              , sender_connection
-                              , std::move(parcels)
-                              , std::move(handlers)
-                              , std::move(new_gids)
-                            )
-                          , "parcelport_impl::send_pending_parcels"
-                          , threads::pending, true, threads::thread_priority_boost,
-                            get_next_num_thread(), threads::thread_stacksize_default
-                        );
+                    hpx::applier::register_thread_nullary(
+                        hpx::util::bind(
+                            hpx::util::one_shot(&parcelport_impl
+                                ::send_pending_parcels)
+                          , this
+                          , locality_id
+                          , sender_connection
+                          , std::move(parcels)
+                          , std::move(handlers)
+                          , std::move(new_gids)
+                        )
+                      , "parcelport_impl::send_pending_parcels"
+                      , threads::pending, true, threads::thread_priority_boost,
+                        get_next_num_thread(), threads::thread_stacksize_default
+                    );
                 }
                 else
                 {
@@ -886,7 +850,7 @@ namespace hpx { namespace parcelset
 
             // Create a new HPX thread which sends parcels that are still
             // pending.
-            trigger_sending_parcels(locality_id);
+            get_connection_and_send_parcels(locality_id);
         }
 
         void send_pending_parcels(
