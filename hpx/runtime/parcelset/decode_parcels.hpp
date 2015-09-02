@@ -178,7 +178,8 @@ namespace hpx { namespace parcelset
                     util::one_shot(&decode_message<Parcelport, Buffer>),
                     boost::ref(parcelport), std::move(buffer), 1),
                 "decode_parcels",
-                threads::pending, true, threads::thread_priority_boost);
+                threads::pending, true, threads::thread_priority_boost,
+                parcelport.get_next_num_thread());
         }
         else
         {
@@ -196,7 +197,8 @@ namespace hpx { namespace parcelset
                     util::one_shot(&decode_message<Parcelport, Buffer>),
                     boost::ref(parcelport), std::move(buffer), 0),
                 "decode_parcels",
-                threads::pending, true, threads::thread_priority_boost);
+                threads::pending, true, threads::thread_priority_boost,
+                parcelport.get_next_num_thread());
         }
         else
         {

@@ -232,7 +232,7 @@ std::pair<std::size_t, std::size_t> get_num_numa_pus(
     hpx::threads::topology const& topo, std::size_t numa_nodes,
     boost::program_options::variables_map& vm)
 {
-    std::size_t numa_pus = hpx::get_os_thread_count() / numa_nodes;
+    std::size_t numa_pus = hpx::threads::hardware_concurrency() / numa_nodes;
 
     std::string num_threads_str = vm["transpose-threads"].as<std::string>();
     std::size_t pus = numa_pus;
@@ -509,6 +509,13 @@ int hpx_main(boost::program_options::variables_map& vm)
 //
 int main(int argc, char* argv[])
 {
+//     std::cout << "Waiting...\n";
+//     int i = 0;
+//     while (i == 0)
+//     {
+//         Sleep(0);
+//     }
+
     using namespace boost::program_options;
 
     options_description desc_commandline;
@@ -547,6 +554,7 @@ int main(int argc, char* argv[])
     std::size_t numa_nodes = get_num_numa_nodes(topo, vm);
     std::pair<std::size_t, std::size_t> pus =
         get_num_numa_pus(topo, numa_nodes, vm);
+    std::size_t num_cores = topo.get_number_of_numa_node_cores(0);
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities
@@ -554,7 +562,11 @@ int main(int argc, char* argv[])
     cfg.push_back("hpx.run_hpx_main!=1");
 
     cfg.push_back("hpx.numa_sensitive=2");  // no-cross NUMA stealing
-    cfg.push_back("hpx.cores=all");         // use all cores
+
+    // block all cores of requested number of NUMA-domains
+    cfg.push_back(boost::str(
+        boost::format("hpx.cores=%d") % (numa_nodes * num_cores)
+    ));
     cfg.push_back(boost::str(
         boost::format("hpx.os_threads=%d") % (numa_nodes * pus.second)
     ));

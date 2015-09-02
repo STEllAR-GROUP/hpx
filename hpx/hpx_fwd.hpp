@@ -172,14 +172,6 @@ namespace hpx
     HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(std::string const& mode);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Retrieve the string value of a configuration entry as given by \p key.
-    HPX_API_EXPORT std::string get_config_entry(std::string const& key,
-        std::string const& dflt);
-    /// Retrieve the integer value of a configuration entry as given by \p key.
-    HPX_API_EXPORT std::string get_config_entry(std::string const& key,
-        std::size_t dflt);
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     class HPX_API_EXPORT runtime_impl;
 
@@ -1120,6 +1112,7 @@ namespace hpx
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 
 #include <hpx/lcos/async_fwd.hpp>

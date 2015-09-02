@@ -47,7 +47,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool background_work(std::size_t num_thread)
         {
-
             connection_list connections;
             {
                 boost::unique_lock<mutex_type> l(connections_mtx_);

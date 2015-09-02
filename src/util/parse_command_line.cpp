@@ -441,7 +441,7 @@ namespace hpx { namespace util
                  "the number of operating system threads to spawn for this HPX "
                  "locality (default: 1, using 'all' will spawn one thread for "
                  "each processing unit")
-                ("hpx:cores", value<std::string>()->default_value("all"),
+                ("hpx:cores", value<std::string>(),
                  "the number of cores to utilize for this HPX "
                  "locality (default: 'all', i.e. the number of cores is based on "
                  "the number of total cores in the system)")

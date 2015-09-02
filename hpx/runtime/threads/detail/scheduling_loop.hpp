@@ -11,13 +11,17 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/detail/periodic_maintenance.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/cstdint.hpp>
+
+#include <limits>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -212,15 +216,21 @@ namespace hpx { namespace threads { namespace detail
                 callback_type && outer,
                 callback_type && inner = callback_type(),
                 background_callback_type && background =
-                    background_callback_type())
+                    background_callback_type(),
+                std::size_t max_background_threads =
+                    hpx::util::safe_lexical_cast<std::size_t>(
+                        hpx::get_config_entry("hpx.max_background_threads",
+                            (std::numeric_limits<std::size_t>::max)())))
           : outer_(std::move(outer)),
             inner_(std::move(inner)),
-            background_(std::move(background))
+            background_(std::move(background)),
+            max_background_threads_(max_background_threads)
         {}
 
         callback_type outer_;
         callback_type inner_;
         background_callback_type background_;
+        std::size_t max_background_threads_;
     };
 
     template <typename SchedulingPolicy>
@@ -395,6 +405,7 @@ namespace hpx { namespace threads { namespace detail
 
                 // do background work in parcel layer and in agas
                 if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
+                    num_thread < callbacks.max_background_threads_ &&
                     !callbacks.background_.empty())
                 {
                     if (callbacks.background_())
@@ -416,6 +427,7 @@ namespace hpx { namespace threads { namespace detail
 
                 // do background work in parcel layer and in agas
                 if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
+                    num_thread < callbacks.max_background_threads_ &&
                     !callbacks.background_.empty())
                 {
                     if (callbacks.background_())

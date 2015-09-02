@@ -15,6 +15,7 @@
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/serialization/detail/future_await_container.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
@@ -22,6 +23,8 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/thread/locks.hpp>
+
+#include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -100,6 +103,13 @@ namespace hpx { namespace parcelset
           , connection_cache_(max_connections(ini), max_connections_per_loc(ini))
           , archive_flags_(0)
           , operations_in_flight_(0)
+          , num_thread_(0)
+          , max_background_thread_(hpx::util::safe_lexical_cast<std::size_t>(
+                hpx::get_config_entry(
+                    "hpx.max_background_threads",
+                        (std::numeric_limits<std::size_t>::max)()
+                )
+            ))
         {
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -331,7 +341,8 @@ namespace hpx { namespace parcelset
                         this, loc),
                     "remove_from_connection_cache",
                     threads::pending, true, threads::thread_priority_normal,
-                    std::size_t(-1), threads::thread_stacksize_default, ec);
+                    get_next_num_thread(), threads::thread_stacksize_default,
+                    ec);
                 if (!ec) return;
             }
 
@@ -348,7 +359,8 @@ namespace hpx { namespace parcelset
                         this, loc),
                     "remove_from_connection_cache",
                     threads::suspended, true, threads::thread_priority_normal,
-                    std::size_t(-1), threads::thread_stacksize_default, ec);
+                    get_next_num_thread(), threads::thread_stacksize_default,
+                    ec);
             if (ec) return;
 
             threads::set_thread_state(id,
@@ -729,7 +741,7 @@ namespace hpx { namespace parcelset
                     this, loc, background),
                 "get_connection_and_send_parcels",
                 threads::pending, true, threads::thread_priority_boost,
-                std::size_t(-1), threads::thread_stacksize_default, ec);
+                get_next_num_thread(), threads::thread_stacksize_default, ec);
             return ec ? false : true;
         }
 
@@ -805,7 +817,6 @@ namespace hpx { namespace parcelset
                 if (!hpx::is_starting() && threads::get_self_ptr() == 0)
                 {
                     // Re-schedule if this is not executed by an HPX thread
-                    std::size_t thread_num = get_worker_thread_num();
                     new_send_thread =
                         hpx::applier::register_thread_nullary(
                             hpx::util::bind(
@@ -820,7 +831,7 @@ namespace hpx { namespace parcelset
                             )
                           , "parcelport_impl::send_pending_parcels"
                           , threads::pending, true, threads::thread_priority_boost,
-                            thread_num, threads::thread_stacksize_default
+                            get_next_num_thread(), threads::thread_stacksize_default
                         );
                 }
                 else
@@ -953,6 +964,12 @@ namespace hpx { namespace parcelset
             do_background_work_impl<ConnectionHandler>(num_thread);
         }
 
+    public:
+        std::size_t get_next_num_thread()
+        {
+            return ++num_thread_ % max_background_thread_;
+        }
+
     protected:
         /// The pool of io_service objects used to perform asynchronous operations.
         util::io_service_pool io_service_pool_;
@@ -964,6 +981,9 @@ namespace hpx { namespace parcelset
 
         int archive_flags_;
         boost::atomic<std::size_t> operations_in_flight_;
+
+        boost::atomic<std::size_t> num_thread_;
+        std::size_t const max_background_thread_;
     };
 }}
 

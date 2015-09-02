@@ -54,6 +54,8 @@
 #  define HPX_DLL_STRING   "hpx" HPX_SHARED_LIB_EXTENSION
 #endif
 
+#include <limits>
+
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__linux) || defined(linux) || defined(__linux__)\
          || defined(__FreeBSD__) || defined(__APPLE__)
@@ -143,7 +145,7 @@ namespace hpx { namespace util
 
             // add placeholders for keys to be added by command line handling
             "os_threads = 1",
-            "cores = 1",
+            "cores = all",
             "localities = 1",
             "first_pu = 0",
             "runtime_mode = console",
@@ -152,6 +154,7 @@ namespace hpx { namespace util
             "pu_step = 1",
             "pu_offset = 0",
             "numa_sensitive = 0",
+            "max_background_threads = ${MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"

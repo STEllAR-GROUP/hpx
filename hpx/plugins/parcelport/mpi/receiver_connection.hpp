@@ -55,6 +55,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , header_(h)
           , allocator_(chunk_pool)
           , buffer_(allocator_)
+          , request_(MPI_REQUEST_NULL)
           , request_ptr_(0)
           , chunks_idx_(0)
           , pp_(pp)
