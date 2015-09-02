@@ -503,7 +503,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // if there are no zero copy chunks, we consider the parcel receive complete
         // so release memory and trigger write_handler.
         // If there are zero copy chunks to be RDMA GET from the remote end, then
-        // we hold onto data until the have completed.
+        // we hold onto data until they have completed.
         // ----------------------------------------------------------------------------------------------
         void handle_recv_completion(uint64_t wr_id, RdmaClient* client)
         {
@@ -511,6 +511,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
             // bookkeeping : decrement counter that keeps preposted queue full
             client->popReceive();
+            _rdmaController->refill_client_receives();
 
             // store details about this parcel so that all memory buffers can be kept
             // until all recv operations have completed.
@@ -626,7 +627,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             //          data.bytes_ = static_cast<std::size_t>(buffer.size_);
             //          ...
             //          data.time_ = timer.elapsed_nanoseconds() - data.time_;
-            _rdmaController->refill_client_receives();
         }
 
 #ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
