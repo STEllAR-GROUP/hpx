@@ -859,15 +859,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             HPX_ASSERT(dests.size() == handlers.size());
             for(std::size_t i = 0; i != dests.size(); ++i)
             {
-                put_parcel(dests[i], parcels[i], handlers[i]);
+                put_parcel(dests[i], std::move(parcels[i]), handlers[i]);
             }
         }
 
-        void send_early_parcel(parcelset::locality const & dest, parcel& p) {
+        void send_early_parcel(parcelset::locality const & dest, parcel p) {
             FUNC_START_DEBUG_MSG;
             FUNC_END_DEBUG_MSG;
             // Only necessary if your PP an be used at bootstrapping
-            put_parcel(dest, p, boost::bind(&parcelport::early_write_handler, this, ::_1, p));
+            throw std::runtime_error("Verbs PP does not handle early parcels");
         }
 
         util::io_service_pool* get_thread_pool(char const* name) {
@@ -972,7 +972,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             //
             if (threads::get_self_ptr() == 0) {
                 // this is an OS thread, so call put_parcel on an hpx thread
-                hpx::apply(&parcelport::put_parcel, this, dest, p, f);
+                hpx::apply(&parcelport::put_parcel, this, dest, std::move(p), f);
                 return;
             }
             {   // if we already have a lot of sends in the queue, process them first
@@ -1058,7 +1058,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 }
                 parcel_send_data &send_data = *current_send;
                 send_data.tag            = tag;
-                send_data.parcel         = p;
+                send_data.parcel         = std::move(p);
                 send_data.handler        = f;
                 send_data.header_region  = NULL;
                 send_data.message_region = NULL;
