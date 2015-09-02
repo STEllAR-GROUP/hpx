@@ -172,8 +172,8 @@ struct block
     block(hpx::future<hpx::id_type> id)
       : base_type(std::move(id))
     {
-        unmanaged_ = get_id();
-        unmanaged_.make_unmanaged();
+//         unmanaged_ = get_id();
+//         unmanaged_.make_unmanaged();
     }
 
     block(
@@ -181,17 +181,17 @@ struct block
         std::size_t numa_domain)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size, numa_domain))
     {
-        unmanaged_ = get_id();
-        unmanaged_.make_unmanaged();
+//         unmanaged_ = get_id();
+//         unmanaged_.make_unmanaged();
     }
 
     hpx::future<sub_block> get_sub_block(boost::uint64_t offset, boost::uint64_t size)
     {
         block_component::get_sub_block_action act;
-        return hpx::async(act, unmanaged_, offset, size);
+        return hpx::async(act, get_id(), offset, size);
     }
 
-    hpx::id_type unmanaged_;
+//     hpx::id_type unmanaged_;
 };
 
 // The macros below are necessary to generate the code required for exposing
@@ -470,11 +470,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                                 }
                             }
 
-                            if(root)
-                            {
-                                errsq += test_results(order, block_order, B,
-                                    block_start, block_end, domain);
-                            }
+                            errsq += test_results(order, block_order, B,
+                                block_start, block_end, domain);
                         }
                         return errsq;
                     }
