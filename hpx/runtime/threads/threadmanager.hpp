@@ -170,7 +170,7 @@ namespace hpx { namespace threads
 
         /// Return the mask for processing units the given thread is allowed
         /// to run on.
-        virtual mask_cref_type get_pu_mask(topology const&, std::size_t) const = 0;
+        virtual mask_type get_pu_mask(topology const&, std::size_t) const = 0;
 
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
         virtual boost::int64_t get_executed_threads(
@@ -192,7 +192,7 @@ namespace hpx { namespace threads
 
         // Returns the mask identifying all processing units used by this
         // thread manager.
-        virtual mask_cref_type get_used_processing_units() const = 0;
+        virtual mask_type get_used_processing_units() const = 0;
 
         ///////////////////////////////////////////////////////////////////////
         virtual std::size_t get_worker_thread_num(bool* numa_sensitive = 0) = 0;

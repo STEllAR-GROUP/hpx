@@ -54,7 +54,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 connection_ptr rcv = accept();
                 if(rcv)
                 {
-                    if(!rcv->receive())
+                    if(!rcv->receive(num_thread))
                     {
                         boost::unique_lock<mutex_type> l(connections_mtx_);
                         connections.push_back(std::move(rcv));

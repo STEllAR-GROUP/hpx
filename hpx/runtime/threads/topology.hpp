@@ -198,7 +198,7 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        virtual mask_cref_type get_machine_affinity_mask(
+        virtual mask_type get_machine_affinity_mask(
             error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
@@ -220,7 +220,7 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        virtual mask_cref_type get_socket_affinity_mask(std::size_t num_thread,
+        virtual mask_type get_socket_affinity_mask(std::size_t num_thread,
             bool numa_sensitive, error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
@@ -230,7 +230,7 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        virtual mask_cref_type get_numa_node_affinity_mask(std::size_t num_thread,
+        virtual mask_type get_numa_node_affinity_mask(std::size_t num_thread,
             bool numa_sensitive, error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
@@ -240,7 +240,7 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        virtual mask_cref_type get_core_affinity_mask(std::size_t num_thread,
+        virtual mask_type get_core_affinity_mask(std::size_t num_thread,
             bool numa_sensitive, error_code& ec = throws) const = 0;
 
         /// \brief Return a bit mask where each set bit corresponds to a
@@ -249,7 +249,7 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        virtual mask_cref_type get_thread_affinity_mask(std::size_t num_thread,
+        virtual mask_type get_thread_affinity_mask(std::size_t num_thread,
             bool numa_sensitive = false, error_code& ec = throws) const = 0;
 
         /// \brief Use the given bit mask to set the affinity of the given
@@ -285,7 +285,7 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        virtual mask_cref_type get_thread_affinity_mask_from_lva(
+        virtual mask_type get_thread_affinity_mask_from_lva(
             naming::address::address_type, error_code& ec = throws) const = 0;
 
         /// \brief Prints the \param m to os in a human readable form

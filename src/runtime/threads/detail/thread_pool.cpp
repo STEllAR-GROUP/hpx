@@ -126,14 +126,14 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    mask_cref_type thread_pool<Scheduler>::get_pu_mask(
+    mask_type thread_pool<Scheduler>::get_pu_mask(
         topology const& topology, std::size_t num_thread) const
     {
         return sched_.Scheduler::get_pu_mask(topology, num_thread);
     }
 
     template <typename Scheduler>
-    mask_cref_type thread_pool<Scheduler>::get_used_processing_units() const
+    mask_type thread_pool<Scheduler>::get_used_processing_units() const
     {
         return used_processing_units_;
     }
@@ -324,7 +324,7 @@ namespace hpx { namespace threads { namespace detail
 
             std::size_t thread_num = num_threads;
             while (thread_num-- != 0) {
-                threads::mask_cref_type mask =
+                threads::mask_type mask =
                     sched_.Scheduler::get_pu_mask(topology_, thread_num);
 
                 LTM_(info) //-V128
@@ -485,7 +485,7 @@ namespace hpx { namespace threads { namespace detail
         topology const& topology, boost::barrier& startup)
     {
         // Set the affinity for the current thread.
-        threads::mask_cref_type mask =
+        threads::mask_type mask =
             sched_.Scheduler::get_pu_mask(topology, num_thread);
 
         if (LHPX_ENABLED(debug))

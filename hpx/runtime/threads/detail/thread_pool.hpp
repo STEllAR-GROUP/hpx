@@ -71,9 +71,9 @@ namespace hpx { namespace threads { namespace detail
             error_code& ec);
 
         std::size_t get_pu_num(std::size_t num_thread) const;
-        mask_cref_type get_pu_mask(topology const& topology,
+        mask_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const;
-        mask_cref_type get_used_processing_units() const;
+        mask_type get_used_processing_units() const;
 
         // performance counters
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS

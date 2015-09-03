@@ -154,7 +154,7 @@ namespace hpx { namespace applier
         }
 
         /// Schedule  threads based on the given parcel
-        void schedule_action(parcelset::parcel p);
+        void schedule_action(parcelset::parcel p, std::size_t num_thread = -1);
 
 #if defined(HPX_HAVE_SECURITY)
         void enable_verify_capabilities()

@@ -434,7 +434,7 @@ namespace hpx { namespace applier
     }
 
     // schedule threads based on given parcel
-    void applier::schedule_action(parcelset::parcel p)
+    void applier::schedule_action(parcelset::parcel p, std::size_t num_thread)
     {
         // fetch the set of destinations
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
@@ -573,7 +573,7 @@ namespace hpx { namespace applier
                 if (!cont) {
                     // No continuation is to be executed, register the plain
                     // action and the local-virtual address.
-                    act->schedule_thread(ids[i], lva, threads::pending);
+                    act->schedule_thread(ids[i], lva, threads::pending, num_thread);
                 }
                 else {
                     // This parcel carries a continuation, register a wrapper
@@ -581,7 +581,7 @@ namespace hpx { namespace applier
                     // required by the action and triggers the continuations
                     // afterwards.
                     act->schedule_thread(std::move(cont), ids[i], lva,
-                        threads::pending);
+                        threads::pending, num_thread);
                 }
             }
         }

@@ -116,7 +116,7 @@ namespace hpx { namespace threads
 
             /// Return the mask for processing units the given thread is allowed
             /// to run on.
-            virtual mask_cref_type get_pu_mask(topology const& topology,
+            virtual mask_type get_pu_mask(topology const& topology,
                 std::size_t num_thread) const;
 
             /// Set the new scheduler mode
@@ -234,7 +234,7 @@ namespace hpx { namespace threads
 
         /// Return the mask for processing units the given thread is allowed
         /// to run on.
-        mask_cref_type get_pu_mask(topology const& topology,
+        mask_type get_pu_mask(topology const& topology,
                 std::size_t num_thread) const
         {
             return executor_data_->get_pu_mask(topology, num_thread);

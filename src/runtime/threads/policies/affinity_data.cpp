@@ -152,7 +152,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         init_cached_pu_nums(num_system_pus, t);
     }
 
-    mask_cref_type affinity_data::get_pu_mask(topology const& topology,
+    mask_type affinity_data::get_pu_mask(topology const& topology,
         std::size_t num_thread, bool numa_sensitive) const
     {
         // --hpx:bind=none disables all affinity

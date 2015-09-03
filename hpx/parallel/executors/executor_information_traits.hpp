@@ -29,7 +29,7 @@
 // forward declaration only
 namespace hpx { namespace threads
 {
-    HPX_API_EXPORT threads::mask_cref_type get_pu_mask(threads::topology& topo,
+    HPX_API_EXPORT threads::mask_type get_pu_mask(threads::topology& topo,
         std::size_t thread_num);
 }}
 
@@ -88,7 +88,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct get_pu_mask_helper
         {
             template <typename Executor>
-            static threads::mask_cref_type call(wrap_int, Executor const&,
+            static threads::mask_type call(wrap_int, Executor const&,
                 threads::topology& topo, std::size_t thread_num)
             {
                 return hpx::threads::get_pu_mask(topo, thread_num);
@@ -104,7 +104,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         };
 
         template <typename Executor>
-        threads::mask_cref_type call_get_pu_mask(Executor const& exec,
+        threads::mask_type call_get_pu_mask(Executor const& exec,
             threads::topology& topo, std::size_t thread_num)
         {
             return get_pu_mask_helper::call(0, exec, topo, thread_num);

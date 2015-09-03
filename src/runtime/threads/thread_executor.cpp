@@ -16,7 +16,7 @@ namespace hpx { namespace threads
 {
     namespace detail
     {
-        mask_cref_type executor_base::get_pu_mask(topology const& topology,
+        mask_type executor_base::get_pu_mask(topology const& topology,
                 std::size_t num_thread) const
         {
             return get_thread_manager().get_pu_mask(topology, num_thread);

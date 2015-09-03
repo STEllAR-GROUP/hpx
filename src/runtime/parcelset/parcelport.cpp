@@ -60,7 +60,7 @@ namespace hpx { namespace parcelset
         }
     }
 
-    void parcelport::add_received_parcel(parcel p)
+    void parcelport::add_received_parcel(parcel p, std::size_t num_thread)
     {
         // do some work (notify event handlers)
         if(applier_)

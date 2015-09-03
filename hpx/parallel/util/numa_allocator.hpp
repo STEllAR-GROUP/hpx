@@ -95,7 +95,7 @@ namespace hpx { namespace parallel { namespace util
 
 #if defined(HPX_DEBUG)
                             // make sure memory was placed appropriately
-                            hpx::threads::mask_cref_type mem_mask =
+                            hpx::threads::mask_type mem_mask =
                                 topo_.get_thread_affinity_mask_from_lva(
                                     reinterpret_cast<hpx::naming::address_type>(&val));
 
@@ -104,7 +104,7 @@ namespace hpx { namespace parallel { namespace util
                                 executor_type> traits;
 
                             std::size_t thread_num = hpx::get_worker_thread_num();
-                            hpx::threads::mask_cref_type thread_mask =
+                            hpx::threads::mask_type thread_mask =
                                 traits::get_pu_mask(executors_[i], topo_, thread_num);
 
                             HPX_ASSERT(mem_mask & thread_mask);

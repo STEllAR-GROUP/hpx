@@ -225,7 +225,7 @@ namespace hpx { namespace threads
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_cref_type hwloc_topology::get_machine_affinity_mask(
+    mask_type hwloc_topology::get_machine_affinity_mask(
         error_code& ec
         ) const
     {
@@ -235,7 +235,7 @@ namespace hpx { namespace threads
         return machine_affinity_mask_;
     }
 
-    mask_cref_type hwloc_topology::get_socket_affinity_mask(
+    mask_type hwloc_topology::get_socket_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -259,7 +259,7 @@ namespace hpx { namespace threads
         return empty_mask;
     } // }}}
 
-    mask_cref_type hwloc_topology::get_numa_node_affinity_mask(
+    mask_type hwloc_topology::get_numa_node_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -283,7 +283,7 @@ namespace hpx { namespace threads
         return empty_mask;
     } // }}}
 
-    mask_cref_type hwloc_topology::get_core_affinity_mask(
+    mask_type hwloc_topology::get_core_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -307,7 +307,7 @@ namespace hpx { namespace threads
         return empty_mask;
     }
 
-    mask_cref_type hwloc_topology::get_thread_affinity_mask(
+    mask_type hwloc_topology::get_thread_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -411,7 +411,7 @@ namespace hpx { namespace threads
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_cref_type hwloc_topology::get_thread_affinity_mask_from_lva(
+    mask_type hwloc_topology::get_thread_affinity_mask_from_lva(
         naming::address::address_type lva
       , error_code& ec
         ) const

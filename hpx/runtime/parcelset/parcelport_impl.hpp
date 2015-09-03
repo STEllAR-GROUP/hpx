@@ -294,10 +294,8 @@ namespace hpx { namespace parcelset
 
         bool do_background_work(std::size_t num_thread)
         {
-            bool did_some_work = false;
-            did_some_work = do_background_work_impl<ConnectionHandler>(num_thread);
             trigger_pending_work();
-            return did_some_work;
+            return do_background_work_impl<ConnectionHandler>(num_thread);
         }
 
         /// support enable_shared_from_this
@@ -746,7 +744,7 @@ namespace hpx { namespace parcelset
             locality const& locality_id, bool background = false)
         {
             // repeat until no more parcels are to be sent
-            while (!hpx::is_stopped())
+//             while (!hpx::is_stopped())
             {
                 std::vector<parcel> parcels;
                 std::vector<write_handler_type> handlers;
@@ -754,7 +752,7 @@ namespace hpx { namespace parcelset
 
                 if(!dequeue_parcels(locality_id, parcels, handlers, new_gids))
                 {
-                    break;
+                    return;
                 }
 
                 // If one of the sending threads are in suspended state, we
@@ -779,7 +777,7 @@ namespace hpx { namespace parcelset
                 }
 
                 // send parcels if they didn't get sent by another connection
-                if (!hpx::is_starting() && threads::get_self_ptr() == 0)
+                if (!hpx::is_starting())
                 {
                     // Re-schedule if this is not executed by an HPX thread
                     hpx::applier::register_thread_nullary(
@@ -809,8 +807,8 @@ namespace hpx { namespace parcelset
                 // We yield here for a short amount of time to give another
                 // HPX thread the chance to put a subsequent parcel which
                 // leads to a more effective parcel buffering
-                if (hpx::threads::get_self_ptr())
-                    hpx::this_thread::yield();
+//                 if (hpx::threads::get_self_ptr())
+//                     hpx::this_thread::yield();
             }
         }
 
@@ -924,8 +922,11 @@ namespace hpx { namespace parcelset
 
             std::size_t num_thread(0);
             if(threads::get_self_ptr())
+            {
                 num_thread = hpx::get_worker_thread_num();
-            do_background_work_impl<ConnectionHandler>(num_thread);
+                while(do_background_work(num_thread))
+                    ;
+            }
         }
 
     public:
