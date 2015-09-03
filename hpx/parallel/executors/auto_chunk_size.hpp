@@ -60,7 +60,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         std::size_t get_chunk_size(Executor& exec, F && f, std::size_t count)
         {
             std::size_t const cores =
-                executor_traits<Executor>::os_thread_count(exec);
+                executor_traits<Executor>::processing_units_count(exec, *this);
 
             if (count > 100*cores)
             {

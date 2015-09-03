@@ -297,7 +297,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     = &receiver::handle_write_ack<Handler>;
 
                 // decode the received parcels.
-                decode_parcel(parcelport_, std::move(buffer_));
+                decode_parcels(parcelport_, std::move(buffer_));
                 buffer_ = parcel_buffer_type();
 
                 ack_ = true;

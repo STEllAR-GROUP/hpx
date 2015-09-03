@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,13 +6,15 @@
 
 // Multi latency network test
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/runtime/serialization/serialize_buffer.hpp>
+#include <hpx/include/serialization.hpp>
+#include <hpx/include/parallel_for_each.hpp>
+#include <hpx/include/util.hpp>
 
-#include <boost/assert.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/range/irange.hpp>
+
+#include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define LOOP_SMALL  10000
@@ -65,7 +67,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
 
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
-    BOOST_ASSERT(align_size <= MAX_ALIGNMENT);
+    HPX_ASSERT(align_size <= MAX_ALIGNMENT);
 
     char* aligned_send_buffer = align_buffer(send_buffer, align_size);
     std::memset(aligned_send_buffer, 'a', size);
@@ -79,16 +81,19 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
             t.restart();
 
         typedef hpx::serialization::serialize_buffer<char> buffer_type;
-        std::vector<hpx::future<buffer_type> > send_futures;
-        send_futures.reserve(window_size);
-        for(std::size_t j = 0; j < window_size; ++j)
-        {
-            send_futures.push_back(
-                hpx::async(send, dest, buffer_type(aligned_send_buffer, size,
-                    buffer_type::reference))
-            );
-        }
-        hpx::wait_all(send_futures);
+
+        using hpx::parallel::for_each;
+        using hpx::parallel::par;
+
+        std::size_t const start = 0;
+
+        auto range = boost::irange(start, window_size);
+        for_each(par, boost::begin(range), boost::end(range),
+            [&](boost::uint64_t j)
+            {
+                send(dest, buffer_type(aligned_send_buffer, size,
+                        buffer_type::reference));
+            });
     }
 
     double elapsed = t.elapsed();
@@ -100,15 +105,15 @@ HPX_PLAIN_ACTION(ireceive);
 void print_header()
 {
     hpx::cout << "# OSU HPX Multi Latency Test\n"
-              << "# Size    Latency (microsec)\n"
-              << hpx::flush;
+              << "# Size    Latency (microsec)"
+              << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void run_benchmark(boost::program_options::variables_map & vm)
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-
+    std::size_t window_size = vm["window-size"].as<std::size_t>();
     std::size_t pairs = localities.size() / 2;
 
     for (std::size_t size = 1; size <= MAX_MSG_SIZE; size *= 2)
@@ -128,16 +133,15 @@ void run_benchmark(boost::program_options::variables_map & vm)
 
             benchmarks.push_back(hpx::async(receive,
                 localities[locality_id], localities[partner], size,
-                vm["window-size"].as<std::size_t>()));
+                window_size));
         }
 
-        double total_latency = 0;
-
-        hpx::wait_all(benchmarks);
-        for (hpx::future<double>& f : benchmarks)
-        {
-            total_latency += f.get();
-        }
+        double total_latency = std::accumulate(
+            benchmarks.begin(), benchmarks.end(), 0.0,
+            [](double sum, hpx::future<double>& f)
+            {
+                return sum + f.get();
+            });
 
         hpx::cout << std::left << std::setw(10) << size
                   << total_latency / (2. * pairs)

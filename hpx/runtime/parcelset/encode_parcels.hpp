@@ -124,10 +124,10 @@ namespace hpx
             }
         }
 
-        template <typename Buffer>
+        template <typename Buffer, typename NewGids>
         std::size_t
         encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
-            int archive_flags_, boost::uint64_t max_outbound_size)
+            int archive_flags_, boost::uint64_t max_outbound_size, NewGids new_gids)
         {
             HPX_ASSERT(buffer.data_.empty());
             // collect argument sizes from parcels
@@ -180,7 +180,8 @@ namespace hpx
                           , archive_flags
                           , dest_locality_id
                           , &buffer.chunks_
-                          , filter.get());
+                          , filter.get()
+                          , new_gids);
 
                         if(num_parcels != std::size_t(-1))
                             archive << parcels_sent; //-V128

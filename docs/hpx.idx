@@ -19,11 +19,11 @@ find_all_localities                   "" "hpx\.find_all_localities.*"
 find_remote_localities                "" "hpx\.find_remote_localities.*"
 find_locality                         "" "hpx\.find_locality.*"
 
-find_all_ids_from_basename            "" "hpx\.find_all_ids_from_basename.*"
-find_ids_from_basename                "" "hpx\.find_ids_from_basename.*"
-find_id_from_basename                 "" "hpx\.find_id_from_basename.*"
-register_id_with_basename             "" "hpx\.register_id_with_basename.*"
-unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
+# hpx/runtime/basename_registration.hpp
+find_all_from_basename                "" "hpx\.find_all_from_basename.*"
+find_from_basename                    "" "hpx\.find_from_basenam_id.*"
+register_with_basename                "" "hpx\.register_with_bas_id.*"
+unregister_with_basename              "" "hpx\.unregister_with_basename.*"
 
 get_num_localities_sync               "" "hpx\.get_num_localitie_id.*"
 get_num_localities                    "" "hpx\.get_num_localitie_id.*"
@@ -45,13 +45,16 @@ is_stopped_or_shutting_down           "" "hpx\.is_stopped_or_shutting_down.*"
 
 get_worker_thread_num                 "" "hpx\.get_worker_thread_num.*"
 get_thread_name                       "" "hpx\.get_thread_name.*"
-get_locality_name                     "" "hpx\.get_locality_name.*"
 get_num_worker_threads                "" "hpx\.get_num_worker_threads.*"
+
+# hpx/runtime/get_locality_name.hpp
+get_locality_name                     "" "hpx\.get_locality_name.*"
 
 get_system_uptime                     "" "hpx\.get_system_uptime.*"
 get_colocation_id                     "" "hpx\.get_colocation_id.*"
 get_colocation_id_sync                "" "hpx\.get_colocation_id_sync.*"
 
+# hpx/runtime/trigger_lco.hpp
 trigger_lco_event                     "" "hpx\.trigger_lco_event.*"
 set_lco_event                         "" "hpx\.set_lco_event.*"
 set_lco_value                         "" "hpx\.set_lco_value.*"
@@ -62,6 +65,7 @@ reset_active_counters                 "" "hpx\.reset_active_counters.*"
 stop_active_counters                  "" "hpx\.stop_active_counters.*"
 evaluate_active_counters              "" "hpx\.evaluate_active_counters.*"
 
+# hpx/runtime/set_parcel_write_handler.hpp
 set_parcel_write_handler              "" "hpx\.set_parcel_write_.*"
 parcel_write_handler_type             "" "hpx\.parcel_write_hand.*"
 
@@ -392,7 +396,7 @@ task_region_not_active                "" "hpx\.error"
 unmanaged                             "" "header\.hpx\.runtime\.naming\.unmanaged.*"
 
 # hpx/runtime/get_ptr.hpp
-get_ptr                               "" "hpx\.get_ptr.*"
+get_ptr                               "" "hpx\.runtime\.get_ptr.*"
 
 # hpx/lcos/broadcast.hpp
 broadcast                             "" "header\.hpx\.lcos\.broadcast.*"

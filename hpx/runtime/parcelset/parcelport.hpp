@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -27,6 +27,12 @@
 #include <deque>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
+#elif defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40900
+#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace agas
@@ -357,7 +363,21 @@ namespace hpx { namespace parcelset
         hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
-        typedef std::pair<std::deque<parcel>, std::deque<write_handler_type> >
+        typedef std::list<naming::gid_type> new_gids_type;
+        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
+        typedef util::tuple<
+            boost::shared_ptr<std::vector<parcel> >
+          , std::vector<write_handler_type>
+          , new_gids_map
+        >
+#else
+        typedef util::tuple<
+            std::vector<parcel>
+          , std::vector<write_handler_type>
+          , new_gids_map
+        >
+#endif
             map_second_type;
         typedef std::map<locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;

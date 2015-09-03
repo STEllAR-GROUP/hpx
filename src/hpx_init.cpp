@@ -1106,6 +1106,14 @@ namespace hpx
 #endif
 
             try {
+                // make sure the runtime system is not active yet
+                if (get_runtime_ptr() != 0)
+                {
+                    std::cerr << "hpx::init: can't initialize runtime system "
+                        "more than once! Exiting...\n";
+                    return -1;
+                }
+
                 // handle all common command line switches
                 util::command_line_handling cfg(mode, f, ini_config, argv[0]);
 

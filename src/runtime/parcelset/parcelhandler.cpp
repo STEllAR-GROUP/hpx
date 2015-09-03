@@ -345,12 +345,14 @@ namespace hpx { namespace parcelset
         void parcel_sent_handler(parcelhandler::write_handler_type f,
             boost::system::error_code const & ec, parcel const & p)
         {
-            // invoke the original handler
-            f(ec, p);
-
             // inform termination detection of a sent message
             if (!p.does_termination_detection())
+            {
                 hpx::detail::dijkstra_make_black();
+            }
+
+            // invoke the original handler
+            f(ec, p);
         }
     }
 

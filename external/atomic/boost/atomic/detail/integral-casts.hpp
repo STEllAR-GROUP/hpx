@@ -391,7 +391,7 @@ protected:
     }
 };
 
-#elif BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) &&
+#elif BOOST_MSVC >= 1500 && (defined(_M_IA64) || defined(_M_AMD64)) && \
       defined(BOOST_ATOMIC_HAVE_SSE2)
 
 #define BOOST_ATOMIC_HAVE_128BIT_SUPPORT

@@ -399,7 +399,7 @@ response symbol_namespace::bind(
                 // split the credit as the receiving end will expect to keep the
                 // object alive
                 naming::gid_type new_gid =
-                    naming::detail::split_gid_if_needed(*current_gid);
+                    naming::detail::split_gid_if_needed(*current_gid).get();
 
                 // trigger the lco
                 set_lco_value(id, new_gid);
@@ -453,7 +453,7 @@ response symbol_namespace::resolve(
     boost::shared_ptr<naming::gid_type> current_gid(it->second);
 
     l.unlock();
-    naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid);
+    naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid).get();
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::resolve, key(%1%), gid(%2%)")
@@ -567,7 +567,7 @@ response symbol_namespace::on_event(
             {
                 util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 naming::gid_type new_gid = naming::detail::split_gid_if_needed(
-                    *current_gid);
+                    *current_gid).get();
 
                 // trigger the lco
                 handled = true;

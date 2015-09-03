@@ -109,7 +109,7 @@ namespace hpx { namespace lcos
             char const* basename, std::size_t site)
         {
             hpx::id_type target = id.get();
-            hpx::register_id_with_basename(basename, target, site);
+            hpx::register_with_basename(basename, target, site);
             return target;
         }
 
@@ -216,7 +216,7 @@ namespace hpx { namespace lcos
             this_site = hpx::get_locality_id();
 
         return gather_there(
-            hpx::find_id_from_basename(basename, root_site),
+            hpx::find_from_basename(basename, root_site),
             std::move(result), this_site);
     }
 }}
