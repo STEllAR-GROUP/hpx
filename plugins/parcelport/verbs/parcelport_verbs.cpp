@@ -29,6 +29,8 @@
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
+#include <hpx/runtime/serialization/detail/future_await_container.hpp>
+#include <hpx/runtime/parcelset/parcelport_impl.hpp>
 
 // Local parcelport plugin
 #include "connection_handler_verbs.hpp"
@@ -982,8 +984,52 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 }
             }
 
+            {
+                LOG_DEBUG_MSG("Extracting futures from parcel");
+                boost::shared_ptr<hpx::serialization::detail::future_await_container>
+                    future_await(new hpx::serialization::detail::future_await_container());
+                boost::shared_ptr<hpx::serialization::output_archive>
+                    archive(
+                        new hpx::serialization::output_archive(
+                            *future_await, 0, 0, 0, 0, &future_await->new_gids_)
+                    );
+                (*archive) << p;
+
+                if(future_await->has_futures())
+                {
+                    void (parcelport::*awaiter)(
+                      parcelset::locality const &, parcel, write_handler_type, bool
+                      , boost::shared_ptr<hpx::serialization::output_archive> const &
+                      , boost::shared_ptr<
+                            hpx::serialization::detail::future_await_container> const &
+                    )
+                        = &parcelport::put_parcel_impl;
+                    (*future_await)(
+                        util::bind(
+                            util::one_shot(awaiter), this,
+                            dest, std::move(p), std::move(f), true,
+                            archive, future_await)
+                    );
+                    return;
+                }
+                else
+                {
+                    LOG_DEBUG_MSG("About to send parcel");
+                    put_parcel_impl(dest, std::move(p), std::move(f), true,
+                      archive, future_await);
+                }
+            }
+        }
+
+        void put_parcel_impl(
+            parcelset::locality const & dest, parcel p, write_handler_type f, bool trigger
+          , boost::shared_ptr<hpx::serialization::output_archive> const & archive
+          , boost::shared_ptr<
+                hpx::serialization::detail::future_await_container
+            > const & future_await)
+        {
             boost::uint32_t dest_ip = dest.get<locality>().ip_;
-            LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " put_parcel to " << ipaddress(dest_ip) );
+            LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " put_parcel_impl to " << ipaddress(dest_ip) );
 
             // @TODO, don't need smartpointers here, remove them as they waste an atomic refcount
             RdmaClientPtr client;
@@ -1018,22 +1064,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             }
 
             // connection ok, we can now send required info to the remote peer
+
+            // the send buffer is created with our allocator and will get memory from our pool
+            // - disable deallocation so that we can manage the block lifetime better
+            // @TODO, integrate the pointer wrapper and allocators better into parcel_buffer
+            allocator_type alloc(*chunk_pool_.get());
+            alloc.disable_deallocate = true;
+            snd_buffer_type buffer(alloc);
+            util::high_resolution_timer timer;
+//            buffer.data_point_.time_ = timer.elapsed_nanoseconds();
+
+
+            // encode the parcel directly into an rdma pinned memory block
+             LOG_DEBUG_MSG("Encoding parcel");
+             encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, chunk_pool_->default_chunk_size(), &future_await->new_gids_);
+             buffer.data_point_.time_ = timer.elapsed_nanoseconds();
+             LOG_DEBUG_MSG("Encoded parcel in " << buffer.data_point_.time_ << "ns");
+
+            // if the serialization overflows the block, panic and rewrite this.
             {
-                util::high_resolution_timer timer;
-
-                // the send buffer is created with our allocator and will get memory from our pool
-                // - disable deallocation so that we can manage the block lifetime better
-                // @TODO, integrate the pointer wrapper and allocators better into parcel_buffer
-                allocator_type alloc(*chunk_pool_.get());
-                alloc.disable_deallocate = true;
-                snd_buffer_type buffer(alloc);
-
-                // encode the parcel directly into an rdma pinned memory block
-                // if the serialization overflows the block, panic and rewrite this.
-                LOG_DEBUG_MSG("Encoding parcel");
-                encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, chunk_pool_->default_chunk_size());
-                buffer.data_point_.time_ = timer.elapsed_nanoseconds();
-
                 // create a tag, needs to be unique per client
                 uint32_t tag = tag_provider_.next(dest_ip);
                 LOG_DEBUG_MSG("Generated tag " << hexuint32(tag) << " from " << hexuint32(dest_ip));
