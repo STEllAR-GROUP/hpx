@@ -18,8 +18,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     template <int SIZE>
     struct header
     {
-        typedef uint32_t value_type;
-        typedef char     flag_type;
+        typedef int  value_type;
+        typedef char flag_type;
         enum data_pos
         {
             pos_tag               = 0 * sizeof(value_type),
