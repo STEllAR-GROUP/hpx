@@ -51,7 +51,7 @@
 
 #define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_DEFAULT_MEMORY_POOL_CHUNK_SIZE
 #define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
-
+//#define USE_SPECIALIZED_SCHEDULER
 using namespace hpx::parcelset::policies;
 
 namespace hpx { namespace parcelset { namespace policies { namespace verbs
@@ -262,8 +262,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         verbs::tag_provider       tag_provider_;
         std::atomic_flag          connection_started;
 
+#ifdef USE_SPECIALIZED_SCHEDULER
         custom_scheduler          parcelport_scheduler;
-
+#endif
         // performance_counters::parcels::gatherer& parcels_sent_;
 
         // ----------------------------------------------------------------------------------------------
@@ -910,6 +911,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             auto completion_function = std::bind( &parcelport::handle_verbs_completion, this, std::placeholders::_1, std::placeholders::_2);
             _rdmaController->setCompletionFunction(completion_function);
 
+#ifdef USE_SPECIALIZED_SCHEDULER
             // initialize our custom scheduler
             parcelport_scheduler.init();
 
@@ -923,6 +925,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
             FUNC_END_DEBUG_MSG;
             return ec ? false : true;
+#else
+            return true;
+#endif
 
         }
 

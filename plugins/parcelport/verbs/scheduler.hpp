@@ -55,8 +55,7 @@ public:
     notifier_(get_runtime().get_notification_policy("custom-pool")),
     pool_(scheduler_, notifier_, "custom-pool")
   {
-    //        LOG_DEBUG_MSG("Creating custom scheduler");
-    std::cout << "Creating custom scheduler" << std::endl;;
+    LOG_DEBUG_MSG("Creating custom scheduler");
   }
 
   //----------------------------------------------------------------------------
