@@ -53,9 +53,17 @@ hpx_option(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE STRING
   "Number of bytes a chunk in the memory pool can hold (default: 4K)" 
   "4096" CATEGORY "Parcelport" ADVANCED)
   
-hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING 
-  "Maximum number of chunks that can be allocated (default: 16)" 
+hpx_option(HPX_PARCELPORT_VERBS_DEFAULT_MEMORY_CHUNKS STRING 
+  "The number of chunks that can are allocated initially (default: 64)" 
   "64" CATEGORY "Parcelport" ADVANCED)
+
+hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING 
+  "Maximum number of chunks that can be allocated (default: 128)" 
+  "128" CATEGORY "Parcelport" ADVANCED)
+
+hpx_option(HPX_PARCELPORT_VERBS_MAX_PREPOSTS STRING 
+  "The number of pre-posted receive buffers (default: 32)" 
+  "32" CATEGORY "Parcelport" ADVANCED)
 
   hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS)
 #  hpx_add_config_define(HPX_PARCELPORT_VERBS_IFNAME "\"${HPX_PARCELPORT_VERBS_IFNAME}\"")
@@ -63,7 +71,10 @@ hpx_option(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING
   hpx_add_config_define(HPX_PARCELPORT_VERBS_INTERFACE "\"${HPX_PARCELPORT_VERBS_INTERFACE}\"")
   hpx_add_config_define(HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD "${HPX_PARCELPORT_VERBS_MESSAGE_PAYLOAD}")
   hpx_add_config_define(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE "${HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE}")
+  hpx_add_config_define(HPX_PARCELPORT_VERBS_DEFAULT_MEMORY_CHUNKS "${HPX_PARCELPORT_VERBS_DEFAULT_MEMORY_CHUNKS}")
   hpx_add_config_define(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS "${HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS}")
+  hpx_add_config_define(HPX_PARCELPORT_VERBS_MAX_PREPOSTS "${HPX_PARCELPORT_VERBS_MAX_PREPOSTS}")
+
 
   if(HPX_PARCELPORT_VERBS_INTERFACE MATCHES "roq")
     message(WARNING "The roq interface on BGQ IO nodes does not support immediate data, disabling it")

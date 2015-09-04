@@ -49,7 +49,7 @@
 #include <mutex>
 #include <condition_variable>
 
-#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
+#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_DEFAULT_MEMORY_POOL_CHUNK_SIZE
 #define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
 
 using namespace hpx::parcelset::policies;
@@ -231,7 +231,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
         // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a more consistent
         // reuse of classes/types
-        typedef header<DEFAULT_MEMORY_POOL_CHUNK_SIZE>  header_type;
+        typedef header<RDMA_DEFAULT_MEMORY_POOL_CHUNK_SIZE>  header_type;
         typedef hpx::lcos::local::spinlock              mutex_type;
         typedef hpx::lcos::local::spinlock::scoped_lock scoped_lock;
         typedef hpx::lcos::local::condition_variable    condition_type;
@@ -571,8 +571,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     for (serialization::serialization_chunk &c : recv_data.chunks) {
                         if (c.type_ == serialization::chunk_type_pointer) {
                             RdmaMemoryRegion *get_region;
-                            if (c.size_<=DEFAULT_MEMORY_POOL_CHUNK_SIZE) {
-                                get_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
+                            if (c.size_<=RDMA_DEFAULT_MEMORY_POOL_CHUNK_SIZE) {
+                                get_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)RDMA_DEFAULT_MEMORY_POOL_CHUNK_SIZE));
                             }
                             else {
                                 get_region = chunk_pool_->AllocateTemporaryBlock(c.size_);
@@ -1134,7 +1134,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                         util::high_resolution_timer regtimer;
                         RdmaMemoryRegion *zero_copy_region;
                         if (c.size_<=HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD) {
-                            zero_copy_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
+                            zero_copy_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)RDMA_DEFAULT_MEMORY_POOL_CHUNK_SIZE));
                             char *zero_copy_memory = (char*)(zero_copy_region->getAddress());
                             std::memcpy(zero_copy_memory, c.data_.cpos_, c.size_);
                             // the pointer in the chunk info must be changed
@@ -1144,7 +1144,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                         else {
                             // create a memory region from the pointer
                             zero_copy_region = new RdmaMemoryRegion(
-                                    _rdmaController->getProtectionDomain(), c.data_.cpos_, std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
+                                    _rdmaController->getProtectionDomain(), c.data_.cpos_, std::max(c.size_, (std::size_t)RDMA_DEFAULT_MEMORY_POOL_CHUNK_SIZE));
                             LOG_DEBUG_MSG("Time to register memory (ns) " << decnumber(regtimer.elapsed_nanoseconds()));
                         }
                         c.rkey_  = zero_copy_region->getRemoteKey();
