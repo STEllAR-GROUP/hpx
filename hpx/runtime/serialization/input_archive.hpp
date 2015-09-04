@@ -224,39 +224,34 @@ namespace hpx { namespace serialization
             return size_;
         }
 
-        void register_pointer(boost::uint64_t pos, detail::ptr_helper_ptr helper)
+    private:
+        // make functions visible through adl
+        friend void register_pointer(input_archive& ar,
+                boost::uint64_t pos, detail::ptr_helper_ptr helper)
         {
-            HPX_ASSERT(pointer_tracker_.find(pos) == pointer_tracker_.end());
+            pointer_tracker& tracker = ar.pointer_tracker_;
+            HPX_ASSERT(tracker.find(pos) == tracker.end());
 
-            pointer_tracker_.insert(std::make_pair(pos, std::move(helper)));
+            tracker.insert(std::make_pair(pos, std::move(helper)));
         }
 
         template <typename Helper>
-        Helper & tracked_pointer(boost::uint64_t pos)
+        friend Helper & tracked_pointer(input_archive& ar, boost::uint64_t pos)
         {
-            pointer_tracker::iterator it = pointer_tracker_.find(pos);
-            HPX_ASSERT(it != pointer_tracker_.end());
+#ifdef BOOST_GCC
+            std::map<boost::uint64_t, detail::ptr_helper_ptr>::iterator
+#else
+            pointer_tracker::iterator
+#endif
+                it = ar.pointer_tracker_.find(pos);
+            HPX_ASSERT(it != ar.pointer_tracker_.end());
 
             return static_cast<Helper &>(*it->second);
         }
 
-    private:
         std::unique_ptr<erased_input_container> buffer_;
         pointer_tracker pointer_tracker_;
     };
-
-    BOOST_FORCEINLINE
-    void register_pointer(input_archive & ar, boost::uint64_t pos,
-        detail::ptr_helper_ptr helper)
-    {
-        ar.register_pointer(pos, std::move(helper));
-    }
-
-    template <typename Helper>
-    Helper & tracked_pointer(input_archive & ar, boost::uint64_t pos)
-    {
-        return ar.tracked_pointer<Helper>(pos);
-    }
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

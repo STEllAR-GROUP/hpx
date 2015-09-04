@@ -32,7 +32,6 @@ namespace hpx { namespace serialization
       : basic_archive<output_archive>
     {
         typedef basic_archive<output_archive> base_type;
-        typedef std::map<const void *, boost::uint64_t> pointer_tracker;
 
         typedef std::list<naming::gid_type> new_gids_type;
         typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
@@ -235,17 +234,6 @@ namespace hpx { namespace serialization
               buffer_->save_binary_chunk(address, count);
         }
 
-        boost::uint64_t track_pointer(const void * p)
-        {
-            pointer_tracker::iterator it = pointer_tracker_.find(p);
-            if(it == pointer_tracker_.end())
-            {
-                pointer_tracker_.insert(std::make_pair(p, size_));
-                return npos;
-            }
-            return it->second;
-        }
-
         boost::uint32_t get_dest_locality_id() const
         {
             return dest_locality_id_;
@@ -261,17 +249,25 @@ namespace hpx { namespace serialization
         naming::gid_type get_new_gid(naming::gid_type const & gid);
 
     private:
+        typedef std::map<const void *, boost::uint64_t> pointer_tracker;
+        // make this function capable for ADL lookup and hence if used as a dependent name
+        // it doesn't require output_archive to be complete type or itself to be fwded
+        friend boost::uint64_t track_pointer(output_archive& ar, const void* pos)
+        {
+            pointer_tracker::iterator it = ar.pointer_tracker_.find(pos);
+            if(it == ar.pointer_tracker_.end())
+            {
+                ar.pointer_tracker_.insert(std::make_pair(pos, ar.size_));
+                return npos;
+            }
+            return it->second;
+        }
+
         std::unique_ptr<erased_output_container> buffer_;
         pointer_tracker pointer_tracker_;
         boost::uint32_t dest_locality_id_;
         new_gids_map * new_gids_;
     };
-
-    BOOST_FORCEINLINE
-    boost::uint64_t track_pointer(output_archive & ar, const void * pos)
-    {
-        return ar.track_pointer(pos);
-    }
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
