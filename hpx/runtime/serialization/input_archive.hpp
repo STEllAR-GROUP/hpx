@@ -87,6 +87,50 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
+        typename boost::enable_if<
+            boost::mpl::or_<
+                boost::is_integral<T>
+              , boost::is_enum<T>
+            >
+        >::type
+        load(T & t)
+        {
+            load_integral(t,
+                typename boost::is_unsigned<T>::type());
+        }
+
+        void load(float & f)
+        {
+            load_binary(&f, sizeof(float));
+        }
+
+        void load(double & d)
+        {
+            load_binary(&d, sizeof(double));
+        }
+
+        void load(char & c)
+        {
+            load_binary(&c, sizeof(char));
+        }
+
+        void load(bool & b)
+        {
+            load_binary(&b, sizeof(bool));
+            HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
+        }
+
+        std::size_t bytes_read() const
+        {
+            return size_;
+        }
+
+    private:
+        friend base_type;
+        template <class T>
+        friend class array;
+
+        template <typename T>
         void load_bitwise(T & t, boost::mpl::false_)
         {
             load_nonintrusively_polymorphic(t,
@@ -121,19 +165,6 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        typename boost::enable_if<
-            boost::mpl::or_<
-                boost::is_integral<T>
-              , boost::is_enum<T>
-            >
-        >::type
-        load(T & t)
-        {
-            load_integral(t,
-                typename boost::is_unsigned<T>::type());
-        }
-
-        template <typename T>
         void load_integral(T & val, boost::mpl::false_)
         {
             boost::int64_t l;
@@ -160,28 +191,6 @@ namespace hpx { namespace serialization
             load_integral_impl(t);
         }
 #endif
-
-        void load(float & f)
-        {
-            load_binary(&f, sizeof(float));
-        }
-
-        void load(double & d)
-        {
-            load_binary(&d, sizeof(double));
-        }
-
-        void load(char & c)
-        {
-            load_binary(&c, sizeof(char));
-        }
-
-        void load(bool & b)
-        {
-            load_binary(&b, sizeof(bool));
-            HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
-        }
-
         template <class Promoted>
         void load_integral_impl(Promoted& l)
         {
@@ -219,12 +228,6 @@ namespace hpx { namespace serialization
             size_ += count;
         }
 
-        std::size_t bytes_read() const
-        {
-            return size_;
-        }
-
-    private:
         // make functions visible through adl
         friend void register_pointer(input_archive& ar,
                 boost::uint64_t pos, detail::ptr_helper_ptr helper)

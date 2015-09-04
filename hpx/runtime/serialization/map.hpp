@@ -47,7 +47,7 @@ namespace hpx
             void load_pair_impl(input_archive& ar, std::pair<Key, Value>& t,
                 boost::mpl::true_)
             {
-                if (!has_array_optimization(ar))
+                if (ar.disable_array_optimization())
                     load_pair_impl(ar, t, boost::mpl::false_());
                 else
                     load_binary(ar, &t, sizeof(std::pair<Key, Value>));
@@ -65,7 +65,7 @@ namespace hpx
             void save_pair_impl(output_archive& ar, std::pair<Key, Value>& t,
                 boost::mpl::true_)
             {
-                if (!has_array_optimization(ar))
+                if (ar.disable_array_optimization())
                     save_pair_impl(ar, t, boost::mpl::false_());
                 else
                     save_binary(ar, &t, sizeof(std::pair<Key, Value>));

@@ -88,6 +88,25 @@ namespace hpx { namespace serialization
                 *hpx::traits::future_access<Future>::get_shared_state(f));
         }
 
+        boost::uint32_t get_dest_locality_id() const
+        {
+            return dest_locality_id_;
+        }
+
+        std::size_t bytes_written() const
+        {
+            return size_;
+        }
+
+        void add_gid(naming::gid_type const & gid, naming::gid_type const & splitted_gid);
+
+        naming::gid_type get_new_gid(naming::gid_type const & gid);
+
+    private:
+        friend base_type;
+        template <class T>
+        friend class array;
+
         template <typename T>
         void invoke_impl(T const & t)
         {
@@ -105,6 +124,40 @@ namespace hpx { namespace serialization
         {
             save_bitwise(t,
                 typename hpx::traits::is_bitwise_serializable<T>::type());
+        }
+
+        template <typename T>
+        typename boost::enable_if<
+            boost::mpl::or_<
+                boost::is_integral<T>
+              , boost::is_enum<T>
+            >
+        >::type
+        save(T t)
+        {
+            save_integral(t,
+                typename boost::is_unsigned<T>::type());
+        }
+
+        void save(float f)
+        {
+            save_binary(&f, sizeof(float));
+        }
+
+        void save(double d)
+        {
+            save_binary(&d, sizeof(double));
+        }
+
+        void save(char c)
+        {
+            save_binary(&c, sizeof(char));
+        }
+
+        void save(bool b)
+        {
+            HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
+            save_binary(&b, sizeof(bool));
         }
 
         template <typename T>
@@ -144,19 +197,6 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        typename boost::enable_if<
-            boost::mpl::or_<
-                boost::is_integral<T>
-              , boost::is_enum<T>
-            >
-        >::type
-        save(T t)
-        {
-            save_integral(t,
-                typename boost::is_unsigned<T>::type());
-        }
-
-        template <typename T>
         void save_integral(T val, boost::mpl::false_)
         {
             save_integral_impl(static_cast<boost::int64_t>(val));
@@ -179,27 +219,6 @@ namespace hpx { namespace serialization
             save_integral_impl(t);
         }
 #endif
-
-        void save(float f)
-        {
-            save_binary(&f, sizeof(float));
-        }
-
-        void save(double d)
-        {
-            save_binary(&d, sizeof(double));
-        }
-
-        void save(char c)
-        {
-            save_binary(&c, sizeof(char));
-        }
-
-        void save(bool b)
-        {
-            HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
-            save_binary(&b, sizeof(bool));
-        }
 
         template <class Promoted>
         void save_integral_impl(Promoted l)
@@ -234,21 +253,6 @@ namespace hpx { namespace serialization
               buffer_->save_binary_chunk(address, count);
         }
 
-        boost::uint32_t get_dest_locality_id() const
-        {
-            return dest_locality_id_;
-        }
-
-        std::size_t bytes_written() const
-        {
-            return size_;
-        }
-
-        void add_gid(naming::gid_type const & gid, naming::gid_type const & splitted_gid);
-
-        naming::gid_type get_new_gid(naming::gid_type const & gid);
-
-    private:
         typedef std::map<const void *, boost::uint64_t> pointer_tracker;
         // make this function capable for ADL lookup and hence if used as a dependent name
         // it doesn't require output_archive to be complete type or itself to be fwded
