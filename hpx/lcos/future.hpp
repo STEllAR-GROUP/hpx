@@ -1294,7 +1294,7 @@ namespace hpx { namespace actions
         {
             // serialize function
             bool have_function = false;
-            ar.load(have_function);
+            ar >> have_function;
             if (have_function)
                 ar >> f_;
         }
@@ -1302,7 +1302,7 @@ namespace hpx { namespace actions
         {
             // serialize function
             bool have_function = !f_.empty();
-            ar.save(have_function);
+            ar << have_function;
             if (have_function)
                 ar << f_;
         }
@@ -1411,7 +1411,7 @@ namespace hpx { namespace actions
         {
             // serialize function
             bool have_function = false;
-            ar.load(have_function);
+            ar >> have_function;
             if (have_function)
                 ar >> f_;
         }
@@ -1419,7 +1419,7 @@ namespace hpx { namespace actions
         {
             // serialize function
             bool have_function = !f_.empty();
-            ar.save(have_function);
+            ar << have_function;
             if (have_function)
                 ar << f_;
         }
@@ -1526,7 +1526,7 @@ namespace hpx { namespace actions
         {
             // serialize function
             bool have_function = false;
-            ar.load(have_function);
+            ar >> have_function;
             if (have_function)
                 ar >> f_;
         }
@@ -1534,7 +1534,7 @@ namespace hpx { namespace actions
         {
             // serialize function
             bool have_function = !f_.empty();
-            ar.save(have_function);
+            ar << have_function;
             if (have_function)
                 ar << f_;
         }
@@ -1643,7 +1643,7 @@ namespace hpx { namespace actions
         {
             // serialize function
             bool have_function = false;
-            ar.load(have_function);
+            ar >> have_function;
             if (have_function)
                 ar >> f_;
         }
@@ -1651,7 +1651,7 @@ namespace hpx { namespace actions
         {
             // serialize function
             bool have_function = !f_.empty();
-            ar.save(have_function);
+            ar << have_function;
             if (have_function)
                 ar << f_;
         }
