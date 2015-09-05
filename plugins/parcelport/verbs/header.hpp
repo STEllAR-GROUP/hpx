@@ -1,11 +1,12 @@
 //  Copyright (c) 2013-2014 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Thomas Heller
+//  Copyright (c)      2015 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_HEADER_HPP
-#define HPX_PARCELSET_POLICIES_HEADER_HPP
+#ifndef HPX_PARCELSET_POLICIES_VERBS_HEADER_HPP
+#define HPX_PARCELSET_POLICIES_VERBS_HEADER_HPP
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 
@@ -13,7 +14,10 @@
 
 #include <boost/array.hpp>
 
-namespace hpx { namespace parcelset { namespace policies { namespace mpi
+// A generic header structure that can be used by parcelports
+// currently, the mpi and verbs parcelports make use of it
+namespace hpx { namespace parcelset {
+namespace policies { namespace verbs
 {
     template <int SIZE>
     struct header
@@ -172,8 +176,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
     };
 
-}}}
-
-#endif
+}}}}
 
 #endif

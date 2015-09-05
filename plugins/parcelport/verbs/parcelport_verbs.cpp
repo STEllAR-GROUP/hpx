@@ -1,6 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
-//  Copyright (c) 2014-2015 Thomas Heller
-//  Copyright (c) 2015      John Biddiscombe
+//  Copyright (c) 2015 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,15 +27,23 @@
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
-#include <hpx/runtime/serialization/detail/future_await_container.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
+#include <hpx/runtime/serialization/detail/future_await_container.hpp>
+
+// boost
+#include <boost/make_shared.hpp>
 
 // Local parcelport plugin
-#include "connection_handler_verbs.hpp"
+// #define USE_SPECIALIZED_SCHEDULER
+#include "sender_connection.hpp"
+#include "connection_handler.hpp"
+#include "locality.hpp"
+#include "header.hpp"
 #include "pointer_wrapper_vector.hpp"
-#include "scheduler.hpp"
+#ifdef USE_SPECIALIZED_SCHEDULER
+# include "scheduler.hpp"
+#endif
 //
-#include <hpx/plugins/parcelport/header.hpp>
 
 // rdmahelper library
 #include "RdmaLogging.h"
@@ -51,62 +57,18 @@
 
 #define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD RDMA_DEFAULT_MEMORY_POOL_CHUNK_SIZE
 #define HPX_PARCELPORT_VERBS_MAX_SEND_QUEUE        32
-//#define USE_SPECIALIZED_SCHEDULER
+
+// Note HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED is set by CMake configuration
+// if the machine is a BlueGene active storage node which does not support immediate
+// data sends
+
 using namespace hpx::parcelset::policies;
 
-namespace hpx { namespace parcelset { namespace policies { namespace verbs
-{
-    // ----------------------------------------------------------------------------------------------
-    // Locality, represented by an ip address and a queue pair (qp) id
-    // the qp id is used internally for quick lookup to find the peer
-    // that we want to communicate with
-    // ----------------------------------------------------------------------------------------------
-    struct locality {
-      static const char *type() {
-        return "verbs";
-      }
+namespace hpx { namespace parcelset {
+    namespace policies { namespace verbs
+    {
 
-      explicit locality(boost::uint32_t ip) :
-            ip_(ip), qp_(0xFFFF) {}
-
-      locality() : ip_(0xFFFF), qp_(0xFFFF) {}
-
-      // some condition marking this locality as valid
-      operator util::safe_bool<locality>::result_type() const {
-        return util::safe_bool<locality>()(ip_ != boost::uint32_t(0xFFFF));
-      }
-
-      void save(serialization::output_archive & ar) const {
-        ar.save(ip_);
-        ar.save(qp_);
-      }
-
-      void load(serialization::input_archive & ar) {
-        ar.load(ip_);
-        ar.load(qp_);
-      }
-
-    private:
-      friend bool operator==(locality const & lhs, locality const & rhs) {
-        return (lhs.ip_ == rhs.ip_) && (lhs.qp_ == rhs.qp_);
-      }
-
-      friend bool operator<(locality const & lhs, locality const & rhs) {
-        return lhs.ip_ < rhs.ip_;
-      }
-
-      friend std::ostream & operator<<(std::ostream & os, locality const & loc) {
-        boost::io::ios_flags_saver
-        ifs(os);
-        os << loc.ip_ << " : " << os << loc.qp_;
-        return os;
-      }
-    public:
-      boost::uint32_t ip_;
-      boost::uint32_t qp_;
-    };
-
-    // ----------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------
     // simple atomic counter we use for tags
     // when a parcel is sent to a remote locality, it may need to pull zero copy chunks from us.
     // we keep the chunks until the remote locality sends a zero byte message with the tag we gave
@@ -116,7 +78,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
     // The tag is sent in immediate data so must be 32bits only : Note that the tag only has a
     // lifetime of the unprocessed parcel, so it can be reused as soon as the parcel has been completed
     // and therefore a 16bit count is sufficient as we only keep a few parcels per locality in flight at a time
-    // ----------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------
     struct tag_provider {
         tag_provider() : next_tag_(1) {}
 
@@ -130,23 +92,35 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         boost::atomic<uint32_t> next_tag_;
     };
 
-    // ----------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------
     // parcelport, the implementation of the parcelport itself
-    // ----------------------------------------------------------------------------------------------
-    class parcelport: public parcelset::parcelport {
+    // --------------------------------------------------------------------
+    class HPX_EXPORT parcelport
+      : public parcelport_impl<parcelport>
+    {
     private:
+        typedef parcelport_impl<parcelport> base_type;
 
-        // ----------------------------------------------------------------------------------------------
+        static std::size_t max_connections(util::runtime_configuration const& ini)
+        {
+            LOG_DEBUG_MSG("This should not be necessary as the parcelport_impl does it for us");
+            return hpx::util::get_entry_as<std::size_t>(
+                // this uses the mpi value as we have not bothered to add a verbs one yet
+                ini, "hpx.parcel.mpi.max_connections", HPX_PARCEL_MAX_CONNECTIONS);
+        }
+
+        // --------------------------------------------------------------------
         // returns a locality object that represents 'this' locality
-        // ----------------------------------------------------------------------------------------------
-        static parcelset::locality here(util::runtime_configuration const& ini) {
+        // --------------------------------------------------------------------
+        static parcelset::locality here(util::runtime_configuration const& ini)
+        {
             FUNC_START_DEBUG_MSG;
             if (ini.has_section("hpx.parcel.verbs")) {
                 util::section const * sec = ini.get_section("hpx.parcel.verbs");
                 if (NULL != sec) {
                     std::string ibverbs_enabled(sec->get_entry("enable", "0"));
                     if (boost::lexical_cast<int>(ibverbs_enabled)) {
-//                        _ibverbs_ifname    = sec->get_entry("ifname",    HPX_PARCELPORT_VERBS_IFNAME);
+                        // _ibverbs_ifname    = sec->get_entry("ifname",    HPX_PARCELPORT_VERBS_IFNAME);
                         _ibverbs_device    = sec->get_entry("device",    HPX_PARCELPORT_VERBS_DEVICE);
                         _ibverbs_interface = sec->get_entry("interface", HPX_PARCELPORT_VERBS_INTERFACE);
                         char buff[256];
@@ -173,71 +147,31 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         }
 
     public:
-        // ----------------------------------------------------------------------------------------------
-        // Constructor : mostly just initializes the superclass with 'here'
-        // ----------------------------------------------------------------------------------------------
-        parcelport(util::runtime_configuration const& ini,
-                util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-                util::function_nonser<void()> const& on_stop_thread) :
-                    parcelset::parcelport(ini, here(ini), "verbs"), archive_flags_(0)
-        , stopped_(false), active_send_count_(0),
-        connection_started(ATOMIC_FLAG_INIT)
-        //      , parcels_sent_(0)
-        {
-            FUNC_START_DEBUG_MSG;
-            parcelport::_parcelport_instance = this;
-            //    _port   = 0;
-#ifdef BOOST_BIG_ENDIAN
-            std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
-#else
-            std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
-#endif
-            if (endian_out == "little")
-                archive_flags_ |= serialization::endian_little;
-            else if (endian_out == "big")
-                archive_flags_ |= serialization::endian_big;
-            else {
-                HPX_ASSERT(endian_out == "little" || endian_out == "big");
-            }
-
-            if (!this->allow_array_optimizations()) {
-                archive_flags_ |= serialization::disable_array_optimization;
-                archive_flags_ |= serialization::disable_data_chunking;
-                LOG_DEBUG_MSG("Disabling array optimization and data chunking");
-            } else {
-                if (!this->allow_zero_copy_optimizations()) {
-                    archive_flags_ |= serialization::disable_data_chunking;
-                    LOG_DEBUG_MSG("Disabling data chunking");
-                }
-            }
-            _rdmaController = std::make_shared<RdmaController>
-                (_ibverbs_device.c_str(), _ibverbs_interface.c_str(), _port);
-
-            connection_started.clear();
-            FUNC_END_DEBUG_MSG;
-        }
-
+        // --------------------------------------------------------------------
+        // main vars used to manage the RDMA controller and interface
+        // --------------------------------------------------------------------
         static RdmaControllerPtr _rdmaController;
-//        static std::string       _ibverbs_ifname;
+        // static std::string       _ibverbs_ifname;
         static std::string       _ibverbs_device;
         static std::string       _ibverbs_interface;
         static boost::uint32_t   _port;
         static boost::uint32_t   _ibv_ip;
-        //
+        // to quickly lookup a que-pair (QP) from a destination ip address
         typedef std::map<boost::uint32_t, boost::uint32_t> ip_map;
         typedef ip_map::iterator                           ip_map_iterator;
         //
         ip_map ip_qp_map;
 
         // @TODO, clean up the allocators, buffers, chunk_pool etc so that there is a more consistent
-        // reuse of classes/types
+        // reuse of classes/types. the use of pointer allocators etc is a dreadful hack and
+        // needs reworking
         typedef header<RDMA_DEFAULT_MEMORY_POOL_CHUNK_SIZE>  header_type;
-        typedef hpx::lcos::local::spinlock              mutex_type;
-        typedef hpx::lcos::local::spinlock::scoped_lock scoped_lock;
-        typedef hpx::lcos::local::condition_variable    condition_type;
-        typedef boost::unique_lock<mutex_type>          unique_lock;
+        typedef hpx::lcos::local::spinlock                   mutex_type;
+        typedef hpx::lcos::local::spinlock::scoped_lock      scoped_lock;
+        typedef hpx::lcos::local::condition_variable         condition_type;
+        typedef boost::unique_lock<mutex_type>               unique_lock;
 
-        // use std::mutex in stop function as HPX is terminating
+        // note use std::mutex in stop function as HPX is terminating
         mutex_type  stop_mutex;
         mutex_type  connection_mutex;
         mutex_type  ReadCompletionMap_mutex;
@@ -255,7 +189,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         typedef parcel_buffer<rcv_data_type, std::vector<memory_type>>    rcv_buffer_type;
 
         //
-        int                       archive_flags_;
         boost::atomic<bool>       stopped_;
         boost::atomic_uint        active_send_count_;
         memory_pool_ptr_type      chunk_pool_;
@@ -267,24 +200,26 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 #endif
         // performance_counters::parcels::gatherer& parcels_sent_;
 
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         // struct we use to keep track of all memory regions used during a send, they must
         // be held onto until all transfers of data are complete.
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         typedef struct parcel_send_data_ {
             uint32_t                                         tag;
             std::atomic_flag                                 delete_flag;
             bool                                             has_zero_copy;
-            parcelset::parcel                                parcel;
-            parcelset::parcelhandler::write_handler_type     handler;
+//            parcelset::parcel                                parcel;
+//            parcelset::parcelhandler::write_handler_type     handler;
+            util::unique_function_nonser< void(error_code const&) > handler;
+
             RdmaMemoryRegion *header_region, *chunk_region, *message_region;
             std::vector<RdmaMemoryRegion*>                   zero_copy_regions;
         } parcel_send_data;
 
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         // struct we use to keep track of all memory regions used during a recv, they must
         // be held onto until all transfers of data are complete.
-        // ----------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------
         typedef struct {
             std::atomic_uint                                 counter;
             uint32_t                                         tag;
@@ -316,17 +251,59 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         active_recv_list_type active_recvs;
         mutex_type       active_recv_mutex;
 
-        void hpx_background_work_thread()
+        // --------------------------------------------------------------------
+        // Constructor : mostly just initializes the superclass with 'here'
+        // --------------------------------------------------------------------
+        parcelport(util::runtime_configuration const& ini,
+                util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+                util::function_nonser<void()> const& on_stop_thread)
+              : base_type(ini, here(ini), on_start_thread, on_stop_thread)
+              , stopped_(false)
+              , active_send_count_(0)
+              , connection_started(ATOMIC_FLAG_INIT)
+              // , parcels_sent_(0)
+
         {
-            // repeat until no more parcels are to be sent
-            while (!hpx::is_stopped())
-            {
-//                LOG_DEBUG_MSG("Background work thread start loop");
-                hpx_background_work();
-//                LOG_DEBUG_MSG("Background work thread end loop");
-            }
-            LOG_ERROR_MSG("HPX is now stopped");
-            std::cout << "hpx background work thread stopped" << std::endl;
+            FUNC_START_DEBUG_MSG;
+            // we need this for background OS threads to get 'this' pointer
+            parcelport::_parcelport_instance = this;
+            // port number is set during locality initialization in 'here()'
+            _rdmaController = std::make_shared<RdmaController>
+                (_ibverbs_device.c_str(), _ibverbs_interface.c_str(), _port);
+            //
+            connection_started.clear();
+            FUNC_END_DEBUG_MSG;
+        }
+
+        // Start the handling of connections.
+        bool do_run()
+        {
+            return true;
+        }
+
+        // --------------------------------------------------------------------
+        //  return a sender_connection object back to the parcelport_impl
+        // --------------------------------------------------------------------
+        boost::shared_ptr<sender_connection> create_connection(
+            parcelset::locality const& dest, error_code& ec)
+        {
+            FUNC_START_DEBUG_MSG;
+
+            boost::uint32_t dest_ip = dest.get<locality>().ip_;
+            LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " put_parcel_impl to " << ipaddress(dest_ip) );
+
+            RdmaClient *client = get_remote_connection(dest);
+            boost::shared_ptr<sender_connection> result = boost::make_shared<sender_connection>(
+                  this
+                , dest_ip
+                , dest.get<locality>()
+                , client
+                , *chunk_pool_.get()
+                , parcels_sent_
+            );
+
+            FUNC_END_DEBUG_MSG;
+            return result;
         }
 
         // ----------------------------------------------------------------------------------------------
@@ -337,7 +314,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             parcel_send_data &send_data = *send;
             // trigger the send complete handler for hpx internal cleanup
             LOG_DEBUG_MSG("Calling write_handler for completed send");
-            send_data.handler.operator()(error_code(), send_data.parcel);
+//            send_data.handler.operator()(error_code(), send_data.parcel);
+            send_data.handler.operator()(error_code());
             //
             LOG_DEBUG_MSG("deallocating region 1 for completed send " << hexpointer(send_data.header_region));
             chunk_pool_->deallocate(send_data.header_region);
@@ -466,9 +444,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     current_send = it->second;
                     LOG_DEBUG_MSG("erasing " << hexpointer(wr_id) << "from SendCompletionMap : size before erase " << SendCompletionMap.size());
                     SendCompletionMap.erase(it);
-                    for (auto & pair : SendCompletionMap) {
-//                        std::cout << hexpointer(pair.first) << "\n";
-                    }
                 }
                 else {
 #ifdef HPX_PARCELPORT_VERBS_IMM_UNSUPPORTED
@@ -477,9 +452,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     return;
 #else
                     LOG_ERROR_MSG("FATAL : SendCompletionMap did not find " << hexpointer(wr_id));
-                    for (auto & pair : SendCompletionMap) {
-                        std::cout << hexpointer(pair.first) << "\n";
-                    }
+                    // for (auto & pair : SendCompletionMap) {
+                    //     std::cout << hexpointer(pair.first) << "\n";
+                    // }
                     std::terminate();
 #endif
                 }
@@ -614,7 +589,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
                     LOG_DEBUG_MSG("calling parcel decode for complete NORMAL parcel");
                     rcv_buffer_type buffer(std::move(wrapped_pointer));
-                    buffer.data_.resize(static_cast<std::size_t>(h->size()));
+//                    buffer.data_.resize(static_cast<std::size_t>(h->size()));
                     decode_message_with_chunks(*this, std::move(buffer), 1, recv_data.chunks);
                     LOG_DEBUG_MSG("parcel decode called for complete NORMAL parcel");
                 }
@@ -816,10 +791,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             FUNC_END_DEBUG_MSG;
         }
 
-        /// return true if this pp can be used at bootstrapping, otherwise omit
+        /// Should not be used any more as parcelport_impl handles this
         bool can_bootstrap() const {
-            //    FUNC_START_DEBUG_MSG;
-            //    FUNC_END_DEBUG_MSG;
+            FUNC_START_DEBUG_MSG;
+            FUNC_END_DEBUG_MSG;
             return false;
         }
 
@@ -854,40 +829,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             return parcelset::locality(locality());
         }
 
+        // should not be used any more.
         void put_parcels(std::vector<parcelset::locality> dests,
                 std::vector<parcel> parcels,
                 std::vector<write_handler_type> handlers)
         {
+            FUNC_START_DEBUG_MSG;
             HPX_ASSERT(dests.size() == parcels.size());
             HPX_ASSERT(dests.size() == handlers.size());
             for(std::size_t i = 0; i != dests.size(); ++i)
             {
                 put_parcel(dests[i], std::move(parcels[i]), handlers[i]);
             }
-        }
-
-        void send_early_parcel(parcelset::locality const & dest, parcel p) {
-            FUNC_START_DEBUG_MSG;
-            FUNC_END_DEBUG_MSG;
-            // Only necessary if your PP an be used at bootstrapping
-            throw std::runtime_error("Verbs PP does not handle early parcels");
-        }
-
-        util::io_service_pool* get_thread_pool(char const* name) {
-            FUNC_START_DEBUG_MSG;
-            FUNC_END_DEBUG_MSG;
-            return 0;
-        }
-
-        // This parcelport doesn't maintain a connection cache
-        boost::int64_t get_connection_cache_statistics(connection_cache_statistics_type, bool reset) {
-            FUNC_START_DEBUG_MSG;
-            FUNC_END_DEBUG_MSG;
-            return 0;
-        }
-
-        void remove_from_connection_cache(parcelset::locality const& loc) {
-            FUNC_START_DEBUG_MSG;
             FUNC_END_DEBUG_MSG;
         }
 
@@ -931,7 +884,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
         }
 
-        void stop(bool blocking = true) {
+        void do_stop() {
             std::cout << "Entering verbs stop " << std::endl;
             FUNC_START_DEBUG_MSG;
             if (!stopped_) {
@@ -941,7 +894,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                     if (!finished) {
                         LOG_ERROR_MSG("Entering STOP when not all parcels have completed");
                         std::terminate();
-                        do_background_work(1);
+//                        do_background_work(1);
                     }
                 } while (!finished && !hpx::is_stopped());
 
@@ -964,13 +917,51 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             // Stop receiving and sending of parcels
         }
 
-        void enable(bool new_state) {
-            // enable/disable sending and receiving of parcels
+        // ----------------------------------------------------------------------------------------------
+        // find the client queue pair object that is at the destination ip address
+        // if no connection has been made yet, make one.
+        // ----------------------------------------------------------------------------------------------
+        RdmaClient *get_remote_connection(parcelset::locality const& dest)
+        {
+            boost::uint32_t dest_ip = dest.get<locality>().ip_;
+            // @TODO, don't need smartpointers here, remove them as they waste an atomic refcount
+            RdmaClientPtr client;
+            {
+                // lock this region as we are creating a connection to a remote locality
+                // if two threads attempt to do this at the same time, we'll get duplicated clients
+                unique_lock lock(connection_mutex);
+                do {
+                    ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
+                    if (ip_it!=ip_qp_map.end()) {
+                        LOG_DEBUG_MSG("Connection found with qp " << ip_it->second);
+                        client = _rdmaController->getClient(ip_it->second);
+                        return client.get();
+                    }
+                    else {
+                        if (connection_started.test_and_set(std::memory_order_acquire)) {
+                            lock.unlock();
+                            LOG_ERROR_MSG("A connection race has been detected, do not connect");
+                            hpx::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+                            lock.lock();
+                        }
+                        else {
+                            LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
+                            client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
+                            LOG_DEBUG_MSG("Setting qpnum in main client map");
+                            ip_qp_map[dest_ip] = client->getQpNum();
+                            return client.get();
+                        }
+                    }
+                } while (true);
+            }
+            return NULL;
         }
-
+/*
         // ----------------------------------------------------------------------------------------------
         // called by hpx when an action is invoked on a remote locality.
         // This must be thread safe in order to function as any thread may invoke an action
+
+        // not called any more : parcelport_impl?
         // ----------------------------------------------------------------------------------------------
         void put_parcel(parcelset::locality const & dest, parcel p, write_handler_type f) {
             FUNC_START_DEBUG_MSG;
@@ -1025,72 +1016,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 }
             }
         }
-
-        void put_parcel_impl(
-            parcelset::locality const & dest, parcel p, write_handler_type f, bool trigger
-          , boost::shared_ptr<hpx::serialization::output_archive> const & archive
-          , boost::shared_ptr<
-                hpx::serialization::detail::future_await_container
-            > const & future_await)
+*/
+        template <typename Handler>
+        bool async_write(Handler && handler, sender_connection *sender, snd_buffer_type &buffer)
         {
-            boost::uint32_t dest_ip = dest.get<locality>().ip_;
-            LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " put_parcel_impl to " << ipaddress(dest_ip) );
-
-            // @TODO, don't need smartpointers here, remove them as they waste an atomic refcount
-            RdmaClientPtr client;
-            {
-                // lock this region as we are creating a connection to a remote locality
-                // if two threads attempt to do this at the same time, we'll get duplicated clients
-                bool connection = 0;
-                unique_lock lock(connection_mutex);
-                do {
-                    ip_map_iterator ip_it = ip_qp_map.find(dest_ip);
-                    if (ip_it!=ip_qp_map.end()) {
-                        LOG_DEBUG_MSG("Connection found with qp " << ip_it->second);
-                        client = _rdmaController->getClient(ip_it->second);
-                        connection = 1;
-                    }
-                    else {
-                        if (connection_started.test_and_set(std::memory_order_acquire)) {
-                            lock.unlock();
-                            LOG_ERROR_MSG("A connection race has been detected, do not connect");
-                            hpx::this_thread::sleep_for(boost::chrono::milliseconds(1000));
-                            lock.lock();
-                        }
-                        else {
-                            LOG_DEBUG_MSG("Connection required to " << ipaddress(dest_ip));
-                            client = _rdmaController->makeServerToServerConnection(dest_ip, _rdmaController->getPort());
-                            LOG_DEBUG_MSG("Setting qpnum in main client map");
-                            ip_qp_map[dest_ip] = client->getQpNum();
-                            connection = 1;
-                        }
-                    }
-                } while (connection==0);
-            }
-
-            // connection ok, we can now send required info to the remote peer
-
-            // the send buffer is created with our allocator and will get memory from our pool
-            // - disable deallocation so that we can manage the block lifetime better
-            // @TODO, integrate the pointer wrapper and allocators better into parcel_buffer
-            allocator_type alloc(*chunk_pool_.get());
-            alloc.disable_deallocate = true;
-            snd_buffer_type buffer(alloc);
-            util::high_resolution_timer timer;
-//            buffer.data_point_.time_ = timer.elapsed_nanoseconds();
-
-
-            // encode the parcel directly into an rdma pinned memory block
-             LOG_DEBUG_MSG("Encoding parcel");
-             encode_parcels(&p, std::size_t(-1), buffer, archive_flags_, chunk_pool_->default_chunk_size(), &future_await->new_gids_);
-             buffer.data_point_.time_ = timer.elapsed_nanoseconds();
-             LOG_DEBUG_MSG("Encoded parcel in " << buffer.data_point_.time_ << "ns");
-
             // if the serialization overflows the block, panic and rewrite this.
             {
                 // create a tag, needs to be unique per client
-                uint32_t tag = tag_provider_.next(dest_ip);
-                LOG_DEBUG_MSG("Generated tag " << hexuint32(tag) << " from " << hexuint32(dest_ip));
+                uint32_t tag = tag_provider_.next(sender->dest_ip_);
+                LOG_DEBUG_MSG("Generated tag " << hexuint32(tag) << " from " << hexuint32(sender->dest_ip_));
 
                 // we must store details about this parcel so that all memory buffers can be kept
                 // until all send operations have completed.
@@ -1112,15 +1046,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 }
                 parcel_send_data &send_data = *current_send;
                 send_data.tag            = tag;
-                send_data.parcel         = std::move(p);
-                send_data.handler        = f;
+//                send_data.parcel         = std::move(p);
+                send_data.handler        = std::move(handler);
                 send_data.header_region  = NULL;
                 send_data.message_region = NULL;
                 send_data.chunk_region   = NULL;
                 send_data.has_zero_copy  = false;
                 send_data.delete_flag.clear();
 
-                LOG_DEBUG_MSG("Generated unique dest " << hexnumber(dest_ip) << " coded tag " << hexuint32(send_data.tag));
+                LOG_DEBUG_MSG("Generated unique dest " << hexnumber(sender->dest_ip_) << " coded tag " << hexuint32(send_data.tag));
 
                 // for each zerocopy chunk, we must create a memory region for the data
                 for (serialization::serialization_chunk &c : buffer.chunks_) {
@@ -1243,21 +1177,30 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 LOG_TRACE_MSG("Block message_region"
                         << " region "    << hexpointer(send_data.message_region)
                         << " buffer "    << hexpointer(send_data.message_region->getAddress()));
-                client->postSend_xN(region_list, 2, true, false, 0);
+                sender->client_->postSend_xN(region_list, 2, true, false, 0);
 
                 // log the time spent in performance counter
-                buffer.data_point_.time_ =
-                        timer.elapsed_nanoseconds() - buffer.data_point_.time_;
+//                buffer.data_point_.time_ =
+//                        timer.elapsed_nanoseconds() - buffer.data_point_.time_;
 
                 // parcels_sent_.add_data(buffer.data_point_);
             }
-
-            // after putting a parcel, immediately poll for completions to help
-            // prevent the send queue from becoming full
-            hpx_background_work();
+            return true;
+        }
+/*
+        void put_parcel_impl(
+            parcelset::locality const & dest, parcel p, write_handler_type f, bool trigger
+          , boost::shared_ptr<hpx::serialization::output_archive> const & archive
+          , boost::shared_ptr<
+                hpx::serialization::detail::future_await_container
+            > const & future_await)
+        {
+            boost::uint32_t dest_ip = dest.get<locality>().ip_;
+            LOG_DEBUG_MSG("Locality " << ipaddress(_ibv_ip) << " put_parcel_impl to " << ipaddress(dest_ip) );
 
             FUNC_END_DEBUG_MSG;
         }
+*/
 
         // ----------------------------------------------------------------------------------------------
         // This is called to poll for completions and handle all incoming messages as well as complete
@@ -1283,6 +1226,26 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
             return true;
         }
 
+        // --------------------------------------------------------------------
+        // Background work, HPX thread version, used on custom scheduler
+        // to poll in an OS background thread which is pre-emtive and therefore
+        // could help reduce latencies (when hpx threads are all doing work).
+        // --------------------------------------------------------------------
+#ifdef USE_SPECIALIZED_SCHEDULER
+        void hpx_background_work_thread()
+        {
+            // repeat until no more parcels are to be sent
+            while (!hpx::is_stopped()) {
+                hpx_background_work();
+            }
+            LOG_ERROR_MSG("HPX is now stopped");
+            std::cout << "hpx background work thread stopped" << std::endl;
+        }
+#endif
+
+        // --------------------------------------------------------------------
+        // Background work, OS thread version
+        // --------------------------------------------------------------------
         static bool OS_background_work() {
             return parcelport::get_singleton()->hpx_background_work();
         }
@@ -1291,7 +1254,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
         // This is called whenever a HPX OS thread is idling, can be used to poll for incoming messages
         // this should be thread safe as eventMonitor only polls and dispatches and is thread safe.
         // ----------------------------------------------------------------------------------------------
-        bool do_background_work(std::size_t num_thread) {
+        bool background_work(std::size_t num_thread) {
             if (stopped_) {
                 return false;
 			}
@@ -1306,28 +1269,26 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
 
         static parcelport *_parcelport_instance;
 
-    private:
-
-        // ----------------------------------------------------------------------------------------------
-        // Only needed for bootstrapping
-        void early_write_handler(boost::system::error_code const& ec, parcel const & p) {
-            FUNC_START_DEBUG_MSG;
-            if (ec) {
-                // all errors during early parcel handling are fatal
-                boost::exception_ptr exception = hpx::detail::get_exception(hpx::exception(ec), "mpi::early_write_handler",
-                        __FILE__, __LINE__,
-                        "error while handling early parcel: " + ec.message() + "(" + boost::lexical_cast < std::string
-                        > (ec.value()) + ")" + parcelset::dump_parcel(p));
-
-                hpx::report_error(exception);
-            }
-            FUNC_END_DEBUG_MSG;
-        }
     };
-}
-}
-}
-}
+
+
+    template <typename Handler, typename ParcelPostprocess>
+    void sender_connection::async_write(Handler && handler, ParcelPostprocess && parcel_postprocess)
+    {
+        HPX_ASSERT(!buffer_.data_.empty());
+        if (!parcelport_->async_write(std::move(handler), this, buffer_)) {
+            error_code ec;
+            postprocess_handler_(ec, there_, shared_from_this());
+        }
+
+        // after send had done, setup a fresh buffer for next time
+        allocator_type alloc(chunk_pool_);
+        alloc.disable_deallocate = true;
+        snd_buffer_type buffer(alloc);
+        buffer_ = std::move(buffer);
+    }
+
+}}}}
 
 namespace hpx {
 namespace traits {
