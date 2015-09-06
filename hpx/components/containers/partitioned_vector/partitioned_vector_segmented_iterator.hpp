@@ -531,7 +531,8 @@ namespace hpx
             > base_type;
 
     public:
-        const_segment_vector_iterator(BaseIter const& it, partitioned_vector<T> const* data = 0)
+        const_segment_vector_iterator(BaseIter const& it,
+                partitioned_vector<T> const* data = 0)
           : base_type(it), data_(data)
         {}
 
@@ -654,7 +655,8 @@ namespace hpx
     public:
         typedef std::size_t size_type;
         typedef typename partitioned_vector<T>::segment_iterator segment_iterator;
-        typedef typename partitioned_vector<T>::local_segment_iterator local_segment_iterator;
+        typedef typename partitioned_vector<T>::local_segment_iterator
+            local_segment_iterator;
         typedef typename partitioned_vector<T>::local_iterator local_iterator;
 
         // constructors
@@ -735,7 +737,8 @@ namespace hpx
     public:
         typedef std::size_t size_type;
         typedef typename partitioned_vector<T>::const_segment_iterator segment_iterator;
-        typedef typename partitioned_vector<T>::const_local_segment_iterator local_segment_iterator;
+        typedef typename partitioned_vector<T>::const_local_segment_iterator
+            local_segment_iterator;
         typedef typename partitioned_vector<T>::const_local_iterator local_iterator;
 
         // constructors

@@ -25,8 +25,8 @@ void fill_vector(hpx::partitioned_vector<T>& v, T const& val)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void compare_vectors(hpx::partitioned_vector<T> const& v1, hpx::partitioned_vector<T> const& v2,
-    bool must_be_equal = true)
+void compare_vectors(hpx::partitioned_vector<T> const& v1,
+    hpx::partitioned_vector<T> const& v2, bool must_be_equal = true)
 {
     typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
 

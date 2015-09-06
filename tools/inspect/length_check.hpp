@@ -22,8 +22,8 @@ namespace boost
 
             length_check(size_t setting);
 
-            std::string a = "*Character Limit*";
-            std::string b = "The line is larger than the character limit";
+            std::string a = "*Line length limit*";
+            std::string b = "The line is longer than allowed by the character limit";
             virtual const char * name() const { return a.c_str(); }
             virtual const char * desc() const { return b.c_str(); }
 
@@ -34,7 +34,7 @@ namespace boost
 
             virtual void print_summary(std::ostream& out)
             {
-                string c = " files exceeding the character limit";
+                string c = " lines exceeding the character limit";
                 out << "  " << m_files_with_errors << c << line_break();
             }
 
