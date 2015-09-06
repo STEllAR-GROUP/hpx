@@ -499,7 +499,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         timings_all = hpx::util::unwrapped(workers);
     time_total = mysecond() - time_total;
 
-    /*	--- SUMMARY --- */
+    /* --- SUMMARY --- */
     const char *label[4] = {
         "Copy:      ",
         "Scale:     ",

@@ -39,26 +39,33 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     namespace detail
     {
         /// \cond NOINTERNAL
-        struct os_thread_count_helper
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Parameters>
+        std::size_t call_processing_units_parameter_count(Parameters& params);
+
+        struct processing_units_count_helper
         {
-            template <typename Executor>
-            static std::size_t call(wrap_int, Executor const& exec)
+            template <typename Executor, typename Parameters>
+            static std::size_t call(wrap_int, Executor& exec,
+                Parameters& params)
             {
-                return hpx::get_os_thread_count();
+                return call_processing_units_parameter_count(params);
             }
 
-            template <typename Executor>
-            static auto call(int, Executor const& exec)
-            ->  decltype(exec.os_thread_count())
+            template <typename Executor, typename Parameters>
+            static auto call(int, Executor& exec, Parameters&)
+            ->  decltype(exec.processing_units_count())
             {
-                return exec.os_thread_count();
+                return exec.processing_units_count();
             }
         };
 
-        template <typename Executor>
-        std::size_t call_os_thread_count(Executor const& exec)
+        template <typename Executor, typename Parameters>
+        std::size_t call_processing_units_count(Executor& exec,
+            Parameters& params)
         {
-            return os_thread_count_helper::call(0, exec);
+            return processing_units_count_helper::call(0, exec, params);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -154,9 +161,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls exec.os_thread_count() if it exists;
         ///       otherwise it executes hpx::get_os_thread_count().
         ///
-        static std::size_t os_thread_count(executor_type const& exec)
+        template <typename Parameters>
+        static std::size_t processing_units_count(executor_type const& exec,
+            Parameters& params)
         {
-            return detail::call_os_thread_count(exec);
+            return detail::call_processing_units_count(exec, params);
         }
 
         /// Retrieve whether this executor has operations pending or not.

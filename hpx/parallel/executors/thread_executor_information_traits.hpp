@@ -45,7 +45,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param sched  [in] The executor object to use for the number of
         ///               os-threads used to schedule tasks.
         ///
-        static std::size_t os_thread_count(executor_type const& sched)
+        /// \note This calls exec.os_thread_count() if it exists;
+        ///       otherwise it executes hpx::get_os_thread_count().
+        ///
+        template <typename Parameters>
+        static std::size_t processing_units_count(executor_type const& sched,
+            Parameters&)
         {
             return hpx::get_os_thread_count(sched);
         }

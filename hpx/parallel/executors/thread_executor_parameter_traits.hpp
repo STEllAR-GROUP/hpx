@@ -12,6 +12,7 @@
 #include <hpx/traits/is_executor_parameters.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/thread_executor_traits.hpp>
+#include <hpx/parallel/executors/executor_parameter_traits.hpp>
 #include <hpx/util/always_void.hpp>
 
 #include <type_traits>
@@ -88,6 +89,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             Executor& sched)
         {
             sched.reset_thread_distribution();
+        }
+
+        /// Retrieve the number of (kernel-)threads used by the associated
+        /// executor.
+        ///
+        /// \param exec  [in] The executor object to use for scheduling of the
+        ///              function \a f.
+        /// \param params [in] The executor parameters object to use as a
+        ///              fallback if the executor does not expose
+        ///
+        /// \note This calls exec.processing_units_count() if it exists;
+        ///       otherwise it forwards teh request to the executor parameters
+        ///       object.
+        ///
+        static std::size_t processing_units_count(
+            executor_parameters_type& params)
+        {
+            return detail::call_processing_units_parameter_count(params);
         }
     };
 }}}
