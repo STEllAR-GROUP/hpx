@@ -191,6 +191,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             return hpx::util::unwrapped(results);
         }
+
+        /// Retrieve the number of (kernel-)threads used by the associated
+        /// executor. All threads::executors invoke
+        /// hpx::get_os_thread_count(sched).
+        ///
+        /// \param sched  [in] The executor object to use for the number of
+        ///               os-threads used to schedule tasks.
+        ///
+        /// \note This calls exec.os_thread_count() if it exists;
+        ///       otherwise it executes hpx::get_os_thread_count().
+        ///
+        static std::size_t processing_units_count(executor_type const& sched)
+        {
+            return hpx::get_os_thread_count(sched);
+        }
+
+        /// Retrieve whether this executor has operations pending or not.
+        /// All threads::executors invoke sched.num_pending_closures().
+        ///
+        /// \param sched  [in] The executor object to use for querying the
+        ///               number of pending tasks.
+        ///
+        static bool has_pending_closures(executor_type& sched)
+        {
+            return sched.num_pending_closures();
+        }
     };
 }}}
 

@@ -129,7 +129,7 @@ struct test_timed_async_executor2 : hpx::parallel::timed_executor_tag
         return hpx::async(hpx::launch::sync, std::forward<F>(f));
     }
 
-    std::size_t os_thread_count()
+    std::size_t processing_units_count()
     {
         return 1;
     }
