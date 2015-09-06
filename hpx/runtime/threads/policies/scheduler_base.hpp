@@ -72,7 +72,7 @@ namespace hpx { namespace threads { namespace policies
 
         virtual ~scheduler_base() {}
 
-        threads::mask_type get_pu_mask(topology const& topology,
+        threads::mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const
         {
             return affinity_data_.get_pu_mask(topology, num_thread,

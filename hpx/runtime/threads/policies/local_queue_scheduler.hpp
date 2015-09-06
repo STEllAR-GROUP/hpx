@@ -278,7 +278,7 @@ namespace hpx { namespace threads { namespace policies
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
 //             // try to figure out the NUMA node where the data lives
 //             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
-//                 mask_type mask =
+//                 mask_cref_type mask =
 //                     topology_.get_thread_affinity_mask_from_lva(data.lva);
 //                 if (any(mask)) {
 //                     num_thread = find_first(mask);

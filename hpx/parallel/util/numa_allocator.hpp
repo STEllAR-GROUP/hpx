@@ -104,7 +104,7 @@ namespace hpx { namespace parallel { namespace util
                                 executor_type> traits;
 
                             std::size_t thread_num = hpx::get_worker_thread_num();
-                            hpx::threads::mask_type thread_mask =
+                            hpx::threads::mask_cref_type thread_mask =
                                 traits::get_pu_mask(executors_[i], topo_, thread_num);
 
                             HPX_ASSERT(mem_mask & thread_mask);

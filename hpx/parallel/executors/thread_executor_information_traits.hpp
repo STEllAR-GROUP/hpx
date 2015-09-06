@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \param sched  [in] The executor object to use for querying the
         ///               number of pending tasks.
         ///
-        static threads::mask_type get_pu_mask(executor_type const& sched,
+        static threads::mask_cref_type get_pu_mask(executor_type const& sched,
             threads::topology& topo, std::size_t thread_num)
         {
             return sched.get_pu_mask(topo, thread_num);

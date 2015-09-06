@@ -1230,7 +1230,7 @@ namespace hpx { namespace threads
         get_runtime().get_thread_manager().set_scheduler_mode(m);
     }
 
-    HPX_API_EXPORT threads::mask_type get_pu_mask(
+    HPX_API_EXPORT threads::mask_cref_type get_pu_mask(
         threads::topology& topo, std::size_t thread_num)
     {
         return get_runtime().get_thread_manager().get_pu_mask(topo, thread_num);

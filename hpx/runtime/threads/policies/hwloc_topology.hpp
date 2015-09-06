@@ -64,29 +64,29 @@ namespace hpx { namespace threads
           , error_code& ec = throws
             ) const;
 
-        mask_type get_machine_affinity_mask(
+        mask_cref_type get_machine_affinity_mask(
             error_code& ec = throws
             ) const;
 
-        mask_type get_socket_affinity_mask(
+        mask_cref_type get_socket_affinity_mask(
             std::size_t num_thread
           , bool numa_sensitive
           , error_code& ec = throws
             ) const;
 
-        mask_type get_numa_node_affinity_mask(
+        mask_cref_type get_numa_node_affinity_mask(
             std::size_t num_thread
           , bool numa_sensitive
           , error_code& ec = throws
             ) const;
 
-        mask_type get_core_affinity_mask(
+        mask_cref_type get_core_affinity_mask(
             std::size_t num_thread
           , bool numa_sensitive
           , error_code& ec = throws
             ) const;
 
-        mask_type get_thread_affinity_mask(
+        mask_cref_type get_thread_affinity_mask(
             std::size_t num_thread
           , bool numa_sensitive = false
           , error_code& ec = throws
@@ -103,7 +103,7 @@ namespace hpx { namespace threads
           , error_code& ec = throws
             ) const;
 
-        mask_type get_thread_affinity_mask_from_lva(
+        mask_cref_type get_thread_affinity_mask_from_lva(
             naming::address::address_type
           , error_code& ec = throws
             ) const;

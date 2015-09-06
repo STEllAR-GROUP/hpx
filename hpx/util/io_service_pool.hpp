@@ -93,8 +93,8 @@ namespace hpx { namespace util
 
     private:
         typedef std::unique_ptr<boost::asio::io_service> io_service_ptr;
-#if 1
-        //(defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700)
+// FIXME: Intel compilers don't like this
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
         typedef std::unique_ptr<boost::asio::io_service::work> work_type;
 #else
         typedef boost::asio::io_service::work work_type;
@@ -103,8 +103,8 @@ namespace hpx { namespace util
         BOOST_FORCEINLINE work_type initialize_work(boost::asio::io_service& io_service)
         {
             return work_type(
-#if 1
-                    //(defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700)
+// FIXME: Intel compilers don't like this
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
                     new boost::asio::io_service::work(io_service)
 #else
                     io_service

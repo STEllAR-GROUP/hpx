@@ -64,7 +64,7 @@ namespace hpx { namespace threads { namespace executors
 
             /// Return the mask for processing units the given thread is allowed
             /// to run on.
-            mask_type get_pu_mask(topology const& topology,
+            mask_cref_type get_pu_mask(topology const& topology,
                 std::size_t num_thread) const
             {
                 return pool_.get_pu_mask(topology, num_thread);

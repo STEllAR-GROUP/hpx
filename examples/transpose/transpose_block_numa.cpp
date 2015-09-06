@@ -172,8 +172,6 @@ struct block
     block(hpx::future<hpx::id_type> id)
       : base_type(std::move(id))
     {
-//         unmanaged_ = get_id();
-//         unmanaged_.make_unmanaged();
     }
 
     block(
@@ -181,8 +179,6 @@ struct block
         std::size_t numa_domain)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size, numa_domain))
     {
-//         unmanaged_ = get_id();
-//         unmanaged_.make_unmanaged();
     }
 
     hpx::future<sub_block> get_sub_block(boost::uint64_t offset, boost::uint64_t size)
@@ -190,8 +186,6 @@ struct block
         block_component::get_sub_block_action act;
         return hpx::async(act, get_id(), offset, size);
     }
-
-//     hpx::id_type unmanaged_;
 };
 
 // The macros below are necessary to generate the code required for exposing
@@ -327,6 +321,8 @@ int hpx_main(boost::program_options::variables_map& vm)
             }
         }
 
+        // establish connection between localities, refer to all blocks from
+        // everywhere
         std::vector<hpx::future<hpx::id_type> > A_ids
             = hpx::find_all_from_basename(A_block_basename, num_blocks);
         std::vector<hpx::future<hpx::id_type> > B_ids
@@ -347,6 +343,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             std::cout
                 << "Number of iterations  = " << iterations << "\n";
         }
+
         using hpx::parallel::for_each;
         using hpx::parallel::par;
 
@@ -369,6 +366,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                         B_ptr->data_[i * block_order + j] = -1.0;
                     }
                 }
+
+                // register the blocks for other localities to discover
                 hpx::register_with_basename(A_block_basename, A[b].get_id(), b);
                 hpx::register_with_basename(B_block_basename, B[b].get_id(), b);
             }
@@ -394,6 +393,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         hpx::lcos::local::barrier b(numa_ranges.size());
 
+        // perform actual transpose
         std::vector<hpx::future<double> > numa_workers;
         numa_workers.reserve(numa_ranges.size());
         for(boost::uint64_t domain = 0; domain < numa_ranges.size(); ++domain)
@@ -420,8 +420,11 @@ int hpx_main(boost::program_options::variables_map& vm)
 
                             for_each(par.on(execs[domain]),
                                 boost::begin(range), boost::end(range),
-                                [domain, &block_futures, num_blocks, block_start, block_order, tile_size, &A, &B]
-                                    (boost::uint64_t b)
+                                [
+                                    domain, &block_futures, num_blocks,
+                                    block_start, block_order, tile_size, &A, &B
+                                ]
+                                (boost::uint64_t b)
                                 {
                                     std::vector<hpx::future<void> > phase_futures;
                                     phase_futures.reserve(num_blocks);
@@ -430,17 +433,21 @@ int hpx_main(boost::program_options::variables_map& vm)
                                         static_cast<boost::uint64_t>(0), num_blocks);
                                     for(boost::uint64_t phase: phase_range)
                                     {
-                                        const boost::uint64_t block_size = block_order * block_order;
+                                        const boost::uint64_t block_size =
+                                            block_order * block_order;
                                         const boost::uint64_t from_block = phase;
                                         const boost::uint64_t from_phase = b;
-                                        const boost::uint64_t A_offset = from_phase * block_size;
-                                        const boost::uint64_t B_offset = phase * block_size;
+                                        const boost::uint64_t A_offset =
+                                            from_phase * block_size;
+                                        const boost::uint64_t B_offset =
+                                            phase * block_size;
 
                                         phase_futures.push_back(
                                             hpx::lcos::local::dataflow(
                                                 execs[domain]
                                               , &transpose
-                                              , A[from_block].get_sub_block(A_offset, block_size)
+                                              , A[from_block].get_sub_block(
+                                                    A_offset, block_size)
                                               , B[b].get_sub_block(B_offset, block_size)
                                               , block_order
                                               , tile_size
@@ -486,27 +493,18 @@ int hpx_main(boost::program_options::variables_map& vm)
         if(root)
         {
             double errsq = std::accumulate(errsqs.begin(), errsqs.end(), 0.0);
-            //if(errsq < epsilon)
-            {
-                std::cout << "Solution validates\n";
-                avgtime = avgtime/static_cast<double>(
-                    (std::max)(iterations-1, static_cast<boost::uint64_t>(1)));
-                std::cout
-                  << "Rate (MB/s): " << 1.e-6 * bytes/mintime << ", "
-                  << "Avg time (s): " << avgtime << ", "
-                  << "Min time (s): " << mintime << ", "
-                  << "Max time (s): " << maxtime << "\n";
 
-                if(verbose)
-                    std::cout << "Squared errors: " << errsq << "\n";
-            }
-//             else
-//             {
-//                 std::cout
-//                   << "ERROR: Aggregate squared error " << errsq
-//                   << " exceeds threshold " << epsilon << "\n";
-//                 hpx::terminate();
-//             }
+            std::cout << "Solution validates\n";
+            avgtime = avgtime/static_cast<double>(
+                (std::max)(iterations-1, static_cast<boost::uint64_t>(1)));
+            std::cout
+                << "Rate (MB/s): " << 1.e-6 * bytes/mintime << ", "
+                << "Avg time (s): " << avgtime << ", "
+                << "Min time (s): " << mintime << ", "
+                << "Max time (s): " << maxtime << "\n";
+
+            if(verbose)
+                std::cout << "Squared errors: " << errsq << "\n";
         }
     }
 
@@ -517,17 +515,11 @@ int hpx_main(boost::program_options::variables_map& vm)
 //
 // --transpose-numa-domains=2 --transpose-threads=6
 //
-// Don't use --hpx:threads or --hpx:bind, those are computed internally.
+// There shouldn't be any need for using  --hpx:threads or --hpx:bind, those
+// are computed internally.
 //
 int main(int argc, char* argv[])
 {
-//     std::cout << "Waiting...\n";
-//     int i = 0;
-//     while (i == 0)
-//     {
-//         Sleep(0);
-//     }
-
     using namespace boost::program_options;
 
     options_description desc_commandline;
@@ -659,7 +651,8 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
     // Fill the original matrix, set transpose to known garbage value.
     auto range = boost::irange(blocks_start, blocks_end);
     double errsq =
-        transform_reduce(par.on(execs[domain]), boost::begin(range), boost::end(range),
+        transform_reduce(
+            par.on(execs[domain]), boost::begin(range), boost::end(range),
             [&](boost::uint64_t b) -> double
             {
                 sub_block trans_block =

@@ -42,7 +42,7 @@ public:
         return std::size_t(-1);
     }
 
-    mask_type get_machine_affinity_mask(
+    mask_cref_type get_machine_affinity_mask(
         error_code& ec = throws
         ) const
     {
@@ -52,7 +52,7 @@ public:
         return empty_mask;
     }
 
-    mask_type get_socket_affinity_mask(
+    mask_cref_type get_socket_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive
       , error_code& ec = throws
@@ -64,7 +64,7 @@ public:
         return empty_mask;
     }
 
-    mask_type get_numa_node_affinity_mask(
+    mask_cref_type get_numa_node_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive
       , error_code& ec = throws
@@ -76,7 +76,7 @@ public:
         return empty_mask;
     }
 
-    mask_type get_core_affinity_mask(
+    mask_cref_type get_core_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive
       , error_code& ec = throws
@@ -88,7 +88,7 @@ public:
         return empty_mask;
     }
 
-    mask_type get_thread_affinity_mask(
+    mask_cref_type get_thread_affinity_mask(
         std::size_t thread_num
       , bool numa_sensitive = false
       , error_code& ec = throws
@@ -119,7 +119,7 @@ public:
             ec = make_success_code();
     }
 
-    mask_type get_thread_affinity_mask_from_lva(
+    mask_cref_type get_thread_affinity_mask_from_lva(
         naming::address::address_type lva
       , error_code& ec = throws
         ) const
