@@ -152,7 +152,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         init_cached_pu_nums(num_system_pus, t);
     }
 
-    static mask_cref_type get_empty_machine_mask()
+    static mask_type get_empty_machine_mask()
     {
         threads::mask_type m = threads::mask_type();
         threads::resize(m, hardware_concurrency());
