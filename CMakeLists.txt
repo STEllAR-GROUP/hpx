@@ -411,6 +411,12 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_HAVE_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
+  if(HPX_WITH_APEX)                                                                
+    if(_scheduler STREQUAL "THROTTLE" OR _all)
+      hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
+      set(HPX_HAVE_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
+    endif()
+  endif(HPX_WITH_APEX)                                                                
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
     set(HPX_HAVE_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
@@ -968,7 +974,8 @@ else()
   endif()
 
   # Check if our libraries have unresolved symbols
-  if(NOT APPLE AND NOT HPX_WITH_APEX)
+  #if(NOT APPLE AND NOT HPX_WITH_APEX)
+  if(NOT APPLE)
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
 
@@ -1105,6 +1112,10 @@ if(HPX_WITH_APEX)
   if(APEX_WITH_ACTIVEHARMONY)
     set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+  endif()
+  if(APEX_WITH_TAU)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${TAU_ROOT}/lib -lTAU)
   endif()
 
   # handle optional ITTNotify library

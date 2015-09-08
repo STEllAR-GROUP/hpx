@@ -41,6 +41,7 @@ static boost::shared_mutex init_mutex;
 
 /* Notes on building and running Throttling scheduler
 
+BASED ON THE local_priority_queue scheduler.
 
 add -DHPX_HAVE_THROTTLE_SCHEDULER=1 to cmake to include the throttling during the HPX build.
 I haven't tested but the flag to include all schedulers should also work.
@@ -136,16 +137,17 @@ namespace hpx { namespace threads { namespace policies
             queue_count_(init.num_queues_),
             apex_current_threads(false),
             numa_sensitive_(init.numa_sensitive_),
-#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
+#ifndef HPX_NATIVE_MIC        // we know that the MIC has one NUMA domain only
             steals_in_numa_domain_(init.num_queues_),
             steals_outside_numa_domain_(init.num_queues_),
 #endif
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || defined(HPX_HAVE_MAX_CPU_COUNT)
+#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || defined(HPX_HAVE_MAX_CPU_COUNT)
             numa_domain_masks_(init.num_queues_),
             outside_numa_domain_masks_(init.num_queues_)
 #else
             numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask()),
-            outside_numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask())
+            outside_numa_domain_masks_(init.num_queues_,
+                topology_.get_machine_affinity_mask())
 #endif
         {
             std::cerr << "starting Throttling Scheduler\n" << std::endl;
@@ -211,9 +213,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_misses;
         }
 
-        boost::uint64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
         {
-            boost::uint64_t num_pending_accesses = 0;
+            boost::int64_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -238,7 +240,8 @@ namespace hpx { namespace threads { namespace policies
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += queues_[num_thread]->get_num_stolen_from_pending(reset);
+            num_stolen_threads += queues_[num_thread]->
+                get_num_stolen_from_pending(reset);
             return num_stolen_threads;
         }
 
@@ -464,7 +467,8 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->schedule_thread(thrd);
         }
 
-        void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
+        void schedule_thread_last(threads::thread_data_base* thrd,
+            std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
             throttle_queue_scheduler::schedule_thread(thrd, num_thread, priority);
@@ -634,7 +638,7 @@ namespace hpx { namespace threads { namespace policies
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
-                if (test(steals_in_numa_domain_, num_thread))
+                if (test(steals_in_numa_domain_, num_thread)) //-V600 //-V111
 #endif
                 {
                     mask_cref_type numa_domain_mask =
@@ -647,6 +651,7 @@ namespace hpx { namespace threads { namespace policies
                         HPX_ASSERT(idx != num_thread);
 
                         if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                            //-V600
                             continue;
 
                         result = queues_[num_thread]->wait_or_add_new(running,
@@ -660,9 +665,9 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
 
-#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
+#ifndef HPX_NATIVE_MIC        // we know that the MIC has one NUMA domain only
                 // if nothing found, ask everybody else
-                if (test(steals_outside_numa_domain_, num_thread)) {
+                if (test(steals_outside_numa_domain_, num_thread)) { //-V600 //-V111
                     mask_cref_type numa_domain_mask =
                         outside_numa_domain_masks_[num_thread];
                     for (std::size_t i = 1; i != queues_size; ++i)
@@ -673,6 +678,7 @@ namespace hpx { namespace threads { namespace policies
                         HPX_ASSERT(idx != num_thread);
 
                         if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                            //-V600
                             continue;
 
                         result = queues_[num_thread]->wait_or_add_new(running,
@@ -726,7 +732,8 @@ namespace hpx { namespace threads { namespace policies
                             << "no new work available, are we deadlocked?";
                     }
                     else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] " //-V128
+                        LHPX_CONSOLE_(hpx::util::logging::level::error)
+                              << "  [TM] " //-V128
                               << "queue(" << num_thread << "): "
                               << "no new work available, are we deadlocked?\n";
                     }

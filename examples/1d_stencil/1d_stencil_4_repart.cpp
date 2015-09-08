@@ -69,6 +69,8 @@ void setup_counters() {
     catch(hpx::exception const& e) {
         std::cerr << "apex_policy_engine_active_thread_count: caught exception: "
             << e.what() << std::endl;
+        counter_id = hpx::naming::invalid_id;
+        return;
     }
     counters_initialized = true;
 }
