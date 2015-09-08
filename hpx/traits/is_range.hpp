@@ -19,7 +19,7 @@ namespace hpx { namespace traits
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(end);
     }
 
-    template <class T>
+    template <class T, class Enable>
     struct is_range:
         boost::mpl::and_<detail::has_begin<T>,
             detail::has_end<T> > {};

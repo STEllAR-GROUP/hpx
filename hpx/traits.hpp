@@ -104,7 +104,7 @@ namespace hpx { namespace traits
     struct default_chunk_size;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Range>
+    template <typename Range, typename Enable = void>
     struct is_range;
 
     template <typename Future, typename Enable = void>
