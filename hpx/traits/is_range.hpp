@@ -7,20 +7,22 @@
 #define HPX_TRAITS_IS_RANGE_HPP
 
 #include <hpx/util/always_void.hpp>
+#include <hpx/traits/has_member_xxx.hpp>
 
-#include <boost/mpl/bool.hpp>
-#include <boost/utility/declval.hpp>
+#include <boost/mpl/and.hpp>
 
 namespace hpx { namespace traits
 {
-    template <class T, class>
-    struct is_range: boost::mpl::false_ {};
+    namespace detail
+    {
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(begin);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(end);
+    }
 
     template <class T>
-    struct is_range<T, typename util::always_void<decltype(
-            boost::declval<T>().begin(),
-            boost::declval<T>().end())>::type >:
-                boost::mpl::true_ {};
+    struct is_range:
+        boost::mpl::and_<detail::has_begin<T>,
+            detail::has_end<T> > {};
 
 }}
 
