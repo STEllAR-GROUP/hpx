@@ -79,7 +79,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 //[fib_main
 int main(int argc, char* argv[])
 {
-	apex::apex_options::use_screen_output(true);
+    apex::apex_options::use_screen_output(true);
 
     // Configure application-specific options
     boost::program_options::options_description
@@ -91,20 +91,43 @@ int main(int argc, char* argv[])
           "n value for the Fibonacci function")
         ;
 
-    std::set<apex_event_type> when = {APEX_STARTUP, APEX_SHUTDOWN, APEX_NEW_NODE, APEX_NEW_THREAD,
-        APEX_START_EVENT, APEX_STOP_EVENT, APEX_SAMPLE_VALUE};
+    std::set<apex_event_type> when = {APEX_STARTUP, APEX_SHUTDOWN, APEX_NEW_NODE, 
+        APEX_NEW_THREAD, APEX_START_EVENT, APEX_STOP_EVENT, APEX_SAMPLE_VALUE};
     apex::register_policy(when, [](apex_context const& context)->int{
         switch(context.event_type) {
-            case APEX_STARTUP: std::cout      << "Startup event" << std::endl; break;
-            case APEX_SHUTDOWN: std::cout     << "Shutdown event" << std::endl; break;
-            case APEX_NEW_NODE: std::cout     << "New node event" << std::endl; break;
-            case APEX_NEW_THREAD: std::cout   << "New thread event" << std::endl; break;
-            case APEX_START_EVENT: std::cout  << "Start event" << std::endl; break;
-            case APEX_STOP_EVENT: std::cout   << "Stop event" << std::endl; break;
-            case APEX_SAMPLE_VALUE: std::cout << "Sample value event" << std::endl; break;
-            default: std::cout << "Unknown event" << std::endl;
+            case APEX_STARTUP: {
+              std::cout << "Startup event" << std::endl;
+              break;
+            }
+            case APEX_SHUTDOWN: {
+              std::cout << "Shutdown event" << std::endl;
+              break;
+            }
+            case APEX_NEW_NODE: {
+              std::cout << "New node event" << std::endl;
+              break;
+            }
+            case APEX_NEW_THREAD: {
+              std::cout << "New thread event" << std::endl;
+              break;
+            }
+            case APEX_START_EVENT: {
+              std::cout << "Start event" << std::endl;
+              break;
+            }
+            case APEX_STOP_EVENT: {
+              std::cout << "Stop event" << std::endl;
+              break;
+            }
+            case APEX_SAMPLE_VALUE: {
+              std::cout << "Sample value event" << std::endl;
+              break;
+            }
+            default: {
+              std::cout << "Unknown event" << std::endl;
+            }
         }
-		return APEX_NOERROR;
+        return APEX_NOERROR;
     });
 
     // Initialize and run HPX

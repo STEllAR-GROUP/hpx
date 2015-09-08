@@ -411,12 +411,12 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_HAVE_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
-  if(HPX_WITH_APEX)                                                                
+  if(HPX_WITH_APEX)
     if(_scheduler STREQUAL "THROTTLE" OR _all)
       hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
       set(HPX_HAVE_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
     endif()
-  endif(HPX_WITH_APEX)                                                                
+  endif(HPX_WITH_APEX)
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
     set(HPX_HAVE_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
@@ -1449,11 +1449,11 @@ install( # Install HPX Python scripts
 #       #make copy, so that we have intact symlink in CMAKE_BINARY_DIR
 #       execute_process(
 #         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${script}" "${script_name}"
-# 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+#   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 #
 #       execute_process(
 #         COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
-# 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+#   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 #
 #       install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "bin")
 #     endforeach()

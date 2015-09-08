@@ -65,7 +65,10 @@ static const char * counter_name = "/threadqueue{locality#%d/total}/length";
 id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
     boost::uint32_t const prefix = hpx::get_locality_id();
-    //boost::format active_threads("/threads{locality#%d/total}/count/instantaneous/active");
+    /*
+    boost::format 
+      active_threads("/threads{locality#%d/total}/count/instantaneous/active");
+    */
     boost::format active_threads(counter_name);
     id_type id = get_counter(boost::str(active_threads % prefix));
     return id;
