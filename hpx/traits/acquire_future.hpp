@@ -142,7 +142,7 @@ namespace hpx { namespace traits
             return std::move(futures);
         }
 
-        template <class Range_>
+        template <typename Range_>
         BOOST_FORCEINLINE Range
         operator()(Range_&& futures) const
         {
