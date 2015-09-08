@@ -103,7 +103,7 @@ namespace hpx { namespace threads
           , error_code& ec = throws
             ) const;
 
-        mask_cref_type get_thread_affinity_mask_from_lva(
+        mask_type get_thread_affinity_mask_from_lva(
             naming::address::address_type
           , error_code& ec = throws
             ) const;
