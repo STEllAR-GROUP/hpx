@@ -158,8 +158,7 @@ namespace hpx { namespace serialization
             ar << valid;
             if(valid)
             {
-                boost::uint64_t cur_pos =
-                    static_cast<basic_archive<output_archive>&>(ar).current_pos();
+                boost::uint64_t cur_pos = current_pos(ar);
                 boost::uint64_t pos = track_pointer(ar, ptr.get());
                 ar << pos;
                 if(pos == boost::uint64_t(-1))
