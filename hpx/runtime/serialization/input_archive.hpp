@@ -126,7 +126,7 @@ namespace hpx { namespace serialization
         }
 
     private:
-        friend base_type;
+        friend struct basic_archive<input_archive>;
         template <class T>
         friend class array;
 

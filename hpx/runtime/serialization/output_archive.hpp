@@ -103,7 +103,7 @@ namespace hpx { namespace serialization
         naming::gid_type get_new_gid(naming::gid_type const & gid);
 
     private:
-        friend base_type;
+        friend struct basic_archive<output_archive>;
         template <class T>
         friend class array;
 
