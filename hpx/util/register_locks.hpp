@@ -8,7 +8,7 @@
 #define HPX_UTIL_REGISTER_LOCKS_JUN_26_2012_1029AM
 
 #include <hpx/config.hpp>
-#if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
+#if !defined(BOOST_NO_SFINAE_EXPR)
 #include <hpx/util/always_void.hpp>
 
 #include <boost/utility/declval.hpp>
@@ -56,7 +56,7 @@ namespace hpx { namespace util
         }
     };
 
-#if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
+#if !defined(BOOST_NO_SFINAE_EXPR)
     template <typename Lock>
     struct ignore_while_checking<Lock,
         typename util::always_void<

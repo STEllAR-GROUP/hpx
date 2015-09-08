@@ -17,6 +17,8 @@
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/identity.hpp>
 
+#include <string>
+
 namespace hpx { namespace serialization
 {
     namespace detail

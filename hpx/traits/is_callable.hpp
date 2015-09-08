@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276) // C++03
+#if defined(BOOST_NO_SFINAE_EXPR) || !defined(HPX_HAVE_CXX11_DECLTYPE_N3276) // C++03
 
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/decay.hpp>

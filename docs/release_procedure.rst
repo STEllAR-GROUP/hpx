@@ -66,7 +66,7 @@ Note: If you are using commandline git to change branches use:
 #.  Checkout the main branch, and bump the HPX version to the next release
     target. The following files contain version info:
 
-    *   ``hpx/version.hpp``
+    *   ``hpx/config/version.hpp``
     *   ``docs/hpx.qbk``
     *   ``CMakeLists.txt``
     *   Grep for old version number
@@ -76,7 +76,7 @@ Note: If you are using commandline git to change branches use:
     lines 262/263.
 
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
-    ``hpx/version.hpp`` (replace it with ``-rc1`` for the release candidate
+    ``hpx/config/version.hpp`` (replace it with ``-rc1`` for the release
     and later with an empty string for the actual release).
     
 #.  Change logo for release documentation by removing '_draft' suffix 
