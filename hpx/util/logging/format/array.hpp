@@ -26,12 +26,13 @@
 
 namespace hpx { namespace util { namespace logging {
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // array holder class
     namespace array {
 
     /**
-        Holds an array of manipulators (formatters or destinations). It owns them, holding them internally as smart pointers
+        Holds an array of manipulators (formatters or destinations). It owns them,
+        holding them internally as smart pointers
         Each function call is locked.
 
         The base_type must implement operator==
@@ -39,7 +40,8 @@ namespace hpx { namespace util { namespace logging {
         When you call get_ptr() or del(), the type you provide, must implement
         operator==(const type& , const base_type&)
     */
-    template <class base_type, class mutex = hpx::util::logging::threading::mutex > class shared_ptr_holder {
+    template <class base_type, class mutex = hpx::util::logging::threading::mutex >
+    class shared_ptr_holder {
         typedef typename mutex::scoped_lock scoped_lock;
     public:
         typedef base_type value_type;
@@ -56,7 +58,8 @@ namespace hpx { namespace util { namespace logging {
 
         template<class derived> base_type * get_ptr(derived val) const {
             scoped_lock lk(m_cs);
-            for ( typename array_type::const_iterator b = m_array.begin(), e = m_array.end(); b != e; ++b)
+            for ( typename array_type::const_iterator b = m_array.begin(),
+                e = m_array.end(); b != e; ++b)
                 if ( val == (*(b->get())) )
                     return b->get();
 
@@ -71,7 +74,8 @@ namespace hpx { namespace util { namespace logging {
 
         void del(base_type * p) {
             scoped_lock lk(m_cs);
-            for ( typename array_type::iterator b = m_array.begin(), e = m_array.end(); b != e; ++b)
+            for ( typename array_type::iterator b = m_array.begin(),
+                e = m_array.end(); b != e; ++b)
                 if ( b->get() == p) {
                     m_array.erase(b);
                     return ;

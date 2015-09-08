@@ -259,7 +259,8 @@ struct HPX_EXPORT locality_namespace
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(locality_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(locality_namespace, remote_bulk_service, bulk_service_action);
+    HPX_DEFINE_COMPONENT_ACTION(locality_namespace, remote_bulk_service,
+        bulk_service_action);
 };
 
 }}}

@@ -219,7 +219,8 @@ namespace hpx
         {
             // manage certificates for root-CA and sub-CA
             util::security::root_certificate_authority root_certificate_authority_;
-            util::security::subordinate_certificate_authority subordinate_certificate_authority_;
+            util::security::subordinate_certificate_authority
+                subordinate_certificate_authority_;
 
             // certificate store
             std::unique_ptr<components::security::certificate_store> cert_store_;
@@ -227,7 +228,8 @@ namespace hpx
         };
     }
 
-    components::security::certificate_store const * runtime::cert_store(error_code& ec) const
+    components::security::certificate_store const * runtime::cert_store(error_code& ec)
+        const
     {
         HPX_ASSERT(security_data_.get() != 0);
         if (0 == security_data_->cert_store_.get())     // should have been created
@@ -362,7 +364,8 @@ namespace hpx
                 // finish initializing our sub-CA
                 boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
                 security_data_->locality_certificate_ = subca_cert;
-                security_data_->subordinate_certificate_authority_.set_certificate(subca_cert);
+                security_data_
+                    ->subordinate_certificate_authority_.set_certificate(subca_cert);
             }
 
             // add the certificates of the root's sub-CA and our own
@@ -408,7 +411,8 @@ namespace hpx
             "certificate: %2%") % here() % cert);
 
         boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
-        HPX_ASSERT(0 != security_data_->cert_store_.get());     // should have been created
+        HPX_ASSERT(0 != security_data_->cert_store_.get());
+        // should have been created
         security_data_->cert_store_->insert(cert);
     }
 
@@ -538,7 +542,8 @@ namespace hpx
 
     boost::uint64_t runtime::get_system_uptime()
     {
-        boost::int64_t diff = util::high_resolution_clock::now() - *runtime::uptime_.get();
+        boost::int64_t diff =
+            util::high_resolution_clock::now() - *runtime::uptime_.get();
         return diff < 0LL ? 0ULL : static_cast<boost::uint64_t>(diff);
     }
 
@@ -1103,7 +1108,8 @@ namespace hpx
             return false;
 
         bool numa_sensitive = false;
-        if (std::size_t(-1) != rt->get_thread_manager().get_worker_thread_num(&numa_sensitive))
+        if (std::size_t(-1) !=
+            rt->get_thread_manager().get_worker_thread_num(&numa_sensitive))
             return numa_sensitive;
         return false;
     }
@@ -1419,7 +1425,8 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
-            return rt->create_binary_filter(binary_filter_type, compress, next_filter, ec);
+            return rt->create_binary_filter
+                    (binary_filter_type, compress, next_filter, ec);
 
         HPX_THROWS_IF(ec, invalid_status, "create_binary_filter",
             "the runtime system is not available at this time");

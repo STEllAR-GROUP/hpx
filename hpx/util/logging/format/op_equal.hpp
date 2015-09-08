@@ -41,10 +41,12 @@ namespace op_equal {
         virtual ~same_type_op_equal_top() {}
         same_type_op_equal_top(const same_type_op_equal_top&) {}
     };
-    inline bool operator ==(const same_type_op_equal_top& a, const same_type_op_equal_top&b) { return a.equals(b); }
+    inline bool operator ==(const same_type_op_equal_top& a,
+        const same_type_op_equal_top&b) { return a.equals(b); }
 
     /**
-        @brief Base class when you want to implement operator== that will compare based on type and member operator==
+        @brief Base class when you want to implement operator==
+        that will compare based on type and member operator==
 
         @sa same_type_op_equal
     */
@@ -55,7 +57,9 @@ namespace op_equal {
     };
 
     /**
-        @brief Implements operator==, which compares two objects. If they have the same type, it will compare them using the type's member operator==.
+        @brief Implements operator==, which compares two objects.
+        If they have the same type, it will compare them using the type's member
+        operator==.
 
         The only constraint is that operator== must be a *member* function
     */

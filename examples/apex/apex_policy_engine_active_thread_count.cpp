@@ -65,7 +65,10 @@ static const char * counter_name = "/threadqueue{locality#%d/total}/length";
 id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
     boost::uint32_t const prefix = hpx::get_locality_id();
-    //boost::format active_threads("/threads{locality#%d/total}/count/instantaneous/active");
+    /*
+    boost::format
+      active_threads("/threads{locality#%d/total}/count/instantaneous/active");
+    */
     boost::format active_threads(counter_name);
     id_type id = get_counter(boost::str(active_threads % prefix));
     return id;
@@ -117,15 +120,16 @@ bool test_function(apex_context const& context) {
         //id_type id = get_counter_id();
         counter_value value1 = performance_counter::get_value(counter_id);
         if (value1.get_value<int>() % 2 == 1) {
-          return true;
+          return APEX_NOERROR;
         } else {
-          return false;
+          std::cerr << "Expecting an error message..." << std::endl;
+          return APEX_ERROR;
         }
     }
     catch(hpx::exception const& e) {
         std::cerr << "apex_policy_engine_active_thread_count: caught exception: "
             << e.what() << std::endl;
-        return false;
+        return APEX_ERROR;
     }
 }
 

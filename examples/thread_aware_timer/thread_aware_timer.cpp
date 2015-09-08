@@ -15,7 +15,8 @@ int main(int argc, char* argv[])
 {
     hpx::util::thread_aware_timer tat;
 
-    double sum_samples = 0, min_sample = (std::numeric_limits<double>::max)(), max_sample = 0;
+    double sum_samples = 0, min_sample = (std::numeric_limits<double>::max)
+        (), max_sample = 0;
     for (int i = 0; i < NUMTESTS; ++i) {
         hpx::util::high_resolution_timer t;
         tat.elapsed();

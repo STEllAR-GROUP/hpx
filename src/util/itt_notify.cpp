@@ -169,12 +169,18 @@ bool use_ittnotify_api = false;
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_INTERNAL_ITT_SYNC_PREPARE(obj)           HPX_INTERNAL_ITT_SYNC(sync_prepare, obj)
-#define HPX_INTERNAL_ITT_SYNC_CANCEL(obj)            HPX_INTERNAL_ITT_SYNC(sync_cancel, obj)
-#define HPX_INTERNAL_ITT_SYNC_ACQUIRED(obj)          HPX_INTERNAL_ITT_SYNC(sync_acquired, obj)
-#define HPX_INTERNAL_ITT_SYNC_RELEASING(obj)         HPX_INTERNAL_ITT_SYNC(sync_releasing, obj)
-#define HPX_INTERNAL_ITT_SYNC_RELEASED(obj)          ((void)0) //HPX_INTERNAL_ITT_SYNC(sync_released, obj)
-#define HPX_INTERNAL_ITT_SYNC_DESTROY(obj)           HPX_INTERNAL_ITT_SYNC(sync_destroy, obj)
+#define HPX_INTERNAL_ITT_SYNC_PREPARE(obj)\
+           HPX_INTERNAL_ITT_SYNC(sync_prepare, obj)
+#define HPX_INTERNAL_ITT_SYNC_CANCEL(obj)\
+            HPX_INTERNAL_ITT_SYNC(sync_cancel, obj)
+#define HPX_INTERNAL_ITT_SYNC_ACQUIRED(obj)\
+          HPX_INTERNAL_ITT_SYNC(sync_acquired, obj)
+#define HPX_INTERNAL_ITT_SYNC_RELEASING(obj)\
+         HPX_INTERNAL_ITT_SYNC(sync_releasing, obj)
+#define HPX_INTERNAL_ITT_SYNC_RELEASED(obj)\
+          ((void)0) //HPX_INTERNAL_ITT_SYNC(sync_released, obj)
+#define HPX_INTERNAL_ITT_SYNC_DESTROY(obj)\
+           HPX_INTERNAL_ITT_SYNC(sync_destroy, obj)
 
 ///////////////////////////////////////////////////////////////////////////////
 void itt_sync_create(void *addr, const char* objtype, const char* objname)
@@ -325,7 +331,8 @@ void itt_heap_allocate_begin(__itt_heap_function f, std::size_t size, int init)
     HPX_INTERNAL_HEAP_ALLOCATE_BEGIN(f, size, init);
 }
 
-void itt_heap_allocate_end(__itt_heap_function f, void** addr, std::size_t size, int init)
+void itt_heap_allocate_end(__itt_heap_function f, void** addr,
+    std::size_t size, int init)
 {
     HPX_INTERNAL_HEAP_ALLOCATE_END(f, addr, size, init);
 }
@@ -340,12 +347,14 @@ void itt_heap_free_end(__itt_heap_function f, void* addr)
     HPX_INTERNAL_HEAP_FREE_END(f, addr);
 }
 
-void itt_heap_reallocate_begin(__itt_heap_function f, void* addr, std::size_t new_size, int init)
+void itt_heap_reallocate_begin(__itt_heap_function f, void* addr,
+    std::size_t new_size, int init)
 {
     HPX_INTERNAL_HEAP_REALLOCATE_BEGIN(f, addr, new_size, init);
 }
 
-void itt_heap_reallocate_end(__itt_heap_function f, void* addr, void** new_addr, std::size_t new_size, int init)
+void itt_heap_reallocate_end(__itt_heap_function f, void* addr,
+    void** new_addr, std::size_t new_size, int init)
 {
     HPX_INTERNAL_HEAP_REALLOCATE_END(f, addr, new_addr, new_size, init);
 }

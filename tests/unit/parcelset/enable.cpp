@@ -69,7 +69,8 @@ void test_disable_enable(std::vector<hpx::id_type> const & localities)
         hpx::this_thread::yield();
 
         HPX_TEST_EQ(sent, send_count());
-        // Decoding might have taken a little longer which increases the receive count ...
+        // Decoding might have taken a little longer which increases the
+        // receive count ...
         // ... so we don't check for equality here
         //HPX_TEST(received == receive_count() || received + 1 == receive_count());
 
@@ -110,7 +111,8 @@ void test_disable(std::vector<hpx::id_type> const & localities)
         hpx::this_thread::yield();
 
         HPX_TEST_EQ(sent, send_count());
-        // Decoding might have taken a little longer which increases the receive count ...
+        // Decoding might have taken a little longer which increases the
+        // receive count ...
         // ... so we don't check for equality here
         //HPX_TEST(received == receive_count() || received + 1 == receive_count());
 

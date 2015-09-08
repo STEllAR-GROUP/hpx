@@ -159,7 +159,8 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
         {
             std::size_t i = 42;
             const_local_iterator loc_end = const_traits::end(const_traits::segment(it));
-            for (const_local_iterator lcit = const_traits::begin(const_traits::segment(it));
+            for (const_local_iterator lcit =
+                const_traits::begin(const_traits::segment(it));
                  lcit != loc_end; ++lcit, ++i)
             {
                 HPX_TEST_EQ(*lcit, T(i));
@@ -357,7 +358,8 @@ void trivial_tests()
 
     trivial_test_with_policy<T>(length, 1, hpx::container_layout, "test1");
     trivial_test_with_policy<T>(length, 3, hpx::container_layout(3), "test2");
-    trivial_test_with_policy<T>(length, 3, hpx::container_layout(3, localities), "test3");
+    trivial_test_with_policy<T>(length, 3,
+        hpx::container_layout(3, localities), "test3");
     trivial_test_with_policy<T>(length, localities.size(),
         hpx::container_layout(localities), "test4");
 }

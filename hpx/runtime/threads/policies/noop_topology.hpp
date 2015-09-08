@@ -180,7 +180,8 @@ public:
         return 0;
     }
 
-    void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const
+    void print_affinity_mask(std::ostream& os, std::size_t num_thread,
+        mask_type const& m) const
     {
     }
 

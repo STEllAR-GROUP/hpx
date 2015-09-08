@@ -33,7 +33,8 @@ namespace placeholders = hpx::util::placeholders;
 
 long f( long a, long b, long c, long d, long e, long f, long g, long h, long i )
 {
-    return a + 10 * b + 100 * c + 1000 * d + 10000 * e + 100000 * f + 1000000 * g + 10000000 * h + 100000000 * i;
+    return a + 10 * b + 100 * c + 1000 * d + 10000 * e
+        + 100000 * f + 1000000 * g + 10000000 * h + 100000000 * i;
 }
 
 template< int I > struct custom_placeholder

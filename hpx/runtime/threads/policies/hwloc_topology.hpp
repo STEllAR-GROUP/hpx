@@ -125,7 +125,8 @@ namespace hpx { namespace threads
             ) const;
 
         mask_type get_cpubind_mask(error_code& ec = throws) const;
-        mask_type get_cpubind_mask(boost::thread & handle, error_code& ec = throws) const;
+        mask_type get_cpubind_mask(boost::thread & handle,
+            error_code& ec = throws) const;
 
         ///////////////////////////////////////////////////////////////////////
         std::size_t get_number_of_sockets() const;

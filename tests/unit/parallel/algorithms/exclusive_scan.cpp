@@ -418,7 +418,8 @@ void test_exclusive_scan_validate(ExPolicy p, std::vector<int> &a, std::vector<i
 
     // test 1, fill array with numbers counting from 0, then run scan algorithm
     a.clear();
-    std::copy(boost::counting_iterator<int>(0), boost::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
+    std::copy(boost::counting_iterator<int>(0),
+        boost::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
 #ifdef DUMP_VALUES
     std::cout << "\nValidating counting from 0 " << "\nInput : ";
     std::copy(a.begin(), a.begin()+DISPLAY, std::ostream_iterator<int>(std::cout, ", "));
@@ -444,7 +445,8 @@ void test_exclusive_scan_validate(ExPolicy p, std::vector<int> &a, std::vector<i
 
     // test 2, fill array with numbers counting from 1, then run scan algorithm
     a.clear();
-    std::copy(boost::counting_iterator<int>(1), boost::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
+    std::copy(boost::counting_iterator<int>(1),
+        boost::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
   #ifdef DUMP_VALUES
     std::cout << "\nValidating counting from 1 " << "\nInput : ";
     std::copy(a.begin(), a.begin()+DISPLAY, std::ostream_iterator<int>(std::cout, ", "));

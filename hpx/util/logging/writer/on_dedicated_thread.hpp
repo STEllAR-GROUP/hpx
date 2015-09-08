@@ -37,7 +37,8 @@ namespace hpx { namespace util { namespace logging { namespace writer {
 
 namespace detail {
     template<class msg_type> struct dedicated_thread_context {
-        dedicated_thread_context() : is_working(true), write_period_ms(100), is_paused(false), pause_acknowledged (false) {}
+        dedicated_thread_context() : is_working(true), write_period_ms(100),
+            is_paused(false), pause_acknowledged (false) {}
 
         bool is_working;
         int write_period_ms;
@@ -63,23 +64,30 @@ namespace detail {
 }
 
 /**
-@brief Performs all writes on a dedicated thread  - very efficient and <b>thread-safe</b>.
+@brief Performs all writes on a dedicated thread
+- very efficient and <b>thread-safe</b>.
 
 <tt>\#include <hpx/util/logging/writer/on_dedicated_thread.hpp> </tt>
 
 Keeps locks in the worker threads to a minimum:
-whenever a message is logged, is put into a queue (this is how long the lock lasts).
-Then, a dedicated thread reads the queue, and processes the messages (applying formatters and destinations if needed).
+whenever a message is logged, is put into a queue
+(this is how long the lock lasts).
+Then, a dedicated thread reads the queue, and processes the messages
+(applying formatters and destinations if needed).
 
-@section on_dedicated_thread_logger Transforming a logger into on-dedicated-thread writer
+@section on_dedicated_thread_logger Transforming a logger into
+on-dedicated-thread writer
 
-To transform a @b logger into on-dedicated-thread (thread-safe) writer, simply specify @c on_dedicated_thread as the thread safety:
+To transform a @b logger into on-dedicated-thread (thread-safe) writer,
+simply specify @c on_dedicated_thread as the thread safety:
 
 @code
-typedef logger_format_write< default_, default_, writer::threading::on_dedicated_thread > logger_type;
+typedef logger_format_write< default_, default_,
+writer::threading::on_dedicated_thread > logger_type;
 @endcode
 
-Of if you're using @ref hpx::util::logging::scenario::usage scenarios, specify @c speed for the @c logger::favor_ :
+Of if you're using @ref hpx::util::logging::scenario::usage scenarios,
+specify @c speed for the @c logger::favor_ :
 @code
 using namespace hpx::util::logging::scenario::usage;
 typedef use< ..., ..., ..., logger_::favor::speed> finder;
@@ -90,7 +98,8 @@ typedef use< ..., ..., ..., logger_::favor::speed> finder;
 \n\n
 @section on_dedicated_thread_writer Transforming a writer into on-dedicated-thread writer
 
-To transform a @b writer into on-dedicated-thread thread-safe writer, simply surround the writer with @c on_dedicated_thread:
+To transform a @b writer into on-dedicated-thread thread-safe writer,
+simply surround the writer with @c on_dedicated_thread:
 
 Example:
 
@@ -104,20 +113,27 @@ logger< string, write_to_cout> g_l();
 logger< string, on_dedicated_thread<string,write_to_cout> > g_l();
 @endcode
 
-You should note that a @b writer is not necessary a %logger. It can be a destination, for instance. For example, you might have a destination
-where writing is time consuming, while writing to the rest of the destinations is very fast.
-You can choose to write to all but that destination on the current thread, and to that destination on a dedicated thread.
-(If you want to write to all destinations on a different thread, we can go back to @ref on_dedicated_thread_logger "transforming a logger...")
+You should note that a @b writer is not necessary a %logger. It can be a destination,
+for instance. For example, you might have a destination
+where writing is time consuming, while writing to the rest of the destinations
+is very fast.
+You can choose to write to all but that destination on the current thread,
+and to that destination on a dedicated thread.
+(If you want to write to all destinations on a different thread,
+we can go back to @ref on_dedicated_thread_logger "transforming a logger...")
 
 */
 template<class msg_type, class base_type>
 struct on_dedicated_thread
         : base_type,
-          hpx::util::logging::manipulator::non_const_context<detail::dedicated_thread_context<msg_type> > {
+          hpx::util::logging::manipulator::non_const_context<detail
+    ::dedicated_thread_context<msg_type> > {
 
     typedef on_dedicated_thread<msg_type,base_type> self_type;
     typedef typename detail::dedicated_thread_context<msg_type> context_type;
-    typedef typename hpx::util::logging::manipulator::non_const_context<detail::dedicated_thread_context<msg_type> > non_const_context_base;
+    typedef typename hpx::util::logging::manipulator
+        ::non_const_context<detail::dedicated_thread_context<msg_type> >
+        non_const_context_base;
 
     typedef hpx::util::logging::threading::mutex::scoped_lock scoped_lock;
 
@@ -154,7 +170,8 @@ struct on_dedicated_thread
 
         scoped_lock lk( non_const_context_base::context().cs);
         if ( !non_const_context_base::context().writer)
-            non_const_context_base::context().writer = thread_ptr( new boost::thread( boost::bind(&self_type::do_write,this) ));
+            non_const_context_base::context().writer = thread_ptr(
+                new boost::thread( boost::bind(&self_type::do_write,this) ));
 
         non_const_context_base::context().msgs.push_back(new_msg);
     }
@@ -166,10 +183,13 @@ struct on_dedicated_thread
         non_const_context_base::context().is_paused = false;
     }
 
-    /** @brief Pauses the writes, so that you can manipulate the base object (the formatters/destinations, for instance)
+    /** @brief Pauses the writes, so that you can manipulate the base object
+    (the formatters/destinations, for instance)
 
-    After this function has been called, you can be @b sure that the other (dedicated) thread is not writing any messagges.
-    In other words, the other thread is not manipulating the base object (formatters/destinations, for instance), but you can do it.
+    After this function has been called, you can be @b sure that the other
+    (dedicated) thread is not writing any messagges.
+    In other words, the other thread is not manipulating the base object
+    (formatters/destinations, for instance), but you can do it.
 
     FIXME allow a timeout as well
     */
@@ -214,7 +234,8 @@ private:
 
             scoped_lock lk( non_const_context_base::context().cs);
             if ( non_const_context_base::context().is_paused)
-                // this way we wake up early after we've been pause()d, even if sleep_ms has a high value
+                // this way we wake up early after we've been pause()d,
+                // even if sleep_ms has a high value
                 break;
         }
     }
@@ -247,7 +268,8 @@ private:
     }
 
 protected:
-    // note: this is virtual, so that if you want to do profiling, you can (that is, you can override this as well
+    // note: this is virtual, so that if you want to do profiling,
+    // you can (that is, you can override this as well
     virtual void write_array() const {
         typedef typename context_type::array array;
 

@@ -285,7 +285,8 @@ namespace hpx { namespace actions
         }
 
         threads::thread_init_data&
-        get_thread_init_data(std::unique_ptr<continuation> cont, naming::id_type const& target,
+        get_thread_init_data(std::unique_ptr<continuation> cont,
+            naming::id_type const& target,
             naming::address::address_type lva, threads::thread_init_data& data)
         {
             data.func = get_thread_function(std::move(cont), lva);
@@ -316,7 +317,8 @@ namespace hpx { namespace actions
             if (traits::action_decorate_continuation<derived_type>::call(cont))
             {
                 traits::action_schedule_thread<derived_type>::call(lva,
-                    get_thread_init_data(std::move(cont), target, lva, data), initial_state);
+                    get_thread_init_data(std::move(cont), target, lva, data),
+                    initial_state);
             }
             else
             {

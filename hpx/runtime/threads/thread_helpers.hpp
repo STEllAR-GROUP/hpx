@@ -9,6 +9,7 @@
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>
@@ -194,7 +195,8 @@ namespace hpx { namespace threads
     HPX_API_EXPORT util::backtrace const* get_thread_backtrace(
         thread_id_type const& id, error_code& ec = throws);
     HPX_API_EXPORT util::backtrace const* set_thread_backtrace(
-        thread_id_type const& id, util::backtrace const* bt = 0, error_code& ec = throws);
+        thread_id_type const& id, util::backtrace const* bt = 0,
+        error_code& ec = throws);
 #endif
 
     ///////////////////////////////////////////////////////////////////////////

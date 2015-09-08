@@ -125,13 +125,16 @@ namespace hpx {
       : runtime(rtcfg, init_affinity),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
-            boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2, false),
+            boost::bind(&runtime_impl::init_tss, This(),
+                "main-thread", ::_1, ::_2, false),
             boost::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
         io_pool_(rtcfg.get_thread_pool_size("io_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "io-thread",
+                ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "timer-thread",
+                ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         scheduler_(init),
         notifier_(runtime_impl<SchedulingPolicy>::
@@ -140,7 +143,8 @@ namespace hpx {
             new hpx::threads::threadmanager_impl<SchedulingPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
         parcel_handler_(rtcfg, thread_manager_.get(),
-            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread",
+                ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(parcel_handler_, ini_, mode_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
@@ -343,6 +347,9 @@ namespace hpx {
         // set thread name as shown in Visual Studio
         util::set_thread_name("main-thread#wait_helper");
 
+#if defined(HPX_HAVE_APEX)
+        apex::register_thread("main-thread#wait_helper");
+#endif
         // wait for termination
         runtime_support_->wait();
 
@@ -597,6 +604,10 @@ namespace hpx {
 
             // set thread name as shown in Visual Studio
             util::set_thread_name(name);
+
+#if defined(HPX_HAVE_APEX)
+            apex::register_thread(name);
+#endif
         }
 
         // if this is a service thread, set its service affinity
@@ -740,6 +751,12 @@ template class HPX_EXPORT hpx::runtime_impl<
 #include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::static_queue_scheduler<> >;
+#endif
+
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::runtime_impl<
+    hpx::threads::policies::throttle_queue_scheduler<> >;
 #endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)

@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
@@ -71,12 +72,12 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         unique_function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
           : unique_function_vtable_ptr<Sig, void, void>(boost::mpl::identity<T>())
-          , name(get_function_name<std::pair<unique_function_vtable_ptr, T> >())
+          , name(get_function_name<util::tuple<unique_function_vtable_ptr, T> >())
           , save_object(&serializable_vtable<IAr, OAr>::template save_object<T>)
           , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
         {
             init_registration<
-                std::pair<unique_function_vtable_ptr, T>
+                util::tuple<unique_function_vtable_ptr, T>
             >::g.register_function();
         }
     };
@@ -85,21 +86,21 @@ namespace hpx { namespace util { namespace detail
     // registration code for serialization
     template <typename Sig, typename IAr, typename OAr, typename T>
     struct init_registration<
-        std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
     >
     {
-        typedef std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T> vtable_ptr;
+        typedef util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T> vtable_ptr;
 
         static automatic_function_registration<vtable_ptr> g;
     };
 
     template <typename Sig, typename IAr, typename OAr, typename T>
     automatic_function_registration<
-        std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
     > init_registration<
-        std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
     >::g =  automatic_function_registration<
-                std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+                util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
             >();
 }}}
 
@@ -253,7 +254,8 @@ namespace hpx { namespace util
     };
 
     template <typename Sig, typename IArchive, typename OArchive>
-    static bool is_empty_function(unique_function<Sig, IArchive, OArchive> const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(unique_function<Sig, IArchive,
+        OArchive> const& f) BOOST_NOEXCEPT
     {
         return f.empty();
     }

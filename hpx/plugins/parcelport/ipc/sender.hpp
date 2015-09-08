@@ -56,7 +56,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             HPX_ASSERT(parcel_locality_id == there_);
         }
 
-        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p, std::size_t arg_size)
+        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p,
+            std::size_t arg_size)
         {
             // generate the name for this data_buffer
             std::string data_buffer_name(p.get_parcel_id().to_string());

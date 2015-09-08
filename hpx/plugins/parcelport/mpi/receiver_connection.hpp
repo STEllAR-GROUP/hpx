@@ -208,7 +208,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 request_ptr_ = &request_;
             }
 
-            decode_parcel(pp_, std::move(buffer_));
+            decode_parcels(pp_, std::move(buffer_));
 
             state_ = sent_release_tag;
 

@@ -1,17 +1,17 @@
-/
-G//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-/ggG/ Naive SMP version implemented with futures.
+// Naive SMP version implemented with futures.
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/include/util.hpp>
-#include <apex/apex.hpp>
+#include <apex_api.hpp>
 
 #include <iostream>
 
@@ -79,6 +79,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 //[fib_main
 int main(int argc, char* argv[])
 {
+    apex::apex_options::use_screen_output(true);
+
     // Configure application-specific options
     boost::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
@@ -89,22 +91,44 @@ int main(int argc, char* argv[])
           "n value for the Fibonacci function")
         ;
 
-    std::set<apex::event_type> when = {apex::STARTUP, apex::SHUTDOWN, apex::NEW_NODE, apex::NEW_THREAD,
-        apex::START_EVENT, apex::STOP_EVENT, apex::SAMPLE_VALUE};
-    apex::register_event_policy(when, [](void * e){return true;}, [](void * e){
-        apex::event_data * evt = (apex::event_data *) e;
-        switch(evt->event_type_) {
-            case apex::APEX_STARTUP: std::cout      << "Startup event" << std::endl; break;
-            case apex::APEX_SHUTDOWN: std::cout     << "Shutdown event" << std::endl; break;
-            case apex::APEX_NEW_NODE: std::cout     << "New node event" << std::endl; break;
-            case apex::APEX_NEW_THREAD: std::cout   << "New thread event" << std::endl; break;
-            case apex::APEX_START_EVENT: std::cout  << "Start event" << std::endl; break;
-            case apex::APEX_STOP_EVENT: std::cout   << "Stop event" << std::endl; break;
-            case apex::APEX_SAMPLE_VALUE: std::cout << "Sample value event" << std::endl; break;
-            default: std::cout << "Unknown event" << std::endl;
+    std::set<apex_event_type> when = {APEX_STARTUP, APEX_SHUTDOWN, APEX_NEW_NODE,
+        APEX_NEW_THREAD, APEX_START_EVENT, APEX_STOP_EVENT, APEX_SAMPLE_VALUE};
+    apex::register_policy(when, [](apex_context const& context)->int{
+        switch(context.event_type) {
+            case APEX_STARTUP: {
+              std::cout << "Startup event" << std::endl;
+              break;
+            }
+            case APEX_SHUTDOWN: {
+              std::cout << "Shutdown event" << std::endl;
+              break;
+            }
+            case APEX_NEW_NODE: {
+              std::cout << "New node event" << std::endl;
+              break;
+            }
+            case APEX_NEW_THREAD: {
+              std::cout << "New thread event" << std::endl;
+              break;
+            }
+            case APEX_START_EVENT: {
+              std::cout << "Start event" << std::endl;
+              break;
+            }
+            case APEX_STOP_EVENT: {
+              std::cout << "Stop event" << std::endl;
+              break;
+            }
+            case APEX_SAMPLE_VALUE: {
+              std::cout << "Sample value event" << std::endl;
+              break;
+            }
+            default: {
+              std::cout << "Unknown event" << std::endl;
+            }
         }
+        return APEX_NOERROR;
     });
-
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);

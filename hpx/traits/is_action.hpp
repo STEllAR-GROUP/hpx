@@ -8,6 +8,7 @@
 
 #include <hpx/traits.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/decay.hpp>
 #include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace traits

@@ -118,7 +118,8 @@ namespace hpx { namespace threads { namespace policies
             outside_numa_domain_masks_(init.num_queues_)
 #else
             numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask()),
-            outside_numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask())
+            outside_numa_domain_masks_(init.num_queues_,
+                topology_.get_machine_affinity_mask())
 #endif
         {
             if (!deferred_initialization)
@@ -522,7 +523,8 @@ namespace hpx { namespace threads { namespace policies
 
                     HPX_ASSERT(idx != num_thread);
 
-                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) //-V560 //-V600 //-V111
+                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx))
+                        //-V560 //-V600 //-V111
                         continue;
 
                     if (idx < high_priority_queues &&
@@ -719,7 +721,8 @@ namespace hpx { namespace threads { namespace policies
                 case thread_priority_critical:
                     {
                         if (num_thread < high_priority_queues_.size())
-                            return high_priority_queues_[num_thread]->get_thread_count(state);
+                            return high_priority_queues_[num_thread]->
+                            get_thread_count(state);
                         break;
                     }
 
@@ -923,7 +926,8 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        if (!test(numa_domain_mask, topology_.get_pu_number(idx))) //-V600
+                        if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                            //-V600
                             continue;
 
                         if (idx < high_priority_queues &&
@@ -968,7 +972,8 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        if (!test(numa_domain_mask, topology_.get_pu_number(idx))) //-V600
+                        if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                            //-V600
                             continue;
 
                         if (idx < high_priority_queues &&
@@ -1056,7 +1061,8 @@ namespace hpx { namespace threads { namespace policies
                             << "no new work available, are we deadlocked?";
                     }
                     else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] " //-V128
+                        LHPX_CONSOLE_(hpx::util::logging::level::error)
+                              << "  [TM] " //-V128
                               << "queue(" << num_thread << "): "
                               << "no new work available, are we deadlocked?\n";
                     }

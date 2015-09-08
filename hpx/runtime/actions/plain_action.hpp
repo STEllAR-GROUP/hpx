@@ -178,7 +178,8 @@ namespace hpx { namespace traits {
 
 /// \def HPX_PLAIN_ACTION(func, name)
 ///
-/// \brief Defines a plain action type based on the given function \a func and registers it with HPX.
+/// \brief Defines a plain action type based on the given function
+/// \a func and registers it with HPX.
 ///
 /// The macro \a HPX_PLAIN_ACTION can be used to define a plain action (e.g. an
 /// action encapsulating a global or free function) based on the given function
@@ -227,7 +228,8 @@ namespace hpx { namespace traits {
 
 /// \def HPX_PLAIN_ACTION_ID(func, actionname, actionid)
 ///
-/// \brief Defines a plain action type based on the given function \a func and registers it with HPX.
+/// \brief Defines a plain action type based on the given function \a func and
+///   registers it with HPX.
 ///
 /// The macro \a HPX_PLAIN_ACTION_ID can be used to define a plain action (e.g. an
 /// action encapsulating a global or free function) based on the given function
@@ -258,7 +260,8 @@ namespace hpx { namespace traits {
 ///
 ///     // This will define the action type 'some_global_action' which represents
 ///     // the function 'app::some_global_function'.
-///     HPX_PLAIN_ACTION_ID(app::some_global_function, some_global_action, some_unique_id);
+///     HPX_PLAIN_ACTION_ID(app::some_global_function, some_global_action,
+///       some_unique_id);
 /// \endcode
 ///
 /// \note The macro \a HPX_PLAIN_ACTION_ID has to be used at global namespace even

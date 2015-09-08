@@ -234,7 +234,8 @@ struct HPX_EXPORT symbol_namespace
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, remote_bulk_service, bulk_service_action);
+    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, remote_bulk_service,
+        bulk_service_action);
 };
 
 }}}

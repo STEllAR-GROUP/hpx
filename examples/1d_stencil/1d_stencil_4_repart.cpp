@@ -69,6 +69,8 @@ void setup_counters() {
     catch(hpx::exception const& e) {
         std::cerr << "apex_policy_engine_active_thread_count: caught exception: "
             << e.what() << std::endl;
+        counter_id = hpx::naming::invalid_id;
+        return;
     }
     counters_initialized = true;
 }
@@ -267,12 +269,17 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    // boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
-    // Number of partitions dynamically determined
+    /* Number of partitions dynamically determined
+    // Number of partitions.
+    // boost::uint64_t np = vm["np"].as<boost::uint64_t>();
+    */
 
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
-    boost::uint64_t nr = vm["nr"].as<boost::uint64_t>();   // Number of runs (repartition between runs).
+    // Number of grid points.
+    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();
+    // Number of steps.
+    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();
+    // Number of runs (repartition between runs).
+    boost::uint64_t nr = vm["nr"].as<boost::uint64_t>();
 
     if (vm.count("no-header"))
         header = false;

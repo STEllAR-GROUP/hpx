@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_THREAD_EXECUTOR_JAN_11_2013_0700PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/safe_bool.hpp>
@@ -16,6 +17,17 @@
 #include <boost/cstdint.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    namespace threads
+    {
+        class HPX_EXPORT executor;
+    }
+
+    HPX_EXPORT std::size_t get_os_thread_count(threads::executor const&);
+}
 
 namespace hpx { namespace threads
 {
@@ -165,7 +177,7 @@ namespace hpx { namespace threads
     //        virtual size_t num_pending_closures() const = 0;
     //    };
     //
-    class HPX_EXPORT executor
+    class executor
     {
         friend std::size_t hpx::get_os_thread_count(threads::executor const&);
 

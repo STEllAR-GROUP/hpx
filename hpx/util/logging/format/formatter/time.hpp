@@ -48,12 +48,16 @@ Example: time("Today is $dd/$MM/$yyyy");
 
 Note: for a high precision clock, try high_precision_time (uses hpx::util::date_time)
 
-@param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
+@param convert [optional] In case there needs to be a conversion between
+std::(w)string and the string that holds your logged message. See convert_format.
+For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
+"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::prepend> struct time_t : is_generic, non_const_context<hpx::util::logging::detail::time_format_holder> {
+template<class convert = do_convert_format::prepend> struct time_t
+    : is_generic, non_const_context<hpx::util::logging::detail::time_format_holder> {
     typedef convert convert_type;
-    typedef non_const_context<hpx::util::logging::detail::time_format_holder> non_const_context_base;
+    typedef non_const_context<hpx::util::logging::detail::time_format_holder>
+        non_const_context_base;
 
     /**
         constructs a time object
@@ -64,7 +68,9 @@ template<class convert = do_convert_format::prepend> struct time_t : is_generic,
         char_type buffer[64];
 
         tm details = *localtime( &val);
-        non_const_context_base::context().write_time( buffer, details.tm_mday, details.tm_mon + 1, details.tm_year + 1900, details.tm_hour, details.tm_min, details.tm_sec);
+        non_const_context_base::context().write_time( buffer,
+            details.tm_mday, details.tm_mon + 1, details.tm_year + 1900,
+            details.tm_hour, details.tm_min, details.tm_sec);
 
         convert::write(buffer, msg);
     }
@@ -75,7 +81,8 @@ template<class convert = do_convert_format::prepend> struct time_t : is_generic,
     }
 
     bool operator==(const time_t & other) const {
-        return non_const_context_base::context() == other.non_const_context_base::context();
+        return non_const_context_base::context() ==
+            other.non_const_context_base::context();
     }
 
     /** @brief configure through script

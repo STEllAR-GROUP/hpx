@@ -100,7 +100,8 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threads::thread_priority get_thread_priority(thread_id_type const& id, error_code& ec)
+    threads::thread_priority get_thread_priority(thread_id_type const& id,
+        error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)

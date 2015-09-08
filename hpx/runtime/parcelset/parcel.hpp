@@ -77,7 +77,8 @@ namespace hpx { namespace parcelset
         template <
             typename Action
           , typename...Args
-          , typename Enable = typename std::enable_if<traits::is_action<Action>::value>::type
+          , typename Enable =
+                typename std::enable_if<traits::is_action<Action>::value>::type
           >
         parcel(
             naming::id_type const& dests,
@@ -102,7 +103,8 @@ namespace hpx { namespace parcelset
         template <
             typename Action
           , typename...Args
-          , typename Enable = typename std::enable_if<traits::is_action<Action>::value>::type
+          , typename Enable =
+                typename std::enable_if<traits::is_action<Action>::value>::type
           >
         parcel(
             std::vector<naming::id_type> const& dests,
@@ -167,7 +169,8 @@ namespace hpx { namespace parcelset
             addrs_(addrs),
 #endif
             cont_(
-                new typename util::decay<Continuation>::type(std::forward<Continuation>(cont))
+                new typename util::decay<Continuation>
+                    ::type(std::forward<Continuation>(cont))
             ),
             action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
         {

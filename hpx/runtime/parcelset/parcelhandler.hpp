@@ -55,7 +55,8 @@ namespace hpx { namespace parcelset
         {
             // ensure the source locality id is set (if no component id is given)
             if (!p.source_id())
-                p.set_source_id(naming::id_type(get_locality(), naming::id_type::unmanaged));
+                p.set_source_id(naming::id_type(get_locality(),
+                    naming::id_type::unmanaged));
 
             // set the current local time for this locality
             p.set_start_time(get_current_time());
@@ -382,7 +383,8 @@ namespace hpx { namespace parcelset
         naming::resolver_client *resolver_;
 
         /// the parcelport this handler is associated with
-        typedef std::map<int, boost::shared_ptr<parcelport>, std::greater<int> > pports_type;
+        typedef std::map<int, boost::shared_ptr<parcelport>,
+            std::greater<int> > pports_type;
         pports_type pports_;
 
         std::map<std::string, int> priority_;

@@ -156,7 +156,8 @@ namespace hpx { namespace util
     }
 
 
-    endpoint_iterator_type connect_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type connect_begin(std::string const & address,
+        boost::uint16_t port,
         boost::asio::io_service& io_service)
     {
         using boost::asio::ip::tcp;
@@ -206,7 +207,8 @@ namespace hpx { namespace util
         return endpoint_iterator_type();
     }
 
-    endpoint_iterator_type accept_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type accept_begin(std::string const & address,
+        boost::uint16_t port,
         boost::asio::io_service& io_service)
     {
         using boost::asio::ip::tcp;

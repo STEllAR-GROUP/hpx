@@ -110,7 +110,8 @@ namespace hpx { namespace util
     {
         boost::lock_guard<mutex_type> m(mtx_);
 
-        return (tix < thread_info_.size())? thread_info_[tix].tid_: invalid_tid; //-V104 //-V108
+        return (tix < thread_info_.size())? thread_info_[tix].tid_:
+            invalid_tid; //-V104 //-V108
     }
 
     std::string const& thread_mapper::get_thread_label(boost::uint32_t tix) const

@@ -107,7 +107,8 @@ namespace hpx { namespace threads { namespace policies
             outside_numa_domain_masks_(init.num_queues_)
 #else
             numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask()),
-            outside_numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask())
+            outside_numa_domain_masks_(init.num_queues_,
+                topology_.get_machine_affinity_mask())
 #endif
         {
             if (!deferred_initialization)
@@ -193,7 +194,8 @@ namespace hpx { namespace threads { namespace policies
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += queues_[num_thread]->get_num_stolen_from_pending(reset);
+            num_stolen_threads += queues_[num_thread]->
+                get_num_stolen_from_pending(reset);
             return num_stolen_threads;
         }
 
@@ -325,7 +327,8 @@ namespace hpx { namespace threads { namespace policies
 
                     HPX_ASSERT(idx != num_thread);
 
-                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) //-V560 //-V600 //-V111
+                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx))
+                        //-V560 //-V600 //-V111
                         continue;
 
                     thread_queue_type* q = queues_[idx];
@@ -371,7 +374,8 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->schedule_thread(thrd);
         }
 
-        void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
+        void schedule_thread_last(threads::thread_data_base* thrd,
+            std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
             if (std::size_t(-1) == num_thread)
@@ -557,7 +561,8 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        if (!test(numa_domain_mask, topology_.get_pu_number(idx))) //-V600
+                        if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                            //-V600
                             continue;
 
                         result = queues_[num_thread]->wait_or_add_new(running,
@@ -583,7 +588,8 @@ namespace hpx { namespace threads { namespace policies
 
                         HPX_ASSERT(idx != num_thread);
 
-                        if (!test(numa_domain_mask, topology_.get_pu_number(idx))) //-V600
+                        if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                            //-V600
                             continue;
 
                         result = queues_[num_thread]->wait_or_add_new(running,
@@ -637,7 +643,8 @@ namespace hpx { namespace threads { namespace policies
                             << "no new work available, are we deadlocked?";
                     }
                     else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] " //-V128
+                        LHPX_CONSOLE_(hpx::util::logging::level::error)
+                              << "  [TM] " //-V128
                               << "queue(" << num_thread << "): "
                               << "no new work available, are we deadlocked?\n";
                     }

@@ -311,7 +311,8 @@ namespace hpx { namespace threads { namespace policies
                 std::size_t count = thread_map_.size();
                 if (max_count_ >= count + min_add_new_count) { //-V104
                     HPX_ASSERT(max_count_ - count <
-                        static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
+                        static_cast<std::size_t>((std::numeric_limits
+                            <boost::int64_t>::max)()));
                     add_count = static_cast<boost::int64_t>(max_count_ - count);
                     if (add_count < min_add_new_count)
                         add_count = min_add_new_count;
@@ -348,7 +349,8 @@ namespace hpx { namespace threads { namespace policies
                 std::size_t count = thread_map_.size();
                 if (max_count_ >= count + min_add_new_count) { //-V104
                     HPX_ASSERT(max_count_ - count <
-                        static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
+                        static_cast<std::size_t>((std::numeric_limits
+                            <boost::int64_t>::max)()));
                     add_count = static_cast<boost::int64_t>(max_count_ - count);
                     if (add_count < min_add_new_count)
                         add_count = min_add_new_count;
@@ -987,26 +989,38 @@ namespace hpx { namespace threads { namespace policies
     private:
         mutable mutex_type mtx_;                    ///< mutex protecting the members
 
-        thread_map_type thread_map_;                ///< mapping of thread id's to HPX-threads
-        boost::atomic<boost::int64_t> thread_map_count_;       ///< overall count of work items
+        thread_map_type thread_map_;
+        ///< mapping of thread id's to HPX-threads
+        boost::atomic<boost::int64_t> thread_map_count_;
+        ///< overall count of work items
 
-        work_items_type work_items_;                ///< list of active work items
-        boost::atomic<boost::int64_t> work_items_count_;       ///< count of active work items
+        work_items_type work_items_;
+        ///< list of active work items
+        boost::atomic<boost::int64_t> work_items_count_;
+        ///< count of active work items
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        boost::atomic<boost::int64_t> work_items_wait_;        ///< overall wait time of work items
-        boost::atomic<boost::int64_t> work_items_wait_count_;  ///< overall number of work items in queue
+        boost::atomic<boost::int64_t> work_items_wait_;
+        ///< overall wait time of work items
+        boost::atomic<boost::int64_t> work_items_wait_count_;
+        ///< overall number of work items in queue
 #endif
         terminated_items_type terminated_items_;     ///< list of terminated threads
-        boost::atomic<boost::int64_t> terminated_items_count_; ///< count of terminated items
+        boost::atomic<boost::int64_t> terminated_items_count_;
+        ///< count of terminated items
 
-        std::size_t max_count_;                     ///< maximum number of existing HPX-threads
-        task_items_type new_tasks_;                 ///< list of new tasks to run
+        std::size_t max_count_;
+        ///< maximum number of existing HPX-threads
+        task_items_type new_tasks_;
+        ///< list of new tasks to run
 
-        boost::atomic<boost::int64_t> new_tasks_count_;        ///< count of new tasks to run
+        boost::atomic<boost::int64_t> new_tasks_count_;
+        ///< count of new tasks to run
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        boost::atomic<boost::int64_t> new_tasks_wait_;         ///< overall wait time of new tasks
-        boost::atomic<boost::int64_t> new_tasks_wait_count_;   ///< overall number tasks waited
+        boost::atomic<boost::int64_t> new_tasks_wait_;
+        ///< overall wait time of new tasks
+        boost::atomic<boost::int64_t> new_tasks_wait_count_;
+        ///< overall number tasks waited
 #endif
 
         threads::thread_pool memory_pool_;          ///< OS thread local memory pools for
@@ -1030,10 +1044,14 @@ namespace hpx { namespace threads { namespace policies
         // # of times our associated worker-thread looked for work in work_items
         boost::atomic<boost::int64_t> pending_accesses_;
 
-        boost::atomic<boost::int64_t> stolen_from_pending_; ///< count of work_items stolen from this queue
-        boost::atomic<boost::int64_t> stolen_from_staged_; ///< count of new_tasks stolen from this queue
-        boost::atomic<boost::int64_t> stolen_to_pending_; ///< count of work_items stolen to this queue from other queues
-        boost::atomic<boost::int64_t> stolen_to_staged_; ///< count of new_tasks stolen to this queue from other queues
+        boost::atomic<boost::int64_t> stolen_from_pending_;
+        ///< count of work_items stolen from this queue
+        boost::atomic<boost::int64_t> stolen_from_staged_;
+        ///< count of new_tasks stolen from this queue
+        boost::atomic<boost::int64_t> stolen_to_pending_;
+        ///< count of work_items stolen to this queue from other queues
+        boost::atomic<boost::int64_t> stolen_to_staged_;
+        ///< count of new_tasks stolen to this queue from other queues
 #endif
 
         util::block_profiler<add_new_tag> add_new_logger_;

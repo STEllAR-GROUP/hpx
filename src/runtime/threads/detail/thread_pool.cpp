@@ -980,6 +980,12 @@ namespace hpx { namespace threads { namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::threads::detail::thread_pool<
+    hpx::threads::policies::throttle_queue_scheduler<> >;
+#endif
+
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<

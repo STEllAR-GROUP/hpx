@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -27,6 +27,12 @@
 #include <deque>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
+#elif defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40900
+#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace agas
@@ -62,7 +68,8 @@ namespace hpx { namespace parcelset
         > read_handler_type;
 
         /// Construct the parcelport on the given locality.
-        parcelport(util::runtime_configuration const& ini, locality const & here, std::string const& type);
+        parcelport(util::runtime_configuration const& ini, locality const & here,
+            std::string const& type);
 
         /// Virtual destructor
         virtual ~parcelport() {}
@@ -112,7 +119,8 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcel(locality const & dest, parcel p, write_handler_type f) = 0;
+        virtual void put_parcel(locality const & dest, parcel p,
+            write_handler_type f) = 0;
 
         /// Queues a list of parcels for transmission to another locality
         ///
@@ -129,7 +137,8 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcels(std::vector<locality> dests, std::vector<parcel> parcels,
+        virtual void put_parcels(std::vector<locality> dests,
+            std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers) = 0;
 
         /// Send an early parcel through the TCP parcelport
@@ -182,7 +191,8 @@ namespace hpx { namespace parcelset
 
         virtual locality create_locality() const = 0;
 
-        virtual locality agas_locality(util::runtime_configuration const & ini) const = 0;
+        virtual locality agas_locality(util::runtime_configuration const & ini)
+            const = 0;
 
         /// Performance counter data
 
@@ -353,7 +363,21 @@ namespace hpx { namespace parcelset
         hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
-        typedef std::pair<std::deque<parcel>, std::deque<write_handler_type> >
+        typedef std::list<naming::gid_type> new_gids_type;
+        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
+        typedef util::tuple<
+            boost::shared_ptr<std::vector<parcel> >
+          , std::vector<write_handler_type>
+          , new_gids_map
+        >
+#else
+        typedef util::tuple<
+            std::vector<parcel>
+          , std::vector<write_handler_type>
+          , new_gids_map
+        >
+#endif
             map_second_type;
         typedef std::map<locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;

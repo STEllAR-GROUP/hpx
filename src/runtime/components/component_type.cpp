@@ -48,7 +48,8 @@ namespace hpx { namespace components
             result = "component_invalid";
         else if ((type < component_last) && (get_derived_type(type) == 0))
             result = components::detail::names[type];
-        else if (get_derived_type(type) < component_last && (get_derived_type(type) != 0))
+        else if (get_derived_type(type) <
+            component_last && (get_derived_type(type) != 0))
             result = components::detail::names[get_derived_type(type)];
         else
             result = "component";

@@ -33,7 +33,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        struct lexicographical_compare : public detail::algorithm<lexicographical_compare, bool>
+        struct lexicographical_compare
+            : public detail::algorithm<lexicographical_compare, bool>
         {
             lexicographical_compare()
                 : lexicographical_compare::algorithm("lexicographical_compare")
@@ -150,14 +151,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// calling thread.
     ///
     /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type \a parallel_execution_policy
+    /// algorithm invoked with an execution policy object of type
+    /// \a parallel_execution_policy
     /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparison is an operation with the following properties
+    /// \note     Lexicographical comparison is an operation
+    ///           with the following properties
     ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range is lexicographically
+    ///             - The first mismatching element defines which range
+    ///               is lexicographically
     ///               \a less or \a greater than the other
     ///             - If one range is a prefix of another, the shorter range is
     ///               lexicographically \a less than the other
@@ -255,14 +259,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// calling thread.
     ///
     /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type \a parallel_execution_policy
+    /// algorithm invoked with an execution policy object of type
+    /// \a parallel_execution_policy
     /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparision is an operation with the following properties
+    /// \note     Lexicographical comparision is an operation with the
+    ///           following properties
     ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range is lexicographically
+    ///             - The first mismatching element defines which range
+    ///               is lexicographically
     ///               \a less or \a greater than the other
     ///             - If one range is a prefix of another, the shorter range is
     ///               lexicographically \a less than the other

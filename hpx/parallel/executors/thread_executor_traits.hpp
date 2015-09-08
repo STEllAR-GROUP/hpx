@@ -202,7 +202,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \note This calls exec.os_thread_count() if it exists;
         ///       otherwise it executes hpx::get_os_thread_count().
         ///
-        static std::size_t os_thread_count(executor_type const& sched)
+        static std::size_t processing_units_count(executor_type const& sched)
         {
             return hpx::get_os_thread_count(sched);
         }

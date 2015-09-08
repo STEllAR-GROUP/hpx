@@ -21,14 +21,16 @@
 #include <vector>
 #include <iosfwd>
 #include <limits>
-#if defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT > 64)
+#if defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
+            && HPX_HAVE_MAX_CPU_COUNT > 64)
 #include <bitset>
 #endif
 
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
-#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
+#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
+             && HPX_HAVE_MAX_CPU_COUNT <= 64)
     typedef boost::uint64_t mask_type;
     typedef boost::uint64_t mask_cref_type;
 
@@ -363,7 +365,8 @@ namespace hpx { namespace threads
 
             bool operator==(spec_type const& rhs) const
             {
-                if (type_ != rhs.type_ || index_bounds_.size() != rhs.index_bounds_.size())
+                if (type_ != rhs.type_ || index_bounds_.size() !=
+                    rhs.index_bounds_.size())
                     return false;
 
                 for (std::size_t i = 0; i < index_bounds_.size(); ++i)

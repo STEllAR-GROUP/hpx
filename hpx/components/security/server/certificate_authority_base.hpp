@@ -64,7 +64,8 @@ namespace hpx { namespace components { namespace security { namespace server
 }}}}
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::security::server::certificate_authority_base::sign_certificate_signing_request_action
+    hpx::components::security::server::certificate_authority_base
+       ::sign_certificate_signing_request_action
   , certificate_authority_base_sign_certificate_signing_request_action);
 
 HPX_REGISTER_ACTION_DECLARATION(

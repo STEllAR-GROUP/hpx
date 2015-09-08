@@ -46,13 +46,16 @@ namespace hpx { namespace util { namespace plugin {
             }
         };
 
-        template<typename BasePlugin, typename Concrete, typename Base, typename A1, typename A2>
-        struct concrete_factory_item<BasePlugin, Concrete, Base, boost::mpl::list<A1, A2> >
+        template<typename BasePlugin, typename Concrete, typename Base,
+            typename A1, typename A2>
+        struct concrete_factory_item<BasePlugin, Concrete, Base,
+            boost::mpl::list<A1, A2> >
         :   public Base
         {
             BasePlugin* create(dll_handle dll, A1 a1, A2 a2)
             {
-                return new plugin_wrapper<Concrete, boost::mpl::list<A1, A2> >(dll, a1, a2);
+                return new plugin_wrapper<Concrete, boost::mpl::list<A1
+                    , A2> >(dll, a1, a2);
             }
         };
     }

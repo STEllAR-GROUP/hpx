@@ -12,7 +12,8 @@
 #if defined(BOOST_WINDOWS)
 #  define HPX_COROUTINE_SYMBOL_EXPORT      __declspec(dllexport)
 #  define HPX_COROUTINE_SYMBOL_IMPORT      __declspec(dllimport)
-#elif defined(HPX_HAVE_COROUTINE_GCC_HIDDEN_VISIBILITY) || defined(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
+#elif defined(HPX_HAVE_COROUTINE_GCC_HIDDEN_VISIBILITY) || defined \
+   (HPX_HAVE_ELF_HIDDEN_VISIBILITY)
 #  define HPX_COROUTINE_SYMBOL_EXPORT      __attribute__((visibility("default")))
 #  define HPX_COROUTINE_SYMBOL_IMPORT      __attribute__((visibility("default")))
 #else

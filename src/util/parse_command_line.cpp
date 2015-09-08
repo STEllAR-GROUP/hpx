@@ -342,7 +342,8 @@ namespace hpx { namespace util
                 hpx_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
-                    ("hpx:connect", "run this instance in worker mode, but connecting late")
+                    ("hpx:connect", "run this instance in worker mode,\
+                         but connecting late")
                 ;
                 break;
 
@@ -355,7 +356,8 @@ namespace hpx { namespace util
                 hidden_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
-                    ("hpx:connect", "run this instance in worker mode, but connecting late")
+                    ("hpx:connect", "run this instance in worker mode,\
+                        but connecting late")
                 ;
                 break;
 
@@ -506,7 +508,8 @@ namespace hpx { namespace util
             counter_options.add_options()
                 ("hpx:print-counter", value<std::vector<std::string> >()->composing(),
                   "print the specified performance counter either repeatedly or "
-                  "before shutting down the system (see option --hpx:print-counter-interval)")
+                  "before shutting down the system \
+                     (see option --hpx:print-counter-interval)")
                 ("hpx:print-counter-interval", value<std::size_t>(),
                   "print the performance counter(s) specified with --hpx:print-counter "
                   "repeatedly after the time interval (specified in milliseconds) "
@@ -519,7 +522,8 @@ namespace hpx { namespace util
                   "possible values:\n"
                   "   'minimal' (prints counter name skeletons)\n"
                   "   'full' (prints all available counter names)")
-                ("hpx:list-counter-infos", value<std::string>()->implicit_value("minimal"),
+                ("hpx:list-counter-infos",
+                    value<std::string>()->implicit_value("minimal"),
                   "list the description of all registered performance counters, "
                   "possible values:\n"
                   "   'minimal' (prints infos for counter name skeletons)\n"
@@ -689,7 +693,8 @@ namespace hpx { namespace util
         if (cfg.has_entry("hpx.cmd_line"))
             cmdline = cfg.get_entry("hpx.cmd_line");
         if (cfg.has_entry("hpx.locality"))
-            node = hpx::util::safe_lexical_cast<std::size_t>(cfg.get_entry("hpx.locality"));
+            node = hpx::util::safe_lexical_cast<std::size_t>
+                (cfg.get_entry("hpx.locality"));
 
         return parse_commandline(cfg, app_options, cmdline, vm, node,
             allow_unregistered);

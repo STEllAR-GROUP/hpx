@@ -7,7 +7,7 @@
 // This is needed to make everything work with the Intel MPI library header
 #include <hpx/config/defines.hpp>
 
-#include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 
 #include <hpx/runtime/applier/applier.hpp>
@@ -17,9 +17,6 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/exception.hpp>
-
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
 namespace hpx { namespace parcelset
 {
@@ -35,7 +32,8 @@ namespace hpx { namespace parcelset
         enable_security_(false),
         async_serialization_(false),
         enable_parcel_handling_(true),
-        priority_(hpx::util::get_entry_as<int>(ini, "hpx.parcel." + type + ".priority", "0")),
+        priority_(hpx::util::get_entry_as<int>(ini, "hpx.parcel." + type + ".priority",
+            "0")),
         type_(type)
     {
         std::string key("hpx.parcel.");
@@ -46,7 +44,8 @@ namespace hpx { namespace parcelset
             allow_zero_copy_optimizations_ = false;
         }
         else {
-            if (hpx::util::get_entry_as<int>(ini, key + ".zero_copy_optimization", "1") == 0)
+            if (hpx::util::get_entry_as<int>(ini, key + ".zero_copy_optimization",
+                "1") == 0)
                 allow_zero_copy_optimizations_ = false;
         }
 

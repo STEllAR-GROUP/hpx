@@ -515,7 +515,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, first1, count-(diff-1),
-                        [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
+                        [=](std::size_t base_idx, FwdIter it,
+                            std::size_t part_size) mutable
                         {
                             FwdIter curr = it;
 
@@ -809,7 +810,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [&tok, &s_first, &s_last, &op](reference v, std::size_t i)
+                                [&tok, &s_first, &s_last, &op]
+                                (reference v, std::size_t i)
                                 {
                                     for(FwdIter iter = s_first; iter != s_last; ++iter) {
                                         if(op(v,*iter))
@@ -880,8 +882,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the first element
     ///           in the range [first, last) that is equal to an element from the range
-    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is
-    ///           greater than the length of the range [first, last), \a last is returned.
+    ///           [s_first, s_last).
+    ///           If the length of the subsequence [s_first, s_last) is
+    ///           greater than the length of the range [first, last),
+    ///           \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
     ///
@@ -984,11 +988,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the first element
     ///           in the range [first, last) that is equal to an element from the range
-    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is
-    ///           greater than the length of the range [first, last), \a last is returned.
+    ///           [s_first, s_last).
+    ///           If the length of the subsequence [s_first, s_last) is
+    ///           greater than the length of the range [first, last),
+    ///           \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
-    ///           This overload of \a find_end is available if the user decides to provide the
+    ///           This overload of \a find_end is available if
+    ///           the user decides to provide the
     ///           algorithm their own predicate \a f.
     ///
     template <typename ExPolicy, typename InIter, typename FwdIter, typename Pred>

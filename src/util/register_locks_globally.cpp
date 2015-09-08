@@ -80,7 +80,8 @@ namespace hpx { namespace util
     {
         using detail::register_locks_globally;
 
-        if (register_locks_globally::lock_detection_enabled_ && 0 != threads::get_self_ptr())
+        if (register_locks_globally::lock_detection_enabled_
+            && 0 != threads::get_self_ptr())
         {
             register_locks_globally::held_locks_map& held_locks =
                 register_locks_globally::get_lock_map();
@@ -106,7 +107,8 @@ namespace hpx { namespace util
     {
         using detail::register_locks_globally;
 
-        if (register_locks_globally::lock_detection_enabled_ && 0 != threads::get_self_ptr())
+        if (register_locks_globally::lock_detection_enabled_
+            && 0 != threads::get_self_ptr())
         {
             register_locks_globally::held_locks_map& held_locks =
                 register_locks_globally::get_lock_map();

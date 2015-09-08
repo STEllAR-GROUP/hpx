@@ -44,7 +44,8 @@ int hpx_main(variables_map& vm)
             typedef hpx::util::any elem_type;
             typedef hpx::util::hash_any hash_elem_functor;
 
-            typedef boost::unordered_multimap<elem_type, index_type, hash_elem_functor> field_index_map_type;
+            typedef boost::unordered_multimap<elem_type, index_type,
+                hash_elem_functor> field_index_map_type;
             typedef field_index_map_type::iterator field_index_map_iterator_type;
 
             field_index_map_type field_index_map_;
@@ -144,7 +145,8 @@ int hpx_main(variables_map& vm)
     {
         // test equality
         {
-            any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10), any4_nonser(std::string("seven"));
+            any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10),
+                any4_nonser(std::string("seven"));
 
             HPX_TEST_EQ(any1_nonser, 7);
             HPX_TEST_NEQ(any1_nonser, 10);

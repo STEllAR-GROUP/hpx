@@ -130,7 +130,8 @@ struct HPX_EXPORT component_namespace
         api_counter_data resolve_id_;           // component_ns_resolve_id
         api_counter_data unbind_name_;          // component_ns_unbind_name
         api_counter_data iterate_types_;        // component_ns_iterate_types
-        api_counter_data get_component_type_name_; // component_ns_get_component_type_name
+        api_counter_data get_component_type_name_;
+        // component_ns_get_component_type_name
         api_counter_data num_localities_;  // component_ns_num_localities
     };
     counter_data counter_data_;
@@ -260,7 +261,8 @@ struct HPX_EXPORT component_namespace
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_bulk_service, bulk_service_action);
+    HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_bulk_service,
+        bulk_service_action);
 };
 
 }}}

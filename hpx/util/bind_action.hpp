@@ -110,13 +110,15 @@ namespace hpx { namespace util
               , BoundArgs& bound_args, UnboundArgs&& unbound_args
             )
             {
-                return hpx::apply<Action>(std::forward<Continuation>(cont), bind_eval<Action>(
+                return hpx::apply<Action>(std::forward<Continuation>(cont),
+                    bind_eval<Action>(
                     util::get<Is>(bound_args),
                     std::forward<UnboundArgs>(unbound_args))...);
             }
         };
 
-        template <typename Action, typename Continuation, typename BoundArgs, typename UnboundArgs>
+        template <typename Action, typename Continuation, typename BoundArgs,
+            typename UnboundArgs>
         BOOST_FORCEINLINE
         typename boost::enable_if_c<
             traits::is_continuation<Continuation>::value, bool
@@ -237,7 +239,8 @@ namespace hpx { namespace util
             >::type
             apply_c(Continuation && cont, Us&&... us) const
             {
-                return detail::bind_action_apply_cont2<Action>(std::forward<Continuation>(cont),
+                return detail::bind_action_apply_cont2<Action>
+                        (std::forward<Continuation>(cont),
                     _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
             }
 

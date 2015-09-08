@@ -92,7 +92,8 @@ namespace hpx { namespace util
         bool result = false;
         for (tokenizer_type::iterator it = tok_paths.begin (); it != end_paths; ++it) {
             std::string path = *it;
-            for (tokenizer_type::iterator jt = tok_suffixes.begin (); jt != end_suffixes; ++jt) {
+            for (tokenizer_type::iterator jt = tok_suffixes.begin ();
+                jt != end_suffixes; ++jt) {
                 path += *jt;
                 bool result2 = handle_ini_file (ini, path + "/hpx.ini");
                 if (result2) {

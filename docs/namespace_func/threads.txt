@@ -56,7 +56,8 @@ namespace hpx::threads
         // advanced?
         thread_state set_state(thread_state_enum)
 
-        bool set_state_tagged(thread_state_enum,thread_state& prevstate,thread_state& newstate)
+        bool set_state_tagged(thread_state_enum,thread_state& prevstate,
+            thread_state& newstate)
         bool restore_state(thread_state_enum newval,thread_state oldval)
 
         thread_state_ex get_state_ex() const

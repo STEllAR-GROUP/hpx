@@ -21,7 +21,8 @@ class widget
     Q_OBJECT
 
     public:
-        widget(boost::function<void(widget *, std::size_t)> callback, QWidget *parent = 0);
+        widget(boost::function<void(widget *, std::size_t)> callback,
+            QWidget *parent = 0);
 
         void add_label(std::size_t i, double t);
 

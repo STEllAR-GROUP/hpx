@@ -604,7 +604,8 @@ namespace hpx { namespace traits
         util::zip_iterator<Ts...>,
         typename std::enable_if<
             util::detail::all_of<
-                typename segmented_local_iterator_traits<Ts>::is_segmented_local_iterator...
+                typename segmented_local_iterator_traits<Ts>
+                ::is_segmented_local_iterator...
             >::value
         >::type>
     {

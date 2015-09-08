@@ -58,7 +58,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         /// Get the data window associated with the parcelport_connection.
         server_context& context() { return context_; }
 
-        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p = parcel(), std::size_t arg_size = 0)
+        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p = parcel(),
+            std::size_t arg_size = 0)
         {
             if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
             {
@@ -123,7 +124,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 buffer_->data_.resize(size);
                 if(size <= message::payload_size)
                 {
-                    std::memcpy(&buffer_->data_[0], context_.connection().msg_payload(), size);
+                    std::memcpy(&buffer_->data_[0], context_.connection().msg_payload(),
+                        size);
                     return next(&receiver::write_ack);
                 }
                 else

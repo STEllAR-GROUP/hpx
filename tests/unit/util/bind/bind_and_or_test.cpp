@@ -52,27 +52,39 @@ int main()
 {
     // &&
 
-    test( hpx::util::bind( f, true ) && hpx::util::bind( g, true ), false, false, f( true ) && g( true ) );
-    test( hpx::util::bind( f, true ) && hpx::util::bind( g, false ), false, false, f( true ) && g( false ) );
+    test( hpx::util::bind( f, true ) && hpx::util::bind( g, true ),
+        false, false, f( true ) && g( true ) );
+    test( hpx::util::bind( f, true ) && hpx::util::bind( g, false ),
+        false, false, f( true ) && g( false ) );
 
-    test( hpx::util::bind( f, false ) && hpx::util::bind( h ), false, false, f( false ) && h() );
+    test( hpx::util::bind( f, false ) && hpx::util::bind( h ),
+        false, false, f( false ) && h() );
 
-    test( hpx::util::bind( f, placeholders::_1 ) && hpx::util::bind( g, placeholders::_2 ), true, true, f( true ) && g( true ) );
-    test( hpx::util::bind( f, placeholders::_1 ) && hpx::util::bind( g, placeholders::_2 ), true, false, f( true ) && g( false ) );
+    test( hpx::util::bind( f, placeholders::_1 ) && hpx::util::bind( g,
+        placeholders::_2 ), true, true, f( true ) && g( true ) );
+    test( hpx::util::bind( f, placeholders::_1 ) && hpx::util::bind( g,
+        placeholders::_2 ), true, false, f( true ) && g( false ) );
 
-    test( hpx::util::bind( f, placeholders::_1 ) && hpx::util::bind( h ), false, false, f( false ) && h() );
+    test( hpx::util::bind( f, placeholders::_1 ) && hpx::util::bind( h ),
+        false, false, f( false ) && h() );
 
     // ||
 
-    test( hpx::util::bind( f, false ) || hpx::util::bind( g, true ), false, false, f( false ) || g( true ) );
-    test( hpx::util::bind( f, false ) || hpx::util::bind( g, false ), false, false, f( false ) || g( false ) );
+    test( hpx::util::bind( f, false ) || hpx::util::bind( g, true ),
+        false, false, f( false ) || g( true ) );
+    test( hpx::util::bind( f, false ) || hpx::util::bind( g, false ),
+        false, false, f( false ) || g( false ) );
 
-    test( hpx::util::bind( f, true ) || hpx::util::bind( h ), false, false, f( true ) || h() );
+    test( hpx::util::bind( f, true ) || hpx::util::bind( h ),
+        false, false, f( true ) || h() );
 
-    test( hpx::util::bind( f, placeholders::_1 ) || hpx::util::bind( g, placeholders::_2 ), false, true, f( false ) || g( true ) );
-    test( hpx::util::bind( f, placeholders::_1 ) || hpx::util::bind( g, placeholders::_2 ), false, false, f( false ) || g( false ) );
+    test( hpx::util::bind( f, placeholders::_1 ) || hpx::util::bind( g,
+        placeholders::_2 ), false, true, f( false ) || g( true ) );
+    test( hpx::util::bind( f, placeholders::_1 ) || hpx::util::bind( g,
+        placeholders::_2 ), false, false, f( false ) || g( false ) );
 
-    test( hpx::util::bind( f, placeholders::_1 ) || hpx::util::bind( h ), true, false, f( true ) || h() );
+    test( hpx::util::bind( f, placeholders::_1 ) || hpx::util::bind( h ),
+        true, false, f( true ) || h() );
 
     //
 

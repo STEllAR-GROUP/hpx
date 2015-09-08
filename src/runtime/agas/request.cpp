@@ -292,7 +292,8 @@ namespace hpx { namespace agas
       , naming::gid_type prefix_
         )
       : mc(type_)
-      , data(new request_data(util::make_tuple(endpoints_, count_, num_threads_, prefix_)))
+      , data(new request_data(util::make_tuple(endpoints_,
+          count_, num_threads_, prefix_)))
     {
         // TODO: verification of namespace_action_code
     }
@@ -376,7 +377,8 @@ namespace hpx { namespace agas
       , hpx::id_type result_lco
         )
       : mc(type_)
-      , data(new request_data(util::make_tuple(name, evt, call_for_past_events, result_lco)))
+      , data(new request_data(util::make_tuple(name,
+          evt, call_for_past_events, result_lco)))
     {
         HPX_ASSERT(type_ == symbol_ns_on_event);
     }

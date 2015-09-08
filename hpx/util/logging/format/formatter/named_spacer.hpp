@@ -33,11 +33,18 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
 
 namespace detail {
 
-    template<class convert, class lock_resource, class format_base> struct named_spacer_context {
-        typedef typename use_default<lock_resource, hpx::util::logging::lock_resource_finder::tss_with_cache<> >::type lock_resource_type;
-        typedef typename use_default<format_base, base<> >::type  format_base_type;
-        typedef typename use_default<convert, hpx::util::logging::formatter::do_convert_format::prepend> ::type convert_type;
-        typedef ::hpx::util::logging::array::shared_ptr_holder<format_base_type, hpx::util::logging::threading::no_mutex > array;
+    template<class convert, class lock_resource, class format_base>
+    struct named_spacer_context {
+        typedef typename use_default<lock_resource,
+            hpx::util::logging::lock_resource_finder::tss_with_cache<> >
+            ::type lock_resource_type;
+        typedef typename use_default<format_base, base<> >
+            ::type  format_base_type;
+        typedef typename use_default<convert,
+            hpx::util::logging::formatter::do_convert_format::prepend>
+            ::type convert_type;
+        typedef ::hpx::util::logging::array::shared_ptr_holder<format_base_type,
+            hpx::util::logging::threading::no_mutex > array;
         typedef hold_string_type string_type;
 
         struct write_step {
@@ -99,11 +106,14 @@ namespace detail {
         }
 
     private:
-        template<class msg_type> void write_with_convert(msg_type & msg, ::hpx::util::logging::formatter::do_convert_format::prepend*) const {
+        template<class msg_type> void write_with_convert(msg_type & msg,
+            ::hpx::util::logging::formatter::do_convert_format::prepend*) const {
             // prepend
             typename data::read info(m_data);
             typedef typename write_info::write_step_array array_;
-            for ( typename array_::const_reverse_iterator b = info->write_steps.rbegin(), e = info->write_steps.rend(); b != e; ++b) {
+            for ( typename array_::const_reverse_iterator b =
+                info->write_steps.rbegin(),
+                e = info->write_steps.rend(); b != e; ++b) {
                 if ( b->fmt)
                     (*(b->fmt))(msg);
                 convert_type::write( b->prefix, msg);
@@ -113,7 +123,8 @@ namespace detail {
             // append
             typename data::read info(m_data);
             typedef typename write_info::write_step_array array_;
-            for ( typename array_::const_iterator b = info->write_steps.begin(), e = info->write_steps.end(); b != e; ++b) {
+            for ( typename array_::const_iterator b = info->write_steps.begin(),
+                e = info->write_steps.end(); b != e; ++b) {
                 convert_type::write( b->prefix, msg);
                 if ( b->fmt)
                     (*(b->fmt))(msg);
@@ -126,7 +137,8 @@ namespace detail {
             while ( true) {
                 size_type found = escaped.find( HPX_LOG_STR("%%"), idx_start );
                 if ( found != string_type::npos) {
-                    escaped.erase( escaped.begin() + static_cast<typename string_type::difference_type>(found));
+                    escaped.erase( escaped.begin() +
+                        static_cast<typename string_type::difference_type>(found));
                     ++idx_start;
                 }
                 else
@@ -136,7 +148,8 @@ namespace detail {
         }
 
         // recomputes the write steps - note taht this takes place after each operation
-        // for instance, the user might have first set the string and later added the formatters
+        // for instance, the user might have first set the string and
+        // later added the formatters
         void compute_write_steps() {
             typedef typename string_type::size_type size_type;
 
@@ -179,18 +192,23 @@ namespace detail {
 
     private:
         // non-generic
-        template<class formatter> void add_impl(const string_type & name, formatter fmt, const boost::false_type& ) {
+        template<class formatter> void add_impl(const string_type & name,
+            formatter fmt, const boost::false_type& ) {
             typename data::write info(m_data);
             format_base_type * p = info->formatters.append(fmt);
             info->name_to_formatter[name] = p;
         }
         // generic manipulator
-        template<class formatter> void add_impl(const string_type & name, formatter fmt, const boost::true_type& ) {
-            typedef hpx::util::logging::manipulator::detail::generic_holder<formatter,format_base_type> holder;
+        template<class formatter> void add_impl(const string_type & name,
+            formatter fmt, const boost::true_type& ) {
+            typedef hpx::util::logging::manipulator::detail::generic_holder<formatter,
+                format_base_type> holder;
 
             typedef typename formatter::convert_type formatter_convert_type;
-            // they must share the same type of conversion - otherwise when trying to prepend we could end up appending or vice versa
-            BOOST_STATIC_ASSERT( (boost::is_same<formatter_convert_type, convert_type>::value) );
+            // they must share the same type of conversion
+            // - otherwise when trying to prepend we could end up appending or vice versa
+            BOOST_STATIC_ASSERT( (boost::is_same<formatter_convert_type,
+                convert_type>::value) );
 
             add_impl( name, holder(fmt), boost::false_type() );
         }
@@ -200,7 +218,9 @@ namespace detail {
 }
 
 /**
-@brief Allows you to contain multiple formatters, and specify a %spacer between them. You have a %spacer string, and within it, you can escape your contained formatters.
+@brief Allows you to contain multiple formatters,
+and specify a %spacer between them. You have a %spacer string, and within it,
+you can escape your contained formatters.
 
 @code
 #include <hpx/util/logging/format/formatter/named_spacer.hpp>
@@ -209,9 +229,11 @@ namespace detail {
 This allows you:
 - to hold multiple formatters
 - each formatter is given a name, when being added
-- you have a %spacer string, which contains what is to be prepended or appended to the string (by default, prepended)
+- you have a %spacer string, which contains what is to be prepended or
+appended to the string (by default, prepended)
 - a formatter is escaped with @c '\%' chars, like this @c "%name%"
-- if you want to write the @c '\%', just double it, like this: <tt>"this %% gets written"</tt>
+- if you want to write the @c '\%', just double it,
+like this: <tt>"this %% gets written"</tt>
 
 Example:
 
@@ -239,13 +261,18 @@ You could have an output like this:
 @endcode
 
 
-@bug Use_tags.cpp example when on dedicated thread, fails with named_spacer. If using the old code, it works.
+@bug Use_tags.cpp example when on dedicated thread,
+fails with named_spacer. If using the old code, it works.
 
 */
-template< class convert = default_, class format_base = default_, class lock_resource = default_ >
-        struct named_spacer_t : is_generic, non_const_context< detail::named_spacer_context<convert,lock_resource,format_base> > {
+template< class convert = default_, class format_base = default_,
+class lock_resource = default_ >
+        struct named_spacer_t : is_generic,
+            non_const_context< detail::named_spacer_context<convert,
+            lock_resource,format_base> > {
 
-    typedef non_const_context< detail::named_spacer_context<convert,lock_resource,format_base> > context_base;
+    typedef non_const_context< detail::named_spacer_context<convert,
+        lock_resource,format_base> > context_base;
     typedef hold_string_type string_type;
 
     named_spacer_t(const string_type & str = string_type() ) {
@@ -258,7 +285,8 @@ template< class convert = default_, class format_base = default_, class lock_res
         return *this;
     }
 
-    template<class formatter> named_spacer_t & add(const string_type & name, formatter fmt) {
+    template<class formatter> named_spacer_t & add(const string_type & name,
+        formatter fmt) {
         context_base::context().add(name, fmt);
         return *this;
     }

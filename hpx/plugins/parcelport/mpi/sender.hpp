@@ -13,6 +13,8 @@
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/tag_provider.hpp>
 
+#include <hpx/util/memory_chunk_pool.hpp>
+
 #include <list>
 #include <iterator>
 #include <memory>
@@ -21,24 +23,27 @@
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
-    template <typename Buffer>
     struct sender
     {
+        typedef util::memory_chunk_pool<> memory_pool_type;
         typedef
-            sender_connection<typename hpx::util::decay<Buffer>::type>
+            util::detail::memory_chunk_pool_allocator<
+                char, util::memory_chunk_pool<>
+            >
+            allocator_type;
+        typedef
+            std::vector<char, allocator_type>
+            data_type;
+        typedef
+            sender_connection
             connection_type;
-#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
         typedef boost::shared_ptr<connection_type> connection_ptr;
-#else
-        typedef std::unique_ptr<connection_type> connection_ptr;
-#endif
         typedef std::list<connection_ptr> connection_list;
 
         typedef hpx::lcos::local::spinlock mutex_type;
-        sender(std::size_t max_connections)
-          : max_connections_(max_connections)
-          , num_connections_(0)
-          , next_free_tag_(-1)
+        sender(memory_pool_type & chunk_pool)
+          : next_free_tag_(-1)
+          , chunk_pool_(chunk_pool)
         {
         }
 
@@ -47,64 +52,24 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             get_next_free_tag();
         }
 
-        struct check_num_connections
+        connection_ptr create_connection(int dest,
+            boost::atomic<bool> & enable,
+            performance_counters::parcels::gatherer & parcels_sent)
         {
-            check_num_connections(sender *s)
-             : this_(s)
-             , decrement_(false)
-            {
-                if(!threads::get_self_ptr()) return;
+            return
+                boost::make_shared<connection_type>(
+                    this, dest, chunk_pool_, enable, parcels_sent);
+        }
 
-                boost::unique_lock<mutex_type> l(this_->connections_mtx_);
-                while(this_->num_connections_ >= this_->max_connections_)
-                {
-                    this_->connections_cond_.wait(l);
-                }
-                ++this_->num_connections_;
-                decrement_ = true;
-            }
-
-            ~check_num_connections()
-            {
-                if(decrement_)
-                {
-                    boost::unique_lock<mutex_type> l(this_->connections_mtx_);
-                    --this_->num_connections_;
-                    this_->connections_cond_.notify_all(std::move(l));
-                }
-            }
-
-            sender *this_;
-            bool decrement_;
-        };
-
-        template <typename Handler>
-        void send(
-            int dest
-          , parcel && p
-          , Handler && handler
-          , Buffer && buffer
-          , performance_counters::parcels::gatherer & parcels_sent
-        )
+        void add(connection_ptr const & ptr)
         {
-            check_num_connections chk(this);
+            boost::unique_lock<mutex_type> l(connections_mtx_);
+            connections_.push_back(ptr);
+        }
 
-            connection_ptr sender(
-                new connection_type(
-                    tag_provider_.acquire()
-                  , dest
-                  , std::move(p)
-                  , std::move(buffer)
-                  , std::forward<Handler>(handler)
-                  , parcels_sent
-                )
-            );
-
-            if(!sender->send())
-            {
-                boost::unique_lock<mutex_type> l(connections_mtx_);
-                connections_.push_back(std::move(sender));
-            }
+        int acquire_tag()
+        {
+            return tag_provider_.acquire();
         }
 
         void send_messages(
@@ -112,15 +77,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         )
         {
             std::size_t k = 0;
-            typename connection_list::iterator it = connections.begin();
+            connection_list::iterator it = connections.begin();
+            hpx::util::high_resolution_timer timer;
 
-            // We try to handle all receives within 1 secone
+            // We try to handle all receives within 1 second
             while(it != connections.end())
             {
+                if(timer.elapsed() > 1.0) break;
+
                 connection_type & sender = **it;
                 if(sender.send())
                 {
+                    connection_ptr s = *it;
                     it = connections.erase(it);
+                    error_code ec;
+                    s->postprocess_handler_(ec, s->destination(), s);
                 }
                 else
                 {
@@ -146,13 +117,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 {
                     connections_.insert(
                         connections_.end()
-#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
-                      , connections.begin()
-                      , connections.end()
-#else
                       , std::make_move_iterator(connections.begin())
                       , std::make_move_iterator(connections.end())
-#endif
                     );
                 }
             }
@@ -244,14 +210,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         mutex_type connections_mtx_;
         lcos::local::detail::condition_variable connections_cond_;
-        std::size_t const max_connections_;
-        std::size_t num_connections_;
         connection_list connections_;
 
         mutex_type next_free_tag_mtx_;
         MPI_Request next_free_tag_request_;
         int next_free_tag_;
+
+        memory_pool_type & chunk_pool_;
     };
+
 
 }}}}
 

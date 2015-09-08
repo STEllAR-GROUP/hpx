@@ -104,7 +104,8 @@ namespace hpx { namespace threads
         ran_exit_funcs_ = true;
     }
 
-    bool thread_data_base::add_thread_exit_callback(util::function_nonser<void()> const& f)
+    bool thread_data_base::add_thread_exit_callback(util
+        ::function_nonser<void()> const& f)
     {
         mutex_type::scoped_lock l(this);
         if (ran_exit_funcs_ || get_state() == terminated)
