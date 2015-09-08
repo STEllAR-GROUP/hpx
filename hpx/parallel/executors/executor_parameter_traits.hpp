@@ -122,6 +122,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             return get_chunk_size_helper::call(0, params, exec,
                 std::forward<F>(f), num_tasks);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        struct reset_thread_distribution_helper
+        {
+            template <typename Parameters, typename Executor>
+            static void call(wrap_int, Parameters&, Executor& exec)
+            {
+            }
+
+            template <typename Parameters, typename Executor>
+            static auto call(int, Parameters& params, Executor& exec)
+            ->  decltype(params.reset_thread_distribution(exec))
+            {
+                params.reset_thread_distribution(exec);
+            }
+        };
+
+        template <typename Parameters, typename Executor>
+        void call_reset_thread_distribution(Parameters& params, Executor& exec)
+        {
+            reset_thread_distribution_helper::call(0, params, exec);
+        }
     }
     /// \endcond
 
@@ -175,6 +197,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             return detail::call_get_chunk_size(params, exec,
                 std::forward<F>(f), num_tasks);
+        }
+
+        /// Reset the internal round robin thread distribution scheme for the
+        /// given executor.
+        ///
+        /// \param params   [in] The executor parameters object to use for
+        ///                 resetting the thread distribution scheme.
+        /// \param exec     [in] The executor object to use.
+        ///
+        /// \note This calls params.reset_thread_distribution(exec) if it exists;
+        ///       otherwise it does nothing.
+        ///
+        template <typename Executor>
+        static void reset_thread_distribution(executor_parameters_type& params,
+            Executor& exec)
+        {
+            detail::call_reset_thread_distribution(params, exec);
         }
 
         /// Retrieve the number of (kernel-)threads used by the associated

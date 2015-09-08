@@ -6,8 +6,6 @@
 #if !defined(HPX_THREADS_POLICIES_TOPOLGY_NOV_25_2012_1036AM)
 #define HPX_THREADS_POLICIES_TOPOLGY_NOV_25_2012_1036AM
 
-#include <hpx/hpx_fwd.hpp>
-
 #if defined(HPX_HAVE_HWLOC)
 #  include <hpx/runtime/threads/policies/hwloc_topology.hpp>
 #else

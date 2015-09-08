@@ -116,6 +116,7 @@ if(HPX_WITH_CXX11_LAMBDAS)
       spinlock_overhead1
       spinlock_overhead2
       stencil3_iterators
+      stream
       transform_reduce_scaling
       vector_foreach
      )
@@ -124,6 +125,7 @@ if(HPX_WITH_CXX11_LAMBDAS)
   set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
   set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)
   set(stencil3_iterators_FLAGS DEPENDENCIES iostreams_component)
+  set(stream_FLAGS DEPENDENCIES iostreams_component)
   set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
   set(vector_foreach_FLAGS DEPENDENCIES iostreams_component)
 endif()

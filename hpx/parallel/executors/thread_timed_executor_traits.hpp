@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/timed_thread_executor_traits.hpp
+/// \file parallel/executors/thread_timed_executor_traits.hpp
 
-#if !defined(HPX_PARALLEL_TIMED_THREAD_EXECUTOR_TRAITS_AUG_07_2015_0328PM)
-#define HPX_PARALLEL_TIMED_THREAD_EXECUTOR_TRAITS_AUG_07_2015_0328PM
+#if !defined(HPX_PARALLEL_THREAD_TIMED_EXECUTOR_TRAITS_AUG_07_2015_0328PM)
+#define HPX_PARALLEL_THREAD_TIMED_EXECUTOR_TRAITS_AUG_07_2015_0328PM
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>

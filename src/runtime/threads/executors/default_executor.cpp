@@ -15,12 +15,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         os_thread_(std::size_t(-1))
     {}
 
-    default_executor::default_executor(thread_stacksize stacksize)
-      : stacksize_(stacksize),
-        priority_(thread_priority_default),
-        os_thread_(std::size_t(-1))
-    {}
-
     default_executor::default_executor(thread_priority priority,
         thread_stacksize stacksize, std::size_t os_thread)
       : stacksize_(stacksize),
@@ -68,8 +62,24 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Return an estimate of the number of waiting tasks.
     boost::uint64_t default_executor::num_pending_closures(error_code& ec) const
     {
+        if (&ec != &throws)
+            ec = make_success_code();
+
         return get_thread_count() - get_thread_count(terminated);
     }
+
+    // Reset internal (round robin) thread distribution scheme
+    void default_executor::reset_thread_distribution()
+    {
+        threads::reset_thread_distribution();
+    }
+
+    // Set the new scheduler mode
+    void default_executor::set_scheduler_mode(threads::policies::scheduler_mode mode)
+    {
+        threads::set_scheduler_mode(mode);
+    }
+
 
     // Return the requested policy element
     std::size_t default_executor::get_policy_element(
@@ -86,7 +96,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         }
 
         HPX_THROWS_IF(ec, bad_parameter,
-            "thread_pool_executor::get_policy_element",
+            "default_executor::get_policy_element",
             "requested value of invalid policy element");
         return std::size_t(-1);
     }

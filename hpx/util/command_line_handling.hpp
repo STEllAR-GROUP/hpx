@@ -31,7 +31,10 @@ namespace hpx { namespace util
             node_(std::size_t(-1)),
             num_threads_(1),
             num_cores_(1),
-            num_localities_(1)
+            num_localities_(1),
+            pu_step_(1),
+            pu_offset_(0),
+            numa_sensitive_(0)
         {
             for (std::string const& e : ini_config)
                 rtcfg_.parse("<user supplied config>", e, true, false);
@@ -52,7 +55,12 @@ namespace hpx { namespace util
         std::size_t num_threads_;
         std::size_t num_cores_;
         std::size_t num_localities_;
+        std::size_t pu_step_;
+        std::size_t pu_offset_;
         std::string queuing_;
+        std::string affinity_domain_;
+        std::string affinity_bind_;
+        std::size_t numa_sensitive_;
 
     protected:
         bool handle_arguments(util::manage_config& cfgmap,

@@ -13,6 +13,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/executor_information_traits.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 
@@ -59,8 +60,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename F>
         std::size_t get_chunk_size(Executor& exec, F && f, std::size_t count)
         {
-            std::size_t const cores =
-                executor_traits<Executor>::processing_units_count(exec, *this);
+            std::size_t const cores = executor_information_traits<Executor>::
+                processing_units_count(exec, *this);
 
             if (count > 100*cores)
             {

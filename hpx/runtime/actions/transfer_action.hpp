@@ -310,10 +310,12 @@ namespace hpx { namespace actions
         // schedule a new thread
         void schedule_thread(naming::id_type const& target,
             naming::address::address_type lva,
-            threads::thread_state_enum initial_state)
+            threads::thread_state_enum initial_state,
+            std::size_t num_thread)
         {
             std::unique_ptr<continuation> cont;
             threads::thread_init_data data;
+            data.num_os_thread = num_thread;
             if (traits::action_decorate_continuation<derived_type>::call(cont))
             {
                 traits::action_schedule_thread<derived_type>::call(lva,
@@ -329,13 +331,15 @@ namespace hpx { namespace actions
 
         void schedule_thread(std::unique_ptr<continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_state_enum initial_state)
+            threads::thread_state_enum initial_state,
+            std::size_t num_thread)
         {
             // first decorate the continuation
             traits::action_decorate_continuation<derived_type>::call(cont);
 
             // now, schedule the thread
             threads::thread_init_data data;
+            data.num_os_thread = num_thread;
             traits::action_schedule_thread<derived_type>::call(lva,
                 get_thread_init_data(std::move(cont), target, lva, data), initial_state);
         }
