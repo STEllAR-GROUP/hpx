@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
           "n value for the Fibonacci function")
         ;
 
-    std::set<apex_event_type> when = {APEX_STARTUP, APEX_SHUTDOWN, APEX_NEW_NODE, 
+    std::set<apex_event_type> when = {APEX_STARTUP, APEX_SHUTDOWN, APEX_NEW_NODE,
         APEX_NEW_THREAD, APEX_START_EVENT, APEX_STOP_EVENT, APEX_SAMPLE_VALUE};
     apex::register_policy(when, [](apex_context const& context)->int{
         switch(context.event_type) {

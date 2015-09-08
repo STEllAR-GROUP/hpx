@@ -43,29 +43,29 @@ static boost::shared_mutex init_mutex;
 
 BASED ON THE local_priority_queue scheduler.
 
-add -DHPX_HAVE_THROTTLE_SCHEDULER=1 to cmake to include the throttling during 
+add -DHPX_HAVE_THROTTLE_SCHEDULER=1 to cmake to include the throttling during
 the HPX build.
 I haven't tested but the flag to include all schedulers should also work.
 
 APEX also needs to be available (-DTAU_ROOT=... -DHPX_HAVE_APEX=1 needed)
 
-To select the throttling scheduler during execution the --hpx:queuing=throttle 
+To select the throttling scheduler during execution the --hpx:queuing=throttle
 needs to be included.
 
-The HPX execution needs to be running on a system with an active RCRdaemon 
+The HPX execution needs to be running on a system with an active RCRdaemon
 writing the RCRblackboard.  (currently I know {elo,thumper}.hpc.renci.org work)
 
-The current model is braindead. It checks to see if the energy is above a fixed 
-value (80W) and reduces the number of active threads to HPX_THROTTLE_MIN 
-environment variable (12 if not specified) and when the power is below 50 the 
+The current model is braindead. It checks to see if the energy is above a fixed
+value (80W) and reduces the number of active threads to HPX_THROTTLE_MIN
+environment variable (12 if not specified) and when the power is below 50 the
 number of threads is set to HPX_THROTTLE_MAX (16 if not specified).
 
-The Power cutoffs should also be controlled via environment variable and the 
-current memory concurrency should play a significant role in deciding whether 
-to limit the parallel in the system. During high concurrency the speed is 
-limited by memory bandwidth and the reduction in parallelism should not 
-significantly reduce execution time (memory is still going to be running flat 
-out). I may get to these additions this week, I'll try hard to have them in 
+The Power cutoffs should also be controlled via environment variable and the
+current memory concurrency should play a significant role in deciding whether
+to limit the parallel in the system. During high concurrency the speed is
+limited by memory bandwidth and the reduction in parallelism should not
+significantly reduce execution time (memory is still going to be running flat
+out). I may get to these additions this week, I'll try hard to have them in
 place before the visit to Oregon.
 */
 
@@ -150,7 +150,7 @@ namespace hpx { namespace threads { namespace policies
             numa_domain_masks_(init.num_queues_),
             outside_numa_domain_masks_(init.num_queues_)
 #else
-            numa_domain_masks_(init.num_queues_, 
+            numa_domain_masks_(init.num_queues_,
             topology_.get_machine_affinity_mask()),
             outside_numa_domain_masks_(init.num_queues_,
                 topology_.get_machine_affinity_mask())
@@ -242,7 +242,7 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += 
+                    num_stolen_threads +=
                         queues_[i]->get_num_stolen_from_pending(reset);
                 return num_stolen_threads;
             }
@@ -258,12 +258,12 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += 
+                    num_stolen_threads +=
                         queues_[i]->get_num_stolen_to_pending(reset);
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += 
+            num_stolen_threads +=
                         queues_[num_thread]->get_num_stolen_to_pending(reset);
             return num_stolen_threads;
         }
@@ -274,12 +274,12 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += 
+                    num_stolen_threads +=
                         queues_[i]->get_num_stolen_from_staged(reset);
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += 
+            num_stolen_threads +=
                         queues_[num_thread]->get_num_stolen_from_staged(reset);
             return num_stolen_threads;
         }
@@ -290,12 +290,12 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += 
+                    num_stolen_threads +=
                         queues_[i]->get_num_stolen_to_staged(reset);
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += 
+            num_stolen_threads +=
                         queues_[num_thread]->get_num_stolen_to_staged(reset);
             return num_stolen_threads;
         }
@@ -359,7 +359,7 @@ namespace hpx { namespace threads { namespace policies
 #ifndef VALUE_THROTTLING
             if (HPX_UNLIKELY(apex_init == false)) {
                 boost::unique_lock<boost::shared_mutex> l{init_mutex};
-                if(apex_init == true || 
+                if(apex_init == true ||
                    apex::setup_power_cap_throttling() != APEX_NOERROR) {
                     return true; // Don't throttle
                 } else {
@@ -369,13 +369,13 @@ namespace hpx { namespace threads { namespace policies
 #else
             if (HPX_UNLIKELY(apex_init == false)) {
                 boost::unique_lock<boost::shared_mutex> l{init_mutex};
-                if(apex_init == true || 
-                   apex::setup_timer_throttling(VALUE_THROTTLING, 
-                       APEX_MINIMIZE_ACCUMULATED, APEX_DISCRETE_HILL_CLIMBING, 
+                if(apex_init == true ||
+                   apex::setup_timer_throttling(VALUE_THROTTLING,
+                       APEX_MINIMIZE_ACCUMULATED, APEX_DISCRETE_HILL_CLIMBING,
                        1000000) != APEX_NOERROR) {
                     return true; // Don't throttle
                 } else {
-                    std::cerr << "Thread " << num_thread << 
+                    std::cerr << "Thread " << num_thread <<
                         " initialized apex throttling." << std::endl;
                     apex_init = true;
                 }
@@ -388,7 +388,7 @@ namespace hpx { namespace threads { namespace policies
                 return true;
             }
             else {
-                // Sleep so that we don't continue using energy repeatedly 
+                // Sleep so that we don't continue using energy repeatedly
                 // checking for work.
                 static const struct timespec tim{0, 100000};
                 nanosleep(&tim, nullptr);
@@ -406,7 +406,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 HPX_ASSERT(num_thread < queues_size);
 
-        bool ret = TTthrottle(num_thread, apex_current_threads < 
+        bool ret = TTthrottle(num_thread, apex_current_threads <
                    apex_current_desired_active_threads); // am I throttled?
         if (!ret) return false;  // throttled --  don't grap any work
 
@@ -441,7 +441,7 @@ namespace hpx { namespace threads { namespace policies
                     HPX_ASSERT(idx != num_thread);
 
                     //-V560 //-V600 //-V111
-                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx)) 
+                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx))
                         continue;
 
                     thread_queue_type* q = queues_[idx];

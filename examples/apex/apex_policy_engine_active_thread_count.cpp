@@ -66,7 +66,7 @@ id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
     boost::uint32_t const prefix = hpx::get_locality_id();
     /*
-    boost::format 
+    boost::format
       active_threads("/threads{locality#%d/total}/count/instantaneous/active");
     */
     boost::format active_threads(counter_name);
