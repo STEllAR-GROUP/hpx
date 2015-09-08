@@ -41,7 +41,7 @@ namespace policies { namespace verbs
         static int const data_size_ = SIZE;
 
         template <typename Buffer>
-        header(Buffer const & buffer, uint32_t tag, bool enable_piggyback_copy=true)
+        header(Buffer const & buffer, uint32_t tag)
         {
             boost::int64_t size = static_cast<boost::int64_t>(buffer.size_);
             boost::int64_t numbytes = static_cast<boost::int64_t>(buffer.data_size_);
@@ -67,19 +67,19 @@ namespace policies { namespace verbs
             if (chunkbytes <= (data_size_ - pos_data_zone)) {
               set<pos_chunk_flag>(static_cast<value_type>(1));
               set<pos_chunk_offset>(static_cast<value_type>(pos_data_zone));
-              std::memcpy(&data_[get<pos_chunk_offset>()], chunks.data(), chunkbytes);
+              std::memcpy(&data_[pos_data_zone], chunks.data(), chunkbytes);
+              LOG_DEBUG_MSG("Chunkbytes is " << hexnumber(chunkbytes));
             }
             else {
               chunkbytes = 0;
             }
 
-            // can we send main chunk as well as other information
+            // the end of header position will be start of piggyback data
+            set<pos_piggy_back_offset>(static_cast<value_type>(pos_data_zone + chunkbytes));
+
+            // can we send main message chunk as well as other information
             if(buffer.data_.size() <= (data_size_ - chunkbytes - pos_data_zone)) {
                 set<pos_piggy_back_flag>(static_cast<value_type>(1));
-                set<pos_piggy_back_offset>(static_cast<value_type>(pos_data_zone + chunkbytes));
-                if (enable_piggyback_copy) {
-                  std::memcpy(&data_[get<pos_piggy_back_offset>()], &buffer.data_[0], buffer.data_.size());
-                }
             }
         }
 
@@ -152,10 +152,12 @@ namespace policies { namespace verbs
 
         std::size_t header_length()
         {
+            // if chunks are included in header, return pos_data_zone + chunkbytes
             if(get<pos_chunk_flag>())
-                return *reinterpret_cast<value_type*>(&data_[pos_piggy_back_offset]);
+                return static_cast<std::size_t>(get<pos_piggy_back_offset>());
+            // otherwise, just end of normal header
             else
-                return *reinterpret_cast<value_type*>(&data_[pos_chunk_offset]);
+                return static_cast<std::size_t>(pos_data_zone);
         }
 
     private:
@@ -173,6 +175,17 @@ namespace policies { namespace verbs
             value_type res;
             std::memcpy(&res, &data_[Pos], sizeof(res));
             return res;
+        }
+
+        friend std::ostream & operator<<(std::ostream & os, header const * h)
+        {
+            boost::io::ios_flags_saver ifs(os);
+            for (int i=0; i<10; i++) {
+                value_type res;
+                std::memcpy(&res, &h->data_[i*sizeof(value_type)], sizeof(res));
+                os << res << ", ";
+            }
+            return os;
         }
     };
 

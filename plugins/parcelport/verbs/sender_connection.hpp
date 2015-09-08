@@ -10,10 +10,11 @@
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
-//#include <hpx/plugins/parcelport/verbs/locality.hpp>
-
+//
 #include <boost/shared_ptr.hpp>
+//
 #include "RdmaClient.h"
+#include "pinned_memory_vector.hpp"
 
 namespace hpx { namespace parcelset {
 namespace policies { namespace verbs
@@ -22,13 +23,12 @@ namespace policies { namespace verbs
     struct parcelport;
 
     typedef lcos::local::spinlock                           mutex_type;
-    typedef char                                            memory_type;
+
     typedef RdmaMemoryPool                                  memory_pool_type;
     typedef std::shared_ptr<memory_pool_type>               memory_pool_ptr_type;
-    typedef util::detail::memory_chunk_pool_allocator
-            <memory_type, memory_pool_type, mutex_type>     allocator_type;
-
-    typedef std::vector<memory_type, allocator_type>        snd_data_type;
+    typedef hpx::util::detail::memory_chunk_pool_allocator
+            <char, memory_pool_type, mutex_type>            allocator_type;
+    typedef util::detail::pinned_memory_vector<char>        snd_data_type;
     typedef parcel_buffer<snd_data_type>                    snd_buffer_type;
 
     struct sender_connection
@@ -44,7 +44,6 @@ namespace policies { namespace verbs
             void(boost::system::error_code const&, parcel const&)
         > write_handler_type;
 
-
         typedef
             parcelset::parcelport_connection<sender_connection, snd_data_type>
             base_type;
@@ -55,10 +54,10 @@ namespace policies { namespace verbs
           , boost::uint32_t dest
           , locality there
           , RdmaClient *client
-          , memory_pool_type & chunk_pool
+          , memory_pool_type * chunk_pool
           , performance_counters::parcels::gatherer & parcels_sent
         )
-          : base_type(allocator_type(chunk_pool))
+          : base_type(chunk_pool)
           , parcelport_(pp)
           , dest_ip_(dest)
           , there_(there)
@@ -69,9 +68,8 @@ namespace policies { namespace verbs
             // the send buffer is created with our allocator and will get memory from our pool
             // - disable deallocation so that we can manage the block lifetime better
             // @TODO, integrate the pointer wrapper and allocators better into parcel_buffer
-            allocator_type alloc(chunk_pool_);
-            alloc.disable_deallocate = true;
-            snd_buffer_type buffer(alloc);
+            snd_data_type pinned_vector(chunk_pool_);
+            snd_buffer_type buffer(std::move(pinned_vector), chunk_pool_);
             buffer_ = std::move(buffer);
         }
 
@@ -100,7 +98,7 @@ namespace policies { namespace verbs
         boost::uint32_t dest_ip_;
         parcelset::locality there_;
         RdmaClient *client_;
-        memory_pool_type & chunk_pool_;
+        memory_pool_type * chunk_pool_;
         performance_counters::parcels::gatherer & parcels_sent_;
     };
 }}}}

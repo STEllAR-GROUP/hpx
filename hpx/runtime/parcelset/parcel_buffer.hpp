@@ -49,6 +49,13 @@ namespace hpx { namespace parcelset
           , size_(0), data_size_(0), header_size_(0)
         {}
 
+        explicit parcel_buffer(BufferType && data,
+            allocator_type *allocator)
+          : data_(std::move(data))
+          , num_chunks_(count_chunks_type(0, 0))
+          , size_(0), data_size_(0), header_size_(0)
+        {}
+
         parcel_buffer(parcel_buffer && other)
           : data_(std::move(other.data_))
           , chunks_(std::move(other.chunks_))

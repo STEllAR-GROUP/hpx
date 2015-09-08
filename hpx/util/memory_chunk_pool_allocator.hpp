@@ -36,10 +36,10 @@ namespace hpx { namespace util { namespace detail
         };
 
         memory_chunk_pool_allocator() throw()
-          : memory_pool_(0), disable_deallocate(false)
+          : memory_pool_(0), disable_deallocate(true)
         {}
         memory_chunk_pool_allocator(Pool & mp) throw()
-          : memory_pool_(&mp), disable_deallocate(false)
+          : memory_pool_(&mp), disable_deallocate(true)
         {}
         memory_chunk_pool_allocator(
                 memory_chunk_pool_allocator const & other) throw()

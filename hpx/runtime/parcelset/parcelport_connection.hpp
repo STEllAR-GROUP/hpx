@@ -92,6 +92,10 @@ namespace hpx { namespace parcelset {
         parcelport_connection(typename BufferType::allocator_type const & alloc)
           : buffer_(alloc)
         {}
+
+        parcelport_connection(typename BufferType::allocator_type * alloc)
+          : buffer_(std::move(buffer_type(alloc)),alloc)
+        {}
 #endif
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
