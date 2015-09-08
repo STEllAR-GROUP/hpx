@@ -73,6 +73,24 @@ void test_wait_for_all_from_list_iterators()
     }
 }
 
+void test_wait_for_all_one_future()
+{
+    hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
+    hpx::lcos::future<int> f1 = pt1.get_future();
+    pt1.apply();
+
+    typedef hpx::util::tuple<
+        hpx::lcos::future<int> > result_type;
+    hpx::lcos::future<result_type> r =
+        hpx::when_all(f1);
+
+    result_type result = r.get();
+
+    HPX_TEST(!f1.valid());
+
+    HPX_TEST(hpx::util::get<0>(result).is_ready());
+}
+
 void test_wait_for_all_two_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
@@ -259,6 +277,7 @@ int hpx_main(variables_map&)
     {
         test_wait_for_all_from_list();
         test_wait_for_all_from_list_iterators();
+        test_wait_for_all_one_future();
         test_wait_for_all_two_futures();
         test_wait_for_all_three_futures();
         test_wait_for_all_four_futures();
