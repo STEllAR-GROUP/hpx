@@ -15,13 +15,18 @@
 #endif
 
 #include <hpx/config/defines.hpp>
-#include <hpx/version.hpp>
+#include <hpx/config/version.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/constexpr.hpp>
-#include <hpx/config/cxx11_macros.hpp>
+
+#include <boost/version.hpp>
+
+#if BOOST_VERSION == 105400
+#include <cstdint> // Boost.Atomic has trouble finding [u]intptr_t
+#endif
 
 #if BOOST_VERSION < 105600
 #include <boost/exception/detail/attribute_noreturn.hpp>
@@ -533,8 +538,5 @@
 #    define HPX_DEPRECATED(x)  /**/
 #  endif
 #endif
-
-///////////////////////////////////////////////////////////////////////////////
-#include <hpx/config/defaults.hpp>
 
 #endif

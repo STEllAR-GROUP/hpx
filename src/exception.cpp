@@ -8,6 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
+#include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>

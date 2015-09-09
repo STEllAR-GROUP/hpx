@@ -24,7 +24,7 @@ void nullary_function()
 void lambdas()
 {
     using hpx::traits::is_callable;
-#   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_DECLTYPE)
+#   if defined(HPX_HAVE_CXX11_LAMBDAS)
     auto lambda = [](){};
 
     typedef decltype(lambda) f;
