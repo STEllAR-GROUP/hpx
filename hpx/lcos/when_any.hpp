@@ -44,7 +44,7 @@ namespace hpx
     ///             iterator.
     template <typename InputIter, typename Container =
         vector<future<typename std::iterator_traits<InputIter>::value_type>>>
-    future<Container>
+    future<when_any_result<Container>>
     when_any(InputIter first, InputIter last);
 
     /// The function \a when_any is a non-deterministic choice operator. It
@@ -66,7 +66,7 @@ namespace hpx
     ///             iterator.
     template <typename Range>
     future<when_any_result<Range>>
-    when_all(Range& values)
+    when_any(Range& values)
 
     /// The function \a when_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns a new future object
