@@ -37,14 +37,14 @@ namespace hpx
     /// \return   Returns a when_any_result holding the same list of futures
     ///           as has been passed to when_any and an index pointing to a
     ///           ready future.
-    ///           - future<when_any_result<vector<future<R>>>>: If the input
+    ///           - future<when_any_result<Container<future<R>>>>: If the input
     ///             cardinality is unknown at compile time and the futures
     ///             are all of the same type. The order of the futures in the
-    ///             output vector will be the same as given by the input
+    ///             output container will be the same as given by the input
     ///             iterator.
-    template <typename InputIter>
-    future<when_any_result<
-        vector<future<typename std::iterator_traits<InputIter>::value_type>>>>
+    template <typename InputIter, typename Container =
+        vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<Container>
     when_any(InputIter first, InputIter last);
 
     /// The function \a when_any is a non-deterministic choice operator. It
@@ -52,22 +52,21 @@ namespace hpx
     /// representing the same list of futures after one future of that list
     /// finishes execution.
     ///
-    /// \param futures  [in] A vector holding an arbitrary amount of \a future or
+    /// \param futures  [in] A container holding an arbitrary amount of \a future or
     ///                 \a shared_future objects for which \a when_any should
     ///                 wait.
     ///
     /// \return   Returns a when_any_result holding the same list of futures
     ///           as has been passed to when_any and an index pointing to a
     ///           ready future.
-    ///           - future<when_any_result<vector<future<R>>>>: If the input
+    ///           - future<when_any_result<Container<future<R>>>>: If the input
     ///             cardinality is unknown at compile time and the futures
     ///             are all of the same type. The order of the futures in the
-    ///             output vector will be the same as given by the input
+    ///             output container will be the same as given by the input
     ///             iterator.
-    template <typename R>
-    future<when_any_result<
-        std::vector<future<R>>>>
-    when_any(std::vector<future<R>>& futures);
+    template <typename Range>
+    future<when_any_result<Range>>
+    when_all(Range& values)
 
     /// The function \a when_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns a new future object
@@ -106,16 +105,16 @@ namespace hpx
     /// \return   Returns a when_any_result holding the same list of futures
     ///           as has been passed to when_any and an index pointing to a
     ///           ready future.
-    ///           - future<when_any_result<vector<future<R>>>>: If the input
+    ///           - future<when_any_result<Container<future<R>>>>: If the input
     ///             cardinality is unknown at compile time and the futures
     ///             are all of the same type. The order of the futures in the
-    ///             output vector will be the same as given by the input
+    ///             output container will be the same as given by the input
     ///             iterator.
     ///
     /// \note     None of the futures in the input sequence are invalidated.
-    template <typename InputIter>
-    future<when_any_result<
-        vector<future<typename std::iterator_traits<InputIter>::value_type>>>>
+    template <typename InputIter, typename Container =
+        vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<when_any_result<Container>>
     when_any_n(InputIter first, std::size_t count);
 }
 
@@ -364,20 +363,13 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future>
-    lcos::future<when_any_result<std::vector<Future> > >
-    when_any(std::vector<Future>& lazy_values)
+    template <typename Range>
+    typename boost::enable_if<traits::is_future_range<Range>,
+        lcos::future<when_any_result<typename util::decay<Range>::type> > >::type
+    when_any(Range& lazy_values)
     {
-        BOOST_STATIC_ASSERT_MSG(
-            traits::is_future<Future>::value, "invalid use of when_any");
-
-        typedef std::vector<Future> result_type;
-
-        result_type lazy_values_;
-        lazy_values_.reserve(lazy_values.size());
-        std::transform(lazy_values.begin(), lazy_values.end(),
-            std::back_inserter(lazy_values_),
-            traits::acquire_future_disp());
+        typedef Range result_type;
+        result_type lazy_values_ = traits::acquire_future<result_type>()(lazy_values);
 
         boost::shared_ptr<detail::when_any<result_type> > f =
             boost::make_shared<detail::when_any<result_type> >(
@@ -390,25 +382,27 @@ namespace hpx { namespace lcos
         return p.get_future();
     }
 
-    template <typename Future>
-    lcos::future<when_any_result<std::vector<Future> > > //-V659
-    when_any(std::vector<Future> && lazy_values)
+    template <typename Range>
+    typename boost::enable_if<traits::is_future_range<Range>,
+        lcos::future<when_any_result<typename util::decay<Range>::type> > >::type
+    when_any(Range&& lazy_values)
     {
         return lcos::when_any(lazy_values);
     }
 
-    template <typename Iterator>
-    lcos::future<when_any_result<std::vector<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    > > >
+    template <typename Iterator, typename Container =
+        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+    lcos::future<when_any_result<Container> >
     when_any(Iterator begin, Iterator end)
     {
-        typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
-            future_type;
-        typedef std::vector<future_type> result_type;
+        Container lazy_values_;
 
-        result_type lazy_values_;
+        typename std::iterator_traits<Iterator>::
+            difference_type difference = std::distance(begin, end);
+        if (difference > 0)
+            traits::detail::reserve_if_vector(
+                lazy_values_, static_cast<std::size_t>(difference));
+
         std::transform(begin, end, std::back_inserter(lazy_values_),
             traits::acquire_future_disp());
 
@@ -424,19 +418,13 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator>
-    lcos::future<when_any_result<std::vector<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    > > >
+    template <typename Iterator, typename Container =
+        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+    lcos::future<when_any_result<Container> >
     when_any_n(Iterator begin, std::size_t count)
     {
-        typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
-            future_type;
-        typedef std::vector<future_type> result_type;
-
-        result_type lazy_values_;
-        lazy_values_.reserve(count);
+        Container lazy_values_;
+        traits::detail::reserve_if_vector(lazy_values_, count);
 
         traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)
