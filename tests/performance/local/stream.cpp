@@ -13,6 +13,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/version.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_transform.hpp>
