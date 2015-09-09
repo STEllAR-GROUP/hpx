@@ -53,12 +53,12 @@ namespace hpx { namespace parallel { namespace util
           : executors_(executors), topo_(topo)
         {}
 
-        explicit numa_allocator(numa_allocator const& rhs)
+        numa_allocator(numa_allocator const& rhs)
           : executors_(rhs.executors_), topo_(rhs.topo_)
         {}
 
         template <typename U>
-        explicit numa_allocator(numa_allocator<U, Executors> const& rhs)
+        numa_allocator(numa_allocator<U, Executors> const& rhs)
           : executors_(rhs.executors_), topo_(rhs.topo_)
         {}
 
