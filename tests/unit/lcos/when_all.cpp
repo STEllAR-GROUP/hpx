@@ -31,8 +31,11 @@ int make_int_slowly()
 template <template <class...> class Container>
 void test_wait_for_all_from_list()
 {
+    typedef Container<hpx::lcos::future<int>,
+        std::allocator<int> > container;
+
     unsigned const count = 10;
-    Container<hpx::lcos::future<int> > futures;
+    container futures;
     for (unsigned j = 0; j < count; ++j)
     {
         hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
@@ -40,10 +43,10 @@ void test_wait_for_all_from_list()
         task.apply();
     }
 
-    hpx::lcos::future<Container<hpx::lcos::future<int> > > r =
+    hpx::lcos::future<container> r =
         hpx::when_all(futures);
 
-    Container<hpx::lcos::future<int> > result = r.get();
+    container result = r.get();
 
     HPX_TEST_EQ(futures.size(), result.size());
     for (const auto& f : futures)
@@ -55,7 +58,9 @@ void test_wait_for_all_from_list()
 template <template <class...> class Container>
 void test_wait_for_all_from_list_iterators()
 {
-    typedef Container<hpx::lcos::future<int> > container;
+    typedef Container<hpx::lcos::future<int>,
+        std::allocator<int> > container;
+
     unsigned const count = 10;
 
     container futures;
@@ -70,7 +75,7 @@ void test_wait_for_all_from_list_iterators()
         hpx::when_all<typename container::iterator,
             container>(futures.begin(), futures.end());
 
-    Container<hpx::lcos::future<int> > result = r.get();
+    container result = r.get();
 
     HPX_TEST_EQ(futures.size(), result.size());
     for (const auto& f : futures)
