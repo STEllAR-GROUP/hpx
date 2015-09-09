@@ -386,6 +386,13 @@ namespace hpx { namespace lcos
     when_all(Iterator begin, Iterator end)
     {
         Container values;
+
+        typename std::iterator_traits<Iterator>::
+            difference_type difference = std::distance(begin, end);
+        if (difference > 0)
+            traits::detail::reserve_if_vector(
+                values, static_cast<std::size_t>(difference));
+
         std::transform(begin, end, std::back_inserter(values),
             traits::acquire_future_disp());
 
@@ -406,7 +413,7 @@ namespace hpx { namespace lcos
     when_all_n(Iterator begin, std::size_t count)
     {
         Container values;
-        //values.reserve(count); //TODO:
+        traits::detail::reserve_if_vector(values, count);
 
         traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)

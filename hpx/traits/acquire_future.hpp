@@ -125,6 +125,19 @@ namespace hpx { namespace traits
 
             reserve_if_random_access(v, r, is_random_access());
         }
+
+        template <typename Container>
+        BOOST_FORCEINLINE
+        void reserve_if_vector(Container&, std::size_t)
+        {
+        }
+
+        template <typename Future>
+        BOOST_FORCEINLINE
+        void reserve_if_vector(std::vector<Future>& v, std::size_t n)
+        {
+            v.reserve(n);
+        }
     }
 
     template <typename Range>
