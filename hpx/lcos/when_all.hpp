@@ -39,7 +39,7 @@ namespace hpx
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename InputIter, typename Container =
-        std::vector<typename std::iterator_traits<InputIter>::value_type>>
+        vector<future<typename std::iterator_traits<InputIter>::value_type>>>
     future<Container>
     when_all(InputIter first, InputIter last);
 
@@ -48,27 +48,27 @@ namespace hpx
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
-    /// \param futures  [in] A vector holding an arbitrary amount of \a future
+    /// \param futures  [in] A container holding an arbitrary amount of \a future
     ///                 or \a shared_future objects for which \a when_all
     ///                 should wait.
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_all.
-    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///           - future<Container<future<R>>>: If the input cardinality is
     ///             unknown at compile time and the futures are all of the
     ///             same type.
     ///
-    /// \note Calling this version of \a when_all where the input vector is
-    ///       empty, returns a future with an empty vector that is immediately
+    /// \note Calling this version of \a when_all where the input container is
+    ///       empty, returns a future with an empty container that is immediately
     ///       ready.
     ///       Each future and shared_future is waited upon and then copied into
     ///       the collection of the output (returned) future, maintaining the
     ///       order of the futures in the input collection.
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
-    template <typename R>
-    future<std::vector<future<R>>>
-    when_all(std::vector<future<R>>&& futures);
+    template <typename Range>
+    future<Range>
+    when_all(Range&& values)
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -109,7 +109,7 @@ namespace hpx
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to \a when_all_n.
-    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///           - future<Container<future<R>>>: If the input cardinality is
     ///             unknown at compile time and the futures are all of the
     ///             same type. The order of the futures in the output vector
     ///             will be the same as given by the input iterator.
@@ -127,8 +127,8 @@ namespace hpx
     ///
     /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter, typename Container =
-        std::vector<typename std::iterator_traits<InputIter>::value_type>>
-    future<Container<future<typename std::iterator_traits<InputIter>::value_type>>>
+        vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<Container>
     when_all_n(InputIter begin, std::size_t count);
 }
 
