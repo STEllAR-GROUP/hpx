@@ -373,7 +373,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(BOOST_WINDOWS)
+#if defined(BOOST_WINDOWS) && _MSC_VER < 1900
 #  define snprintf _snprintf
 #endif
 
