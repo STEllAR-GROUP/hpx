@@ -4,31 +4,31 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/vector.hpp>
+#include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
-HPX_REGISTER_VECTOR(double);
-HPX_REGISTER_VECTOR(int);
+HPX_REGISTER_PARTITIONED_VECTOR(double);
+HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void fill_vector(hpx::vector<T>& v, T const& val)
+void fill_vector(hpx::partitioned_vector<T>& v, T const& val)
 {
-    typename hpx::vector<T>::iterator it = v.begin(), end = v.end();
+    typename hpx::partitioned_vector<T>::iterator it = v.begin(), end = v.end();
     for (/**/; it != end; ++it)
         *it = val;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void compare_vectors(hpx::vector<T> const& v1, hpx::vector<T> const& v2,
-    bool must_be_equal = true)
+void compare_vectors(hpx::partitioned_vector<T> const& v1,
+    hpx::partitioned_vector<T> const& v2, bool must_be_equal = true)
 {
-    typedef typename hpx::vector<T>::const_iterator const_iterator;
+    typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
 
     HPX_TEST_EQ(v1.size(), v2.size());
 
@@ -48,22 +48,22 @@ void compare_vectors(hpx::vector<T> const& v1, hpx::vector<T> const& v2,
 }
 
 template <typename T>
-void move_tests(hpx::vector<T> const& v1)
+void move_tests(hpx::partitioned_vector<T> const& v1)
 {
-    hpx::vector<T> v2(v1);
+    hpx::partitioned_vector<T> v2(v1);
     compare_vectors(v1, v2);
 
-    hpx::vector<T> v3(std::move(v2));
+    hpx::partitioned_vector<T> v3(std::move(v2));
     compare_vectors(v1, v3);
 
     fill_vector(v3, T(43));
     compare_vectors(v1, v3, false);
 
-    hpx::vector<T> v4;
+    hpx::partitioned_vector<T> v4;
     v4 = v1;
     compare_vectors(v1, v4);
 
-    hpx::vector<T> v5;
+    hpx::partitioned_vector<T> v5;
     v5 = std::move(v4);
     compare_vectors(v1, v5);
 
@@ -76,22 +76,22 @@ template <typename T, typename DistPolicy>
 void move_tests_with_policy(std::size_t size, std::size_t localities,
     DistPolicy const& policy)
 {
-    hpx::vector<T> v1(size, policy);
+    hpx::partitioned_vector<T> v1(size, policy);
 
-    hpx::vector<T> v2(v1);
+    hpx::partitioned_vector<T> v2(v1);
     compare_vectors(v1, v2);
 
-    hpx::vector<T> v3(std::move(v2));
+    hpx::partitioned_vector<T> v3(std::move(v2));
     compare_vectors(v1, v3);
 
     fill_vector(v3, T(43));
     compare_vectors(v1, v3, false);
 
-    hpx::vector<T> v4;
+    hpx::partitioned_vector<T> v4;
     v4 = v1;
     compare_vectors(v1, v4);
 
-    hpx::vector<T> v5;
+    hpx::partitioned_vector<T> v5;
     v5 = std::move(v4);
     compare_vectors(v1, v5);
 
@@ -107,17 +107,17 @@ void move_tests()
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     {
-        hpx::vector<T> v;
+        hpx::partitioned_vector<T> v;
         move_tests(v);
     }
 
     {
-        hpx::vector<T> v(length);
+        hpx::partitioned_vector<T> v(length);
         move_tests(v);
     }
 
     {
-        hpx::vector<T> v(length, T(42));
+        hpx::partitioned_vector<T> v(length, T(42));
         move_tests(v);
     }
 

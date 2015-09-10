@@ -4,13 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file partition_vector_component.hpp
+/// \file hpx/components/partitioned_vector/partitioned_vector_component.hpp
 
-#ifndef HPX_PARTITION_VECTOR_COMPONENT_HPP
-#define HPX_PARTITION_VECTOR_COMPONENT_HPP
+#ifndef HPX_PARTITIONED_VECTOR_COMPONENT_HPP
+#define HPX_PARTITIONED_VECTOR_COMPONENT_HPP
 
-/// \file hpx/components/vector/partition_vector_component.hpp
-///
 /// \brief The partition_vector as the hpx component is defined here.
 ///
 /// The partition_vector is the wrapper to the stl vector class except all API's
@@ -37,9 +35,9 @@ namespace hpx { namespace server
     /// This contain the implementation of the partition_vector's component
     /// functionality.
     template <typename T>
-    class partition_vector
+    class partitioned_vector
       : public components::locking_hook<
-            components::simple_component_base<partition_vector<T> > >
+            components::simple_component_base<partitioned_vector<T> > >
     {
     public:
         typedef std::vector<T> data_type;
@@ -49,7 +47,7 @@ namespace hpx { namespace server
         typedef typename data_type::const_iterator const_iterator_type;
 
         typedef components::locking_hook<
-                components::simple_component_base<partition_vector<T> > >
+                components::simple_component_base<partitioned_vector<T> > >
             base_type;
 
     private:
@@ -61,12 +59,12 @@ namespace hpx { namespace server
         ///////////////////////////////////////////////////////////////////////
 
         /// \brief Default Constructor which create partition_vector with size 0.
-        partition_vector()
+        partitioned_vector()
         {
             HPX_ASSERT(false);  // shouldn't ever be called
         }
 
-        explicit partition_vector(size_type partition_size)
+        explicit partitioned_vector(size_type partition_size)
           : partition_vector_(partition_size)
         {}
 
@@ -76,17 +74,17 @@ namespace hpx { namespace server
         /// param partition_size The size of vector
         /// param val Default value for the elements in partition_vector
         ///
-        partition_vector(size_type partition_size, T const& val)
+        partitioned_vector(size_type partition_size, T const& val)
           : partition_vector_(partition_size, val)
         {}
 
         // support components::copy
-        partition_vector(partition_vector const& rhs)
+        partitioned_vector(partitioned_vector const& rhs)
           : base_type(rhs),
             partition_vector_(rhs.partition_vector_)
         {}
 
-        partition_vector& operator=(partition_vector const& rhs)
+        partitioned_vector& operator=(partitioned_vector const& rhs)
         {
             if (this != &rhs)
             {
@@ -96,12 +94,12 @@ namespace hpx { namespace server
             return *this;
         }
 
-        partition_vector(partition_vector && rhs)
+        partitioned_vector(partitioned_vector && rhs)
           : base_type(std::move(rhs)),
             partition_vector_(std::move(rhs.partition_vector_))
         {}
 
-        partition_vector& operator=(partition_vector && rhs)
+        partitioned_vector& operator=(partitioned_vector && rhs)
         {
             if (this != &rhs)
             {
@@ -340,18 +338,18 @@ namespace hpx { namespace server
         }
 
         /// Macros to define HPX component actions for all exported functions.
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, size);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, size);
 
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, max_size);
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, resize);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, resize);
 
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, capacity);
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, empty);
 //         HPX_DEFINE_COMPONENT_ACTION(partition_vector, reserve);
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, get_value);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, get_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_value);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_values);
 
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, front);
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, back);
@@ -359,8 +357,8 @@ namespace hpx { namespace server
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, push_back);
 //         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, pop_back);
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, set_value);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_vector, set_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_value);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_values);
 
 //         HPX_DEFINE_COMPONENT_ACTION(partition_vector, clear);
     };
@@ -381,26 +379,26 @@ namespace hpx { namespace server
 /**/
 #define HPX_REGISTER_VECTOR_DECLARATION_2(type, name)                         \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_vector<type>::get_value_action,                \
+        hpx::server::partitioned_vector<type>::get_value_action,              \
         BOOST_PP_CAT(__vector_get_value_action_, name));                      \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_vector<type>::get_values_action,               \
+        hpx::server::partitioned_vector<type>::get_values_action,             \
         BOOST_PP_CAT(__vector_get_values_action_, name));                     \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_vector<type>::set_value_action,                \
+        hpx::server::partitioned_vector<type>::set_value_action,              \
         BOOST_PP_CAT(__vector_set_value_action_, name));                      \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_vector<type>::set_values_action,               \
+        hpx::server::partitioned_vector<type>::set_values_action,             \
         BOOST_PP_CAT(__vector_set_values_action_, name));                     \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_vector<type>::size_action,                     \
+        hpx::server::partitioned_vector<type>::size_action,                   \
         BOOST_PP_CAT(__vector_size_action_, name));                           \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
-        hpx::server::partition_vector<type>::resize_action,                   \
+        hpx::server::partitioned_vector<type>::resize_action,                 \
         BOOST_PP_CAT(__vector_resize_action_, name));                         \
 /**/
 
-#define HPX_REGISTER_VECTOR(...)                                              \
+#define HPX_REGISTER_PARTITIONED_VECTOR(...)                                  \
     HPX_REGISTER_VECTOR_(__VA_ARGS__)                                         \
 /**/
 #define HPX_REGISTER_VECTOR_(...)                                             \
@@ -414,25 +412,25 @@ namespace hpx { namespace server
 /**/
 #define HPX_REGISTER_VECTOR_2(type, name)                                     \
     HPX_REGISTER_ACTION(                                                      \
-        ::hpx::server::partition_vector<type>::get_value_action,              \
+        ::hpx::server::partitioned_vector<type>::get_value_action,            \
         BOOST_PP_CAT(__vector_get_value_action_, name));                      \
     HPX_REGISTER_ACTION(                                                      \
-        ::hpx::server::partition_vector<type>::get_values_action,             \
+        ::hpx::server::partitioned_vector<type>::get_values_action,           \
         BOOST_PP_CAT(__vector_get_values_action_, name));                     \
     HPX_REGISTER_ACTION(                                                      \
-        ::hpx::server::partition_vector<type>::set_value_action,              \
+        ::hpx::server::partitioned_vector<type>::set_value_action,            \
         BOOST_PP_CAT(__vector_set_value_action_, name));                      \
     HPX_REGISTER_ACTION(                                                      \
-        ::hpx::server::partition_vector<type>::set_values_action,             \
+        ::hpx::server::partitioned_vector<type>::set_values_action,           \
         BOOST_PP_CAT(__vector_set_values_action_, name));                     \
     HPX_REGISTER_ACTION(                                                      \
-        hpx::server::partition_vector<type>::size_action,                     \
+        hpx::server::partitioned_vector<type>::size_action,                   \
         BOOST_PP_CAT(__vector_size_action_, name));                           \
     HPX_REGISTER_ACTION(                                                      \
-        hpx::server::partition_vector<type>::resize_action,                   \
+        hpx::server::partitioned_vector<type>::resize_action,                 \
         BOOST_PP_CAT(__vector_resize_action_, name));                         \
     typedef ::hpx::components::simple_component<                              \
-        ::hpx::server::partition_vector<type>                                 \
+        ::hpx::server::partitioned_vector<type>                               \
     > BOOST_PP_CAT(__vector_, name);                                          \
     HPX_REGISTER_COMPONENT(BOOST_PP_CAT(__vector_, name))                     \
 /**/
@@ -443,13 +441,13 @@ namespace hpx
     template <typename T>
     class partition_vector
       : public components::client_base<
-            partition_vector<T>, server::partition_vector<T>
+            partition_vector<T>, server::partitioned_vector<T>
         >
     {
     private:
-        typedef hpx::server::partition_vector<T> server_type;
+        typedef hpx::server::partitioned_vector<T> server_type;
         typedef hpx::components::client_base<
-                partition_vector<T>, server::partition_vector<T>
+                partition_vector<T>, server::partitioned_vector<T>
             > base_type;
 
     public:
@@ -464,10 +462,11 @@ namespace hpx
         {}
 
         // Return the pinned pointer to the underlying component
-        boost::shared_ptr<server::partition_vector<T> > get_ptr() const
+        boost::shared_ptr<server::partitioned_vector<T> > get_ptr() const
         {
             error_code ec(lightweight);
-            return hpx::get_ptr<server::partition_vector<T> >(this->get_id()).get(ec);
+            return hpx::get_ptr<server::partitioned_vector<T> >(
+                this->get_id()).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -606,7 +605,8 @@ namespace hpx
         ///
         /// \return This returns the value as the hpx::future
         ///
-        future<std::vector<T> > get_values(std::vector<std::size_t> const& pos) const
+        future<std::vector<T> >
+        get_values(std::vector<std::size_t> const& pos) const
         {
             HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::get_values_action>(
