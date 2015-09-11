@@ -16,7 +16,6 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
@@ -382,7 +381,7 @@ namespace hpx { namespace actions
         // loading ...
         void serialize(hpx::serialization::input_archive & ar)
         {
-            serialization::serialize_sequence(ar, arguments_);
+            ar >> arguments_;
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
@@ -402,7 +401,7 @@ namespace hpx { namespace actions
         // saving ...
         void serialize(hpx::serialization::output_archive & ar)
         {
-            serialization::serialize_sequence(ar, arguments_);
+            ar << arguments_;
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
