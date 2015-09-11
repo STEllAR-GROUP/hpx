@@ -771,6 +771,15 @@ namespace hpx { namespace threads
                     detail::decode_mappings(t, m, affinities, ec);
                     if (ec) return;
                 }
+
+                if(num_pus.empty())
+                {
+                    num_pus.resize(affinities.size());
+                    for (std::size_t i = 0; i != affinities.size(); ++i)
+                    {
+                        num_pus[i] = threads::find_first(affinities[i]);
+                    }
+                }
             }
             break;
         }

@@ -37,8 +37,8 @@ namespace hpx { namespace threads { namespace detail
     {
     public:
         thread_pool(Scheduler& sched,
-            threads::policies::callback_notifier& notifier,
-            char const* pool_name, bool do_background_work = false);
+            threads::policies::callback_notifier& notifier, char const* pool_name,
+            policies::scheduler_mode m = policies::nothing_special);
         ~thread_pool();
 
         std::size_t init(std::size_t num_threads,
@@ -61,8 +61,11 @@ namespace hpx { namespace threads { namespace detail
         void create_work(thread_init_data& data,
             thread_state_enum initial_state, error_code& ec);
 
-        thread_id_type
-        set_state(util::steady_time_point const& abs_time,
+        thread_state set_state(thread_id_type const& id,
+            thread_state_enum new_state, thread_state_ex_enum new_state_ex,
+            thread_priority priority, error_code& ec);
+
+        thread_id_type set_state(util::steady_time_point const& abs_time,
             thread_id_type const& id, thread_state_enum newstate,
             thread_state_ex_enum newstate_ex, thread_priority priority,
             error_code& ec);
@@ -87,9 +90,9 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-    ///////////////////////////////////////////////////////////////////////////
-    boost::int64_t avg_idle_rate(bool reset);
-    boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
+        ///////////////////////////////////////////////////////////////////////
+        boost::int64_t avg_idle_rate(bool reset);
+        boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
         boost::int64_t avg_creation_idle_rate(bool reset);
@@ -118,6 +121,10 @@ namespace hpx { namespace threads { namespace detail
 
         boost::int64_t get_thread_count(thread_state_enum state,
             thread_priority priority, std::size_t num_thread, bool reset) const;
+
+        void reset_thread_distribution();
+
+        void set_scheduler_mode(threads::policies::scheduler_mode mode);
 
         //
         void abort_all_suspended_threads();
@@ -169,9 +176,8 @@ namespace hpx { namespace threads { namespace detail
         // thread manager.
         threads::mask_type used_processing_units_;
 
-        // Instruct pool to allow doing background work (parcelport and garbage
-        // collection)
-        bool do_background_work_;
+        // Mode of operation of the pool
+        policies::scheduler_mode mode_;
     };
 }}}
 

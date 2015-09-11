@@ -16,7 +16,6 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
@@ -310,10 +309,12 @@ namespace hpx { namespace actions
         // schedule a new thread
         void schedule_thread(naming::id_type const& target,
             naming::address::address_type lva,
-            threads::thread_state_enum initial_state)
+            threads::thread_state_enum initial_state,
+            std::size_t num_thread)
         {
             std::unique_ptr<continuation> cont;
             threads::thread_init_data data;
+            data.num_os_thread = num_thread;
             if (traits::action_decorate_continuation<derived_type>::call(cont))
             {
                 traits::action_schedule_thread<derived_type>::call(lva,
@@ -329,13 +330,15 @@ namespace hpx { namespace actions
 
         void schedule_thread(std::unique_ptr<continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_state_enum initial_state)
+            threads::thread_state_enum initial_state,
+            std::size_t num_thread)
         {
             // first decorate the continuation
             traits::action_decorate_continuation<derived_type>::call(cont);
 
             // now, schedule the thread
             threads::thread_init_data data;
+            data.num_os_thread = num_thread;
             traits::action_schedule_thread<derived_type>::call(lva,
                 get_thread_init_data(std::move(cont), target, lva, data), initial_state);
         }
@@ -378,7 +381,7 @@ namespace hpx { namespace actions
         // loading ...
         void serialize(hpx::serialization::input_archive & ar)
         {
-            serialization::serialize_sequence(ar, arguments_);
+            ar >> arguments_;
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
@@ -398,7 +401,7 @@ namespace hpx { namespace actions
         // saving ...
         void serialize(hpx::serialization::output_archive & ar)
         {
-            serialization::serialize_sequence(ar, arguments_);
+            ar << arguments_;
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.

@@ -46,6 +46,11 @@ namespace hpx { namespace threads { namespace policies
           : base_type(init, deferred_initialization)
         {}
 
+        static std::string get_scheduler_name()
+        {
+            return "static_priority_queue_scheduler";
+        }
+
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread,

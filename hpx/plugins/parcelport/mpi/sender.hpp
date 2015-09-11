@@ -76,15 +76,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             connection_list connections
         )
         {
-            std::size_t k = 0;
-            connection_list::iterator it = connections.begin();
-            hpx::util::high_resolution_timer timer;
-
             // We try to handle all receives within 1 second
-            while(it != connections.end())
+            for(connection_list::iterator it = connections.begin();
+                it != connections.end();)
             {
-                if(timer.elapsed() > 1.0) break;
-
                 connection_type & sender = **it;
                 if(sender.send())
                 {
@@ -95,13 +90,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
                 else
                 {
-                    if(k < 32 || k & 1) //-V112
-                    {
-                        if(threads::get_self_ptr())
-                            hpx::this_thread::suspend(hpx::threads::pending,
-                                "mpi::sender::wait_done");
-                    }
-                    ++k;
                     ++it;
                 }
             }
@@ -134,21 +122,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             bool has_work = false;
             if(!connections.empty())
             {
-                if(hpx::is_starting())
-                {
-                    send_messages(std::move(connections));
-                }
-                else
-                {
-//                     error_code ec(lightweight);
-                    hpx::applier::register_thread_nullary(
-                        util::bind(
-                            util::one_shot(&sender::send_messages),
-                            this, std::move(connections)),
-                        "mpi::sender::send_messages",
-                        threads::pending, true, threads::thread_priority_boost,
-                        num_thread, threads::thread_stacksize_default);
-                }
+                send_messages(std::move(connections));
                 has_work = true;
             }
             next_free_tag();

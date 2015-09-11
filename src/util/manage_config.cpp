@@ -32,7 +32,7 @@ namespace hpx { namespace util
     {
         for (std::string const& s : cfg)
         {
-            std::string::size_type p = s.find_last_of("=");
+            std::string::size_type p = s.find_first_of("=");
             std::string key(trim_whitespace(s.substr(0, p)));
             if (key[key.size()-1] == '!')
                 key.erase(key.size()-1);

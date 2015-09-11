@@ -737,6 +737,13 @@ namespace hpx {
         deinit_tss();
         return true;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threads::policies::callback_notifier
+        get_notification_policy(char const* prefix)
+    {
+        return get_runtime().get_notification_policy(prefix);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

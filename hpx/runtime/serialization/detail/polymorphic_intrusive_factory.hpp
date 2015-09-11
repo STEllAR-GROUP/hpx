@@ -8,6 +8,7 @@
 #ifndef HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 #define HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 
+#include <hpx/exception.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <hpx/util/jenkins_hash.hpp>

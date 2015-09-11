@@ -9,10 +9,6 @@
 #if !defined(HPX_EXCEPTION_MAR_24_2008_0929AM)
 #define HPX_EXCEPTION_MAR_24_2008_0929AM
 
-#include <exception>
-#include <string>
-#include <iosfwd>
-
 #include <hpx/config.hpp>
 #include <hpx/error.hpp>
 #include <hpx/util/assert.hpp>
@@ -26,6 +22,10 @@
 #include <boost/throw_exception.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
+
+#include <exception>
+#include <string>
+#include <iosfwd>
 
 #include <hpx/config/warnings_prefix.hpp>
 

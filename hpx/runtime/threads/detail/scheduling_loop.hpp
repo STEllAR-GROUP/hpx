@@ -11,17 +11,20 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/detail/periodic_maintenance.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/cstdint.hpp>
 
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/apex.hpp>
 #endif
+#include <limits>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -216,15 +219,21 @@ namespace hpx { namespace threads { namespace detail
                 callback_type && outer,
                 callback_type && inner = callback_type(),
                 background_callback_type && background =
-                    background_callback_type())
+                    background_callback_type(),
+                std::size_t max_background_threads =
+                    hpx::util::safe_lexical_cast<std::size_t>(
+                        hpx::get_config_entry("hpx.max_background_threads",
+                            (std::numeric_limits<std::size_t>::max)())))
           : outer_(std::move(outer)),
             inner_(std::move(inner)),
-            background_(std::move(background))
+            background_(std::move(background)),
+            max_background_threads_(max_background_threads)
         {}
 
         callback_type outer_;
         callback_type inner_;
         background_callback_type background_;
+        std::size_t max_background_threads_;
     };
 
     template <typename SchedulingPolicy>
@@ -260,6 +269,7 @@ namespace hpx { namespace threads { namespace detail
 
                 idle_loop_count = 0;
                 ++busy_loop_count;
+
                 may_exit = false;
 
                 // Only pending HPX threads will be executed.
@@ -395,7 +405,7 @@ namespace hpx { namespace threads { namespace detail
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
                     {
                         // if this is an inner scheduler, exit immediately
-                        if (!callbacks.inner_.empty())
+                        if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
                         {
                             this_state.store(state_stopped);
                             break;
@@ -409,10 +419,12 @@ namespace hpx { namespace threads { namespace detail
                 }
 
                 // do background work in parcel layer and in agas
-                if (!callbacks.background_.empty())
+                if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
+                    num_thread < callbacks.max_background_threads_ &&
+                    !callbacks.background_.empty())
                 {
                     if (callbacks.background_())
-                    idle_loop_count = 0;
+                        idle_loop_count = 0;
                 }
 
                 // call back into invoking context
@@ -429,20 +441,24 @@ namespace hpx { namespace threads { namespace detail
                 busy_loop_count = 0;
 
                 // do background work in parcel layer and in agas
-                if (!callbacks.background_.empty())
+                if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
+                    num_thread < callbacks.max_background_threads_ &&
+                    !callbacks.background_.empty())
                 {
                     if (callbacks.background_())
-                    idle_loop_count = 0;
+                        idle_loop_count = 0;
                 }
             }
-            else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+            else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
+                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
             {
+                // clean up terminated threads
+                if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+                    idle_loop_count = 0;
+
                 // call back into invoking context
                 if (!callbacks.outer_.empty())
                     callbacks.outer_();
-
-                // clean up terminated threads
-                idle_loop_count = 0;
 
                 // break if we were idling after 'may_exit'
                 if (may_exit)

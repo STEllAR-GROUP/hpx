@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/version.hpp>
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config/defaults.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/itt_notify.hpp>
@@ -53,6 +54,8 @@
 #else
 #  define HPX_DLL_STRING   "hpx" HPX_SHARED_LIB_EXTENSION
 #endif
+
+#include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__linux) || defined(linux) || defined(__linux__)\
@@ -143,11 +146,16 @@ namespace hpx { namespace util
 
             // add placeholders for keys to be added by command line handling
             "os_threads = 1",
-            "cores = 1",
+            "cores = all",
             "localities = 1",
             "first_pu = 0",
             "runtime_mode = console",
             "scheduler = local-priority",
+            "affinity = pu",
+            "pu_step = 1",
+            "pu_offset = 0",
+            "numa_sensitive = 0",
+            "max_background_threads = ${MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
@@ -174,7 +182,7 @@ namespace hpx { namespace util
             // enable aliasing
             "aliasing = ${HPX_COMMANDLINE_ALIASING:1}",
 
-            // allow for unknown options to passes through
+            // allow for unknown options to passed through
             "allow_unknown = ${HPX_COMMANDLINE_ALLOW_UNKNOWN:0}",
 
             // predefine command line aliases

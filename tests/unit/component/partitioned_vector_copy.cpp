@@ -4,31 +4,31 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/vector.hpp>
+#include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_copy.hpp>
 
 #include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
-HPX_REGISTER_VECTOR(double);
-HPX_REGISTER_VECTOR(int);
+HPX_REGISTER_PARTITIONED_VECTOR(double);
+HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void fill_vector(hpx::vector<T>& v, T const& val)
+void fill_vector(hpx::partitioned_vector<T>& v, T const& val)
 {
-    typename hpx::vector<T>::iterator it = v.begin(), end = v.end();
+    typename hpx::partitioned_vector<T>::iterator it = v.begin(), end = v.end();
     for (/**/; it != end; ++it)
         *it = val;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void compare_vectors(hpx::vector<T> const& v1, hpx::vector<T> const& v2,
-    bool must_be_equal = true)
+void compare_vectors(hpx::partitioned_vector<T> const& v1,
+    hpx::partitioned_vector<T> const& v2, bool must_be_equal = true)
 {
-    typedef typename hpx::vector<T>::const_iterator const_iterator;
+    typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
 
     HPX_TEST_EQ(v1.size(), v2.size());
 
@@ -48,15 +48,15 @@ void compare_vectors(hpx::vector<T> const& v1, hpx::vector<T> const& v2,
 }
 
 template <typename T>
-void copy_tests(hpx::vector<T> const& v1)
+void copy_tests(hpx::partitioned_vector<T> const& v1)
 {
-    hpx::vector<T> v2(v1);
+    hpx::partitioned_vector<T> v2(v1);
     compare_vectors(v1, v2);
 
     fill_vector(v2, T(43));
     compare_vectors(v1, v2, false);
 
-    hpx::vector<T> v3;
+    hpx::partitioned_vector<T> v3;
     v3 = v1;
     compare_vectors(v1, v3);
 
@@ -69,11 +69,11 @@ template <typename T, typename DistPolicy, typename ExPolicy>
 void copy_algo_tests_with_policy(std::size_t size, std::size_t localities,
     DistPolicy const& policy, ExPolicy const& copy_policy)
 {
-    hpx::vector<T> v1(size, policy);
+    hpx::partitioned_vector<T> v1(size, policy);
     fill_vector(v1, T(43));
 
-    hpx::vector<T> v2(size, policy);
-    typename hpx::vector<T>::iterator it =
+    hpx::partitioned_vector<T> v2(size, policy);
+    typename hpx::partitioned_vector<T>::iterator it =
         hpx::parallel::copy(copy_policy, v1.begin(), v1.end(), v2.begin());
     HPX_TEST(it == v2.end());
     compare_vectors(v1, v2);
@@ -83,13 +83,13 @@ template <typename T, typename DistPolicy, typename ExPolicy>
 void copy_algo_tests_with_policy_async(std::size_t size, std::size_t localities,
     DistPolicy const& policy, ExPolicy const& copy_policy)
 {
-    hpx::vector<T> v1(size, policy);
+    hpx::partitioned_vector<T> v1(size, policy);
     fill_vector(v1, T(43));
 
     using hpx::parallel::task;
 
-    hpx::vector<T> v2(size, policy);
-    hpx::future<typename hpx::vector<T>::iterator> f =
+    hpx::partitioned_vector<T> v2(size, policy);
+    hpx::future<typename hpx::partitioned_vector<T>::iterator> f =
         hpx::parallel::copy(copy_policy(task), v1.begin(), v1.end(), v2.begin());
 
     HPX_TEST(f.get() == v2.end());
@@ -100,15 +100,15 @@ template <typename T, typename DistPolicy>
 void copy_tests_with_policy(std::size_t size, std::size_t localities,
     DistPolicy const& policy)
 {
-    hpx::vector<T> v1(size, policy);
+    hpx::partitioned_vector<T> v1(size, policy);
 
-    hpx::vector<T> v2(v1);
+    hpx::partitioned_vector<T> v2(v1);
     compare_vectors(v1, v2);
 
     fill_vector(v2, T(43));
     compare_vectors(v1, v2, false);
 
-    hpx::vector<T> v3;
+    hpx::partitioned_vector<T> v3;
     v3 = v1;
     compare_vectors(v1, v3);
 
@@ -132,17 +132,17 @@ void copy_tests()
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     {
-        hpx::vector<T> v;
+        hpx::partitioned_vector<T> v;
         copy_tests(v);
     }
 
     {
-        hpx::vector<T> v(length);
+        hpx::partitioned_vector<T> v(length);
         copy_tests(v);
     }
 
     {
-        hpx::vector<T> v(length, T(42));
+        hpx::partitioned_vector<T> v(length, T(42));
         copy_tests(v);
     }
 

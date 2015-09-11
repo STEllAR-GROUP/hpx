@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file hpx/components/vector/vector.hpp
+/// \file hpx/components/partitioned_vector/partitioned_vector.hpp
 
-#ifndef HPX_VECTOR_HPP
-#define HPX_VECTOR_HPP
+#ifndef HPX_PARTITIONED_VECTOR_HPP
+#define HPX_PARTITIONED_VECTOR_HPP
 
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
@@ -15,8 +15,8 @@
 #include <hpx/include/serialization.hpp>
 
 #include <hpx/components/containers/container_distribution_policy.hpp>
-#include <hpx/components/containers/vector/vector_segmented_iterator.hpp>
-#include <hpx/components/containers/vector/partition_vector_component.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -31,7 +31,7 @@
 namespace hpx { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct vector_config_data
+    struct partitioned_vector_config_data
     {
         // Each partition is described by it's corresponding client object, its
         // size, and locality id.
@@ -66,11 +66,11 @@ namespace hpx { namespace server
             }
         };
 
-        vector_config_data()
+        partitioned_vector_config_data()
           : size_(0)
         {}
 
-        vector_config_data(std::size_t size,
+        partitioned_vector_config_data(std::size_t size,
                 std::vector<partition_data> && partitions)
           : size_(size),
             partitions_(std::move(partitions))
@@ -90,21 +90,25 @@ namespace hpx { namespace server
     };
 }}
 
-HPX_DISTRIBUTED_METADATA_DECLARATION(hpx::server::vector_config_data,
-    hpx_server_vector_config_data);
+HPX_DISTRIBUTED_METADATA_DECLARATION(
+    hpx::server::partitioned_vector_config_data,
+    hpx_server_partitioned_vector_config_data);
 
 /// \endcond
 
 namespace hpx
 {
-    /// hpx::vector is a sequence container that encapsulates dynamic size arrays.
+    /// hpx::partitioned_vector is a sequence container that encapsulates
+    /// dynamic size arrays.
     ///
-    /// \note A hpx::vector does not stores all elements in a contiguous block of
-    ///       memory. Memory is contiguous inside each of the segmented partitions
-    ///       only.
+    /// \note A hpx::partitioned_vector does not stores all elements in a
+    ///       contiguous block of memory. Memory is contiguous inside each of
+    ///       the segmented partitions only.
     ///
-    /// The hpx::vector is a segmented data structure which is a collection of one
-    /// or more hpx::server::partition_vectors. The hpx::vector stores the global
+    /// The hpx::partitioned_vector is a segmented data structure which is a
+    /// collection of one
+    /// or more hpx::server::partition_vectors. The hpx::partitioned_vector
+    /// stores the global
     /// ids of each hpx::server::partition_vector and the size of each
     /// hpx::server::partition_vector.
     ///
@@ -114,7 +118,8 @@ namespace hpx
     /// does not need to reallocate each time an element is inserted, but only when
     /// the additional memory is exhausted.
     ///
-    ///  This contains the client side implementation of the hpx::vector. This
+    ///  This contains the client side implementation of the
+    ///  hpx::partitioned_vector. This
     ///  class defines the synchronous and asynchronous API's for each of the
     ///  exposed functionalities.
     ///
@@ -125,10 +130,10 @@ namespace hpx
     ///             but many member functions impose stricter requirements.
     ///
     template <typename T>
-    class vector
-      : hpx::components::client_base<vector<T>,
+    class partitioned_vector
+      : hpx::components::client_base<partitioned_vector<T>,
             hpx::components::server::distributed_metadata_base<
-                server::vector_config_data> >
+                server::partitioned_vector_config_data> >
     {
     public:
         typedef std::allocator<T> allocator_type;
@@ -151,17 +156,18 @@ namespace hpx
 
     private:
         typedef hpx::components::client_base<
-                vector,
+                partitioned_vector,
                 hpx::components::server::distributed_metadata_base<
-                    server::vector_config_data>
+                    server::partitioned_vector_config_data>
             > base_type;
 
-        typedef hpx::server::partition_vector<T> partition_vector_server;
+        typedef hpx::server::partitioned_vector<T> partition_vector_server;
         typedef hpx::partition_vector<T> partition_vector_client;
 
-        struct partition_data : server::vector_config_data::partition_data
+        struct partition_data
+          : server::partitioned_vector_config_data::partition_data
         {
-            typedef server::vector_config_data::partition_data base_type;
+            typedef server::partitioned_vector_config_data::partition_data base_type;
 
             partition_data(id_type const& part, std::size_t size,
                     boost::uint32_t locality_id)
@@ -235,9 +241,9 @@ namespace hpx
         // Connect this vector to the existing vector using the given symbolic
         // name.
         void get_data_helper(id_type id,
-            future<server::vector_config_data> && f)
+            future<server::partitioned_vector_config_data> && f)
         {
-            server::vector_config_data data = f.get();
+            server::partitioned_vector_config_data data = f.get();
 
             partitions_.clear();
             partitions_.reserve(data.partitions_.size());
@@ -261,7 +267,7 @@ namespace hpx
                     ptrs.push_back(
                         get_ptr<partition_vector_server>(it->partition_)
                         .then(
-                            util::bind(&vector::get_ptr_helper,
+                            util::bind(&partitioned_vector::get_ptr_helper,
                                 l, std::ref(partitions_), _1
                             )
                         )
@@ -280,12 +286,12 @@ namespace hpx
         {
             using util::placeholders::_1;
             typedef typename components::server::distributed_metadata_base<
-                    server::vector_config_data
+                    server::partitioned_vector_config_data
                 >::get_action act;
 
             id_type id = f.get();
             return async(act(), id).then(
-                util::bind(&vector::get_data_helper, this, id, _1));
+                util::bind(&partitioned_vector::get_data_helper, this, id, _1));
         }
 
     public:
@@ -294,7 +300,7 @@ namespace hpx
             using util::placeholders::_1;
             this->base_type::connect_to(symbolic_name);
             return this->base_type::share().then(
-                util::bind(&vector::connect_to_helper, this, _1));
+                util::bind(&partitioned_vector::connect_to_helper, this, _1));
         }
 
         void connect_to_sync(std::string const& symbolic_name)
@@ -305,16 +311,19 @@ namespace hpx
         // Register this vector with AGAS using the given symbolic name
         future<void> register_as(std::string const& symbolic_name)
         {
-            std::vector<server::vector_config_data::partition_data> partitions;
+            std::vector<
+                server::partitioned_vector_config_data::partition_data
+            > partitions;
             partitions.reserve(partitions_.size());
 
             std::copy(partitions_.begin(), partitions_.end(),
                 std::back_inserter(partitions));
 
-            server::vector_config_data data(size_, std::move(partitions));
+            server::partitioned_vector_config_data data(
+                size_, std::move(partitions));
             this->base_type::reset(hpx::new_<
                     components::server::distributed_metadata_base<
-                        server::vector_config_data> >(
+                        server::partitioned_vector_config_data> >(
                     hpx::find_here(), std::move(data)));
 
             return this->base_type::register_as(symbolic_name);
@@ -519,7 +528,7 @@ namespace hpx
                         using util::placeholders::_1;
                         ptrs.push_back(
                             get_ptr<partition_vector_server>(id).then(
-                                util::bind(&vector::get_ptr_helper,
+                                util::bind(&partitioned_vector::get_ptr_helper,
                                     l, std::ref(partitions_), _1
                                 )
                             )
@@ -561,8 +570,8 @@ namespace hpx
             using util::placeholders::_2;
             using util::placeholders::_3;
 
-            create(policy, util::bind(&vector::create_helper1<DistPolicy>,
-                _1, _2, _3));
+            create(policy, util::bind(
+                &partitioned_vector::create_helper1<DistPolicy>, _1, _2, _3));
         }
 
         template <typename DistPolicy>
@@ -572,12 +581,12 @@ namespace hpx
             using util::placeholders::_2;
             using util::placeholders::_3;
 
-            create(policy, util::bind(&vector::create_helper2<DistPolicy>,
+            create(policy, util::bind(&partitioned_vector::create_helper2<DistPolicy>,
                 _1, _2, _3, std::ref(val)));
         }
 
         // Perform a deep copy from the given vector
-        void copy_from(vector const& rhs)
+        void copy_from(partitioned_vector const& rhs)
         {
             typedef typename partitions_vector_type::const_iterator const_iterator;
 
@@ -609,7 +618,7 @@ namespace hpx
                     using util::placeholders::_1;
                     ptrs.push_back(get_ptr<partition_vector_server>(
                         partitions[i].partition_).then(
-                            util::bind(&vector::get_ptr_helper,
+                            util::bind(&partitioned_vector::get_ptr_helper,
                                 i, std::ref(partitions), _1)));
                 }
             }
@@ -622,20 +631,21 @@ namespace hpx
         }
 
     public:
-        /// Default Constructor which create hpx::vector with
+        /// Default Constructor which create hpx::partitioned_vector with
         /// \a num_partitions = 0 and \a partition_size = 0. Hence overall size
         /// of the vector is 0.
         ///
-        vector()
+        partitioned_vector()
           : size_(0),
             partition_size_(std::size_t(-1))
         {}
 
-        /// Constructor which create hpx::vector with the given overall \a size
+        /// Constructor which create hpx::partitioned_vector with the given
+        /// overall \a size
         ///
         /// \param size             The overall size of the vector
         ///
-        vector(size_type size)
+        partitioned_vector(size_type size)
           : size_(size),
             partition_size_(std::size_t(-1))
         {
@@ -651,7 +661,7 @@ namespace hpx
         /// \param symbolic_name    The (optional) name to register the newly
         ///                         created vector
         ///
-        vector(size_type size, T const& val)
+        partitioned_vector(size_type size, T const& val)
           : size_(size),
             partition_size_(std::size_t(-1))
         {
@@ -668,7 +678,7 @@ namespace hpx
         ///                         created vector
         ///
         template <typename DistPolicy>
-        vector(size_type size, DistPolicy const& policy,
+        partitioned_vector(size_type size, DistPolicy const& policy,
                 typename std::enable_if<
                     traits::is_distribution_policy<DistPolicy>::value
                 >::type* = 0)
@@ -690,7 +700,7 @@ namespace hpx
         ///                         created vector
         ///
         template <typename DistPolicy>
-        vector(size_type size, T const& val, DistPolicy const& policy,
+        partitioned_vector(size_type size, T const& val, DistPolicy const& policy,
                 typename std::enable_if<
                     traits::is_distribution_policy<DistPolicy>::value
                 >::type* = 0)
@@ -703,7 +713,7 @@ namespace hpx
 
         /// Copy construction performs a deep copy of the right hand side
         /// vector.
-        vector(vector const& rhs)
+        partitioned_vector(partitioned_vector const& rhs)
           : base_type(),
             size_(0)
         {
@@ -711,7 +721,7 @@ namespace hpx
                 copy_from(rhs);
         }
 
-        vector(vector && rhs)
+        partitioned_vector(partitioned_vector && rhs)
           : base_type(std::move(rhs)),
             size_(rhs.size_),
             partition_size_(rhs.partition_size_),
@@ -755,16 +765,17 @@ namespace hpx
         /// Copy assignment operator, performs deep copy of the right hand side
         /// vector.
         ///
-        /// \param rhs    This the hpx::vector object which is to be copied
+        /// \param rhs    This the hpx::partitioned_vector object which is to
+        ///               be copied
         ///
-        vector& operator=(vector const& rhs)
+        partitioned_vector& operator=(partitioned_vector const& rhs)
         {
             if (this != &rhs && rhs.size_ != 0)
                 copy_from(rhs);
             return *this;
         }
 
-        vector& operator=(vector && rhs)
+        partitioned_vector& operator=(partitioned_vector && rhs)
         {
             if (this != &rhs)
             {
