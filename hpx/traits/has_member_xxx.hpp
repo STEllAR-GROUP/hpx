@@ -12,6 +12,10 @@
 #include <boost/type_traits/is_class.hpp>
 #include <boost/utility/enable_if.hpp>
 
+// This macro creates a boolean unary metafunction which result is
+// true if and only if its parameter type has member function with
+// MEMBER name (no matter static it is or not). The generated trait
+// ends up in a namespace where the macro itself has been placed.
 #define HPX_HAS_MEMBER_XXX_TRAIT_DEF(MEMBER)                      \
     namespace BOOST_PP_CAT(BOOST_PP_CAT(has_, MEMBER), _detail)   \
     {                                                             \
