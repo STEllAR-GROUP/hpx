@@ -17,8 +17,8 @@ namespace hpx { namespace parcelset { namespace policies
         > write_handler_type;
 
         virtual ~message_handler() {}
-        virtual void put_parcel(parcelset::locality const & dest, parcel& p,
-            write_handler_type const& f) = 0;
+        virtual void put_parcel(parcelset::locality const & dest, parcel p,
+            write_handler_type f) = 0;
         virtual bool flush(bool stop_buffering = false) = 0;
     };
 }}}

@@ -30,7 +30,8 @@
 #endif
 
 // Flags determined by comparing output of 'icpc -dM -E' with and without '-std=c++0x'
-#if (!(defined(_WIN32) || defined(_WIN64)) && defined(__STDC_HOSTED__) && (__STDC_HOSTED__ && (BOOST_INTEL_CXX_VERSION <= 1310))) \
+#if (!(defined(_WIN32) || defined(_WIN64)) && defined(__STDC_HOSTED__) \
+ && (__STDC_HOSTED__ && (BOOST_INTEL_CXX_VERSION <= 1310))) \
     || defined(__GXX_EXPERIMENTAL_CPP0X__) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #  define BOOST_INTEL_STDCXX0X
 #endif
@@ -39,7 +40,8 @@
 #endif
 
 #ifdef BOOST_INTEL_STDCXX0X
-#define BOOST_COMPILER "Intel C++ C++0x mode version " BOOST_STRINGIZE(BOOST_INTEL_CXX_VERSION)
+#define BOOST_COMPILER \
+ "Intel C++ C++0x mode version " BOOST_STRINGIZE(BOOST_INTEL_CXX_VERSION)
 #else
 #define BOOST_COMPILER "Intel C++ version " BOOST_STRINGIZE(BOOST_INTEL_CXX_VERSION)
 #endif
@@ -111,11 +113,13 @@
 // later than that if they are set up to emulate gcc 3.2
 // or earlier):
 //
-#  if ((__GNUC__ == 3) && (__GNUC_MINOR__ <= 2)) || (BOOST_INTEL < 900) || (__INTEL_COMPILER_BUILD_DATE < 20050912)
+#  if ((__GNUC__ == 3) && (__GNUC_MINOR__ <= 2)) || (BOOST_INTEL < 900)
+|| (__INTEL_COMPILER_BUILD_DATE < 20050912)
 #     define BOOST_FUNCTION_SCOPE_USING_DECLARATION_BREAKS_ADL
 #  endif
 #endif
-#if (defined(__GNUC__) && (__GNUC__ < 4)) || defined(_WIN32) || (BOOST_INTEL_CXX_VERSION <= 1200)
+#if (defined(__GNUC__) && (__GNUC__ < 4)) || defined(_WIN32) \
+ || (BOOST_INTEL_CXX_VERSION <= 1200)
 // GCC or VC emulation:
 #define BOOST_NO_TWO_PHASE_NAME_LOOKUP
 #endif
@@ -183,7 +187,8 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 // intel-vc9-win-11.1 may leave a non-POD array uninitialized, in some
 // cases when it should be value-initialized.
 // (Niels Dekker, LKEB, May 2010)
-// Apparently Intel 12.1 (compiler version number 9999 !!) has the same issue (compiler regression).
+// Apparently Intel 12.1 (compiler version number 9999 !!)
+// has the same issue (compiler regression).
 #if defined(__INTEL_COMPILER)
 #  if (__INTEL_COMPILER <= 1110) || (__INTEL_COMPILER == 9999)
 #    define BOOST_NO_COMPLETE_VALUE_INITIALIZATION
@@ -216,8 +221,10 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 #endif
 
 #if defined(BOOST_INTEL_STDCXX0X) && (BOOST_INTEL_CXX_VERSION >= 1200)
-//#  undef  BOOST_NO_CXX11_RVALUE_REFERENCES // Enabling this breaks Filesystem and Exception libraries
-//#  undef  BOOST_NO_CXX11_SCOPED_ENUMS  // doesn't really work!!
+//#  undef  BOOST_NO_CXX11_RVALUE_REFERENCES
+     // Enabling this breaks Filesystem and Exception libraries
+//#  undef  BOOST_NO_CXX11_SCOPED_ENUMS
+     // doesn't really work!!
 #ifdef __MIC__
 #  define  BOOST_NO_CXX11_ALLOCATOR
 #  define  BOOST_NO_CXX11_SMART_PTR
@@ -236,7 +243,8 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 #if defined(BOOST_INTEL_STDCXX0X) && (BOOST_INTEL_CXX_VERSION > 1200)
 #  undef  BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
 // std::nullptr seems to be enabled starting with gcc 4.4.7
-#if defined(_MSC_VER) || (defined(__GNUC__) && !(__GNUC__ == 4 && __GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ <= 7))
+#if defined(_MSC_VER) || (defined(__GNUC__) && !(__GNUC__ == 4                  \
+   && __GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ <= 7))
 #  undef  BOOST_NO_CXX11_NULLPTR
 #endif
 #  undef  BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -251,7 +259,8 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 
 #if defined(_MSC_VER) && (_MSC_VER <= 1700)
 //
-// Although the Intel compiler is capable of supporting these, it appears not to in MSVC compatibility mode:
+// Although the Intel compiler is capable of supporting these,
+// it appears not to in MSVC compatibility mode:
 //
 #  define  BOOST_NO_CXX11_HDR_INITIALIZER_LIST
 #  define  BOOST_NO_CXX11_VARIADIC_TEMPLATES
@@ -277,7 +286,8 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 //      We don't emit this warning any more, since we have so few
 //      defect macros set anyway (just the one).
 //
-//#     pragma message("Unknown compiler version - please run the configure tests and report the results")
+//#     pragma message("Unknown compiler version
+//#     - please run the configure tests and report the results")
 #  endif
 #endif
 

@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_base_of.hpp>
@@ -16,14 +17,27 @@
 
 namespace hpx { namespace traits
 {
-    template <typename Policy, typename Enable>
+    namespace detail
+    {
+        template <typename Policy>
+        struct is_launch_policy
+          : boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>
+        {};
+
+        template <typename Policy>
+        struct is_threads_executor
+          : boost::is_base_of<threads::executor, Policy>
+        {};
+    }
+
+    template <typename Policy>
     struct is_launch_policy
-      : boost::mpl::false_
+      : detail::is_launch_policy<typename hpx::util::decay<Policy>::type>
     {};
 
     template <typename Policy>
     struct is_threads_executor
-      : boost::is_base_of<threads::executor, Policy>
+      : detail::is_threads_executor<typename hpx::util::decay<Policy>::type>
     {};
 
     template <typename Policy>

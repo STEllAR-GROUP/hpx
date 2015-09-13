@@ -66,7 +66,8 @@ void init(jacobi_smp::crs_matrix<double> & M, std::size_t dim, std::size_t non_z
     M.rows.push_back(0);
 }
 
-void add_entry(jacobi_smp::crs_matrix<double> & M, std::size_t & row, std::size_t & n, std::size_t j, std::size_t i, double v)
+void add_entry(jacobi_smp::crs_matrix<double> & M, std::size_t & row,
+    std::size_t & n, std::size_t j, std::size_t i, double v)
 {
     M.values.push_back(v);
     M.indices.push_back(j);
@@ -106,26 +107,30 @@ int hpx_main(variables_map &vm)
             qi::phrase_parse(
                 begin
               , end
-              , (qi::int_[phx::ref(dim) = qi::_1] >> qi::int_ >> qi::int_[phx::ref(non_zero_entries) = qi::_1])
+              , (qi::int_[phx::ref(dim) = qi::_1] >> qi::int_ >>
+                   qi::int_[phx::ref(non_zero_entries) = qi::_1])
                 [phx::bind(init, phx::ref(A), dim, non_zero_entries)]
                 >>
                 *(  // entry
                     (qi::int_ >> qi::int_ >> qi::double_)
-                    [phx::bind(add_entry, phx::ref(A), phx::ref(current_row), phx::ref(non_zero_row), qi::_1, qi::_2, qi::_3)]
+                    [phx::bind(add_entry, phx::ref(A), phx::ref(current_row),
+                        phx::ref(non_zero_row), qi::_1, qi::_2, qi::_3)]
                 )
               , qi::space | (qi::lit("%") >> *(!qi::eol >> qi::char_) >> qi::eol)
             );
 
             if(dim == 0)
             {
-                std::cerr << "Parsed zero non zero values in matrix file " << matrix << "\n";
+                std::cerr << "Parsed zero non zero values in matrix file "
+                    << matrix << "\n";
 #if !defined(JACOBI_SMP_NO_HPX)
                 hpx::finalize();
 #endif
                 return 1;
             }
 
-                std::cout << "A: " << dim << "x" << dim << " number of non zeros: " << non_zero_entries << "\n";
+                std::cout << "A: " << dim << "x" << dim << " number of non zeros: "
+                    << non_zero_entries << "\n";
         }
         if(vm.count("vector"))
         {
@@ -173,7 +178,8 @@ int hpx_main(variables_map &vm)
             std::cout << "\tmax " << max_per_row << "\n";
             std::cout << "\tmin " << min_per_row << "\n";
             std::cout << "\tmean " << mean_per_row/double(b.size()) << "\n";
-            std::cout << "Density is: " << double(A.values.size())/double(b.size() * b.size()) << "\n";
+            std::cout << "Density is: " << double(A.values.size())
+                /double(b.size() * b.size()) << "\n";
         }
         else
         {

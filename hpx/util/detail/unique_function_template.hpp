@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
@@ -68,24 +68,16 @@ namespace hpx { namespace util { namespace detail
         char const* name;
         typename serializable_vtable<IAr, OAr>::save_object_t save_object;
         typename serializable_vtable<IAr, OAr>::load_object_t load_object;
-        typename serializable_vtable<IAr, OAr>::wait_for_future_t
-            wait_for_future;
-        typename serializable_vtable<IAr, OAr>::has_to_wait_for_futures_t
-            has_to_wait_for_futures;
 
         template <typename T>
         unique_function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
           : unique_function_vtable_ptr<Sig, void, void>(boost::mpl::identity<T>())
-          , name(get_function_name<std::pair<unique_function_vtable_ptr, T> >())
+          , name(get_function_name<util::tuple<unique_function_vtable_ptr, T> >())
           , save_object(&serializable_vtable<IAr, OAr>::template save_object<T>)
           , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
-          , wait_for_future(
-                &serializable_vtable<IAr, OAr>::template wait_for_future<T>)
-          , has_to_wait_for_futures(
-                &serializable_vtable<IAr, OAr>::template has_to_wait_for_futures<T>)
         {
             init_registration<
-                std::pair<unique_function_vtable_ptr, T>
+                util::tuple<unique_function_vtable_ptr, T>
             >::g.register_function();
         }
     };
@@ -94,21 +86,21 @@ namespace hpx { namespace util { namespace detail
     // registration code for serialization
     template <typename Sig, typename IAr, typename OAr, typename T>
     struct init_registration<
-        std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
     >
     {
-        typedef std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T> vtable_ptr;
+        typedef util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T> vtable_ptr;
 
         static automatic_function_registration<vtable_ptr> g;
     };
 
     template <typename Sig, typename IAr, typename OAr, typename T>
     automatic_function_registration<
-        std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
     > init_registration<
-        std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
     >::g =  automatic_function_registration<
-                std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+                util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
             >();
 }}}
 
@@ -214,8 +206,6 @@ namespace hpx { namespace util
           , Sig
         >
     {
-        friend struct traits::serialize_as_future<unique_function>;
-
         typedef detail::unique_function_vtable_ptr<Sig, void, void> vtable_ptr;
         typedef detail::basic_function<vtable_ptr, Sig> base_type;
 
@@ -264,13 +254,14 @@ namespace hpx { namespace util
     };
 
     template <typename Sig, typename IArchive, typename OArchive>
-    static bool is_empty_function(unique_function<Sig, IArchive, OArchive> const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(unique_function<Sig, IArchive,
+        OArchive> const& f) BOOST_NOEXCEPT
     {
         return f.empty();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#   ifndef BOOST_NO_CXX11_TEMPLATE_ALIASES
+#   ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
 
     template <typename Sig>
     using unique_function_nonser = unique_function<Sig, void, void>;
@@ -322,56 +313,7 @@ namespace hpx { namespace util
         return f.empty();
     }
 
-#   endif /*BOOST_NO_CXX11_TEMPLATE_ALIASES*/
-}}
-
-namespace hpx { namespace traits
-{
-    template <typename Sig, typename IArchive, typename OArchive>
-    struct serialize_as_future<util::unique_function<Sig, IArchive, OArchive> >
-      : boost::mpl::false_
-    {
-        // call_if will be invoked when the trait is false
-        static bool
-        call_if(util::unique_function<Sig, IArchive, OArchive>& f)
-        {
-            return !f.vptr->empty && f.vptr->has_to_wait_for_futures(&f.object);
-        }
-
-        static void call(util::unique_function<Sig, IArchive, OArchive>& f)
-        {
-            if (!f.vptr->empty)
-                f.vptr->wait_for_future(&f.object);
-        }
-    };
-
-    template <typename Sig>
-    struct serialize_as_future<util::unique_function<Sig, void, void> >
-      : boost::mpl::false_
-    {
-        static BOOST_FORCEINLINE
-        bool call_if(util::unique_function<Sig, void, void>&)
-            { return false; }
-
-        static BOOST_FORCEINLINE
-        void call(util::unique_function<Sig, void, void>&)
-            {}
-    };
-
-#ifdef BOOST_NO_CXX11_TEMPLATE_ALIASES
-    template <typename Sig>
-    struct serialize_as_future<util::unique_function_nonser<Sig> >
-      : boost::mpl::false_
-    {
-        static BOOST_FORCEINLINE
-        bool call_if(util::unique_function_nonser<Sig>&)
-            { return false; }
-
-        static BOOST_FORCEINLINE
-        void call(util::unique_function_nonser<Sig>&)
-            {}
-    };
-#endif
+#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 #endif

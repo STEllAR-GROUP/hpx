@@ -35,30 +35,12 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
           : max_messages_(max_messages)
         {}
 
-        message_buffer(message_buffer const& rhs)
-          : dests_(rhs.dests_),
-            messages_(rhs.messages_),
-            handlers_(rhs.handlers_),
-            max_messages_(rhs.max_messages_)
-        {}
-
         message_buffer(message_buffer && rhs)
           : dests_(std::move(rhs.dests_)),
             messages_(std::move(rhs.messages_)),
             handlers_(std::move(rhs.handlers_)),
             max_messages_(rhs.max_messages_)
         {}
-
-        message_buffer& operator=(message_buffer const & rhs)
-        {
-            if (&rhs != this) {
-                max_messages_ = rhs.max_messages_;
-                dests_    = rhs.dests_;
-                messages_ = rhs.messages_;
-                handlers_ = rhs.handlers_;
-            }
-            return *this;
-        }
 
         message_buffer& operator=(message_buffer && rhs)
         {
@@ -74,11 +56,12 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
         void operator()(parcelset::parcelport* set)
         {
             if (!messages_.empty())
-                set->put_parcels(dests_, messages_, handlers_);
+                set->put_parcels(dests_, std::move(messages_), std::move(handlers_));
         }
 
-        message_buffer_append_state append(parcelset::locality const & dest, parcelset::parcel const& p,
-            parcelset::parcelport::write_handler_type const& f)
+        message_buffer_append_state append(parcelset::locality const & dest,
+            parcelset::parcel p,
+            parcelset::parcelport::write_handler_type f)
         {
             HPX_ASSERT(messages_.size() == handlers_.size());
             HPX_ASSERT(dests_.size() == handlers_.size());
@@ -88,8 +71,8 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
                 result = first_message;
 
             dests_.push_back(dest);
-            messages_.push_back(p);
-            handlers_.push_back(f);
+            messages_.push_back(std::move(p));
+            handlers_.push_back(std::move(f));
 
             if (messages_.size() >= max_messages_)
                 result = buffer_now_full;

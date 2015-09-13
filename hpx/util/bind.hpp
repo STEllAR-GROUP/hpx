@@ -12,7 +12,6 @@
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_placeholder.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
@@ -475,36 +474,14 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename BoundArgs>
     struct is_bind_expression<util::detail::bound<F, BoundArgs> >
-      : boost::mpl::true_
+      : boost::true_type
     {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t I>
     struct is_placeholder<util::detail::placeholder<I> >
-      : util::detail::placeholder<I>
+      : boost::integral_constant<int, I>
     {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename BoundArgs>
-    struct serialize_as_future<util::detail::bound<F, BoundArgs> >
-      : boost::mpl::bool_<
-            serialize_as_future<F>::value ||
-            serialize_as_future<BoundArgs>::value
-        >
-    {
-        static BOOST_FORCEINLINE
-        bool call_if(util::detail::bound<F, BoundArgs>& b)
-        {
-            return serialize_as_future<F>::call_if(b._f) ||
-                serialize_as_future<BoundArgs>::call_if(b._bound_args);
-        }
-
-        static void call(util::detail::bound<F, BoundArgs> & b)
-        {
-            traits::serialize_as_future<F>::call(b._f);
-            traits::serialize_as_future<BoundArgs>::call(b._bound_args);
-        }
-    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

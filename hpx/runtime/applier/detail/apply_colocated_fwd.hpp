@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/traits/is_continuation.hpp>
 
 namespace hpx { namespace detail
 {
@@ -23,14 +24,18 @@ namespace hpx { namespace detail
         naming::id_type const& gid, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename ...Ts>
-    bool apply_colocated(hpx::actions::continuation_type const& cont,
+    template <typename Action, typename Continuation, typename ...Ts>
+    typename std::enable_if<
+        traits::is_continuation<Continuation>::value
+      , bool
+    >::type
+    apply_colocated(Continuation && cont,
         naming::id_type const& gid, Ts&&... vs);
 
-    template <typename Component, typename Signature, typename Derived,
-        typename ...Ts>
+    template <typename Continuation, typename Component, typename Signature,
+        typename Derived, typename ...Ts>
     bool apply_colocated(
-        hpx::actions::continuation_type const& cont,
+        Continuation && cont,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Ts&&... vs);
 }}

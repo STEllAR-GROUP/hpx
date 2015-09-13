@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -13,7 +13,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -25,8 +24,15 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <deque>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
+#elif defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40900
+#define HPX_PARCELSET_PENDING_PARCELS_WORKAROUND
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace agas
@@ -62,7 +68,8 @@ namespace hpx { namespace parcelset
         > read_handler_type;
 
         /// Construct the parcelport on the given locality.
-        parcelport(util::runtime_configuration const& ini, locality const & here, std::string const& type);
+        parcelport(util::runtime_configuration const& ini, locality const & here,
+            std::string const& type);
 
         /// Virtual destructor
         virtual ~parcelport() {}
@@ -112,7 +119,8 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcel(locality const & dest, parcel p, write_handler_type f) = 0;
+        virtual void put_parcel(locality const & dest, parcel p,
+            write_handler_type f) = 0;
 
         /// Queues a list of parcels for transmission to another locality
         ///
@@ -129,7 +137,8 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcels(std::vector<locality> dests, std::vector<parcel> parcels,
+        virtual void put_parcels(std::vector<locality> dests,
+            std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers) = 0;
 
         /// Send an early parcel through the TCP parcelport
@@ -138,7 +147,7 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        virtual void send_early_parcel(locality const & dest, parcel& p) = 0;
+        virtual void send_early_parcel(locality const & dest, parcel p) = 0;
 
         /// Cache specific functionality
         virtual void remove_from_connection_cache(locality const& loc) = 0;
@@ -170,28 +179,6 @@ namespace hpx { namespace parcelset
         /// Return the name of this locality
         virtual std::string get_locality_name() const = 0;
 
-        /// Register an event handler to be called whenever a parcel has been
-        /// received.
-        ///
-        /// \param sink     [in] A function object to be invoked whenever a
-        ///                 parcel has been received by the parcelport. The
-        ///                 signature of this function object is expected to be:
-        ///
-        /// \code
-        ///      void handler(hpx::parcelset::parcelport& pp,
-        ///                   boost::shared_ptr<std::vector<char> > const& data,
-        ///                   hpx::threads::thread_priority priority);
-        /// \endcode
-        ///
-        ///                 where \a pp is a reference to the parcelport this
-        ///                 function object instance is invoked by, and \a dest
-        ///                 is the local destination address of the parcel.
-        template <typename F>
-        void register_event_handler(F sink)
-        {
-            parcels_.register_event_handler(sink);
-        }
-
         /// \brief Allow access to the locality this parcelport is associated
         /// with.
         ///
@@ -204,7 +191,8 @@ namespace hpx { namespace parcelset
 
         virtual locality create_locality() const = 0;
 
-        virtual locality agas_locality(util::runtime_configuration const & ini) const = 0;
+        virtual locality agas_locality(util::runtime_configuration const & ini)
+            const = 0;
 
         /// Performance counter data
 
@@ -316,11 +304,13 @@ namespace hpx { namespace parcelset
             return pending_parcels_.size();
         }
 
-        void add_received_parcel(parcel const& p)
+
+        void set_applier(applier::applier * applier)
         {
-            // do some work (notify event handlers)
-            parcels_.add_parcel(p);
+            applier_ = applier;
         }
+
+        void add_received_parcel(parcel p, std::size_t num_thread = -1);
 
         /// Update performance counter data
         void add_received_data(performance_counters::parcels::data_point const& data)
@@ -370,11 +360,24 @@ namespace hpx { namespace parcelset
         /// mutex for all of the member data
         mutable lcos::local::spinlock mtx_;
 
-        /// The handler for all incoming requests.
-        server::parcelport_queue parcels_;
+        hpx::applier::applier *applier_;
 
         /// The cache for pending parcels
-        typedef std::pair<std::vector<parcel>, std::vector<write_handler_type> >
+        typedef std::list<naming::gid_type> new_gids_type;
+        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
+#if defined(HPX_PARCELSET_PENDING_PARCELS_WORKAROUND)
+        typedef util::tuple<
+            boost::shared_ptr<std::vector<parcel> >
+          , std::vector<write_handler_type>
+          , new_gids_map
+        >
+#else
+        typedef util::tuple<
+            std::vector<parcel>
+          , std::vector<write_handler_type>
+          , new_gids_map
+        >
+#endif
             map_second_type;
         typedef std::map<locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;

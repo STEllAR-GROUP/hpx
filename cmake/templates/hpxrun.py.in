@@ -271,7 +271,9 @@ if __name__ == '__main__':
                 msg += ')'
                 print(msg)
                 while procs:
-                    term(procs.pop(0))
+                    nextproc = procs.pop(0)
+                    if nextproc != proc:
+                        term(nextproc)
         except:
             pass
         finally: procs_lock.release()

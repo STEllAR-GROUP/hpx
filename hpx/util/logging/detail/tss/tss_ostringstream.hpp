@@ -28,8 +28,10 @@
 namespace hpx { namespace util { namespace logging {
 
 /**
-@brief Represents an ostringstream that takes advantage of TSS (Thread Specific Storage). In other words, each thread has its
-       own copy of an ostringstream, thus when needed, we avoid the cost of re-creating it (it's created only once per thread).
+@brief Represents an ostringstream that takes advantage of TSS (Thread Specific Storage).
+       In other words, each thread has its
+       own copy of an ostringstream, thus when needed,
+       we avoid the cost of re-creating it (it's created only once per thread).
 */
 template< class stream = std::basic_ostringstream<char_type> > struct tss_ostringstream {
     typedef stream stream_type;
@@ -55,7 +57,8 @@ private:
     mutable tss_value<stream_type> m_cache;
 };
 
-template<class stream, class value_type> inline stream& operator<<( tss_ostringstream<stream> & out, const value_type & val) {
+template<class stream, class value_type> inline stream& operator
+<<( tss_ostringstream<stream> & out, const value_type & val) {
     stream & result = out.get();
     result << val;
     return result;

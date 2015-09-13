@@ -34,6 +34,37 @@ namespace hpx { namespace traits
     {};
 
     ///////////////////////////////////////////////////////////////////////////
+    // Simple components are components
+    template <typename Component>
+    struct is_component<Component,
+            typename boost::enable_if<
+                boost::is_base_and_derived<
+                    detail::simple_component_tag, Component
+                > >::type>
+      : boost::mpl::true_
+    {};
+
+    // Fixed components are components
+    template <typename Component>
+    struct is_component<Component,
+            typename boost::enable_if<
+                boost::is_base_and_derived<
+                    detail::fixed_component_tag, Component
+                > >::type>
+      : boost::mpl::true_
+    {};
+
+    // Managed components are components
+    template <typename Component>
+    struct is_component<Component,
+            typename boost::enable_if<
+                boost::is_base_and_derived<
+                    detail::managed_component_tag, Component
+                > >::type>
+      : boost::mpl::true_
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable>
     struct is_component_or_component_array
       : is_component<T>

@@ -27,7 +27,8 @@ widget::widget(boost::function<void(widget *, std::size_t)> callback, QWidget *p
     QSpinBox * thread_number_widget = new QSpinBox;
     thread_number_widget->setValue(50);
     thread_number_widget->setRange(1, 100000);
-    QObject::connect(thread_number_widget, SIGNAL(valueChanged(int)), this, SLOT(set_threads(int)));
+    QObject::connect(thread_number_widget, SIGNAL(valueChanged(int)),
+        this, SLOT(set_threads(int)));
 
     run_button = new QPushButton("Run");
     QObject::connect(run_button, SIGNAL(clicked(bool)), this, SLOT(run_clicked(bool)));

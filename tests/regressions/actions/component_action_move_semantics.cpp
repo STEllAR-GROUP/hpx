@@ -158,14 +158,16 @@ void test_actions()
             //FIXME: bumped number for intel compiler
             HPX_TEST_RANGE((
                 return_object<
-                    action_move_semantics::return_test_non_movable_action, non_movable_object
+                    action_move_semantics::return_test_non_movable_action,
+                non_movable_object
                 >(id)
             ), 1u, 5u); // ?call + set_value + ?return
         } else {
             //FIXME: bumped number for intel compiler
             HPX_TEST_RANGE((
                 return_object<
-                    action_move_semantics::return_test_non_movable_action, non_movable_object
+                    action_move_semantics::return_test_non_movable_action,
+                non_movable_object
                 >(id)
             ), 4u, 8u); // transfer_action + bind + function + ?call +
                     // set_value + ?return
@@ -216,25 +218,29 @@ void test_direct_actions()
         {
             HPX_TEST_EQ((
                 pass_object<
-                    action_move_semantics::test_non_movable_direct_action, non_movable_object
+                    action_move_semantics::test_non_movable_direct_action,
+                non_movable_object
                 >(id)
             ), 0u);
 
             HPX_TEST_EQ((
                 move_object<
-                    action_move_semantics::test_non_movable_direct_action, non_movable_object
+                    action_move_semantics::test_non_movable_direct_action,
+                non_movable_object
                 >(id)
             ), 0u);
         } else {
             HPX_TEST_EQ((
                 pass_object<
-                    action_move_semantics::test_non_movable_direct_action, non_movable_object
+                    action_move_semantics::test_non_movable_direct_action,
+                non_movable_object
                 >(id)
             ), 3u); // transfer_action + bind + function
 
             HPX_TEST_EQ((
                 move_object<
-                    action_move_semantics::test_non_movable_direct_action, non_movable_object
+                    action_move_semantics::test_non_movable_direct_action,
+                non_movable_object
                 >(id)
             ), 3u); // transfer_action + bind + function
         }
@@ -244,13 +250,15 @@ void test_direct_actions()
         {
             HPX_TEST_EQ((
                 return_object<
-                    action_move_semantics::return_test_movable_direct_action, movable_object
+                    action_move_semantics::return_test_movable_direct_action,
+                movable_object
                 >(id)
             ), 0u);
         } else {
             HPX_TEST_EQ((
                 return_object<
-                    action_move_semantics::return_test_movable_direct_action, movable_object
+                    action_move_semantics::return_test_movable_direct_action,
+                movable_object
                 >(id)
             ), 0u);
         }
@@ -260,14 +268,16 @@ void test_direct_actions()
         {
             HPX_TEST_RANGE((
                 return_object<
-                    action_move_semantics::return_test_non_movable_direct_action, non_movable_object
+                    action_move_semantics::return_test_non_movable_direct_action,
+                non_movable_object
                 >(id)
             ), 1u, 3u); // ?call + set_value + ?return
         } else {
             //FIXME: bumped number for intel compiler
             HPX_TEST_RANGE((
                 return_object<
-                    action_move_semantics::return_test_non_movable_direct_action, non_movable_object
+                    action_move_semantics::return_test_non_movable_direct_action,
+                non_movable_object
                 >(id)
             ), 4u, 8u); // transfer_action + bind + function + ?call +
                     // set_value + ?return

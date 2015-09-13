@@ -545,9 +545,9 @@ namespace hpx
         {
             std::string affinity_domain("pu");
 #if defined(HPX_HAVE_HWLOC)
-            if (0 != cfg.vm_.count("hpx:affinity"))
+            if (cfg.affinity_domain_ != "pu")
             {
-                affinity_domain = cfg.vm_["hpx:affinity"].as<std::string>();
+                affinity_domain = cfg.affinity_domain_;
                 if (0 != std::string("pu").find(affinity_domain) &&
                     0 != std::string("core").find(affinity_domain) &&
                     0 != std::string("numa").find(affinity_domain) &&
@@ -562,16 +562,15 @@ namespace hpx
             return affinity_domain;
         }
 
-        bool get_affinity_description(util::command_line_handling const& cfg,
-            std::string& affinity_desc)
+        std::size_t get_affinity_description(
+            util::command_line_handling const& cfg, std::string& affinity_desc)
         {
 #if defined(HPX_HAVE_HWLOC)
-            if (0 == cfg.vm_.count("hpx:bind"))
-                return 0 != cfg.vm_.count("hpx:numa-sensitive");
+            if (cfg.affinity_bind_.empty())
+                return cfg.numa_sensitive_;
 
-            if (cfg.vm_.count("hpx:pu-offset") ||
-                cfg.vm_.count("hpx:pu-step") ||
-                cfg.vm_.count("hpx:affinity"))
+            if (cfg.pu_offset_ != 0 || cfg.pu_step_ != 1 ||
+                cfg.affinity_domain_ != "pu")
             {
                 throw detail::command_line_error(
                     "Command line option --hpx:bind "
@@ -579,27 +578,17 @@ namespace hpx
                     "or --hpx:affinity.");
             }
 
-            std::vector<std::string> bind_affinity =
-                cfg.vm_["hpx:bind"].as<std::vector<std::string> >();
-            for (std::string const& s : bind_affinity)
-            {
-                if (!affinity_desc.empty())
-                    affinity_desc += ";";
-                affinity_desc += s;
-            }
-
-            return true;
-#else
-            return 0 != cfg.vm_.count("hpx:numa-sensitive");
+            affinity_desc = cfg.affinity_bind_;
 #endif
+            return cfg.numa_sensitive_;
         }
 
         std::size_t get_pu_offset(util::command_line_handling const& cfg)
         {
-            std::size_t pu_offset = std::size_t(-1);
+            std::size_t pu_offset = 0;
 #if defined(HPX_HAVE_HWLOC)
-            if (cfg.vm_.count("hpx:pu-offset")) {
-                pu_offset = cfg.vm_["hpx:pu-offset"].as<std::size_t>();
+            if (cfg.pu_offset_ != 0) {
+                pu_offset = cfg.pu_offset_;
                 if (pu_offset >= hpx::threads::hardware_concurrency()) {
                     throw detail::command_line_error(
                         "Invalid command line option "
@@ -615,8 +604,8 @@ namespace hpx
         {
             std::size_t pu_step = 1;
 #if defined(HPX_HAVE_HWLOC)
-            if (cfg.vm_.count("hpx:pu-step")) {
-                pu_step = cfg.vm_["hpx:pu-step"].as<std::size_t>();
+            if (cfg.pu_step_ != 1) {
+                pu_step = cfg.pu_step_;
                 if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency())
                 {
                     throw detail::command_line_error(
@@ -650,7 +639,8 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         int run(hpx::runtime& rt,
-            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<int(boost::program_options::variables_map& vm)>
+                const& f,
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown)
@@ -666,7 +656,8 @@ namespace hpx
         }
 
         int start(hpx::runtime& rt,
-            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<int(boost::program_options::variables_map& vm)>
+                const& f,
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown)
@@ -713,7 +704,8 @@ namespace hpx
             std::size_t pu_step = get_pu_step(cfg);
             std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
-            bool numa_sensitive = get_affinity_description(cfg, affinity_desc);
+            std::size_t numa_sensitive =
+                get_affinity_description(cfg, affinity_desc);
 
             // scheduling policy
             typedef hpx::threads::policies::local_queue_scheduler<>
@@ -836,7 +828,8 @@ namespace hpx
             std::size_t pu_step = get_pu_step(cfg);
             std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
-            bool numa_sensitive = get_affinity_description(cfg, affinity_desc);
+            std::size_t numa_sensitive =
+                get_affinity_description(cfg, affinity_desc);
 
             // scheduling policy
             typedef hpx::threads::policies:: local_priority_queue_scheduler<>
@@ -870,16 +863,12 @@ namespace hpx
             std::size_t num_high_priority_queues =
                 get_num_high_priority_queues(cfg);
 
-            bool numa_sensitive = false;
-            if (cfg.vm_.count("hpx:numa-sensitive"))
-                numa_sensitive = true;
-
             // scheduling policy
             typedef hpx::threads::policies::abp_fifo_priority_queue_scheduler
                 abp_priority_queue_policy;
             abp_priority_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
-                numa_sensitive);
+                cfg.numa_sensitive_);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
@@ -943,15 +932,11 @@ namespace hpx
             std::size_t num_high_priority_queues =
                 get_num_high_priority_queues(cfg);
 
-            bool numa_sensitive = false;
-            if (cfg.vm_.count("hpx:numa-sensitive"))
-                numa_sensitive = true;
-
             // scheduling policy
             typedef hpx::threads::policies::periodic_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(cfg.num_threads_,
-                num_high_priority_queues, 1000, numa_sensitive);
+                num_high_priority_queues, 1000, cfg.numa_sensitive_);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
@@ -969,7 +954,8 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT int run_or_start(
-            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<int(boost::program_options::variables_map& vm)>
+                const& f,
             boost::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> const& ini_config,
             startup_function_type const& startup,
@@ -997,6 +983,14 @@ namespace hpx
 #endif
 
             try {
+                // make sure the runtime system is not active yet
+                if (get_runtime_ptr() != 0)
+                {
+                    std::cerr << "hpx::init: can't initialize runtime system "
+                        "more than once! Exiting...\n";
+                    return -1;
+                }
+
                 // handle all common command line switches
                 util::command_line_handling cfg(mode, f, ini_config, argv[0]);
 

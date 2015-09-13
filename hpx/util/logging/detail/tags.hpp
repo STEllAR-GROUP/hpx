@@ -56,7 +56,8 @@ namespace detail {
 }
 
 /**
-@brief Allows you to use tags (extra information about the context of the logged message: file/line, function name, thread id, etc.), and log this information as well
+@brief Allows you to use tags (extra information about the context of the logged message:
+file/line, function name, thread id, etc.), and log this information as well
 
 - @ref tag_need
 - @ref tag_explained
@@ -68,13 +69,16 @@ namespace detail {
 
 @section tag_need Do you need tags?
 
-First of all, note that the easiest way to log some extra context is to simply append it, when definining your macro:
+First of all, note that the easiest way to log some extra context is to simply append it,
+when definining your macro:
 
 @code
-#define LDBG_ HPX_LOG_USE_LOG_IF_LEVEL(g_l(), g_log_level(), debug ) << __FILE__ << ":" << __LINE__ << " [dbg] "
+#define LDBG_ HPX_LOG_USE_LOG_IF_LEVEL(g_l(), g_log_level(), debug ) << __FILE__ \
+<< ":" << __LINE__ << " [dbg] "
 @endcode
 
-In the above case, you appended file & line, and the level of the logged message. Usage is just the same:
+In the above case, you appended file & line, and the level of the logged message.
+Usage is just the same:
 
 @code
 std::string hello = "hello", world = "world";
@@ -89,20 +93,30 @@ my_cool_sample:234 [dbg] hello, world
 
 I can see a few issues with the above
 - The context formatting is fixed
-  - You can't choose at runtime - what if I want to see the level first, then the file & line?
-  - You can't choose at runtime if you want to ignore some of that context (to speed up the app in some cases, you might decide not to log the file & line)
-  - You can't mix the context formatting with the rest of the formatting. For example, what if I want to log info like this : \n
+  - You can't choose at runtime - what if I want to see the level first,
+    then the file & line?
+  - You can't choose at runtime if you want to ignore some of that context
+    (to speed up the app in some cases, you might decide not to log the file & line)
+  - You can't mix the context formatting with the rest of the formatting.
+    For example, what if I want to log info like this : \n
     <tt>[idx] file_and_line [time] message [level]</tt> ?
-  - You can't do extra formatting to any of the context. For example, when dumping file/line,
-    what if you want to strip some information from the file (the file name could be pretty big). Or, you might want to @em normalize
+  - You can't do extra formatting to any of the context.
+    For example, when dumping file/line,
+    what if you want to strip some information from the file
+    (the file name could be pretty big). Or, you might want to @em normalize
     the file/line (like, fix it at 50 chars - by stripping or padding information)
-- If you want to be efficient and do the logging on a @ref hpx::util::logging::writer::on_dedicated_thread "dedicated thread"
-  - You can't use formatter::thread_id, because the thread_id is computed when being written (which when used on a dedicated thread, would always
+- If you want to be efficient and do the logging on a
+    @ref hpx::util::logging::writer::on_dedicated_thread "dedicated thread"
+  - You can't use formatter::thread_id, because the thread_id is computed when
+  being written (which when used on a dedicated thread, would always
     return the same value)
-  - Logging the context takes time as well. For instance, <tt>" << __FILE__ << ":" << __LINE__ << " [dbg] "</tt> , in the above case,
-    takes time. It is much faster to only @em gather the context on the current thread, and then dump it on the dedicated thread. You can use tags for that.
+  - Logging the context takes time as well. For instance, <tt>" << __FILE__
+    << ":" << __LINE__ << " [dbg] "</tt> , in the above case,
+    takes time. It is much faster to only @em gather the context on the current thread,
+    and then dump it on the dedicated thread. You can use tags for that.
 
-If you're ok with the above issues, no need to delve into tags. You can dump context like shown above, and be fine with it.
+If you're ok with the above issues, no need to delve into tags.
+You can dump context like shown above, and be fine with it.
 
 Otherwise, welcome to the world of @b tags!
 
@@ -116,7 +130,8 @@ Otherwise, welcome to the world of @b tags!
 
 @subsection tag_classes Tag classes
 
-Each single context information you need to hold, is identified by a tag class. Tag classes are always found in the hpx::util::logging::tag namespace.
+Each single context information you need to hold, is identified by a tag class.
+Tag classes are always found in the hpx::util::logging::tag namespace.
 
 A tag class is deadly simple. Here are a few examples:
 
@@ -132,7 +147,8 @@ struct time {
 };
 @endcode
 
-They only allow holding the context, and making sure you can get to it - when doing formatting. You can of course add your own tag clases.
+They only allow holding the context, and making sure you can get to it
+- when doing formatting. You can of course add your own tag clases.
 
 
 
@@ -142,7 +158,8 @@ Now, you have to decide what tags you need. You will use templated class tag::ho
 - first param: the string class
 - the next params: the tags you need
 
-You will replace your old <tt>HPX_LOG_FORMAT_MSG(string_class)</tt> usage, with tags. In case you don't have a HPX_LOG_FORMAT_MSG in your
+You will replace your old <tt>HPX_LOG_FORMAT_MSG(string_class)</tt> usage,
+with tags. In case you don't have a HPX_LOG_FORMAT_MSG in your
 application, the string_class is std::(w)string.
 
 @code
@@ -152,7 +169,8 @@ HPX_LOG_FORMAT_MSG( optimize::cache_string_one_str<> )
 // new - use tags
 //
 //       In our case, time, file/line, function name
-typedef tag::holder< optimize::cache_string_one_str<>, tag::time, tag::file_line, tag::function> string;
+typedef tag::holder< optimize::cache_string_one_str<>,
+tag::time, tag::file_line, tag::function> string;
 HPX_LOG_FORMAT_MSG( string )
 @endcode
 
@@ -160,12 +178,14 @@ HPX_LOG_FORMAT_MSG( string )
 
 @subsection tag_adding_tags Adding tags to your LOG macros
 
-Some tag classes compute their context automatically (for instance, the tag::time class). However, some tag classes need you to manually specify it,
+Some tag classes compute their context automatically (for instance, the tag::time class).
+However, some tag classes need you to manually specify it,
 in your LOG macros. This is the case for file/line, function, level, etc.
 
 In your LOG macros, you need to append the tags like this:
 - add <tt>.set_tag( <em>tag_class( tag_init_values)</em> ) </tt>
-- if it's a tag class defined in the hpx::util::logging::tag namespace, you can use HPX_LOG_TAG(class_name) \n
+- if it's a tag class defined in the hpx::util::logging::tag namespace,
+  you can use HPX_LOG_TAG(class_name) \n
   (which is just a shortcut for ::hpx::util::logging::tag::class_name)
 - some tags that come with the lib have shortcuts :
   - HPX_LOG_TAG_LEVEL(lvl) - append the level
@@ -176,14 +196,17 @@ Examples:
 
 @code
 // add file/line and function tags
-#define L_ HPX_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) .set_tag(HPX_LOG_TAG_FILELINE) .set_tag(HPX_LOG_TAG_FUNCTION)
+#define L_ HPX_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) \
+.set_tag(HPX_LOG_TAG_FILELINE) .set_tag(HPX_LOG_TAG_FUNCTION)
 
 // add function and level
-#define LDBG_ HPX_LOG_USE_LOG_IF_LEVEL(g_log_dbg(), g_log_level(), debug ) .set_tag(HPX_LOG_TAG_FUNCTION) .set_tag( HPX_LOG_TAG_LEVEL(debug) )
+#define LDBG_ HPX_LOG_USE_LOG_IF_LEVEL(g_log_dbg(), g_log_level(), debug ) \
+.set_tag(HPX_LOG_TAG_FUNCTION) .set_tag( HPX_LOG_TAG_LEVEL(debug) )
 
 // add module information - you specify the module name whe using the L_ macro. Example:
 // L_("chart") << "Initializing environment";
-#define L_(module_name) HPX_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) .set_tag( HPX_LOG_TAG(module)(module_name) )
+#define L_(module_name) HPX_LOG_USE_LOG_IF_FILTER(g_l(), \
+g_log_filter()->is_enabled() ) .set_tag( HPX_LOG_TAG(module)(module_name) )
 
 @endcode
 
@@ -191,7 +214,9 @@ Examples:
 
 @subsection tag_process_tags Processing the tags
 
-Now, you're ready to process these tags - where you're specifying your formatters and/or destinations, add the tag formatters that will process your tags.
+Now, you're ready to process these tags
+- where you're specifying your formatters and/or destinations,
+add the tag formatters that will process your tags.
 Example:
 
 @code
@@ -210,9 +235,11 @@ g_l()->writer().add_destination( destination::cout() );
 g_l()->writer().add_destination( destination::dbg_window() );
 @endcode
 
-Note that the library comes with default formatters for each tag class. However, you can create your own formatter class, for a given tag class.
+Note that the library comes with default formatters for each tag class.
+However, you can create your own formatter class, for a given tag class.
 
-The formatters that come with the library, have the same name as the tag class itself, only that they're in the @c formatter::tag namespace.
+The formatters that come with the library, have the same name as the tag class itself,
+only that they're in the @c formatter::tag namespace.
 
 Examples:
 - for tag::file_line, we have formatter::tag::file_line
@@ -238,7 +265,8 @@ namespace tag {
 
 /** @brief Holds up to 10 @ref tag "tags".
 
-@param string_ (required) The string class we use for holding logged messages. By default, std::(w)string. What you used to specify using HPX_LOG_FORMAT_MSG.
+@param string_ (required) The string class we use for holding logged messages.
+By default, std::(w)string. What you used to specify using HPX_LOG_FORMAT_MSG.
 
 @param param1 (optional) First tag
 @param param2 (optional) Second tag
@@ -262,7 +290,8 @@ template<
         class param7 = detail::void_7,
         class param8 = detail::void_8,
         class param9 = detail::void_9,
-        class param10 = detail::void_10> struct holder : detail::tag_holder_base<string_> {
+        class param10 = detail::void_10> struct holder
+            : detail::tag_holder_base<string_> {
     typedef typename use_default<string_, hold_string_type>::type string_type;
     typedef detail::tag_holder_base<string_> tag_base_type;
 

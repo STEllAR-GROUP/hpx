@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config/defines.hpp>
+#include <hpx/config/warnings_prefix.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <mpi.h>
@@ -18,9 +19,8 @@
 
 // parcelport
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
-#include <hpx/runtime/parcelset/encode_parcels.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/parcelset/parcelport_impl.hpp>
 
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
@@ -41,322 +41,254 @@ namespace hpx
     bool is_starting();
 }
 
-namespace hpx { namespace parcelset { namespace policies { namespace mpi
+namespace hpx { namespace parcelset
 {
-    class parcelport
-      : public parcelset::parcelport
+    namespace policies { namespace mpi
     {
-    private:
-        static parcelset::locality here()
+        class HPX_EXPORT parcelport;
+    }}
+
+    template <>
+    struct connection_handler_traits<policies::mpi::parcelport>
+    {
+        typedef policies::mpi::sender_connection connection_type;
+        typedef boost::mpl::true_  send_early_parcel;
+        typedef boost::mpl::true_ do_background_work;
+        typedef boost::mpl::true_ do_enable_parcel_handling;
+
+        static const char * type()
         {
-            return
-                parcelset::locality(
-                    locality(
-                        util::mpi_environment::rank()
-                    )
-                );
+            return "mpi";
         }
 
-        static std::size_t max_connections(util::runtime_configuration const& ini)
+        static const char * pool_name()
         {
-            return hpx::util::get_entry_as<std::size_t>(
-                ini, "hpx.parcel.mpi.max_connections", HPX_PARCEL_MAX_CONNECTIONS);
-        }
-    public:
-        parcelport(util::runtime_configuration const& ini,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread)
-          : parcelset::parcelport(ini, here(), "mpi")
-          , archive_flags_(boost::archive::no_header)
-          , stopped_(false)
-          , bootstrapping_(true)
-          , max_connections_(max_connections(ini))
-          , chunk_pool_(4096, max_connections_)
-          , sender_(max_connections_)
-          , receiver_(*this, chunk_pool_, max_connections_)
-          , enable_parcel_handling_(true)
-          , handles_parcels_(0)
-        {
-#ifdef BOOST_BIG_ENDIAN
-            std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
-#else
-            std::string endian_out = get_config_entry("hpx.parcel.endian_out", "little");
-#endif
-            if (endian_out == "little")
-                archive_flags_ |= serialization::endian_little;
-            else if (endian_out == "big")
-                archive_flags_ |= serialization::endian_big;
-            else {
-                HPX_ASSERT(endian_out =="little" || endian_out == "big");
-            }
-
-            if (!this->allow_array_optimizations()) {
-                archive_flags_ |= serialization::disable_array_optimization;
-                archive_flags_ |= serialization::disable_data_chunking;
-            }
-            else {
-                if (!this->allow_zero_copy_optimizations())
-                    archive_flags_ |= serialization::disable_data_chunking;
-            }
+            return "parcel-pool-mpi";
         }
 
-        ~parcelport()
+        static const char * pool_name_postfix()
         {
-            if(receive_early_parcels_thread_.joinable())
-                receive_early_parcels_thread_.join();
-            util::mpi_environment::finalize();
+            return "-mpi";
+        }
+    };
+
+    namespace policies { namespace mpi
+    {
+        int acquire_tag(sender * s)
+        {
+            return s->acquire_tag();
         }
 
-        bool can_bootstrap() const
+        void add_connection(sender * s, boost::shared_ptr<sender_connection> const &ptr)
         {
-            return true;
+            s->add(ptr);
         }
 
-        /// Return the name of this locality
-        std::string get_locality_name() const
+        class HPX_EXPORT parcelport
+          : public parcelport_impl<parcelport>
         {
-            return util::mpi_environment::get_processor_name();
-        }
+            typedef parcelport_impl<parcelport> base_type;
 
-        parcelset::locality
-        agas_locality(util::runtime_configuration const & ini) const
-        {
-            return
-                parcelset::locality(
-                    locality(
-                        util::mpi_environment::enabled() ? 0 : -1
-                    )
-                );
-        }
-
-        parcelset::locality create_locality() const
-        {
-            return parcelset::locality(locality());
-        }
-
-        void put_parcels(std::vector<parcelset::locality> dests,
-            std::vector<parcel> parcels,
-            std::vector<write_handler_type> handlers)
-        {
-            HPX_ASSERT(dests.size() == parcels.size());
-            HPX_ASSERT(dests.size() == handlers.size());
-            for(std::size_t i = 0; i != dests.size(); ++i)
+            static parcelset::locality here()
             {
-                put_parcel(dests[i], parcels[i], handlers[i]);
+                return
+                    parcelset::locality(
+                        locality(
+                            util::mpi_environment::rank()
+                        )
+                    );
             }
-        }
 
-        void send_early_parcel(parcelset::locality const & dest, parcel& p)
-        {
-            put_parcel(dest, p
-              , boost::bind(
-                    &parcelport::early_write_handler
-                  , this
-                  , ::_1
-                  , p
-                )
-            );
-        }
-
-        util::io_service_pool* get_thread_pool(char const* name)
-        {
-            return 0;
-        }
-
-        // This parcelport doesn't maintain a connection cache
-        boost::int64_t get_connection_cache_statistics(
-            connection_cache_statistics_type, bool reset)
-        {
-            return 0;
-        }
-
-        void remove_from_connection_cache(parcelset::locality const& loc)
-        {}
-
-        bool run(bool blocking = true)
-        {
-            receiver_.run();
-            sender_.run();
-            receive_early_parcels_thread_ =
-                boost::thread(&parcelport::receive_early_parcels, this,
-                    hpx::get_runtime_ptr());
-            return true;
-        }
-
-        void stop(bool blocking = true)
-        {
-            stopped_ = true;
-            while(handles_parcels_ != 0)
+            static std::size_t max_connections(util::runtime_configuration const& ini)
             {
-                if(threads::get_self_ptr())
-                    hpx::this_thread::suspend(hpx::threads::pending,
-                        "mpi::parcelport::enable");
+                return hpx::util::get_entry_as<std::size_t>(
+                    ini, "hpx.parcel.mpi.max_connections", HPX_PARCEL_MAX_CONNECTIONS);
             }
-            if(blocking)
-            {
-                MPI_Barrier(util::mpi_environment::communicator());
-            }
-        }
+        public:
+            parcelport(util::runtime_configuration const& ini,
+                util::function_nonser<void(std::size_t, char const*)> const& on_start,
+                util::function_nonser<void()> const& on_stop)
+              : base_type(ini, here(), on_start, on_stop)
+              , stopped_(false)
+              , chunk_pool_(4096, max_connections(ini))
+              , sender_(chunk_pool_)
+              , receiver_(*this, chunk_pool_)
+              , handles_parcels_(0)
+            {}
 
-        void enable(bool new_state)
-        {
-            enable_parcel_handling_ = new_state;
-            if(!new_state)
+            ~parcelport()
             {
+                if(receive_early_parcels_thread_.joinable())
+                    receive_early_parcels_thread_.join();
+                util::mpi_environment::finalize();
+            }
+
+            /// Start the handling of connections.
+            bool do_run()
+            {
+                receiver_.run();
+                sender_.run();
+                receive_early_parcels_thread_ =
+                    boost::thread(&parcelport::receive_early_parcels, this,
+                        hpx::get_runtime_ptr());
+                return true;
+            }
+
+            /// Stop the handling of connectons.
+            void do_stop()
+            {
+                while(do_background_work(0))
+                {
+                    if(threads::get_self_ptr())
+                        hpx::this_thread::suspend(hpx::threads::pending,
+                            "mpi::parcelport::do_stop");
+                }
+                stopped_ = true;
                 while(handles_parcels_ != 0)
                 {
                     if(threads::get_self_ptr())
                         hpx::this_thread::suspend(hpx::threads::pending,
-                            "mpi::parcelport::enable");
+                            "mpi::parcelport::do_stop");
                 }
-            }
-        }
-
-        void wait_for_enabled_put_parcel(parcelset::locality const & dest, parcel p,
-            write_handler_type f)
-        {
-            while(!enable_parcel_handling_)
-            {
-                if(threads::get_self_ptr())
-                    hpx::this_thread::suspend(hpx::threads::pending,
-                        "mpi::parcelport::put_parcel");
+                MPI_Barrier(util::mpi_environment::communicator());
             }
 
-            put_parcel(dest, p, f);
-        }
-
-        void put_parcel(parcelset::locality const & dest, parcel p,
-            write_handler_type f)
-        {
-            handles_parcels h(this);
-
-            if(!enable_parcel_handling_)
+            void enable_parcel_handling(bool new_state)
             {
-                hpx::threads::register_thread(
-                    util::bind(&parcelport::wait_for_enabled_put_parcel, this, dest, p, f)
-                  , "mpi::parcelport::put_parcel");
-                return;
-            }
-
-            allocator_type alloc(chunk_pool_);
-            snd_buffer_type buffer(alloc);
-            encode_parcels(&p, std::size_t(-1), buffer, archive_flags_,
-                this->get_max_outbound_message_size());
-
-            buffer.data_point_.time_ = util::high_resolution_clock::now();
-
-            int dest_rank = dest.get<locality>().rank();
-            HPX_ASSERT(dest_rank != util::mpi_environment::rank());
-
-            sender_.send(
-                dest_rank
-              , std::move(p)
-              , std::move(f)
-              , std::move(buffer)
-              , parcels_sent_
-            );
-
-            std::size_t num_thread(0);
-            if(threads::get_self_ptr())
-                num_thread = hpx::get_worker_thread_num();
-
-            do_background_work(num_thread);
-        }
-
-        bool do_background_work(std::size_t num_thread)
-        {
-            if (stopped_)
-                return false;
-            handles_parcels h(this);
-
-            if(!enable_parcel_handling_)
-                return false;
-
-            bool has_work = sender_.background_work(num_thread);
-            has_work = receiver_.background_work(num_thread) || has_work;
-            return has_work;
-        }
-
-    private:
-        typedef util::memory_chunk_pool<> memory_pool_type;
-        typedef util::detail::memory_chunk_pool_allocator<char, util::memory_chunk_pool<>> allocator_type;
-        typedef
-            std::vector<char, allocator_type>
-            data_type;
-        typedef parcel_buffer<data_type> snd_buffer_type;
-        typedef parcel_buffer<data_type, data_type> rcv_buffer_type;
-        typedef lcos::local::spinlock mutex_type;
-
-        int archive_flags_;
-
-        boost::atomic<bool> stopped_;
-        boost::atomic<bool> bootstrapping_;
-        std::size_t const max_connections_;
-
-        memory_pool_type chunk_pool_;
-
-        mutex_type connections_mtx_;
-        lcos::local::detail::condition_variable connections_cond_;
-        sender<snd_buffer_type> sender_;
-        receiver receiver_;
-
-        boost::thread receive_early_parcels_thread_;
-
-        boost::atomic<bool> enable_parcel_handling_;
-        boost::atomic<std::size_t> handles_parcels_;
-
-        struct handles_parcels
-        {
-            handles_parcels(parcelport *pp)
-              : this_(pp)
-            {
-                ++this_->handles_parcels_;
-            }
-
-            ~handles_parcels()
-            {
-                --this_->handles_parcels_;
-            }
-
-            parcelport *this_;
-        };
-
-        void receive_early_parcels(hpx::runtime * rt)
-        {
-            rt->register_thread("receive_early_parcel");
-            try
-            {
-                while(rt->get_state() <= state_startup)
+                if(!new_state)
                 {
-                    do_background_work(0);
+                    while(handles_parcels_ != 0)
+                    {
+                        if(threads::get_self_ptr())
+                            hpx::this_thread::suspend(hpx::threads::pending,
+                                "mpi::parcelport::enable");
+                    }
                 }
             }
-            catch(...)
+
+            /// Return the name of this locality
+            std::string get_locality_name() const
             {
+                return util::mpi_environment::get_processor_name();
+            }
+
+            boost::shared_ptr<sender_connection> create_connection(
+                parcelset::locality const& l, error_code& ec)
+            {
+                int dest_rank = l.get<locality>().rank();
+                return sender_.create_connection(
+                    dest_rank, enable_parcel_handling_, parcels_sent_);
+            }
+
+            parcelset::locality agas_locality(
+                util::runtime_configuration const & ini) const
+            {
+                return
+                    parcelset::locality(
+                        locality(
+                            util::mpi_environment::enabled() ? 0 : -1
+                        )
+                    );
+            }
+
+            parcelset::locality create_locality() const
+            {
+                return parcelset::locality(locality());
+            }
+
+            bool background_work(std::size_t num_thread)
+            {
+                if (stopped_)
+                    return false;
+
+                handles_parcels h(this);
+
+                if(!enable_parcel_handling_)
+                    return false;
+
+                bool has_work = sender_.background_work(num_thread);
+                has_work = receiver_.background_work(num_thread) || has_work;
+                return has_work;
+            }
+
+        private:
+            typedef util::memory_chunk_pool<> memory_pool_type;
+            typedef
+                util::detail::memory_chunk_pool_allocator<
+                    char, util::memory_chunk_pool<>
+                > allocator_type;
+            typedef
+                std::vector<char, allocator_type>
+                data_type;
+            typedef lcos::local::spinlock mutex_type;
+
+            boost::atomic<bool> stopped_;
+
+            memory_pool_type chunk_pool_;
+
+            sender sender_;
+            receiver receiver_;
+
+            boost::thread receive_early_parcels_thread_;
+
+            boost::atomic<std::size_t> handles_parcels_;
+
+            struct handles_parcels
+            {
+                handles_parcels(parcelport *pp)
+                  : this_(pp)
+                {
+                    ++this_->handles_parcels_;
+                }
+
+                ~handles_parcels()
+                {
+                    --this_->handles_parcels_;
+                }
+
+                parcelport *this_;
+            };
+
+            void receive_early_parcels(hpx::runtime * rt)
+            {
+                rt->register_thread("receive_early_parcel");
+                try
+                {
+                    while(rt->get_state() <= state_startup)
+                    {
+                        do_background_work(0);
+                    }
+                }
+                catch(...)
+                {
+                    rt->unregister_thread();
+                    throw;
+                }
                 rt->unregister_thread();
-                throw;
             }
-            rt->unregister_thread();
-        }
 
-        void early_write_handler(
-            boost::system::error_code const& ec, parcel const & p)
-        {
-            if (ec) {
-                // all errors during early parcel handling are fatal
-                boost::exception_ptr exception =
-                    hpx::detail::get_exception(hpx::exception(ec),
-                        "mpi::early_write_handler", __FILE__, __LINE__,
-                        "error while handling early parcel: " +
-                            ec.message() + "(" +
-                            boost::lexical_cast<std::string>(ec.value()) +
-                            ")" + parcelset::dump_parcel(p));
+            void early_write_handler(
+                boost::system::error_code const& ec, parcel const & p)
+            {
+                if (ec) {
+                    // all errors during early parcel handling are fatal
+                    boost::exception_ptr exception =
+                        hpx::detail::get_exception(hpx::exception(ec),
+                            "mpi::early_write_handler", __FILE__, __LINE__,
+                            "error while handling early parcel: " +
+                                ec.message() + "(" +
+                                boost::lexical_cast<std::string>(ec.value()) +
+                                ")" + parcelset::dump_parcel(p));
 
-                hpx::report_error(exception);
+                    hpx::report_error(exception);
+                }
             }
-        }
-    };
-}}}}
+
+        };
+    }}
+}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 namespace hpx { namespace traits
 {

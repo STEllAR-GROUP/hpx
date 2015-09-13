@@ -212,6 +212,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         return scheduler_.get_queue_length();
     }
 
+
+    // Reset internal (round robin) thread distribution scheme
+    template <typename Scheduler>
+    void thread_pool_executor<Scheduler>::reset_thread_distribution()
+    {
+        scheduler_.reset_thread_distribution();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     struct on_self_reset
     {
@@ -309,13 +317,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times);
 
-
             threads::detail::scheduling_callbacks callbacks(
                 threads::detail::scheduling_callbacks::callback_type(),
                 util::bind( //-V107
                     &thread_pool_executor::suspend_back_into_calling_context,
                     this, virt_core));
 
+            scheduler_.set_scheduler_mode(policies::fast_idle_mode);
             threads::detail::scheduling_loop(virt_core, scheduler_,
                 counters, callbacks);
 

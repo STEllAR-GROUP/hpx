@@ -24,63 +24,120 @@ namespace hpx
     /// reported from any of the API functions.
     enum error
     {
-        success = 0,                                ///< The operation was successful
-        no_success = 1,                             ///< The operation did failed, but not in an unexpected manner
-        not_implemented = 2,                        ///< The operation is not implemented
-        out_of_memory = 3,                          ///< The operation caused a out of memory condition
-        bad_action_code = 4,                        ///<
-        bad_component_type = 5,                     ///< The specified component type is not known or otherwise invalid
-        network_error = 6,                          ///< A generic network error occurred
-        version_too_new = 7,                        ///< The version of the network representation for this object is too new
-        version_too_old = 8,                        ///< The version of the network representation for this object is too old
-        version_unknown = 9,                        ///< The version of the network representation for this object is unknown
-        unknown_component_address = 10,             ///<
-        duplicate_component_address = 11,           ///< The given global id has already been registered
-        invalid_status = 12,                        ///< The operation was executed in an invalid status
-        bad_parameter = 13,                         ///< One of the supplied parameters is invalid
-        internal_server_error = 14,                 ///<
-        service_unavailable = 15,                   ///<
-        bad_request = 16,                           ///<
-        repeated_request = 17,                      ///<
-        lock_error = 18,                            ///<
-        duplicate_console = 19,                     ///< There is more than one console locality
-        no_registered_console = 20,                 ///< There is no registered console locality available
-        startup_timed_out = 21,                     ///<
-        uninitialized_value = 22,                   ///<
-        bad_response_type = 23,                     ///<
-        deadlock = 24,                              ///<
-        assertion_failure = 25,                     ///<
-        null_thread_id = 26,                        ///< Attempt to invoke a API function from a non-HPX thread
-        invalid_data = 27,                          ///<
-        yield_aborted = 28,                         ///< The yield operation was aborted
-        dynamic_link_failure = 29,                  ///<
-        commandline_option_error = 30,              ///< One of the options given on the command line is erroneous
-        serialization_error = 31,                   ///< There was an error during serialization of this object
-        unhandled_exception = 32,                   ///< An unhandled exception has been caught
-        kernel_error = 33,                          ///< The OS kernel reported an error
-        broken_task = 34,                           ///< The task associated with this future object is not available anymore
-        task_moved = 35,                            ///< The task associated with this future object has been moved
-        task_already_started = 36,                  ///< The task associated with this future object has already been started
-        future_already_retrieved = 37,              ///< The future object has already been retrieved
-        promise_already_satisfied = 38,             ///< The value for this future object has already been set
-        future_does_not_support_cancellation = 39,  ///< The future object does not support cancellation
-        future_can_not_be_cancelled = 40,           ///< The future can't be canceled at this time
-        no_state = 41,                              ///< The future object has no valid shared state
-        broken_promise = 42,                        ///< The promise has been deleted
-        thread_resource_error = 43,                 ///<
-        future_cancelled = 44,                      ///<
-        thread_cancelled = 45,                      ///<
-        thread_not_interruptable = 46,              ///<
-        duplicate_component_id = 47,                ///< The component type has already been registered
-        unknown_error = 48,                         ///< An unknown error occurred
-        bad_plugin_type = 49,                       ///< The specified plugin type is not known or otherwise invalid
-        security_error = 50,                        ///< An error occurred in the security component
-        filesystem_error = 51,                      ///< The specified file does not exist or other filesystem related error
-        bad_function_call = 52,                     ///< equivalent of std::bad_function_call
-        task_canceled_exception = 53,               ///< parallel::v2::task_canceled_exception
-        task_block_not_active = 54,                 ///< task_region is not active
-        out_of_range = 55,                          ///< Equivalent to std::out_of_range
-        length_error = 56,                          ///< Equivalent to std::length_error
+        success = 0,
+        ///< The operation was successful
+        no_success = 1,
+        ///< The operation did failed, but not in an unexpected manner
+        not_implemented = 2,
+        ///< The operation is not implemented
+        out_of_memory = 3,
+        ///< The operation caused a out of memory condition
+        bad_action_code = 4,
+        ///<
+        bad_component_type = 5,
+        ///< The specified component type is not known or otherwise invalid
+        network_error = 6,
+        ///< A generic network error occurred
+        version_too_new = 7,
+        ///< The version of the network representation for this object is too new
+        version_too_old = 8,
+        ///< The version of the network representation for this object is too old
+        version_unknown = 9,
+        ///< The version of the network representation for this object is unknown
+        unknown_component_address = 10,
+        ///<
+        duplicate_component_address = 11,
+        ///< The given global id has already been registered
+        invalid_status = 12,
+        ///< The operation was executed in an invalid status
+        bad_parameter = 13,
+        ///< One of the supplied parameters is invalid
+        internal_server_error = 14,
+        ///<
+        service_unavailable = 15,
+        ///<
+        bad_request = 16,
+        ///<
+        repeated_request = 17,
+        ///<
+        lock_error = 18,
+        ///<
+        duplicate_console = 19,
+        ///< There is more than one console locality
+        no_registered_console = 20,
+        ///< There is no registered console locality available
+        startup_timed_out = 21,
+        ///<
+        uninitialized_value = 22,
+        ///<
+        bad_response_type = 23,
+        ///<
+        deadlock = 24,
+        ///<
+        assertion_failure = 25,
+        ///<
+        null_thread_id = 26,
+        ///< Attempt to invoke a API function from a non-HPX thread
+        invalid_data = 27,
+        ///<
+        yield_aborted = 28,
+        ///< The yield operation was aborted
+        dynamic_link_failure = 29,
+        ///<
+        commandline_option_error = 30,
+        ///< One of the options given on the command line is erroneous
+        serialization_error = 31,
+        ///< There was an error during serialization of this object
+        unhandled_exception = 32,
+        ///< An unhandled exception has been caught
+        kernel_error = 33,
+        ///< The OS kernel reported an error
+        broken_task = 34,
+        ///< The task associated with this future object is not available anymore
+        task_moved = 35,
+        ///< The task associated with this future object has been moved
+        task_already_started = 36,
+        ///< The task associated with this future object has already been started
+        future_already_retrieved = 37,
+        ///< The future object has already been retrieved
+        promise_already_satisfied = 38,
+        ///< The value for this future object has already been set
+        future_does_not_support_cancellation = 39,
+        ///< The future object does not support cancellation
+        future_can_not_be_cancelled = 40,
+        ///< The future can't be canceled at this time
+        no_state = 41,
+        ///< The future object has no valid shared state
+        broken_promise = 42,
+        ///< The promise has been deleted
+        thread_resource_error = 43,
+        ///<
+        future_cancelled = 44,
+        ///<
+        thread_cancelled = 45,
+        ///<
+        thread_not_interruptable = 46,
+        ///<
+        duplicate_component_id = 47,
+        ///< The component type has already been registered
+        unknown_error = 48,
+        ///< An unknown error occurred
+        bad_plugin_type = 49,
+        ///< The specified plugin type is not known or otherwise invalid
+        security_error = 50,
+        ///< An error occurred in the security component
+        filesystem_error = 51,
+        ///< The specified file does not exist or other filesystem related error
+        bad_function_call = 52,
+        ///< equivalent of std::bad_function_call
+        task_canceled_exception = 53,
+        ///< parallel::v2::task_canceled_exception
+        task_block_not_active = 54,
+        ///< task_region is not active
+        out_of_range = 55,
+        ///< Equivalent to std::out_of_range
+        length_error = 56,
+        ///< Equivalent to std::length_error
 
         /// \cond NOINTERNAL
         last_error,

@@ -48,32 +48,41 @@ template<class type, class tag_type> struct uses_tag {
     }
 };
 
-/** @brief Classes that process the @ref hpx::util::logging::tag "tags" coming with the library
+/** @brief Classes that process the @ref hpx::util::logging::tag "tags"
+coming with the library
 
 See @ref hpx::util::logging::tag "how to use tags".
 */
 namespace tag {
 
-/** @brief Dumps file/line information (corresponds to hpx::util::logging::tag::file_line tag class)
+/** @brief Dumps file/line information (corresponds to
+hpx::util::logging::tag::file_line tag class)
 
 See @ref hpx::util::logging::tag "how to use tags".
 */
-template<class convert = do_convert_format::prepend> struct file_line_t : is_generic, uses_tag< file_line_t<convert>, ::hpx::util::logging::tag::file_line >, hpx::util::logging::op_equal::always_equal  {
+template<class convert = do_convert_format::prepend>
+struct file_line_t : is_generic, uses_tag< file_line_t<convert>,
+    ::hpx::util::logging::tag::file_line >, hpx::util::logging::op_equal::always_equal  {
     typedef convert convert_type;
-    template<class msg_type, class tag_type> void write_tag(msg_type & str, const tag_type & tag) const {
+    template<class msg_type, class tag_type> void write_tag(msg_type & str,
+        const tag_type & tag) const {
         convert::write( tag.val, str);
     }
 };
 
 
 
-/** @brief Dumps function name information (corresponds to hpx::util::logging::tag::function tag class)
+/** @brief Dumps function name information
+(corresponds to hpx::util::logging::tag::function tag class)
 
 See @ref hpx::util::logging::tag "how to use tags".
 */
-template<class convert = do_convert_format::prepend> struct function_t : is_generic, uses_tag< function_t<convert>, ::hpx::util::logging::tag::function >, hpx::util::logging::op_equal::always_equal  {
+template<class convert = do_convert_format::prepend> struct function_t : is_generic,
+uses_tag< function_t<convert>, ::hpx::util::logging::tag::function >,
+hpx::util::logging::op_equal::always_equal  {
     typedef convert convert_type;
-    template<class msg_type, class tag_type> void write_tag(msg_type & str, const tag_type & tag) const {
+    template<class msg_type, class tag_type> void write_tag(msg_type & str,
+        const tag_type & tag) const {
         convert::write( tag.val, str);
     }
 };
@@ -84,9 +93,12 @@ template<class convert = do_convert_format::prepend> struct function_t : is_gene
 
 See @ref hpx::util::logging::tag "how to use tags".
 */
-template<class convert = do_convert_format::prepend> struct level_t : is_generic, uses_tag< level_t<convert>, ::hpx::util::logging::tag::level >, hpx::util::logging::op_equal::always_equal  {
+template<class convert = do_convert_format::prepend>
+struct level_t : is_generic, uses_tag< level_t<convert>,
+    ::hpx::util::logging::tag::level >, hpx::util::logging::op_equal::always_equal  {
     typedef convert convert_type;
-    template<class msg_type, class tag_type> void write_tag(msg_type & str, const tag_type & tag) const {
+    template<class msg_type, class tag_type> void write_tag(msg_type & str,
+        const tag_type & tag) const {
         typedef typename hpx::util::logging::dump_level<>::type dump_type;
         convert::write( dump_type::dump(tag.val) , str);
     }
@@ -94,20 +106,23 @@ template<class convert = do_convert_format::prepend> struct level_t : is_generic
 
 
 
-/** @brief Dumps current time information (corresponds to hpx::util::logging::tag::time tag class)
+/** @brief Dumps current time information
+(corresponds to hpx::util::logging::tag::time tag class)
 
 Similar to hpx::util::logging::formatter::time_t class - only that this one uses tags.
 
 See @ref hpx::util::logging::tag "how to use tags".
 */
-template<class convert = do_convert_format::prepend> struct time_t : is_generic, uses_tag< time_t<convert>, ::hpx::util::logging::tag::time > {
+template<class convert = do_convert_format::prepend> struct time_t
+    : is_generic, uses_tag< time_t<convert>, ::hpx::util::logging::tag::time > {
     typedef convert convert_type;
     typedef hpx::util::logging::formatter::time_t<convert> time_write_type;
     time_write_type m_writer;
 
     time_t(const hold_string_type & format) : m_writer(format) {}
 
-    template<class msg_type, class tag_type> void write_tag(msg_type & str, const tag_type & tag) const {
+    template<class msg_type, class tag_type>
+    void write_tag(msg_type & str, const tag_type & tag) const {
         m_writer.write_time(str, tag.val);
     }
 
@@ -120,28 +135,37 @@ private:
 
 
 
-/** @brief Dumps module information (corresponds to hpx::util::logging::tag::module tag class)
+/** @brief Dumps module information
+(corresponds to hpx::util::logging::tag::module tag class)
 
 See @ref hpx::util::logging::tag "how to use tags".
 */
-template<class convert = do_convert_format::prepend> struct module_t : is_generic, uses_tag< module_t<convert>, ::hpx::util::logging::tag::module >, hpx::util::logging::op_equal::always_equal  {
+template<class convert = do_convert_format::prepend> struct module_t
+    : is_generic, uses_tag< module_t<convert>, ::hpx::util::logging::tag::module >,
+    hpx::util::logging::op_equal::always_equal  {
     typedef convert convert_type;
-    template<class msg_type, class tag_type> void write_tag(msg_type & str, const tag_type & tag) const {
+    template<class msg_type, class tag_type> void write_tag(msg_type & str,
+        const tag_type & tag) const {
         convert::write( tag.val, str);
     }
 };
 
 
 
-/** @brief Dumps thread id information (corresponds to hpx::util::logging::tag::thread_id tag class)
+/** @brief Dumps thread id information
+(corresponds to hpx::util::logging::tag::thread_id tag class)
 
 See @ref hpx::util::logging::tag "how to use tags".
 */
-template<class stream_type = ::std::basic_ostringstream<char_type> , class convert = do_convert_format::prepend> struct thread_id_t
-        : is_generic, uses_tag< thread_id_t< ::std::basic_ostringstream<char_type>, convert>, ::hpx::util::logging::tag::thread_id >, hpx::util::logging::op_equal::always_equal  {
+template<class stream_type = ::std::basic_ostringstream<char_type> ,
+class convert = do_convert_format::prepend> struct thread_id_t
+        : is_generic, uses_tag< thread_id_t< ::std::basic_ostringstream<char_type>,
+    convert>, ::hpx::util::logging::tag::thread_id >,
+    hpx::util::logging::op_equal::always_equal  {
 
     typedef convert convert_type;
-    template<class msg_type, class tag_type> void write_tag(msg_type & str, const tag_type & tag) const {
+    template<class msg_type, class tag_type> void write_tag(msg_type & str,
+        const tag_type & tag) const {
         stream_type out;
         out << tag.val ;
         convert::write( out.str(), str);

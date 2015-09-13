@@ -200,7 +200,8 @@ namespace hpx { namespace performance_counters { namespace papi
                     !p.countername_.empty())
                 { // validate specific PAPI event
                     int code;
-                    if (PAPI_event_name_to_code(const_cast<char *>(p.countername_.c_str()), &code) != PAPI_OK)
+                    if (PAPI_event_name_to_code(const_cast<char *>
+                        (p.countername_.c_str()), &code) != PAPI_OK)
                         return false;
                     hpx::performance_counters::counter_status status =
                         get_counter_name(p, cnt_info.fullname_, ec);

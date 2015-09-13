@@ -16,7 +16,8 @@ namespace hpx { namespace serialization
 {
     // load vector<T>
     template <typename T, typename Allocator>
-    void load_impl(input_archive & ar, std::vector<T, Allocator> & vs, boost::mpl::false_)
+    void load_impl(input_archive & ar, std::vector<T, Allocator> & vs,
+        boost::mpl::false_)
     {
         // normal load ...
         typedef typename std::vector<T, Allocator>::size_type size_type;
@@ -85,7 +86,8 @@ namespace hpx { namespace serialization
 
     // save vector<T>
     template <typename T, typename Allocator>
-    void save_impl(output_archive & ar, std::vector<T, Allocator> & vs, boost::mpl::false_)
+    void save_impl(output_archive & ar, std::vector<T, Allocator> & vs,
+        boost::mpl::false_)
     {
         // normal save ...
         typedef typename std::vector<T, Allocator>::value_type value_type;

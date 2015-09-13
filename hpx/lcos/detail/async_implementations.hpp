@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>

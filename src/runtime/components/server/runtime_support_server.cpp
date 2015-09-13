@@ -5,9 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/config/defaults.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
@@ -427,7 +429,8 @@ namespace hpx { namespace components { namespace server
 
                 strm << "list of registered components: \n";
                 component_map_type::iterator end = components_.end();
-                for (component_map_type::iterator cit = components_.begin(); cit!= end; ++cit)
+                for (component_map_type::iterator cit = components_.begin();
+                    cit!= end; ++cit)
                 {
                     strm << "  "
                          << components::get_component_type_name((*cit).first)
@@ -981,7 +984,8 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Remove the given locality from our connection cache
-    void runtime_support::remove_from_connection_cache(parcelset::endpoints_type const& eps)
+    void runtime_support::remove_from_connection_cache(parcelset::endpoints_type
+        const& eps)
     {
         runtime* rt = get_runtime_ptr();
         if (rt == 0) return;
@@ -1056,7 +1060,8 @@ namespace hpx { namespace components { namespace server
                 cleanup_threads(tm, l);
 
                 // obey timeout
-                if ((std::abs(timeout - 1.) < 1e-16)  && timeout < (t.elapsed() - start_time)) {
+                if ((std::abs(timeout - 1.) < 1e-16)  && timeout <
+                    (t.elapsed() - start_time)) {
                     // we waited long enough
                     timed_out = true;
                     break;
@@ -1573,7 +1578,8 @@ namespace hpx { namespace components { namespace server
                 boost::program_options::variables_map vm;
 
                 util::commandline_error_mode mode = util::rethrow_on_error;
-                std::string allow_unknown(ini.get_entry("hpx.commandline.allow_unknown", "0"));
+                std::string allow_unknown(ini.get_entry("hpx.commandline.allow_unknown",
+                    "0"));
                 if (allow_unknown != "0") mode = util::allow_unregistered;
 
                 util::parse_commandline(ini, options, unknown_cmd_line, vm,

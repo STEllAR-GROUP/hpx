@@ -62,7 +62,8 @@ namespace detail {
             BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
             std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
-                get_abstract_factory<BasePlugin>(this->m_dll, name, this->m_basename, ec);
+                get_abstract_factory<BasePlugin>
+                (this->m_dll, name, this->m_basename, ec);
             if (ec) return 0;
 
             return r.first->create(r.second, BOOST_PP_ENUM_PARAMS(N, a));

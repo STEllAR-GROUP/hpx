@@ -318,18 +318,4 @@ namespace hpx { namespace components
     };
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
-    // Simple components are components
-    template <typename Component>
-    struct is_component<Component,
-            typename boost::enable_if<
-                boost::is_base_and_derived<
-                    detail::simple_component_tag, Component
-                > >::type>
-      : boost::mpl::true_
-    {};
-}}
-
 #endif

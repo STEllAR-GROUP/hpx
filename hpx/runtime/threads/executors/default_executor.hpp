@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_DEFAULT_EXECUTOR_JAN_11_2013_0700PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -20,8 +21,6 @@ namespace hpx { namespace threads { namespace executors
         {
         public:
             default_executor();
-
-            default_executor(thread_stacksize stacksize);
 
             default_executor(thread_priority priority,
                 thread_stacksize stacksize, std::size_t os_thread);
@@ -56,6 +55,12 @@ namespace hpx { namespace threads { namespace executors
             // Return an estimate of the number of waiting tasks.
             boost::uint64_t num_pending_closures(error_code& ec) const;
 
+            // Reset internal (round robin) thread distribution scheme
+            void reset_thread_distribution();
+
+            /// Set the new scheduler mode
+            void set_scheduler_mode(threads::policies::scheduler_mode mode);
+
         protected:
             // Return the requested policy element
             std::size_t get_policy_element(
@@ -76,7 +81,8 @@ namespace hpx { namespace threads { namespace executors
         {}
 
         default_executor(thread_stacksize stacksize)
-          : scheduled_executor(new detail::default_executor(stacksize))
+          : scheduled_executor(new detail::default_executor(
+                thread_priority_default, stacksize, std::size_t(-1)))
         {}
 
         default_executor(thread_priority priority,
@@ -84,6 +90,11 @@ namespace hpx { namespace threads { namespace executors
                 std::size_t os_thread = std::size_t(-1))
           : scheduled_executor(new detail::default_executor(
                 priority, stacksize, os_thread))
+        {}
+
+        default_executor(std::size_t os_thread)
+          : scheduled_executor(new detail::default_executor(
+                thread_priority_default, thread_stacksize_default, os_thread))
         {}
     };
 }}}

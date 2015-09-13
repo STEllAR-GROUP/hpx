@@ -40,16 +40,18 @@
 #include <hpx/traits.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
-#include <hpx/util/function.hpp>            // this has to come before the naming/id_type.hpp below
+#include <hpx/lcos_fwd.hpp>
+#include <hpx/util/function.hpp>
+// ^ this has to come before the naming/id_type.hpp below
 #include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 /// \cond NOINTERNAL
 namespace boost
@@ -148,119 +150,6 @@ namespace hpx
         HPX_API_EXPORT bool do_background_work(std::size_t num_thread = 0);
     }
 
-    /// \namespace threads
-    ///
-    /// The namespace \a thread-manager contains all the definitions required
-    /// for the scheduling, execution and general management of \a
-    /// hpx#threadmanager#thread's.
-    namespace threads
-    {
-        namespace policies
-        {
-            struct scheduler_base;
-
-            struct lockfree_fifo;
-            struct lockfree_lifo;
-
-            // multi priority scheduler with work-stealing
-            template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_fifo
-                    , typename StagedQueuing = lockfree_fifo
-                    , typename TerminatedQueuing = lockfree_lifo
-                     >
-            class HPX_EXPORT local_priority_queue_scheduler;
-
-            // single priority scheduler with work-stealing
-            template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_fifo
-                    , typename StagedQueuing = lockfree_fifo
-                    , typename TerminatedQueuing = lockfree_lifo
-                     >
-            class HPX_EXPORT local_queue_scheduler;
-
-#if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
-            template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_fifo
-                    , typename StagedQueuing = lockfree_fifo
-                    , typename TerminatedQueuing = lockfree_lifo
-                     >
-            class HPX_EXPORT periodic_priority_queue_scheduler;
-#endif
-
-#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-            // multi priority scheduler with no work-stealing
-            template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_fifo
-                    , typename StagedQueuing = lockfree_fifo
-                    , typename TerminatedQueuing = lockfree_lifo
-                     >
-            class HPX_EXPORT static_priority_queue_scheduler;
-#endif
-
-#if defined(HPX_HAVE_STATIC_SCHEDULER)
-            // single priority scheduler with no work-stealing
-            template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_fifo
-                    , typename StagedQueuing = lockfree_fifo
-                    , typename TerminatedQueuing = lockfree_lifo
-                     >
-            class HPX_EXPORT static_queue_scheduler;
-#endif
-
-#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
-            template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_fifo
-                    , typename StagedQueuing = lockfree_fifo
-                    , typename TerminatedQueuing = lockfree_lifo
-                     >
-            class HPX_EXPORT hierarchy_scheduler;
-#endif
-
-            typedef local_priority_queue_scheduler<
-                boost::mutex,
-                lockfree_fifo, // FIFO pending queuing
-                lockfree_fifo, // FIFO staged queuing
-                lockfree_lifo  // LIFO terminated queuing
-            > fifo_priority_queue_scheduler;
-
-#if defined(HPX_HAVE_ABP_SCHEDULER)
-            struct lockfree_abp_fifo;
-            struct lockfree_abp_lifo;
-
-            typedef local_priority_queue_scheduler<
-                boost::mutex,
-                lockfree_abp_fifo, // FIFO + ABP pending queuing
-                lockfree_abp_fifo, // FIFO + ABP staged queuing
-                lockfree_lifo  // LIFO terminated queuing
-            > abp_fifo_priority_queue_scheduler;
-#endif
-
-            // define the default scheduler to use
-            typedef fifo_priority_queue_scheduler queue_scheduler;
-
-            class HPX_EXPORT callback_notifier;
-        }
-    }
-
-    /// \namespace actions
-    ///
-    /// The namespace \a actions contains all definitions needed for the
-    /// class \a hpx#action_manager#action_manager and its related
-    /// functionality. This namespace is part of the HPX core module.
-    namespace actions
-    {
-        struct HPX_API_EXPORT base_action;
-        typedef boost::shared_ptr<base_action> action_type;
-
-        class HPX_API_EXPORT continuation;
-        typedef boost::shared_ptr<continuation> continuation_type;
-
-        class HPX_API_EXPORT action_manager;
-
-        template <typename Component, typename Signature, typename Derived>
-        struct basic_action;
-    }
-
     class HPX_API_EXPORT runtime;
     class HPX_API_EXPORT thread;
 
@@ -282,14 +171,6 @@ namespace hpx
     /// constant.
     HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);
     HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(std::string const& mode);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Retrieve the string value of a configuration entry as given by \p key.
-    HPX_API_EXPORT std::string get_config_entry(std::string const& key,
-        std::string const& dflt);
-    /// Retrieve the integer value of a configuration entry as given by \p key.
-    HPX_API_EXPORT std::string get_config_entry(std::string const& key,
-        std::size_t dflt);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
@@ -393,51 +274,6 @@ namespace hpx
 
     HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr();
 
-    /// \namespace lcos
-    namespace lcos
-    {
-        class base_lco;
-        template <typename Result, typename RemoteResult = Result>
-        class base_lco_with_value;
-
-        template <typename Result,
-            typename RemoteResult =
-                typename traits::promise_remote_result<Result>::type>
-        class promise;
-
-        template <typename Action,
-            typename Result = typename traits::promise_local_result<
-                typename Action::remote_result_type>::type,
-            typename DirectExecute = typename Action::direct_execution>
-        class packaged_action;
-
-        template <typename R>
-        class future;
-
-        template <typename R>
-        class shared_future;
-
-        template <typename ValueType>
-        struct object_semaphore;
-
-        namespace stubs
-        {
-            template <typename ValueType>
-            struct object_semaphore;
-        }
-
-        namespace server
-        {
-            template <typename ValueType>
-            struct object_semaphore;
-        }
-
-        namespace local
-        {
-            class barrier;
-        }
-    }
-
     /// \namespace util
     namespace util
     {
@@ -473,10 +309,6 @@ namespace hpx
     // Pulling important types into the main namespace
     using naming::id_type;
     using naming::invalid_id;
-
-    using lcos::future;
-    using lcos::shared_future;
-    using lcos::promise;
 
     /// \endcond
 }
@@ -711,113 +543,6 @@ namespace hpx
     /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
     HPX_API_EXPORT naming::id_type find_locality(components::component_type type,
         error_code& ec = throws);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return all registered ids from all localities from the given
-    ///        base name.
-    ///
-    /// This function locates all ids which were registered with the given
-    /// base name. It returns a list of futures representing those ids.
-    ///
-    /// \param base_name    [in] The base name for which to retrieve the
-    ///                     registered ids.
-    /// \param num_ids      [in] The number of registered ids to expect.
-    ///
-    /// \returns A list of futures representing the ids which were registered
-    ///          using the given base name.
-    ///
-    /// \note   The future will become ready even if the event (for instance,
-    ///         binding the name to an id) has already happened in the past.
-    ///         This is important in order to reliably retrieve ids from a
-    ///         name, even if the name was already registered.
-    ///
-    HPX_API_EXPORT std::vector<hpx::future<hpx::id_type> >
-        find_all_ids_from_basename(char const* base_name, std::size_t num_ids);
-
-    /// \brief Return registered ids from the given base name and sequence numbers.
-    ///
-    /// This function locates the ids which were registered with the given
-    /// base name and the given sequence numbers. It returns a list of futures
-    /// representing those ids.
-    ///
-    /// \param base_name    [in] The base name for which to retrieve the
-    ///                     registered ids.
-    /// \param ids          [in] The sequence numbers of the registered ids.
-    ///
-    /// \returns A list of futures representing the ids which were registered
-    ///          using the given base name and sequence numbers.
-    ///
-    /// \note   The future will become ready even if the event (for instance,
-    ///         binding the name to an id) has already happened in the past.
-    ///         This is important in order to reliably retrieve ids from a
-    ///         name, even if the name was already registered.
-    ///
-    HPX_API_EXPORT std::vector<hpx::future<hpx::id_type> >
-        find_ids_from_basename(char const* base_name,
-            std::vector<std::size_t> const& ids);
-
-    /// \brief Return registered id from the given base name and sequence number.
-    ///
-    /// This function locates the id which was registered with the given
-    /// base name and the given sequence number. It returns a future
-    /// representing those id.
-    ///
-    /// \param base_name    [in] The base name for which to retrieve the
-    ///                     registered ids.
-    /// \param sequence_nr  [in] The sequence number of the registered id.
-    ///
-    /// \returns A representing the id which was registered using the given
-    ///          base name and sequence numbers.
-    ///
-    /// \note   The future will become ready even if the event (for instance,
-    ///         binding the name to an id) has already happened in the past.
-    ///         This is important in order to reliably retrieve ids from a
-    ///         name, even if the name was already registered.
-    ///
-    HPX_API_EXPORT hpx::future<hpx::id_type>
-        find_id_from_basename(char const* base_name,
-            std::size_t sequence_nr = ~0U);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Register the given id using the given base name.
-    ///
-    /// The function registers the given ids using the provided base name.
-    ///
-    /// \param base_name    [in] The base name for which to retrieve the
-    ///                     registered ids.
-    /// \param id           [in] The id to register using the given base name.
-    /// \param sequence_nr  [in, optional] The sequential number to use for the
-    ///                     registration of the id. This number has to be
-    ///                     unique system wide for each registration using the
-    ///                     same base name. The default is the current locality
-    ///                     identifier. Also, the sequence numbers have to be
-    ///                     consecutive starting from zero.
-    ///
-    /// \returns A future representing the result of the registration operation
-    ///          itself.
-    ///
-    /// \note    The operation will fail if the given sequence number is not
-    ///          unique.
-    ///
-    HPX_API_EXPORT hpx::future<bool> register_id_with_basename(
-        char const* base_name, hpx::id_type id, std::size_t sequence_nr = ~0U);
-
-    /// \brief Unregister the given id using the given base name.
-    ///
-    /// The function unregisters the given ids using the provided base name.
-    ///
-    /// \param base_name    [in] The base name for which to retrieve the
-    ///                     registered ids.
-    /// \param sequence_nr  [in, optional] The sequential number to use for the
-    ///                     un-registration. This number has to be the same
-    ///                     as has been used with \a register_id_with_basename
-    ///                     before.
-    ///
-    /// \returns A future representing the result of the un-registration
-    ///          operation itself.
-    ///
-    HPX_API_EXPORT hpx::future<hpx::id_type> unregister_id_with_basename(
-        char const* base_name, std::size_t sequence_nr = ~0U);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of localities which are currently registered
@@ -1284,8 +1009,10 @@ namespace hpx
 }
 
 // Including declarations of various API function declarations
+#include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>

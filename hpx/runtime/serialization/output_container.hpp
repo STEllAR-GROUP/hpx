@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>
@@ -26,6 +27,12 @@ namespace hpx { namespace serialization
         struct access_data
         {
             static bool is_saving() { return true; }
+            static bool is_future_awaiting() { return false; }
+
+            static void await_future(
+                Container& cont
+              , hpx::lcos::detail::future_data_refcnt_base & future_data)
+            {}
 
             static void write(Container& cont, std::size_t count,
                 std::size_t current, void const* address)
@@ -137,6 +144,17 @@ namespace hpx { namespace serialization
             return detail::access_data<Container>::is_saving();
         }
 
+        bool is_future_awaiting() const
+        {
+            return detail::access_data<Container>::is_future_awaiting();
+        }
+
+        void await_future(
+            hpx::lcos::detail::future_data_refcnt_base & future_data)
+        {
+            return detail::access_data<Container>::await_future(cont_, future_data);
+        }
+
         void set_filter(binary_filter* filter) // override
         {
             HPX_ASSERT(0 == filter_);
@@ -194,7 +212,8 @@ namespace hpx { namespace serialization
 
         void save_binary_chunk(void const* address, std::size_t count) // override
         {
-            if (filter_ || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
+            if (filter_ || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
+            {
                 // fall back to serialization_chunk-less archive
                 this->output_container::save_binary(address, count);
             }

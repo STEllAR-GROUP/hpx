@@ -59,7 +59,7 @@ namespace hpx { namespace components { namespace security
         }
 
         friend std::ostream & operator<<(std::ostream & os,
-                                         certificate_signing_request const & certificate_signing_request)
+                certificate_signing_request const & certificate_signing_request)
         {
             return os << "<certificate_signing_request "
                       << certificate_signing_request.subject_

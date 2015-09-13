@@ -28,7 +28,8 @@ struct broadcast_component
     broadcast_component()
     {}
 
-    void init(std::vector<hpx::id_type> const & id, std::size_t max_msg_size, std::size_t fan_out)
+    void init(std::vector<hpx::id_type> const & id, std::size_t max_msg_size,
+        std::size_t fan_out)
     {
         bcast.this_id = this->get_id();
         bcast.fan_out = fan_out;
@@ -47,7 +48,8 @@ struct broadcast_component
         {
             hpx::util::high_resolution_timer t;
 
-            recv_buffer = bcast(ids, 0, buffer_type(&send_buffer[0], size, buffer_type::reference)).get();
+            recv_buffer = bcast(ids, 0, buffer_type(&send_buffer[0], size,
+                buffer_type::reference)).get();
 
             double t_elapsed = t.elapsed();
             if(i >= skip)
@@ -83,7 +85,8 @@ void run_benchmark(params const & p)
 
     if(ids.size() < 2)
     {
-        hpx::cout << "This benchmark must be run with at least 2 threads" << hpx::endl << hpx::flush;
+        hpx::cout << "This benchmark must be run with at least 2 threads"
+            << hpx::endl << hpx::flush;
         return;
     }
 
@@ -93,7 +96,8 @@ void run_benchmark(params const & p)
         for (hpx::id_type const& id : ids)
         {
             init_futures.push_back(
-                hpx::async<broadcast_component::init_action>(id, ids, p.max_msg_size, p.fan_out)
+                hpx::async<broadcast_component::init_action>(id, ids,
+                    p.max_msg_size, p.fan_out)
             );
         }
         hpx::wait_all(init_futures);
@@ -124,7 +128,8 @@ void run_benchmark(params const & p)
             times.push_back(f.get());
         }
 
-        double avg_latency = std::accumulate(times.begin(), times.end(), 0.0) / ids.size();
+        double avg_latency = std::accumulate(times.begin(), times.end(), 0.0)
+            / ids.size();
 
         print_data(avg_latency, size, iterations);
     }

@@ -26,7 +26,8 @@
 
 #if defined(__clang__)
 
-#  define HPX_CLANG_VERSION (__clang_major__*10000 + __clang_minor__*100 + __clang_patchlevel__)
+#  define HPX_CLANG_VERSION \
+ (__clang_major__*10000 + __clang_minor__*100 + __clang_patchlevel__)
 
 #  undef HPX_INTEL_VERSION
 

@@ -35,19 +35,23 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Initialization support for the performance counter actions
 HPX_REGISTER_ACTION_ID(
-    hpx::performance_counters::server::base_performance_counter::get_counter_info_action,
+    hpx::performance_counters::server
+    ::base_performance_counter::get_counter_info_action,
     performance_counter_get_counter_info_action,
     hpx::actions::performance_counter_get_counter_info_action_id)
 HPX_REGISTER_ACTION_ID(
-    hpx::performance_counters::server::base_performance_counter::get_counter_value_action,
+    hpx::performance_counters::server
+    ::base_performance_counter::get_counter_value_action,
     performance_counter_get_counter_value_action,
     hpx::actions::performance_counter_get_counter_value_action_id)
 HPX_REGISTER_ACTION_ID(
-    hpx::performance_counters::server::base_performance_counter::set_counter_value_action,
+    hpx::performance_counters::server
+    ::base_performance_counter::set_counter_value_action,
     performance_counter_set_counter_value_action,
     hpx::actions::performance_counter_set_counter_value_action_id)
 HPX_REGISTER_ACTION_ID(
-    hpx::performance_counters::server::base_performance_counter::reset_counter_value_action,
+    hpx::performance_counters::server
+    ::base_performance_counter::reset_counter_value_action,
     performance_counter_reset_counter_value_action,
     hpx::actions::performance_counter_reset_counter_value_action_id)
 HPX_REGISTER_ACTION_ID(
@@ -97,7 +101,8 @@ namespace hpx { namespace performance_counters
                 if (-1 != path.parentinstanceindex_)
                 {
                     result += "#";
-                    result += boost::lexical_cast<std::string>(path.parentinstanceindex_);
+                    result += boost::lexical_cast<std::string>
+                                (path.parentinstanceindex_);
                 }
                 if (!path.instancename_.empty())
                     result += "/";
@@ -260,7 +265,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 namespace hpx { namespace performance_counters
 {
     ///
-    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}/countername#parameters
+    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}
+    ///       /countername#parameters
     ///    /objectname{parentinstancename#*/instancename#*}/countername#parameters
     ///    /objectname{/basecounter}/countername,parameters
     ///
@@ -277,7 +283,8 @@ namespace hpx { namespace performance_counters
                 >> -('/' >>  +~qi::char_("#}@")) >> -('@' >> +qi::char_);
             instance = '{' >> parent >> -('/' >> child) >> '}';
             parent =
-                    &qi::lit('/') >> qi::raw[start] >> qi::attr(-1) >> qi::attr(true)   // base counter
+                    &qi::lit('/') >> qi::raw[start] >> qi::attr(-1) >> qi::attr(true)
+                    // base counter
                 |  +~qi::char_("#/}")
                     >>  (   '#' >> raw_uint     // counter parentinstance name
                         |  -qi::string("#*")    // counter parentinstance skeleton name
@@ -304,7 +311,8 @@ namespace hpx { namespace performance_counters
     /// \brief Fill the given \a counter_path_elements instance from the given
     ///        full name of a counter
     ///
-    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}/countername
+    ///    /objectname{parentinstancename#parentindex
+    ///       /instancename#instanceindex}/countername
     ///
     counter_status get_counter_path_elements(std::string const& name,
         counter_path_elements& path, error_code& ec)
@@ -338,7 +346,8 @@ namespace hpx { namespace performance_counters
             }
             else if (!elements.instance_.parent_.index_.empty()) {
                 path.parentinstanceindex_ =
-                    hpx::util::safe_lexical_cast<boost::uint64_t>(elements.instance_.parent_.index_);
+                    hpx::util::safe_lexical_cast<boost::uint64_t>
+                    (elements.instance_.parent_.index_);
             }
 
             if (elements.instance_.child_.index_ == "#*") {
@@ -346,7 +355,8 @@ namespace hpx { namespace performance_counters
             }
             else if (!elements.instance_.child_.index_.empty()) {
                 path.instanceindex_ =
-                    hpx::util::safe_lexical_cast<boost::uint64_t>(elements.instance_.child_.index_);
+                    hpx::util::safe_lexical_cast<boost::uint64_t>
+                    (elements.instance_.child_.index_);
             }
         }
 
@@ -867,7 +877,8 @@ namespace hpx { namespace performance_counters
         complement_counter_info(complemented_info, ec);
         if (ec) result_type();
 
-        ensure_counter_prefix(complemented_info.fullname_);      // pre-pend prefix, if necessary
+        ensure_counter_prefix(complemented_info.fullname_);
+        // pre-pend prefix, if necessary
 
         // ask AGAS for the id of the given counter
         naming::id_type id;
@@ -889,7 +900,8 @@ namespace hpx { namespace performance_counters
 
                 if (p.parentinstancename_ == "locality" &&
                         (   p.parentinstanceindex_ < 0 ||
-                            p.parentinstanceindex_ >= static_cast<boost::int32_t>(get_num_localities_sync())
+                            p.parentinstanceindex_ >= static_cast<boost::int32_t>
+                            (get_num_localities_sync())
                         )
                     )
                 {
@@ -914,7 +926,8 @@ namespace hpx { namespace performance_counters
                 }
 
                 // attach the function which registers the id_type with AGAS
-                return f.then(hpx::util::bind(&register_with_agas, hpx::util::placeholders::_1,
+                return f.then(hpx::util::bind(&register_with_agas,
+                    hpx::util::placeholders::_1,
                     complemented_info.fullname_));
             }
             catch (hpx::exception const& e) {

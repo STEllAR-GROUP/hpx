@@ -164,24 +164,37 @@ void test_fp(T min, T max)
 int main()
 {
     test_bool();
-    test<char>((std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
-    test<int>((std::numeric_limits<int>::min)(), (std::numeric_limits<int>::min)() + 100);
-    test<int>((std::numeric_limits<int>::max)() - 100, (std::numeric_limits<int>::max)());
+    test<char>((std::numeric_limits<char>::min)(),
+        (std::numeric_limits<char>::max)());
+    test<int>((std::numeric_limits<int>::min)(),
+        (std::numeric_limits<int>::min)() + 100);
+    test<int>((std::numeric_limits<int>::max)() - 100,
+        (std::numeric_limits<int>::max)());
     test<int>(-100, 100);
-    test<unsigned>((std::numeric_limits<unsigned>::min)(), (std::numeric_limits<unsigned>::min)() + 100);
-    test<unsigned>((std::numeric_limits<unsigned>::max)() - 100, (std::numeric_limits<unsigned>::max)());
-    test<long>((std::numeric_limits<long>::min)(), (std::numeric_limits<long>::min)() + 100);
-    test<long>((std::numeric_limits<long>::max)() - 100, (std::numeric_limits<long>::max)());
+    test<unsigned>((std::numeric_limits<unsigned>::min)(),
+        (std::numeric_limits<unsigned>::min)() + 100);
+    test<unsigned>((std::numeric_limits<unsigned>::max)() - 100,
+        (std::numeric_limits<unsigned>::max)());
+    test<long>((std::numeric_limits<long>::min)(),
+        (std::numeric_limits<long>::min)() + 100);
+    test<long>((std::numeric_limits<long>::max)() - 100,
+        (std::numeric_limits<long>::max)());
     test<long>(-100, 100);
-    test<unsigned long>((std::numeric_limits<unsigned long>::min)(), (std::numeric_limits<unsigned long>::min)() + 100);
-    test<unsigned long>((std::numeric_limits<unsigned long>::max)() - 100, (std::numeric_limits<unsigned long>::max)());
+    test<unsigned long>((std::numeric_limits<unsigned long>::min)(),
+        (std::numeric_limits<unsigned long>::min)() + 100);
+    test<unsigned long>((std::numeric_limits<unsigned long>::max)() - 100,
+        (std::numeric_limits<unsigned long>::max)());
 #if defined(BOOST_HAS_INT128)
-    test<boost::int128_type>((std::numeric_limits<boost::int128_type>::max)() - 100, (std::numeric_limits<boost::int128_type>::max)());
-    test<boost::uint128_type>((std::numeric_limits<boost::uint128_type>::max)() - 100, (std::numeric_limits<boost::uint128_type>::max)());
+    test<boost::int128_type>((std::numeric_limits<boost::int128_type>::max)() - 100,\
+        (std::numeric_limits<boost::int128_type>::max)());
+    test<boost::uint128_type>((std::numeric_limits<boost::uint128_type>::max)() - 100,\
+        (std::numeric_limits<boost::uint128_type>::max)());
 #endif
-    test_fp<float>((std::numeric_limits<float>::min)(), (std::numeric_limits<float>::min)() + 100);
+    test_fp<float>((std::numeric_limits<float>::min)(),
+        (std::numeric_limits<float>::min)() + 100);
     test_fp<float>(-100, 100);
-    test<double>((std::numeric_limits<double>::min)(), (std::numeric_limits<double>::min)() + 100);
+    test<double>((std::numeric_limits<double>::min)(),
+        (std::numeric_limits<double>::min)() + 100);
     test<double>(-100, 100);
 
     return hpx::util::report_errors();

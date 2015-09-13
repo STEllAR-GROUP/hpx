@@ -128,7 +128,8 @@ namespace hpx { namespace  threads
             }
 
             boost::shared_ptr<detail::manage_executor> proxy_;  // hold on to proxy
-            std::vector<coreids_type> core_ids_;                // map physical to logical puinit ids
+            std::vector<coreids_type> core_ids_;
+            // map physical to logical puinit ids
         };
 
         typedef std::map<std::size_t, proxy_data> proxies_map_type;

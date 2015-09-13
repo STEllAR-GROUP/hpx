@@ -67,11 +67,13 @@
 /**
  * Stack allocation routines and trampolines for setcontext
  */
-namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix {
+namespace hpx { namespace util { namespace coroutines { namespace detail
+{ namespace posix {
 
 HPX_EXPORT extern bool use_guard_pages;
 
-#if defined(HPX_HAVE_THREAD_STACK_MMAP) && defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
+#if defined(HPX_HAVE_THREAD_STACK_MMAP) && defined(_POSIX_MAPPED_FILES) \
+ && _POSIX_MAPPED_FILES > 0
 
   inline
   void*
@@ -103,7 +105,8 @@ HPX_EXPORT extern bool use_guard_pages;
         // Add a guard page.
         ::mprotect(real_stack, EXEC_PAGESIZE, PROT_NONE);
 
-        void** stack = static_cast<void**>(real_stack) + (EXEC_PAGESIZE / sizeof(void*));
+        void** stack = static_cast<void**>(real_stack) + (EXEC_PAGESIZE
+            / sizeof(void*));
         return static_cast<void*>(stack);
     }
     return real_stack;
@@ -117,13 +120,15 @@ HPX_EXPORT extern bool use_guard_pages;
     HPX_ASSERT(size > EXEC_PAGESIZE);
 
     // Fill the bottom 8 bytes of the first page with 1s.
-    void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE) / sizeof(void*));
+    void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE)
+        / sizeof(void*));
     *watermark = reinterpret_cast<void*>(0xDEADBEEFDEADBEEFull);
   }
 
   inline
   bool reset_stack(void* stack, std::size_t size) {
-    void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE) / sizeof(void*));
+    void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE)
+        / sizeof(void*));
 
     // If the watermark has been overwritten, then we've gone past the first
     // page.
@@ -253,7 +258,8 @@ HPX_EXPORT extern bool use_guard_pages;
 //# error "Anonymous mmap not available on this platform!"
 //#endif
 //
-//namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix {
+//namespace hpx { namespace util { namespace coroutines
+// { namespace detail { namespace posix {
 //  inline
 //  void *
 //  alloc_stack_mmap(std::size_t size) {

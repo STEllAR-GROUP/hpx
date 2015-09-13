@@ -17,6 +17,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <boost/lockfree/queue.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
@@ -39,7 +40,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     boost::mutex mtx;
     std::size_t connected;
 
-    boost::lockfree::queue<util::function_nonser<void()>* > thunks;
+    boost::lockfree::queue<util::unique_function_nonser<void()>* > thunks;
 
     void spin();
 
@@ -74,7 +75,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 
     ~big_boot_barrier()
     {
-        util::function_nonser<void()>* f;
+        util::unique_function_nonser<void()>* f;
         while (thunks.pop(f))
             delete f;
     }
@@ -82,19 +83,38 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     parcelset::locality here() { return bootstrap_agas; }
     parcelset::endpoints_type const &get_endpoints() { return endpoints; }
 
+    template <typename Action, typename... Args>
     void apply(
-        boost::uint32_t source_prefix
-      , boost::uint32_t prefix
-      , parcelset::locality const& dest
-      , actions::base_action* act
-        );
+        boost::uint32_t source_locality_id
+      , boost::uint32_t target_locality_id
+      , parcelset::locality const & dest
+      , Action act
+      , Args &&... args
+    ) { // {{{
+        HPX_ASSERT(pp);
+        naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
+        parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id),
+                addr, act, std::forward<Args>(args)...);
+        if (!p.parcel_id())
+            p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
+        pp->send_early_parcel(dest, std::move(p));
+    } // }}}
 
+    template <typename Action, typename... Args>
     void apply_late(
-        boost::uint32_t source_prefix
-      , boost::uint32_t prefix
-      , parcelset::locality const& dest
-      , actions::base_action* act
-        );
+        boost::uint32_t source_locality_id
+      , boost::uint32_t target_locality_id
+      , parcelset::locality const & dest
+      , Action act
+      , Args &&... args
+    ) { // {{{
+        naming::address addr(naming::get_gid_from_locality_id(target_locality_id));
+        parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id),
+                addr, act, std::forward<Args>(args)...);
+        if (!p.parcel_id())
+            p.parcel_id() = parcelset::parcel::generate_unique_id(source_locality_id);
+        get_runtime().get_parcel_handler().put_parcel(std::move(p));
+    } // }}}
 
     void wait_bootstrap();
     void wait_hosted(std::string const& locality_name,
@@ -103,7 +123,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     // no-op on non-bootstrap localities
     void trigger();
 
-    void add_thunk(util::function_nonser<void()>* f)
+    void add_thunk(util::unique_function_nonser<void()>* f)
     {
         thunks.push(f);
     }

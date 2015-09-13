@@ -69,7 +69,8 @@ namespace jacobi
         row_range()
         {}
 
-        row_range(boost::intrusive_ptr<value_holder> values, std::ptrdiff_t b, std::ptrdiff_t e)
+        row_range(boost::intrusive_ptr<value_holder> values,
+              std::ptrdiff_t b, std::ptrdiff_t e)
             : begin_(b)
             , end_(e)
             , values_(values)
@@ -115,7 +116,8 @@ namespace jacobi
         void save(Archive & ar, unsigned) const
         {
             HPX_ASSERT(values_);
-            std::vector<double> tmp(values_->v_.begin() + begin_, values_->v_.begin() + end_);
+            std::vector<double> tmp(values_->v_.begin()
+                + begin_, values_->v_.begin() + end_);
             ar & tmp;
         }
 

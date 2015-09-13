@@ -56,11 +56,8 @@ response primary_namespace::service(
     {
         case primary_ns_route:
             {
-                update_time_on_exit update(
-                    counter_data_.route_.time_
-                );
-                counter_data_.increment_route_count();
-                return route(req, ec);
+                HPX_ASSERT(false);
+                return response();
             }
         case primary_ns_bind_gid:
             {
@@ -213,7 +210,8 @@ void primary_namespace::register_counter_types(
         std::string::size_type p = name.find_last_of('/');
         HPX_ASSERT(p != std::string::npos);
 
-        if (detail::primary_namespace_services[i].target_ == detail::counter_target_count)
+        if (detail::primary_namespace_services[i].target_
+            == detail::counter_target_count)
             help = boost::str(help_count % name.substr(p+1));
         else
             help = boost::str(help_time % name.substr(p+1));
@@ -245,12 +243,15 @@ void primary_namespace::register_global_counter_types(
           ++i)
     {
         // local counters are handled elsewhere
-        if (detail::primary_namespace_services[i].code_ != primary_ns_statistics_counter)
+        if (detail::primary_namespace_services[i].code_
+            != primary_ns_statistics_counter)
             continue;
 
         std::string help;
-        if (detail::primary_namespace_services[i].target_ == detail::counter_target_count)
-            help = "returns the overall number of invocations of all primary AGAS services";
+        if (detail::primary_namespace_services[i].target_
+            == detail::counter_target_count)
+            help = "returns the overall number of invocations \
+                     of all primary AGAS services";
         else
             help = "returns the overall execution time of all primary AGAS services";
 
@@ -316,18 +317,12 @@ parcelset::policies::message_handler* primary_namespace::get_message_handler(
     )
 {
     typedef hpx::actions::transfer_action<
-        server::primary_namespace::service_action
+        server::primary_namespace::route_action
     > action_type;
 
-    boost::shared_ptr<action_type> act =
-        boost::static_pointer_cast<action_type>(p.get_action());
-    agas::request const& req = hpx::actions::get<0>(*act);
+    action_type * act = static_cast<action_type *>(p.get_action());
 
-    // only routing is handled in a special way
-    if (req.get_action_code() != primary_ns_route)
-        return 0;
-
-    parcelset::parcel routed_p = req.get_parcel();
+    parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
     return routed_p.get_message_handler(ph, loc);
 }
 
@@ -336,18 +331,12 @@ serialization::binary_filter* primary_namespace::get_serialization_filter(
     )
 {
     typedef hpx::actions::transfer_action<
-        server::primary_namespace::service_action
+        server::primary_namespace::route_action
     > action_type;
 
-    boost::shared_ptr<action_type> act =
-        boost::static_pointer_cast<action_type>(p.get_action());
-    agas::request const& req = hpx::actions::get<0>(*act);
+    action_type * act = static_cast<action_type *>(p.get_action());
 
-    // only routing is handled in a special way
-    if (req.get_action_code() != primary_ns_route)
-        return 0;
-
-    parcelset::parcel routed_p = req.get_parcel();
+    parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
     return routed_p.get_serialization_filter();
 }
 
@@ -1127,7 +1116,8 @@ void primary_namespace::decrement_sweep(
             refcnt_table_type::iterator it = refcnts_.find(raw);
             if (it == refcnts_.end())
             {
-                boost::int64_t count = boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits;
+                boost::int64_t count = boost::int64_t(HPX_GLOBALCREDIT_INITIAL)
+                    - credits;
                 std::pair<refcnt_table_type::iterator, bool> p =
                     refcnts_.insert(refcnt_table_type::value_type(raw, count));
                 if (!p.second)
@@ -1377,28 +1367,36 @@ response primary_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_bind_gid_count, &counter_data_, ::_1);
             break;
         case primary_ns_resolve_gid:
-            get_data_func = boost::bind(&cd::get_resolve_gid_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolve_gid_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_unbind_gid:
-            get_data_func = boost::bind(&cd::get_unbind_gid_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_unbind_gid_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_increment_credit:
-            get_data_func = boost::bind(&cd::get_increment_credit_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_increment_credit_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_decrement_credit:
-            get_data_func = boost::bind(&cd::get_decrement_credit_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_decrement_credit_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_allocate_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_begin_migration:
-            get_data_func = boost::bind(&cd::get_begin_migration_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_begin_migration_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_end_migration:
-            get_data_func = boost::bind(&cd::get_end_migration_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_end_migration_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_statistics_counter:
-            get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_overall_count,
+                &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1423,22 +1421,27 @@ response primary_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_increment_credit:
-            get_data_func = boost::bind(&cd::get_increment_credit_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_increment_credit_time,
+                &counter_data_, ::_1);
             break;
         case primary_ns_decrement_credit:
-            get_data_func = boost::bind(&cd::get_decrement_credit_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_decrement_credit_time,
+                &counter_data_, ::_1);
             break;
         case primary_ns_allocate:
             get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
             break;
         case primary_ns_begin_migration:
-            get_data_func = boost::bind(&cd::get_begin_migration_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_begin_migration_time,
+                &counter_data_, ::_1);
             break;
         case primary_ns_end_migration:
-            get_data_func = boost::bind(&cd::get_end_migration_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_end_migration_time,
+                &counter_data_, ::_1);
             break;
         case primary_ns_statistics_counter:
-            get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_overall_time,
+                &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter

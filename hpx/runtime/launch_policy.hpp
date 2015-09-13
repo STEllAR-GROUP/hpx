@@ -9,7 +9,6 @@
 #define HPX_RUNTIME_LAUNCH_POLICY_AUG_13_2015_0647PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
 
 #include <boost/detail/scoped_enum_emulation.hpp>
 
@@ -48,15 +47,5 @@ namespace hpx
     }
     /// \endcond
 }
-
-namespace hpx { namespace traits
-{
-    template <typename Policy>
-    struct is_launch_policy<Policy,
-        typename std::enable_if<
-            boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>::value
-        >::type>
-    {};
-}}
 
 #endif

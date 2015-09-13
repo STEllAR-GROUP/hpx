@@ -8,9 +8,6 @@
 #if !defined(HPX_703646B3_0567_484E_AD34_A752B8163B30)
 #define HPX_703646B3_0567_484E_AD34_A752B8163B30
 
-#include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
-
 #include <hpx/config.hpp>
 
 namespace hpx

@@ -40,7 +40,8 @@ namespace hpx { namespace util
 #if BOOST_FILESYSTEM_VERSION >= 3
         return boost::filesystem::path(back == ':' ? p.substr(0, p.size()-1) : p);
 #else
-        return boost::filesystem::path(back == ':' ? p.substr(0, p.size()-1) : p, boost::filesystem::native);
+        return boost::filesystem::path(back == ':' ? p.substr(0, p.size()-1)
+            : p, boost::filesystem::native);
 #endif
     }
 

@@ -198,18 +198,5 @@ namespace hpx { namespace components { namespace server
     {};
 }}}
 
-namespace hpx { namespace traits
-{
-    // Managed components are components
-    template <typename Component>
-    struct is_component<Component,
-            typename boost::enable_if<
-                boost::is_base_and_derived<
-                    detail::managed_component_tag, Component
-                > >::type>
-      : boost::mpl::true_
-    {};
-}}
-
 #endif
 

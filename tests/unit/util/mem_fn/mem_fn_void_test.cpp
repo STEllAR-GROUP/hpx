@@ -48,17 +48,25 @@ struct X
     void f4(int a1, int a2, int a3, int a4) { f3(a1, a2, a3); f1(a4); }
     void g4(int a1, int a2, int a3, int a4) const { g3(a1, a2, a3); g1(a4); }
 
-    void f5(int a1, int a2, int a3, int a4, int a5) { f4(a1, a2, a3, a4); f1(a5); }
-    void g5(int a1, int a2, int a3, int a4, int a5) const { g4(a1, a2, a3, a4); g1(a5); }
+    void f5(int a1, int a2, int a3, int a4, int a5)
+        { f4(a1, a2, a3, a4); f1(a5); }
+    void g5(int a1, int a2, int a3, int a4, int a5)
+        const { g4(a1, a2, a3, a4); g1(a5); }
 
-    void f6(int a1, int a2, int a3, int a4, int a5, int a6) { f5(a1, a2, a3, a4, a5); f1(a6); }
-    void g6(int a1, int a2, int a3, int a4, int a5, int a6) const { g5(a1, a2, a3, a4, a5); g1(a6); }
+    void f6(int a1, int a2, int a3, int a4, int a5, int a6)
+        { f5(a1, a2, a3, a4, a5); f1(a6); }
+    void g6(int a1, int a2, int a3, int a4, int a5, int a6)
+        const { g5(a1, a2, a3, a4, a5); g1(a6); }
 
-    void f7(int a1, int a2, int a3, int a4, int a5, int a6, int a7) { f6(a1, a2, a3, a4, a5, a6); f1(a7); }
-    void g7(int a1, int a2, int a3, int a4, int a5, int a6, int a7) const { g6(a1, a2, a3, a4, a5, a6); g1(a7); }
+    void f7(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
+        { f6(a1, a2, a3, a4, a5, a6); f1(a7); }
+    void g7(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
+        const { g6(a1, a2, a3, a4, a5, a6); g1(a7); }
 
-    void f8(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8) { f7(a1, a2, a3, a4, a5, a6, a7); f1(a8); }
-    void g8(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8) const { g7(a1, a2, a3, a4, a5, a6, a7); g1(a8); }
+    void f8(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8)
+        { f7(a1, a2, a3, a4, a5, a6, a7); f1(a8); }
+    void g8(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8)
+        const { g7(a1, a2, a3, a4, a5, a6, a7); g1(a8); }
 };
 
 int main()

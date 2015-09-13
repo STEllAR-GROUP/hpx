@@ -102,7 +102,8 @@ namespace hpx { namespace serialization { namespace detail
             return factory.get();
         }
 
-        void register_class(const std::type_info& typeinfo, const std::string& class_name,
+        void register_class(const std::type_info& typeinfo,
+            const std::string& class_name,
             const function_bunch_type& bunch)
         {
             if(!typeinfo.name() && std::string(typeinfo.name()).empty())

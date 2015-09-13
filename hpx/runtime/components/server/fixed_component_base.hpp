@@ -259,20 +259,5 @@ class fixed_component : public Component
 
 }}
 
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
-    // Fixed components are components
-    template <typename Component>
-    struct is_component<Component,
-            typename boost::enable_if<
-                boost::is_base_and_derived<
-                    detail::fixed_component_tag, Component
-                > >::type>
-      : boost::mpl::true_
-    {};
-}}
-
 #endif // HPX_F5D19D10_9D74_4DB9_9ABB_ECCF2FA54497
 

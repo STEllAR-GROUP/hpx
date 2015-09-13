@@ -19,7 +19,13 @@
 #include <boost/type_traits/is_enum.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <memory>
+
 #include <hpx/config/warnings_prefix.hpp>
+
+namespace hpx { namespace naming {
+    struct HPX_EXPORT gid_type;
+}}
 
 namespace hpx { namespace serialization
 {
@@ -29,15 +35,20 @@ namespace hpx { namespace serialization
         typedef basic_archive<output_archive> base_type;
         typedef std::map<const void *, boost::uint64_t> pointer_tracker;
 
+        typedef std::list<naming::gid_type> new_gids_type;
+        typedef std::map<naming::gid_type, new_gids_type> new_gids_map;
+
         template <typename Container>
         output_archive(Container & buffer,
             boost::uint32_t flags = 0U,
             boost::uint32_t dest_locality_id = ~0U,
             std::vector<serialization_chunk>* chunks = 0,
-            binary_filter* filter = 0)
+            binary_filter* filter = 0,
+            new_gids_map* new_gids = 0)
             : base_type(flags)
             , buffer_(new output_container<Container>(buffer, chunks, filter))
             , dest_locality_id_(dest_locality_id)
+            , new_gids_(new_gids)
         {
             // endianness needs to be saves separately as it is needed to
             // properly interpret the flags
@@ -63,6 +74,20 @@ namespace hpx { namespace serialization
         bool is_saving() const
         {
             return buffer_->is_saving();
+        }
+
+        bool is_future_awaiting() const
+        {
+            return buffer_->is_future_awaiting();
+        }
+
+        template <typename Future>
+        void await_future(Future const & f)
+        {
+            if(f.is_ready()) return;
+
+            buffer_->await_future(
+                *hpx::traits::future_access<Future>::get_shared_state(f));
         }
 
         template <typename T>
@@ -232,10 +257,15 @@ namespace hpx { namespace serialization
             return size_;
         }
 
+        void add_gid(naming::gid_type const & gid, naming::gid_type const & splitted_gid);
+
+        naming::gid_type get_new_gid(naming::gid_type const & gid);
+
     private:
         std::unique_ptr<erased_output_container> buffer_;
         pointer_tracker pointer_tracker_;
         boost::uint32_t dest_locality_id_;
+        new_gids_map * new_gids_;
     };
 
     BOOST_FORCEINLINE

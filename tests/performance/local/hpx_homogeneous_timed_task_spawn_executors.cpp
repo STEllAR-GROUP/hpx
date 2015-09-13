@@ -76,12 +76,14 @@ int hpx_main(
         throw std::invalid_argument("number of executors to use must be larger than 0");
 
     if (std::size_t(num_executors) > num_os_threads)
-        throw std::invalid_argument("number of executors to use must be smaller than number of OS threads");
+        throw std::invalid_argument("number of executors to use must be \
+                                        smaller than number of OS threads");
 
     std::size_t num_cores_per_executor = vm["cores"].as<int>();
 
     if ((num_executors - 1) * num_cores_per_executor > num_os_threads)
-        throw std::invalid_argument("number of cores per executor should not cause oversubscription");
+        throw std::invalid_argument("number of cores per executor should not \
+                                     cause oversubscription");
 
     if (0 == tasks)
         throw std::invalid_argument("count of 0 tasks specified\n");

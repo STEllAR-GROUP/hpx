@@ -65,6 +65,9 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct is_action;
 
+    template <typename Action, typename Enable = void>
+    struct is_continuation;
+
     // Customization point for action priority
     template <typename Action, typename Enable = void>
     struct action_priority;
@@ -127,9 +130,6 @@ namespace hpx { namespace traits
     struct is_future_tuple;
 
     template <typename Future, typename Enable = void>
-    struct serialize_as_future;
-
-    template <typename Future, typename Enable = void>
     struct acquire_future;
 
     template <typename Future, typename Enable = void>
@@ -176,10 +176,6 @@ namespace hpx { namespace traits
 
     template <typename T, typename Enable = void>
     struct is_executor_parameters;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
-    struct is_launch_policy;
 }}
 
 #endif

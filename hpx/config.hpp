@@ -7,20 +7,26 @@
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
-// We need to detect if user code include boost/config.hpp before including hpx/config.hpp
+// We need to detect if user code include boost/config.hpp before
+// including hpx/config.hpp
 // Everything else might lead to hard compile errors and possible very subtile bugs.
 #if defined(BOOST_CONFIG_HPP)
 #error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
 #endif
 
 #include <hpx/config/defines.hpp>
-#include <hpx/version.hpp>
+#include <hpx/config/version.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/constexpr.hpp>
-#include <hpx/config/cxx11_macros.hpp>
+
+#include <boost/version.hpp>
+
+#if BOOST_VERSION == 105400
+#include <cstdint> // Boost.Atomic has trouble finding [u]intptr_t
+#endif
 
 #if BOOST_VERSION < 105600
 #include <boost/exception/detail/attribute_noreturn.hpp>
@@ -29,11 +35,10 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-// On Windows, include winsock2.h as early as possible to work around a known
-// include-order issue causing trouble if winsock.h is included before
-// winsock2.h.
 #if defined(BOOST_MSVC)
-#include <WinSock2.h>
+// On Windows, make sure winsock.h is not included even if windows.h is
+// included before winsock2.h
+#define _WINSOCKAPI_
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -368,7 +373,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(BOOST_WINDOWS)
+#if defined(BOOST_WINDOWS) && _MSC_VER < 1900
 #  define snprintf _snprintf
 #endif
 
@@ -514,12 +519,14 @@
 #if defined(HPX_HAVE_SODIUM)
 #  define HPX_ROOT_CERTIFICATE_AUTHORITY_MSB         0x0000000100000001ULL
 #  define HPX_ROOT_CERTIFICATE_AUTHORITY_LSB         0x0000000000000005ULL
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB  0x0000000000000001ULL      // this is made locality specific
+#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB  0x0000000000000001ULL
+// this is made locality specific
 #  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB  0x0000000000000006ULL
 #endif
 
 #if !defined(HPX_NO_DEPRECATED)
-#  define HPX_DEPRECATED_MSG "This function is deprecated and will be removed in the future."
+#  define HPX_DEPRECATED_MSG \
+   "This function is deprecated and will be removed in the future."
 #  if defined(BOOST_MSVC)
 #    define HPX_DEPRECATED(x) __declspec(deprecated(x))
 #  elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
@@ -531,8 +538,5 @@
 #    define HPX_DEPRECATED(x)  /**/
 #  endif
 #endif
-
-///////////////////////////////////////////////////////////////////////////////
-#include <hpx/config/defaults.hpp>
 
 #endif

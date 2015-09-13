@@ -193,8 +193,10 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 
 void test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 {
-    set_description("test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point");
-    timed_test(&do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point, 1);
+    set_description("test_thread_no_interrupt_if_interrupts_disabled_at\
+                    _interruption_point");
+    timed_test
+        (&do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point,1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

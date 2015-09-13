@@ -9,6 +9,7 @@
 #include <hpx/traits.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 
