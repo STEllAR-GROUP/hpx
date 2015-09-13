@@ -12,8 +12,6 @@
 
 #include <vector>
 
-#include <boost/noncopyable.hpp>
-
 namespace hpx { namespace plugins { namespace parcel { namespace detail
 {
     class message_buffer
@@ -34,24 +32,6 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
         message_buffer(std::size_t max_messages)
           : max_messages_(max_messages)
         {}
-
-        message_buffer(message_buffer && rhs)
-          : dests_(std::move(rhs.dests_)),
-            messages_(std::move(rhs.messages_)),
-            handlers_(std::move(rhs.handlers_)),
-            max_messages_(rhs.max_messages_)
-        {}
-
-        message_buffer& operator=(message_buffer && rhs)
-        {
-            if (&rhs != this) {
-                max_messages_ = rhs.max_messages_;
-                dests_    = std::move(rhs.dests_);
-                messages_ = std::move(rhs.messages_);
-                handlers_ = std::move(rhs.handlers_);
-            }
-            return *this;
-        }
 
         void operator()(parcelset::parcelport* set)
         {
