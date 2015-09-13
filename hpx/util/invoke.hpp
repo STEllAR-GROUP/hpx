@@ -47,7 +47,8 @@ namespace hpx { namespace util
 
             template <typename F, typename T0>
             inline typename std::enable_if<
-                std::is_base_of<C, typename std::decay<T0>::type>::value,
+                std::is_base_of<C, typename std::decay<T0>::type>::value
+             && !std::is_lvalue_reference<T0>::value,
                 typename util::result_of<F&&(T0&&)>::type
             >::type
             operator()(F f, T0&& v0)
