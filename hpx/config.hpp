@@ -35,7 +35,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-#if defined(BOOST_MSVC)
+#if defined(_MSC_VER)
 // On Windows, make sure winsock.h is not included even if windows.h is
 // included before winsock2.h
 #define WIN32_LEAN_AND_MEAN
@@ -469,7 +469,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Older Boost versions do not have BOOST_NOINLINE defined
 #if !defined(BOOST_NOINLINE)
-#  if defined(BOOST_MSVC)
+#  if defined(_MSC_VER)
 #    define BOOST_NOINLINE __declspec(noinline)
 #  else
 #    define BOOST_NOINLINE
@@ -528,7 +528,7 @@
 #if !defined(HPX_NO_DEPRECATED)
 #  define HPX_DEPRECATED_MSG \
    "This function is deprecated and will be removed in the future."
-#  if defined(BOOST_MSVC)
+#  if defined(_MSC_VER)
 #    define HPX_DEPRECATED(x) __declspec(deprecated(x))
 #  elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
 #    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
