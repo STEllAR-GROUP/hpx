@@ -65,8 +65,11 @@ if(HPX_WITH_PARCELPORT_MPI)
         "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/header.hpp"
         "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/locality.hpp"
         "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/mpi_environment.hpp"
-        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
         "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver_connection.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender_connection.hpp"
+        "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
       DEPENDENCIES
         ${_mpi_libraries}
       FOLDER "Core/Plugins/Parcelport/MPI")

@@ -105,7 +105,8 @@ public:
                 memory_order success_order,
                 memory_order failure_order) volatile
         {
-                return compare_exchange_strong(expected, desired, success_order, failure_order);
+                return compare_exchange_strong(expected, desired, success_order,
+                    failure_order);
     }
     T exchange(T replacement, memory_order order=memory_order_seq_cst) volatile
     {
@@ -115,11 +116,12 @@ public:
                 return o;
         // Note that ARM has an atomic swap instruction that we could use here:
         //   T oldval;
-        //   asm volatile ("swp\t%0, %1, [%2]" : "=&r"(oldval) : "r" (replacement), "r" (&i) : "memory");
+        //   asm volatile ("swp\t%0, %1, [%2]" : "=&r"(oldval) : "r" (replacement),
+        //        "r" (&i) : "memory");
         //   return oldval;
-        // This instruction is deprecated in architecture >= 6.  I'm unsure how inefficient
-        // its implementation is on those newer architectures.  I don't think this would gain
-        // much since exchange() is not used often.
+        // This instruction is deprecated in architecture >= 6.  I'm unsure
+        //  how inefficient its implementation is on those newer architectures.
+        //  I don't think this would gain much since exchange() is not used often.
     }
 
     bool is_lock_free(void) const volatile {return true;}
@@ -133,7 +135,8 @@ private:
 };
 
 template<typename T>
-class platform_atomic_integral<T, 4> : public build_atomic_from_exchange<atomic_linux_arm_4<T> > {
+class platform_atomic_integral<T, 4>
+    : public build_atomic_from_exchange<atomic_linux_arm_4<T> > {
 public:
     typedef build_atomic_from_exchange<atomic_linux_arm_4<T> > super;
     explicit platform_atomic_integral(T v) : super(v) {}
@@ -142,7 +145,8 @@ public:
 
 
 template<typename T>
-class platform_atomic_integral<T, 1> : public build_atomic_from_larger_type<atomic_linux_arm_4<uint32_t>, T > {
+class platform_atomic_integral<T, 1>
+    : public build_atomic_from_larger_type<atomic_linux_arm_4<uint32_t>, T > {
 public:
     typedef build_atomic_from_larger_type<atomic_linux_arm_4<uint32_t>, T> super;
     explicit platform_atomic_integral(T v) : super(v) {}
@@ -151,7 +155,8 @@ public:
 
 
 template<typename T>
-class platform_atomic_integral<T, 2> : public build_atomic_from_larger_type<atomic_linux_arm_4<uint32_t>, T > {
+class platform_atomic_integral<T, 2>
+    : public build_atomic_from_larger_type<atomic_linux_arm_4<uint32_t>, T > {
 public:
     typedef build_atomic_from_larger_type<atomic_linux_arm_4<uint32_t>, T> super;
     explicit platform_atomic_integral(T v) : super(v) {}

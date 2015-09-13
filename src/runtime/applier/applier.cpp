@@ -381,7 +381,8 @@ namespace hpx { namespace applier
         error_code& ec) const
     {
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_localities(raw_prefixes, components::component_invalid, ec))
+        if (!parcel_handler_.get_raw_localities(raw_prefixes,
+            components::component_invalid, ec))
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)
@@ -433,7 +434,7 @@ namespace hpx { namespace applier
     }
 
     // schedule threads based on given parcel
-    void applier::schedule_action(parcelset::parcel p)
+    void applier::schedule_action(parcelset::parcel p, std::size_t num_thread)
     {
         // fetch the set of destinations
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
@@ -449,7 +450,8 @@ namespace hpx { namespace applier
         if (client.was_object_migrated(ids, size))
         {
             client.route(std::move(p), util::bind(&detail::parcel_sent_handler,
-                std::ref(parcel_handler_), util::placeholders::_1, util::placeholders::_2));
+                std::ref(parcel_handler_), util::placeholders::_1,
+                util::placeholders::_2));
             return;
         }
 
@@ -543,21 +545,23 @@ namespace hpx { namespace applier
             if (!cont) {
                 // No continuation is to be executed, register the plain
                 // action and the local-virtual address.
-                act->schedule_thread(ids[i], lva, threads::pending);
+                act->schedule_thread(ids[i], lva, threads::pending, num_thread);
             }
             else {
                 // This parcel carries a continuation, register a wrapper
                 // which first executes the original thread function as
                 // required by the action and triggers the continuations
                 // afterwards.
-                act->schedule_thread(std::move(cont), ids[i], lva, threads::pending);
+                act->schedule_thread(std::move(cont), ids[i], lva,
+                    threads::pending, num_thread);
             }
         }
     }
 
     applier& get_applier()
     {
-        HPX_ASSERT(NULL != applier::applier_.get());   // should have been initialized
+        // should have been initialized
+        HPX_ASSERT(NULL != applier::applier_.get());
         return **applier::applier_;
     }
 

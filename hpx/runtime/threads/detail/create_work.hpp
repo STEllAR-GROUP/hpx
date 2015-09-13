@@ -86,11 +86,13 @@ namespace hpx { namespace threads { namespace detail
             thread_priority_boost == data.priority)
         {
             // For critical priority threads, create the thread immediately.
-            scheduler->create_thread(data, 0, initial_state, true, ec, data.num_os_thread);
+            scheduler->create_thread(data, 0, initial_state, true, ec,
+                data.num_os_thread);
         }
         else {
             // Create a task description for the new thread.
-            scheduler->create_thread(data, 0, initial_state, false, ec, data.num_os_thread);
+            scheduler->create_thread(data, 0, initial_state, false, ec,
+                data.num_os_thread);
         }
     }
 }}}

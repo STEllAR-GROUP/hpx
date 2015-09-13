@@ -240,7 +240,8 @@ namespace hpx { namespace components
         /// \note This function is part of the invocation policy implemented by
         ///       this class
         ///
-        template <typename Action, typename Continuation, typename Callback, typename ...Ts>
+        template <typename Action, typename Continuation, typename Callback,
+            typename ...Ts>
         bool apply_cb(Continuation && c,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {

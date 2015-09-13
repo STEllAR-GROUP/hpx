@@ -17,6 +17,8 @@
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/identity.hpp>
 
+#include <string>
+
 namespace hpx { namespace serialization
 {
     namespace detail
@@ -43,7 +45,8 @@ namespace hpx { namespace serialization
                     t.serialize(ar, 0);
                 }
 
-                static void call(hpx::serialization::output_archive& ar, const T& t, unsigned)
+                static void call(hpx::serialization::output_archive& ar,
+                    const T& t, unsigned)
                 {
                     t.serialize(ar, 0);
                 }

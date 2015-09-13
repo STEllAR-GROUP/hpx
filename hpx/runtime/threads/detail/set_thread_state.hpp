@@ -59,7 +59,8 @@ namespace hpx { namespace threads { namespace detail
 
         // just retry, set_state will create new thread if target is still active
         error_code ec(lightweight);      // do not throw
-        detail::set_thread_state(thrd, newstate, newstate_ex, priority, std::size_t(-1), ec);
+        detail::set_thread_state(thrd, newstate, newstate_ex, priority,
+            std::size_t(-1), ec);
         return terminated;
     }
 
@@ -88,7 +89,8 @@ namespace hpx { namespace threads { namespace detail
         if (!thrd) {
             if (&ec != &throws)
                 ec = make_success_code();
-            return thread_state(terminated);     // this thread has already been terminated
+            return thread_state(terminated);
+            // this thread has already been terminated
         }
 
         thread_state previous_state;
@@ -211,7 +213,8 @@ namespace hpx { namespace threads { namespace detail
         if (new_state == pending) {
             // REVIEW: Passing a specific target thread may interfere with the
             // round robin queuing.
-            thrd->get_scheduler_base()->schedule_thread(thrd.get(), thread_num, priority);
+            thrd->get_scheduler_base()->schedule_thread(thrd.get(),
+                thread_num, priority);
             thrd->get_scheduler_base()->do_some_work(thread_num);
         }
 

@@ -17,7 +17,8 @@
 #ifndef JT28092007_after_being_destroyed_HPP_DEFINED
 #define JT28092007_after_being_destroyed_HPP_DEFINED
 
-// see "Using the logger(s)/filter(s) after they've been destroyed" section in the documentation
+// see "Using the logger(s)/filter(s) after they've been destroyed" section in
+// the documentation
 #error this is obsolete
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
@@ -26,7 +27,9 @@
 
 #include <hpx/util/logging/detail/fwd.hpp>
 
-#if !defined(HPX_LOG_AFTER_BEING_DESTROYED_WRITE_TO_FUNCTION) && !defined(HPX_LOG_AFTER_BEING_DESTROYED_IGNORE) && !defined(HPX_LOG_AFTER_BEING_DESTROYED_LEAK_LOGGER)
+#if !defined(HPX_LOG_AFTER_BEING_DESTROYED_WRITE_TO_FUNCTION) \
+    && !defined(HPX_LOG_AFTER_BEING_DESTROYED_IGNORE) \
+    && !defined(HPX_LOG_AFTER_BEING_DESTROYED_LEAK_LOGGER)
     // default
     #define HPX_LOG_AFTER_BEING_DESTROYED_WRITE_TO_FUNCTION
 #endif
@@ -46,7 +49,8 @@ namespace destination { template<class T > struct msg_type; }
         deals with what to do with the logger, if used after it's been destroyed
 
     @remarks
-        we need to make this a template, in order to postpone figuring out the gather_msg msg_type
+        we need to make this a template, in order to postpone figuring
+        out the gather_msg msg_type
         (so that we can wait until the user has specified the msg_type
 
     */
@@ -63,7 +67,8 @@ namespace destination { template<class T > struct msg_type; }
             m_after_being_destroyed(msg);
         }
 
-        after_being_destroyed_defer_to_function () : m_is_destroyed(false), m_after_being_destroyed(&nothing) {}
+        after_being_destroyed_defer_to_function () : m_is_destroyed(false),
+            m_after_being_destroyed(&nothing) {}
         ~after_being_destroyed_defer_to_function () {
             m_is_destroyed = true;
         }

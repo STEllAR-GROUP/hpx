@@ -9,7 +9,8 @@
 
 #include <hpx/config.hpp>
 
-#if defined(BOOST_NO_SFINAE_EXPR) || defined(BOOST_NO_CXX11_DECLTYPE_N3276) // C++03
+#if defined(BOOST_NO_SFINAE_EXPR) || !defined(HPX_HAVE_CXX11_DECLTYPE_N3276) \
+    || defined(__INTEL_COMPILER) // C++03
 
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/decay.hpp>
@@ -27,7 +28,8 @@
 #include <utility>
 
 // The technique implemented here was devised by Eric Niebler, see:
-// http://www.boost.org/doc/libs/1_54_0/doc/html/proto/appendices.html#boost_proto.appendices.implementation.function_arity
+// http://www.boost.org/doc/libs/1_54_0/doc/html/proto/appendices.html
+// #boost_proto.appendices.implementation.function_arity
 namespace hpx { namespace traits
 {
     namespace detail
@@ -44,7 +46,7 @@ namespace hpx { namespace traits
         };
 
         template <std::size_t Arity, typename Is =
-            typename util::detail::make_index_pack<Arity>::type>
+            typename hpx::util::detail::make_index_pack<Arity>::type>
         struct make_fallback_signature;
 
         template <std::size_t /*I*/>
@@ -54,7 +56,8 @@ namespace hpx { namespace traits
         };
 
         template <std::size_t Arity, std::size_t ...Is>
-        struct make_fallback_signature<Arity, util::detail::pack_c<std::size_t, Is...> >
+        struct make_fallback_signature<Arity,
+            hpx::util::detail::pack_c<std::size_t, Is...> >
         {
             typedef fallback_call const& type(
                 typename make_fallback_argument<Is>::type...);
@@ -91,7 +94,7 @@ namespace hpx { namespace traits
 
         template <typename T, std::size_t Arity>
         struct callable_wrapper<boost::reference_wrapper<T>, Arity>
-          : callable_wrapper<typename util::decay<T>::type, Arity>
+          : callable_wrapper<typename hpx::util::decay<T>::type, Arity>
         {};
 
         template <typename R, typename ...Ps, std::size_t Arity>
@@ -147,9 +150,9 @@ namespace hpx { namespace traits
         template <typename F, typename ...Ts>
         struct is_callable_impl
         {
-            typedef typename util::detail::qualify_as<
+            typedef typename hpx::util::detail::qualify_as<
                     detail::callable_wrapper<
-                        typename util::decay<F>::type, sizeof...(Ts)
+                        typename hpx::util::decay<F>::type, sizeof...(Ts)
                     >, F
                 >::type callable_wrapper;
             typedef char (&no_type)[1];
@@ -198,7 +201,7 @@ namespace hpx { namespace traits
 
         template <typename F, typename... A>
         struct is_callable_impl<F(A...)
-          , typename util::always_void<decltype(
+          , typename hpx::util::always_void<decltype(
                 boost::declval<F>()(boost::declval<A>()...)
             )>::type
         > : boost::mpl::true_
@@ -206,7 +209,7 @@ namespace hpx { namespace traits
 
         template <typename F, typename C>
         struct is_callable_impl<F(C)
-          , typename util::always_void<decltype(
+          , typename hpx::util::always_void<decltype(
                 boost::declval<C>().*boost::declval<F>()
             )>::type
         > : boost::mpl::true_
@@ -214,7 +217,7 @@ namespace hpx { namespace traits
 
         template <typename F, typename C>
         struct is_callable_impl<F(C)
-          , typename util::always_void<decltype(
+          , typename hpx::util::always_void<decltype(
                 (*boost::declval<C>()).*boost::declval<F>()
             )>::type
         > : boost::mpl::true_
@@ -224,10 +227,10 @@ namespace hpx { namespace traits
         struct is_callable_impl<F(C)
           , typename boost::enable_if_c<
                 boost::is_reference_wrapper<
-                    typename util::decay<C>::type
+                    typename hpx::util::decay<C>::type
                 >::value
             >::type
-          , typename util::always_void<decltype(
+          , typename hpx::util::always_void<decltype(
                 (boost::declval<C>().get()).*boost::declval<F>()
             )>::type
         > : boost::mpl::true_
@@ -235,7 +238,7 @@ namespace hpx { namespace traits
 
         template <typename F, typename C, typename... A>
         struct is_callable_impl<F(C, A...)
-          , typename util::always_void<decltype(
+          , typename hpx::util::always_void<decltype(
                 (boost::declval<C>().*boost::declval<F>())
                     (boost::declval<A>()...)
             )>::type
@@ -244,7 +247,7 @@ namespace hpx { namespace traits
 
         template <typename F, typename C, typename... A>
         struct is_callable_impl<F(C, A...)
-          , typename util::always_void<decltype(
+          , typename hpx::util::always_void<decltype(
                 ((*boost::declval<C>()).*boost::declval<F>())
                     (boost::declval<A>()...)
             )>::type
@@ -255,10 +258,10 @@ namespace hpx { namespace traits
         struct is_callable_impl<F(C, A...)
           , typename boost::enable_if_c<
                 boost::is_reference_wrapper<
-                    typename util::decay<C>::type
+                    typename hpx::util::decay<C>::type
                 >::value
             >::type
-          , typename util::always_void<decltype(
+          , typename hpx::util::always_void<decltype(
                 ((boost::declval<C>().get()).*boost::declval<F>())
                     (boost::declval<A>()...)
             )>::type
@@ -270,11 +273,11 @@ namespace hpx { namespace traits
         struct is_callable_impl<F(A...)
           , typename boost::enable_if_c<
                 boost::is_reference_wrapper<
-                    typename util::decay<F>::type
+                    typename hpx::util::decay<F>::type
                 >::value
             >::type
         > : is_callable_impl<
-                typename util::decay_unwrap<F>::type&(A...)
+                typename hpx::util::decay_unwrap<F>::type&(A...)
             >
         {};
     }
@@ -306,7 +309,9 @@ namespace hpx { namespace traits { namespace detail
     template <typename F, typename ...Ts>
     struct is_deferred_callable<F(Ts...)>
       : is_callable<
-            typename util::decay<F>::type(typename util::decay<Ts>::type...)
+            typename hpx::util::decay<F>::type(
+                typename hpx::util::decay<Ts>::type...
+            )
         >
     {};
 }}}

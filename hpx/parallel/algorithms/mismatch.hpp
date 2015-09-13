@@ -388,7 +388,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                         tok.cancel(i);
                                 });
                         },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
+                        [=](std::vector<hpx::future<void> > &&) mutable ->
+                            std::pair<FwdIter1, FwdIter2>
                         {
                             difference_type mismatched =
                                 static_cast<difference_type>(tok.get_data());

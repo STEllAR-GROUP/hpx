@@ -348,52 +348,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         {
             return bulk_execute_helper::call(0, exec, std::forward<F>(f), shape);
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        struct os_thread_count_helper
-        {
-            template <typename Executor>
-            static std::size_t call(wrap_int, Executor& exec)
-            {
-                return hpx::get_os_thread_count();
-            }
-
-            template <typename Executor>
-            static auto call(int, Executor& exec)
-            ->  decltype(exec.os_thread_count())
-            {
-                return exec.os_thread_count();
-            }
-        };
-
-        template <typename Executor>
-        std::size_t call_os_thread_count(Executor& exec)
-        {
-            return os_thread_count_helper::call(0, exec);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        struct has_pending_closures_helper
-        {
-            template <typename Executor>
-            static auto call(wrap_int, Executor& exec) -> bool
-            {
-                return false;   // assume stateless scheduling
-            }
-
-            template <typename Executor>
-            static auto call(int, Executor& exec)
-                ->  decltype(exec.has_pending_closures())
-            {
-                return exec.has_pending_closures();
-            }
-        };
-
-        template <typename Executor>
-        bool call_has_pending_closures(Executor& exec)
-        {
-            return has_pending_closures_helper::call(0, exec);
-        }
         /// \endcond
     }
 
@@ -604,33 +558,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 #endif
         {
             return detail::call_bulk_execute(exec, std::forward<F>(f), shape);
-        }
-
-        /// Retrieve the number of (kernel-)threads used by the associated
-        /// executor.
-        ///
-        /// \param exec  [in] The executor object to use for scheduling of the
-        ///              function \a f.
-        ///
-        /// \note This calls exec.os_thread_count() if it exists;
-        ///       otherwise it executes hpx::get_os_thread_count().
-        ///
-        static std::size_t os_thread_count(executor_type const& exec)
-        {
-            return detail::call_os_thread_count(exec);
-        }
-
-        /// Retrieve whether this executor has operations pending or not.
-        ///
-        /// \param exec  [in] The executor object to use for scheduling of the
-        ///              function \a f.
-        ///
-        /// \note If the executor does not expose this information, this call
-        ///       will always return \a false
-        ///
-        static bool has_pending_closures(executor_type& exec)
-        {
-            return detail::call_has_pending_closures(exec);
         }
     };
 

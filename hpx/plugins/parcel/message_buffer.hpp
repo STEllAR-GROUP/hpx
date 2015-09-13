@@ -59,7 +59,8 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
                 set->put_parcels(dests_, std::move(messages_), std::move(handlers_));
         }
 
-        message_buffer_append_state append(parcelset::locality const & dest, parcelset::parcel p,
+        message_buffer_append_state append(parcelset::locality const & dest,
+            parcelset::parcel p,
             parcelset::parcelport::write_handler_type f)
         {
             HPX_ASSERT(messages_.size() == handlers_.size());

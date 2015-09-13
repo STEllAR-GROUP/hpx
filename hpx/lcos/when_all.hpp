@@ -176,8 +176,8 @@ namespace hpx { namespace lcos
 
         template <typename T>
         struct when_all_result<util::tuple<T>,
-            typename util::always_void<
-                typename traits::is_future_range<T>::type
+            typename std::enable_if<
+                traits::is_future_range<T>::value
             >::type>
         {
             typedef T type;
@@ -424,9 +424,9 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
-    lcos::future<
+    typename detail::when_all_frame<
         hpx::util::tuple<typename traits::acquire_future<Ts>::type...>
-    >
+    >::type
     when_all(Ts&&... ts)
     {
         typedef hpx::util::tuple<

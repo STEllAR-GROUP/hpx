@@ -61,8 +61,9 @@ namespace hpx { namespace components
         component_type rhs_base = get_base_type(rhs);
 
         // special case for lco's
-        if ((lhs_base == component_base_lco && rhs_base == component_base_lco_with_value) ||
-            (rhs_base == component_base_lco && lhs_base == component_base_lco_with_value))
+        if ((lhs_base == component_base_lco && rhs_base == component_base_lco_with_value)
+            || (rhs_base == component_base_lco && lhs_base ==
+                component_base_lco_with_value))
         {
             return true;
         }

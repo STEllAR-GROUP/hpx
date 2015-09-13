@@ -337,7 +337,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
+    ///                     \a f is invoked.
     ///
     /// The application of function objects in parallel algorithm
     /// invoked with an execution policy object of type
@@ -350,7 +350,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a for_each_n algorithm returns a
+    /// \returns  The \a for_each algorithm returns a
     ///           \a hpx::future<InIter> if the execution policy is of
     ///           type
     ///           \a sequential_task_execution_policy or

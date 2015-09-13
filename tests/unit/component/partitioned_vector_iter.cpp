@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/vector.hpp>
+#include <hpx/include/partitioned_vector.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
@@ -15,18 +15,19 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
-HPX_REGISTER_VECTOR(double);
-HPX_REGISTER_VECTOR(int);
+HPX_REGISTER_PARTITIONED_VECTOR(double);
+HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void test_global_iteration(hpx::vector<T>& v, std::size_t size, T const& val)
+void test_global_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
+    T const& val)
 {
-    typedef typename hpx::vector<T>::iterator iterator;
+    typedef typename hpx::partitioned_vector<T>::iterator iterator;
     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
     HPX_TEST(traits::is_segmented_iterator::value);
 
-    typedef typename hpx::vector<T>::const_iterator const_iterator;
+    typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
     typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
     HPX_TEST(const_traits::is_segmented_iterator::value);
 
@@ -60,17 +61,17 @@ void test_global_iteration(hpx::vector<T>& v, std::size_t size, T const& val)
 
 // test segmented iteration
 template <typename T>
-void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
+void test_segmented_iteration(hpx::partitioned_vector<T>& v, std::size_t size,
     std::size_t parts)
 {
-    typedef typename hpx::vector<T>::iterator iterator;
+    typedef typename hpx::partitioned_vector<T>::iterator iterator;
     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
     typedef typename traits::segment_iterator segment_iterator;
     typedef typename traits::local_segment_iterator local_segment_iterator;
     typedef typename traits::local_iterator local_iterator;
     typedef typename traits::local_raw_iterator local_raw_iterator;
 
-    typedef typename hpx::vector<T>::const_iterator const_iterator;
+    typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
     typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
     typedef typename const_traits::segment_iterator const_segment_iterator;
     typedef typename const_traits::local_segment_iterator const_local_segment_iterator;
@@ -158,8 +159,10 @@ void test_segmented_iteration(hpx::vector<T>& v, std::size_t size,
         for (const_iterator it = v.cbegin(locality_id); it != end; ++it, ++count)
         {
             std::size_t i = 42;
-            const_local_iterator loc_end = const_traits::end(const_traits::segment(it));
-            for (const_local_iterator lcit = const_traits::begin(const_traits::segment(it));
+            const_local_iterator loc_end =
+                const_traits::end(const_traits::segment(it));
+            for (const_local_iterator lcit =
+                const_traits::begin(const_traits::segment(it));
                  lcit != loc_end; ++lcit, ++i)
             {
                 HPX_TEST_EQ(*lcit, T(i));
@@ -235,7 +238,7 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
 
     {
         // create empty vector
-        hpx::vector<T> v;
+        hpx::partitioned_vector<T> v;
 
         test_global_iteration(v, 0, T());
         test_segmented_iteration(v, 0, 0);
@@ -245,10 +248,10 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         // create and connect to empty vector
         std::string empty(prefix_ + "empty");
 
-        hpx::vector<T> base;
+        hpx::partitioned_vector<T> base;
         base.register_as_sync(empty);
 
-        hpx::vector<T> v;
+        hpx::partitioned_vector<T> v;
         v.connect_to_sync(empty);
 
         test_global_iteration(v, 0, T());
@@ -257,7 +260,7 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
 
     {
         // create vector with initial size != 0
-        hpx::vector<T> v(size);
+        hpx::partitioned_vector<T> v(size);
 
         test_global_iteration(v, size, T());
         test_segmented_iteration(v, size, 1);
@@ -267,10 +270,10 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         // create vector with initial size != 0
         std::string size_(prefix_ + "size");
 
-        hpx::vector<T> base(size);
+        hpx::partitioned_vector<T> base(size);
         base.register_as_sync(size_);
 
-        hpx::vector<T> v;
+        hpx::partitioned_vector<T> v;
         v.connect_to_sync(size_);
 
         test_global_iteration(v, size, T());
@@ -279,7 +282,7 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
 
     {
         // create vector with initial size and values
-        hpx::vector<T> v(size, T(999));
+        hpx::partitioned_vector<T> v(size, T(999));
 
         test_global_iteration(v, size, T(999));
         test_segmented_iteration(v, size, 1);
@@ -289,10 +292,10 @@ void trivial_test_without_policy(std::size_t size, char const* prefix)
         // create vector with initial size and values
         std::string size_value(prefix_ + "size_value");
 
-        hpx::vector<T> base(size, T(999));
+        hpx::partitioned_vector<T> base(size, T(999));
         base.register_as_sync(size_value);
 
-        hpx::vector<T> v;
+        hpx::partitioned_vector<T> v;
         v.connect_to_sync(size_value);
 
         test_global_iteration(v, size, T(999));
@@ -307,7 +310,7 @@ void trivial_test_with_policy(std::size_t size, std::size_t parts,
     std::string prefix_(prefix);
 
     {
-        hpx::vector<T> v(size, policy);
+        hpx::partitioned_vector<T> v(size, policy);
 
         test_global_iteration(v, size, T(0));
         test_segmented_iteration(v, size, parts);
@@ -316,10 +319,10 @@ void trivial_test_with_policy(std::size_t size, std::size_t parts,
     {
         std::string policy_(prefix_ + "policy");
 
-        hpx::vector<T> base(size, policy);
+        hpx::partitioned_vector<T> base(size, policy);
         base.register_as_sync(policy_);
 
-        hpx::vector<T> v;
+        hpx::partitioned_vector<T> v;
         v.connect_to_sync(policy_);
 
         test_global_iteration(v, size, T(0));
@@ -327,7 +330,7 @@ void trivial_test_with_policy(std::size_t size, std::size_t parts,
     }
 
     {
-        hpx::vector<T> v(size, T(999), policy);
+        hpx::partitioned_vector<T> v(size, T(999), policy);
 
         test_global_iteration(v, size, T(999));
         test_segmented_iteration(v, size, parts);
@@ -336,10 +339,10 @@ void trivial_test_with_policy(std::size_t size, std::size_t parts,
     {
         std::string policy_value(prefix_ + "policy_value");
 
-        hpx::vector<T> base(size, T(999), policy);
+        hpx::partitioned_vector<T> base(size, T(999), policy);
         base.register_as_sync(policy_value);
 
-        hpx::vector<T> v;
+        hpx::partitioned_vector<T> v;
         v.connect_to_sync(policy_value);
 
         test_global_iteration(v, size, T(999));
@@ -357,7 +360,8 @@ void trivial_tests()
 
     trivial_test_with_policy<T>(length, 1, hpx::container_layout, "test1");
     trivial_test_with_policy<T>(length, 3, hpx::container_layout(3), "test2");
-    trivial_test_with_policy<T>(length, 3, hpx::container_layout(3, localities), "test3");
+    trivial_test_with_policy<T>(length, 3,
+        hpx::container_layout(3, localities), "test3");
     trivial_test_with_policy<T>(length, localities.size(),
         hpx::container_layout(localities), "test4");
 }

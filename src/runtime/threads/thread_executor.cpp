@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/lcos/local/once.hpp>
 #include <hpx/util/reinitializable_static.hpp>
@@ -13,6 +14,15 @@
 
 namespace hpx { namespace threads
 {
+    namespace detail
+    {
+        mask_cref_type executor_base::get_pu_mask(topology const& topology,
+                std::size_t num_thread) const
+        {
+            return get_thread_manager().get_pu_mask(topology, num_thread);
+        }
+    }
+
     scheduled_executor& scheduled_executor::default_executor()
     {
         typedef util::reinitializable_static<

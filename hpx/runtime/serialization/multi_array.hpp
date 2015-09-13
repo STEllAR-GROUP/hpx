@@ -22,7 +22,8 @@ namespace hpx { namespace serialization
     }
 
     template <class T, std::size_t N, class Allocator>
-    void save(output_archive& ar, const boost::multi_array<T, N, Allocator>& marray, unsigned)
+    void save(output_archive& ar, const boost::multi_array<T, N,
+        Allocator>& marray, unsigned)
     {
         ar & make_array(marray.shape(), marray.num_dimensions());
         ar & make_array(marray.data(), marray.num_elements());

@@ -37,13 +37,15 @@
 #include <hpx/util/logging/format/formatter/high_precision_time.hpp>
 namespace hpx { namespace util { namespace logging { namespace detail {
     typedef formatter::high_precision_time formatter_time_type ;
-    typedef formatter::high_precision_time_t<formatter::do_convert_format::append> formatter_time_type_append ;
+    typedef formatter::high_precision_time_t<formatter::do_convert_format::append>
+        formatter_time_type_append ;
 }}}}
 // #else
 // #include <hpx/util/logging/format/formatter/time.hpp>
 // namespace hpx { namespace util { namespace logging { namespace detail {
 //     typedef formatter::time formatter_time_type ;
-//     typedef formatter::time_t<formatter::do_convert_format::append> formatter_time_type_append ;
+//     typedef formatter::time_t<formatter::do_convert_format::append>
+//     formatter_time_type_append ;
 // }}}}
 // #endif
 
@@ -51,7 +53,8 @@ namespace hpx { namespace util { namespace logging { namespace detail {
 namespace hpx { namespace util { namespace logging { namespace writer {
 
 /**
-@brief Composed of a named formatter and a named destinations. Thus, you can specify the formatting and destinations as strings
+@brief Composed of a named formatter and a named destinations.
+Thus, you can specify the formatting and destinations as strings
 
 @code
 #include <hpx/util/logging/format/named_write.hpp>
@@ -61,11 +64,13 @@ namespace hpx { namespace util { namespace logging { namespace writer {
 Contains a very easy interface for using @ref manipulator "formatters and destinations":
 - at construction, specify 2 params: the %formatter string and the destinations string
 
-Setting the @ref manipulator "formatters and destinations" to write to is extremely simple:
+Setting the @ref manipulator "formatters and destinations" to
+write to is extremely simple:
 
 @code
 // Set the formatters (first param) and destinatins (second step) in one step
-g_l()->writer().write("%time%($hh:$mm.$ss.$mili) [%idx%] |\n", "cout file(out.txt) debug");
+g_l()->writer().write("%time%($hh:$mm.$ss.$mili) [%idx%] |\n",
+"cout file(out.txt) debug");
 
 // set the formatter(s)
 g_l()->writer().format("%time%($hh:$mm.$ss.$mili) [%idx%] |\n");
@@ -84,9 +89,11 @@ g_l()->writer().destination("cout file(out.txt) debug");
     - <tt>"%time%"</tt> - writes the time (formatter::high_precision_time)
     - <tt>"%thread_id%"</tt> - writes the thread id (formatter::thread_id)
     - if you want to write @c "%", double it, like this: @c "%%"
-- @c "|" is used to specify the original message. What is before it, is prepended to the message, what is after, is appended to the message
+- @c "|" is used to specify the original message. What is before it,
+is prepended to the message, what is after, is appended to the message
 - If a formatter is configurable, append @em (params) to it
-  - For now, only @c "%time%" is configurable. For instance, @c "%time%($hh:$mm.$ss.$mili)" writes time like @c "21:14.24.674"
+  - For now, only @c "%time%" is configurable. For instance,
+  @c "%time%($hh:$mm.$ss.$mili)" writes time like @c "21:14.24.674"
 
 Example:
 @code
@@ -110,34 +117,41 @@ The output can look like:
 - Available destinations
   - <tt>"cout"</tt> - writes to std::cout (destination::cout)
   - <tt>"cerr"</tt> - writes to std::cerr (destination::cerr)
-  - <tt>"debug"</tt> - writes to the debug window: OutputDebugString in Windows, console on Linux (destination::dbg_window)
+  - <tt>"debug"</tt> - writes to the debug window: OutputDebugString in Windows,
+  console on Linux (destination::dbg_window)
   - <tt>"file"</tt> - writes to a file (destination::file)
   - <tt>"file2"</tt> - writes to a second file (destination::file)
   - <tt>"rol_file"</tt> - writes to a rolling file (destination::rolling_file)
   - <tt>"rol_file2"</tt> - writes to a second rolling file (destination::rolling_file)
 - If a destination is configurable, append @em (params) to it
   - Right now, @c "file", @c "file2", @c "rol_file" and @c "rol_file2" are configurable
-    - Append <tt>(</tt><em>filename</em><tt>)</tt> to them to specify the file name. Example: @c "file(out.txt)" will write to the out.txt file
+    - Append <tt>(</tt><em>filename</em><tt>)</tt> to them to specify the file name.
+    Example: @c "file(out.txt)" will write to the out.txt file
 
 Examples:
 - <tt>"file(out.txt) cout"</tt> - will write to a file called out.txt and to cout
 - <tt>"cout debug"</tt> - will write to cout and debug window (see above)
-- <tt>"cout file(out.txt) file2(dbg.txt)"</tt> - will write to cout, and to 2 files - out.txt and dbg.txt
-- <tt>"cout rol_file(r.txt)"</tt> - will write to cout and to a @ref destination::rolling_file "rolling_file" called r.txt
+- <tt>"cout file(out.txt) file2(dbg.txt)"</tt> - will write to cout, and to 2 files
+- out.txt and dbg.txt
+- <tt>"cout rol_file(r.txt)"</tt> - will write to cout and to a
+@ref destination::rolling_file "rolling_file" called r.txt
 
 @note
-If you want to output to 2 files, don't use "file(one.txt) file(two.txt)". This will just configure "file" twice, ending up with writing only to "two.txt" file.
+If you want to output to 2 files, don't use "file(one.txt) file(two.txt)".
+This will just configure "file" twice, ending up with writing only to "two.txt" file.
 Use "file(one.txt) file2(two.txt)" instead!
 
 @note
-At this time, named_write does not support tags. However, it's a high priority on my TODO list, so it'll be here soon!
+At this time, named_write does not support tags. However,
+it's a high priority on my TODO list, so it'll be here soon!
 
 @param format_write_ the underlying format writer
 
 
 */
 template<class format_write_ /* = default_ */ > struct named_write {
-    typedef typename use_default< format_write_, format_write< formatter::base<> , destination::base<> > >::type format_write_type;
+    typedef typename use_default< format_write_, format_write< formatter::base<> ,
+        destination::base<> > >::type format_write_type;
 
     typedef typename format_write_type::formatter_base_type formatter_base_type;
     typedef typename format_write_type::destination_base_type destination_base_type;
@@ -153,10 +167,12 @@ template<class format_write_ /* = default_ */ > struct named_write {
         init();
     }
 
-    /** @brief sets the format string: what should be before, and what after the original message, separated by "|"
+    /** @brief sets the format string: what should be before,
+    and what after the original message, separated by "|"
 
     Example: \n
-    "[%idx%] |\n" - this writes "[%idx%] " before the message, and "\n" after the message
+    "[%idx%] |\n" - this writes "[%idx%] " before the message,
+    and "\n" after the message
 
     If "|" is not present, the whole message is prepended to the message
     */
@@ -175,9 +191,11 @@ template<class format_write_ /* = default_ */ > struct named_write {
         format( before, after);
     };
 
-    /** @brief sets the format strings (what should be before, and what after the original message)
+    /** @brief sets the format strings (what should be before,
+    and what after the original message)
     */
-    void format(const string_type & format_before_str, const string_type & format_after_str) {
+    void format(const string_type & format_before_str,
+        const string_type & format_after_str) {
         m_format_before_str = format_before_str;
         m_format_after_str = format_after_str;
 
@@ -208,18 +226,22 @@ template<class format_write_ /* = default_ */ > struct named_write {
 
     /** @brief Replaces a destination from the named destination.
 
-    You can use this, for instance, when you want to share a destination between multiple named writers.
+    You can use this, for instance, when you want to share a
+    destination between multiple named writers.
     */
-    template<class destination> void replace_destination(const string_type & name, destination d) {
+    template<class destination> void replace_destination(const string_type & name,
+        destination d) {
         m_destination.del(name);
         m_destination.add(name, d);
     }
 
     /** @brief Replaces a formatter from the named formatter.
 
-    You can use this, for instance, when you want to share a formatter between multiple named writers.
+    You can use this, for instance, when you want to share
+    a formatter between multiple named writers.
     */
-    template<class formatter> void replace_formatter(const string_type & name, formatter d) {
+    template<class formatter> void replace_formatter(const string_type & name,
+        formatter d) {
         if ( m_format_before_str.find(name) != string_type::npos) {
             m_format_before.del(name);
         }
@@ -235,7 +257,8 @@ template<class format_write_ /* = default_ */ > struct named_write {
         m_writer.add_formatter(fmt);
     }
 
-    template<class destination> void add_destination(const string_type & name, destination d) {
+    template<class destination> void add_destination(const string_type & name,
+        destination d) {
         m_destination.add(name, d);
     }
 
@@ -306,12 +329,15 @@ private:
     };
 
 
-    template<class manipulator, class parser_type> void set_and_configure(manipulator & manip, const string_type & name, parser_type parser) {
+    template<class manipulator, class parser_type>
+    void set_and_configure(manipulator & manip, const string_type & name,
+        parser_type parser) {
         // need to parse string
         bool parsing_params = false;
         string_type params;
         string_type stripped_str;
-        for ( typename string_type::const_iterator b = name.begin(), e = name.end(); b != e; ++b) {
+        for ( typename string_type::const_iterator b = name.begin(),
+            e = name.end(); b != e; ++b) {
             if ( (*b == '(') && !parsing_params) {
                 if ( parser.has_manipulator_name() ) {
                     parsing_params = true;
@@ -343,14 +369,22 @@ private:
 private:
     void init() {
         m_format_before
-            .add( HPX_LOG_STR("idx"), formatter::idx() )
-            .add( HPX_LOG_STR("time"), ::hpx::util::logging::detail::formatter_time_type( HPX_LOG_STR("$hh:$mm:$ss") ) )
-            .add( HPX_LOG_STR("thread_id"), formatter::thread_id() );
+            .add( HPX_LOG_STR("idx"),
+                formatter::idx() )
+            .add( HPX_LOG_STR("time"),
+                ::hpx::util::logging::detail::formatter_time_type(
+                    HPX_LOG_STR("$hh:$mm:$ss") ) )
+            .add( HPX_LOG_STR("thread_id"),
+                formatter::thread_id() );
 
         m_format_after
-            .add( HPX_LOG_STR("idx"), formatter::idx_t<formatter::do_convert_format::append>() )
-            .add( HPX_LOG_STR("time"), ::hpx::util::logging::detail::formatter_time_type_append( HPX_LOG_STR("$hh:$mm:$ss") ) )
-            .add( HPX_LOG_STR("thread_id"), formatter::thread_id_t<formatter::do_convert_format::append>() );
+            .add( HPX_LOG_STR("idx"),
+                formatter::idx_t<formatter::do_convert_format::append>() )
+            .add( HPX_LOG_STR("time"),
+                ::hpx::util::logging::detail::formatter_time_type_append(
+                    HPX_LOG_STR("$hh:$mm:$ss") ) )
+            .add( HPX_LOG_STR("thread_id"),
+                formatter::thread_id_t<formatter::do_convert_format::append>() );
 
         m_destination
             .add( HPX_LOG_STR("file"), destination::file("") )
@@ -363,8 +397,10 @@ private:
     }
 
 private:
-    formatter::named_spacer_t< formatter::do_convert_format::prepend, formatter_base_type, lock_resource_type > m_format_before;
-    formatter::named_spacer_t< formatter::do_convert_format::append,  formatter_base_type, lock_resource_type > m_format_after;
+    formatter::named_spacer_t< formatter::do_convert_format::prepend,
+        formatter_base_type, lock_resource_type > m_format_before;
+    formatter::named_spacer_t< formatter::do_convert_format::append,
+        formatter_base_type, lock_resource_type > m_format_after;
     destination::named_t< destination_base_type, lock_resource_type > m_destination;
     format_write_type m_writer;
 

@@ -23,14 +23,21 @@
 namespace boost {
 namespace lockfree {
 
-/** The stack class provides a multi-writer/multi-reader stack, pushing and poping is lockfree,
- *  construction/destruction has to be synchronized. It uses a freelist for memory management,
- *  freed nodes are pushed to the freelist and not returned to the os before the stack is destroyed.
+/** The stack class provides a multi-writer/multi-reader stack,
+ *  pushing and poping is lockfree,
+ *  construction/destruction has to be synchronized.
+ *  It uses a freelist for memory management,
+ *  freed nodes are pushed to the freelist and not returned to the os before
+ *  the stack is destroyed.
  *
- *  The memory management of the stack can be controlled via its freelist_t template argument. Two different
- *  freelists can be used. struct caching_freelist_t selects a caching freelist, which can allocate more nodes
- *  from the operating system, and struct static_freelist_t uses a fixed-sized freelist. With a fixed-sized
- *  freelist, the push operation may fail, while with a caching freelist, the push operation may block.
+ *  The memory management of the stack can be controlled via
+ *  its freelist_t template argument. Two different
+ *  freelists can be used. struct caching_freelist_t selects a caching freelist,
+ *  which can allocate more nodes
+ *  from the operating system, and struct static_freelist_t uses a fixed-sized freelist.
+ *  With a fixed-sized
+ *  freelist, the push operation may fail, while with a caching freelist,
+ *  the push operation may block.
  *
  *  \b Limitation: The class T is required to have a trivial assignment operator.
  * */
@@ -118,12 +125,14 @@ public:
         }
     }
 
-    /** Pushes object t to the queue. May fail, if the freelist is not able to allocate a new queue node.
+    /** Pushes object t to the queue.
+     *  May fail, if the freelist is not able to allocate a new queue node.
      *
      * \returns true, if the push operation is successful.
      *
      * \note Thread-safe and non-blocking
-     * \warning \b Warning: May block if node needs to be allocated from the operating system
+     * \warning \b Warning:
+     * May block if node needs to be allocated from the operating system
      * */
     bool push(T const & v)
     {
@@ -143,12 +152,14 @@ public:
         }
     }
 
-    /** Pushes object t to the queue. May fail, if the freelist is not able to allocate a new queue node.
+    /** Pushes object t to the queue.
+     *  May fail, if the freelist is not able to allocate a new queue node.
      *
      * \returns true, if the push operation is successful.
      *
      * \note Not thread-safe
-     * \warning \b Warning: May block if node needs to be allocated from the operating system
+     * \warning \b Warning:
+     * May block if node needs to be allocated from the operating system
      * */
     bool push_unsafe(T const & v)
     {
@@ -169,7 +180,8 @@ public:
 
     /** Pops object from stack.
      *
-     * If pop operation is successful, object is written to memory location denoted by ret.
+     * If pop operation is successful,
+     * object is written to memory location denoted by ret.
      *
      * \returns true, if the pop operation is successful, false if stack was empty.
      *
@@ -197,7 +209,8 @@ public:
 
     /** Pops object from stack.
      *
-     * If pop operation is successful, object is written to memory location denoted by ret.
+     * If pop operation is successful,
+     * object is written to memory location denoted by ret.
      *
      * \returns true, if the pop operation is successful, false if stack was empty.
      *
@@ -225,7 +238,8 @@ public:
      *
      * \warning The state of the stack can be modified by other threads
      *
-     * \note While this function is thread-safe, it only guarantees that at some point during the execution of the function the
+     * \note While this function is thread-safe,
+     * it only guarantees that at some point during the execution of the function the
      *       stack has been empty
      * */
     bool empty(void) const
@@ -237,7 +251,8 @@ private:
 #ifndef BOOST_DOXYGEN_INVOKED
     detail::atomic<tagged_node_ptr> tos;
 
-    static const int padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(tagged_node_ptr);
+    static const int padding_size = BOOST_LOCKFREE_CACHELINE_BYTES -
+        sizeof(tagged_node_ptr);
     char padding[padding_size];
 
     pool_t pool;

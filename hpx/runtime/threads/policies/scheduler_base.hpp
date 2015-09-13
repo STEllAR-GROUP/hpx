@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/assert.hpp>
 
@@ -55,9 +56,11 @@ namespace hpx { namespace threads { namespace policies
     /// scheduler policies
     struct scheduler_base : boost::noncopyable
     {
-        scheduler_base(std::size_t num_threads)
+        scheduler_base(std::size_t num_threads,
+                scheduler_mode mode = nothing_special)
           : topology_(get_topology())
           , affinity_data_(num_threads)
+          , mode_(mode)
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
 #endif
@@ -195,6 +198,17 @@ namespace hpx { namespace threads { namespace policies
             return result;
         }
 
+        // get/set scheduler mode
+        scheduler_mode get_scheduler_mode() const
+        {
+            return mode_.load(boost::memory_order_acquire);
+        }
+
+        void set_scheduler_mode(scheduler_mode mode)
+        {
+            mode_.store(mode);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         virtual bool numa_sensitive() const { return false; }
 
@@ -268,9 +282,12 @@ namespace hpx { namespace threads { namespace policies
             boost::atomic<hpx::state>& global_state)
         {}
 
+        virtual void reset_thread_distribution() {}
+
     protected:
         topology const& topology_;
         detail::affinity_data affinity_data_;
+        boost::atomic<scheduler_mode> mode_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues

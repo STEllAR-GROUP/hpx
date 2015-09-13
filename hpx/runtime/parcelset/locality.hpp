@@ -12,6 +12,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/serialization/map.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <boost/config.hpp>

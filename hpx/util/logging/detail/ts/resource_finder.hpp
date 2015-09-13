@@ -35,11 +35,13 @@ namespace hpx { namespace util { namespace logging {
     namespace lock_resource_finder {
 
     /**
-        @brief Locks a resource thread-safe - each time, at read/write (safe but rather inefficient)
+        @brief Locks a resource thread-safe - each time,
+        at read/write (safe but rather inefficient)
     */
     template<class mutex = hpx::util::logging::threading::mutex> struct ts {
             template<class lock_type> struct finder {
-                typedef typename hpx::util::logging::locker::ts_resource<lock_type, mutex > type;
+                typedef typename hpx::util::logging::locker
+                    ::ts_resource<lock_type, mutex > type;
             };
     };
 
@@ -48,26 +50,32 @@ namespace hpx { namespace util { namespace logging {
     */
     struct single_thread {
             template<class lock_type> struct finder {
-                typedef typename hpx::util::logging::locker::ts_resource_single_thread<lock_type> type;
+                typedef typename hpx::util::logging::locker
+                    ::ts_resource_single_thread<lock_type> type;
             };
     };
 
 #if !defined( HPX_HAVE_LOG_NO_TSS)
     /**
-        @brief Caches the resource on each thread, and refreshes it at @c refresh_secs period
+        @brief Caches the resource on each thread, and refreshes it at
+        @c refresh_secs period
     */
-    template<int refresh_secs = 5, class mutex = hpx::util::logging::threading::mutex > struct tss_with_cache {
+    template<int refresh_secs = 5, class mutex = hpx::util::logging::threading::mutex >
+    struct tss_with_cache {
             template<class lock_type> struct finder {
-                typedef typename locker::tss_resource_with_cache<lock_type, refresh_secs, mutex > type;
+                typedef typename locker::tss_resource_with_cache<lock_type,
+                    refresh_secs, mutex > type;
             };
     };
 
     /**
-        @brief Allows you to initialize this resource once even if multiple threads are running. Then, all threads will use the initialized value
+        @brief Allows you to initialize this resource once even if
+        multiple threads are running. Then, all threads will use the initialized value
     */
     template<class mutex = hpx::util::logging::threading::mutex> struct tss_once_init {
             template<class lock_type> struct finder {
-                typedef typename hpx::util::logging::locker::tss_resource_once_init <lock_type, mutex> type;
+                typedef typename hpx::util::logging::locker::tss_resource_once_init
+                    <lock_type, mutex> type;
             };
     };
 
@@ -75,7 +83,8 @@ namespace hpx { namespace util { namespace logging {
 
     // Not using TSS at all
 
-    template<int = 5, class = hpx::util::logging::threading::mutex > struct tss_with_cache {
+    template<int = 5, class = hpx::util::logging::threading::mutex >
+    struct tss_with_cache {
             template<class lock_type> struct finder {
                 typedef typename locker::ts_resource_single_thread<lock_type> type;
             };

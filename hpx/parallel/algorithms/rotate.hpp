@@ -155,7 +155,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///       of \a MoveAssignable and \a MoveConstructible.
     ///
     /// \returns  The \a rotate algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type \a parallel_task_execution_policy and
+    ///           if the execution policy is of type
+    ///           \a parallel_task_execution_policy and
     ///           returns \a FwdIter otherwise.
     ///           The \a rotate algorithm returns the iterator equal to
     ///           first + (last - new_first).
@@ -281,7 +282,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// within each thread.
     ///
     /// \returns  The \a rotate_copy algorithm returns a \a hpx::future<OutIter>
-    ///           if the execution policy is of type \a parallel_task_execution_policy and
+    ///           if the execution policy is of type
+    ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
     ///           The \a rotate_copy algorithm returns the output iterator to the
     ///           element past the last element copied.

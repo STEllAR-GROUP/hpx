@@ -43,12 +43,13 @@ struct divide
 
 void future_swap( future_type &f1 , future_type &f2 )
 {
-    //future_type tmp = hpx::lcos::local::dataflow( unwrapped( []( double x ){ return x; } ) , f1 );
+    //future_type tmp = hpx::lcos::local::dataflow(
+    //  unwrapped( []( double x ){ return x; } ) , f1 );
     future_type tmp = f1;
-    f1 = hpx::lcos::local::dataflow( unwrapped( []( double x , double sync ){ return x; } ) ,
-                                     f2 , f1 );
-    f2 = hpx::lcos::local::dataflow( unwrapped( []( double x , double sync ){ return x; } ) ,
-                                     tmp , f1 );
+    f1 = hpx::lcos::local::dataflow( unwrapped( []( double x ,
+        double sync ){ return x; } ) , f2 , f1 );
+    f2 = hpx::lcos::local::dataflow( unwrapped( []( double x ,
+        double sync ){ return x; } ) , tmp , f1 );
 }
 
 int main()
@@ -58,8 +59,10 @@ int main()
 
     for( int n=0 ; n<20 ; ++n )
     {
-        f1 = hpx::lcos::local::dataflow( hpx::launch::async , unwrapped(mul()) , f1 , f2 );
-        f2 = hpx::lcos::local::dataflow( hpx::launch::async , unwrapped(divide()) , f1 , f2 );
+        f1 = hpx::lcos::local::dataflow( hpx::launch::async , unwrapped(mul()) ,
+            f1 , f2 );
+        f2 = hpx::lcos::local::dataflow( hpx::launch::async , unwrapped(divide()) ,
+            f1 , f2 );
         future_swap( f1 , f2 );
     }
 

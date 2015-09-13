@@ -70,7 +70,8 @@ namespace hpx { namespace performance_counters { namespace server
         typedef lcos::local::spinlock mutex_type;
         mutable mutex_type mtx_;
 
-        std::vector<std::string> base_counter_names_;  ///< names of base counters to be queried
+        std::vector<std::string> base_counter_names_;
+        ///^ names of base counters to be queried
         std::vector<naming::id_type> base_counter_ids_;
         boost::uint64_t invocation_count_;
     };

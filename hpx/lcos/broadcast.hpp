@@ -258,7 +258,8 @@ namespace hpx { namespace lcos
           , typename ...Ts
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
+        broadcast_invoke(broadcast_with_index<Action>,
+            Futures& futures, hpx::id_type const& id
           , std::size_t global_idx
           , Ts const&... vs)
         {
@@ -409,7 +410,8 @@ namespace hpx { namespace lcos
         struct make_broadcast_action_impl;
 
         template <typename Action, std::size_t ...Is>
-        struct make_broadcast_action_impl<Action, util::detail::pack_c<std::size_t, Is...> >
+        struct make_broadcast_action_impl<Action,
+            util::detail::pack_c<std::size_t, Is...> >
         {
             typedef
                 typename broadcast_result<Action>::action_result
@@ -449,7 +451,8 @@ namespace hpx { namespace lcos
         struct make_broadcast_apply_action_impl;
 
         template <typename Action, std::size_t ...Is>
-        struct make_broadcast_apply_action_impl<Action, util::detail::pack_c<std::size_t, Is...> >
+        struct make_broadcast_apply_action_impl<Action,
+            util::detail::pack_c<std::size_t, Is...> >
         {
             typedef
                 typename broadcast_result<Action>::action_result

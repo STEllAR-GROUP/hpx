@@ -53,13 +53,13 @@ void test_find_all_ids_from_basename()
     HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
 
     // register our component with AGAS
-    HPX_TEST((hpx::register_id_with_basename(basename, client_id).get()));
+    HPX_TEST((hpx::register_with_basename(basename, client_id).get()));
 
     // wait for all localities to register their component
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     std::vector<hpx::future<hpx::id_type> > all_ids =
-        hpx::find_all_ids_from_basename(basename, localities.size());
+        hpx::find_all_from_basename(basename, localities.size());
     HPX_TEST_EQ(all_ids.size(), localities.size());
 
     // retrieve all component ids
@@ -92,7 +92,7 @@ void test_find_ids_from_basename()
     HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
 
     // register our component with AGAS
-    HPX_TEST((hpx::register_id_with_basename(basename, client_id).get()));
+    HPX_TEST((hpx::register_with_basename(basename, client_id).get()));
 
     // wait for all localities to register their component
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
@@ -105,7 +105,7 @@ void test_find_ids_from_basename()
     }
 
     std::vector<hpx::future<hpx::id_type> > ids =
-        hpx::find_ids_from_basename(basename, sequence_nrs);
+        hpx::find_from_basename(basename, sequence_nrs);
     HPX_TEST_EQ(ids.size(), sequence_nrs.size());
 
     // retrieve all component ids
@@ -139,7 +139,7 @@ void test_find_id_from_basename()
     HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
 
     // register our component with AGAS
-    HPX_TEST((hpx::register_id_with_basename(basename, client_id).get()));
+    HPX_TEST((hpx::register_with_basename(basename, client_id).get()));
 
     // wait for all localities to register their component
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
@@ -153,7 +153,7 @@ void test_find_id_from_basename()
     {
         std::size_t nr = hpx::naming::get_locality_id_from_id(locality);
         sequence_nrs.push_back(nr);
-        ids.push_back(hpx::find_id_from_basename(basename, nr));
+        ids.push_back(hpx::find_from_basename(basename, nr));
     }
 
     HPX_TEST_EQ(ids.size(), sequence_nrs.size());

@@ -134,7 +134,8 @@ double null_tree(
                                         );
 
         futures.push_back(f.then
-            (hpx::util::bind(&null_callback, boost::ref(dd), j, hpx::util::placeholders::_1)));
+            (hpx::util::bind(&null_callback, boost::ref(dd), j,
+                hpx::util::placeholders::_1)));
     }
 
     null_function(seed, delay_iterations);

@@ -465,7 +465,8 @@ namespace hpx
                 action_type_(), priority);
 
             // Send the parcel through the parcel handler
-            hpx::applier::get_applier().get_parcel_handler().sync_put_parcel(std::move(p));
+            hpx::applier::get_applier().get_parcel_handler()
+                .sync_put_parcel(std::move(p));
             return false;     // destination is remote
         }
 
@@ -504,7 +505,8 @@ namespace hpx
         apply_l (Continuation && c, naming::id_type const& target,
             naming::address& addr, Ts&&... vs)
         {
-            return apply_l_p<Action>(std::forward<Continuation>(c), target, std::move(addr),
+            return apply_l_p<Action>(std::forward<Continuation>(c),
+                target, std::move(addr),
                 actions::action_priority<Action>(), std::forward<Ts>(vs)...);
         }
     }}
@@ -521,7 +523,8 @@ namespace hpx
             std::forward<Continuation>(c), gid, priority, std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename Continuation, typename DistPolicy, typename ...Ts>
+    template <typename Action, typename Continuation, typename DistPolicy,
+        typename ...Ts>
     inline typename boost::enable_if_c<
         traits::is_continuation<Continuation>::value &&
         traits::is_distribution_policy<DistPolicy>::value, bool
@@ -576,11 +579,13 @@ namespace hpx
     apply(Continuation && c, naming::id_type const& gid,
         Ts&&... vs)
     {
-        return apply_p<Action>(std::forward<Continuation>(c), gid, actions::action_priority<Action>(),
+        return apply_p<Action>(std::forward<Continuation>(c), gid,
+            actions::action_priority<Action>(),
             std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename Continuation, typename DistPolicy, typename ...Ts>
+    template <typename Action, typename Continuation, typename DistPolicy,
+        typename ...Ts>
     inline typename boost::enable_if_c<
         traits::is_distribution_policy<DistPolicy>::value
      && traits::is_continuation<Continuation>::value

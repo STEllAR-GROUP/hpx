@@ -169,27 +169,35 @@ namespace hpx { namespace performance_counters { namespace server
 }}}
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
-    hpx::performance_counters::server::base_performance_counter::get_counter_info_action);
+    hpx::performance_counters::server::base_performance_counter
+    ::get_counter_info_action);
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::performance_counters::server::base_performance_counter::get_counter_info_action,
+    hpx::performance_counters::server::base_performance_counter
+    ::get_counter_info_action,
     performance_counter_get_counter_info_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
-    hpx::performance_counters::server::base_performance_counter::get_counter_value_action);
+    hpx::performance_counters::server::base_performance_counter
+    ::get_counter_value_action);
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::performance_counters::server::base_performance_counter::get_counter_value_action,
+    hpx::performance_counters::server::base_performance_counter
+    ::get_counter_value_action,
     performance_counter_get_counter_value_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
-    hpx::performance_counters::server::base_performance_counter::set_counter_value_action);
+    hpx::performance_counters::server::base_performance_counter
+    ::set_counter_value_action);
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::performance_counters::server::base_performance_counter::set_counter_value_action,
+    hpx::performance_counters::server::base_performance_counter
+    ::set_counter_value_action,
     performance_counter_set_counter_value_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
-    hpx::performance_counters::server::base_performance_counter::reset_counter_value_action);
+    hpx::performance_counters::server::base_performance_counter
+    ::reset_counter_value_action);
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::performance_counters::server::base_performance_counter::reset_counter_value_action,
+    hpx::performance_counters::server::base_performance_counter
+    ::reset_counter_value_action,
     performance_counter_reset_counter_value_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(

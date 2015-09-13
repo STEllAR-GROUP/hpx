@@ -50,6 +50,8 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound>
         struct apply_continuation_impl
         {
+            HPX_MOVABLE_BUT_NOT_COPYABLE(apply_continuation_impl);
+        public:
             typedef typename util::decay<Bound>::type bound_type;
 
             template <typename T>
@@ -70,7 +72,8 @@ namespace hpx { namespace util { namespace functional
             explicit apply_continuation_impl(
                     Bound && bound, Continuation && c)
               : bound_(std::move(bound)),
-                cont_(new typename util::decay<Continuation>::type(std::forward<Continuation>(c)))
+                cont_(new typename
+                    util::decay<Continuation>::type(std::forward<Continuation>(c)))
             {}
 
             apply_continuation_impl(apply_continuation_impl && o)
@@ -155,6 +158,8 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound>
         struct async_continuation_impl
         {
+            HPX_MOVABLE_BUT_NOT_COPYABLE(async_continuation_impl);
+        public:
             typedef typename util::decay<Bound>::type bound_type;
 
             template <typename T>
@@ -175,7 +180,8 @@ namespace hpx { namespace util { namespace functional
             explicit async_continuation_impl(
                     Bound && bound, Continuation && c)
               : bound_(std::move(bound)),
-                cont_(new typename util::decay<Continuation>::type(std::forward<Continuation>(c)))
+                cont_(new typename util::decay<Continuation>
+                        ::type(std::forward<Continuation>(c)))
             {}
 
             async_continuation_impl(async_continuation_impl && o)

@@ -88,7 +88,8 @@ namespace hpx { namespace util { namespace detail
 
         bool pre_shutdown_;           ///< execute termination during pre-shutdown
         bool is_started_;             ///< timer has been started (is running)
-        bool first_start_;            ///< flag to distinguish first invocation of start()
+        bool first_start_;
+        ///^ flag to distinguish first invocation of start()
         bool is_terminated_;          ///< The timer has been terminated
         bool is_stopped_;
     };

@@ -186,7 +186,8 @@ namespace hpx { namespace util
     template <typename R, typename F, typename ...Ts>
     HPX_MAYBE_FORCEINLINE
     typename boost::disable_if_c<
-        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+        boost::is_function<typename boost::remove_pointer<typename
+                           util::decay<F>::type>::type>::value
      || boost::is_member_pointer<typename util::decay<F>::type>::value
      || boost::is_reference_wrapper<typename util::decay<F>::type>::value
       , R
@@ -230,7 +231,8 @@ namespace hpx { namespace util
     template <typename F, typename ...Ts>
     HPX_MAYBE_FORCEINLINE
     typename boost::disable_if_c<
-        boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>::value
+        boost::is_function<typename boost::remove_pointer<typename
+                           util::decay<F>::type>::type>::value
      || boost::is_member_function_pointer<typename util::decay<F>::type>::value
       , typename invoke_result_of<F(Ts...)>::type
     >::type

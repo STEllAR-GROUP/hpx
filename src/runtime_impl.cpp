@@ -125,13 +125,16 @@ namespace hpx {
       : runtime(rtcfg, init_affinity),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
-            boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2, false),
+            boost::bind(&runtime_impl::init_tss, This(),
+                "main-thread", ::_1, ::_2, false),
             boost::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
         io_pool_(rtcfg.get_thread_pool_size("io_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "io-thread",
+                ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "timer-thread",
+                ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         scheduler_(init),
         notifier_(runtime_impl<SchedulingPolicy>::
@@ -140,7 +143,8 @@ namespace hpx {
             new hpx::threads::threadmanager_impl<SchedulingPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
         parcel_handler_(rtcfg, thread_manager_.get(),
-            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread",
+                ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(parcel_handler_, ini_, mode_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
@@ -725,6 +729,13 @@ namespace hpx {
 
         deinit_tss();
         return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threads::policies::callback_notifier
+        get_notification_policy(char const* prefix)
+    {
+        return get_runtime().get_notification_policy(prefix);
     }
 }
 

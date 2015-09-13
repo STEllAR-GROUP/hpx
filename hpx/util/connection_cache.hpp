@@ -270,7 +270,8 @@ namespace hpx { namespace util
                 // Otherwise, if we have less connections for this locality
                 // than the maximum, try to reserve space in the cache for a new
                 // connection.
-                if (num_existing_connections(it->second) < max_num_connections(it->second) ||
+                if (num_existing_connections(it->second) <
+                    max_num_connections(it->second) ||
                     force_insert)
                 {
                     // See if we have enough space or can make space available.
@@ -366,7 +367,8 @@ namespace hpx { namespace util
 
                 // Return the connection back to the cache only if the number
                 // of connections does not need to be shrunk.
-                if (num_existing_connections(ct->second) <= max_num_connections(ct->second))
+                if (num_existing_connections(ct->second) <=
+                    max_num_connections(ct->second))
                 {
                     // Add the connection to the entry.
                     cached_connections(ct->second).push_back(conn);
@@ -421,7 +423,8 @@ namespace hpx { namespace util
 
             typename cache_type::const_iterator ct = cache_.find(l);
             HPX_ASSERT(ct != cache_.end());
-            return (num_existing_connections(ct->second) >= max_num_connections(ct->second))
+            return (num_existing_connections(ct->second) >=
+                    max_num_connections(ct->second))
                 || (connections_ >= max_connections_);
         }
 

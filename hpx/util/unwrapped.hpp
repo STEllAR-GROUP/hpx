@@ -268,6 +268,26 @@ namespace hpx { namespace util
               : f_(std::move(f))
             {}
 
+            unwrapped_impl(unwrapped_impl && other)
+              : f_(std::move(other.f_))
+            {}
+
+            unwrapped_impl(unwrapped_impl const & other)
+              : f_(other.f_)
+            {}
+
+            unwrapped_impl &operator=(unwrapped_impl && other)
+            {
+                f_ = std::move(other.f_);
+                return *this;
+            }
+
+            unwrapped_impl &operator=(unwrapped_impl const & other)
+            {
+                f_ = other.f_;
+                return *this;
+            }
+
             template <typename Sig>
             struct result;
 

@@ -6,17 +6,47 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_SENDER_CONNECTION_HPP
 #define HPX_PARCELSET_POLICIES_MPI_SENDER_CONNECTION_HPP
 
+#include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
+#include <hpx/plugins/parcelport/mpi/locality.hpp>
+
+#include <hpx/util/memory_chunk_pool.hpp>
+
+#include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
-    template <typename Buffer>
+    struct sender;
+    struct sender_connection;
+
+    int acquire_tag(sender *);
+    void add_connection(sender *, boost::shared_ptr<sender_connection> const&);
+
     struct sender_connection
+      : parcelset::parcelport_connection<
+            sender_connection
+          , std::vector<
+                char
+              , util::detail::memory_chunk_pool_allocator<
+                    char, util::memory_chunk_pool<>
+                >
+            >
+        >
     {
     private:
+        typedef sender sender_type;
+
         typedef util::function_nonser<
             void(boost::system::error_code const&, parcel const&)
         > write_handler_type;
+
+        typedef util::memory_chunk_pool<> memory_pool_type;
+        typedef
+            util::detail::memory_chunk_pool_allocator<char, util::memory_chunk_pool<>>
+            allocator_type;
+        typedef
+            std::vector<char, allocator_type>
+            data_type;
 
         enum connection_state
         {
@@ -27,31 +57,73 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , sent_chunks
         };
 
+        typedef
+            parcelset::parcelport_connection<sender_connection, data_type>
+            base_type;
+
     public:
         sender_connection(
-            int tag
+            sender_type * s
           , int dst
-          , parcel && p
-          , Buffer && buffer
-          , write_handler_type && handler
+          , memory_pool_type & chunk_pool
+          , boost::atomic<bool> & enable
           , performance_counters::parcels::gatherer & parcels_sent
         )
-          : state_(initialized)
-          , tag_(tag)
+          : base_type(allocator_type(chunk_pool))
+          , state_(initialized)
+          , sender_(s)
           , dst_(dst)
-          , parcel_(std::move(p))
-          , buffer_(std::move(buffer))
-          , handler_(std::move(handler))
-          , header_(buffer_, tag_)
+          , request_(MPI_REQUEST_NULL)
           , request_ptr_(0)
           , chunks_idx_(0)
+          , ack_(0)
+          , chunk_pool_(chunk_pool)
+          , enable_(enable)
           , parcels_sent_(parcels_sent)
+          , there_(
+                parcelset::locality(
+                    locality(
+                        dst_
+                    )
+                )
+            )
         {
+        }
+
+        parcelset::locality const& destination() const
+        {
+            return there_;
+        }
+
+        void verify(parcelset::locality const & parcel_locality_id) const
+        {
+        }
+
+        template <typename Handler, typename ParcelPostprocess>
+        void async_write(Handler && handler, ParcelPostprocess && parcel_postprocess)
+        {
+            HPX_ASSERT(!buffer_.data_.empty());
+            request_ptr_ = 0;
+            chunks_idx_ = 0;
+            tag_ = acquire_tag(sender_);
+            header_ = header(buffer_, tag_);
             header_.assert_valid();
+
+            handler_ = std::forward<Handler>(handler);
+            postprocess_handler_ = std::forward<ParcelPostprocess>(parcel_postprocess);
+
+            if(!send())
+                add_connection(sender_, shared_from_this());
+            else
+            {
+                error_code ec;
+                postprocess_handler_(ec, there_, shared_from_this());
+            }
         }
 
         bool send()
         {
+            if(!enable_) return false;
             switch(state_)
             {
                 case initialized:
@@ -101,7 +173,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             HPX_ASSERT(request_ptr_ == 0);
 
-            std::vector<typename Buffer::transmission_chunk_type>& chunks =
+            std::vector<typename parcel_buffer_type::transmission_chunk_type>& chunks =
                 buffer_.transmission_chunks_;
             if(!chunks.empty())
             {
@@ -110,7 +182,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     chunks.data()
                   , static_cast<int>(
                         chunks.size()
-                      * sizeof(typename Buffer::transmission_chunk_type)
+                      * sizeof(parcel_buffer_type::transmission_chunk_type)
                     )
                   , MPI_BYTE
                   , dst_
@@ -190,10 +262,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(!request_done()) return false;
 
             error_code ec;
-            handler_(ec, parcel_);
+            handler_(ec);
             buffer_.data_point_.time_ =
                 util::high_resolution_clock::now() - buffer_.data_point_.time_;
             parcels_sent_.add_data(buffer_.data_point_);
+            buffer_.clear();
+
+            state_ = initialized;
 
             return true;
         }
@@ -218,11 +293,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
 
         connection_state state_;
+        sender_type * sender_;
         int tag_;
         int dst_;
-        parcel parcel_;
-        Buffer buffer_;
-        write_handler_type handler_;
+        util::unique_function_nonser<
+            void(
+                error_code const&
+            )
+        > handler_;
+        util::unique_function_nonser<
+            void(
+                error_code const&
+              , parcelset::locality const&
+              , boost::shared_ptr<sender_connection>
+            )
+        > postprocess_handler_;
 
         header header_;
 
@@ -231,7 +316,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         std::size_t chunks_idx_;
         char ack_;
 
+        memory_pool_type & chunk_pool_;
+
+        boost::atomic<bool> & enable_;
+
         performance_counters::parcels::gatherer & parcels_sent_;
+
+        parcelset::locality there_;
     };
 }}}}
 

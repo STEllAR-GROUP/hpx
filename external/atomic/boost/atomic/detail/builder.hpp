@@ -18,7 +18,8 @@ namespace atomic {
 given a Base that implements:
 
 - load(memory_order order)
-- compare_exchange_weak(integral_type &expected, integral_type desired, memory_order order)
+- compare_exchange_weak(integral_type &expected,
+  integral_type desired, memory_order order)
 
 generates exchange and compare_exchange_strong
 */
@@ -38,13 +39,15 @@ public:
     {
         integral_type expected_save=expected;
         while(true) {
-            if (compare_exchange_weak(expected, desired, success_order, failure_order)) return true;
+            if (compare_exchange_weak(expected, desired,
+                success_order, failure_order)) return true;
             if (expected_save!=expected) return false;
             expected=expected_save;
         }
     }
 
-    integral_type exchange(integral_type replacement, memory_order order=memory_order_seq_cst) volatile
+    integral_type exchange(integral_type replacement,
+        memory_order order=memory_order_seq_cst) volatile
     {
         integral_type o=load(memory_order_relaxed);
         do {} while(!compare_exchange_weak(o, replacement, order, memory_order_relaxed));
@@ -97,7 +100,8 @@ protected:
 given a Base that implements:
 
 - load(memory_order order)
-- compare_exchange_weak(integral_type &expected, integral_type desired, memory_order order)
+- compare_exchange_weak(integral_type &expected,
+integral_type desired, memory_order order)
 
 generates a -- not very efficient, but correct -- fetch_add operation
 */
@@ -112,7 +116,8 @@ public:
         integral_type c, memory_order order=memory_order_seq_cst) volatile
     {
         integral_type o=Base::load(memory_order_relaxed), n;
-        do {n=o+c;} while(!compare_exchange_weak(o, n, order, memory_order_relaxed));
+        do {n=o+c;} while(!compare_exchange_weak(o, n,
+            order, memory_order_relaxed));
         return o;
     }
 
@@ -140,7 +145,8 @@ public:
     {
 #if defined(BOOST_MSVC)
 #pragma warning(push)
-#pragma warning(disable: 4146)    // unary minus operator applied to unsigned type, result still unsigned
+#pragma warning(disable: 4146)
+        // unary minus operator applied to unsigned type, result still unsigned
 #endif
         return fetch_add(-c, order);
 #if defined(BOOST_MSVC)
@@ -156,9 +162,11 @@ public:
 given a Base that implements:
 
 - load(memory_order order)
-- compare_exchange_weak(integral_type &expected, integral_type desired, memory_order order)
+- compare_exchange_weak(integral_type &expected,
+integral_type desired, memory_order order)
 
-generates -- not very efficient, but correct -- fetch_and, fetch_or and fetch_xor operators
+generates -- not very efficient, but correct
+-- fetch_and, fetch_or and fetch_xor operators
 */
 template<typename Base>
 class build_logicops : public Base {
@@ -168,22 +176,28 @@ public:
     using Base::compare_exchange_weak;
     using Base::load;
 
-    integral_type fetch_and(integral_type c, memory_order order=memory_order_seq_cst) volatile
+    integral_type fetch_and(integral_type c,
+        memory_order order=memory_order_seq_cst) volatile
     {
         integral_type o=load(memory_order_relaxed), n;
-        do {n=o&c;} while(!compare_exchange_weak(o, n, order, memory_order_relaxed));
+        do {n=o&c;} while(!compare_exchange_weak(o, n, order,
+            memory_order_relaxed));
         return o;
     }
-    integral_type fetch_or(integral_type c, memory_order order=memory_order_seq_cst) volatile
+    integral_type fetch_or(integral_type c,
+        memory_order order=memory_order_seq_cst) volatile
     {
         integral_type o=load(memory_order_relaxed), n;
-        do {n=o|c;} while(!compare_exchange_weak(o, n, order, memory_order_relaxed));
+        do {n=o|c;} while(!compare_exchange_weak(o, n, order,
+            memory_order_relaxed));
         return o;
     }
-    integral_type fetch_xor(integral_type c, memory_order order=memory_order_seq_cst) volatile
+    integral_type fetch_xor(integral_type c,
+        memory_order order=memory_order_seq_cst) volatile
     {
         integral_type o=load(memory_order_relaxed), n;
-        do {n=o^c;} while(!compare_exchange_weak(o, n, order, memory_order_relaxed));
+        do {n=o^c;} while(!compare_exchange_weak(o, n, order,
+            memory_order_relaxed));
         return o;
     }
 
@@ -196,14 +210,18 @@ given a Base that implements:
 
 - load(memory_order order)
 - store(integral_type i, memory_order order)
-- compare_exchange_weak(integral_type &expected, integral_type desired, memory_order order)
+- compare_exchange_weak(integral_type &expected,
+integral_type desired, memory_order order)
 
 generates the full set of atomic operations for integral types
 */
 template<typename Base>
-class build_atomic_from_minimal : public build_logicops< build_arithmeticops< build_fetch_add< build_exchange<Base> > > > {
+class build_atomic_from_minimal
+    : public build_logicops< build_arithmeticops<
+    build_fetch_add< build_exchange<Base> > > > {
 public:
-    typedef build_logicops< build_arithmeticops< build_fetch_add< build_exchange<Base> > > > super;
+    typedef build_logicops< build_arithmeticops<
+        build_fetch_add< build_exchange<Base> > > > super;
     typedef typename super::integral_type integral_type;
 
     build_atomic_from_minimal(void) {}
@@ -215,8 +233,10 @@ given a Base that implements:
 
 - load(memory_order order)
 - store(integral_type i, memory_order order)
-- compare_exchange_weak(integral_type &expected, integral_type desired, memory_order order)
-- compare_exchange_strong(integral_type &expected, integral_type desired, memory_order order)
+- compare_exchange_weak(integral_type &expected,
+integral_type desired, memory_order order)
+- compare_exchange_strong(integral_type &expected,
+integral_type desired, memory_order order)
 - exchange(integral_type replacement, memory_order order)
 - fetch_add_var(integral_type c, memory_order order)
 - fetch_inc(memory_order order)
@@ -225,7 +245,8 @@ given a Base that implements:
 generates the full set of atomic operations for integral types
 */
 template<typename Base>
-class build_atomic_from_typical : public build_logicops< build_arithmeticops< build_const_fetch_add<Base> > > {
+class build_atomic_from_typical
+    : public build_logicops< build_arithmeticops< build_const_fetch_add<Base> > > {
 public:
     typedef build_logicops< build_arithmeticops< build_const_fetch_add<Base> > > super;
     typedef typename super::integral_type integral_type;
@@ -239,15 +260,18 @@ given a Base that implements:
 
 - load(memory_order order)
 - store(integral_type i, memory_order order)
-- compare_exchange_weak(integral_type &expected, integral_type desired, memory_order order)
-- compare_exchange_strong(integral_type &expected, integral_type desired, memory_order order)
+- compare_exchange_weak(integral_type &expected,
+integral_type desired, memory_order order)
+- compare_exchange_strong(integral_type &expected,
+integral_type desired, memory_order order)
 - exchange(integral_type replacement, memory_order order)
 - fetch_add(integral_type c, memory_order order)
 
 generates the full set of atomic operations for integral types
 */
 template<typename Base>
-class build_atomic_from_add : public build_logicops< build_arithmeticops<Base> > {
+class build_atomic_from_add
+    : public build_logicops< build_arithmeticops<Base> > {
 public:
     typedef build_logicops< build_arithmeticops<Base> > super;
     typedef typename super::integral_type integral_type;
@@ -261,14 +285,17 @@ given a Base that implements:
 
 - load(memory_order order)
 - store(integral_type i, memory_order order)
-- compare_exchange_weak(integral_type &expected, integral_type desired, memory_order order)
-- compare_exchange_strong(integral_type &expected, integral_type desired, memory_order order)
+- compare_exchange_weak(integral_type &expected,
+integral_type desired, memory_order order)
+- compare_exchange_strong(integral_type &expected,
+integral_type desired, memory_order order)
 - exchange(integral_type replacement, memory_order order)
 
 generates the full set of atomic operations for integral types
 */
 template<typename Base>
-class build_atomic_from_exchange : public build_logicops< build_arithmeticops< build_fetch_add<Base> > > {
+class build_atomic_from_exchange
+    : public build_logicops< build_arithmeticops< build_fetch_add<Base> > > {
 public:
     typedef build_logicops< build_arithmeticops< build_fetch_add<Base> > > super;
     typedef typename super::integral_type integral_type;
@@ -311,7 +338,8 @@ public:
         expected_=get_base().load(memory_order_relaxed);
         expected_=insert(expected_, expected);
         desired_=insert(expected_, desired);
-        bool success=get_base().compare_exchange_weak(expected_, desired_, success_order, failure_order);
+        bool success=get_base().compare_exchange_weak(expected_, desired_,
+            success_order, failure_order);
         expected=extract(expected_);
         return success;
     }
@@ -322,7 +350,8 @@ public:
         expected=get_base().load(memory_order_relaxed);
         do {
             desired=insert(expected, v);
-        } while(!get_base().compare_exchange_weak(expected, desired, order, memory_order_relaxed));
+        } while(!get_base().compare_exchange_weak(expected,
+            desired, order, memory_order_relaxed));
     }
 
     bool is_lock_free(void)
@@ -367,7 +396,8 @@ private:
         return v>>get_shift();
     }
 
-    larger_integral_type insert(larger_integral_type target, integral_type source) const volatile
+    larger_integral_type insert(larger_integral_type target,
+        integral_type source) const volatile
     {
         larger_integral_type tmp=source;
         larger_integral_type mask=larger_integral_type(-1);
@@ -395,7 +425,8 @@ data type (e.g. an atomic "byte" embedded into a temporary
 and properly aligned atomic "int").
 */
 template<typename Base, typename Type>
-class build_atomic_from_larger_type : public build_atomic_from_minimal< build_base_from_larger_type<Base, Type> > {
+class build_atomic_from_larger_type
+    : public build_atomic_from_minimal< build_base_from_larger_type<Base, Type> > {
 public:
     typedef build_atomic_from_minimal< build_base_from_larger_type<Base, Type> > super;
     //typedef typename super::integral_type integral_type;

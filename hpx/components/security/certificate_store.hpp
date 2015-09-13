@@ -114,8 +114,8 @@ namespace hpx { namespace components { namespace security
                     hpx::security_error
                   , "certificate_store::insert"
                   , boost::str(boost::format(
-                        "The issuer can't delegated the requested capabilities: %1% %2%") %
-                        issuer_capability % certificate.get_capability())
+                      "The issuer can't delegated the requested capabilities: %1% %2%") %
+                      issuer_capability % certificate.get_capability())
                 )
             }
 

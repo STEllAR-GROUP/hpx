@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_VECTOR_NOV_02_2014_0636PM)
-#define HPX_VECTOR_NOV_02_2014_0636PM
+#if !defined(HPX_PARTITIONED_VECTOR_NOV_02_2014_0636PM)
+#define HPX_PARTITIONED_VECTOR_NOV_02_2014_0636PM
 
-#include <hpx/components/containers/vector/vector.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 
 #endif
 

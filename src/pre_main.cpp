@@ -187,7 +187,8 @@ int pre_main(runtime_mode mode)
                 startup_barrier = create_barrier(num_localities, startup_barrier_name);
             }
 
-            LBT_(info) << "(2nd stage) pre_main: created 2nd and 3rd stage boot barriers";
+            LBT_(info) << "(2nd stage) pre_main: created \
+                           2nd and 3rd stage boot barriers";
         }
         else // Hosted.
         {

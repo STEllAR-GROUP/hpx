@@ -18,7 +18,8 @@ namespace hpx { namespace util { namespace security
 {
     subordinate_certificate_authority::~subordinate_certificate_authority()
     {
-        // Bind the delete_subordinate_certificate_authority symbol dynamically and invoke it.
+        // Bind the delete_subordinate_certificate_authority symbol dynamically
+        // and invoke it.
         typedef void (*function_type)(certificate_authority_type*);
         typedef boost::function<void(function_type)> deleter_type;
 
@@ -33,7 +34,8 @@ namespace hpx { namespace util { namespace security
 
     void subordinate_certificate_authority::initialize()
     {
-        // Bind the new_subordinate_certificate_authority symbol dynamically and invoke it.
+        // Bind the new_subordinate_certificate_authority symbol dynamically
+        // and invoke it.
         typedef certificate_authority_type* (*function_type)(
             components::security::key_pair const&);
         typedef boost::function<void(function_type)> deleter_type;
@@ -53,7 +55,8 @@ namespace hpx { namespace util { namespace security
     {
         HPX_ASSERT(0 != subordinate_certificate_authority_);
 
-        // Bind the certificate_authority_sign_certificate_signing_request symbol dynamically and invoke it.
+        // Bind the certificate_authority_sign_certificate_signing_request
+        // symbol dynamically and invoke it.
         typedef void (*function_type)(
             components::security::server::subordinate_certificate_authority*
           , components::security::signed_certificate_signing_request*);
@@ -75,11 +78,13 @@ namespace hpx { namespace util { namespace security
 
     components::security::signed_certificate
         subordinate_certificate_authority::sign_certificate_signing_request(
-            components::security::signed_certificate_signing_request const & signed_csr) const
+            components::security::signed_certificate_signing_request const & signed_csr)
+        const
     {
         HPX_ASSERT(0 != subordinate_certificate_authority_);
 
-        // Bind the certificate_authority_sign_certificate_signing_request symbol dynamically and invoke it.
+        // Bind the certificate_authority_sign_certificate_signing_request
+        // symbol dynamically and invoke it.
         typedef void (*function_type)(
             components::security::server::certificate_authority_base*
           , components::security::signed_certificate_signing_request const &
@@ -108,7 +113,8 @@ namespace hpx { namespace util { namespace security
     {
         HPX_ASSERT(0 != subordinate_certificate_authority_);
 
-        // Bind the subordinate_certificate_authority_set_certificate symbol dynamically and invoke it.
+        // Bind the subordinate_certificate_authority_set_certificate symbol
+        // dynamically and invoke it.
         typedef void (*function_type)(
             components::security::server::subordinate_certificate_authority*
           , components::security::signed_certificate const &);
@@ -136,7 +142,8 @@ namespace hpx { namespace util { namespace security
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        // Bind the certificate_authority_get_certificate symbol dynamically and invoke it.
+        // Bind the certificate_authority_get_certificate symbol dynamically
+        // and invoke it.
         typedef void (*function_type)(
             components::security::server::certificate_authority_base*
           , components::security::signed_certificate*);

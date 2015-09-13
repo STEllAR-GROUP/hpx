@@ -342,7 +342,8 @@ namespace hpx { namespace util
                 hpx_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
-                    ("hpx:connect", "run this instance in worker mode, but connecting late")
+                    ("hpx:connect", "run this instance in worker mode,\
+                         but connecting late")
                 ;
                 break;
 
@@ -355,7 +356,8 @@ namespace hpx { namespace util
                 hidden_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
-                    ("hpx:connect", "run this instance in worker mode, but connecting late")
+                    ("hpx:connect", "run this instance in worker mode,\
+                        but connecting late")
                 ;
                 break;
 
@@ -429,7 +431,7 @@ namespace hpx { namespace util
                   "the detailed affinity description for the OS threads, see "
                   "the documentation for a detailed description of possible "
                   "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
-                  "--hpx:affinity options. Implies --hpx:numa-sensitive "
+                  "--hpx:affinity options. Implies --hpx:numa-sensitive=1"
                   "(--hpx:bind=none disables defining thread affinities).")
                 ("hpx:print-bind",
                   "print to the console the bit masks calculated from the "
@@ -439,7 +441,7 @@ namespace hpx { namespace util
                  "the number of operating system threads to spawn for this HPX "
                  "locality (default: 1, using 'all' will spawn one thread for "
                  "each processing unit")
-                ("hpx:cores", value<std::string>()->default_value("all"),
+                ("hpx:cores", value<std::string>(),
                  "the number of cores to utilize for this HPX "
                  "locality (default: 'all', i.e. the number of cores is based on "
                  "the number of total cores in the system)")
@@ -457,8 +459,11 @@ namespace hpx { namespace util
                   "priority queue (default: number of OS threads), valid for "
                   "--hpx:queuing=local-priority,--hpx:queuing=static-priority, "
                   " and --hpx:queuing=abp-priority only)")
-                ("hpx:numa-sensitive",
-                  "makes the local-priority scheduler NUMA sensitive")
+                ("hpx:numa-sensitive", value<std::size_t>()->implicit_value(0),
+                  "makes the local-priority scheduler NUMA sensitive ("
+                  "allowed values: 0 - no NUMA sensitivity, 1 - allow only for "
+                  "boundary cores to steal across NUMA domains, 2 - "
+                  "no cross boundary stealing is allowed (default value: 0)")
             ;
 
             options_description config_options("HPX configuration options");
@@ -506,7 +511,8 @@ namespace hpx { namespace util
             counter_options.add_options()
                 ("hpx:print-counter", value<std::vector<std::string> >()->composing(),
                   "print the specified performance counter either repeatedly or "
-                  "before shutting down the system (see option --hpx:print-counter-interval)")
+                  "before shutting down the system \
+                     (see option --hpx:print-counter-interval)")
                 ("hpx:print-counter-interval", value<std::size_t>(),
                   "print the performance counter(s) specified with --hpx:print-counter "
                   "repeatedly after the time interval (specified in milliseconds) "
@@ -519,7 +525,8 @@ namespace hpx { namespace util
                   "possible values:\n"
                   "   'minimal' (prints counter name skeletons)\n"
                   "   'full' (prints all available counter names)")
-                ("hpx:list-counter-infos", value<std::string>()->implicit_value("minimal"),
+                ("hpx:list-counter-infos",
+                    value<std::string>()->implicit_value("minimal"),
                   "list the description of all registered performance counters, "
                   "possible values:\n"
                   "   'minimal' (prints infos for counter name skeletons)\n"
@@ -689,7 +696,8 @@ namespace hpx { namespace util
         if (cfg.has_entry("hpx.cmd_line"))
             cmdline = cfg.get_entry("hpx.cmd_line");
         if (cfg.has_entry("hpx.locality"))
-            node = hpx::util::safe_lexical_cast<std::size_t>(cfg.get_entry("hpx.locality"));
+            node = hpx::util::safe_lexical_cast<std::size_t>
+                (cfg.get_entry("hpx.locality"));
 
         return parse_commandline(cfg, app_options, cmdline, vm, node,
             allow_unregistered);

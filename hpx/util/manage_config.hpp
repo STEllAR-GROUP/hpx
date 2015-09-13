@@ -7,6 +7,7 @@
 #define HPX_UTIL_MANAGE_CONFIG_APR_11_2012_0519PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/lexical_cast.hpp>
 
@@ -30,7 +31,7 @@ namespace hpx { namespace util
         {
             map_type::const_iterator it = config_.find(key);
             if (it != config_.end())
-                return boost::lexical_cast<T>((*it).second);
+                return hpx::util::safe_lexical_cast<T>((*it).second, dflt);
             return dflt;
         }
 

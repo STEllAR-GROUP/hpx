@@ -160,8 +160,8 @@ namespace hpx { namespace actions
         /// directly or by a HPX-threads
         enum action_type
         {
-            plain_action = 0,   ///< The action will be executed by a newly created thread
-            direct_action = 1   ///< The action needs to be executed directly
+            plain_action = 0, ///< The action will be executed by a newly created thread
+            direct_action = 1 ///< The action needs to be executed directly
         };
 
         /// Destructor
@@ -235,11 +235,11 @@ namespace hpx { namespace actions
         /// Return all data needed for thread initialization
         virtual void schedule_thread(naming::id_type const& target,
             naming::address::address_type lva,
-            threads::thread_state_enum initial_state) = 0;
+            threads::thread_state_enum initial_state, std::size_t num_thred) = 0;
 
         virtual void schedule_thread(std::unique_ptr<continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_state_enum initial_state) = 0;
+            threads::thread_state_enum initial_state, std::size_t num_thred) = 0;
 
         /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.

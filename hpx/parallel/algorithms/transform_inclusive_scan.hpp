@@ -155,7 +155,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
     /// the value of
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(op, init, conv(*first), ..., conv(*(first + (i - result)))).
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(op, init, conv(*first), ...,
+    /// conv(*(first + (i - result)))).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicate \a op.
@@ -217,11 +218,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     sequence can be implicitly converted to any
     ///                     of those types.
     ///
-    /// The reduce operations in the parallel \a transform_inclusive_scan algorithm invoked
+    /// The reduce operations in the parallel \a transform_inclusive_scan algorithm
+    /// invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The reduce operations in the parallel \a transform_inclusive_scan algorithm invoked
+    /// The reduce operations in the parallel \a transform_inclusive_scan algorithm
+    /// invoked
     /// with an execution policy object of type \a parallel_execution_policy
     /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
@@ -238,7 +241,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK), GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
+    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK),
+    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
     ///           where 1 < K+1 = M <= N.
     ///
     /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
@@ -291,7 +295,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
     /// the value of
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(op, conv(*first), ..., conv(*(first + (i - result)))).
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(op, conv(*first), ...,
+    /// conv(*(first + (i - result)))).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicate \a op.
@@ -352,11 +357,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     sequence can be implicitly converted to any
     ///                     of those types.
     ///
-    /// The reduce operations in the parallel \a transform_inclusive_scan algorithm invoked
+    /// The reduce operations in the parallel \a transform_inclusive_scan algorithm
+    /// invoked
     /// with an execution policy object of type \a sequential_execution_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The reduce operations in the parallel \a transform_inclusive_scan algorithm invoked
+    /// The reduce operations in the parallel \a transform_inclusive_scan algorithm
+    /// invoked
     /// with an execution policy object of type \a parallel_execution_policy
     /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
@@ -373,7 +380,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK), GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
+    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK),
+    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
     ///           where 1 < K+1 = M <= N.
     ///
     /// Neither \a conv nor \a op shall invalidate iterators or subranges, or

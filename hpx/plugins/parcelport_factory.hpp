@@ -12,6 +12,7 @@
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/plugins/parcelport_factory_base.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/util/find_prefix.hpp>
 
 #include <boost/assign.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -79,7 +80,8 @@ namespace hpx { namespace plugins
                 "max_message_size =  ${HPX_PARCEL_" + name_uc +
                     "_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}",
                 "max_outbound_message_size =  ${HPX_PARCEL_" + name_uc +
-                    "_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}",
+                    "_MAX_OUTBOUND_MESSAGE_SIZE"
+                    + ":$[hpx.parcel.max_outbound_message_size]}",
                 "array_optimization = ${HPX_PARCEL_" + name_uc +
                     "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}",
                 "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
@@ -92,7 +94,8 @@ namespace hpx { namespace plugins
                     "_ASYNC_SERIALIZATION:"
                     "$[hpx.parcel.async_serialization]}",
                 "priority = ${HPX_PARCEL_" + name_uc +
-                    "_PRIORITY:" + traits::plugin_config_data<Parcelport>::priority() + "}"
+                    "_PRIORITY:" + traits::plugin_config_data<Parcelport>::priority()
+                                 + "}"
                 ;
 
             // get the parcelport specific information ...
@@ -116,7 +119,8 @@ namespace hpx { namespace plugins
         ///        supported by this factory
         parcelset::parcelport* create(
             hpx::util::runtime_configuration const & cfg,
-            hpx::util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+            hpx::util::function_nonser<void(std::size_t, char const*)>
+              const& on_start_thread,
             hpx::util::function_nonser<void()> const& on_stop_thread)
         {
             return new Parcelport(cfg, on_start_thread, on_stop_thread);

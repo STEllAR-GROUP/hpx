@@ -463,7 +463,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \throws An \a exception_list, as specified in Exception Handling.
     ///
     /// Postcondition: All tasks spawned from \a f have finished execution.
-    ///                A call to \a define_task_block_restore_thread always returns on the
+    ///                A call to \a define_task_block_restore_thread always
+    ///                returns on the
     ///                same thread as that on which it was called.
     ///
     /// \note It is expected (but not mandated) that f will (directly or
@@ -495,7 +496,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)
     /// \throws An \a exception_list, as specified in Exception Handling.
     ///
     /// Postcondition: All tasks spawned from \a f have finished execution.
-    ///                A call to \a define_task_block_restore_thread always returns on the
+    ///                A call to \a define_task_block_restore_thread always
+    ///                returns on the
     ///                same thread as that on which it was called.
     ///
     /// \note It is expected (but not mandated) that f will (directly or

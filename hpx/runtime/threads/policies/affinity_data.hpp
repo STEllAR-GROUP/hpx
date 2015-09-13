@@ -26,6 +26,15 @@ namespace hpx { namespace threads { namespace policies
             affinity_desc_(affinity_desc)
         {}
 
+        init_affinity_data(std::string const& affinity,
+                std::string const& affinity_desc)
+          : used_cores_(0),
+            pu_offset_(std::size_t(-1)),
+            pu_step_(1),
+            affinity_domain_(affinity),
+            affinity_desc_(affinity_desc)
+        {}
+
         std::size_t used_cores_;
         std::size_t pu_offset_;
         std::size_t pu_step_;

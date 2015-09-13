@@ -132,7 +132,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             std::size_t bytes_transferred, boost::tuple<Handler> handler)
         {
             if (e) {
-                if(e==boost::asio::error::not_connected) std::cout << "handle_read_header\n";
+                if(e==boost::asio::error::not_connected) std::cout <<
+                    "handle_read_header\n";
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
@@ -296,7 +297,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     = &receiver::handle_write_ack<Handler>;
 
                 // decode the received parcels.
-                decode_parcel(parcelport_, std::move(buffer_));
+                decode_parcels(parcelport_, std::move(buffer_), -1);
                 buffer_ = parcel_buffer_type();
 
                 ack_ = true;

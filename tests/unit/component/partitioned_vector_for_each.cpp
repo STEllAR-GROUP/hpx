@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/vector.hpp>
+#include <hpx/include/partitioned_vector.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_count.hpp>
 
@@ -12,8 +12,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
-HPX_REGISTER_VECTOR(double);
-HPX_REGISTER_VECTOR(int);
+HPX_REGISTER_PARTITIONED_VECTOR(double);
+HPX_REGISTER_PARTITIONED_VECTOR(int);
 
 struct pfo
 {
@@ -46,9 +46,10 @@ struct cmp
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename T>
-void verify_values(ExPolicy && policy, hpx::vector<T> const& v, T const& val)
+void verify_values(ExPolicy && policy, hpx::partitioned_vector<T> const& v,
+    T const& val)
 {
-    typedef typename hpx::vector<T>::const_iterator const_iterator;
+    typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
 
     std::size_t size = 0;
 
@@ -62,7 +63,8 @@ void verify_values(ExPolicy && policy, hpx::vector<T> const& v, T const& val)
 }
 
 template <typename ExPolicy, typename T>
-void verify_values_count(ExPolicy && policy, hpx::vector<T> const& v, T const& val)
+void verify_values_count(ExPolicy && policy, hpx::partitioned_vector<T> const& v,
+    T const& val)
 {
     HPX_TEST_EQ(
         std::size_t(hpx::parallel::count(
@@ -75,7 +77,7 @@ void verify_values_count(ExPolicy && policy, hpx::vector<T> const& v, T const& v
 }
 
 template <typename ExPolicy, typename T>
-void test_for_each(ExPolicy && policy, hpx::vector<T>& v, T val)
+void test_for_each(ExPolicy && policy, hpx::partitioned_vector<T>& v, T val)
 {
     verify_values(policy, v, val);
     verify_values_count(policy, v, val);
@@ -87,8 +89,8 @@ void test_for_each(ExPolicy && policy, hpx::vector<T>& v, T val)
 }
 
 template <typename ExPolicy, typename T>
-void verify_values_count_async(ExPolicy && policy, hpx::vector<T> const& v,
-    T const& val)
+void verify_values_count_async(ExPolicy && policy,
+    hpx::partitioned_vector<T> const& v, T const& val)
 {
     HPX_TEST_EQ(
         std::size_t(hpx::parallel::count(
@@ -101,7 +103,7 @@ void verify_values_count_async(ExPolicy && policy, hpx::vector<T> const& v,
 }
 
 template <typename ExPolicy, typename T>
-void test_for_each_async(ExPolicy && policy, hpx::vector<T>& v, T val)
+void test_for_each_async(ExPolicy && policy, hpx::partitioned_vector<T>& v, T val)
 {
     verify_values(policy, v, val);
     verify_values_count_async(policy, v, val);
@@ -119,7 +121,7 @@ void for_each_tests()
     std::size_t const length = 12;
 
     {
-        hpx::vector<T> v;
+        hpx::partitioned_vector<T> v;
         hpx::parallel::for_each(hpx::parallel::seq, v.begin(), v.end(), pfo());
         hpx::parallel::for_each(hpx::parallel::par, v.begin(), v.end(), pfo());
         hpx::parallel::for_each(hpx::parallel::seq(hpx::parallel::task),
@@ -129,7 +131,7 @@ void for_each_tests()
     }
 
     {
-        hpx::vector<T> v(length, T(0));
+        hpx::partitioned_vector<T> v(length, T(0));
         test_for_each(hpx::parallel::seq, v, T(0));
         test_for_each(hpx::parallel::par, v, T(1));
         test_for_each_async(hpx::parallel::seq(hpx::parallel::task), v, T(2));

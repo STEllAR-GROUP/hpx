@@ -24,6 +24,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -575,7 +576,8 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 if (0 == threads::get_self_ptr())
                 {
                     // this should happen only during bootstrap
-                    // FIXME: Disabled this assert cause it fires. It should not, but doesn't do any harm
+                    // FIXME: Disabled this assert cause it fires.
+                    // It should not, but doesn't do any harm
                     //HPX_ASSERT(hpx::is_starting());
 
                     while(!endpoints_future.is_ready())
@@ -1804,7 +1806,8 @@ void addressing_service::route(
               , action_type(), action_priority_, std::move(p));
 
             // send to the main AGAS instance for routing
-            hpx::applier::get_applier().get_parcel_handler().put_parcel(std::move(route_p), f);
+            hpx::applier::get_applier().get_parcel_handler()
+                .put_parcel(std::move(route_p), f);
             return;
         }
     }
@@ -2055,7 +2058,7 @@ lcos::future<bool> addressing_service::register_name_async(
 { // {{{
     // We need to modify the reference count.
     naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
-    naming::gid_type new_gid = naming::detail::split_gid_if_needed(mutable_gid);
+    naming::gid_type new_gid = naming::detail::split_gid_if_needed(mutable_gid).get();
 
     request req(symbol_ns_bind, name, new_gid);
 
@@ -2822,7 +2825,8 @@ void addressing_service::register_counter_types()
 
         boost::uint32_t locality_id =
             naming::get_locality_id_from_gid(get_local_locality());
-        std::string str("locality#" + boost::lexical_cast<std::string>(locality_id) + "/");
+        std::string str("locality#"
+            + boost::lexical_cast<std::string>(locality_id) + "/");
         hosted->register_server_instance(str.c_str(), locality_id);
     }
 } // }}}
@@ -3147,12 +3151,16 @@ namespace hpx
 {
     namespace detail
     {
-        inline std::string name_from_basename(char const* basename, std::size_t idx)
+        inline std::string
+        name_from_basename(std::string const& basename, std::size_t idx)
         {
+            HPX_ASSERT(!basename.empty());
+
             std::string name;
 
             if (basename[0] != '/')
                 name += '/';
+
             name += basename;
             if (name[name.size()-1] != '/')
                 name += '/';
@@ -3164,12 +3172,12 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     std::vector<hpx::future<hpx::id_type> >
-        find_all_ids_from_basename(char const* basename, std::size_t num_ids)
+        find_all_from_basename(std::string basename, std::size_t num_ids)
     {
-        if (0 == basename)
+        if (basename.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::find_all_ids_from_basename",
+                "hpx::find_all_from_basename",
                 "no basename specified");
         }
 
@@ -3178,19 +3186,19 @@ namespace hpx
         {
             std::string name = detail::name_from_basename(basename, i);
             results.push_back(agas::on_symbol_namespace_event(
-                name, agas::symbol_ns_bind, true));
+                std::move(name), agas::symbol_ns_bind, true));
         }
         return results;
     }
 
     std::vector<hpx::future<hpx::id_type> >
-        find_ids_from_basename(char const* basename,
+        find_from_basename(std::string basename,
             std::vector<std::size_t> const& ids)
     {
-        if (0 == basename)
+        if (basename.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::find_ids_from_basename",
+                "hpx::find_from_basename",
                 "no basename specified");
         }
 
@@ -3199,18 +3207,18 @@ namespace hpx
         {
             std::string name = detail::name_from_basename(basename, i);
             results.push_back(agas::on_symbol_namespace_event(
-                name, agas::symbol_ns_bind, true));
+                std::move(name), agas::symbol_ns_bind, true));
         }
         return results;
     }
 
-    hpx::future<hpx::id_type> find_id_from_basename(char const* basename,
+    hpx::future<hpx::id_type> find_from_basename(std::string basename,
         std::size_t sequence_nr)
     {
-        if (0 == basename)
+        if (basename.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::find_id_from_basename",
+                "hpx::find_from_basename",
                 "no basename specified");
         }
 
@@ -3218,16 +3226,17 @@ namespace hpx
             sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
-        return agas::on_symbol_namespace_event(name, agas::symbol_ns_bind, true);
+        return agas::on_symbol_namespace_event(std::move(name),
+            agas::symbol_ns_bind, true);
     }
 
-    hpx::future<bool> register_id_with_basename(char const* basename,
+    hpx::future<bool> register_with_basename(std::string basename,
         hpx::id_type id, std::size_t sequence_nr)
     {
-        if (0 == basename)
+        if (basename.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::register_id_with_basename",
+                "hpx::register_with_basename",
                 "no basename specified");
         }
 
@@ -3235,16 +3244,16 @@ namespace hpx
             sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
-        return agas::register_name(name, id);
+        return agas::register_name(std::move(name), id);
     }
 
-    hpx::future<hpx::id_type> unregister_id_with_basename(
-        char const* basename, std::size_t sequence_nr)
+    hpx::future<hpx::id_type> unregister_with_basename(
+        std::string basename, std::size_t sequence_nr)
     {
-        if (0 == basename)
+        if (basename.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::unregister_id_with_basename",
+                "hpx::unregister_with_basename",
                 "no basename specified");
         }
 
@@ -3252,6 +3261,6 @@ namespace hpx
             sequence_nr = std::size_t(naming::get_locality_id_from_id(find_here()));
 
         std::string name = detail::name_from_basename(basename, sequence_nr);
-        return agas::unregister_name(name);
+        return agas::unregister_name(std::move(name));
     }
 }

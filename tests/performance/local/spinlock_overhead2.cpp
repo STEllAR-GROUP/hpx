@@ -262,7 +262,8 @@ int hpx_main(
                             )
                          << flush;
                 else
-                    cout << ( boost::format("invoked %1% futures in %2% seconds (k1 = %3%, k2 = %4%, k3 = %5%)\n")
+                    cout << ( boost::format("invoked %1% futures in %2% seconds \
+                                (k1 = %3%, k2 = %4%, k3 = %5%)\n")
                             % count
                             % duration
                             % k1

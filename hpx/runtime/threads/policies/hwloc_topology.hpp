@@ -88,7 +88,7 @@ namespace hpx { namespace threads
 
         mask_cref_type get_thread_affinity_mask(
             std::size_t num_thread
-          , bool numa_sensitive
+          , bool numa_sensitive = false
           , error_code& ec = throws
             ) const;
 
@@ -103,7 +103,7 @@ namespace hpx { namespace threads
           , error_code& ec = throws
             ) const;
 
-        mask_cref_type get_thread_affinity_mask_from_lva(
+        mask_type get_thread_affinity_mask_from_lva(
             naming::address::address_type
           , error_code& ec = throws
             ) const;
@@ -125,7 +125,8 @@ namespace hpx { namespace threads
             ) const;
 
         mask_type get_cpubind_mask(error_code& ec = throws) const;
-        mask_type get_cpubind_mask(boost::thread & handle, error_code& ec = throws) const;
+        mask_type get_cpubind_mask(boost::thread & handle,
+            error_code& ec = throws) const;
 
         ///////////////////////////////////////////////////////////////////////
         std::size_t get_number_of_sockets() const;
@@ -157,6 +158,13 @@ namespace hpx { namespace threads
         struct hwloc_topology_tag {};
 
         void write_to_log() const;
+
+        /// This is equivalent to malloc(), except that it tries to allocate
+        /// page-aligned memory from the OS.
+        void* allocate(std::size_t len);
+
+        /// Free memory that was previously allocated by allocate
+        void deallocate(void* addr, std::size_t len);
 
     private:
         static mask_type empty_mask;

@@ -86,7 +86,8 @@ namespace hpx { namespace threads { namespace policies
             boost::atomic<bool> v;
             flag_type() { v = false; }
             flag_type(flag_type const & f) { v.store(f.v.load()); }
-            flag_type & operator=(flag_type const & f) { v.store(f.v.load()); return *this; }
+            flag_type & operator=(flag_type const & f) { v.store(f.v.load());
+               return *this; }
             flag_type & operator=(bool b) { v.store(b); return *this;}
             bool operator==(bool b) { return v == b; }
             operator bool() { return v; }
@@ -178,6 +179,11 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const { return numa_sensitive_; }
+
+        static std::string get_scheduler_name()
+        {
+            return "hierarchy_scheduler";
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
@@ -638,7 +644,8 @@ namespace hpx { namespace threads { namespace policies
             tree.back()[0]->schedule_thread(thrd);
         }
 
-        void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
+        void schedule_thread_last(threads::thread_data_base* thrd,
+            std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
             HPX_ASSERT(tree.size());
