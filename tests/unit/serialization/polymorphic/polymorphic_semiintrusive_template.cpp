@@ -26,6 +26,8 @@ struct A
 
     A() = default;
 
+    virtual ~A() {};
+
     virtual void foo() const = 0;
 
 };
@@ -43,6 +45,8 @@ struct B: A<T>
     {}
 
     B() = default;
+
+    virtual ~B() {};
 
     virtual void foo() const{}
 
