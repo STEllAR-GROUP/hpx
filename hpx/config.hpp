@@ -38,7 +38,6 @@
 #if defined(_MSC_VER)
 // On Windows, make sure winsock.h is not included even if windows.h is
 // included before winsock2.h
-#define WIN32_LEAN_AND_MEAN
 #define _WINSOCKAPI_
 #endif
 
