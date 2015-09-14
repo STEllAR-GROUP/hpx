@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -24,9 +25,9 @@
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
+#include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/asio/io_service.hpp>
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>

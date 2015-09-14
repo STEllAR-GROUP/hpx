@@ -38,6 +38,7 @@
 #include <boost/type_traits/remove_reference.hpp>
 
 #include <hpx/traits.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
@@ -46,19 +47,16 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-
-/// \cond NOINTERNAL
-namespace boost
-{
-    class exception_ptr;
-}
-/// \endcond
 
 /// \namespace hpx
 ///
@@ -86,18 +84,6 @@ namespace hpx
         HPX_API_EXPORT applier* get_applier_ptr();
     }
 
-    namespace agas
-    {
-        struct HPX_API_EXPORT addressing_service;
-
-        enum service_mode
-        {
-            service_mode_invalid = -1,
-            service_mode_bootstrap = 0,
-            service_mode_hosted = 1
-        };
-    }
-
     /// \namespace naming
     ///
     /// The namespace \a naming contains all definitions needed for the AGAS
@@ -117,60 +103,8 @@ namespace hpx
         typedef boost::uint64_t address_type;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// \namespace parcelset
-    namespace parcelset
-    {
-        class HPX_API_EXPORT locality;
-
-        class HPX_API_EXPORT parcel;
-        class HPX_API_EXPORT parcelport;
-        class HPX_API_EXPORT parcelhandler;
-
-        namespace server
-        {
-            class parcelport_queue;
-        }
-
-        struct parcelhandler_queue_base;
-
-        namespace policies
-        {
-            struct global_parcelhandler_queue;
-            typedef global_parcelhandler_queue parcelhandler_queue;
-
-            struct message_handler;
-        }
-
-        HPX_API_EXPORT policies::message_handler* get_message_handler(
-            parcelhandler* ph, char const* name, char const* type,
-            std::size_t num, std::size_t interval, locality const& l,
-            error_code& ec = throws);
-
-        HPX_API_EXPORT bool do_background_work(std::size_t num_thread = 0);
-    }
-
     class HPX_API_EXPORT runtime;
     class HPX_API_EXPORT thread;
-
-    /// A HPX runtime can be executed in two different modes: console mode
-    /// and worker mode.
-    enum runtime_mode
-    {
-        runtime_mode_invalid = -1,
-        runtime_mode_console = 0,   ///< The runtime is the console locality
-        runtime_mode_worker = 1,    ///< The runtime is a worker locality
-        runtime_mode_connect = 2,   ///< The runtime is a worker locality
-                                    ///< connecting late
-        runtime_mode_default = 3,   ///< The runtime mode will be determined
-                                    ///< based on the command line arguments
-        runtime_mode_last
-    };
-
-    /// Get the readable string representing the name of the given runtime_mode
-    /// constant.
-    HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);
-    HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(std::string const& mode);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
@@ -315,34 +249,6 @@ namespace hpx
 
 namespace hpx
 {
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the global id representing this locality
-    ///
-    /// The function \a find_here() can be used to retrieve the global id
-    /// usable to refer to the current locality.
-    ///
-    /// \param ec [in,out] this represents the error status on exit, if this
-    ///           is pre-initialized to \a hpx#throws the function will throw
-    ///           on error instead.
-    ///
-    /// \note     Generally, the id of a locality can be used for instance to
-    ///           create new instances of components and to invoke plain actions
-    ///           (global functions).
-    ///
-    /// \returns  The global id representing the locality this function has
-    ///           been called on.
-    ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           hpx::exception.
-    ///
-    /// \note     This function will return meaningful results only if called
-    ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
-    ///           otherwise.
-    ///
-    /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
-    HPX_API_EXPORT naming::id_type find_here(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing the root locality
@@ -730,30 +636,6 @@ namespace hpx
     HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const& f);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the number of the locality this function is being called
-    ///        from.
-    ///
-    /// This function returns the id of the current locality.
-    ///
-    /// \param ec [in,out] this represents the error status on exit, if this
-    ///           is pre-initialized to \a hpx#throws the function will throw
-    ///           on error instead.
-    ///
-    /// \note     The returned value is zero based and its maximum value is
-    ///           smaller than the overall number of localities the current
-    ///           application is running on (as returned by
-    ///           \a get_num_localities()).
-    ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           hpx::exception.
-    ///
-    /// \note     This function needs to be executed on a HPX-thread. It will
-    ///           fail otherwise (it will return -1).
-    HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
-
-    ///////////////////////////////////////////////////////////////////////////
     /// \brief Test whether the runtime system is currently being started.
     ///
     /// This function returns whether the runtime system is currently being
@@ -1012,6 +894,7 @@ namespace hpx
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>

@@ -6,9 +6,8 @@
 #if !defined(HPX_7B5783D6_FCA3_4E3D_BBCE_FBB0A6CF644B)
 #define HPX_7B5783D6_FCA3_4E3D_BBCE_FBB0A6CF644B
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/interval_timer.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/config/export_definitions.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/include/performance_counters.hpp>
 
 #include <string>

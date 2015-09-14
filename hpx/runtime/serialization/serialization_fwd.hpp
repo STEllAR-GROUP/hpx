@@ -32,8 +32,10 @@ namespace hpx { namespace serialization
 #endif
     }
 
+    class access;
     struct input_archive;
     struct output_archive;
+    struct binary_filter;
 
     BOOST_FORCEINLINE
     void register_pointer(input_archive & ar, boost::uint64_t pos,

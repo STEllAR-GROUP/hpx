@@ -11,6 +11,7 @@
 #define HPX_PARCELSET_POLICIES_TCP_CONNECTION_HANDLER_HPP
 
 #include <hpx/config/warnings_prefix.hpp>
+#include <hpx/config/asio.hpp>
 
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>

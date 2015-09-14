@@ -45,6 +45,7 @@
 
 #include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/config.hpp>
 #include <boost/atomic.hpp>

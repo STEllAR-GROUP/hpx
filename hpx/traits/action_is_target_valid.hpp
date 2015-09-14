@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_ACTION_IS_TARGET_VALID_MAR_10_2014_1103AM)
 #define HPX_TRAITS_ACTION_IS_TARGET_VALID_MAR_10_2014_1103AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits

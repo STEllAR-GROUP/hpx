@@ -8,7 +8,7 @@
 #if !defined(HPX_UTIL_COORDINATE_NOV_03_2014_0227PM)
 #define HPX_UTIL_COORDINATE_NOV_03_2014_0227PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <algorithm>

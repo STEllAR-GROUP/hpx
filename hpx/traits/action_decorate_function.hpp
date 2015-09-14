@@ -6,7 +6,6 @@
 #if !defined(HPX_TRAITS_ACTION_DECORATE_FUNCTION_MAR_30_2014_1054AM)
 #define HPX_TRAITS_ACTION_DECORATE_FUNCTION_MAR_30_2014_1054AM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/always_void.hpp>
 

@@ -6,8 +6,14 @@
 #if !defined(HPX_UTIL_PARSE_COMMAND_LINE_NOV_30_2011_0652PM)
 #define HPX_UTIL_PARSE_COMMAND_LINE_NOV_30_2011_0652PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/export_definitions.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/util/ini.hpp>
+
 #include <boost/program_options.hpp>
+
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
