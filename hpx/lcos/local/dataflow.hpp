@@ -7,8 +7,14 @@
 #ifndef HPX_LCOS_LOCAL_DATAFLOW_HPP
 #define HPX_LCOS_LOCAL_DATAFLOW_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/is_future_range.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/acquire_future.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/bind.hpp>
@@ -16,11 +22,6 @@
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_future_range.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/acquire_future.hpp>
 
 #include <boost/fusion/include/begin.hpp>
 #include <boost/fusion/include/deref.hpp>

@@ -13,13 +13,13 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>

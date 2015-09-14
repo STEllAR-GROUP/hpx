@@ -7,6 +7,7 @@
 #ifndef HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_INPUT_ARCHIVE_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/input_container.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>

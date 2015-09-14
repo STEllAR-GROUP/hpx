@@ -24,14 +24,18 @@ macro(create_cmake_test name hpx_dir)
   if(CMAKE_SYSROOT)
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_SYSROOT=${CMAKE_SYSROOT})
   endif()
+  if(MSVC)
+    set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -G "${CMAKE_GENERATOR}")
+  else()
+    set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER})
+    set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER})
+  endif()
   add_custom_target(${name}.make_configure
     COMMAND
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}"
       "${PROJECT_SOURCE_DIR}/tests/unit/build/src"
       -DHPX_DIR=${hpx_dir}
       ${ADDITIONAL_CMAKE_OPTIONS}
-      -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-      -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
       -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=$<CONFIGURATION> VERBATIM)
   add_dependencies(${name}.make_configure ${name}.make_build_dir hpx iostreams_component)

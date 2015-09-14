@@ -6,8 +6,10 @@
 #if !defined(HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM)
 #define HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM
 
-#include <hpx/hpx_fwd.hpp>
-
+#include <hpx/config.hpp>
+#include <hpx/traits/is_client.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
@@ -26,6 +28,7 @@
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/has_xxx.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,11 +42,6 @@ namespace hpx { namespace components
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
-    struct is_client
-      : boost::mpl::false_
-    {};
-
     template <typename Derived>
     struct is_client<Derived,
         typename util::always_void<typename Derived::stub_argument_type>::type
@@ -52,21 +50,6 @@ namespace hpx { namespace traits
                 Derived, typename Derived::stub_argument_type
             >,
             Derived>
-    {};
-
-    template <typename T, typename Enable = void>
-    struct is_client_or_client_array
-      : is_client<T>
-    {};
-
-    template <typename T>
-    struct is_client_or_client_array<T[]>
-      : is_client<T>
-    {};
-
-    template <typename T, std::size_t N>
-    struct is_client_or_client_array<T[N]>
-      : is_client<T>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

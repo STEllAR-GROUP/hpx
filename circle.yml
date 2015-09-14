@@ -26,6 +26,7 @@ dependencies:
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k examples
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.headers
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tools.inspect
         # TODO replace this line with "docker build" once docker managed to

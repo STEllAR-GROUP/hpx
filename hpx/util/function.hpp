@@ -7,7 +7,7 @@
 #ifndef HPX_UTIL_FUNCTION_HPP
 #define HPX_UTIL_FUNCTION_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/error.hpp>
 #include <hpx/util/detail/function_template.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>

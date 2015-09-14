@@ -6,6 +6,7 @@
 #ifndef HPX_SERIALIZATION_SET_HPP
 #define HPX_SERIALIZATION_SET_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <set>

@@ -7,7 +7,8 @@
 #define HPX_TRAITS_IS_LAUNCH_POLICY_APR_8_2014_0436PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/traits.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <boost/type_traits/is_same.hpp>

@@ -12,10 +12,12 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/invoke.hpp>
@@ -38,6 +40,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    namespace actions
+    {
+        template <typename Component, typename Signature, typename Derived>
+        struct basic_action;
+    }
+
     //////////////////////////////////////////////////////////////////////////
     // forward declare the required overload of apply.
     template <typename Action, typename ...Ts>

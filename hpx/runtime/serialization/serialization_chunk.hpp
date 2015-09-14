@@ -7,6 +7,8 @@
 #ifndef HPX_SERIALIZATION_SERIALIZATION_CHUNK_HPP
 #define HPX_SERIALIZATION_SERIALIZATION_CHUNK_HPP
 
+#include <hpx/config.hpp>
+
 #include <cstddef>
 #include <climits>
 #include <cstring>

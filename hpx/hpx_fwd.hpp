@@ -38,6 +38,7 @@
 #include <boost/type_traits/remove_reference.hpp>
 
 #include <hpx/traits.hpp>
+#include <hpx/traits/component_type_database.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/util/function.hpp>
@@ -45,11 +46,12 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/unused.hpp>
-#include <hpx/util/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 
 /// \cond NOINTERNAL
 namespace boost
@@ -148,7 +150,6 @@ namespace hpx
         HPX_API_EXPORT bool do_background_work(std::size_t num_thread = 0);
     }
 
-
     class HPX_API_EXPORT runtime;
     class HPX_API_EXPORT thread;
 
@@ -208,82 +209,13 @@ namespace hpx
     /// \namespace components
     namespace components
     {
-        enum component_enum_type
-        {
-            component_invalid = -1,
-
-            // Runtime support component (provides system services such as
-            // component creation, etc). One per locality.
-            component_runtime_support = 0,
-
-            // Pseudo-component to be used for plain actions
-            component_plain_function = 1,
-
-            // Pseudo-component for direct access to local virtual memory.
-            component_memory = 2,
-
-            // Generic memory blocks.
-            component_memory_block = 3,
-
-            // Base component for LCOs that do not produce a value.
-            component_base_lco = 4,
-
-            // Base component for LCOs that do produce values.
-            component_base_lco_with_value = 5,
-
-            // Synchronization latch, barrier, and flex_barrier LCOs.
-            component_latch = ((6 << 16) | component_base_lco_with_value),
-            component_barrier = ((7 << 16) | component_base_lco),
-            component_flex_barrier = ((8 << 16) | component_base_lco),
-
-            // An LCO representing a value which may not have been computed yet.
-            component_promise = ((9 << 16) | component_base_lco_with_value),
-
-            // AGAS locality services.
-            component_agas_locality_namespace = 10,
-
-            // AGAS primary address resolution services.
-            component_agas_primary_namespace = 11,
-
-            // AGAS global type system.
-            component_agas_component_namespace = 12,
-
-            // AGAS symbolic naming services.
-            component_agas_symbol_namespace = 13,
-
-#if defined(HPX_HAVE_SODIUM)
-            // root CA, subordinate CA
-            signed_certificate_promise = ((14 << 16) | component_base_lco_with_value),
-            component_root_certificate_authority = 15,
-            component_subordinate_certificate_authority = 16,
-#endif
-
-            component_last,
-            component_first_dynamic = component_last,
-
-            // Force this enum type to be at least 32 bits.
-            component_upper_bound = 0x7fffffffL //-V112
-        };
-
-        enum factory_state_enum
-        {
-            factory_enabled  = 0,
-            factory_disabled = 1,
-            factory_check    = 2
-        };
-
         /// \ cond NODETAIL
         namespace detail
         {
             struct this_type {};
-            struct fixed_component_tag {};
-            struct simple_component_tag {};
-            struct managed_component_tag {};
         }
         /// \ endcond
 
-        ///////////////////////////////////////////////////////////////////////
-        typedef boost::int32_t component_type;
         ///////////////////////////////////////////////////////////////////////
         template <typename Component = detail::this_type>
         class fixed_component_base;
@@ -362,23 +294,6 @@ namespace hpx
     {
         struct counter_info;
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the number of OS-threads running in the runtime instance
-    ///        the current HPX-thread is associated with.
-    HPX_API_EXPORT std::size_t get_os_thread_count();
-
-    /// \brief Return the number of worker OS- threads used by the given
-    ///        executor to execute HPX threads
-    ///
-    /// This function returns the number of cores used to execute HPX
-    /// threads for the given executor. If the function is called while no HPX
-    /// runtime system is active, it will return zero. If the executor is not
-    /// valid, this function will fall back to retrieving the number of OS
-    /// threads used by HPX.
-    ///
-    /// \param id [in] The id of the object to locate.
-    HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor const& exec);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool is_scheduler_numa_sensitive();
@@ -815,21 +730,6 @@ namespace hpx
     HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const& f);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the number of the current OS-thread running in the
-    ///        runtime instance the current HPX-thread is executed with.
-    ///
-    /// This function returns the zero based index of the OS-thread which
-    /// executes the current HPX-thread.
-    ///
-    /// \note   The returned value is zero based and its maximum value is
-    ///         smaller than the overall number of OS-threads executed (as
-    ///         returned by \a get_os_thread_count().
-    ///
-    /// \note   This function needs to be executed on a HPX-thread. It will
-    ///         fail otherwise (it will return -1).
-    HPX_API_EXPORT std::size_t get_worker_thread_num();
-
-    ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the locality this function is being called
     ///        from.
     ///
@@ -1114,6 +1014,8 @@ namespace hpx
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
+#include <hpx/runtime/get_os_thread_count.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/async_callback_fwd.hpp>

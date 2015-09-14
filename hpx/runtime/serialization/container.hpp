@@ -7,6 +7,7 @@
 #ifndef HPX_SERIALIZATION_CONTAINER_HPP
 #define HPX_SERIALIZATION_CONTAINER_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>

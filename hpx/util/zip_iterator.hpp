@@ -13,6 +13,7 @@
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/functional/segmented_iterator_helpers.hpp>
 #include <hpx/runtime/serialization/serialize_sequence.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/iterator/iterator_facade.hpp>
@@ -587,7 +588,7 @@ namespace hpx { namespace traits
 
         // Extract the base id for the segment referenced by the given segment
         // iterator.
-        static id_type get_id(segment_iterator const& iter)
+        static naming::id_type get_id(segment_iterator const& iter)
         {
             typedef typename util::tuple_element<
                     0, typename iterator::iterator_tuple_type

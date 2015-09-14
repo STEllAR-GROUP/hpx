@@ -7,7 +7,7 @@
 #if !defined(HPX_SERIALIZATION_SERIALIZE_BUFFER_APR_05_2013_0312PM)
 #define HPX_SERIALIZATION_SERIALIZE_BUFFER_APR_05_2013_0312PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <hpx/runtime/serialization/serialize.hpp>

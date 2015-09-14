@@ -22,6 +22,13 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
+    namespace actions { namespace detail
+    {
+        template <typename Result>
+        struct remote_action_result;
+    }}
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         template <typename Action, typename Cont>

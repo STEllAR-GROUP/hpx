@@ -6,7 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -16,6 +19,7 @@
 #include "public_key.hpp"
 
 #include <boost/io/ios_state.hpp>
+#include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace components { namespace security
 {
@@ -125,8 +129,10 @@ namespace hpx { namespace traits
     template <>
     struct is_bitwise_serializable<
             hpx::components::security::certificate>
-       : mpl::true_
+       : boost::mpl::true_
     {};
 }}
+
+#endif
 
 #endif

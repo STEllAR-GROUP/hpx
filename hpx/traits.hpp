@@ -33,6 +33,13 @@ namespace hpx { namespace traits
     struct component_type_is_compatible;
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable = void>
+    struct is_client;
+
+    template <typename T, typename Enable = void>
+    struct is_client_or_client_array;
+
+    ///////////////////////////////////////////////////////////////////////////
     // control the way managed_components are constructed
     struct construct_with_back_ptr {};
     struct construct_without_back_ptr {};

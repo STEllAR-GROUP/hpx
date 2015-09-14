@@ -18,11 +18,13 @@
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/eval_if.hpp>

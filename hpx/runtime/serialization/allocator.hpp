@@ -6,7 +6,7 @@
 #if !defined(HPX_SERIALIZATION_ALLOCATOR_FEB_19_2014_0711PM)
 #define HPX_SERIALIZATION_ALLOCATOR_FEB_19_2014_0711PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

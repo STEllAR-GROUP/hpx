@@ -183,6 +183,7 @@ hpx_option(HPX_WITH_TESTS BOOL "Build the HPX tests (default ON)" ON CATEGORY "B
 hpx_option(HPX_WITH_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_WITH_TESTS_HEADERS BOOL "Build HPX header tests (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
@@ -468,10 +469,25 @@ hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
 
 ## Profiling related build options
 hpx_option(HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
+if(HPX_WITH_APEX)
+  hpx_add_config_define(HPX_HAVE_APEX)
+endif()
 hpx_option(HPX_WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
+if(HPX_WITH_PAPI)
+  hpx_add_config_define(HPX_HAVE_PAPI)
+endif()
 hpx_option(HPX_WITH_TAU BOOL "Enable TAU profiling support." OFF CATEGORY "Profiling")
+if(HPX_WITH_TAU)
+  hpx_add_config_define(HPX_HAVE_TAU)
+endif()
 hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
+if(HPX_WITH_GOOGLE_PERFTOOLS)
+  hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
+endif()
 hpx_option(HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
+if(HPX_WITH_ITTNOTIFY)
+  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+endif()
 
 ## Debugging related build options
 hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")

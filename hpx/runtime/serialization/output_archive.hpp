@@ -7,6 +7,7 @@
 #ifndef HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/output_container.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>

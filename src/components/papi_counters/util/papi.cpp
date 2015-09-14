@@ -4,6 +4,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_PAPI)
+
 #include <map>
 
 #include <boost/format.hpp>
@@ -307,3 +310,5 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     }
 
 }}}}
+
+#endif

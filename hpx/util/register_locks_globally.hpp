@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_REGISTER_LOCKS_GLOBALLY_JAN_27_2014_0607PM)
 #define HPX_UTIL_REGISTER_LOCKS_GLOBALLY_JAN_27_2014_0607PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 namespace hpx { namespace util
 {

@@ -6,8 +6,9 @@
 #if !defined(HPX_LCOS_ASYNC_CALLBACK_MAR_30_2015_1119AM)
 #define HPX_LCOS_ASYNC_CALLBACK_MAR_30_2015_1119AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async.hpp>

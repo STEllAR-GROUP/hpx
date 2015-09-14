@@ -6,6 +6,7 @@
 #ifndef HPX_SERIALIZATION_STRING_HPP
 #define HPX_SERIALIZATION_STRING_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <string>

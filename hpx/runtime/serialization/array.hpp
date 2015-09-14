@@ -8,10 +8,11 @@
 #ifndef HPX_SERIALIZATION_ARRAY_HPP
 #define HPX_SERIALIZATION_ARRAY_HPP
 
-#include <cstddef>
-
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
+
+#include <cstddef>
 
 #include <boost/array.hpp>
 #ifndef BOOST_NO_CXX11_HDR_ARRAY

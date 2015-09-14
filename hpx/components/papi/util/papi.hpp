@@ -6,6 +6,15 @@
 #if !defined(HPX_PERFORMANCE_COUNTERS_PAPI_UTIL_PAPI_201112101243)
 #define HPX_PERFORMANCE_COUNTERS_PAPI_UTIL_PAPI_201112101243
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_PAPI)
+
+#include <hpx/hpx.hpp>
+#include <hpx/config/export_definitions.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/exception.hpp>
+
 #include <vector>
 #include <string>
 #include <cstring>
@@ -16,11 +25,6 @@
 #include <boost/generator_iterator.hpp>
 
 #include <papi.h>
-
-#include <hpx/hpx.hpp>
-#include <hpx/config/export_definitions.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/exception.hpp>
 
 #if PAPI_VERSION_MAJOR(PAPI_VERSION) > 4
 #define PAPI_EXTENDED_EVENT_CODES 1
@@ -239,5 +243,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     boost::uint32_t get_counter_thread(counter_path_elements const&, std::string&);
 
 }}}}
+
+#endif
 
 #endif

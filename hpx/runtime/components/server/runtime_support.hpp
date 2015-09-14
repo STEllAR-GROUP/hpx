@@ -8,7 +8,8 @@
 #if !defined(HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM)
 #define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -977,6 +978,12 @@ namespace hpx { namespace traits
         }
     };
 #endif
+
+    // runtime_support is a (hand-rolled) component
+    template <>
+    struct is_component<components::server::runtime_support>
+      : boost::mpl::true_
+    {};
 }}
 
 #endif  // HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
