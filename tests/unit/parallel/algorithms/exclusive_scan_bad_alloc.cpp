@@ -15,7 +15,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_exclusive_scan1(ExPolicy policy, IteratorTag)
+void test_exclusive_scan_bad_alloc(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -26,26 +26,30 @@ void test_exclusive_scan1(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
-    std::size_t const val(0);
-    auto op =
-        [val](std::size_t v1, std::size_t v2) {
-            return v1 + v2;
-        };
+    bool caught_exception = false;
+    try {
+        hpx::parallel::exclusive_scan(policy,
+            iterator(boost::begin(c)), iterator(boost::end(c)),
+            boost::begin(d), std::size_t(0),
+            [](std::size_t v1, std::size_t v2)
+            {
+                return throw std::bad_alloc(), v1 + v2;
+            });
 
-    hpx::parallel::exclusive_scan(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
-        val, op);
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_exception = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
 
-    // verify values
-    std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_exclusive_scan(
-        boost::begin(c), boost::end(c), boost::begin(e), val, op);
-
-    HPX_TEST(std::equal(boost::begin(d), boost::end(d), boost::begin(e)));
+    HPX_TEST(caught_exception);
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_exclusive_scan1_async(ExPolicy p, IteratorTag)
+void test_exclusive_scan_bad_alloc_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -54,53 +58,61 @@ void test_exclusive_scan1_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
-    std::size_t const val(0);
-    auto op =
-        [val](std::size_t v1, std::size_t v2) {
-            return v1 + v2;
-        };
+    bool caught_exception = false;
+    bool returned_from_algorithm = false;
+    try {
+        hpx::future<void> f =
+            hpx::parallel::exclusive_scan(p,
+                iterator(boost::begin(c)), iterator(boost::end(c)),
+                boost::begin(d), std::size_t(0),
+                [](std::size_t v1, std::size_t v2)
+                {
+                    return throw std::bad_alloc(), v1 + v2;
+                });
 
-    hpx::future<void> f =
-        hpx::parallel::exclusive_scan(p,
-            iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
-            val, op);
-    f.wait();
+        returned_from_algorithm = true;
+        f.get();
 
-    // verify values
-    std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_exclusive_scan(
-        boost::begin(c), boost::end(c), boost::begin(e), val, op);
+        HPX_TEST(false);
+    }
+    catch(std::bad_alloc const&) {
+        caught_exception = true;
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
 
-    HPX_TEST(std::equal(boost::begin(d), boost::end(d), boost::begin(e)));
+    HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
-void test_exclusive_scan1()
+void test_exclusive_scan_bad_alloc()
 {
     using namespace hpx::parallel;
 
-    test_exclusive_scan1(seq, IteratorTag());
-    test_exclusive_scan1(par, IteratorTag());
-    test_exclusive_scan1(par_vec, IteratorTag());
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
+    test_exclusive_scan_bad_alloc(seq, IteratorTag());
+    test_exclusive_scan_bad_alloc(par, IteratorTag());
 
-    test_exclusive_scan1_async(seq(task), IteratorTag());
-    test_exclusive_scan1_async(par(task), IteratorTag());
+    test_exclusive_scan_bad_alloc_async(seq(task), IteratorTag());
+    test_exclusive_scan_bad_alloc_async(par(task), IteratorTag());
 
-    test_exclusive_scan1(execution_policy(seq), IteratorTag());
-    test_exclusive_scan1(execution_policy(par), IteratorTag());
-    test_exclusive_scan1(execution_policy(par_vec), IteratorTag());
+    test_exclusive_scan_bad_alloc(execution_policy(seq), IteratorTag());
+    test_exclusive_scan_bad_alloc(execution_policy(par), IteratorTag());
 
-    test_exclusive_scan1(execution_policy(seq(task)), IteratorTag());
-    test_exclusive_scan1(execution_policy(par(task)), IteratorTag());
+    test_exclusive_scan_bad_alloc(execution_policy(seq(task)), IteratorTag());
+    test_exclusive_scan_bad_alloc(execution_policy(par(task)), IteratorTag());
 }
 
-void exclusive_scan_test1()
+void exclusive_scan_bad_alloc_test()
 {
-    test_exclusive_scan1<std::random_access_iterator_tag>();
-    test_exclusive_scan1<std::forward_iterator_tag>();
-    test_exclusive_scan1<std::input_iterator_tag>();
+    test_exclusive_scan_bad_alloc<std::random_access_iterator_tag>();
+    test_exclusive_scan_bad_alloc<std::forward_iterator_tag>();
+    test_exclusive_scan_bad_alloc<std::input_iterator_tag>();
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -111,7 +123,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    exclusive_scan_test1();
+    exclusive_scan_bad_alloc_test();
 
   return hpx::finalize();
 }

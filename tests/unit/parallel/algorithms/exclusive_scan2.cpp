@@ -15,7 +15,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_exclusive_scan1(ExPolicy policy, IteratorTag)
+void test_exclusive_scan2(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -27,25 +27,21 @@ void test_exclusive_scan1(ExPolicy policy, IteratorTag)
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    auto op =
-        [val](std::size_t v1, std::size_t v2) {
-            return v1 + v2;
-        };
-
     hpx::parallel::exclusive_scan(policy,
         iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
-        val, op);
+        val);
 
     // verify values
     std::vector<std::size_t> e(c.size());
     hpx::parallel::v1::detail::sequential_exclusive_scan(
-        boost::begin(c), boost::end(c), boost::begin(e), val, op);
+        boost::begin(c), boost::end(c), boost::begin(e), val,
+        std::plus<std::size_t>());
 
     HPX_TEST(std::equal(boost::begin(d), boost::end(d), boost::begin(e)));
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_exclusive_scan1_async(ExPolicy p, IteratorTag)
+void test_exclusive_scan2_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -55,50 +51,46 @@ void test_exclusive_scan1_async(ExPolicy p, IteratorTag)
     std::fill(boost::begin(c), boost::end(c), std::size_t(1));
 
     std::size_t const val(0);
-    auto op =
-        [val](std::size_t v1, std::size_t v2) {
-            return v1 + v2;
-        };
-
     hpx::future<void> f =
         hpx::parallel::exclusive_scan(p,
             iterator(boost::begin(c)), iterator(boost::end(c)), boost::begin(d),
-            val, op);
+            val);
     f.wait();
 
     // verify values
     std::vector<std::size_t> e(c.size());
     hpx::parallel::v1::detail::sequential_exclusive_scan(
-        boost::begin(c), boost::end(c), boost::begin(e), val, op);
+        boost::begin(c), boost::end(c), boost::begin(e), val,
+        std::plus<std::size_t>());
 
     HPX_TEST(std::equal(boost::begin(d), boost::end(d), boost::begin(e)));
 }
 
 template <typename IteratorTag>
-void test_exclusive_scan1()
+void test_exclusive_scan2()
 {
     using namespace hpx::parallel;
 
-    test_exclusive_scan1(seq, IteratorTag());
-    test_exclusive_scan1(par, IteratorTag());
-    test_exclusive_scan1(par_vec, IteratorTag());
+    test_exclusive_scan2(seq, IteratorTag());
+    test_exclusive_scan2(par, IteratorTag());
+    test_exclusive_scan2(par_vec, IteratorTag());
 
-    test_exclusive_scan1_async(seq(task), IteratorTag());
-    test_exclusive_scan1_async(par(task), IteratorTag());
+    test_exclusive_scan2_async(seq(task), IteratorTag());
+    test_exclusive_scan2_async(par(task), IteratorTag());
 
-    test_exclusive_scan1(execution_policy(seq), IteratorTag());
-    test_exclusive_scan1(execution_policy(par), IteratorTag());
-    test_exclusive_scan1(execution_policy(par_vec), IteratorTag());
+    test_exclusive_scan2(execution_policy(seq), IteratorTag());
+    test_exclusive_scan2(execution_policy(par), IteratorTag());
+    test_exclusive_scan2(execution_policy(par_vec), IteratorTag());
 
-    test_exclusive_scan1(execution_policy(seq(task)), IteratorTag());
-    test_exclusive_scan1(execution_policy(par(task)), IteratorTag());
+    test_exclusive_scan2(execution_policy(seq(task)), IteratorTag());
+    test_exclusive_scan2(execution_policy(par(task)), IteratorTag());
 }
 
-void exclusive_scan_test1()
+void exclusive_scan_test2()
 {
-    test_exclusive_scan1<std::random_access_iterator_tag>();
-    test_exclusive_scan1<std::forward_iterator_tag>();
-    test_exclusive_scan1<std::input_iterator_tag>();
+    test_exclusive_scan2<std::random_access_iterator_tag>();
+    test_exclusive_scan2<std::forward_iterator_tag>();
+    test_exclusive_scan2<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -111,7 +103,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    exclusive_scan_test1();
+    exclusive_scan_test2();
 
   return hpx::finalize();
 }

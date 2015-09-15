@@ -14,7 +14,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_n(ExPolicy policy, IteratorTag)
+void test_for_each_n_exception(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -24,26 +24,27 @@ void test_for_each_n(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    iterator result = hpx::parallel::for_each_n(policy,
-        iterator(boost::begin(c)), c.size(),
-        [](std::size_t& v) {
-            v = 42;
-        });
-    iterator end = iterator(boost::end(c));
-    HPX_TEST(result == end);
+    bool caught_exception = false;
+    try {
+        hpx::parallel::for_each_n(policy,
+            iterator(boost::begin(c)), c.size(),
+            [](std::size_t& v) { throw std::runtime_error("test"); });
 
-    // verify values
-    std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
-        [&count](std::size_t v) -> void {
-            HPX_TEST_EQ(v, std::size_t(42));
-            ++count;
-        });
-    HPX_TEST_EQ(count, c.size());
+        HPX_TEST(false);
+    }
+    catch(hpx::exception_list const& e) {
+        caught_exception = true;
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_n_async(ExPolicy p, IteratorTag)
+void test_for_each_n_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -51,49 +52,56 @@ void test_for_each_n_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand());
 
-    hpx::future<iterator> f =
-        hpx::parallel::for_each_n(p,
-            iterator(boost::begin(c)), c.size(),
-            [](std::size_t& v) {
-                v = 42;
-            });
-    HPX_TEST(f.get() == iterator(boost::end(c)));
+    bool caught_exception = false;
+    bool returned_from_algorithm = false;
+    try {
+        hpx::future<iterator> f =
+            hpx::parallel::for_each_n(p,
+                iterator(boost::begin(c)), c.size(),
+                [](std::size_t& v) { throw std::runtime_error("test"); });
+        returned_from_algorithm = true;
+        f.get();    // rethrow exception
 
-    // verify values
-    std::size_t count = 0;
-    std::for_each(boost::begin(c), boost::end(c),
-        [&count](std::size_t v) -> void {
-            HPX_TEST_EQ(v, std::size_t(42));
-            ++count;
-        });
-    HPX_TEST_EQ(count, c.size());
+        HPX_TEST(false);
+    }
+    catch(hpx::exception_list const& e) {
+        caught_exception = true;
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
+    }
+    catch(...) {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
 }
 
 template <typename IteratorTag>
-void test_for_each_n()
+void test_for_each_n_exception()
 {
     using namespace hpx::parallel;
 
-    test_for_each_n(seq, IteratorTag());
-    test_for_each_n(par, IteratorTag());
-    test_for_each_n(par_vec, IteratorTag());
+    // If the execution policy object is of type vector_execution_policy,
+    // std::terminate shall be called. therefore we do not test exceptions
+    // with a vector execution policy
+    test_for_each_n_exception(seq, IteratorTag());
+    test_for_each_n_exception(par, IteratorTag());
 
-    test_for_each_n_async(seq(task), IteratorTag());
-    test_for_each_n_async(par(task), IteratorTag());
+    test_for_each_n_exception_async(seq(task), IteratorTag());
+    test_for_each_n_exception_async(par(task), IteratorTag());
 
-    test_for_each_n(execution_policy(seq), IteratorTag());
-    test_for_each_n(execution_policy(par), IteratorTag());
-    test_for_each_n(execution_policy(par_vec), IteratorTag());
+    test_for_each_n_exception(execution_policy(seq), IteratorTag());
+    test_for_each_n_exception(execution_policy(par), IteratorTag());
 
-    test_for_each_n(execution_policy(seq(task)), IteratorTag());
-    test_for_each_n(execution_policy(par(task)), IteratorTag());
+    test_for_each_n_exception(execution_policy(seq(task)), IteratorTag());
+    test_for_each_n_exception(execution_policy(par(task)), IteratorTag());
 }
 
-void for_each_n_test()
+void for_each_n_exception_test()
 {
-    test_for_each_n<std::random_access_iterator_tag>();
-    test_for_each_n<std::forward_iterator_tag>();
-    test_for_each_n<std::input_iterator_tag>();
+    test_for_each_n_exception<std::random_access_iterator_tag>();
+    test_for_each_n_exception<std::forward_iterator_tag>();
+    test_for_each_n_exception<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,7 +114,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    for_each_n_test();
+    for_each_n_exception_test();
     return hpx::finalize();
 }
 
