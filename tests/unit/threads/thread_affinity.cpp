@@ -26,10 +26,6 @@
 #  include <hwloc.h>
 #endif
 
-#if defined(__linux__) && !defined(HPX_HAVE_PTHREAD_SETAFFINITY_NP)
-#  include <sys/syscall.h>      // make SYS_gettid available
-#endif
-
 std::size_t thread_affinity_worker(std::size_t desired)
 {
     // Returns the OS-thread number of the worker that is running this
@@ -45,11 +41,18 @@ std::size_t thread_affinity_worker(std::size_t desired)
         hpx::threads::mask_type desired_mask = t.get_thread_affinity_mask(current,
             numa_sensitive);
 
-        std::size_t idx = hpx::threads::find_first(desired_mask);
+        std::size_t logical_idx = hpx::threads::find_first(desired_mask);
+
+        std::size_t idx = 0;
 
         hwloc_topology_t topo;
         hwloc_topology_init(&topo);
         hwloc_topology_load(topo);
+
+        int const pu_depth = hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
+        hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(topo, pu_depth, logical_idx);
+        idx = pu_obj->os_index;
+
 
         // retrieve the current affinity mask
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
