@@ -30,6 +30,7 @@ namespace hpx { namespace parallel { namespace util
     template <typename T, typename Executors>
     class numa_allocator
     {
+        typedef typename Executors::value_type executor_type;
     public:
         // typedefs
         typedef T value_type;
@@ -99,7 +100,6 @@ namespace hpx { namespace parallel { namespace util
                                 topo_.get_thread_affinity_mask_from_lva(
                                     reinterpret_cast<hpx::naming::address_type>(&val));
 
-                            typedef typename Executors::value_type executor_type;
                             typedef hpx::parallel::executor_information_traits<
                                 executor_type> traits;
 
