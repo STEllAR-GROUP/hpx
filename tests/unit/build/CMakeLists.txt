@@ -43,8 +43,11 @@ macro(create_cmake_test name hpx_dir)
     add_dependencies(${name}.make_configure hpx_init)
   endif()
   add_custom_target(${name}.make_compile
-    COMMAND "${CMAKE_COMMAND}" --build "${build_dir}" VERBATIM
-  )
+    COMMAND
+      "${CMAKE_COMMAND}"
+        --build "${build_dir}"
+        --config $<CONFIGURATION>
+    VERBATIM)
   add_dependencies(${name}.make_compile ${name}.make_configure)
   add_hpx_pseudo_target(${name})
   add_hpx_pseudo_dependencies_no_shortening(${name} ${name}.make_compile)
