@@ -401,7 +401,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             numa_workers.push_back(
                 hpx::async(
                     execs[domain],
-                    [&, domain]()
+                    [&, domain]() -> double
                     {
                         double errsq = 0.0;
                         for(boost::uint64_t iter = 0; iter < iterations; ++iter)
