@@ -412,6 +412,12 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_HAVE_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
+  if(HPX_WITH_APEX)
+    if(_scheduler STREQUAL "THROTTLE" OR _all)
+      hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
+      set(HPX_HAVE_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
+    endif()
+  endif(HPX_WITH_APEX)
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
     set(HPX_HAVE_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
@@ -534,6 +540,12 @@ endif()
 
 if(HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF)
   hpx_add_config_define(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+endif()
+
+# If APEX is defined, the action timers need thread debug info.
+if(HPX_WITH_APEX)
+    hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
+    set(HPX_HAVE_THREAD_DESCRIPTION ON CACHE INTERNAL "")
 endif()
 
 if(HPX_WITH_THREAD_DEBUG_INFO)
@@ -896,7 +908,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
     # OpenMPI triggers a lot of forcing value to bool 'true' or 'false'
     # (performance warning)
-    if(MPI_FOUND)
+    if(MPI_FOUND OR HPX_WITH_APEX)
       hpx_add_compile_flag(-wd4800)
     endif()
   else() # Trial and error approach for any other compiler ...
@@ -987,6 +999,7 @@ else()
   endif()
 
   # Check if our libraries have unresolved symbols
+  #if(NOT APPLE AND NOT HPX_WITH_APEX)
   if(NOT APPLE)
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
@@ -1097,16 +1110,50 @@ endif()
 # Enable integration with Apex event counters
 ################################################################################
 if(HPX_WITH_APEX)
-  find_package(APEX)
+  # handle APEX library
+  include(GitExternal)
+  git_external(apex
+    https://github.com/khuck/xpress-apex.git
+    master
+    NO_UPDATE VERBOSE)
+
+  LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
+  add_subdirectory(apex/src/apex)
   if(NOT APEX_FOUND)
-    hpx_error("Apex could not be found and HPX_WITH_APEX=On, please specify APEX_ROOT to point to the root of your Apex installation")
+    hpx_error("Apex could not be found and HPX_WITH_APEX=On")
   endif()
-  hpx_libraries(${APEX_LIBRARIES})
-  include_directories(${APEX_INCLUDE_DIR})
   if(AMPLIFIER_FOUND)
     hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
   endif()
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+
+  include_directories(${APEX_SOURCE_DIR})
+  hpx_add_config_define(HPX_HAVE_APEX 1)
+  set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+      ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} apex_lib)
+  if(APEX_WITH_MSR)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
+  endif()
+  if(APEX_WITH_ACTIVEHARMONY)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+  endif()
+  if(APEX_WITH_TAU)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${TAU_ROOT}/lib -lTAU)
+  endif()
+
+  # handle optional ITTNotify library
+  if(HPX_WITH_ITTNOTIFY)
+    add_subdirectory(apex/src/ITTNotify)
+    if(NOT ITTNOTIFY_FOUND)
+      hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
+    endif()
+    include_directories(${ITTNOTIFY_SOURCE_DIR})
+    hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} ittnotify_lib)
+  endif()
 endif()
 
 if(HPX_WITH_GOOGLE_PERFTOOLS)
@@ -1427,11 +1474,11 @@ install( # Install HPX Python scripts
 #       #make copy, so that we have intact symlink in CMAKE_BINARY_DIR
 #       execute_process(
 #         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${script}" "${script_name}"
-# 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+#   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 #
 #       execute_process(
 #         COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
-# 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+#   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 #
 #       install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "bin")
 #     endforeach()

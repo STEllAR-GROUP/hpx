@@ -347,6 +347,9 @@ namespace hpx {
         // set thread name as shown in Visual Studio
         util::set_thread_name("main-thread#wait_helper");
 
+#if defined(HPX_HAVE_APEX)
+        apex::register_thread("main-thread#wait_helper");
+#endif
         // wait for termination
         runtime_support_->wait();
 
@@ -601,6 +604,10 @@ namespace hpx {
 
             // set thread name as shown in Visual Studio
             util::set_thread_name(name);
+
+#if defined(HPX_HAVE_APEX)
+            apex::register_thread(name);
+#endif
         }
 
         // if this is a service thread, set its service affinity
@@ -751,6 +758,12 @@ template class HPX_EXPORT hpx::runtime_impl<
 #include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::static_queue_scheduler<> >;
+#endif
+
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::runtime_impl<
+    hpx::threads::policies::throttle_queue_scheduler<> >;
 #endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
