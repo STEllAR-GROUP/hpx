@@ -52,7 +52,7 @@ namespace hpx { namespace serialization
                 }
             };
 
-            struct non_intrusive_polymorphic
+            struct non_intrusive
             {
                 // this additional indirection level is needed to
                 // force ADL on the second phase of template lookup.
@@ -74,7 +74,7 @@ namespace hpx { namespace serialization
                 }
             };
 
-            struct usual
+            struct intrusive_usual
             {
                 template <class Archive>
                 static void call(Archive& ar, T& t, unsigned)
@@ -87,22 +87,15 @@ namespace hpx { namespace serialization
             typedef typename boost::mpl::eval_if<
                 hpx::traits::is_intrusive_polymorphic<T>,
                     boost::mpl::identity<intrusive_polymorphic>,
-                    boost::mpl::eval_if<
-                        hpx::traits::is_nonintrusive_polymorphic<T>,
-                            boost::mpl::identity<non_intrusive_polymorphic>,
-                            boost::mpl::eval_if<
-                                boost::mpl::and_<
-                                    boost::mpl::not_<
-                                        hpx::traits::has_serialize<T>
-                                    >,
-                                    boost::is_empty<T>
-                                >,
-                                    boost::mpl::identity<empty>,
-                                    boost::mpl::identity<usual>
-                            >
-
-
-                    >
+                        boost::mpl::eval_if<
+                            hpx::traits::has_serialize<T>,
+                                boost::mpl::identity<intrusive_usual>,
+                                boost::mpl::eval_if<
+                                    boost::is_empty<T>,
+                                        boost::mpl::identity<empty>,
+                                        boost::mpl::identity<non_intrusive>
+                                >
+                        >
             >::type type;
         };
 
