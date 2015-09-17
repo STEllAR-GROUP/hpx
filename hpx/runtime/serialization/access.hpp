@@ -23,8 +23,14 @@ namespace hpx { namespace serialization
 {
     namespace detail
     {
-        template <class Archive, class T>
-        BOOST_FORCEINLINE void serialize_force_adl(Archive& ar, T& t, unsigned)
+        template <class T> BOOST_FORCEINLINE
+        void serialize_force_adl(output_archive& ar, const T& t, unsigned)
+        {
+            serialize(ar, t, 0);
+        }
+
+        template <class T> BOOST_FORCEINLINE
+        void serialize_force_adl(input_archive& ar, T& t, unsigned)
         {
             serialize(ar, t, 0);
         }
