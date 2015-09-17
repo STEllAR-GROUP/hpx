@@ -1127,7 +1127,6 @@ if(HPX_WITH_APEX)
   endif()
 
   include_directories(${APEX_SOURCE_DIR})
-  hpx_add_config_define(HPX_HAVE_APEX 1)
   set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
       ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} apex_lib)
   if(APEX_WITH_MSR)
