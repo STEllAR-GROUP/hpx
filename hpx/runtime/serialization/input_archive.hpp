@@ -13,6 +13,7 @@
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
+#include <boost/config.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
@@ -242,11 +243,9 @@ namespace hpx { namespace serialization
         template <typename Helper>
         friend Helper & tracked_pointer(input_archive& ar, boost::uint64_t pos)
         {
-#ifdef BOOST_GCC
+            // gcc has some lookup problems when using
+            // nested type inside friend function
             std::map<boost::uint64_t, detail::ptr_helper_ptr>::iterator
-#else
-            pointer_tracker::iterator
-#endif
                 it = ar.pointer_tracker_.find(pos);
             HPX_ASSERT(it != ar.pointer_tracker_.end());
 
