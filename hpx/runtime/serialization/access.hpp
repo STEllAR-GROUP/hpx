@@ -10,6 +10,7 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/traits/has_serialize.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/type_traits/is_empty.hpp>
 #include <boost/mpl/eval_if.hpp>
@@ -23,14 +24,8 @@ namespace hpx { namespace serialization
 {
     namespace detail
     {
-        template <class T> BOOST_FORCEINLINE
-        void serialize_force_adl(output_archive& ar, const T& t, unsigned)
-        {
-            serialize(ar, t, 0);
-        }
-
-        template <class T> BOOST_FORCEINLINE
-        void serialize_force_adl(input_archive& ar, T& t, unsigned)
+        template <class Archive, class T> BOOST_FORCEINLINE
+        void serialize_force_adl(Archive& ar, T& t, unsigned)
         {
             serialize(ar, t, 0);
         }
@@ -85,7 +80,10 @@ namespace hpx { namespace serialization
                 template <class Archive>
                 static void call(Archive& ar, T& t, unsigned)
                 {
-                    t.serialize(ar, 0);
+                    // cast it to let it be run for templated
+                    // member functions
+                    const_cast<typename util::decay<T>::type&>(
+                            t).serialize(ar, 0);
                 }
             };
 
