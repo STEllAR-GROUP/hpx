@@ -535,7 +535,7 @@ namespace hpx { namespace naming
         const unsigned int version) const
     {
         bool isvalid = gid_ != 0;
-        ar.save(isvalid);
+        ar << isvalid;
         if (isvalid)
             gid_->save(ar);
     }
@@ -550,7 +550,7 @@ namespace hpx { namespace naming
         }
 
         bool isvalid;
-        ar.load(isvalid);
+        ar >> isvalid;
         if (isvalid) {
             boost::intrusive_ptr<detail::id_type_impl> gid(
                 new detail::id_type_impl);

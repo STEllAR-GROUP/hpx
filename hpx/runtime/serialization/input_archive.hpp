@@ -88,6 +88,50 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
+        typename boost::enable_if<
+            boost::mpl::or_<
+                boost::is_integral<T>
+              , boost::is_enum<T>
+            >
+        >::type
+        load(T & t)
+        {
+            load_integral(t,
+                typename boost::is_unsigned<T>::type());
+        }
+
+        void load(float & f)
+        {
+            load_binary(&f, sizeof(float));
+        }
+
+        void load(double & d)
+        {
+            load_binary(&d, sizeof(double));
+        }
+
+        void load(char & c)
+        {
+            load_binary(&c, sizeof(char));
+        }
+
+        void load(bool & b)
+        {
+            load_binary(&b, sizeof(bool));
+            HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
+        }
+
+        std::size_t bytes_read() const
+        {
+            return size_;
+        }
+
+    private:
+        friend struct basic_archive<input_archive>;
+        template <class T>
+        friend class array;
+
+        template <typename T>
         void load_bitwise(T & t, boost::mpl::false_)
         {
             load_nonintrusively_polymorphic(t,
@@ -122,19 +166,6 @@ namespace hpx { namespace serialization
         }
 
         template <typename T>
-        typename boost::enable_if<
-            boost::mpl::or_<
-                boost::is_integral<T>
-              , boost::is_enum<T>
-            >
-        >::type
-        load(T & t)
-        {
-            load_integral(t,
-                typename boost::is_unsigned<T>::type());
-        }
-
-        template <typename T>
         void load_integral(T & val, boost::mpl::false_)
         {
             boost::int64_t l;
@@ -161,28 +192,6 @@ namespace hpx { namespace serialization
             load_integral_impl(t);
         }
 #endif
-
-        void load(float & f)
-        {
-            load_binary(&f, sizeof(float));
-        }
-
-        void load(double & d)
-        {
-            load_binary(&d, sizeof(double));
-        }
-
-        void load(char & c)
-        {
-            load_binary(&c, sizeof(char));
-        }
-
-        void load(bool & b)
-        {
-            load_binary(&b, sizeof(bool));
-            HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
-        }
-
         template <class Promoted>
         void load_integral_impl(Promoted& l)
         {
@@ -220,44 +229,33 @@ namespace hpx { namespace serialization
             size_ += count;
         }
 
-        std::size_t bytes_read() const
+        // make functions visible through adl
+        friend void register_pointer(input_archive& ar,
+                boost::uint64_t pos, detail::ptr_helper_ptr helper)
         {
-            return size_;
-        }
+            pointer_tracker& tracker = ar.pointer_tracker_;
+            HPX_ASSERT(tracker.find(pos) == tracker.end());
 
-        void register_pointer(boost::uint64_t pos, detail::ptr_helper_ptr helper)
-        {
-            HPX_ASSERT(pointer_tracker_.find(pos) == pointer_tracker_.end());
-
-            pointer_tracker_.insert(std::make_pair(pos, std::move(helper)));
+            tracker.insert(std::make_pair(pos, std::move(helper)));
         }
 
         template <typename Helper>
-        Helper & tracked_pointer(boost::uint64_t pos)
+        friend Helper & tracked_pointer(input_archive& ar, boost::uint64_t pos)
         {
-            pointer_tracker::iterator it = pointer_tracker_.find(pos);
-            HPX_ASSERT(it != pointer_tracker_.end());
+#ifdef BOOST_GCC
+            std::map<boost::uint64_t, detail::ptr_helper_ptr>::iterator
+#else
+            pointer_tracker::iterator
+#endif
+                it = ar.pointer_tracker_.find(pos);
+            HPX_ASSERT(it != ar.pointer_tracker_.end());
 
             return static_cast<Helper &>(*it->second);
         }
 
-    private:
         std::unique_ptr<erased_input_container> buffer_;
         pointer_tracker pointer_tracker_;
     };
-
-    BOOST_FORCEINLINE
-    void register_pointer(input_archive & ar, boost::uint64_t pos,
-        detail::ptr_helper_ptr helper)
-    {
-        ar.register_pointer(pos, std::move(helper));
-    }
-
-    template <typename Helper>
-    Helper & tracked_pointer(input_archive & ar, boost::uint64_t pos)
-    {
-        return ar.tracked_pointer<Helper>(pos);
-    }
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
