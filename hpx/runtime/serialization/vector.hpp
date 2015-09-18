@@ -98,7 +98,8 @@ namespace hpx { namespace serialization
     }
 
     template <typename T, typename Allocator>
-    void save_impl(output_archive & ar, const std::vector<T, Allocator> & v, boost::mpl::true_)
+    void save_impl(output_archive & ar, const std::vector<T, Allocator> & v,
+        boost::mpl::true_)
     {
         if(!has_array_optimization(ar))
         {
