@@ -7,6 +7,8 @@
 #define HPX_TRAITS_IS_FUTURE_RANGE_HPP
 
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/is_range.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
@@ -17,14 +19,15 @@
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Range, typename Enable>
+    template <typename Range, typename>
     struct is_future_range
       : boost::mpl::false_
     {};
 
-    template <typename T>
-    struct is_future_range<std::vector<T> >
-      : is_future<T>
+    template <typename Range>
+    struct is_future_range<Range,
+        typename boost::enable_if<is_range<Range> >::type>
+      : is_future<typename util::decay<Range>::type::value_type>
     {};
 
     template <typename Iterator>
@@ -36,12 +39,12 @@ namespace hpx { namespace traits
     template <typename Range, typename Enable>
     struct future_range_traits;
 
-    template <typename T>
+    template <typename Range>
     struct future_range_traits<
-            std::vector<T>, typename boost::enable_if<is_future<T> >::type
+            Range, typename boost::enable_if<is_future_range<Range> >::type
         >
     {
-        typedef T future_type;
+        typedef typename Range::value_type future_type;
     };
 
     template <typename Iterator>
