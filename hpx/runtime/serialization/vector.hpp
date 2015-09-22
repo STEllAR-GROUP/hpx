@@ -35,7 +35,7 @@ namespace hpx { namespace serialization
     template <typename T, typename Allocator>
     void load_impl(input_archive & ar, std::vector<T, Allocator> & v, boost::mpl::true_)
     {
-        if(!has_array_optimization(ar))
+        if(ar.disable_array_optimization())
         {
             load_impl(ar, v, boost::mpl::false_());
         }
@@ -100,7 +100,7 @@ namespace hpx { namespace serialization
     template <typename T, typename Allocator>
     void save_impl(output_archive & ar, std::vector<T, Allocator> & v, boost::mpl::true_)
     {
-        if(!has_array_optimization(ar))
+        if(ar.disable_array_optimization())
         {
             save_impl(ar, v, boost::mpl::false_());
         }

@@ -172,11 +172,11 @@ namespace hpx { namespace util
             reset();
 
             bool is_empty = false;
-            ar.load(is_empty);
+            ar >> is_empty;
             if (!is_empty)
             {
                 std::string name;
-                ar.load(name);
+                ar >> name;
 
                 this->vptr = detail::get_table_ptr<vtable_ptr>(name);
                 this->vptr->load_object(&this->object, ar, version);
@@ -186,11 +186,11 @@ namespace hpx { namespace util
         void save(OArchive& ar, const unsigned version) const
         {
             bool is_empty = empty();
-            ar.save(is_empty);
+            ar << is_empty;
             if (!is_empty)
             {
                 std::string function_name = this->vptr->name;
-                ar.save(function_name);
+                ar << function_name;
 
                 this->vptr->save_object(&this->object, ar, version);
             }

@@ -107,31 +107,42 @@ namespace hpx { namespace serialization
             return false;
         }
 
+        std::size_t current_pos() const
+        {
+            return size_;
+        }
+
+        void save_binary(void const* address, std::size_t count)
+        {
+            static_cast<Archive*>(this)->save_binary(address, count);
+        }
+
+        void load_binary(void* address, std::size_t count)
+        {
+            static_cast<Archive*>(this)->load_binary(address, count);
+        }
+
+    protected:
         boost::uint32_t flags_;
         std::size_t size_;
     };
 
-    template <typename Archive>
-    std::size_t & current_pos(Archive & ar)
-    {
-        return ar.size_;
-    }
-
-    template <typename Archive>
-    bool has_array_optimization(Archive & ar)
-    {
-        return !ar.disable_array_optimization();
-    }
-
-    template <typename Archive>
+    template <typename Archive> inline
     void save_binary(Archive & ar, void const * address, std::size_t count)
     {
-        return ar.save_binary(address, count);
+        return ar.basic_archive<Archive>::save_binary(address, count);
     }
-    template <typename Archive>
+
+    template <typename Archive> inline
     void load_binary(Archive & ar, void * address, std::size_t count)
     {
-        return ar.load_binary(address, count);
+        return ar.basic_archive<Archive>::load_binary(address, count);
+    }
+
+    template <typename Archive> inline
+    size_t current_pos(const Archive& ar)
+    {
+        return ar.basic_archive<Archive>::current_pos();
     }
 }}
 

@@ -45,12 +45,12 @@ namespace hpx { namespace parcelset
 
             void save(serialization::output_archive & ar) const
             {
-                ar.save(rank_);
+                ar << rank_;
             }
 
             void load(serialization::input_archive & ar)
             {
-                ar.load(rank_);
+                ar >> rank_;
             }
 
         private:
