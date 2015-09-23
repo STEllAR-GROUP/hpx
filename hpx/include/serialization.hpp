@@ -9,7 +9,6 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
-#include <hpx/runtime/serialization/allocator.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/serialization/map.hpp>

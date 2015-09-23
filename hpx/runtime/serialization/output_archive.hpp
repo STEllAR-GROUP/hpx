@@ -177,7 +177,7 @@ namespace hpx { namespace serialization
                 "Can not bitwise serialize a class that is abstract");
             if(disable_array_optimization())
             {
-                serialize(*this, const_cast<T &>(t), 0);
+                serialize(*this, t, 0);
             }
             else
             {
