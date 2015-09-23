@@ -573,7 +573,7 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::size_t>& num_pus, error_code& ec)
     {
         std::size_t num_threads = affinities.size();
-        std::size_t num_cores = max_cores % (t.get_number_of_cores()+1);
+        std::size_t num_cores = (std::min)(max_cores, t.get_number_of_cores());
         num_pus.resize(num_threads);
 
         for (std::size_t num_thread = 0; num_thread != num_threads; /**/)
@@ -608,7 +608,7 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::size_t>& num_pus, error_code& ec)
     {
         std::size_t num_threads = affinities.size();
-        std::size_t num_cores = max_cores % (t.get_number_of_cores()+1);
+        std::size_t num_cores = (std::min)(max_cores, t.get_number_of_cores());
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
         num_pus.resize(num_threads);
@@ -642,7 +642,7 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::size_t>& num_pus, error_code& ec)
     {
         std::size_t num_threads = affinities.size();
-        std::size_t num_cores = max_cores % (t.get_number_of_cores()+1);
+        std::size_t num_cores = (std::min)(max_cores, t.get_number_of_cores());
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
         num_pus.resize(num_threads);
