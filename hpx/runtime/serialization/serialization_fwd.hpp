@@ -42,9 +42,6 @@ namespace hpx { namespace serialization
     template <typename Helper>
     Helper & tracked_pointer(input_archive & ar, boost::uint64_t pos);
 
-    template <typename Archive, typename T>
-    void serialize(Archive & ar, T & t, unsigned);
-
     template <typename T>
     output_archive & operator<<(output_archive & ar, T const & t);
 
