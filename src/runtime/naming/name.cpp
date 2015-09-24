@@ -504,7 +504,7 @@ namespace hpx { namespace naming
     }   // detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <class T>
+    template <typename T>
     void gid_type::save(
         T& ar
       , const unsigned int version) const
@@ -512,7 +512,7 @@ namespace hpx { namespace naming
         ar << id_msb_ << id_lsb_;
     }
 
-    template <class T>
+    template <typename T>
     void gid_type::load(
         T& ar
       , const unsigned int /*version*/)
@@ -522,15 +522,15 @@ namespace hpx { namespace naming
         id_msb_ &= ~is_locked_mask;     // strip lock-bit upon receive
     }
 
-    template void gid_type::save<serialization::output_archive>(
+    template HPX_EXPORT void gid_type::save<serialization::output_archive>(
         serialization::output_archive&
       , const unsigned int) const;
-    template void gid_type::load<serialization::input_archive>(
+    template HPX_EXPORT void gid_type::load<serialization::input_archive>(
         serialization::input_archive&
       , const unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <class T>
+    template <typename T>
     void id_type::save(T& ar,
         const unsigned int version) const
     {
@@ -540,7 +540,7 @@ namespace hpx { namespace naming
             gid_->save(ar);
     }
 
-    template <class T>
+    template <typename T>
     void id_type::load(T& ar,
         const unsigned int version)
     {
@@ -559,9 +559,9 @@ namespace hpx { namespace naming
         }
     }
 
-    template void id_type::save<serialization::output_archive>(
+    template HPX_EXPORT void id_type::save<serialization::output_archive>(
         serialization::output_archive&, const unsigned int) const;
-    template void id_type::load<serialization::input_archive>(
+    template HPX_EXPORT void id_type::load<serialization::input_archive>(
         serialization::input_archive&, const unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
