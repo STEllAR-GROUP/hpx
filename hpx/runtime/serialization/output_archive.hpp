@@ -23,7 +23,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace naming {
+namespace hpx { namespace naming
+{
     struct HPX_EXPORT gid_type;
 }}
 
@@ -99,9 +100,16 @@ namespace hpx { namespace serialization
             return size_;
         }
 
-        void add_gid(naming::gid_type const & gid, naming::gid_type const & splitted_gid);
+        void add_gid(naming::gid_type const & gid,
+            naming::gid_type const & splitted_gid);
 
         naming::gid_type get_new_gid(naming::gid_type const & gid);
+
+        // this function is needed to avoid a MSVC linker error
+        std::size_t current_pos() const
+        {
+            return basic_archive<output_archive>::current_pos();
+        }
 
     private:
         friend struct basic_archive<output_archive>;
@@ -168,8 +176,8 @@ namespace hpx { namespace serialization
                 hpx::traits::is_nonintrusive_polymorphic<T>());
         }
 
-        //think about remaining this commented stuff below
-        //and adding new free function save_bitwise
+        // FIXME: think about removing this commented stuff below
+        // and adding new free function save_bitwise
         template <typename T>
         void save_bitwise(T const & t, boost::mpl::true_)
         {
@@ -255,8 +263,10 @@ namespace hpx { namespace serialization
         }
 
         typedef std::map<const void *, boost::uint64_t> pointer_tracker;
-        // make this function capable for ADL lookup and hence if used as a dependent name
-        // it doesn't require output_archive to be complete type or itself to be fwded
+
+        // FIXME: make this function capable for ADL lookup and hence if used
+        // as a dependent name it doesn't require output_archive to be complete
+        // type or itself to be forwarded
         friend boost::uint64_t track_pointer(output_archive& ar, const void* pos)
         {
             pointer_tracker::iterator it = ar.pointer_tracker_.find(pos);

@@ -127,6 +127,12 @@ namespace hpx { namespace serialization
             return size_;
         }
 
+        // this function is needed to avoid a MSVC linker error
+        std::size_t current_pos() const
+        {
+            return basic_archive<input_archive>::current_pos();
+        }
+
     private:
         friend struct basic_archive<input_archive>;
         template <class T>

@@ -127,22 +127,25 @@ namespace hpx { namespace serialization
         std::size_t size_;
     };
 
-    template <typename Archive> inline
+    template <typename Archive>
+    inline
     void save_binary(Archive & ar, void const * address, std::size_t count)
     {
         return ar.basic_archive<Archive>::save_binary(address, count);
     }
 
-    template <typename Archive> inline
+    template <typename Archive>
+    inline
     void load_binary(Archive & ar, void * address, std::size_t count)
     {
         return ar.basic_archive<Archive>::load_binary(address, count);
     }
 
-    template <typename Archive> inline
-    size_t current_pos(const Archive& ar)
+    template <typename Archive>
+    inline
+    std::size_t current_pos(const Archive& ar)
     {
-        return ar.basic_archive<Archive>::current_pos();
+        return ar.current_pos();
     }
 }}
 
