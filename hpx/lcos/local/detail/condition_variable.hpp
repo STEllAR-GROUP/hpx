@@ -129,7 +129,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 threads::set_thread_state(threads::thread_id_type(
                     reinterpret_cast<threads::thread_data_base*>(id)),
-                    threads::pending, threads::wait_timeout,
+                    threads::pending, threads::wait_signaled,
                     threads::thread_priority_default, ec);
                 if (!ec) return not_empty;
             }
@@ -164,7 +164,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 threads::set_thread_state(threads::thread_id_type(
                     reinterpret_cast<threads::thread_data_base*>(id)),
-                    threads::pending, threads::wait_timeout,
+                    threads::pending, threads::wait_signaled,
                     threads::thread_priority_default, ec);
                 if (ec) return;
             }
@@ -243,7 +243,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 if (ec) return threads::wait_unknown;
             }
 
-            return (f.id_ == threads::invalid_thread_id_repr) ?
+            return (f.id_ != threads::invalid_thread_id_repr) ?
                 threads::wait_timeout : reason;
         }
 
@@ -276,7 +276,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 if (ec) return threads::wait_unknown;
             }
 
-            return (f.id_ == threads::invalid_thread_id_repr) ?
+            return (f.id_ != threads::invalid_thread_id_repr) ?
                 threads::wait_timeout : reason;
         }
 

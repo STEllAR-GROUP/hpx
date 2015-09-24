@@ -27,6 +27,7 @@ set(tests
     set_hpx_limit_798
     shared_mutex_1702
     shared_stated_leaked_1211
+    wait_for_1751
     when_all_vectors_1623
    )
 
@@ -43,6 +44,7 @@ set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 set(shared_mutex_1702_PARAMETERS THREADS_PER_LOCALITY 4)
+set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 
 if(HPX_WITH_CXX11_LAMBDAS)
   set(tests ${tests}
