@@ -20,4 +20,5 @@ int main()
     add_const<int>::type* rc = &x;
     decay<int const&>::type* d = &x;
     result_of<callable()>::type* ro = &x;
+    is_convertible<int, long>::type ic;
 }

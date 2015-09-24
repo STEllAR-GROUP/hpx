@@ -200,11 +200,6 @@ namespace hpx { namespace util { namespace detail
     public:
         typedef R result_type;
 
-        template <typename T>
-        struct is_callable
-          : traits::is_callable<T(Ts...)>
-        {};
-
         basic_function() BOOST_NOEXCEPT
           : base_type()
         {}
@@ -228,7 +223,7 @@ namespace hpx { namespace util { namespace detail
         T* target() BOOST_NOEXCEPT
         {
             BOOST_STATIC_ASSERT_MSG(
-                is_callable<T>::value
+                (traits::is_callable<T(Ts...), R>::value)
               , "T shall be Callable with the function signature"
             );
 
@@ -239,7 +234,7 @@ namespace hpx { namespace util { namespace detail
         T* target() const BOOST_NOEXCEPT
         {
             BOOST_STATIC_ASSERT_MSG(
-                is_callable<T>::value
+                (traits::is_callable<T(Ts...), R>::value)
               , "T shall be Callable with the function signature"
             );
 

@@ -7,7 +7,6 @@ set(tests
     mem_fn_derived_test
     mem_fn_dm_test
 #    mem_fn_eq_test
-    mem_fn_ref_test
     mem_fn_rv_test
     mem_fn_test
     mem_fn_unary_addr_test

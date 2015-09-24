@@ -380,7 +380,7 @@ namespace hpx { namespace lcos { namespace local
         explicit packaged_task(F && f,
             typename boost::enable_if_c<
                 !boost::is_same<typename util::decay<F>::type, packaged_task>::value
-             && traits::is_callable<typename util::decay<F>::type(Ts...)>::value
+             && traits::is_callable<typename util::decay<F>::type(Ts...), R>::value
             >::type* = 0)
           : base_type(std::forward<F>(f))
         {}
