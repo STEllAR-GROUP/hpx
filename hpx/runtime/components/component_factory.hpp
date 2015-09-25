@@ -48,6 +48,7 @@
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
 #include <boost/preprocessor/cat.hpp>
@@ -185,7 +186,7 @@ namespace hpx { namespace components
         /// \return   Returns the GID of the first newly created component
         ///           instance.
         naming::gid_type create_with_args(
-            util::function_nonser<void(void*)> const& ctor)
+            util::unique_function_nonser<void(void*)> const& ctor)
         {
             if (isenabled_)
             {
@@ -214,7 +215,7 @@ namespace hpx { namespace components
         ///           instance (this is the same as assign_gid, if successful).
         naming::gid_type create_with_args(
             naming::gid_type const& assign_gid,
-            util::function_nonser<void(void*)> const& ctor)
+            util::unique_function_nonser<void(void*)> const& ctor)
         {
             if (isenabled_)
             {
