@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -32,7 +32,7 @@ namespace hpx { namespace actions
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    //  Specialized generic non-conts component action types allowing to hold
+    //  Specialized generic non-const component action types allowing to hold
     //  a different number of arguments
     ///////////////////////////////////////////////////////////////////////////
     template <
@@ -46,9 +46,11 @@ namespace hpx { namespace actions
         static std::string get_action_name(naming::address::address_type lva)
         {
             std::stringstream name;
-            name << "component action(" << detail::get_action_name<Derived>() <<
-                ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
+            name << "component action("
+                 << detail::get_action_name<Derived>()
+                 << ") lva("
+                 << reinterpret_cast<void const*>(get_lva<Component>::call(lva))
+                 << ")";
             return name.str();
         }
 
@@ -61,6 +63,8 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static R invoke(naming::address::address_type lva, Ts&&... vs)
         {
+            basic_action<Component, R(Ps...), Derived>::
+                increment_invocation_count();
             return (get_lva<Component>::call(lva)->*F)
                 (std::forward<Ts>(vs)...);
         }
@@ -81,9 +85,11 @@ namespace hpx { namespace actions
         static std::string get_action_name(naming::address::address_type lva)
         {
             std::stringstream name;
-            name << "component action(" << detail::get_action_name<Derived>() <<
-                ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
+            name << "component action("
+                 << detail::get_action_name<Derived>()
+                 << ") lva("
+                 << reinterpret_cast<void const*>(get_lva<Component>::call(lva))
+                 << ")";
             return name.str();
         }
 
@@ -96,6 +102,8 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static R invoke(naming::address::address_type lva, Ts&&... vs)
         {
+            basic_action<Component const, R(Ps...), Derived>::
+                increment_invocation_count();
             return (get_lva<Component const>::call(lva)->*F)
                 (std::forward<Ts>(vs)...);
         }

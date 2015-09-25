@@ -27,26 +27,26 @@
 
 namespace hpx { namespace serialization { namespace detail
 {
-        template <typename T>
-        struct get_serialization_name
+    template <typename T>
+    struct get_serialization_name
 #ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
-        ;
+    ;
 #else
+    {
+        const char *operator()()
         {
-            const char *operator()()
-            {
-                /// If you encounter this assert while compiling code, that means that
-                /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
-                /// but the header in which the action is defined misses a
-                /// HPX_REGISTER_ACTION_DECLARATION
-                BOOST_MPL_ASSERT_MSG(
-                    traits::needs_automatic_registration<T>::value
-                  , HPX_REGISTER_ACTION_DECLARATION_MISSING
-                  , (T)
-                );
-                return util::type_id<T>::typeid_.type_id();
-            }
-        };
+            /// If you encounter this assert while compiling code, that means that
+            /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
+            /// but the header in which the action is defined misses a
+            /// HPX_REGISTER_ACTION_DECLARATION
+            BOOST_MPL_ASSERT_MSG(
+                traits::needs_automatic_registration<T>::value
+                , HPX_REGISTER_ACTION_DECLARATION_MISSING
+                , (T)
+            );
+            return util::type_id<T>::typeid_.type_id();
+        }
+    };
 #endif
 
     struct function_bunch_type

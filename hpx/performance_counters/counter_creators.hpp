@@ -81,6 +81,15 @@ namespace hpx { namespace performance_counters
     ///
     HPX_API_EXPORT bool agas_counter_discoverer(counter_info const&,
         discover_counter_func const&, discover_counters_mode, error_code&);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Creation function for action invocation counters.
+    HPX_API_EXPORT naming::gid_type action_invocation_counter_creator(
+        counter_info const&, error_code&);
+
+    // Discoverer function for action invocation counters.
+    HPX_API_EXPORT bool action_invocation_counter_discoverer(counter_info const&,
+        discover_counter_func const&, discover_counters_mode, error_code&);
 }}
 
 #endif

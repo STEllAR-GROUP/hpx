@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -26,6 +26,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/void_guard.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
 
@@ -37,6 +38,7 @@
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/type_traits/is_array.hpp>
 #include <boost/type_traits/is_pointer.hpp>
+#include <boost/atomic.hpp>
 
 #include <sstream>
 
@@ -60,8 +62,9 @@ namespace hpx { namespace actions
 
         public:
             template <typename F_, typename ...Ts_>
-            explicit continuation_thread_function(std::unique_ptr<continuation> cont,
-                naming::address::address_type lva, F_&& f, Ts_&&... vs)
+            explicit continuation_thread_function(
+                    std::unique_ptr<continuation> cont,
+                    naming::address::address_type lva, F_&& f, Ts_&&... vs)
               : cont_(std::move(cont))
               , lva_(lva)
               , f_(util::deferred_call(
@@ -398,13 +401,31 @@ namespace hpx { namespace actions
             return base_action::plain_action;
         }
 
+        /// Extract the current invocation count for this action
+        static boost::int64_t get_invocation_count(bool reset)
+        {
+            return util::get_and_reset_value(invocation_count_, reset);
+        }
+
     private:
         // serialization support
         friend class hpx::serialization::access;
 
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
+
+        static boost::atomic<boost::int64_t> invocation_count_;
+
+    protected:
+        static void increment_invocation_count()
+        {
+            ++invocation_count_;
+        }
     };
+
+    template <typename Component, typename R, typename ...Args, typename Derived>
+    boost::atomic<boost::int64_t>
+        basic_action<Component, R(Args...), Derived>::invocation_count_(0);
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
