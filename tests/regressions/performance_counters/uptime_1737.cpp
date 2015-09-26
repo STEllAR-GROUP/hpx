@@ -46,7 +46,7 @@ int hpx_main(int argc, char ** argv)
     hpx::this_thread::sleep_for(boost::chrono::seconds(1));
     double end = uptime.get_value_sync<double>();
 
-    HPX_TEST(end - start >= 1.0);
+    HPX_TEST(end - start >= 1.0 && end - start < 1.1);
 
     // make sure start/stop return false
     HPX_TEST(!uptime.start_sync());
