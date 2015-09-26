@@ -31,6 +31,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
 #include <boost/lockfree/stack.hpp>
+#include <boost/type_traits/aligned_storage.hpp>
 
 #include <stack>
 
@@ -661,8 +662,10 @@ namespace hpx { namespace threads
         // Avoid warning about using 'this' in initializer list
         thread_data_base* this_() { return this; }
 
+        struct allocated_data;
+
     public:
-        typedef boost::lockfree::caching_freelist<thread_data> pool_type;
+        typedef boost::lockfree::caching_freelist<allocated_data> pool_type;
 
         thread_data(thread_init_data& init_data,
                pool_type& pool, thread_state_enum newstate)
@@ -701,14 +704,6 @@ namespace hpx { namespace threads
         // Memory management
         static void* operator new(std::size_t size, pool_type&);
         static void operator delete(void* p, std::size_t size);
-        static void operator delete(void*, pool_type&);
-
-        // Won't be called.
-        static void* operator new(std::size_t) throw()
-        {
-            HPX_ASSERT(false);
-            return NULL;
-        }
 
         bool is_created_from(void* pool) const
         {
@@ -769,6 +764,12 @@ namespace hpx { namespace threads
     private:
         coroutine_type coroutine_;
         pool_type* pool_;
+    };
+
+    struct thread_data::allocated_data
+    {
+        boost::aligned_storage<sizeof(thread_data)>::type data;
+        thread_data::pool_type* pool;
     };
 
     typedef thread_data::pool_type thread_pool;
