@@ -48,6 +48,10 @@ int hpx_main(int argc, char ** argv)
 
     HPX_TEST(end - start >= 1.0);
 
+    // make sure start/stop return false
+    HPX_TEST(!uptime.start_sync());
+    HPX_TEST(!uptime.stop_sync());
+
     return hpx::finalize();
 }
 
