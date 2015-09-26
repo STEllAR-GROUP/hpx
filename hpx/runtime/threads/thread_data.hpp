@@ -776,7 +776,7 @@ namespace hpx { namespace threads
     struct thread_data::allocated_data
     {
         boost::aligned_storage<sizeof(thread_data)>::type data;
-        void* pool;
+        thread_data::pool_type* pool;
     };
 
     typedef thread_data::pool_type thread_pool;

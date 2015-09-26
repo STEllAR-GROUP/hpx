@@ -66,7 +66,7 @@ namespace hpx { namespace threads
         if (0 != p)
         {
             allocated_data* pt = static_cast<allocated_data*>(p);
-            thread_pool* pool = static_cast<thread_pool*>(pt->pool);
+            thread_pool* pool = pt->pool;
             HPX_ASSERT(pool);
 
 #ifdef HPX_DEBUG_THREAD_POOL
