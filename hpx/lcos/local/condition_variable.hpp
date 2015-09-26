@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace local
             if (ec) return cv_status::error;
 
             // if the timer has hit, the waiting period timed out
-            return (reason == threads::wait_signaled) ? //-V110
+            return (reason == threads::wait_timeout) ? //-V110
                 cv_status::timeout : cv_status::no_timeout;
         }
 
