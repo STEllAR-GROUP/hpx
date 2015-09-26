@@ -726,7 +726,7 @@ namespace hpx
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=local "
                 "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_THREAD_SCHEDULERS=local'.");
+                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local'.");
 #endif
         }
 
@@ -736,73 +736,16 @@ namespace hpx
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
         {
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
             ensure_high_priority_compatibility(cfg.vm_);
             ensure_hierarchy_arity_compatibility(cfg.vm_);
 
-            bool numa_sensitive = false;
-            if (cfg.vm_.count("hpx:numa-sensitive"))
-                numa_sensitive = true;
-
-            std::size_t pu_offset = std::size_t(-1);
-            std::size_t pu_step = 1;
-            std::string affinity_domain("pu");
+            std::size_t pu_offset = get_pu_offset(cfg);
+            std::size_t pu_step = get_pu_step(cfg);
+            std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
-
-#if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
-            if (cfg.vm_.count("hpx:pu-offset")) {
-                pu_offset = cfg.vm_["hpx:pu-offset"].as<std::size_t>();
-                if (pu_offset >= hpx::threads::hardware_concurrency()) {
-                    throw std::logic_error("Invalid command line option "
-                        "--hpx:pu-offset, value must be smaller than number of "
-                        "available processing units.");
-                }
-            }
-
-            if (cfg.vm_.count("hpx:pu-step")) {
-                pu_step = cfg.vm_["hpx:pu-step"].as<std::size_t>();
-                if (pu_step == 0 || pu_step >= hpx::threads::hardware_concurrency()) {
-                    throw std::logic_error("Invalid command line option "
-                        "--hpx:pu-step, value must be non-zero smaller than number of "
-                        "available processing units.");
-                }
-            }
-#endif
-#if defined(HPX_HAVE_HWLOC)
-            if (cfg.vm_.count("hpx:affinity")) {
-                affinity_domain = cfg.vm_["hpx:affinity"].as<std::string>();
-                if (0 != std::string("pu").find(affinity_domain) &&
-                    0 != std::string("core").find(affinity_domain) &&
-                    0 != std::string("numa").find(affinity_domain) &&
-                    0 != std::string("machine").find(affinity_domain))
-                {
-                    throw std::logic_error("Invalid command line option "
-                        "--hpx:affinity, value must be one of: pu, core, numa, "
-                        "or machine.");
-                }
-            }
-            if (cfg.vm_.count("hpx:bind")) {
-                if (cfg.vm_.count("hpx:pu-offset") ||
-                    cfg.vm_.count("hpx:pu-step") ||
-                    cfg.vm_.count("hpx:affinity"))
-                {
-                    throw std::logic_error("Command line option --hpx:bind "
-                        "should not be used with --hpx:pu-step, --hpx:pu-offset, "
-                        "or --hpx:affinity.");
-                }
-
-                std::vector<std::string> bind_affinity =
-                    cfg.vm_["hpx:bind"].as<std::vector<std::string> >();
-                for(std::string const& s: bind_affinity)
-                {
-                    if (!affinity_desc.empty())
-                        affinity_desc += ";";
-                    affinity_desc += s;
-                }
-
-                numa_sensitive = true;
-            }
-#endif
+            std::size_t numa_sensitive =
+                get_affinity_description(cfg, affinity_desc);
 
             // scheduling policy
             typedef hpx::threads::policies::throttle_queue_scheduler<>
@@ -818,21 +761,12 @@ namespace hpx
                 new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
                     affinity_init));
 
-            if (blocking) {
-                return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown);
-            }
-
-            // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
-
-            rt.release();          // pointer to runtime is stored in TLS
-            return 0;
+            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
 #else
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=throttle "
                 "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_THREAD_SCHEDULERS=throttle'.");
+                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=throttle -DHPX_WITH_APEX'.");
 #endif
         }
 
@@ -874,7 +808,7 @@ namespace hpx
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=static-priority "
                 "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_THREAD_SCHEDULERS=static-priority'.");
+                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static-priority'.");
 #endif
         }
 
@@ -915,7 +849,7 @@ namespace hpx
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=static "
                 "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_THREAD_SCHEDULERS=static'.");
+                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=static'.");
 #endif
         }
 
@@ -986,7 +920,7 @@ namespace hpx
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=abp-priority "
                 "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_THREAD_SCHEDULERS=abp-priority'.");
+                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=abp-priority'.");
 #endif
         }
 
@@ -1020,7 +954,7 @@ namespace hpx
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=hierarchy "
                 "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_THREAD_SCHEDULERS=hierarchy'.");
+                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=hierarchy'.");
 #endif
         }
 
@@ -1054,7 +988,7 @@ namespace hpx
             throw detail::command_line_error("Command line option "
                 "--hpx:queuing=periodic-priority "
                 "is not configured in this build. Please rebuild with "
-                "'cmake -DHPX_THREAD_SCHEDULERS=periodic-priority'.");
+                "'cmake -DHPX_WITH_THREAD_SCHEDULERS=periodic-priority'.");
 #endif
         }
 
