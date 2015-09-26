@@ -41,9 +41,9 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     void* thread_data::operator new(std::size_t size, thread_pool& pool)
     {
-        HPX_ASSERT(sizeof(thread_data) == size);
+        HPX_ASSERT(sizeof(allocated_data) == size);
 
-        void *ret = reinterpret_cast<void*>(pool.allocate());
+        allocated_data *ret = pool.allocate();
         if (0 == ret)
         {
             HPX_THROW_EXCEPTION(out_of_memory,
@@ -55,36 +55,25 @@ namespace hpx { namespace threads
         using namespace std;    // some systems have memset in namespace std
         memset (ret, initial_value, sizeof(thread_data));
 #endif
+        ret->pool = &pool;
         return ret;
     }
 
     void thread_data::operator delete(void *p, std::size_t size)
     {
-        HPX_ASSERT(sizeof(thread_data) == size);
+        HPX_ASSERT(sizeof(allocated_data) == size);
 
         if (0 != p)
         {
-            thread_data* pt = static_cast<thread_data*>(p);
-            thread_pool* pool = pt->pool_;
+            allocated_data* pt = static_cast<allocated_data*>(p);
+            thread_pool* pool = static_cast<thread_pool*>(pt->pool);
             HPX_ASSERT(pool);
 
 #ifdef HPX_DEBUG_THREAD_POOL
             using namespace std;    // some systems have memset in namespace std
-            memset (static_cast<void*>(pt), freed_value, sizeof(thread_data)); //-V598
+            memset (static_cast<void*>(pt), freed_value, sizeof(allocated_data)); //-V598
 #endif
             pool->deallocate(pt);
-        }
-    }
-
-    void thread_data::operator delete(void *p, thread_pool& pool)
-    {
-        if (0 != p)
-        {
-#ifdef HPX_DEBUG_THREAD_POOL
-            using namespace std;    // some systems have memset in namespace std
-            memset (p, freed_value, sizeof(thread_data));
-#endif
-            pool.deallocate(static_cast<thread_data*>(p));
         }
     }
 
