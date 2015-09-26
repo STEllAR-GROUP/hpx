@@ -664,15 +664,22 @@ namespace hpx { namespace threads
     public:
         typedef boost::lockfree::caching_freelist<thread_data> pool_type;
 
-        thread_data(thread_init_data& init_data,
-               pool_type& pool, thread_state_enum newstate)
-          : thread_data_base(init_data, newstate),
-            coroutine_(std::move(init_data.func), std::move(init_data.target),
-                this_(), init_data.stacksize),
-            pool_(&pool)
+        static boost::intrusive_ptr<thread_data> create(
+            thread_init_data& init_data, pool_type& pool,
+            thread_state_enum newstate)
         {
-            HPX_ASSERT(init_data.stacksize != 0);
-            HPX_ASSERT(coroutine_.is_ready());
+            thread_data* ret = pool.allocate();
+            if (ret == 0)
+            {
+                HPX_THROW_EXCEPTION(out_of_memory,
+                    "thread_data::operator new",
+                    "could not allocate memory for thread_data");
+            }
+#ifdef HPX_DEBUG_THREAD_POOL
+            using namespace std;    // some systems have memset in namespace std
+            memset (ret, initial_value, sizeof(thread_data));
+#endif
+            return new (ret) thread_data(init_data, pool, newstate);
         }
 
         ~thread_data()
@@ -695,19 +702,6 @@ namespace hpx { namespace threads
 
             HPX_ASSERT(init_data.stacksize != 0);
             HPX_ASSERT(coroutine_.is_ready());
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // Memory management
-        static void* operator new(std::size_t size, pool_type&);
-        static void operator delete(void* p, std::size_t size);
-        static void operator delete(void*, pool_type&);
-
-        // Won't be called.
-        static void* operator new(std::size_t) throw()
-        {
-            HPX_ASSERT(false);
-            return NULL;
         }
 
         bool is_created_from(void* pool) const
@@ -767,6 +761,19 @@ namespace hpx { namespace threads
         //}
 
     private:
+        friend HPX_EXPORT void intrusive_ptr_release(thread_data_base*);
+
+        thread_data(thread_init_data& init_data,
+               pool_type& pool, thread_state_enum newstate)
+          : thread_data_base(init_data, newstate),
+            coroutine_(std::move(init_data.func), std::move(init_data.target),
+                this_(), init_data.stacksize),
+            pool_(&pool)
+        {
+            HPX_ASSERT(init_data.stacksize != 0);
+            HPX_ASSERT(coroutine_.is_ready());
+        }
+
         coroutine_type coroutine_;
         pool_type* pool_;
     };

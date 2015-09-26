@@ -214,8 +214,8 @@ namespace hpx { namespace threads { namespace policies
 
                 // Allocate a new thread object.
                 if (data.stacksize != 0)
-                    thrd.reset(new (memory_pool_) threads::thread_data(
-                        data, memory_pool_, state));
+                    thrd = threads::thread_data::create(
+                        data, memory_pool_, state);
                 else
                     thrd.reset(new threads::stackless_thread_data(
                         data, &memory_pool_, state));
