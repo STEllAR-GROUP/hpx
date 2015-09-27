@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
 
@@ -27,7 +28,8 @@ namespace hpx { namespace util
         template <typename F, typename ...Ts>
         struct deferred_result_of<F(Ts...)>
           : util::result_of<
-                typename std::decay<F>::type(typename std::decay<Ts>::type...)
+                typename util::decay_unwrap<F>::type(
+                    typename util::decay_unwrap<Ts>::type...)
             >
         {};
 
@@ -73,8 +75,8 @@ namespace hpx { namespace util
             }
 
         private:
-            typename std::decay<F>::type _f;
-            util::tuple<typename std::decay<Ts>::type...> _args;
+            typename util::decay_unwrap<F>::type _f;
+            util::tuple<typename util::decay_unwrap<Ts>::type...> _args;
         };
     }
 
