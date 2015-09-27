@@ -23,6 +23,7 @@ set(tests
     lifetime_588
     lifetime_588_1
     promise_leak_996
+    receive_buffer_1733
     safely_destroy_promise_1481
     set_hpx_limit_798
     shared_mutex_1702
@@ -41,6 +42,7 @@ set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
 set(ignore_while_locked_1485_PARAMETERS THREADS_PER_LOCALITY 2)
 set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
 set(set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 set(shared_mutex_1702_PARAMETERS THREADS_PER_LOCALITY 4)
