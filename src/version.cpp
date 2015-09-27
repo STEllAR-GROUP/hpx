@@ -7,11 +7,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config/defines.hpp>
-#include <hpx/version.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <mpi.h>
 #endif
+
+#include <hpx/version.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
@@ -87,7 +88,11 @@ namespace hpx
         strm << "Unknown MPI";
 #endif
         // add general MPI version
+#if defined(MPI_VERSION) && defined(MPI_SUBVERSION)
         strm << ", MPI V" << MPI_VERSION << "." << MPI_SUBVERSION;
+#else
+        strm << ", unknown MPI version";
+#endif
         return strm.str();
     }
 #endif
