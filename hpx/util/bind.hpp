@@ -36,6 +36,9 @@ namespace hpx { namespace util
         {
             static std::size_t const value = I;
         };
+
+        template <>
+        struct placeholder<0>; // not a valid placeholder
     }
 
     namespace placeholders
