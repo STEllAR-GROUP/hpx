@@ -87,24 +87,24 @@ namespace hpx { namespace util
             }
         };
 
-        template <typename F, typename T, typename Us, typename Enable = void>
+        template <
+            typename F, typename T, typename TD, typename Us,
+            typename Enable = void
+        >
         struct bind_eval_impl
           : bind_eval_bound_impl<F, T>
         {};
 
-        template <typename F, typename T, typename Us>
-        struct bind_eval_impl<F, T, Us,
+        template <typename F, typename T, typename TD, typename Us>
+        struct bind_eval_impl<F, T, TD, Us,
             typename std::enable_if<
-                (traits::is_placeholder<
-                    typename std::decay<T>::type
-                >::value != 0 && traits::is_placeholder<
-                    typename std::decay<T>::type
-                >::value <= util::tuple_size<Us>::value)
+                (traits::is_placeholder<TD>::value != 0 &&
+                traits::is_placeholder<TD>::value <= util::tuple_size<Us>::value)
             >::type
         >
         {
             static const std::size_t index =
-                traits::is_placeholder<typename std::decay<T>::type>::value - 1;
+                traits::is_placeholder<TD>::value - 1;
 
             typedef typename util::tuple_element<
                 index, typename util::decay<Us>::type
@@ -117,10 +117,10 @@ namespace hpx { namespace util
             }
         };
 
-        template <typename F, typename T, typename Us>
-        struct bind_eval_impl<F, T, Us,
+        template <typename F, typename T, typename TD, typename Us>
+        struct bind_eval_impl<F, T, TD, Us,
             typename std::enable_if<
-                traits::is_bind_expression<typename std::decay<T>::type>::value
+                traits::is_bind_expression<TD>::value
             >::type
         >
         {
@@ -136,16 +136,10 @@ namespace hpx { namespace util
             }
         };
 
-        template <typename F, typename T, typename Us>
-        struct bind_eval_impl<F, T, Us,
-            typename std::enable_if<
-                boost::is_reference_wrapper<typename std::decay<T>::type>::value
-            >::type
-        >
+        template <typename F, typename T, typename X, typename Us>
+        struct bind_eval_impl<F, T, ::boost::reference_wrapper<X>, Us>
         {
-            typedef typename boost::unwrap_reference<
-                typename std::decay<T>::type
-            >::type& type;
+            typedef X& type;
 
             static BOOST_FORCEINLINE
             type call(T& t, Us&& /*unbound*/)
@@ -154,12 +148,26 @@ namespace hpx { namespace util
             }
         };
 
+#if defined(HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
+        template <typename F, typename T, typename X, typename Us>
+        struct bind_eval_impl<F, T, ::std::reference_wrapper<X>, Us>
+        {
+            typedef X& type;
+
+            static BOOST_FORCEINLINE
+            type call(T& t, Us&& /*unbound*/)
+            {
+                return t.get();
+            }
+        };
+#endif
+
         template <typename F, typename T, typename Us>
         BOOST_FORCEINLINE
-        typename bind_eval_impl<F, T, Us>::type
+        typename bind_eval_impl<F, T, typename std::decay<T>::type, Us>::type
         bind_eval(T& t, Us&& unbound)
         {
-            return bind_eval_impl<F, T, Us>::call(
+            return bind_eval_impl<F, T, typename std::decay<T>::type, Us>::call(
                     t, std::forward<Us>(unbound));
         }
 
@@ -171,7 +179,9 @@ namespace hpx { namespace util
         struct bound_result_of<
             F, util::tuple<Ts...>, Us
         > : util::result_of<
-                F(typename bind_eval_impl<F, Ts, Us>::type&&...)
+                F(typename bind_eval_impl<
+                    F, Ts, typename std::decay<Ts>::type, Us
+                >::type&&...)
             >
         {};
 
@@ -179,7 +189,9 @@ namespace hpx { namespace util
         struct bound_result_of<
             F, util::tuple<Ts...> const, Us
         > : util::result_of<
-                F(typename bind_eval_impl<F, Ts const, Us>::type&&...)
+                F(typename bind_eval_impl<
+                    F, Ts const, typename std::decay<Ts>::type, Us
+                >::type&&...)
             >
         {};
 
