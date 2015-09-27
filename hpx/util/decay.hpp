@@ -1,5 +1,5 @@
 //  Copyright (c) 2012 Thomas Heller
-//  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,36 +7,17 @@
 #ifndef HPX_UTIL_DECAY_HPP
 #define HPX_UTIL_DECAY_HPP
 
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/identity.hpp>
+#include <hpx/config.hpp>
+
 #include <boost/ref.hpp>
-#include <boost/type_traits/config.hpp>
-#include <boost/type_traits/is_array.hpp>
-#include <boost/type_traits/is_function.hpp>
-#include <boost/type_traits/remove_bounds.hpp>
-#include <boost/type_traits/add_pointer.hpp>
-#include <boost/type_traits/remove_cv.hpp>
-#include <boost/type_traits/remove_reference.hpp>
+
+#include <utility>
 
 namespace hpx { namespace util
 {
     template <typename T>
-    struct decay
-    {
-        typedef typename boost::remove_reference<T>::type Ty;
-
-        typedef
-            typename boost::mpl::eval_if<
-                boost::is_array<Ty>
-              , boost::mpl::identity<typename boost::remove_bounds<Ty>::type *>
-              , typename boost::mpl::eval_if<
-                    boost::is_function<Ty>
-                  , boost::add_pointer<Ty>
-                  , boost::remove_cv<Ty>
-                >
-            >::type
-            type;
-    };
+    struct decay : std::decay<T>
+    {};
 
     namespace detail
     {
@@ -55,7 +36,7 @@ namespace hpx { namespace util
 
     template <typename T>
     struct decay_unwrap
-      : detail::decay_unwrap_impl<typename decay<T>::type>
+      : detail::decay_unwrap_impl<typename std::decay<T>::type>
     {};
 }}
 
