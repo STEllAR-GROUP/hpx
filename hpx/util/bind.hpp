@@ -180,6 +180,18 @@ namespace hpx { namespace util
             >
         {};
 
+        template <typename F, typename ...Ts, typename Us>
+        struct bound_result_of<
+            one_shot_wrapper<F> const, util::tuple<Ts...>, Us
+        >
+        {};
+
+        template <typename F, typename ...Ts, typename Us>
+        struct bound_result_of<
+            one_shot_wrapper<F> const, util::tuple<Ts...> const, Us
+        >
+        {};
+
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Ts, typename Us, std::size_t ...Is>
         typename bound_result_of<F, Ts, Us>::type
@@ -238,7 +250,7 @@ namespace hpx { namespace util
 
             template <typename ...Us>
             inline typename bound_result_of<
-                typename std::decay<F>::type,
+                typename std::decay<F>::type const,
                 util::tuple<typename std::decay<Ts>::type const...>,
                 util::tuple<Us&&...>
             >::type operator()(Us&&... vs) const
