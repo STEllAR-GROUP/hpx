@@ -95,27 +95,41 @@ namespace hpx { namespace util
           : bind_eval_bound_impl<F, T>
         {};
 
-        template <typename F, typename T, typename TD, typename Us>
-        struct bind_eval_impl<F, T, TD, Us,
+        template <
+            std::size_t I, typename T, typename Us,
+            typename Enable = void
+        >
+        struct bind_eval_placeholder_impl
+        {};
+
+        template <std::size_t I, typename T, typename Us>
+        struct bind_eval_placeholder_impl<I, T, Us,
             typename std::enable_if<
-                (traits::is_placeholder<TD>::value != 0 &&
-                traits::is_placeholder<TD>::value <= util::tuple_size<Us>::value)
+                (I < util::tuple_size<Us>::value)
             >::type
         >
         {
-            static const std::size_t index =
-                traits::is_placeholder<TD>::value - 1;
-
             typedef typename util::tuple_element<
-                index, typename util::decay<Us>::type
+                I, typename util::decay<Us>::type
             >::type&& type;
 
             static BOOST_FORCEINLINE
             type call(T /*t*/, Us&& unbound)
             {
-                return util::get<index>(std::forward<Us>(unbound));
+                return util::get<I>(std::forward<Us>(unbound));
             }
         };
+
+        template <typename F, typename T, typename TD, typename Us>
+        struct bind_eval_impl<F, T, TD, Us,
+            typename std::enable_if<
+                traits::is_placeholder<TD>::value != 0
+            >::type
+        > : bind_eval_placeholder_impl<
+                static_cast<std::size_t>(traits::is_placeholder<TD>::value - 1),
+                T, Us
+            >
+        {};
 
         template <typename F, typename T, typename TD, typename Us>
         struct bind_eval_impl<F, T, TD, Us,
