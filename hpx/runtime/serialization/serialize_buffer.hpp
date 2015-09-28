@@ -12,7 +12,6 @@
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
-#include <hpx/runtime/serialization/allocator.hpp>
 
 #include <boost/shared_array.hpp>
 #include <boost/mpl/bool.hpp>

@@ -23,7 +23,7 @@ namespace hpx { namespace serialization
     }
 
     template <typename T>
-    void serialize(output_archive& ar, std::complex<T>& c, unsigned)
+    void serialize(output_archive& ar, const std::complex<T>& c, unsigned)
     {
         ar << c.real() << c.imag();
     }

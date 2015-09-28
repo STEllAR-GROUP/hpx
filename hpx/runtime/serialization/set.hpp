@@ -27,7 +27,8 @@ namespace hpx { namespace serialization
     }
 
     template <class T, class Compare, class Allocator>
-    void serialize(output_archive & ar, std::set<T, Compare, Allocator> & set, unsigned)
+    void serialize(output_archive & ar,const std::set<T, Compare, Allocator> & set,
+        unsigned)
     {
         boost::uint64_t size = set.size();
         ar << size;

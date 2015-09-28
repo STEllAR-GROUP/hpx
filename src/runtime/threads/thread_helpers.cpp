@@ -496,13 +496,21 @@ namespace hpx { namespace this_thread
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             detail::reset_backtrace bt(id, ec);
 #endif
-            threads::set_thread_state(id,
-                abs_time, threads::pending, threads::wait_signaled,
+            threads::thread_id_type timer_id = threads::set_thread_state(id,
+                abs_time, threads::pending, threads::wait_timeout,
                 threads::thread_priority_boost, ec);
             if (ec) return threads::wait_unknown;
 
             // suspend the HPX-thread
             statex = self.yield(threads::suspended);
+
+            if (statex != threads::wait_timeout)
+            {
+                error_code ec(lightweight);    // do not throw
+                threads::set_thread_state(timer_id,
+                    threads::pending, threads::wait_abort,
+                    threads::thread_priority_boost, ec);
+            }
         }
 
         // handle interruption, if needed

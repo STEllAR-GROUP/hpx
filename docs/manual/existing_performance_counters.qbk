@@ -1170,6 +1170,93 @@ system and application performance.
         [Returns the amount of resident memory currently allocated by the
          referenced locality (in bytes).]
     ]
+    [   [`/runtime/io/read_bytes_issued`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of bytes
+          read should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of bytes read by the process (aggregate of count
+         arguments passed to read() call or its analogues). This performance
+         counter is available only on systems which expose the related data
+         through the /proc file system.]
+    ]
+    [   [`/runtime/io/write_bytes_issued`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of bytes
+          written should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of bytes written by the process (aggregate of count
+         arguments passed to write() call or its analogues). This performance
+         counter is available only on systems which expose the related data
+         through the /proc file system.]
+    ]
+    [   [`/runtime/io/read_syscalls`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of
+          system calls should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of system calls that perform I/O reads. This
+         performance counter is available only on systems which expose the
+         related data through the /proc file system.]
+    ]
+    [   [`/runtime/io/write_syscalls`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of
+          system calls should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of system calls that perform I/O writes. This
+         performance counter is available only on systems which expose the
+         related data through the /proc file system.]
+    ]
+    [   [`/runtime/io/read_bytes_transferred`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of bytes
+          transferred should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of bytes retrieved from storage by I/O operations.
+         This performance counter is available only on systems which expose the
+         related data through the /proc file system.]
+    ]
+    [   [`/runtime/io/write_bytes_transferred`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of bytes
+          transferred should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of bytes retrieved from storage by I/O operations.
+         This performance counter is available only on systems which expose the
+         related data through the /proc file system.]
+    ]
+    [   [`/runtime/io/write_bytes_cancelled`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of bytes
+          not being transferred should be queried. The locality id is a (zero
+          based) number identifying the locality.
+        ]
+        [None]
+        [Returns the number of bytes accounted by write_bytes_transferred that
+         has not been ultimately stored due to truncation or deletion.
+         This performance counter is available only on systems which expose the
+         related data through the /proc file system.]
+    ]
 ]
 
 [/////////////////////////////////////////////////////////////////////////////]

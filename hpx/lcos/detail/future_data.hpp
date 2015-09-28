@@ -585,7 +585,7 @@ namespace detail
                     cond_.wait_until(l, abs_time, "future_data::wait_until", ec);
                 if (ec) return future_status::uninitialized;
 
-                if (reason == threads::wait_signaled)
+                if (reason == threads::wait_timeout)
                     return future_status::timeout;
 
                 HPX_ASSERT(state_ != empty);

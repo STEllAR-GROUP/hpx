@@ -486,14 +486,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// GCC has issues with forceinline and member function pointers
-#if defined(HPX_GCC_VERSION)
-#  define HPX_MAYBE_FORCEINLINE inline
-#else
-#  define HPX_MAYBE_FORCEINLINE BOOST_FORCEINLINE
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Make sure we have support for more than 64 threads for Xeon Phi
 #if defined(__MIC__) && !defined(HPX_WITH_MORE_THAN_64_THREADS)
 #  define HPX_WITH_MORE_THAN_64_THREADS

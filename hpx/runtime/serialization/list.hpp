@@ -29,7 +29,7 @@ namespace hpx { namespace serialization
     }
 
     template <typename T, typename Allocator>
-    void serialize(output_archive & ar, std::list<T, Allocator> & ls, unsigned)
+    void serialize(output_archive & ar, const std::list<T, Allocator> & ls, unsigned)
     {
         // normal save ...
         ar << ls.size(); //-V128

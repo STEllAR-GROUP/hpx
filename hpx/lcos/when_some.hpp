@@ -47,22 +47,22 @@ namespace hpx
     /// \return   Returns a when_some_result holding the same list of futures
     ///           as has been passed to when_some and indices pointing to
     ///           ready futures.
-    ///           - future<when_some_result<vector<future<R>>>>: If the input
+    ///           - future<when_some_result<Container<future<R>>>>: If the input
     ///             cardinality is unknown at compile time and the futures
     ///             are all of the same type. The order of the futures in the
-    ///             output vector will be the same as given by the input
+    ///             output container will be the same as given by the input
     ///             iterator.
     ///
     /// \note Calling this version of \a when_some where first == last, returns
-    ///       a future with an empty vector that is immediately ready.
+    ///       a future with an empty container that is immediately ready.
     ///       Each future and shared_future is waited upon and then copied into
     ///       the collection of the output (returned) future, maintaining the
     ///       order of the futures in the input collection.
     ///       The future returned by \a when_some will not throw an exception,
     ///       but the futures held in the output collection may.
-    template <typename InputIter>
-    future<when_some_result<
-        vector<future<typename std::iterator_traits<InputIter>::value_type>>>>
+    template <typename InputIter, typename Container =
+        vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<when_some_result<Container>>
     when_some(std::size_t n, Iterator first, Iterator last, error_code& ec = throws);
 
     /// The function \a when_some is an operator allowing to join on the result
@@ -73,7 +73,7 @@ namespace hpx
     /// \param n        [in] The number of futures out of the arguments which
     ///                 have to become ready in order for the returned future
     ///                 to get ready.
-    /// \param futures  [in] A vector holding an arbitrary amount of \a future
+    /// \param futures  [in] A container holding an arbitrary amount of \a future
     ///                 or \a shared_future objects for which \a when_some
     ///                 should wait.
     /// \param ec       [in,out] this represents the error status on exit, if
@@ -86,10 +86,10 @@ namespace hpx
     /// \return   Returns a when_some_result holding the same list of futures
     ///           as has been passed to when_some and indices pointing to
     ///           ready futures.
-    ///           - future<when_some_result<vector<future<R>>>>: If the input
+    ///           - future<when_some_result<Container<future<R>>>>: If the input
     ///             cardinality is unknown at compile time and the futures
     ///             are all of the same type. The order of the futures in the
-    ///             output vector will be the same as given by the input
+    ///             output container will be the same as given by the input
     ///             iterator.
     ///
     /// \note Each future and shared_future is waited upon and then copied into
@@ -97,9 +97,9 @@ namespace hpx
     ///       order of the futures in the input collection.
     ///       The future returned by \a when_some will not throw an exception,
     ///       but the futures held in the output collection may.
-    template <typename R>
-    future<when_some_result<std::vector<future<R>>>>
-    when_some(std::size_t n, std::vector<future<R>>&& futures,
+    template <typename Range>
+    future<when_some_result<Range>>
+    when_some(std::size_t n, Range&& futures,
         error_code& ec = throws);
 
     /// The function \a when_some is an operator allowing to join on the result
@@ -198,24 +198,24 @@ namespace hpx
     /// \return   Returns a when_some_result holding the same list of futures
     ///           as has been passed to when_some and indices pointing to
     ///           ready futures.
-    ///           - future<when_some_result<vector<future<R>>>>: If the input
+    ///           - future<when_some_result<Container<future<R>>>>: If the input
     ///             cardinality is unknown at compile time and the futures
     ///             are all of the same type. The order of the futures in the
-    ///             output vector will be the same as given by the input
+    ///             output container will be the same as given by the input
     ///             iterator.
     ///
     /// \note Calling this version of \a when_some_n where count == 0, returns
     ///       a future with the same elements as the arguments that is
-    ///       immediately ready. Possibly none of the futures in that vector
+    ///       immediately ready. Possibly none of the futures in that container
     ///       are ready.
     ///       Each future and shared_future is waited upon and then copied into
     ///       the collection of the output (returned) future, maintaining the
     ///       order of the futures in the input collection.
     ///       The future returned by \a when_some_n will not throw an exception,
     ///       but the futures held in the output collection may.
-    template <typename InputIter>
-    future<when_some_result<
-        vector<future<typename std::iterator_traits<InputIter>::value_type>>>>
+    template <typename InputIter, typename Container =
+        vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<when_some_result<Container>>
     when_some_n(std::size_t n, Iterator first, std::size_t count,
         error_code& ec = throws);
 }
@@ -468,20 +468,19 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future>
-    lcos::future<when_some_result<std::vector<Future> > >
+    template <typename Range>
+    typename boost::enable_if<traits::is_future_range<Range>,
+        lcos::future<when_some_result<typename util::decay<Range>::type> > >::type
     when_some(std::size_t n,
-        std::vector<Future>& lazy_values,
+        Range& lazy_values,
         error_code& ec = throws)
     {
-        BOOST_STATIC_ASSERT_MSG(
-            traits::is_future<Future>::value, "invalid use of when_some");
-
-        typedef std::vector<Future> result_type;
+        typedef Range result_type;
 
         if (n == 0)
         {
-            return lcos::make_ready_future(std::move(lazy_values));
+            return lcos::make_ready_future(
+                when_some_result<result_type>(std::move(lazy_values)));
         }
 
         if (n > lazy_values.size())
@@ -489,14 +488,12 @@ namespace hpx { namespace lcos
             HPX_THROWS_IF(ec, hpx::bad_parameter,
                 "hpx::lcos::when_some",
                 "number of results to wait for is out of bounds");
-            return lcos::make_ready_future(result_type());
+            return lcos::make_ready_future(
+                when_some_result<result_type>(result_type()));
         }
 
-        result_type lazy_values_;
-        lazy_values_.reserve(lazy_values.size());
-        std::transform(lazy_values.begin(), lazy_values.end(),
-            std::back_inserter(lazy_values_),
-            traits::acquire_future_disp());
+        result_type lazy_values_ =
+            traits::acquire_future<result_type>()(lazy_values);
 
         boost::shared_ptr<detail::when_some<result_type> > f =
             boost::make_shared<detail::when_some<result_type> >(
@@ -509,48 +506,44 @@ namespace hpx { namespace lcos
         return p.get_future();
     }
 
-    template <typename Future>
-    lcos::future<when_some_result<std::vector<Future> > > //-V659
+    template <typename Range>
+    typename boost::enable_if<traits::is_future_range<Range>,
+        lcos::future<when_some_result<typename util::decay<Range>::type> > >::type
     when_some(std::size_t n,
-        std::vector<Future> && lazy_values,
+        Range&& lazy_values,
         error_code& ec = throws)
     {
         return lcos::when_some(n, lazy_values, ec);
     }
 
-    template <typename Iterator>
-    lcos::future<when_some_result<std::vector<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    > > >
+    template <typename Iterator, typename Container =
+        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+    lcos::future<when_some_result<Container> >
     when_some(std::size_t n, Iterator begin, Iterator end,
         error_code& ec = throws)
     {
-        typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
-            future_type;
-        typedef std::vector<future_type> result_type;
+        Container lazy_values_;
 
-        result_type lazy_values_;
+        typename std::iterator_traits<Iterator>::
+            difference_type difference = std::distance(begin, end);
+        if (difference > 0)
+            traits::detail::reserve_if_vector(
+                lazy_values_, static_cast<std::size_t>(difference));
+
         std::transform(begin, end, std::back_inserter(lazy_values_),
             traits::acquire_future_disp());
 
         return lcos::when_some(n, lazy_values_, ec);
     }
 
-    template <typename Iterator>
-    lcos::future<when_some_result<std::vector<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    > > >
+    template <typename Iterator, typename Container =
+        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+    lcos::future<when_some_result<Container> >
     when_some_n(std::size_t n, Iterator begin, std::size_t count,
         error_code& ec = throws)
     {
-        typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
-            future_type;
-        typedef std::vector<future_type> result_type;
-
-        result_type lazy_values_;
-        lazy_values_.reserve(count);
+        Container lazy_values_;
+        traits::detail::reserve_if_vector(lazy_values_, count);
 
         traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)

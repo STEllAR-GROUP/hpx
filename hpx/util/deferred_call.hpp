@@ -51,12 +51,12 @@ namespace hpx { namespace util
             {}
 
             typedef
-                typename util::invoke_fused_result_of<F(Args)>::type
+                typename util::detail::fused_result_of<F(Args)>::type
                 result_type;
 
             BOOST_FORCEINLINE result_type operator()()
             {
-                return util::invoke_fused_r<result_type>(
+                return util::invoke_fused(
                     std::move(_f), std::move(_args));
             }
 

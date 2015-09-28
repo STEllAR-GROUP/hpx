@@ -585,7 +585,7 @@ namespace hpx
 
         std::size_t get_pu_offset(util::command_line_handling const& cfg)
         {
-            std::size_t pu_offset = 0;
+            std::size_t pu_offset = static_cast<std::size_t>(-1);
 #if defined(HPX_HAVE_HWLOC)
             if (cfg.pu_offset_ != 0) {
                 pu_offset = cfg.pu_offset_;
