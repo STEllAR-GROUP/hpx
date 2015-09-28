@@ -225,12 +225,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if(request_ptr_ == 0) return true;
 
-            util::mpi_environment::scoped_lock l;
+            util::mpi_environment::scoped_try_lock l;
+
+            if(!l.locked) return false;
 
             int completed = 0;
-            MPI_Status status;
             int ret = 0;
-            ret = MPI_Test(request_ptr_, &completed, &status);
+            ret = MPI_Test(request_ptr_, &completed, MPI_STATUS_IGNORE);
             HPX_ASSERT(ret == MPI_SUCCESS);
             if(completed)// && status.MPI_ERROR != MPI_ERR_PENDING)
             {

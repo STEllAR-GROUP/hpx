@@ -109,15 +109,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             header_ = header(buffer_, tag_);
             header_.assert_valid();
 
+            state_ = initialized;
+
             handler_ = std::forward<Handler>(handler);
-            postprocess_handler_ = std::forward<ParcelPostprocess>(parcel_postprocess);
 
             if(!send())
+            {
+                postprocess_handler_ = std::forward<ParcelPostprocess>(parcel_postprocess);
                 add_connection(sender_, shared_from_this());
+            }
             else
             {
                 error_code ec;
-                postprocess_handler_(ec, there_, shared_from_this());
+                parcel_postprocess(ec, there_, shared_from_this());
             }
         }
 
@@ -268,8 +272,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             parcels_sent_.add_data(buffer_.data_point_);
             buffer_.clear();
 
-            state_ = initialized;
-
             return true;
         }
 
@@ -277,12 +279,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if(request_ptr_ == 0) return true;
 
-            util::mpi_environment::scoped_lock l;
+            util::mpi_environment::scoped_try_lock l;
+
+            if(!l.locked) return false;
 
             int completed = 0;
-            MPI_Status status;
             int ret = 0;
-            ret = MPI_Test(request_ptr_, &completed, &status);
+            ret = MPI_Test(request_ptr_, &completed, MPI_STATUS_IGNORE);
             HPX_ASSERT(ret == MPI_SUCCESS);
             if(completed)// && status.MPI_ERROR != MPI_ERR_PENDING)
             {
