@@ -351,9 +351,12 @@ int hpx_main(variables_map&)
         test_wait_for_either_of_five_futures_1_from_list<std::vector<future<int> > >();
         test_wait_for_either_of_five_futures_1_from_list<std::list<future<int> > >();
         test_wait_for_either_of_five_futures_1_from_list<std::deque<future<int> > >();
-        test_wait_for_either_of_five_futures_1_from_list_iterators<std::vector<future<int> > >();
-        test_wait_for_either_of_five_futures_1_from_list_iterators<std::list<future<int> > >();
-        test_wait_for_either_of_five_futures_1_from_list_iterators<std::deque<future<int> > >();
+        test_wait_for_either_of_five_futures_1_from_list_iterators<
+            std::vector<future<int> > >();
+        test_wait_for_either_of_five_futures_1_from_list_iterators<
+            std::list<future<int> > >();
+        test_wait_for_either_of_five_futures_1_from_list_iterators<
+            std::deque<future<int> > >();
     }
 
     hpx::finalize();
