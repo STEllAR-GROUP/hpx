@@ -146,6 +146,7 @@ namespace hpx { namespace threads { namespace policies
             threads::thread_init_data& data, thread_state_enum state, Lock& lk)
         {
             HPX_ASSERT(lk.owns_lock());
+            HPX_ASSERT(data.stacksize != 0);
 
             std::ptrdiff_t stacksize = data.stacksize;
 
@@ -213,12 +214,8 @@ namespace hpx { namespace threads { namespace policies
                 hpx::util::unlock_guard<Lock> ull(lk);
 
                 // Allocate a new thread object.
-                if (data.stacksize != 0)
-                    thrd = threads::thread_data::create(
-                        data, memory_pool_, state);
-                else
-                    thrd.reset(new threads::stackless_thread_data(
-                        data, &memory_pool_, state));
+                thrd = threads::thread_data::create(
+                    data, memory_pool_, state);
             }
         }
 
