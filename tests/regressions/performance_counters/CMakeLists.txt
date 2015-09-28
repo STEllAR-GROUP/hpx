@@ -4,7 +4,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests)
+set(tests
+    uptime_1737)
 
 if(PAPI_FOUND)
   set(tests ${tests}
@@ -26,14 +27,14 @@ foreach(test ${tests})
                        ${${test}_FLAGS}
                        EXCLUDE_FROM_ALL
                        HPX_PREFIX ${HPX_BUILD_PREFIX}
-                       FOLDER "Tests/Regressions/performance_counters")
+                       FOLDER "Tests/Regressions/PerformanceCounters")
   else()
     add_hpx_executable(${test}_test
                        SOURCES ${sources}
                        ${${test}_FLAGS}
                        EXCLUDE_FROM_ALL
                        HPX_PREFIX ${HPX_BUILD_PREFIX}
-                       FOLDER "Tests/Regressions/performance_counters")
+                       FOLDER "Tests/Regressions/PerformanceCounters")
   endif()
 
   add_hpx_regression_test("performance_counters" ${test} ${${test}_PARAMETERS})
