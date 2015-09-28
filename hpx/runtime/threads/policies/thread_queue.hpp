@@ -277,7 +277,7 @@ namespace hpx { namespace threads { namespace policies
 
                 // this thread has to be in the map now
                 HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
-                HPX_ASSERT(thrd->is_created_from(&memory_pool_));
+                HPX_ASSERT(thrd->get_pool() == &memory_pool_);
             }
 
             if (added) {
@@ -727,7 +727,7 @@ namespace hpx { namespace threads { namespace policies
 
                     // this thread has to be in the map now
                     HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
-                    HPX_ASSERT(thrd->is_created_from(&memory_pool_));
+                    HPX_ASSERT(thrd->get_pool() == &memory_pool_);
 
                     // push the new thread in the pending queue thread
                     if (initial_state == pending)
@@ -858,7 +858,7 @@ namespace hpx { namespace threads { namespace policies
         /// Destroy the passed thread as it has been terminated
         bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
         {
-            if (thrd->is_created_from(&memory_pool_))
+            if (thrd->get_pool() == &memory_pool_)
             {
                 terminated_items_.push(thrd);
 

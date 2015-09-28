@@ -36,16 +36,9 @@ namespace hpx { namespace threads
     {
         if (0 == --p->count_)
         {
-            if (thread_data* td = dynamic_cast<thread_data*>(p))
-            {
-                thread_pool* pool = td->pool_;
-                td->~thread_data();
-                pool->deallocate(td);
-            }
-            else
-            {
-                delete p;
-            }
+            thread_data_base::pool_base* pool = p->get_pool();
+            p->~thread_data_base();
+            pool->deallocate(p);
         }
     }
 

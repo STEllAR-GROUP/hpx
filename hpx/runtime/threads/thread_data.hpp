@@ -121,6 +121,13 @@ namespace hpx { namespace threads
         struct tag {};
         typedef util::spinlock_pool<tag> mutex_type;
 
+        struct pool_base
+        {
+            virtual ~pool_base() {}
+            virtual thread_data_base* allocate() = 0;
+            virtual void deallocate(thread_data_base*) = 0;
+        };
+
         /// Construct a new \a thread
         thread_data_base(thread_init_data& init_data, thread_state_enum newstate)
           : current_state_(thread_state(newstate)),
@@ -584,7 +591,7 @@ namespace hpx { namespace threads
             return stacksize_;
         }
 
-        virtual bool is_created_from(void* pool) const = 0;
+        virtual pool_base* get_pool() = 0;
         virtual thread_state_enum operator()() = 0;
         virtual thread_id_type get_thread_id() const = 0;
         virtual std::size_t get_thread_phase() const = 0;
@@ -662,7 +669,25 @@ namespace hpx { namespace threads
         thread_data_base* this_() { return this; }
 
     public:
-        typedef boost::lockfree::caching_freelist<thread_data> pool_type;
+        struct pool_type: thread_data_base::pool_base
+        {
+            pool_type(std::size_t size)
+              : pool_(size)
+            {}
+
+            virtual thread_data* allocate()
+            {
+                return pool_.allocate();
+            }
+
+            virtual void deallocate(thread_data_base* p)
+            {
+                pool_.deallocate(static_cast<thread_data*>(p));
+            }
+
+        private:
+            boost::lockfree::caching_freelist<thread_data> pool_;
+        };
 
         static boost::intrusive_ptr<thread_data> create(
             thread_init_data& init_data, pool_type& pool,
@@ -704,9 +729,9 @@ namespace hpx { namespace threads
             HPX_ASSERT(coroutine_.is_ready());
         }
 
-        bool is_created_from(void* pool) const
+        virtual pool_base* get_pool()
         {
-            return pool_ == pool;
+            return pool_;
         }
 
         /// \brief Execute the thread function
