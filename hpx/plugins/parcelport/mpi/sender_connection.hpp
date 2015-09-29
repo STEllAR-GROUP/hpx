@@ -115,7 +115,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             if(!send())
             {
-                postprocess_handler_ = std::forward<ParcelPostprocess>(parcel_postprocess);
+                postprocess_handler_
+                    = std::forward<ParcelPostprocess>(parcel_postprocess);
                 add_connection(sender_, shared_from_this());
             }
             else
