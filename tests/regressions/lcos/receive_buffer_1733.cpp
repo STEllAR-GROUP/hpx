@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS static_cast<std::size_t>(100)
 
 ///////////////////////////////////////////////////////////////////////////////
 char const* buffer_basename = "/receive_buffer_1733/buffer/";
