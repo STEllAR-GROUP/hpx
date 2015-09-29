@@ -9,6 +9,8 @@
 #include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
+// Intel MPI does not like to be included after stdio.h. As such, we include mpi.h
+// as soon as possible.
 #include <mpi.h>
 #endif
 
