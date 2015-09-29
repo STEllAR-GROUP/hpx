@@ -16,8 +16,9 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     // Discoverer function for action invocation counters
     bool action_invocation_counter_discoverer(counter_info const& info,
-        discover_counter_func const& f,
-        discover_counters_mode mode, error_code& ec)
+        discover_counter_func const& f, discover_counters_mode mode,
+        hpx::actions::detail::invocation_count_registry& registry,
+        error_code& ec)
     {
         performance_counters::counter_info i = info;
 
@@ -27,9 +28,7 @@ namespace hpx { namespace performance_counters
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        bool result =
-            hpx::actions::detail::invocation_count_registry::instance().
-                counter_discoverer(info, p, f, mode, ec);
+        bool result = registry.counter_discoverer(info, p, f, mode, ec);
         if (!result || ec) return false;
 
         if (&ec != &throws)
@@ -38,10 +37,29 @@ namespace hpx { namespace performance_counters
         return true;
     }
 
+    bool local_action_invocation_counter_discoverer(counter_info const& info,
+        discover_counter_func const& f, discover_counters_mode mode,
+        error_code& ec)
+    {
+        using hpx::actions::detail::invocation_count_registry;
+        return action_invocation_counter_discoverer(info, f, mode,
+            invocation_count_registry::local_instance(), ec);
+    }
+
+    bool remote_action_invocation_counter_discoverer(counter_info const& info,
+        discover_counter_func const& f, discover_counters_mode mode,
+        error_code& ec)
+    {
+        using hpx::actions::detail::invocation_count_registry;
+        return action_invocation_counter_discoverer(info, f, mode,
+            invocation_count_registry::remote_instance(), ec);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Creation function for action invocation counter
-    naming::gid_type action_invocation_counter_creator(
-        counter_info const& info, error_code& ec)
+    naming::gid_type action_invocation_counter_creator(counter_info const& info,
+        hpx::actions::detail::invocation_count_registry& registry,
+        error_code& ec)
     {
         switch (info.type_) {
         case counter_raw:
@@ -68,8 +86,7 @@ namespace hpx { namespace performance_counters
 
                 // ask registry
                 hpx::util::function_nonser<boost::int64_t(bool)> f =
-                    hpx::actions::detail::invocation_count_registry::instance().
-                        get_invocation_counter(paths.parameters_);
+                    registry.get_invocation_counter(paths.parameters_);
 
                 return detail::create_raw_counter(info, std::move(f), ec);
             }
@@ -81,6 +98,22 @@ namespace hpx { namespace performance_counters
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
+    }
+
+    naming::gid_type local_action_invocation_counter_creator(
+        counter_info const& info, error_code& ec)
+    {
+        using hpx::actions::detail::invocation_count_registry;
+        return action_invocation_counter_creator(info,
+            invocation_count_registry::local_instance(), ec);
+    }
+
+    naming::gid_type remote_action_invocation_counter_creator(
+        counter_info const& info, error_code& ec)
+    {
+        using hpx::actions::detail::invocation_count_registry;
+        return action_invocation_counter_creator(info,
+            invocation_count_registry::remote_instance(), ec);
     }
 }}
 

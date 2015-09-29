@@ -15,16 +15,22 @@
 
 namespace hpx { namespace actions { namespace detail
 {
-    invocation_count_registry& invocation_count_registry::instance()
+    invocation_count_registry& invocation_count_registry::local_instance()
     {
-        hpx::util::static_<invocation_count_registry> registry;
+        hpx::util::static_<invocation_count_registry, local_tag> registry;
+        return registry.get();
+    }
+
+    invocation_count_registry& invocation_count_registry::remote_instance()
+    {
+        hpx::util::static_<invocation_count_registry, remote_tag> registry;
         return registry.get();
     }
 
     void invocation_count_registry::register_class(std::string const& name,
         get_invocation_count_type fun)
     {
-        if(name.empty())
+        if (name.empty())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "invocation_count_registry::register_class",
@@ -121,7 +127,7 @@ namespace hpx { namespace actions { namespace detail
 
         // use given action type directly
         map_type::const_iterator it = map_.find(p.parameters_);
-        if (it != map_.end())
+        if (it == map_.end())
         {
             // compose a list of known action types
             std::string types;

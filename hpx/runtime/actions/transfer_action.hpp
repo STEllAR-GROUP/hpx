@@ -14,6 +14,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/invocation_count_registry.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -472,6 +473,19 @@ namespace hpx { namespace actions
     template <typename Action>
     boost::atomic<boost::int64_t>
         transfer_action<Action>::invocation_count_(0);
+
+    namespace detail
+    {
+        template <typename Action>
+        void register_remote_action_invocation_count(
+            invocation_count_registry& registry)
+        {
+            registry.register_class(
+                hpx::actions::detail::get_action_name<Action>(),
+                &transfer_action<Action>::get_invocation_count
+            );
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t N, typename Action>

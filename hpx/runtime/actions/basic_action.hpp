@@ -18,6 +18,7 @@
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/invocation_count_registry.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/util/bind.hpp>
@@ -427,6 +428,19 @@ namespace hpx { namespace actions
     boost::atomic<boost::int64_t>
         basic_action<Component, R(Args...), Derived>::invocation_count_(0);
 
+    namespace detail
+    {
+        template <typename Action>
+        void register_local_action_invocation_count(
+            invocation_count_registry& registry)
+        {
+            registry.register_class(
+                hpx::actions::detail::get_action_name<Action>(),
+                &Action::get_invocation_count
+            );
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -680,7 +694,9 @@ namespace hpx { namespace actions
 /**/
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
+    HPX_REGISTER_ACTION_INVOCATION_COUNT(action, actionname)                  \
 /**/
+
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
     namespace hpx { namespace actions { namespace detail {                    \

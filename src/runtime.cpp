@@ -718,8 +718,19 @@ namespace hpx
               "on this locality (the action type has to be specified as the "
               "counter parameter)",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::action_invocation_counter_creator,
-              &performance_counters::action_invocation_counter_discoverer,
+              &performance_counters::local_action_invocation_counter_creator,
+              &performance_counters::local_action_invocation_counter_discoverer,
+              ""
+            },
+
+            { "/runtime/count/remote_action_invocation",
+              performance_counters::counter_raw,
+              "returns the number of (remote) invocations of a specific action "
+              "on this locality (the action type has to be specified as the "
+              "counter parameter)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::remote_action_invocation_counter_creator,
+              &performance_counters::remote_action_invocation_counter_discoverer,
               ""
             }
         };

@@ -84,12 +84,21 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     // Creation function for action invocation counters.
-    HPX_API_EXPORT naming::gid_type action_invocation_counter_creator(
+    HPX_API_EXPORT naming::gid_type local_action_invocation_counter_creator(
         counter_info const&, error_code&);
 
     // Discoverer function for action invocation counters.
-    HPX_API_EXPORT bool action_invocation_counter_discoverer(counter_info const&,
-        discover_counter_func const&, discover_counters_mode, error_code&);
+    HPX_API_EXPORT bool local_action_invocation_counter_discoverer(
+        counter_info const&, discover_counter_func const&,
+        discover_counters_mode, error_code&);
+
+    HPX_API_EXPORT naming::gid_type remote_action_invocation_counter_creator(
+        counter_info const&, error_code&);
+
+    // Discoverer function for action invocation counters.
+    HPX_API_EXPORT bool remote_action_invocation_counter_discoverer(
+        counter_info const&, discover_counter_func const&,
+        discover_counters_mode, error_code&);
 }}
 
 #endif
