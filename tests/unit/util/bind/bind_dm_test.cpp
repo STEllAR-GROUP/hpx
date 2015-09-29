@@ -61,10 +61,5 @@ int main()
     HPX_TEST( hpx::util::bind( &X::m, pcx )() == 17041 );
     HPX_TEST( hpx::util::bind( &X::m, boost::ref(cx) )() == 17041 );
 
-    int const v = 42;
-
-    HPX_TEST( hpx::util::bind( &X::m, hpx::util::bind( f,
-        placeholders::_1 ) )( v ) == v );
-
     return hpx::util::report_errors();
 }
