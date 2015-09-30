@@ -694,7 +694,7 @@ namespace hpx { namespace actions
 /**/
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
-    HPX_REGISTER_ACTION_INVOCATION_COUNT(action, actionname)                  \
+    HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////

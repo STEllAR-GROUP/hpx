@@ -74,14 +74,20 @@ namespace hpx { namespace actions { namespace detail
             register_remote_action_invocation_count<Action>(
                 invocation_count_registry::remote_instance());
         }
+
+        static register_action_invocation_count instance;
     };
+
+    template <typename Action>
+    register_action_invocation_count<Action>
+        register_action_invocation_count<Action>::instance;
 }}}
 
-#define HPX_REGISTER_ACTION_INVOCATION_COUNT(Action, Name)                    \
+#define HPX_REGISTER_ACTION_INVOCATION_COUNT(Action)                          \
     namespace hpx { namespace actions { namespace detail                      \
     {                                                                         \
-        static register_action_invocation_count<Action>                       \
-            BOOST_PP_CAT(register_action_invocation_count_, Name);            \
+        template register_action_invocation_count<Action>                     \
+            register_action_invocation_count<Action>::instance;               \
     }}}                                                                       \
 /**/
 
