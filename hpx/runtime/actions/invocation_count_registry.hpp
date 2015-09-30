@@ -82,10 +82,6 @@ namespace hpx { namespace actions { namespace detail
     {                                                                         \
         static register_action_invocation_count<Action>                       \
             BOOST_PP_CAT(register_action_invocation_count_, Name);            \
-        template void register_local_action_invocation_count<Action>(         \
-            invocation_count_registry& registry);                             \
-        template void register_remote_action_invocation_count<Action>(        \
-            invocation_count_registry& registry);                             \
     }}}                                                                       \
 /**/
 
