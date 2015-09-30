@@ -9,6 +9,7 @@
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
 #include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/util/coroutine/detail/tss.hpp>
 #include <hpx/util/coroutine/detail/self.hpp>
