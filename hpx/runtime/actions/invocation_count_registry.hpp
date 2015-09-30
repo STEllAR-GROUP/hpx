@@ -7,11 +7,9 @@
 #define HPX_ACTIONS_INVOCATION_COUNT_REGISTRY_SEP_25_2015_0727AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/performance_counters/counters.hpp>
 
 #include <hpx/util/jenkins_hash.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/static.hpp>
 
 #include <boost/preprocessor/cat.hpp>
