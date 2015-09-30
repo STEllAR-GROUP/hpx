@@ -111,7 +111,7 @@ void test_receive_buffer_server::do_work()
         hpx::future<std::size_t> f = receive(i);
         steps.push_back(
             f.then(
-                [this, i](hpx::future<std::size_t> && f)
+                [this, i](hpx::future<std::size_t> && f) -> std::size_t
                 {
                     std::size_t val = f.get();
                     send(i + 1, val + 1);
