@@ -984,14 +984,14 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Remove the given locality from our connection cache
-    void runtime_support::remove_from_connection_cache(parcelset::endpoints_type
-        const& eps)
+    void runtime_support::remove_from_connection_cache(
+        naming::gid_type const& gid, parcelset::endpoints_type const& eps)
     {
         runtime* rt = get_runtime_ptr();
         if (rt == 0) return;
 
         // instruct our connection cache to drop all connections it is holding
-        rt->get_parcel_handler().remove_from_connection_cache(eps);
+        rt->get_parcel_handler().remove_from_connection_cache(gid, eps);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1225,11 +1225,13 @@ namespace hpx { namespace components { namespace server
 
         std::vector<naming::id_type> locality_ids = find_remote_localities();
 
-        typedef server::runtime_support::remove_from_connection_cache_action action_type;
+        typedef server::runtime_support::remove_from_connection_cache_action
+            action_type;
+
         action_type act;
         for (naming::id_type const& id : locality_ids)
         {
-            apply(act, id, rt->endpoints());
+            apply(act, id, hpx::get_locality(), rt->endpoints());
         }
     }
 

@@ -636,13 +636,7 @@ bool addressing_service::unregister_locality(
         if (ec || (success != rep.get_status()))
             return false;
 
-        {
-            boost::lock_guard<mutex_type> l(resolved_localities_mtx_);
-            resolved_localities_type::iterator it = resolved_localities_.find(gid);
-            if(it != resolved_localities_.end())
-                resolved_localities_.erase(it);
-        }
-
+        remove_resolved_locality(gid);
         return true;
     }
     catch (hpx::exception const& e) {
@@ -650,6 +644,15 @@ bool addressing_service::unregister_locality(
         return false;
     }
 } // }}}
+
+void addressing_service::remove_resolved_locality(naming::gid_type const& gid)
+{
+    boost::lock_guard<mutex_type> l(resolved_localities_mtx_);
+    resolved_localities_type::iterator it = resolved_localities_.find(gid);
+    if(it != resolved_localities_.end())
+        resolved_localities_.erase(it);
+}
+
 
 bool addressing_service::get_console_locality(
     naming::gid_type& prefix
@@ -1432,7 +1435,6 @@ bool addressing_service::resolve_cached(
     // special cases
     if (resolve_locally_known_addresses(id, addr))
         return true;
-    if (ec) return false;
 
     // If caching is disabled, bail
     if (!caching_)
@@ -2302,13 +2304,15 @@ void addressing_service::insert_cache_entry(
     }
 } // }}}
 
+// This function has to return false if the key is already in the cache (true
+// means go ahead with the cache update).
 bool check_for_collisions(
     addressing_service::gva_cache_key const& new_key
   , addressing_service::gva_cache_key const& old_key
     )
 {
-    return (new_key.get_gid() == old_key.get_gid())
-        && (new_key.get_count() == old_key.get_count());
+    return (new_key.get_gid() != old_key.get_gid())
+        || (new_key.get_count() != old_key.get_count());
 }
 
 void addressing_service::update_cache_entry(
@@ -2346,25 +2350,28 @@ void addressing_service::update_cache_entry(
 
         if (!gva_cache_->update_if(key, g, check_for_collisions))
         {
-            // Figure out who we collided with.
-            gva_cache_key idbase;
-            gva_cache_type::entry_type e;
-
-            if (!gva_cache_->get_entry(key, idbase, e))
+            if (LAGAS_ENABLED(warning))
             {
-                // This is impossible under sane conditions.
-                HPX_THROWS_IF(ec, invalid_data
-                  , "addressing_service::update_cache_entry"
-                  , "data corruption or lock error occurred in cache");
-                return;
-            }
+                // Figure out who we collided with.
+                gva_cache_key idbase;
+                gva_cache_type::entry_type e;
 
-            LAGAS_(warning) <<
-                ( boost::format(
-                    "addressing_service::update_cache_entry, "
-                    "aborting update due to key collision in cache, "
-                    "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
-                ) % gid % count % idbase.get_gid() % idbase.get_count());
+                if (!gva_cache_->get_entry(key, idbase, e))
+                {
+                    // This is impossible under sane conditions.
+                    HPX_THROWS_IF(ec, invalid_data
+                      , "addressing_service::update_cache_entry"
+                      , "data corruption or lock error occurred in cache");
+                    return;
+                }
+
+                LAGAS_(warning) <<
+                    ( boost::format(
+                        "addressing_service::update_cache_entry, "
+                        "aborting update due to key collision in cache, "
+                        "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
+                    ) % gid % count % idbase.get_gid() % idbase.get_count());
+            }
         }
 
         if (&ec != &throws)

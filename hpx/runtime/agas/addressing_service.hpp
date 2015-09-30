@@ -313,6 +313,9 @@ public:
       , error_code& ec = throws
         );
 
+    /// \brief remove given locality from locality cache
+    void remove_resolved_locality(naming::gid_type const& gid);
+
     /// \brief Get locality locality_id of the console locality.
     ///
     /// \param locality_id     [out] The locality_id value uniquely identifying the
