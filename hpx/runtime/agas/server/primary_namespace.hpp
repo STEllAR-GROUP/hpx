@@ -361,7 +361,8 @@ struct HPX_EXPORT primary_namespace
 
   private:
     resolved_type resolve_gid_locked(
-        naming::gid_type const& gid
+        boost::unique_lock<mutex_type>& l
+      , naming::gid_type const& gid
       , error_code& ec
         );
 

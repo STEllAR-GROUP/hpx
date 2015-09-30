@@ -327,34 +327,34 @@ void addressing_service::launch_bootstrap(
     naming::gid_type const locality_gid = bootstrap_locality_namespace_gid();
     gva locality_gva(here,
         server::locality_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->locality_ns_server_));
+            get_bootstrap_locality_ns_ptr());
     locality_ns_addr_ = naming::address(here,
         server::locality_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->locality_ns_server_));
+            get_bootstrap_locality_ns_ptr());
 
     naming::gid_type const primary_gid = bootstrap_primary_namespace_gid();
     gva primary_gva(here,
         server::primary_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->primary_ns_server_));
+            get_bootstrap_primary_ns_ptr());
     primary_ns_addr_ = naming::address(here,
         server::primary_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->primary_ns_server_));
+            get_bootstrap_primary_ns_ptr());
 
     naming::gid_type const component_gid = bootstrap_component_namespace_gid();
     gva component_gva(here,
         server::component_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->component_ns_server_));
+            get_bootstrap_component_ns_ptr());
     component_ns_addr_ = naming::address(here,
         server::component_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->component_ns_server_));
+            get_bootstrap_component_ns_ptr());
 
     naming::gid_type const symbol_gid = bootstrap_symbol_namespace_gid();
     gva symbol_gva(here,
         server::symbol_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->symbol_ns_server_));
+            get_bootstrap_symbol_ns_ptr());
     symbol_ns_addr_ = naming::address(here,
         server::symbol_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->symbol_ns_server_));
+            get_bootstrap_symbol_ns_ptr());
 
     set_local_locality(here);
     rt.get_config().parse("assigned locality",
@@ -557,6 +557,8 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 = bootstrap->locality_ns_server_.service(req, ec).get_endpoints();
             if(ec)
             {
+                l.unlock();
+
                 HPX_THROWS_IF(ec, internal_server_error
                   , "addressing_service::resolve_locality"
                   , "could not resolve locality to endpoints");
@@ -585,6 +587,7 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 }
                 endpoints = endpoints_future.get(ec);
             }
+
             // Search again ... might have been added by a different thread already
             it = resolved_localities_.find(gid);
         }
@@ -598,6 +601,8 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                     )
                 ), it)))
             {
+                l.unlock();
+
                 HPX_THROWS_IF(ec, internal_server_error
                   , "addressing_service::resolve_locality"
                   , "resolved locality insertion failed "
@@ -1338,23 +1343,61 @@ bool addressing_service::resolve_locally_known_addresses(
         addr = locality_ns_addr_;
         return true;
     }
-
-    if (HPX_AGAS_PRIMARY_NS_MSB == msb && HPX_AGAS_PRIMARY_NS_LSB == lsb)
-    {
-        addr = primary_ns_addr_;
-        return true;
-    }
-
     if (HPX_AGAS_COMPONENT_NS_MSB == msb && HPX_AGAS_COMPONENT_NS_LSB == lsb)
     {
         addr = component_ns_addr_;
         return true;
     }
 
-    if (HPX_AGAS_SYMBOL_NS_MSB == msb && HPX_AGAS_SYMBOL_NS_LSB == lsb)
+    boost::uint64_t locality_msb =
+        get_local_locality().get_msb() | HPX_AGAS_NS_MSB;
+
+    if (HPX_AGAS_PRIMARY_NS_LSB == lsb)
     {
-        addr = symbol_ns_addr_;
-        return true;
+        if (HPX_AGAS_PRIMARY_NS_MSB == msb)
+        {
+            addr = primary_ns_addr_;
+            return true;
+        }
+
+        if (locality_msb == msb)
+        {
+            if (is_bootstrap())
+            {
+                addr = primary_ns_addr_;
+            }
+            else
+            {
+                addr = naming::address(get_local_locality(),
+                    server::primary_namespace::get_component_type(),
+                    get_hosted_primary_ns_ptr());
+            }
+            return true;
+        }
+    }
+
+    if (HPX_AGAS_SYMBOL_NS_LSB == lsb)
+    {
+        if (HPX_AGAS_SYMBOL_NS_MSB == msb)
+        {
+            addr = symbol_ns_addr_;
+            return true;
+        }
+
+        if (locality_msb == msb)
+        {
+            if (is_bootstrap())
+            {
+                addr = symbol_ns_addr_;
+            }
+            else
+            {
+                addr = naming::address(get_local_locality(),
+                    server::symbol_namespace::get_component_type(),
+                    get_hosted_symbol_ns_ptr());
+            }
+            return true;
+        }
     }
 
     return false;
@@ -1769,7 +1812,7 @@ bool addressing_service::resolve_cached(
 void addressing_service::route(
     parcelset::parcel p
   , util::function_nonser<void(boost::system::error_code const&,
-        parcelset::parcel const&)> const& f
+        parcelset::parcel const&)> && f
     )
 {
     // compose request
@@ -1799,24 +1842,14 @@ void addressing_service::route(
         if (stubs::primary_namespace::is_service_instance(ids[0]) ||
             stubs::symbol_namespace::is_service_instance(ids[0]))
         {
-            // construct wrapper parcel
-            naming::id_type const route_target(
-                bootstrap_primary_namespace_gid(), naming::id_type::unmanaged);
-
-            parcelset::parcel route_p(
-                route_target, primary_ns_addr_
-              , action_type(), action_priority_, std::move(p));
-
-            // send to the main AGAS instance for routing
-            hpx::applier::get_applier().get_parcel_handler()
-                .put_parcel(std::move(route_p), f);
-            return;
+            // target locality will supply the lva
+            addr.locality_ = naming::get_locality_from_id(target).get_gid();
         }
     }
 
     // apply directly as we have the resolved destination address
     applier::detail::apply_r_p_cb<action_type>(std::move(addr), target,
-        action_priority_, f, std::move(p));
+        action_priority_, std::move(f), std::move(p));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
