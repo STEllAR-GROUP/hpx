@@ -924,8 +924,7 @@ namespace hpx { namespace parcelset
             if(threads::get_self_ptr())
             {
                 num_thread = hpx::get_worker_thread_num();
-                while(do_background_work(num_thread))
-                    ;
+                do_background_work(num_thread);
             }
         }
 

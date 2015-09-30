@@ -76,39 +76,31 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             connection_list connections
         )
         {
-            // We try to handle all receives within 1 second
-            for(connection_list::iterator it = connections.begin();
-                it != connections.end();)
-            {
-                connection_type & sender = **it;
-                if(sender.send())
-                {
-                    connection_ptr s = *it;
-                    it = connections.erase(it);
-                    error_code ec;
-                    s->postprocess_handler_(ec, s->destination(), s);
-                }
-                else
-                {
-                    ++it;
-                }
-            }
+            // We try to handle all sends
+            connection_list::iterator end = std::remove_if(
+                connections.begin()
+              , connections.end()
+              , [](connection_ptr sender) -> bool
+              {
+                    if(sender->send())
+                    {
+                        error_code ec;
+                        sender->postprocess_handler_(ec, sender->destination(), sender);
+                        return true;
+                    }
+                    return false;
+              }
+            );
 
-            if(!connections.empty())
+            // If some are still in progress, give them back
+//             if(end != connections.end())
             {
                 boost::unique_lock<mutex_type> l(connections_mtx_);
-                if(connections_.empty())
-                {
-                    std::swap(connections, connections_);
-                }
-                else
-                {
-                    connections_.insert(
-                        connections_.end()
-                      , std::make_move_iterator(connections.begin())
-                      , std::make_move_iterator(connections.end())
-                    );
-                }
+                connections_.insert(
+                    connections_.end()
+                  , std::make_move_iterator(connections.begin())
+                  , std::make_move_iterator(end)
+                );
             }
         }
 
@@ -183,7 +175,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
 
         mutex_type connections_mtx_;
-        lcos::local::detail::condition_variable connections_cond_;
         connection_list connections_;
 
         mutex_type next_free_tag_mtx_;
