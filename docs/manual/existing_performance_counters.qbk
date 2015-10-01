@@ -1136,6 +1136,38 @@ system and application performance.
         [Returns the overall number of currently active components of the
          specified type on the given locality.]
     ]
+    [   [`/runtime/count/action_invocation`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of
+          action invocations should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [The action type. This is the string which has been used
+         while registering the action with __hpx__, e.g. which has been
+         passed as the second parameter to the macro
+         [macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`] or
+         [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`].
+        ]
+        [Returns the overall (local) invocation count of the specified action
+         type on the given locality.]
+    ]
+    [   [`/runtime/count/remote_action_invocation`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of
+          action invocations should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [The action type. This is the string which has been used
+         while registering the action with __hpx__, e.g. which has been
+         passed as the second parameter to the macro
+         [macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`] or
+         [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`].
+        ]
+        [Returns the overall (remote) invocation count of the specified action
+         type on the given locality.]
+    ]
     [   [`/runtime/uptime`]
         [`locality#*/total`
 

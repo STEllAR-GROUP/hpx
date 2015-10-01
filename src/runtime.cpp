@@ -693,7 +693,8 @@ namespace hpx
 
             // uptime counters
             { "/runtime/uptime", performance_counters::counter_elapsed_time,
-              "returns the up time of the runtime instance for the referenced locality",
+              "returns the up time of the runtime instance for the referenced "
+              "locality",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::uptime_counter_creator,
               &performance_counters::locality_counter_discoverer,
@@ -708,6 +709,28 @@ namespace hpx
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::component_instance_counter_creator,
               &performance_counters::locality_counter_discoverer,
+              ""
+            },
+
+            // action invocation counters
+            { "/runtime/count/action_invocation", performance_counters::counter_raw,
+              "returns the number of (local) invocations of a specific action "
+              "on this locality (the action type has to be specified as the "
+              "counter parameter)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::local_action_invocation_counter_creator,
+              &performance_counters::local_action_invocation_counter_discoverer,
+              ""
+            },
+
+            { "/runtime/count/remote_action_invocation",
+              performance_counters::counter_raw,
+              "returns the number of (remote) invocations of a specific action "
+              "on this locality (the action type has to be specified as the "
+              "counter parameter)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::remote_action_invocation_counter_creator,
+              &performance_counters::remote_action_invocation_counter_discoverer,
               ""
             }
         };
