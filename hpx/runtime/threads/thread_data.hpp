@@ -121,6 +121,13 @@ namespace hpx { namespace threads
         struct tag {};
         typedef util::spinlock_pool<tag> mutex_type;
 
+        struct pool_base
+        {
+            virtual ~pool_base() {}
+            virtual thread_data_base* allocate() = 0;
+            virtual void deallocate(thread_data_base*) = 0;
+        };
+
         /// Construct a new \a thread
         thread_data_base(thread_init_data& init_data, thread_state_enum newstate)
           : current_state_(thread_state(newstate)),
@@ -584,7 +591,7 @@ namespace hpx { namespace threads
             return stacksize_;
         }
 
-        virtual bool is_created_from(void* pool) const = 0;
+        virtual pool_base* get_pool() = 0;
         virtual thread_state_enum operator()() = 0;
         virtual thread_id_type get_thread_id() const = 0;
         virtual std::size_t get_thread_phase() const = 0;
@@ -662,17 +669,42 @@ namespace hpx { namespace threads
         thread_data_base* this_() { return this; }
 
     public:
-        typedef boost::lockfree::caching_freelist<thread_data> pool_type;
-
-        thread_data(thread_init_data& init_data,
-               pool_type& pool, thread_state_enum newstate)
-          : thread_data_base(init_data, newstate),
-            coroutine_(std::move(init_data.func), std::move(init_data.target),
-                this_(), init_data.stacksize),
-            pool_(&pool)
+        struct pool_type: thread_data_base::pool_base
         {
-            HPX_ASSERT(init_data.stacksize != 0);
-            HPX_ASSERT(coroutine_.is_ready());
+            pool_type(std::size_t size)
+              : pool_(size)
+            {}
+
+            virtual thread_data* allocate()
+            {
+                return pool_.allocate();
+            }
+
+            virtual void deallocate(thread_data_base* p)
+            {
+                pool_.deallocate(static_cast<thread_data*>(p));
+            }
+
+        private:
+            boost::lockfree::caching_freelist<thread_data> pool_;
+        };
+
+        static boost::intrusive_ptr<thread_data> create(
+            thread_init_data& init_data, pool_type& pool,
+            thread_state_enum newstate)
+        {
+            thread_data* ret = pool.allocate();
+            if (ret == 0)
+            {
+                HPX_THROW_EXCEPTION(out_of_memory,
+                    "thread_data::operator new",
+                    "could not allocate memory for thread_data");
+            }
+#ifdef HPX_DEBUG_THREAD_POOL
+            using namespace std;    // some systems have memset in namespace std
+            memset (ret, initial_value, sizeof(thread_data));
+#endif
+            return new (ret) thread_data(init_data, pool, newstate);
         }
 
         ~thread_data()
@@ -697,22 +729,9 @@ namespace hpx { namespace threads
             HPX_ASSERT(coroutine_.is_ready());
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // Memory management
-        static void* operator new(std::size_t size, pool_type&);
-        static void operator delete(void* p, std::size_t size);
-        static void operator delete(void*, pool_type&);
-
-        // Won't be called.
-        static void* operator new(std::size_t) throw()
+        virtual pool_base* get_pool()
         {
-            HPX_ASSERT(false);
-            return NULL;
-        }
-
-        bool is_created_from(void* pool) const
-        {
-            return pool_ == pool;
+            return pool_;
         }
 
         /// \brief Execute the thread function
@@ -767,113 +786,24 @@ namespace hpx { namespace threads
         //}
 
     private:
+        friend HPX_EXPORT void intrusive_ptr_release(thread_data_base*);
+
+        thread_data(thread_init_data& init_data,
+               pool_type& pool, thread_state_enum newstate)
+          : thread_data_base(init_data, newstate),
+            coroutine_(std::move(init_data.func), std::move(init_data.target),
+                this_(), init_data.stacksize),
+            pool_(&pool)
+        {
+            HPX_ASSERT(init_data.stacksize != 0);
+            HPX_ASSERT(coroutine_.is_ready());
+        }
+
         coroutine_type coroutine_;
         pool_type* pool_;
     };
 
     typedef thread_data::pool_type thread_pool;
-
-    ///////////////////////////////////////////////////////////////////////////
-    class stackless_thread_data : public thread_data_base
-    {
-        // Avoid warning about using 'this' in initializer list
-        thread_data_base* this_() { return this; }
-
-    public:
-        stackless_thread_data(thread_init_data& init_data,
-                void* pool, thread_state_enum newstate)
-          : thread_data_base(init_data, newstate),
-            coroutine_(std::move(init_data.func), std::move(init_data.target), this_()),
-            pool_(pool)
-        {
-            HPX_ASSERT(init_data.stacksize == 0);
-        }
-
-        ~stackless_thread_data()
-        {
-            LTM_(debug) << "~stackless_thread(" << this << "), description(" //-V128
-                        << get_description() << "), phase("
-                        << get_thread_phase() << ")";
-        }
-
-        void rebind(thread_init_data& init_data, thread_state_enum newstate)
-        {
-            LTM_(debug) << "~stackless_thread(" << this << "), description(" //-V128
-                        << get_description() << "), phase("
-                        << get_thread_phase() << "), rebind";
-
-            this->thread_data_base::rebind_base(init_data, newstate);
-
-            coroutine_.rebind(std::move(init_data.func),
-                std::move(init_data.target), this_());
-
-            HPX_ASSERT(init_data.stacksize == 0);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // Memory management
-        bool is_created_from(void* pool) const
-        {
-            return pool_ == pool;
-        }
-
-        /// \brief Execute the thread function
-        ///
-        /// \returns        This function returns the thread state the thread
-        ///                 should be scheduled from this point on. The thread
-        ///                 manager will use the returned value to set the
-        ///                 thread's scheduling status.
-        thread_state_enum operator()()
-        {
-            thread_state_ex current_state_ex = get_state_ex();
-            current_state_ex_.store(thread_state_ex(wait_signaled,
-                current_state_ex.get_tag() + 1), boost::memory_order_release);
-
-            return coroutine_(current_state_ex);
-        }
-
-        thread_id_type get_thread_id() const
-        {
-            return thread_id_type(
-                    reinterpret_cast<thread_data_base*>(coroutine_.get_thread_id())
-                );
-        }
-
-        std::size_t get_thread_phase() const
-        {
-#ifndef HPX_HAVE_THREAD_PHASE_INFORMATION
-            return 0;
-#else
-            return coroutine_.get_thread_phase();
-#endif
-        }
-
-#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
-        std::size_t get_thread_data() const
-        {
-            return coroutine_.get_thread_data();
-        }
-        std::size_t set_thread_data(std::size_t data)
-        {
-            return coroutine_.set_thread_data(data);
-        }
-#endif
-
-        /// This function will be called when the thread is about to be deleted
-        //void reset()
-        //{
-        //    thread_data_base::reset();
-        //    coroutine_.reset();
-        //}
-
-    private:
-        typedef util::coroutines::stackless_coroutine<
-            thread_function_sig
-        > coroutine_type;
-
-        coroutine_type coroutine_;
-        void* pool_;
-    };
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

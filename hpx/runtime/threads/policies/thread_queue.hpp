@@ -146,6 +146,7 @@ namespace hpx { namespace threads { namespace policies
             threads::thread_init_data& data, thread_state_enum state, Lock& lk)
         {
             HPX_ASSERT(lk.owns_lock());
+            HPX_ASSERT(data.stacksize != 0);
 
             std::ptrdiff_t stacksize = data.stacksize;
 
@@ -213,12 +214,8 @@ namespace hpx { namespace threads { namespace policies
                 hpx::util::unlock_guard<Lock> ull(lk);
 
                 // Allocate a new thread object.
-                if (data.stacksize != 0)
-                    thrd.reset(new (memory_pool_) threads::thread_data(
-                        data, memory_pool_, state));
-                else
-                    thrd.reset(new threads::stackless_thread_data(
-                        data, &memory_pool_, state));
+                thrd = threads::thread_data::create(
+                    data, memory_pool_, state);
             }
         }
 
@@ -280,7 +277,7 @@ namespace hpx { namespace threads { namespace policies
 
                 // this thread has to be in the map now
                 HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
-                HPX_ASSERT(thrd->is_created_from(&memory_pool_));
+                HPX_ASSERT(thrd->get_pool() == &memory_pool_);
             }
 
             if (added) {
@@ -730,7 +727,7 @@ namespace hpx { namespace threads { namespace policies
 
                     // this thread has to be in the map now
                     HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
-                    HPX_ASSERT(thrd->is_created_from(&memory_pool_));
+                    HPX_ASSERT(thrd->get_pool() == &memory_pool_);
 
                     // push the new thread in the pending queue thread
                     if (initial_state == pending)
@@ -861,7 +858,7 @@ namespace hpx { namespace threads { namespace policies
         /// Destroy the passed thread as it has been terminated
         bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
         {
-            if (thrd->is_created_from(&memory_pool_))
+            if (thrd->get_pool() == &memory_pool_)
             {
                 terminated_items_.push(thrd);
 
