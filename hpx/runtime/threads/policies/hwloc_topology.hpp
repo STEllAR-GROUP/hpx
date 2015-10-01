@@ -12,12 +12,17 @@
 
 #include <hwloc.h>
 
-#include <boost/format.hpp>
-
+#include <hpx/config.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/exception.hpp>
 
 #include <hpx/util/spinlock.hpp>
+
+#include <boost/format.hpp>
+
+#if defined(HPX_NATIVE_MIC) && HWLOC_API_VERSION < 0x00010600
+#error On Intel Xeon/Phi coprosessors HPX cannot be use with a HWLOC version earlier than V1.6.
+#endif
 
 namespace hpx { namespace threads
 {

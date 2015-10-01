@@ -40,14 +40,19 @@
 
 [heading Installation of the hwloc Library]
 
-* Download __hwloc_downloads__, unpack the retreived tarball and change to the newly
-  created directory
-* Run the configure-make-install procedure as follows:
+* Download __hwloc_downloads__, unpack the retreived tarball and change to the
+  newly created directory
+* Run the configure-make-install procedure as follows
+
 ```
-        CC=icc CFLAGS=-mmic CXX=icpc CXXFLAGS=-mmic LDFLAGS=-mmic ./configure --host=k1om --prefix=$HWLOC_ROOT
-        make
-        make install
+    CC=icc CFLAGS=-mmic CXX=icpc CXXFLAGS=-mmic LDFLAGS=-mmic ./configure --host=x86_64-k1om-linux --prefix=$HWLOC_ROOT
+    make
+    make install
 ```
+
+[important The minimally required version of the __hwloc__ library on the
+           Intel Xeon Phi is V1.6.]
+
 You now have a working hwloc installation in $HWLOC_ROOT.
 
 [heading Building __hpx__]
@@ -57,11 +62,11 @@ installing __hpx__. The build procedure is almost the same as for __unix_install
 with the sole difference that you have to enable the Xeon Phi in the CMake Build system.
 This is achieved by invoking CMake in the following way:
 ```
-        cmake                                             \
-            -DCMAKE_TOOLCHAIN_FILE=/path/to/hpx/cmake/toolchains/XeonPhi.cmake \
-            -DBOOST_ROOT=$BOOST_ROOT                      \
-            -DHWLOC_ROOT=$HWLOC_ROOT                      \
-            /path/to/hpx
+    cmake                                             \
+        -DCMAKE_TOOLCHAIN_FILE=/path/to/hpx/cmake/toolchains/XeonPhi.cmake \
+        -DBOOST_ROOT=$BOOST_ROOT                      \
+        -DHWLOC_ROOT=$HWLOC_ROOT                      \
+        /path/to/hpx
 ```
 [c++]
 For more detailed information about using __cmake__ please refer its documentation
