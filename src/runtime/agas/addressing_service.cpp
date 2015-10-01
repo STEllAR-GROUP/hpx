@@ -1312,7 +1312,8 @@ bool addressing_service::resolve_locally_known_addresses(
 {
     // LVA-encoded GIDs (located on this machine)
     boost::uint64_t lsb = id.get_lsb();
-    boost::uint64_t msb = naming::detail::strip_internal_bits_from_gid(id.get_msb());
+    boost::uint64_t msb =
+        naming::detail::strip_internal_bits_from_gid(id.get_msb());
 
     if (is_local_lva_encoded_address(msb))
     {
@@ -1337,6 +1338,15 @@ bool addressing_service::resolve_locally_known_addresses(
         return true;
     }
 
+    // explicitly resolve localities
+    if (naming::is_locality(id))
+    {
+        addr.locality_ = id;
+        addr.type_ = components::component_runtime_support;
+        // addr.address_ will be supplied on the target locality
+        return true;
+    }
+
     // authoritative AGAS component address resolution
     if (HPX_AGAS_LOCALITY_NS_MSB == msb && HPX_AGAS_LOCALITY_NS_LSB == lsb)
     {
@@ -1354,12 +1364,14 @@ bool addressing_service::resolve_locally_known_addresses(
 
     if (HPX_AGAS_PRIMARY_NS_LSB == lsb)
     {
+        // primary AGAS service on locality 0?
         if (HPX_AGAS_PRIMARY_NS_MSB == msb)
         {
             addr = primary_ns_addr_;
             return true;
         }
 
+        // primary AGAS service on this locality?
         if (locality_msb == msb)
         {
             if (is_bootstrap())
@@ -1374,16 +1386,28 @@ bool addressing_service::resolve_locally_known_addresses(
             }
             return true;
         }
+
+        // primary AGAS service on any locality
+        if (naming::detail::strip_internal_bits_and_locality_from_gid(msb) ==
+            HPX_AGAS_NS_MSB)
+        {
+            addr.locality_ = naming::get_locality_from_gid(id);
+            addr.type_ = server::primary_namespace::get_component_type();
+            // addr.address_ will be supplied on the target locality
+            return true;
+        }
     }
 
     if (HPX_AGAS_SYMBOL_NS_LSB == lsb)
     {
+        // symbol AGAS service on locality 0?
         if (HPX_AGAS_SYMBOL_NS_MSB == msb)
         {
             addr = symbol_ns_addr_;
             return true;
         }
 
+        // symbol AGAS service on this locality?
         if (locality_msb == msb)
         {
             if (is_bootstrap())
@@ -1398,6 +1422,16 @@ bool addressing_service::resolve_locally_known_addresses(
             }
             return true;
         }
+
+        // symbol AGAS service on any locality
+        if (naming::detail::strip_internal_bits_and_locality_from_gid(msb) ==
+            HPX_AGAS_NS_MSB)
+        {
+            addr.locality_ = naming::get_locality_from_gid(id);
+            addr.type_ = server::symbol_namespace::get_component_type();
+            // addr.address_ will be supplied on the target locality
+            return true;
+        }
     }
 
     return false;
@@ -1410,10 +1444,6 @@ bool addressing_service::resolve_full_local(
     )
 { // {{{ resolve implementation
     try {
-        // special cases
-        if (resolve_locally_known_addresses(id, addr))
-            return true;
-
         request req(primary_ns_resolve_gid, id);
         response rep;
 
@@ -1654,11 +1684,6 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
         return make_ready_future(naming::address());
     }
 
-    // handle special cases
-    naming::address addr;
-    if (resolve_locally_known_addresses(gid, addr))
-        return make_ready_future(addr);
-
     // ask server
     request req(primary_ns_resolve_gid, gid);
     naming::id_type target(
@@ -1691,12 +1716,7 @@ bool addressing_service::resolve_full_local(
         // special cases
         for (std::size_t i = 0; i != count; ++i)
         {
-            if (!addrs[i])
-            {
-                bool is_local = resolve_locally_known_addresses(gids[i], addrs[i]);
-                locals.set(i, is_local);
-            }
-            else
+            if (addrs[i])
             {
                 locals.set(i, true);
             }
