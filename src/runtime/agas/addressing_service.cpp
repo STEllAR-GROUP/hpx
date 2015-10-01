@@ -327,34 +327,34 @@ void addressing_service::launch_bootstrap(
     naming::gid_type const locality_gid = bootstrap_locality_namespace_gid();
     gva locality_gva(here,
         server::locality_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->locality_ns_server_));
+            get_bootstrap_locality_ns_ptr());
     locality_ns_addr_ = naming::address(here,
         server::locality_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->locality_ns_server_));
+            get_bootstrap_locality_ns_ptr());
 
     naming::gid_type const primary_gid = bootstrap_primary_namespace_gid();
     gva primary_gva(here,
         server::primary_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->primary_ns_server_));
+            get_bootstrap_primary_ns_ptr());
     primary_ns_addr_ = naming::address(here,
         server::primary_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->primary_ns_server_));
+            get_bootstrap_primary_ns_ptr());
 
     naming::gid_type const component_gid = bootstrap_component_namespace_gid();
     gva component_gva(here,
         server::component_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->component_ns_server_));
+            get_bootstrap_component_ns_ptr());
     component_ns_addr_ = naming::address(here,
         server::component_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->component_ns_server_));
+            get_bootstrap_component_ns_ptr());
 
     naming::gid_type const symbol_gid = bootstrap_symbol_namespace_gid();
     gva symbol_gva(here,
         server::symbol_namespace::get_component_type(), 1U,
-            static_cast<void*>(&bootstrap->symbol_ns_server_));
+            get_bootstrap_symbol_ns_ptr());
     symbol_ns_addr_ = naming::address(here,
         server::symbol_namespace::get_component_type(),
-            static_cast<void*>(&bootstrap->symbol_ns_server_));
+            get_bootstrap_symbol_ns_ptr());
 
     set_local_locality(here);
     rt.get_config().parse("assigned locality",
@@ -557,6 +557,8 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 = bootstrap->locality_ns_server_.service(req, ec).get_endpoints();
             if(ec)
             {
+                l.unlock();
+
                 HPX_THROWS_IF(ec, internal_server_error
                   , "addressing_service::resolve_locality"
                   , "could not resolve locality to endpoints");
@@ -585,6 +587,7 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 }
                 endpoints = endpoints_future.get(ec);
             }
+
             // Search again ... might have been added by a different thread already
             it = resolved_localities_.find(gid);
         }
@@ -598,6 +601,8 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                     )
                 ), it)))
             {
+                l.unlock();
+
                 HPX_THROWS_IF(ec, internal_server_error
                   , "addressing_service::resolve_locality"
                   , "resolved locality insertion failed "
@@ -636,13 +641,7 @@ bool addressing_service::unregister_locality(
         if (ec || (success != rep.get_status()))
             return false;
 
-        {
-            boost::lock_guard<mutex_type> l(resolved_localities_mtx_);
-            resolved_localities_type::iterator it = resolved_localities_.find(gid);
-            if(it != resolved_localities_.end())
-                resolved_localities_.erase(it);
-        }
-
+        remove_resolved_locality(gid);
         return true;
     }
     catch (hpx::exception const& e) {
@@ -650,6 +649,15 @@ bool addressing_service::unregister_locality(
         return false;
     }
 } // }}}
+
+void addressing_service::remove_resolved_locality(naming::gid_type const& gid)
+{
+    boost::lock_guard<mutex_type> l(resolved_localities_mtx_);
+    resolved_localities_type::iterator it = resolved_localities_.find(gid);
+    if(it != resolved_localities_.end())
+        resolved_localities_.erase(it);
+}
+
 
 bool addressing_service::get_console_locality(
     naming::gid_type& prefix
@@ -1304,7 +1312,8 @@ bool addressing_service::resolve_locally_known_addresses(
 {
     // LVA-encoded GIDs (located on this machine)
     boost::uint64_t lsb = id.get_lsb();
-    boost::uint64_t msb = naming::detail::strip_internal_bits_from_gid(id.get_msb());
+    boost::uint64_t msb =
+        naming::detail::strip_internal_bits_from_gid(id.get_msb());
 
     if (is_local_lva_encoded_address(msb))
     {
@@ -1329,29 +1338,100 @@ bool addressing_service::resolve_locally_known_addresses(
         return true;
     }
 
+    // explicitly resolve localities
+    if (naming::is_locality(id))
+    {
+        addr.locality_ = id;
+        addr.type_ = components::component_runtime_support;
+        // addr.address_ will be supplied on the target locality
+        return true;
+    }
+
     // authoritative AGAS component address resolution
     if (HPX_AGAS_LOCALITY_NS_MSB == msb && HPX_AGAS_LOCALITY_NS_LSB == lsb)
     {
         addr = locality_ns_addr_;
         return true;
     }
-
-    if (HPX_AGAS_PRIMARY_NS_MSB == msb && HPX_AGAS_PRIMARY_NS_LSB == lsb)
-    {
-        addr = primary_ns_addr_;
-        return true;
-    }
-
     if (HPX_AGAS_COMPONENT_NS_MSB == msb && HPX_AGAS_COMPONENT_NS_LSB == lsb)
     {
         addr = component_ns_addr_;
         return true;
     }
 
-    if (HPX_AGAS_SYMBOL_NS_MSB == msb && HPX_AGAS_SYMBOL_NS_LSB == lsb)
+    boost::uint64_t locality_msb =
+        get_local_locality().get_msb() | HPX_AGAS_NS_MSB;
+
+    if (HPX_AGAS_PRIMARY_NS_LSB == lsb)
     {
-        addr = symbol_ns_addr_;
-        return true;
+        // primary AGAS service on locality 0?
+        if (HPX_AGAS_PRIMARY_NS_MSB == msb)
+        {
+            addr = primary_ns_addr_;
+            return true;
+        }
+
+        // primary AGAS service on this locality?
+        if (locality_msb == msb)
+        {
+            if (is_bootstrap())
+            {
+                addr = primary_ns_addr_;
+            }
+            else
+            {
+                addr = naming::address(get_local_locality(),
+                    server::primary_namespace::get_component_type(),
+                    get_hosted_primary_ns_ptr());
+            }
+            return true;
+        }
+
+        // primary AGAS service on any locality
+        if (naming::detail::strip_internal_bits_and_locality_from_gid(msb) ==
+            HPX_AGAS_NS_MSB)
+        {
+            addr.locality_ = naming::get_locality_from_gid(id);
+            addr.type_ = server::primary_namespace::get_component_type();
+            // addr.address_ will be supplied on the target locality
+            return true;
+        }
+    }
+
+    if (HPX_AGAS_SYMBOL_NS_LSB == lsb)
+    {
+        // symbol AGAS service on locality 0?
+        if (HPX_AGAS_SYMBOL_NS_MSB == msb)
+        {
+            addr = symbol_ns_addr_;
+            return true;
+        }
+
+        // symbol AGAS service on this locality?
+        if (locality_msb == msb)
+        {
+            if (is_bootstrap())
+            {
+                addr = symbol_ns_addr_;
+            }
+            else
+            {
+                addr = naming::address(get_local_locality(),
+                    server::symbol_namespace::get_component_type(),
+                    get_hosted_symbol_ns_ptr());
+            }
+            return true;
+        }
+
+        // symbol AGAS service on any locality
+        if (naming::detail::strip_internal_bits_and_locality_from_gid(msb) ==
+            HPX_AGAS_NS_MSB)
+        {
+            addr.locality_ = naming::get_locality_from_gid(id);
+            addr.type_ = server::symbol_namespace::get_component_type();
+            // addr.address_ will be supplied on the target locality
+            return true;
+        }
     }
 
     return false;
@@ -1364,10 +1444,6 @@ bool addressing_service::resolve_full_local(
     )
 { // {{{ resolve implementation
     try {
-        // special cases
-        if (resolve_locally_known_addresses(id, addr))
-            return true;
-
         request req(primary_ns_resolve_gid, id);
         response rep;
 
@@ -1432,7 +1508,6 @@ bool addressing_service::resolve_cached(
     // special cases
     if (resolve_locally_known_addresses(id, addr))
         return true;
-    if (ec) return false;
 
     // If caching is disabled, bail
     if (!caching_)
@@ -1609,11 +1684,6 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
         return make_ready_future(naming::address());
     }
 
-    // handle special cases
-    naming::address addr;
-    if (resolve_locally_known_addresses(gid, addr))
-        return make_ready_future(addr);
-
     // ask server
     request req(primary_ns_resolve_gid, gid);
     naming::id_type target(
@@ -1646,12 +1716,7 @@ bool addressing_service::resolve_full_local(
         // special cases
         for (std::size_t i = 0; i != count; ++i)
         {
-            if (!addrs[i])
-            {
-                bool is_local = resolve_locally_known_addresses(gids[i], addrs[i]);
-                locals.set(i, is_local);
-            }
-            else
+            if (addrs[i])
             {
                 locals.set(i, true);
             }
@@ -1767,7 +1832,7 @@ bool addressing_service::resolve_cached(
 void addressing_service::route(
     parcelset::parcel p
   , util::function_nonser<void(boost::system::error_code const&,
-        parcelset::parcel const&)> const& f
+        parcelset::parcel const&)> && f
     )
 {
     // compose request
@@ -1797,24 +1862,14 @@ void addressing_service::route(
         if (stubs::primary_namespace::is_service_instance(ids[0]) ||
             stubs::symbol_namespace::is_service_instance(ids[0]))
         {
-            // construct wrapper parcel
-            naming::id_type const route_target(
-                bootstrap_primary_namespace_gid(), naming::id_type::unmanaged);
-
-            parcelset::parcel route_p(
-                route_target, primary_ns_addr_
-              , action_type(), action_priority_, std::move(p));
-
-            // send to the main AGAS instance for routing
-            hpx::applier::get_applier().get_parcel_handler()
-                .put_parcel(std::move(route_p), f);
-            return;
+            // target locality will supply the lva
+            addr.locality_ = naming::get_locality_from_id(target).get_gid();
         }
     }
 
     // apply directly as we have the resolved destination address
     applier::detail::apply_r_p_cb<action_type>(std::move(addr), target,
-        action_priority_, f, std::move(p));
+        action_priority_, std::move(f), std::move(p));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2302,13 +2357,15 @@ void addressing_service::insert_cache_entry(
     }
 } // }}}
 
+// This function has to return false if the key is already in the cache (true
+// means go ahead with the cache update).
 bool check_for_collisions(
     addressing_service::gva_cache_key const& new_key
   , addressing_service::gva_cache_key const& old_key
     )
 {
-    return (new_key.get_gid() == old_key.get_gid())
-        && (new_key.get_count() == old_key.get_count());
+    return (new_key.get_gid() != old_key.get_gid())
+        || (new_key.get_count() != old_key.get_count());
 }
 
 void addressing_service::update_cache_entry(
@@ -2346,25 +2403,28 @@ void addressing_service::update_cache_entry(
 
         if (!gva_cache_->update_if(key, g, check_for_collisions))
         {
-            // Figure out who we collided with.
-            gva_cache_key idbase;
-            gva_cache_type::entry_type e;
-
-            if (!gva_cache_->get_entry(key, idbase, e))
+            if (LAGAS_ENABLED(warning))
             {
-                // This is impossible under sane conditions.
-                HPX_THROWS_IF(ec, invalid_data
-                  , "addressing_service::update_cache_entry"
-                  , "data corruption or lock error occurred in cache");
-                return;
-            }
+                // Figure out who we collided with.
+                gva_cache_key idbase;
+                gva_cache_type::entry_type e;
 
-            LAGAS_(warning) <<
-                ( boost::format(
-                    "addressing_service::update_cache_entry, "
-                    "aborting update due to key collision in cache, "
-                    "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
-                ) % gid % count % idbase.get_gid() % idbase.get_count());
+                if (!gva_cache_->get_entry(key, idbase, e))
+                {
+                    // This is impossible under sane conditions.
+                    HPX_THROWS_IF(ec, invalid_data
+                      , "addressing_service::update_cache_entry"
+                      , "data corruption or lock error occurred in cache");
+                    return;
+                }
+
+                LAGAS_(warning) <<
+                    ( boost::format(
+                        "addressing_service::update_cache_entry, "
+                        "aborting update due to key collision in cache, "
+                        "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
+                    ) % gid % count % idbase.get_gid() % idbase.get_count());
+            }
         }
 
         if (&ec != &throws)

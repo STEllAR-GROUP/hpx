@@ -49,7 +49,7 @@ namespace hpx { namespace agas { namespace server
                     // wait for any migration to be completed
                     wait_for_migration_locked(l, gid, ec);
 
-                    cache_addresses.push_back(resolve_gid_locked(gid, ec));
+                    cache_addresses.push_back(resolve_gid_locked(l, gid, ec));
                     resolved_type const& r = cache_addresses.back();
 
                     if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)

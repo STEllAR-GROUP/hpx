@@ -338,7 +338,8 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         static void
-        call_shutdown_functions_async(naming::id_type const& gid,
+        remove_from_connection_cache_async(naming::id_type const& target,
+            naming::gid_type const& gid,
             parcelset::endpoints_type const& endpoints);
     };
 }}}

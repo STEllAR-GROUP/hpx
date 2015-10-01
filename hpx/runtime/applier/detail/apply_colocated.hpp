@@ -24,6 +24,12 @@ namespace hpx { namespace detail
     template <typename Action, typename ...Ts>
     bool apply_colocated(naming::id_type const& gid, Ts&&... vs)
     {
+        // shortcut co-location code if target already is a locality
+        if (naming::is_locality(gid))
+        {
+            return apply<Action>(gid, std::forward<Ts>(vs)...);
+        }
+
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
         agas::request req(agas::primary_ns_resolve_gid, gid.get_gid());
@@ -59,6 +65,13 @@ namespace hpx { namespace detail
     apply_colocated(Continuation && cont,
         naming::id_type const& gid, Ts&&... vs)
     {
+        // shortcut co-location code if target already is a locality
+        if (naming::is_locality(gid))
+        {
+            return apply_c<Action>(std::forward<Continuation>(cont), gid,
+                std::forward<Ts>(vs)...);
+        }
+
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
         agas::request req(agas::primary_ns_resolve_gid, gid.get_gid());

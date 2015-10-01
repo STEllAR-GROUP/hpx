@@ -456,7 +456,26 @@ namespace hpx { namespace applier
             // support component
             if (0 == lva)
             {
-                lva = get_runtime_support_raw_gid().get_lsb();
+                switch(comptype)
+                {
+                case components::component_runtime_support:
+                    lva = get_runtime_support_raw_gid().get_lsb();
+                    break;
+
+                case components::component_agas_primary_namespace:
+                    lva = get_agas_client().get_primary_ns_lva();
+                    break;
+
+                case components::component_agas_symbol_namespace:
+                    lva = get_agas_client().get_symbol_ns_lva();
+                    break;
+
+                case components::component_plain_function:
+                    break;
+
+                default:
+                    HPX_ASSERT(false);
+                }
             }
             else if (comptype == components::component_memory)
             {

@@ -233,7 +233,8 @@ namespace hpx { namespace parcelset
 
         /// \brief Make sure the specified locality is not held by any
         /// connection caches anymore
-        void remove_from_connection_cache(endpoints_type const& endpoints);
+        void remove_from_connection_cache(naming::gid_type const& gid,
+            endpoints_type const& endpoints);
 
         /// \brief return the endpoints associated with this parcelhandler
         /// \returns all connection information for the enabled parcelports

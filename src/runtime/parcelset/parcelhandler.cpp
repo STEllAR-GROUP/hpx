@@ -198,7 +198,7 @@ namespace hpx { namespace parcelset
     /// \brief Make sure the specified locality is not held by any
     /// connection caches anymore
     void parcelhandler::remove_from_connection_cache(
-        endpoints_type const& endpoints)
+        naming::gid_type const& gid, endpoints_type const& endpoints)
     {
         for (endpoints_type::value_type const& loc : endpoints)
         {
@@ -210,6 +210,9 @@ namespace hpx { namespace parcelset
                 }
             }
         }
+
+        HPX_ASSERT(resolver_);
+        resolver_->remove_resolved_locality(gid);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -301,7 +304,8 @@ namespace hpx { namespace parcelset
         naming::gid_type const& dest_gid)
     {
         HPX_ASSERT(resolver_);
-        endpoints_type const & dest_endpoints = resolver_->resolve_locality(dest_gid);
+        endpoints_type const & dest_endpoints =
+            resolver_->resolve_locality(dest_gid);
 
         for (pports_type::value_type& pp : pports_)
         {
