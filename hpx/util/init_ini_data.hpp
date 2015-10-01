@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/plugin/dll.hpp>
-#include <hpx/util/plugin/virtual_constructors.hpp>
+#include <hpx/util/plugin/virtual_constructor.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

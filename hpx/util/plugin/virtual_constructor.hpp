@@ -8,7 +8,6 @@
 #define HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
 
 #include <boost/config.hpp>
-#include <boost/mpl/list.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
 
@@ -16,6 +15,7 @@
 #include <map>
 
 #include <hpx/util/plugin/config.hpp>
+#include <hpx/util/detail/pack.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace plugin {
@@ -28,9 +28,9 @@ namespace hpx { namespace util { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     template<typename BasePlugin>
-    struct virtual_constructors
+    struct virtual_constructor
     {
-        typedef boost::mpl::list<boost::mpl::list<> > type;
+        typedef hpx::util::detail::pack<> type;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
