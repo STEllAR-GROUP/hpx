@@ -40,7 +40,6 @@ namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
     struct HPX_EXPORT threadmanager_base;
-    class HPX_EXPORT thread_data_base;
     class HPX_EXPORT thread_data;
 
     template <typename SchedulingPolicy>
@@ -72,10 +71,10 @@ namespace hpx { namespace threads
         thread_self_impl_type;
     typedef void * thread_id_repr_type;
 
-    typedef boost::intrusive_ptr<thread_data_base> thread_id_type;
+    typedef boost::intrusive_ptr<thread_data> thread_id_type;
 
-    HPX_API_EXPORT void intrusive_ptr_add_ref(thread_data_base* p);
-    HPX_API_EXPORT void intrusive_ptr_release(thread_data_base* p);
+    HPX_API_EXPORT void intrusive_ptr_add_ref(thread_data* p);
+    HPX_API_EXPORT void intrusive_ptr_release(thread_data* p);
 
     BOOST_CONSTEXPR_OR_CONST thread_id_repr_type invalid_thread_id_repr = 0;
     thread_id_type const invalid_thread_id = thread_id_type();

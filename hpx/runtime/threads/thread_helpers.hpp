@@ -643,28 +643,6 @@ namespace hpx { namespace applier
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws);
 
-    /// \brief Create a new \a thread using the given function as the work to
-    ///        be executed. The work item can't be suspended when
-    ///        executing.
-    ///
-    /// \param func       [in] The function to be executed as the thread-function.
-    ///                   This function has to expose the minimal low level
-    ///                   HPX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex_enum). The thread will be
-    ///                   terminated after the function returns.
-    ///
-    /// \note All other arguments are equivalent to those of the function
-    ///       \a threads#register_thread_plain
-    ///
-    HPX_API_EXPORT threads::thread_id_type register_non_suspendable_thread(
-        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
-        char const* description = 0,
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
-        error_code& ec = throws);
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given function as the work to
     ///        be executed.
@@ -790,27 +768,6 @@ namespace hpx { namespace applier
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
-        error_code& ec = throws);
-
-    /// \brief Create a new work item using the given function as the
-    ///        work to be executed. The work item can't be suspended when
-    ///        executing.
-    ///
-    /// \param func       [in] The function to be executed as the thread-function.
-    ///                   This function has to expose the minimal low level
-    ///                   HPX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex_enum). The thread will be
-    ///                   terminated after the function returns.
-    ///
-    /// \note All other arguments are equivalent to those of the function
-    ///       \a threads#register_work_plain
-    ///
-    HPX_API_EXPORT void register_non_suspendable_work(
-        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
-        char const* description = 0,
-        threads::thread_state_enum initial_state = threads::pending,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        std::size_t os_thread = std::size_t(-1),
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////

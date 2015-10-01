@@ -128,7 +128,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 lock.unlock();
 
                 threads::set_thread_state(threads::thread_id_type(
-                    reinterpret_cast<threads::thread_data_base*>(id)),
+                    reinterpret_cast<threads::thread_data*>(id)),
                     threads::pending, threads::wait_signaled,
                     threads::thread_priority_default, ec);
                 if (!ec) return not_empty;
@@ -163,7 +163,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 }
 
                 threads::set_thread_state(threads::thread_id_type(
-                    reinterpret_cast<threads::thread_data_base*>(id)),
+                    reinterpret_cast<threads::thread_data*>(id)),
                     threads::pending, threads::wait_signaled,
                     threads::thread_priority_default, ec);
                 if (ec) return;
@@ -196,7 +196,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 // we know that the id is actually the pointer to the thread
                 threads::thread_id_type tid(
-                    reinterpret_cast<threads::thread_data_base*>(id));
+                    reinterpret_cast<threads::thread_data*>(id));
 
                 LERR_(fatal)
                         << "condition_variable::abort_all:"

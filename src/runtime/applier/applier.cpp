@@ -113,31 +113,6 @@ namespace hpx { namespace applier
         return id;
     }
 
-    threads::thread_id_type register_non_suspendable_thread(
-        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
-        char const* desc, threads::thread_state_enum state, bool run_now,
-        threads::thread_priority priority, std::size_t os_thread,
-        error_code& ec)
-    {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::applier::register_thread",
-                "global applier object is not accessible");
-            return threads::invalid_thread_id;
-        }
-
-        threads::thread_init_data data(
-            util::bind(util::one_shot(&thread_function), std::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread,
-            threads::get_stack_size(threads::thread_stacksize_nostack));
-
-        threads::thread_id_type id = threads::invalid_thread_id;
-        app->get_thread_manager().register_thread(data, id, state, run_now, ec);
-        return id;
-    }
-
     threads::thread_id_type register_thread_plain(
         threads::thread_function_type && func,
         char const* desc, threads::thread_state_enum state, bool run_now,
@@ -222,28 +197,6 @@ namespace hpx { namespace applier
             util::bind(util::one_shot(&thread_function), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
-        app->get_thread_manager().register_work(data, state, ec);
-    }
-
-    void register_non_suspendable_work(
-        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
-        char const* desc, threads::thread_state_enum state,
-        threads::thread_priority priority, std::size_t os_thread,
-        error_code& ec)
-    {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::applier::register_work",
-                "global applier object is not accessible");
-            return;
-        }
-
-        threads::thread_init_data data(
-            util::bind(util::one_shot(&thread_function), std::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread,
-            threads::get_stack_size(threads::thread_stacksize_nostack));
         app->get_thread_manager().register_work(data, state, ec);
     }
 

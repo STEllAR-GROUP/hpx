@@ -28,21 +28,21 @@ namespace hpx { namespace threads
     };
 #endif
 
-    void intrusive_ptr_add_ref(thread_data_base* p)
+    void intrusive_ptr_add_ref(thread_data* p)
     {
         ++p->count_;
     }
-    void intrusive_ptr_release(thread_data_base* p)
+    void intrusive_ptr_release(thread_data* p)
     {
         if (0 == --p->count_)
         {
-            thread_data_base::pool_base* pool = p->get_pool();
-            p->~thread_data_base();
+            thread_data::pool_type* pool = p->get_pool();
+            p->~thread_data();
             pool->deallocate(p);
         }
     }
 
-    void thread_data_base::run_thread_exit_callbacks()
+    void thread_data::run_thread_exit_callbacks()
     {
         mutex_type::scoped_lock l(this);
 
@@ -58,7 +58,7 @@ namespace hpx { namespace threads
         ran_exit_funcs_ = true;
     }
 
-    bool thread_data_base::add_thread_exit_callback(util
+    bool thread_data::add_thread_exit_callback(util
         ::function_nonser<void()> const& f)
     {
         mutex_type::scoped_lock l(this);
@@ -72,7 +72,7 @@ namespace hpx { namespace threads
         return true;
     }
 
-    void thread_data_base::free_thread_exit_callbacks()
+    void thread_data::free_thread_exit_callbacks()
     {
         mutex_type::scoped_lock l(this);
 
@@ -82,7 +82,7 @@ namespace hpx { namespace threads
         exit_funcs_.clear();
     }
 
-    bool thread_data_base::interruption_point(bool throw_on_interrupt)
+    bool thread_data::interruption_point(bool throw_on_interrupt)
     {
         // We do not protect enabled_interrupt_ and requested_interrupt_
         // from concurrent access here (which creates a benign data race) in
@@ -158,7 +158,7 @@ namespace hpx { namespace threads
             return threads::invalid_thread_id;
 
         return thread_id_type(
-                reinterpret_cast<thread_data_base*>(self->get_thread_id())
+                reinterpret_cast<thread_data*>(self->get_thread_id())
             );
     }
 

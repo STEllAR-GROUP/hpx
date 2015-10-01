@@ -715,8 +715,7 @@ namespace hpx { namespace actions
 #define HPX_ACTION_USES_HUGE_STACK(action)                                    \
     HPX_ACTION_USES_STACK(action, threads::thread_stacksize_huge)             \
 /**/
-#define HPX_ACTION_DOES_NOT_SUSPEND(action)                                   \
-    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_nostack)          \
+#define HPX_ACTION_DOES_NOT_SUSPEND(action)
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
