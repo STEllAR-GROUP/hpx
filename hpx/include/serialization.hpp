@@ -13,7 +13,6 @@
 #include <hpx/runtime/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/serialization/map.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
-#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/vector.hpp>

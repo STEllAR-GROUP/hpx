@@ -12,7 +12,6 @@
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/functional/segmented_iterator_helpers.hpp>
-#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
@@ -363,7 +362,7 @@ namespace hpx { namespace util
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
             {
-                serialization::serialize_sequence(ar, iterators_);
+                ar & iterators_;
             }
 
         private:
