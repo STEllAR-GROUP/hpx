@@ -73,6 +73,9 @@ to the master branch commits since the last release.
 
 [heading Breaking Changes]
 
+* We removed the support for stackless threads. It turned out that there was no
+  performance benefit when using stackless threads. As such, we decided to clean
+  up our codebase. This feature was not documented.
 * The CMake project name has changed from 'hpx' to 'HPX' for consistency and
   compatibilty with naming conventions and other CMake projects. Generated
   config files go into <prefix>/lib/cmake/HPX and not <prefix>/lib/cmake/hpx.

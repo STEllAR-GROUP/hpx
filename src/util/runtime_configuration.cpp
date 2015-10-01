@@ -935,9 +935,6 @@ namespace hpx { namespace util
         case threads::thread_stacksize_huge:
             return huge_stacksize;
 
-        case threads::thread_stacksize_nostack:
-            return 0;       // stackless thread
-
         default:
         case threads::thread_stacksize_small:
             break;
