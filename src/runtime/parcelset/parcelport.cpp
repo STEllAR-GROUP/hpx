@@ -31,7 +31,6 @@ namespace hpx { namespace parcelset
         allow_zero_copy_optimizations_(true),
         enable_security_(false),
         async_serialization_(false),
-        enable_parcel_handling_(true),
         priority_(hpx::util::get_entry_as<int>(ini, "hpx.parcel." + type + ".priority",
             "0")),
         type_(type)

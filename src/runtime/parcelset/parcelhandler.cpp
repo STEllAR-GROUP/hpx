@@ -559,21 +559,6 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool parcelhandler::enable(bool new_state)
-    {
-        new_state = enable_parcel_handling_.exchange(
-            new_state, boost::memory_order_acquire);
-
-        for (pports_type::value_type& pp : pports_)
-        {
-            if(pp.first > 0)
-                pp.second->enable(enable_parcel_handling_);
-        }
-
-        return new_state;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     // Performance counter data
 
     // number of parcels sent

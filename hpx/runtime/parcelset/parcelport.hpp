@@ -155,10 +155,6 @@ namespace hpx { namespace parcelset
         /// Return the thread pool if the name matches
         virtual util::io_service_pool* get_thread_pool(char const* name) = 0;
 
-        /// Temporarily enable/disable all parcel handling activities in the
-        /// parcelport
-        virtual void enable(bool new_state) = 0;
-
         /// Return the given connection cache statistic
         enum connection_cache_statistics_type
         {
@@ -405,9 +401,6 @@ namespace hpx { namespace parcelset
 
         /// async serialization of parcels
         bool async_serialization_;
-
-        /// enable parcelport
-        boost::atomic<bool> enable_parcel_handling_;
 
         /// priority of the parcelport
         int priority_;
