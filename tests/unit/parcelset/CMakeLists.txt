@@ -6,12 +6,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-  enable
   set_parcel_write_handler
 )
-
-set(enable_PARAMETERS
-    LOCALITIES 2 THREADS_PER_LOCALITY 4 PARCELPORTS "mpi")
 
 set(set_parcel_write_handler_PARAMETERS
     LOCALITIES 2)

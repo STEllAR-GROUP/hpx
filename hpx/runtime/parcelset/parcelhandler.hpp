@@ -214,17 +214,6 @@ namespace hpx { namespace parcelset
         /// parcelport
         std::string get_locality_name() const;
 
-        /// Temporarily enable/disable all parcel handling activities in the
-        /// parcel subsystem
-        ///
-        /// \param new_state    [in] The desired new state of the parcel
-        ///                     handling (true: enable parcel handling, false:
-        ///                     disable parcel handling)
-        ///
-        /// \returns            The previous state of the parcel handling
-        ///                     subsystem.
-        bool enable(bool new_state);
-
         ///////////////////////////////////////////////////////////////////////
         /// The function register_counter_types() is called during startup to
         /// allow the registration of all performance counter types for this

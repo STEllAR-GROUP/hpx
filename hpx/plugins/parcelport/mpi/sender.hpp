@@ -53,12 +53,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
 
         connection_ptr create_connection(int dest,
-            boost::atomic<bool> & enable,
             performance_counters::parcels::gatherer & parcels_sent)
         {
             return
                 boost::make_shared<connection_type>(
-                    this, dest, chunk_pool_, enable, parcels_sent);
+                    this, dest, chunk_pool_, parcels_sent);
         }
 
         void add(connection_ptr const & ptr)

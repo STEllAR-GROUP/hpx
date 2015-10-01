@@ -66,7 +66,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             sender_type * s
           , int dst
           , memory_pool_type & chunk_pool
-          , boost::atomic<bool> & enable
           , performance_counters::parcels::gatherer & parcels_sent
         )
           : base_type(allocator_type(chunk_pool))
@@ -78,7 +77,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , chunks_idx_(0)
           , ack_(0)
           , chunk_pool_(chunk_pool)
-          , enable_(enable)
           , parcels_sent_(parcels_sent)
           , there_(
                 parcelset::locality(
@@ -128,7 +126,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool send()
         {
-            if(!enable_) return false;
             switch(state_)
             {
                 case initialized:
@@ -321,8 +318,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         char ack_;
 
         memory_pool_type & chunk_pool_;
-
-        boost::atomic<bool> & enable_;
 
         performance_counters::parcels::gatherer & parcels_sent_;
 
