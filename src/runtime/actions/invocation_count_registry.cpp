@@ -65,10 +65,26 @@ namespace hpx { namespace actions { namespace detail
 
     bool invocation_count_registry::counter_discoverer(
         performance_counters::counter_info const& info,
-        performance_counters::counter_path_elements const& p,
+        performance_counters::counter_path_elements& p,
         performance_counters::discover_counter_func const& f,
         performance_counters::discover_counters_mode mode, error_code& ec)
     {
+        if (mode == performance_counters::discover_counters_minimal ||
+            p.parentinstancename_.empty() || p.instancename_.empty())
+        {
+            if (p.parentinstancename_.empty())
+            {
+                p.parentinstancename_ = "locality#*";
+                p.parentinstanceindex_ = -1;
+            }
+
+            if (p.instancename_.empty())
+            {
+                p.instancename_ = "total";
+                p.instanceindex_ = -1;
+            }
+        }
+
         if (p.parameters_.find_first_of("*?[]") != std::string::npos)
         {
             std::string str_rx(

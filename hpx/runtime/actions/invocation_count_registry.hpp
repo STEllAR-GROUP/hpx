@@ -39,7 +39,7 @@ namespace hpx { namespace actions { namespace detail
 
         bool counter_discoverer(
             performance_counters::counter_info const& info,
-            performance_counters::counter_path_elements const& p,
+            performance_counters::counter_path_elements& p,
             performance_counters::discover_counter_func const& f,
             performance_counters::discover_counters_mode mode, error_code& ec);
 
