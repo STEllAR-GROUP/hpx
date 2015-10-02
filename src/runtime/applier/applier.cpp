@@ -402,9 +402,11 @@ namespace hpx { namespace applier
         naming::resolver_client& client = hpx::naming::get_agas_client();
         if (client.was_object_migrated(ids, size))
         {
-            client.route(std::move(p), util::bind(&detail::parcel_sent_handler,
-                std::ref(parcel_handler_), util::placeholders::_1,
-                util::placeholders::_2));
+            using hpx::util::placeholders::_1;
+            using hpx::util::placeholders::_2;
+            client.route(std::move(p),
+                util::bind(&detail::parcel_sent_handler,
+                    std::ref(parcel_handler_), _1, _2));
             return;
         }
 
