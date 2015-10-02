@@ -6,10 +6,11 @@
 #if !defined(HPX_TRAITS_ACTION_CAPABILITY_PROVIDER_JUN_09_2013_1257PM)
 #define HPX_TRAITS_ACTION_CAPABILITY_PROVIDER_JUN_09_2013_1257PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/capability.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits

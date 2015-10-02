@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_DETAIL_PERIODIC_MAINTENANCE_JAN_11_2015_0626PM
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/bind.hpp>

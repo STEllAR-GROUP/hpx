@@ -6,12 +6,18 @@
 #if !defined(HPX_UTIL_COMMAND_LINE_HANDLING_OCT_04_2012_0800AM)
 #define HPX_UTIL_COMMAND_LINE_HANDLING_OCT_04_2012_0800AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/defines.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/util/manage_config.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+#include <boost/cstdint.hpp>
 #include <boost/program_options.hpp>
+
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

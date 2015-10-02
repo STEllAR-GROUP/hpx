@@ -6,7 +6,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/version.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/config/defaults.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/init_ini_data.hpp>

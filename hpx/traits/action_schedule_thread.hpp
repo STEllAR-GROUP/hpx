@@ -6,9 +6,9 @@
 #if !defined(HPX_TRAITS_ACTION_SCHEDULE_THREAD_MAR_30_2014_0325PM)
 #define HPX_TRAITS_ACTION_SCHEDULE_THREAD_MAR_30_2014_0325PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits

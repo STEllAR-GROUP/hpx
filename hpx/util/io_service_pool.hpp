@@ -10,7 +10,8 @@
 #define HPX_UTIL_IO_SERVICE_POOL_MAR_26_2008_1218PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/config/asio.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <vector>

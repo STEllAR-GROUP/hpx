@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_ACTION_STACKSIZE_SEP_03_2012_1136AM)
 #define HPX_TRAITS_ACTION_STACKSIZE_SEP_03_2012_1136AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits

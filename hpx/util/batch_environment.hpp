@@ -7,8 +7,10 @@
 #define HPX_UTIL_PBS_ENVIRONMENT_AUG_26_2011_0901AM
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
+#include <hpx/util/spinlock.hpp>
 
-#include <hpx/util/asio_util.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 #include <map>
 #include <cstdlib>

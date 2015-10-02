@@ -6,13 +6,12 @@
 #if !defined(HPX_UTIL_THREAD_AWARE_TIMER_AUG_17_2012_0745PM)
 #define HPX_UTIL_THREAD_AWARE_TIMER_AUG_17_2012_0745PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/chrono/chrono.hpp>
 
 namespace hpx { namespace util
 {

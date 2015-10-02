@@ -6,7 +6,6 @@
 #if !defined(HPX_TRAITS_ACTION_DOES_TERMINATION_DETECTION_MAR_21_2014_0818PM)
 #define HPX_TRAITS_ACTION_DOES_TERMINATION_DETECTION_MAR_21_2014_0818PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits

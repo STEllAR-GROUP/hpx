@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_ACTION_DECORATE_CONTINUATION_MAR_30_2014_0725PM)
 #define HPX_TRAITS_ACTION_DECORATE_CONTINUATION_MAR_30_2014_0725PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/util/always_void.hpp>
 
 #include <memory>

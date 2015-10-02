@@ -12,6 +12,7 @@
 #ifndef HPX_PARCELSET_POLICIES_TCP_RECEIVER_HPP
 #define HPX_PARCELSET_POLICIES_TCP_RECEIVER_HPP
 
+#include <hpx/config/asio.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>

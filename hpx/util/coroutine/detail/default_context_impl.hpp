@@ -29,7 +29,7 @@
 #ifndef HPX_COROUTINE_DEFAULT_CONTEXT_IMPL_HPP_20060601
 #define HPX_COROUTINE_DEFAULT_CONTEXT_IMPL_HPP_20060601
 
-#include <boost/config.hpp>
+#include <hpx/config/defines.hpp>
 #include <boost/version.hpp>
 
 /*

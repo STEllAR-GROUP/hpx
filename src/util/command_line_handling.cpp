@@ -5,7 +5,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/version.hpp>
+#include <hpx/util/asio_util.hpp>
 #include <hpx/util/batch_environment.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/sed_transform.hpp>
@@ -18,7 +20,7 @@
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <boost/asio.hpp>
+#include <boost/asio/ip/host_name.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>

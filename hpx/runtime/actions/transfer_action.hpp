@@ -10,8 +10,8 @@
 #if !defined(HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_NOV_14_2008_0711PM)
 #define HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_NOV_14_2008_0711PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/invocation_count_registry.hpp>

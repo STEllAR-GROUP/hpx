@@ -6,8 +6,8 @@
 #if !defined(HPX_TRAITS_ACTION_SERIALIZATION_FILTER_FEB_14_2013_0903PM)
 #define HPX_TRAITS_ACTION_SERIALIZATION_FILTER_FEB_14_2013_0903PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/serialization/binary_filter.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits

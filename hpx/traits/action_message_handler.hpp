@@ -6,8 +6,7 @@
 #if !defined(HPX_TRAITS_ACTION_MESSAGE_HANDLER_FEB_24_2013_0318PM)
 #define HPX_TRAITS_ACTION_MESSAGE_HANDLER_FEB_24_2013_0318PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/parcelset/policies/message_handler.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits

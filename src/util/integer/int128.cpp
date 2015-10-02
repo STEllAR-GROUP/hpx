@@ -6,11 +6,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/integer/int128.hpp>
 
-#include <memory>
 #include <cmath>
+#include <cstring>
+#include <memory>
 #include <algorithm>
 
 // IMPLEMENTATION
@@ -22,7 +22,7 @@ namespace hpx { namespace util { namespace integer
         if (radix < 2 || radix > 37) return "(invalid radix)";
 
         static char sz [256];
-        memset (sz, 0, 256);
+        std::memset (sz, 0, 256);
 
         int128 r;
         int128 ii = (*this < 0) ? -*this : *this;
