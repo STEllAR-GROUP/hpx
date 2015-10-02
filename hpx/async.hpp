@@ -29,13 +29,13 @@ namespace hpx { namespace detail
     // Defer the evaluation of result_of during the SFINAE checks below
 #if defined(__clang__)
     template <typename F, typename Result =
-        typename util::deferred_call_result_of<F>::type>
+        typename util::detail::deferred_result_of<F>::type>
     struct create_future
     {
         typedef lcos::future<Result> type;
     };
 #else
-    template <typename F, typename ResultOf = util::deferred_call_result_of<F> >
+    template <typename F, typename ResultOf = util::detail::deferred_result_of<F> >
     struct create_future
     {
         typedef lcos::future<typename ResultOf::type> type;
@@ -45,12 +45,12 @@ namespace hpx { namespace detail
     template <typename F>
     BOOST_FORCEINLINE
     typename boost::lazy_enable_if<
-        boost::is_reference<typename util::deferred_call_result_of<F()>::type>
+        boost::is_reference<typename util::detail::deferred_result_of<F()>::type>
       , detail::create_future<F()>
     >::type
     call_sync(F&& f, boost::mpl::false_)
     {
-        typedef typename util::deferred_call_result_of<F()>::type result_type;
+        typedef typename util::detail::deferred_result_of<F()>::type result_type;
         try
         {
             return lcos::make_ready_future(boost::ref(f()));
@@ -63,12 +63,12 @@ namespace hpx { namespace detail
     template <typename F>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_reference<typename util::deferred_call_result_of<F()>::type>
+        boost::is_reference<typename util::detail::deferred_result_of<F()>::type>
       , detail::create_future<F()>
     >::type
     call_sync(F&& f, boost::mpl::false_) //-V659
     {
-        typedef typename util::deferred_call_result_of<F()>::type result_type;
+        typedef typename util::detail::deferred_result_of<F()>::type result_type;
         try
         {
             return lcos::make_ready_future(f());
@@ -101,12 +101,12 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         BOOST_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
-            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
         call(BOOST_SCOPED_ENUM(launch) launch_policy, F&& f, Ts&&... ts)
         {
-            typedef typename util::deferred_call_result_of<
+            typedef typename util::detail::deferred_result_of<
                 F(Ts...)
             >::type result_type;
 
@@ -138,8 +138,8 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         BOOST_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
-            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
         call(F&& f, Ts&&... ts)
         {
@@ -158,12 +158,12 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         BOOST_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
-            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
         call(Executor& sched, F&& f, Ts&&... ts)
         {
-            typedef typename util::deferred_call_result_of<
+            typedef typename util::detail::deferred_result_of<
                     F(Ts...)
                 >::type result_type;
 
@@ -184,8 +184,8 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         BOOST_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
-            hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
+            hpx::future<typename util::detail::deferred_result_of<F(Ts&&...)>::type>
         >::type
         call(Executor& exec, F&& f, Ts&&... ts)
         {
