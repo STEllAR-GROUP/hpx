@@ -6,10 +6,8 @@
 #ifndef HPX_CONCRETE_FACTORY_VP_2004_08_25
 #define HPX_CONCRETE_FACTORY_VP_2004_08_25
 
-#include <iostream>
-
 #include <hpx/util/plugin/abstract_factory.hpp>
-#include <hpx/util/plugin/detail/plugin_wrapper.hpp>
+#include <hpx/util/plugin/plugin_wrapper.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace plugin {
@@ -18,66 +16,34 @@ namespace hpx { namespace util { namespace plugin {
     {
         template<
             typename BasePlugin, typename Concrete, typename Base,
-            typename Parameters
+            typename Parameter
         >
         struct concrete_factory_item;
 
-        template<typename BasePlugin, typename Concrete, typename Base>
-        struct concrete_factory_item<
-            BasePlugin, Concrete, Base, boost::mpl::list<>
-        >
-        :   public Base
-        {
-            BasePlugin* create(dll_handle dll)
-            {
-                return new plugin_wrapper<Concrete, boost::mpl::list<> >(dll);
-            }
-        };
 
-        template<typename BasePlugin, typename Concrete, typename Base, typename A1>
-        struct concrete_factory_item<
-            BasePlugin, Concrete, Base, boost::mpl::list<A1>
+        template<
+            typename BasePlugin, typename Concrete, typename Base,
+            typename...Parameters
         >
-        :   public Base
-        {
-            BasePlugin* create(dll_handle dll, A1 a1)
-            {
-                return new plugin_wrapper<Concrete, boost::mpl::list<A1> >(dll, a1);
-            }
-        };
-
-        template<typename BasePlugin, typename Concrete, typename Base,
-            typename A1, typename A2>
         struct concrete_factory_item<BasePlugin, Concrete, Base,
-            boost::mpl::list<A1, A2> >
-        :   public Base
+            hpx::util::detail::pack<Parameters...> >
+          : public Base
         {
-            BasePlugin* create(dll_handle dll, A1 a1, A2 a2)
+            BasePlugin* create(dll_handle dll, Parameters...parameters)
             {
-                return new plugin_wrapper<Concrete, boost::mpl::list<A1
-                    , A2> >(dll, a1, a2);
+                return new plugin_wrapper<Concrete, Parameters...>(dll, parameters...);
             }
         };
     }
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//  Bring in the remaining concrete_factory_item definitions for parameter
-//  counts greater 2
-//
-///////////////////////////////////////////////////////////////////////////////
-#include <hpx/util/plugin/detail/concrete_factory_impl.hpp>
-
     ///////////////////////////////////////////////////////////////////////////
     template<typename BasePlugin, typename Concrete>
     struct concrete_factory
-    :   public boost::mpl::inherit_linearly<
-            typename virtual_constructors<BasePlugin>::type,
-            detail::concrete_factory_item<BasePlugin, Concrete,
-                boost::mpl::placeholders::_, boost::mpl::placeholders::_>,
-            abstract_factory<BasePlugin>
-        >::type
-    {};
+      : detail::concrete_factory_item<
+            BasePlugin,
+            Concrete, abstract_factory<BasePlugin>,
+            typename virtual_constructor<BasePlugin>::type
+    > {};
 
 ///////////////////////////////////////////////////////////////////////////////
 }}}  // namespace hpx::util::plugin

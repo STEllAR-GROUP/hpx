@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
-#include <hpx/util/plugin/virtual_constructors.hpp>
+#include <hpx/util/plugin/virtual_constructor.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
 

@@ -9,7 +9,7 @@
 
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
-#include <hpx/util/plugin/virtual_constructors.hpp>
+#include <hpx/util/plugin/virtual_constructor.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 
 #include <boost/filesystem/path.hpp>
