@@ -12,7 +12,6 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
-#include <hpx/runtime/serialization/serialize_sequence.hpp>
 
 #include <hpx/util/logging/format/named_write_fwd.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
