@@ -65,7 +65,7 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[[*Required Libraries]]]
     [[__boost_libraries__        ][1.57.0 or newer    ][1.49.0          ]
         [See below for an important limitation when using Boost V1.54.0.]]
-    [[__hwloc__                  ][1.10                ][1.2             ]
+    [[__hwloc__                  ][1.10                ][1.2 (Xeon Phi: 1.6)]
         [Used for OS-thread pinning and NUMA awareness. This library is optional on Mac OSX.]]
 ]
 
