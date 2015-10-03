@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
@@ -88,7 +88,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         template <typename Mutex>
         bool empty(boost::unique_lock<Mutex> const& lock) const
         {
-            HPX_ASSERT(lock.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(lock);
 
             return queue_.empty();
         }
@@ -96,7 +96,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         template <typename Mutex>
         std::size_t size(boost::unique_lock<Mutex> const& lock) const
         {
-            HPX_ASSERT(lock.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(lock);
 
             return queue_.size();
         }
@@ -106,7 +106,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         template <typename Mutex>
         bool notify_one(boost::unique_lock<Mutex> lock, error_code& ec = throws)
         {
-            HPX_ASSERT(lock.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(lock);
 
             if (!queue_.empty())
             {
@@ -118,6 +118,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
                 {
+                    lock.unlock();
+
                     HPX_THROWS_IF(ec, null_thread_id,
                         "condition_variable::notify_one",
                         "NULL thread id encountered");
@@ -131,20 +133,23 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     reinterpret_cast<threads::thread_data*>(id)),
                     threads::pending, threads::wait_signaled,
                     threads::thread_priority_default, ec);
-                if (!ec) return not_empty;
+                return not_empty;
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
             return false;
         }
 
         template <typename Mutex>
         void notify_all(boost::unique_lock<Mutex> lock, error_code& ec = throws)
         {
-            HPX_ASSERT(lock.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(lock);
 
             // swap the list
             queue_type queue;
             queue.swap(queue_);
-            lock.unlock();
 
             while (!queue.empty())
             {
@@ -156,11 +161,16 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
                 {
+                    lock.unlock();
+
                     HPX_THROWS_IF(ec, null_thread_id,
                         "condition_variable::notify_all",
                         "NULL thread id encountered");
                     return;
                 }
+
+                // unlock while notifying thread as this can suspend
+                util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
 
                 threads::set_thread_state(threads::thread_id_type(
                     reinterpret_cast<threads::thread_data*>(id)),
@@ -168,56 +178,68 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     threads::thread_priority_default, ec);
                 if (ec) return;
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
         template <typename Mutex>
         void abort_all(boost::unique_lock<Mutex> lock)
         {
-            HPX_ASSERT(lock.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(lock);
 
-            // swap the list
-            queue_type queue;
-            queue.swap(queue_);
-            lock.unlock();
-
-            while (!queue.empty())
+            // new threads might have been added while we were notifying
+            while(!queue_.empty())
             {
-                threads::thread_id_repr_type id = queue.front().id_;
-                queue.front().id_ = threads::invalid_thread_id_repr;
-                queue.pop_front();
+                // swap the list
+                queue_type queue;
+                queue.swap(queue_);
 
-                if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
+                while (!queue.empty())
                 {
+                    threads::thread_id_repr_type id = queue.front().id_;
+
+                    queue.front().id_ = threads::invalid_thread_id_repr;
+                    queue.pop_front();
+
+                    if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
+                    {
+                        LERR_(fatal)
+                            << "condition_variable::abort_all:"
+                            << " NULL thread id encountered";
+                        continue;
+                    }
+
+                    // we know that the id is actually the pointer to the thread
+                    threads::thread_id_type tid(
+                        reinterpret_cast<threads::thread_data*>(id));
+
                     LERR_(fatal)
-                        << "condition_variable::abort_all:"
-                        << " NULL thread id encountered";
-                    continue;
-                }
+                            << "condition_variable::abort_all:"
+                            << " pending thread: "
+                            << get_thread_state_name(
+                                    threads::get_thread_state(tid))
+                            << "(" << tid << "): "
+                            << threads::get_thread_description(tid);
 
-                // we know that the id is actually the pointer to the thread
-                threads::thread_id_type tid(
-                    reinterpret_cast<threads::thread_data*>(id));
+                    // unlock while notifying thread as this can suspend
+                    util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
 
-                LERR_(fatal)
-                        << "condition_variable::abort_all:"
-                        << " pending thread: "
-                        << get_thread_state_name(threads::get_thread_state(tid))
-                        << "(" << tid << "): "
-                        << threads::get_thread_description(tid);
-
-                // forcefully abort thread, do not throw
-                error_code ec(lightweight);
-                threads::set_thread_state(tid,
-                    threads::pending, threads::wait_abort,
-                    threads::thread_priority_default, ec);
-                if (ec)
-                {
-                    LERR_(fatal)
-                        << "condition_variable::abort_all:"
-                        << " could not abort thread: "
-                        << get_thread_state_name(threads::get_thread_state(tid))
-                        << "(" << tid << "): "
-                        << threads::get_thread_description(tid);
+                    // forcefully abort thread, do not throw
+                    error_code ec(lightweight);
+                    threads::set_thread_state(tid,
+                        threads::pending, threads::wait_abort,
+                        threads::thread_priority_default, ec);
+                    if (ec)
+                    {
+                        LERR_(fatal)
+                            << "condition_variable::abort_all:"
+                            << " could not abort thread: "
+                            << get_thread_state_name(
+                                    threads::get_thread_state(tid))
+                            << "(" << tid << "): "
+                            << threads::get_thread_description(tid);
+                    }
                 }
             }
         }
@@ -228,7 +250,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             char const* description, error_code& ec = throws)
         {
             HPX_ASSERT(threads::get_self_ptr() != 0);
-            HPX_ASSERT(lock.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(lock);
 
             // enqueue the request and block this thread
             queue_entry f(threads::get_self_id().get());
@@ -261,7 +283,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             char const* description, error_code& ec = throws)
         {
             HPX_ASSERT(threads::get_self_ptr() != 0);
-            HPX_ASSERT(lock.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(lock);
 
             // enqueue the request and block this thread
             queue_entry f(threads::get_self_id().get());

@@ -39,6 +39,7 @@ namespace hpx { namespace lcos { namespace local
 
         void notify_all(error_code& ec = throws)
         {
+            util::ignore_all_while_checking ignore_lock;
             boost::unique_lock<mutex_type> l(mtx_);
             cond_.notify_all(std::move(l), ec);
         }
