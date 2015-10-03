@@ -9,7 +9,6 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -27,12 +26,6 @@ namespace hpx { namespace traits
             return component_type::schedule_thread(lva, data, initial_state);
         }
     };
-
-    template <typename Action>
-    struct action_schedule_thread<Action
-      , typename util::always_void<typename Action::type>::type>
-      : action_schedule_thread<typename Action::type>
-    {};
 }}
 
 #endif
