@@ -31,11 +31,12 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 boost::intrusive::link_mode<boost::intrusive::normal_link>
             > hook_type;
 
-            queue_entry(threads::thread_id_repr_type const& id)
-              : id_(id)
+            queue_entry(threads::thread_id_repr_type const& id, void* q)
+              : id_(id), q_(q)
             {}
 
             threads::thread_id_repr_type id_;
+            void* q_;
             hook_type slist_hook_;
         };
 
@@ -53,17 +54,19 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         struct reset_queue_entry
         {
             reset_queue_entry(queue_entry& e, queue_type& q)
-              : e_(e), q_(q), last_(q.last())
+              : e_(e), last_(q.last())
             {}
 
             ~reset_queue_entry()
             {
                 if (e_.id_ != threads::invalid_thread_id_repr)
-                    q_.erase(last_);     // remove entry from queue
+                {
+                    queue_type* q = reinterpret_cast<queue_type*>(e_.q_);
+                    q->erase(last_);     // remove entry from queue
+                }
             }
 
             queue_entry& e_;
-            queue_type& q_;
             queue_type::const_iterator last_;
         };
 
@@ -151,32 +154,39 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             queue_type queue;
             queue.swap(queue_);
 
-            while (!queue.empty())
+            if (!queue.empty())
             {
-                threads::thread_id_repr_type id = queue.front().id_;
+                // update reference to queue for all queue entries
+                for (queue_entry& qe : queue)
+                    qe.q_ = &queue;
 
-                // remove item from queue before error handling
-                queue.front().id_ = threads::invalid_thread_id_repr;
-                queue.pop_front();
-
-                if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
+                while (!queue.empty())
                 {
-                    lock.unlock();
+                    threads::thread_id_repr_type id = queue.front().id_;
 
-                    HPX_THROWS_IF(ec, null_thread_id,
-                        "condition_variable::notify_all",
-                        "NULL thread id encountered");
-                    return;
+                    // remove item from queue before error handling
+                    queue.front().id_ = threads::invalid_thread_id_repr;
+                    queue.pop_front();
+
+                    if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
+                    {
+                        lock.unlock();
+
+                        HPX_THROWS_IF(ec, null_thread_id,
+                            "condition_variable::notify_all",
+                            "NULL thread id encountered");
+                        return;
+                    }
+
+                    // unlock while notifying thread as this can suspend
+                    util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
+
+                    threads::set_thread_state(threads::thread_id_type(
+                        reinterpret_cast<threads::thread_data*>(id)),
+                        threads::pending, threads::wait_signaled,
+                        threads::thread_priority_default, ec);
+                    if (ec) return;
                 }
-
-                // unlock while notifying thread as this can suspend
-                util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
-
-                threads::set_thread_state(threads::thread_id_type(
-                    reinterpret_cast<threads::thread_data*>(id)),
-                    threads::pending, threads::wait_signaled,
-                    threads::thread_priority_default, ec);
-                if (ec) return;
             }
 
             if (&ec != &throws)
@@ -194,6 +204,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 // swap the list
                 queue_type queue;
                 queue.swap(queue_);
+
+                // update reference to queue for all queue entries
+                for (queue_entry& qe : queue)
+                    qe.q_ = &queue;
 
                 while (!queue.empty())
                 {
@@ -253,7 +267,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             HPX_ASSERT_OWNS_LOCK(lock);
 
             // enqueue the request and block this thread
-            queue_entry f(threads::get_self_id().get());
+            queue_entry f(threads::get_self_id().get(), &queue_);
             queue_.push_back(f);
 
             reset_queue_entry r(f, queue_);
@@ -286,7 +300,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             HPX_ASSERT_OWNS_LOCK(lock);
 
             // enqueue the request and block this thread
-            queue_entry f(threads::get_self_id().get());
+            queue_entry f(threads::get_self_id().get(), &queue_);
             queue_.push_back(f);
 
             reset_queue_entry r(f, queue_);
