@@ -491,9 +491,9 @@ if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
 hpx_option(HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
-if(HPX_WITH_ITTNOTIFY)
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
-endif()
+#if(HPX_WITH_ITTNOTIFY)
+  #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+#endif()
 
 ## Debugging related build options
 hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")
@@ -1130,7 +1130,6 @@ if(HPX_WITH_APEX)
   endif()
 
   include_directories(${APEX_SOURCE_DIR})
-  hpx_add_config_define(HPX_HAVE_APEX 1)
   set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
       ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} apex_lib)
   if(APEX_WITH_MSR)

@@ -114,8 +114,8 @@ namespace hpx { namespace lcos { namespace local
     }
 
     template <typename Tag>
-    lcos::local::itt_spinlock_init<Tag>
-        lcos::local::spinlock_pool<Tag>::init_ = lcos::local::itt_spinlock_init<Tag>();
+    lcos::local::detail::itt_spinlock_init<Tag>
+        lcos::local::spinlock_pool<Tag>::init_ = lcos::local::detail::itt_spinlock_init<Tag>();
 #endif
 }}}
 
