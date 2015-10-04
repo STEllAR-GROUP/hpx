@@ -61,7 +61,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             {
                 if (e_.id_ != threads::invalid_thread_id_repr)
                 {
-                    queue_type* q = reinterpret_cast<queue_type*>(e_.q_);
+                    queue_type* q = static_cast<queue_type*>(e_.q_);
                     q->erase(last_);     // remove entry from queue
                 }
             }
@@ -160,8 +160,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 for (queue_entry& qe : queue)
                     qe.q_ = &queue;
 
-                while (!queue.empty())
-                {
+                do {
                     threads::thread_id_repr_type id = queue.front().id_;
 
                     // remove item from queue before error handling
@@ -186,7 +185,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         threads::pending, threads::wait_signaled,
                         threads::thread_priority_default, ec);
                     if (ec) return;
-                }
+
+                } while (!queue.empty());
             }
 
             if (&ec != &throws)
