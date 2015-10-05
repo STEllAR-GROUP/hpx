@@ -11,7 +11,6 @@
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/capability.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -29,12 +28,6 @@ namespace hpx { namespace traits
             return components::security::capability();
         }
     };
-
-    template <typename Action>
-    struct action_capability_provider<Action
-      , typename util::always_void<typename Action::type>::type>
-      : action_capability_provider<typename Action::type>
-    {};
 }}
 
 #endif

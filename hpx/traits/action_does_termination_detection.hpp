@@ -6,8 +6,6 @@
 #if !defined(HPX_TRAITS_ACTION_DOES_TERMINATION_DETECTION_MAR_21_2014_0818PM)
 #define HPX_TRAITS_ACTION_DOES_TERMINATION_DETECTION_MAR_21_2014_0818PM
 
-#include <hpx/util/always_void.hpp>
-
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -20,12 +18,6 @@ namespace hpx { namespace traits
             return false;
         }
     };
-
-    template <typename Action>
-    struct action_does_termination_detection<Action
-      , typename util::always_void<typename Action::type>::type>
-      : action_does_termination_detection<typename Action::type>
-    {};
 }}
 
 #endif

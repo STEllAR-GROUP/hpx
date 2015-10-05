@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits.hpp>
-#include <hpx/util/always_void.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -27,12 +26,6 @@ namespace hpx { namespace actions
         typedef typename type::result_type result_type;
         typedef typename type::remote_result_type remote_result_type;
     };
-
-    template <typename Action>
-    struct extract_action<Action
-      , typename util::always_void<typename Action::type>::type>
-      : extract_action<typename Action::type>
-    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

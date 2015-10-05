@@ -7,7 +7,6 @@
 #define HPX_TRAITS_ACTION_DECORATE_FUNCTION_MAR_30_2014_1054AM
 
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -25,12 +24,6 @@ namespace hpx { namespace traits
             return component_type::decorate_action(lva, std::forward<F>(f));
         }
     };
-
-    template <typename Action>
-    struct action_decorate_function<Action
-      , typename util::always_void<typename Action::type>::type>
-      : action_decorate_function<typename Action::type>
-    {};
 }}
 
 #endif
