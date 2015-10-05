@@ -7,7 +7,6 @@
 #define HPX_TRAITS_ACTION_MESSAGE_HANDLER_FEB_24_2013_0318PM
 
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -24,12 +23,6 @@ namespace hpx { namespace traits
             return 0;   // by default actions don't have a message_handler
         }
     };
-
-    template <typename Action>
-    struct action_message_handler<Action
-      , typename util::always_void<typename Action::type>::type>
-      : action_message_handler<typename Action::type>
-    {};
 }}
 
 #endif
