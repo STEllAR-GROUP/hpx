@@ -37,6 +37,86 @@
 
 namespace hpx { namespace agas
 {
+struct addressing_service::gva_cache_key
+{ // {{{ gva_cache_key implementation
+  private:
+    typedef boost::icl::closed_interval<naming::gid_type, std::less>
+        key_type;
+
+    key_type key_;
+
+  public:
+    gva_cache_key()
+      : key_()
+    {}
+
+    explicit gva_cache_key(
+        naming::gid_type const& id_
+      , boost::uint64_t count_ = 1
+        )
+      : key_(naming::detail::get_stripped_gid(id_)
+           , naming::detail::get_stripped_gid(id_) + (count_ - 1))
+    {
+        HPX_ASSERT(count_);
+    }
+
+    naming::gid_type get_gid() const
+    {
+        return boost::icl::lower(key_);
+    }
+
+    boost::uint64_t get_count() const
+    {
+        naming::gid_type const size = boost::icl::length(key_);
+        HPX_ASSERT(size.get_msb() == 0);
+        return size.get_lsb();
+    }
+
+    friend bool operator<(
+        gva_cache_key const& lhs
+      , gva_cache_key const& rhs
+        )
+    {
+        return boost::icl::exclusive_less(lhs.key_, rhs.key_);
+    }
+
+    friend bool operator==(
+        gva_cache_key const& lhs
+      , gva_cache_key const& rhs
+        )
+    {
+        // Is lhs in rhs?
+        if (1 == lhs.get_count() && 1 != rhs.get_count())
+            return boost::icl::contains(rhs.key_, lhs.key_);
+
+        // Is rhs in lhs?
+        else if (1 != lhs.get_count() && 1 == rhs.get_count())
+            return boost::icl::contains(lhs.key_, rhs.key_);
+
+        // Direct hit
+        return lhs.key_ == rhs.key_;
+    }
+}; // }}}
+}}
+
+namespace std
+{
+    // specialize std::hash for hpx::agas::addressing_service::gva_cache_key
+    template <>
+    struct hash<hpx::agas::addressing_service::gva_cache_key>
+    {
+        typedef hpx::agas::addressing_service::gva_cache_key argument_type;
+        typedef std::size_t result_type;
+
+        result_type operator()(argument_type const& key) const
+        {
+            return std::hash<hpx::naming::gid_type>()(key.get_gid());
+        }
+    };
+}
+
+namespace hpx { namespace agas
+{
 
 struct addressing_service::bootstrap_data_type
 { // {{{
@@ -116,66 +196,6 @@ struct addressing_service::hosted_data_type
     server::symbol_namespace symbol_ns_server_;
 }; // }}}
 
-struct addressing_service::gva_cache_key
-{ // {{{ gva_cache_key implementation
-  private:
-    typedef boost::icl::closed_interval<naming::gid_type, std::less>
-        key_type;
-
-    key_type key_;
-
-  public:
-    gva_cache_key()
-      : key_()
-    {}
-
-    explicit gva_cache_key(
-        naming::gid_type const& id_
-      , boost::uint64_t count_ = 1
-        )
-      : key_(naming::detail::get_stripped_gid(id_)
-           , naming::detail::get_stripped_gid(id_) + (count_ - 1))
-    {
-        HPX_ASSERT(count_);
-    }
-
-    naming::gid_type get_gid() const
-    {
-        return boost::icl::lower(key_);
-    }
-
-    boost::uint64_t get_count() const
-    {
-        naming::gid_type const size = boost::icl::length(key_);
-        HPX_ASSERT(size.get_msb() == 0);
-        return size.get_lsb();
-    }
-
-    friend bool operator<(
-        gva_cache_key const& lhs
-      , gva_cache_key const& rhs
-        )
-    {
-        return boost::icl::exclusive_less(lhs.key_, rhs.key_);
-    }
-
-    friend bool operator==(
-        gva_cache_key const& lhs
-      , gva_cache_key const& rhs
-        )
-    {
-        // Is lhs in rhs?
-        if (1 == lhs.get_count() && 1 != rhs.get_count())
-            return boost::icl::contains(rhs.key_, lhs.key_);
-
-        // Is rhs in lhs?
-        else if (1 != lhs.get_count() && 1 == rhs.get_count())
-            return boost::icl::contains(lhs.key_, rhs.key_);
-
-        // Direct hit
-        return lhs.key_ == rhs.key_;
-    }
-}; // }}}
 
 struct addressing_service::gva_erase_policy
 { // {{{ gva_erase_policy implementation

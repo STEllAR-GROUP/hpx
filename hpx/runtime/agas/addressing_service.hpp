@@ -30,6 +30,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 // TODO: split into a base class and two implementations (one for bootstrap,
@@ -73,13 +74,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         gva_cache_key, gva_entry_type,
         std::less<gva_entry_type>,
         boost::cache::policies::always<gva_entry_type>,
-        std::map<gva_cache_key, gva_entry_type>,
+        std::unordered_map<gva_cache_key, gva_entry_type>,
         boost::cache::statistics::local_full_statistics
     > gva_cache_type;
     // }}}
 
     typedef std::set<naming::gid_type> migrated_objects_table_type;
-    typedef std::map<naming::gid_type, boost::int64_t> refcnt_requests_type;
+    typedef std::unordered_map<naming::gid_type, boost::int64_t> refcnt_requests_type;
 
     struct bootstrap_data_type;
     struct hosted_data_type;
