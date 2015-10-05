@@ -15,7 +15,6 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
-#include <apex.hpp>
 #include <apex_api.hpp>
 
 #include <iostream>
