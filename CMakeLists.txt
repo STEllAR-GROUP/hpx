@@ -1118,7 +1118,7 @@ if(HPX_WITH_APEX)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
     master
-    NO_UPDATE VERBOSE)
+    VERBOSE)
 
   LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
   add_subdirectory(apex/src/apex)
