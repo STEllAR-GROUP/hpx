@@ -8,7 +8,6 @@
 
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -23,12 +22,6 @@ namespace hpx { namespace traits
             return 0;   // by default actions don't have a serialization filter
         }
     };
-
-    template <typename Action>
-    struct action_serialization_filter<Action
-      , typename util::always_void<typename Action::type>::type>
-      : action_serialization_filter<typename Action::type>
-    {};
 }}
 
 #endif
