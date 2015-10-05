@@ -119,30 +119,40 @@ described in the table below:
                                        cout)]]
     [[`--hpx:debug-clp`]        [debug command line processing]]
     [[`--hpx:attach-debugger arg`] [wait for a debugger to be attached, possible arg values:
-                                    startup or exception (default: startup)]]
+                                    `startup` or `exception` (default: startup)]]
 
     [[[*__hpx__ options related to performance counters]]]
-    [[`--hpx:print-counter`]    [print the specified performance counter either repeatedly or
-                                 before shutting down the system (see option `--hpx:print-counter-interval`)]]
-    [[`--hpx:print-counter-interval`][print the performance counter(s) specified with `--hpx:print-counter`
-                                 repeatedly after the time interval (specified in milliseconds)
-                                 (default: 0, which means print once at shutdown)]]
-    [[`--hpx:print-counter-destination`][print the performance counter(s) specified with `--hpx:print-counter`
-                                 to the given file (default: console)]]
-    [[`--hpx:list-counters`]    [list the names of all registered performance counters, possible
-                                 values: 'minimal' (prints counter name skeletons),
-                                 'full' (prints all available counter names)]]
-    [[`--hpx:list-counter-infos`][list the description of all registered performance counters,
-                                   possible values: 'minimal' (prints info for counter name skeletons),
-                                  'full' (prints all available counter infos)]]
-    [[`--hpx:print-counter-format`][print the performance counter(s) specified with `--hpx:print-counter`,
-                                 possible formats in csv format with  header or
-                                 without any header (see option `--hpx:no-csv-header`)
-                                 values: 'csv' (prints counter values in CSV format with full names as header)
-                                 'csv-short' (prints counter values in CSV format with shortnames provided with `--hpx:print-counter`
-                                 as `--hpx:print-counter shortname,full-countername`)]]
-    [[`--hpx:no-csv-header`][print the performance counter(s) specified with `--hpx:print-counter` and
-                                `csv` or `csv-short` format specified with `--hpx:print-counter-format` without header]]
+    [[`--hpx:print-counter`]    [print the specified performance counter either
+        repeatedly and/or at the times specified by `--hpx:print-counter-at`
+        (see also option `--hpx:print-counter-interval`)]]
+    [[`--hpx:print-counter-interval`][print the performance counter(s)
+        specified with `--hpx:print-counter` repeatedly after the time interval
+        (specified in milliseconds), (default: 0, which means print once at
+        shutdown)]]
+    [[`--hpx:print-counter-destination`][print the performance counter(s)
+        specified with `--hpx:print-counter` to the given file (default:
+        `console`)]]
+    [[`--hpx:list-counters`]    [list the names of all registered performance
+        counters, possible values: `minimal` (prints counter name skeletons),
+        `full` (prints all available counter names)]]
+    [[`--hpx:list-counter-infos`][list the description of all registered
+        performance counters, possible values: `minimal` (prints info for
+        counter name skeletons), 'full' (prints all available counter infos)]]
+    [[`--hpx:print-counter-format`][print the performance counter(s) specified
+        with `--hpx:print-counter`, possible formats in csv format with  header
+        or without any header (see option `--hpx:no-csv-header`), possible
+        values: `csv` (prints counter values in CSV format with full names as
+        header), `csv-short` (prints counter values in CSV format with shortnames
+        provided with `--hpx:print-counter` as
+        `--hpx:print-counter shortname,full-countername`)]]
+    [[`--hpx:no-csv-header`][print the performance counter(s) specified with
+        `--hpx:print-counter` and `csv` or `csv-short` format specified with
+        `--hpx:print-counter-format` without header]]
+    [[`--hpx:printer-counter-at arg`][print the performance counter(s)
+        specified with `--hpx:print-counter` at the given point in time,
+        possible argument values: `startup`, `shutdown` (default), `noshutdown`]]
+    [[`--hpx:reset-counters`][reset the performance counter(s) specified with
+        `--hpx:print-counter` after they have been evaluated]]
 ]
 
 [heading Command Line Argument Shortcuts]

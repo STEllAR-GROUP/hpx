@@ -548,7 +548,7 @@ namespace hpx { namespace util
                   "argument values: 'startup', 'shutdown' (default), 'noshutdown'")
                 ("hpx:reset-counters",
                   "reset the performance counter(s) specified with --hpx:print-counter "
-                  "after they are evaluated")
+                  "after they have been evaluated")
             ;
 
             hidden_options.add_options()
