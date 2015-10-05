@@ -28,7 +28,6 @@
 #include <limits>
 #include <algorithm>
 
-#include <apex.hpp>
 #include <apex_api.hpp>
 
 #include "print_time_results.hpp"
