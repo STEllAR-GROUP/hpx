@@ -93,8 +93,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [f, proj](reference t)
                         {
                             using hpx::util::get;
-                            using hpx::util::invoke;
-                            get<1>(t) = f(invoke(proj, get<0>(t)));
+                            get<1>(t) = f(hpx::util::invoke(proj, get<0>(t)));
                         }));
             }
         };
@@ -216,9 +215,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             InIter2 first2,  OutIter dest, F && f,
             Proj1 && proj1, Proj2 && proj2)
         {
-            using hpx::util::invoke;
             while (first1 != last1)
-                *dest++ = f(invoke(proj1, *first1++), invoke(proj2, *first2++));
+                *dest++ = f(hpx::util::invoke(proj1, *first1++),
+                    hpx::util::invoke(proj2, *first2++));
             return hpx::util::make_tuple(first1, first2, dest);
         }
 
@@ -270,9 +269,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [f, proj1, proj2](reference t)
                         {
                             using hpx::util::get;
-                            using hpx::util::invoke;
-                            get<2>(t) = f(invoke(proj1, get<0>(t)),
-                                invoke(proj2, get<1>(t)));
+                            get<2>(t) = f(hpx::util::invoke(proj1, get<0>(t)),
+                                hpx::util::invoke(proj2, get<1>(t)));
                         }));
             }
         };
@@ -425,9 +423,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             InIter2 first2, InIter2 last2, OutIter dest, F && f,
             Proj1 && proj1, Proj2 && proj2)
         {
-            using hpx::util::invoke;
             while (first1 != last1 && first2 != last2)
-                *dest++ = f(invoke(proj1, *first1++), invoke(proj2, *first2++));
+                *dest++ = f(hpx::util::invoke(proj1, *first1++),
+                    hpx::util::invoke(proj2, *first2++));
             return hpx::util::make_tuple(first1, first2, dest);
         }
 
@@ -482,9 +480,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         [f, proj1, proj2](reference t)
                         {
                             using hpx::util::get;
-                            using hpx::util::invoke;
-                            get<2>(t) = f(invoke(proj1, get<0>(t)),
-                                invoke(proj2, get<1>(t)));
+                            get<2>(t) = f(hpx::util::invoke(proj1, get<0>(t)),
+                                hpx::util::invoke(proj2, get<1>(t)));
                         }));
             }
         };
