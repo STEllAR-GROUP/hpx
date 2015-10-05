@@ -14,7 +14,6 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
 
-#include <apex.hpp>
 #include <apex_api.hpp>
 
 #include <iostream>
