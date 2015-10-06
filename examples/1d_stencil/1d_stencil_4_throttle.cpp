@@ -42,7 +42,6 @@ hpx::naming::id_type counter_id;
 id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
     boost::uint32_t const prefix = hpx::get_locality_id();
-    //boost::format active_threads("/threads{locality#%d/total}/count/instantaneous/active");
     boost::format active_threads(counter_name);
     id_type id = get_counter(boost::str(active_threads % prefix));
     return id;
@@ -61,7 +60,9 @@ void setup_counters() {
         counter_id = id;
     }
     catch(hpx::exception const& e) {
-        std::cerr << "apex_policy_engine_active_thread_count: caught exception: " << e.what() << std::endl;
+        std::cerr
+            << "apex_policy_engine_active_thread_count: caught exception: "
+            << e.what() << std::endl;
     }
     counters_initialized = true;
 }
@@ -74,7 +75,9 @@ bool test_function(apex_context const& context) {
         return APEX_NOERROR;
     }
     catch(hpx::exception const& e) {
-        std::cerr << "apex_policy_engine_active_thread_count: caught exception: " << e.what() << std::endl;
+        std::cerr
+            << "apex_policy_engine_active_thread_count: caught exception: "
+            << e.what() << std::endl;
         return APEX_ERROR;
     }
 }
@@ -82,7 +85,7 @@ bool test_function(apex_context const& context) {
 void register_policies() {
     apex::register_periodic_policy(100000, test_function);
 
-    apex::setup_timer_throttling(std::string("thread_queue_length"), 
+    apex::setup_timer_throttling(std::string("thread_queue_length"),
         APEX_MINIMIZE_ACCUMULATED, APEX_ACTIVE_HARMONY, 200000);
 
     // to just set a power cap, do this.
