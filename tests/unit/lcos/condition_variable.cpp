@@ -136,8 +136,9 @@ void test_condition_notify_one_wakes_from_wait()
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
         data.flag=true;
-        data.cond_var.notify_one();
     }
+
+    data.cond_var.notify_one();
 
     thread.join();
     HPX_TEST(data.woken);
@@ -152,8 +153,9 @@ void test_condition_notify_one_wakes_from_wait_with_predicate()
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
         data.flag=true;
-        data.cond_var.notify_one();
     }
+
+    data.cond_var.notify_one();
 
     thread.join();
     HPX_TEST(data.woken);
@@ -168,8 +170,9 @@ void test_condition_notify_one_wakes_from_wait_until()
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
         data.flag=true;
-        data.cond_var.notify_one();
     }
+
+    data.cond_var.notify_one();
 
     thread.join();
     HPX_TEST(data.woken);
@@ -184,8 +187,9 @@ void test_condition_notify_one_wakes_from_wait_until_with_predicate()
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
         data.flag=true;
-        data.cond_var.notify_one();
     }
+
+    data.cond_var.notify_one();
 
     thread.join();
     HPX_TEST(data.woken);
@@ -201,8 +205,9 @@ void test_condition_notify_one_wakes_from_relative_wait_until_with_predicate()
     {
         boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
         data.flag=true;
-        data.cond_var.notify_one();
     }
+
+    data.cond_var.notify_one();
 
     thread.join();
     HPX_TEST(data.woken);
@@ -254,8 +259,9 @@ void test_condition_notify_all_wakes_from_wait()
         {
             boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
             data.flag=true;
-            data.cond_var.notify_all();
         }
+
+        data.cond_var.notify_all();
 
         join_all(group);
         HPX_TEST_EQ(data.woken,5u);
@@ -284,8 +290,9 @@ void test_condition_notify_all_wakes_from_wait_with_predicate()
         {
             boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
             data.flag=true;
-            data.cond_var.notify_all();
         }
+
+        data.cond_var.notify_all();
 
         join_all(group);
         HPX_TEST_EQ(data.woken,5u);
@@ -314,8 +321,9 @@ void test_condition_notify_all_wakes_from_wait_until()
         {
             boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
             data.flag=true;
-            data.cond_var.notify_all();
         }
+
+        data.cond_var.notify_all();
 
         join_all(group);
         HPX_TEST_EQ(data.woken,5u);
@@ -344,8 +352,9 @@ void test_condition_notify_all_wakes_from_wait_until_with_predicate()
         {
             boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
             data.flag=true;
-            data.cond_var.notify_all();
         }
+
+        data.cond_var.notify_all();
 
         join_all(group);
         HPX_TEST_EQ(data.woken,5u);
@@ -374,8 +383,9 @@ void test_condition_notify_all_wakes_from_relative_wait_until_with_predicate()
         {
             boost::unique_lock<hpx::lcos::local::spinlock> lock(data.mutex);
             data.flag=true;
-            data.cond_var.notify_all();
         }
+
+        data.cond_var.notify_all();
 
         join_all(group);
         HPX_TEST_EQ(data.woken,5u);
