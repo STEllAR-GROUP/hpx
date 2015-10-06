@@ -33,6 +33,21 @@ HPX_REGISTER_ACTION_ID(
     hpx::actions::primary_namespace_bulk_service_action_id)
 
 HPX_REGISTER_ACTION_ID(
+    primary_namespace::increment_credit_action,
+    primary_namespace_increment_credit_action,
+    hpx::actions::primary_namespace_increment_credit_action_id)
+
+HPX_REGISTER_ACTION_ID(
+    primary_namespace::decrement_credit_action,
+    primary_namespace_decrement_credit_action,
+    hpx::actions::primary_namespace_decrement_credit_action_id)
+
+HPX_REGISTER_ACTION_ID(
+    primary_namespace::decrement_credit_bulk_action,
+    primary_namespace_decrement_credit_bulk_action,
+    hpx::actions::primary_namespace_decrement_credit_bulk_action_id)
+
+HPX_REGISTER_ACTION_ID(
     primary_namespace::route_action,
     primary_namespace_route_action,
     hpx::actions::primary_namespace_route_action_id)
