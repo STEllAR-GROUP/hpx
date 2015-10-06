@@ -82,7 +82,11 @@ bool test_function(apex_context const& context) {
 void register_policies() {
     apex::register_periodic_policy(100000, test_function);
 
-    apex::setup_timer_throttling(std::string("thread_queue_length"), APEX_MINIMIZE_ACCUMULATED, APEX_ACTIVE_HARMONY, 200000);
+    apex::setup_timer_throttling(std::string("thread_queue_length"), 
+        APEX_MINIMIZE_ACCUMULATED, APEX_ACTIVE_HARMONY, 200000);
+
+    // to just set a power cap, do this.
+    //apex::setup_power_cap_throttling();
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
@@ -276,11 +280,11 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
-        ("nx", value<boost::uint64_t>()->default_value(10),
+        ("nx", value<boost::uint64_t>()->default_value(100000),
          "Local x dimension (of each partition)")
-        ("nt", value<boost::uint64_t>()->default_value(45),
+        ("nt", value<boost::uint64_t>()->default_value(450),
          "Number of time steps")
-        ("np", value<boost::uint64_t>()->default_value(10),
+        ("np", value<boost::uint64_t>()->default_value(1000),
          "Number of partitions")
         ("k", value<double>(&k)->default_value(0.5),
          "Heat transfer coefficient (default: 0.5)")
@@ -293,6 +297,7 @@ int main(int argc, char* argv[])
 
     hpx::register_startup_function(&setup_counters);
     hpx::register_startup_function(&register_policies);
+    hpx::register_startup_function(&apex::print_options);
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);

@@ -19,10 +19,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-static bool apex_init = false;
 static boost::shared_mutex init_mutex;
-
-#define VALUE_THROTTLING "/threadqueue{locality#0/total}/length"
 
 /* Notes on building and running Throttling scheduler
 
@@ -93,8 +90,7 @@ namespace hpx { namespace threads { namespace policies
 
         virtual ~throttle_queue_scheduler()
         {
-            if (apex_init)
-                apex::shutdown_throttling();
+            apex::shutdown_throttling();
         }
 
         static std::string get_scheduler_name()
@@ -104,31 +100,6 @@ namespace hpx { namespace threads { namespace policies
 
         bool throttle(std::size_t num_thread, std::size_t add_thread)
         {
-#ifndef VALUE_THROTTLING
-            if (HPX_UNLIKELY(!apex_init))
-            {
-                boost::unique_lock<boost::shared_mutex> l(init_mutex);
-                if(apex_init ||
-                   apex::setup_power_cap_throttling() != APEX_NOERROR)
-                {
-                    return true; // Don't throttle
-                }
-                apex_init = true;
-            }
-#else
-            if (HPX_UNLIKELY(!apex_init))
-            {
-                boost::unique_lock<boost::shared_mutex> l(init_mutex);
-                if (apex_init ||
-                   apex::setup_timer_throttling(VALUE_THROTTLING,
-                       APEX_MINIMIZE_ACCUMULATED, APEX_DISCRETE_HILL_CLIMBING,
-                       1000000) != APEX_NOERROR) {
-                    return true; // Don't throttle
-                }
-                apex_init = true;
-            }
-#endif
-
             // check if we should throttle
             std::size_t desired_active_threads = apex::get_thread_cap();
             if (num_thread < desired_active_threads)
