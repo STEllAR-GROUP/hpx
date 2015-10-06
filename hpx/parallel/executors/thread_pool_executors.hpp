@@ -40,7 +40,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     typedef threads::executors::static_queue_executor static_queue_executor;
 #endif
 
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
     /// Creates a new throttle_queue_executor
     ///
     /// \param max_punits   [in] The maximum number of processing units to
