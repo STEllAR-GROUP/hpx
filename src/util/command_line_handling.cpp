@@ -262,7 +262,7 @@ namespace hpx { namespace util
                     vm["hpx:numa-sensitive"].as<std::size_t>();
                 if (numa_sensitive > 2)
                 {
-                    throw hpx::detail::command_line_error("Invaid argument "
+                    throw hpx::detail::command_line_error("Invalid argument "
                         "value for --hpx:numa-sensitive. Allowed values are "
                         "0, 1, or 2");
                 }
@@ -787,6 +787,46 @@ namespace hpx { namespace util
         //        scheduler, switch to the 'local' scheduler instead.
         ini_config += std::string("hpx.runtime_mode=") +
             get_runtime_mode_name(mode_);
+
+        bool noshutdown_evaluate = false;
+        if (vm.count("hpx:print-counter-at")) {
+            std::vector<std::string> print_counters_at =
+                vm["hpx:print-counter-at"].as<std::vector<std::string> >();
+
+            for (std::string const& s: print_counters_at)
+            {
+                if (0 == std::string("startup").find(s))
+                {
+                    ini_config += "hpx.print_counter.startup!=1";
+                    continue;
+                }
+                if (0 == std::string("shutdown").find(s))
+                {
+                    ini_config += "hpx.print_counter.shutdown!=1";
+                    continue;
+                }
+                if (0 == std::string("noshutdown").find(s))
+                {
+                    ini_config += "hpx.print_counter.shutdown!=0";
+                    noshutdown_evaluate = true;
+                    continue;
+                }
+
+                throw hpx::detail::command_line_error(boost::str(boost::format(
+                    "Invalid argument for option --hpx:print-counter-at: "
+                    "'%1%', allowed values: 'startup', 'shutdown' (default), "
+                    "'noshutdown'") % s));
+            }
+        }
+
+        // if any counters have to be evaluated, always print at the end
+        if (vm.count("hpx:print-counter"))
+        {
+            if (!noshutdown_evaluate)
+                ini_config += "hpx.print_counter.shutdown!=1";
+            if (vm.count("hpx:reset-counters"))
+                ini_config += "hpx.print_counter.reset!=1";
+        }
 
         if (debug_clp) {
             std::cerr << "Configuration before runtime start:\n";
