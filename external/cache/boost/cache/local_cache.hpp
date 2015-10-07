@@ -112,7 +112,8 @@ namespace boost { namespace cache
         typedef typename statistics_type::update_on_exit update_on_exit;
 
         template <typename Storage>
-        static void reserve(Storage & storage, size_type size, typename Storage::key_compare * d = 0)
+        static void reserve(Storage & storage, size_type size,
+            typename Storage::key_compare * d = 0)
         {
         }
 

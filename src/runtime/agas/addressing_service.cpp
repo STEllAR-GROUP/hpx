@@ -2954,14 +2954,16 @@ void addressing_service::send_refcnt_requests_non_blocking(
               , naming::id_type::unmanaged);
 
             auto it = std::find_if(requests.begin(), requests.end(),
-                [&target](std::pair<naming::id_type, std::vector<request_type> > const & r)
+                [&target](std::pair<naming::id_type,
+                    std::vector<request_type> > const & r)
                 {
                     return r.first == target;
                 }
             );
             if(it == requests.end())
             {
-                requests.push_back(std::make_pair(target, std::vector<request_type>()));
+                requests.push_back(
+                    std::make_pair(target, std::vector<request_type>()));
                 it = --requests.end();
             }
             it->second.push_back(req);
