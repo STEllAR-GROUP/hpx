@@ -64,6 +64,10 @@ to the master branch commits since the last release.
   semantically conform to the proposed `std::latch` (see __cpp17_n4399__).
 * Added performance counters exposing data related to data transferred by
   input/output (filesystem) operations.
+* Added performance counters allowing to track the number of action invocations
+  (local and remote invocations).
+* Added new command line options [hpx_cmdline `--hpx:print-counter-at`] and
+  [hpx_cmdline `--hpx:reset-counters`].
 * The `hpx::vector` component has been renamed to `hpx::partitioned_vector` to
   make it explicit that the underlying memory is not contiguous.
 * Introduced a completely new and uniform higher-level parallelism API which is

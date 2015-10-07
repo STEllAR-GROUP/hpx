@@ -18,8 +18,9 @@
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
-#include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/include/performance_counters.hpp>
 
 #include <boost/config.hpp>
 #include <boost/bind.hpp>
@@ -245,6 +246,17 @@ namespace hpx {
         set_state(state_running);
 
         parcel_handler_.enable_alternative_parcelports();
+
+        // reset all counters right before running main, if requested
+        if (get_config_entry("hpx.print_counter.startup", "0") == "1")
+        {
+            bool reset = false;
+            if (get_config_entry("hpx.print_counter.reset", "0") == "1")
+                reset = true;
+
+            error_code ec(lightweight);     // ignore errors
+            evaluate_active_counters(reset, "startup", ec);
+        }
 
         // Now, execute the user supplied thread function (hpx_main)
         if (!!func) {

@@ -11,6 +11,7 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -174,7 +175,11 @@ namespace hpx { namespace util
 
     bool query_counters::evaluate()
     {
-        return evaluate_counters();
+        bool reset = false;
+        if (get_config_entry("hpx.print_counter.reset", "0") == "1")
+            reset = true;
+
+        return evaluate_counters(reset);
     }
 
     void query_counters::terminate()
@@ -232,7 +237,6 @@ namespace hpx { namespace util
             }
         }
     }
-
 
     void query_counters::stop_counters(error_code& ec)
     {
