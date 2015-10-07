@@ -85,6 +85,22 @@ namespace hpx { namespace actions { namespace detail
             }
         }
 
+        if (p.parameters_.empty())
+        {
+            if (mode == performance_counters::discover_counters_minimal)
+            {
+                std::string fullname;
+                performance_counters::get_counter_name(p, fullname, ec);
+                if (ec) return false;
+
+                performance_counters::counter_info cinfo = info;
+                cinfo.fullname_ = fullname;
+                return f(cinfo, ec) && !ec;
+            }
+
+            p.parameters_ = "*";
+        }
+
         if (p.parameters_.find_first_of("*?[]") != std::string::npos)
         {
             std::string str_rx(
