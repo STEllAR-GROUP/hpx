@@ -5,17 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_guard.hpp>
-#include <hpx/util/logging.hpp>
-
-#include <boost/swap.hpp>
-#include <boost/format.hpp>
 
 namespace hpx { namespace util
 {

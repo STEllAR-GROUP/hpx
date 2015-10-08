@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/concepts.hpp>
@@ -56,7 +57,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::loop_n(first, count,
                     [&f, &proj](Iter const& curr)
                     {
-                        f(proj(*curr));
+                        f(hpx::util::invoke(proj, *curr));
                     });
             }
 
@@ -76,7 +77,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             util::loop_n(part_begin, part_size,
                                 [=](Iter const& curr)
                                 {
-                                    f(proj(*curr));
+                                    f(hpx::util::invoke(proj, *curr));
                                 });
                         });
                 }
@@ -223,7 +224,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::loop(first, last,
                     [&f, &proj](Iter const& curr)
                     {
-                        f(proj(*curr));
+                        f(hpx::util::invoke(proj, *curr));
                     });
             }
 

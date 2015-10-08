@@ -352,12 +352,13 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////
-    void runtime_support::call_shutdown_functions_async(
-        naming::id_type const& gid, parcelset::endpoints_type const& endpoints)
+    void runtime_support::remove_from_connection_cache_async(
+        naming::id_type const& target, naming::gid_type const& gid,
+        parcelset::endpoints_type const& endpoints)
     {
         typedef server::runtime_support::remove_from_connection_cache_action
             action_type;
-        hpx::apply<action_type>(gid, endpoints);
+        hpx::apply<action_type>(target, gid, endpoints);
     }
 }}}
 

@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -24,9 +25,9 @@
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
+#include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/asio/io_service.hpp>
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
@@ -198,7 +199,7 @@ namespace hpx { namespace parcelset
     /// \brief Make sure the specified locality is not held by any
     /// connection caches anymore
     void parcelhandler::remove_from_connection_cache(
-        endpoints_type const& endpoints)
+        naming::gid_type const& gid, endpoints_type const& endpoints)
     {
         for (endpoints_type::value_type const& loc : endpoints)
         {
@@ -210,6 +211,9 @@ namespace hpx { namespace parcelset
                 }
             }
         }
+
+        HPX_ASSERT(resolver_);
+        resolver_->remove_resolved_locality(gid);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -301,7 +305,8 @@ namespace hpx { namespace parcelset
         naming::gid_type const& dest_gid)
     {
         HPX_ASSERT(resolver_);
-        endpoints_type const & dest_endpoints = resolver_->resolve_locality(dest_gid);
+        endpoints_type const & dest_endpoints =
+            resolver_->resolve_locality(dest_gid);
 
         for (pports_type::value_type& pp : pports_)
         {
@@ -556,21 +561,6 @@ namespace hpx { namespace parcelset
             }
         }
         return "<unknown>";
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    bool parcelhandler::enable(bool new_state)
-    {
-        new_state = enable_parcel_handling_.exchange(
-            new_state, boost::memory_order_acquire);
-
-        for (pports_type::value_type& pp : pports_)
-        {
-            if(pp.first > 0)
-                pp.second->enable(enable_parcel_handling_);
-        }
-
-        return new_state;
     }
 
     ///////////////////////////////////////////////////////////////////////////

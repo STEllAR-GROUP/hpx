@@ -6,8 +6,6 @@
 #if !defined(HPX_UTIL_BUFFER_POOL_HPP)
 #define HPX_UTIL_BUFFER_POOL_HPP
 
-#include <hpx/hpx_fwd.hpp>
-
 #include <vector>
 #include <list>
 #include <map>

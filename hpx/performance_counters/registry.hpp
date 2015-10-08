@@ -140,6 +140,12 @@ namespace hpx { namespace performance_counters
     private:
         counter_type_map_type countertypes_;
     };
+
+    namespace detail
+    {
+        std::string regex_from_pattern(std::string const& pattern,
+            error_code& ec);
+    }
 }}
 
 #endif

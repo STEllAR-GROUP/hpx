@@ -42,37 +42,34 @@ namespace hpx { namespace agas { namespace server
             cache_addresses.reserve(size);
             for (std::size_t i = 0; i != size; ++i)
             {
-                if (!addrs[i])
+                naming::gid_type gid(ids[i].get_gid());
+
+                // wait for any migration to be completed
+                wait_for_migration_locked(l, gid, ec);
+
+                cache_addresses.push_back(resolve_gid_locked(l, gid, ec));
+                resolved_type const& r = cache_addresses.back();
+
+                if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)
                 {
-                    naming::gid_type gid(ids[i].get_gid());
+                    id_type const id = ids[i];
+                    l.unlock();
 
-                    // wait for any migration to be completed
-                    wait_for_migration_locked(l, gid, ec);
+                    HPX_THROWS_IF(ec, no_success,
+                        "primary_namespace::route",
+                        boost::str(boost::format(
+                                "can't route parcel to unknown gid: %s"
+                            ) % id));
 
-                    cache_addresses.push_back(resolve_gid_locked(gid, ec));
-                    resolved_type const& r = cache_addresses.back();
-
-                    if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)
-                    {
-                        id_type const id = ids[i];
-                        l.unlock();
-
-                        HPX_THROWS_IF(ec, no_success,
-                            "primary_namespace::route",
-                            boost::str(boost::format(
-                                    "can't route parcel to unknown gid: %s"
-                                ) % id));
-
-                        return response(primary_ns_route, no_success);
-                    }
-
-                    gva const g = boost::fusion::at_c<1>(r).resolve(
-                        ids[i].get_gid(), boost::fusion::at_c<0>(r));
-
-                    addrs[i].locality_ = g.prefix;
-                    addrs[i].type_ = g.type;
-                    addrs[i].address_ = g.lva();
+                    return response(primary_ns_route, no_success);
                 }
+
+                gva const g = boost::fusion::at_c<1>(r).resolve(
+                    ids[i].get_gid(), boost::fusion::at_c<0>(r));
+
+                addrs[i].locality_ = g.prefix;
+                addrs[i].type_ = g.type;
+                addrs[i].address_ = g.lva();
             }
         }
 
@@ -103,7 +100,8 @@ namespace hpx { namespace agas { namespace server
 
                     using components::stubs::runtime_support;
                     runtime_support::update_agas_cache_entry_colocated(
-                        source, boost::fusion::at_c<0>(r), addr, g.count, g.offset);
+                        source, boost::fusion::at_c<0>(r), addr, g.count,
+                        g.offset);
                 }
             }
         }

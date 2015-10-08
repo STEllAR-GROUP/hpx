@@ -54,7 +54,6 @@ namespace hpx { namespace parcelset
         typedef policies::mpi::sender_connection connection_type;
         typedef boost::mpl::true_  send_early_parcel;
         typedef boost::mpl::true_ do_background_work;
-        typedef boost::mpl::true_ do_enable_parcel_handling;
 
         static const char * type()
         {
@@ -153,19 +152,6 @@ namespace hpx { namespace parcelset
                 MPI_Barrier(util::mpi_environment::communicator());
             }
 
-            void enable_parcel_handling(bool new_state)
-            {
-                if(!new_state)
-                {
-                    while(handles_parcels_ != 0)
-                    {
-                        if(threads::get_self_ptr())
-                            hpx::this_thread::suspend(hpx::threads::pending,
-                                "mpi::parcelport::enable");
-                    }
-                }
-            }
-
             /// Return the name of this locality
             std::string get_locality_name() const
             {
@@ -177,7 +163,7 @@ namespace hpx { namespace parcelset
             {
                 int dest_rank = l.get<locality>().rank();
                 return sender_.create_connection(
-                    dest_rank, enable_parcel_handling_, parcels_sent_);
+                    dest_rank, parcels_sent_);
             }
 
             parcelset::locality agas_locality(
@@ -202,9 +188,6 @@ namespace hpx { namespace parcelset
                     return false;
 
                 handles_parcels h(this);
-
-                if(!enable_parcel_handling_)
-                    return false;
 
                 bool has_work = sender_.background_work(num_thread);
                 has_work = receiver_.background_work(num_thread) || has_work;

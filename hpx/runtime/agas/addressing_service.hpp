@@ -215,6 +215,22 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
       , boost::int64_t compensated_credit
         );
 
+    naming::address::address_type get_primary_ns_lva() const
+    {
+        return reinterpret_cast<naming::address::address_type>(
+            is_bootstrap() ?
+                get_bootstrap_primary_ns_ptr() :
+                get_hosted_primary_ns_ptr());
+    }
+
+    naming::address::address_type get_symbol_ns_lva() const
+    {
+        return reinterpret_cast<naming::address::address_type>(
+            is_bootstrap() ?
+                get_bootstrap_symbol_ns_ptr() :
+                get_hosted_symbol_ns_ptr());
+    }
+
 protected:
     void launch_bootstrap(
         boost::shared_ptr<parcelset::parcelport> const& pp
@@ -312,6 +328,9 @@ public:
         naming::gid_type const & gid
       , error_code& ec = throws
         );
+
+    /// \brief remove given locality from locality cache
+    void remove_resolved_locality(naming::gid_type const& gid);
 
     /// \brief Get locality locality_id of the console locality.
     ///
@@ -1124,7 +1143,7 @@ public:
     void route(
         parcelset::parcel p
       , util::function_nonser<void(boost::system::error_code const&,
-            parcelset::parcel const&)> const&
+            parcelset::parcel const&)> &&
         );
 
     /// \brief Increment the global reference count for the given id

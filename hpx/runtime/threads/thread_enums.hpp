@@ -93,8 +93,6 @@ namespace hpx { namespace threads
         thread_stacksize_medium = 2,        ///< use medium sized stack size
         thread_stacksize_large = 3,         ///< use large stack size
         thread_stacksize_huge = 4,          ///< use very large stack size
-        thread_stacksize_nostack = 5,       ///< this thread does not suspend
-                                            ///< (does not need a stack)
 
         thread_stacksize_default = thread_stacksize_small,  ///< use default stack size
         thread_stacksize_minimal = thread_stacksize_small,  ///< use minimally stack size

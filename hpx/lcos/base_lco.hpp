@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_BASE_LCO_JUN_12_2008_0852PM)
 #define HPX_LCOS_BASE_LCO_JUN_12_2008_0852PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>

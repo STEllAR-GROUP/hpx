@@ -99,7 +99,6 @@ namespace hpx { namespace threads
             "medium",
             "large",
             "huge",
-            "stack-less"
         };
     }
 
@@ -117,10 +116,8 @@ namespace hpx { namespace threads
             size = thread_stacksize_large;
         else if (rtcfg.get_stack_size(thread_stacksize_huge) == size)
             size = thread_stacksize_huge;
-        else if (rtcfg.get_stack_size(thread_stacksize_nostack) == size)
-            size = thread_stacksize_nostack;
 
-        if (size < thread_stacksize_small || size > thread_stacksize_nostack)
+        if (size < thread_stacksize_small || size > thread_stacksize_huge)
             return "custom";
 
         return strings::stack_size_names[size-1];

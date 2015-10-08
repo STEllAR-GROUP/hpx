@@ -10,7 +10,7 @@
 #if !defined(HPX_E43E0AF0_8A9D_4870_8CC7_E5AD53EF4798)
 #define HPX_E43E0AF0_8A9D_4870_8CC7_E5AD53EF4798
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
 #include <boost/thread.hpp>

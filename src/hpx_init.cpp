@@ -18,6 +18,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/query_counters.hpp>
@@ -38,7 +39,6 @@
 #include <new>
 #include <memory>
 
-#include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
@@ -267,7 +267,7 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void print_counters(boost::shared_ptr<util::query_counters> const& qc)
+    void start_counters(boost::shared_ptr<util::query_counters> const& qc)
     {
         try {
             HPX_ASSERT(qc);
@@ -397,12 +397,16 @@ namespace hpx
                         boost::ref(counters), interval, destination, counter_format,
                         counter_shortnames, csv_header);
 
-                // schedule to run at shutdown
-                rt.add_pre_shutdown_function(
-                    boost::bind(&util::query_counters::evaluate, qc));
+                // schedule to print counters at shutdown, if requested
+                if (get_config_entry("hpx.print_counter.shutdown", "0") == "1")
+                {
+                    // schedule to run at shutdown
+                    rt.add_pre_shutdown_function(
+                        boost::bind(&util::query_counters::evaluate, qc));
+                }
 
                 // schedule to start all counters
-                rt.add_startup_function(boost::bind(&print_counters, qc));
+                rt.add_startup_function(boost::bind(&start_counters, qc));
 
                 // register the query_counters object with the runtime system
                 rt.register_query_counters(qc);
@@ -420,6 +424,16 @@ namespace hpx
             else if (vm.count("hpx:print-counter-format")) {
                 throw detail::command_line_error("Invalid command line option "
                     "--hpx:print-counter-format, valid in conjunction with "
+                    "--hpx:print-counter only");
+            }
+            else if (vm.count("hpx:print-counter-at")) {
+                throw detail::command_line_error("Invalid command line option "
+                    "--hpx:print-counter-at, valid in conjunction with "
+                    "--hpx:print-counter only");
+            }
+            else if (vm.count("hpx:reset-counters")) {
+                throw detail::command_line_error("Invalid command line option "
+                    "--hpx:reset-counters, valid in conjunction with "
                     "--hpx:print-counter only");
             }
         }

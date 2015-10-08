@@ -15,7 +15,7 @@
 #if !defined(HPX_UTIL_CONNECTION_CACHE_MAY_20_0104PM)
 #define HPX_UTIL_CONNECTION_CACHE_MAY_20_0104PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>

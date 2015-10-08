@@ -52,9 +52,21 @@ endforeach()
 
 # Get the include directories we need ...
 get_directory_property(_INCLUDE_DIRS INCLUDE_DIRECTORIES)
+
+# replace all characters with special regex meaning
+set(special_chars "^;+;*;?;$;.;-;|;(;);]")
+set(binarydir_escaped ${CMAKE_BINARY_DIR})
+set(sourcedir_escaped ${PROJECT_SOURCE_DIR})
+foreach(special_char ${special_chars})
+  string(REPLACE "${special_char}" "\\${special_char}" binarydir_escaped ${binarydir_escaped})
+  string(REPLACE "${special_char}" "\\${special_char}" sourcedir_escaped ${sourcedir_escaped})
+endforeach()
+
+# '[' has special meaning in lists
+string(REPLACE "[" "\\[" binarydir_escaped ${binarydir_escaped})
+string(REPLACE "[" "\\[" sourcedir_escaped ${sourcedir_escaped})
+
 foreach(dir ${_INCLUDE_DIRS})
-  string(REPLACE "++" "\\+\\+" binarydir_escaped ${CMAKE_BINARY_DIR})
-  string(REPLACE "++" "\\+\\+" sourcedir_escaped ${PROJECT_SOURCE_DIR})
   if((NOT dir MATCHES "^${binarydir_escaped}.*")
     AND (NOT dir MATCHES "^${sourcedir_escaped}.*"))
     set(_NEEDED_INCLUDE_DIRS "${_NEEDED_INCLUDE_DIRS} -I${dir}")

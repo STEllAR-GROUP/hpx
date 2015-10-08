@@ -260,6 +260,7 @@ namespace hpx { namespace actions
         template <typename Archive>
         void serialize(Archive &, unsigned)
         {}
+
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(base_action);
     };
 

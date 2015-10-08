@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/util/decay.hpp>
 

@@ -258,7 +258,7 @@ namespace hpx { namespace util
     }
 
     mpi_environment::scoped_try_lock::scoped_try_lock()
-      : locked(false)
+      : locked(true)
     {
         if(!multi_threaded())
         {

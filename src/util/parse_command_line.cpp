@@ -3,7 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -535,13 +534,21 @@ namespace hpx { namespace util
                   "print the performance counter(s) specified with --hpx:print-counter "
                   "in a given format (default: normal)")
                 ("hpx:csv-header",
-                  "print the performance counter(s) specified with --hpx:print-counter"
+                  "print the performance counter(s) specified with --hpx:print-counter "
                   "with header when format specified with --hpx:print-counter-format"
                   "is csv or csv-short")
                 ("hpx:no-csv-header",
-                  "print the performance counter(s) specified with --hpx:print-counter"
+                  "print the performance counter(s) specified with --hpx:print-counter "
                   "without header when format specified with --hpx:print-counter-format"
                   "is csv or csv-short")
+                ("hpx:print-counter-at",
+                    value<std::vector<std::string> >()->composing(),
+                  "print the performance counter(s) specified with "
+                  "--hpx:print-counter at the given point in time, possible "
+                  "argument values: 'startup', 'shutdown' (default), 'noshutdown'")
+                ("hpx:reset-counters",
+                  "reset the performance counter(s) specified with --hpx:print-counter "
+                  "after they have been evaluated")
             ;
 
             hidden_options.add_options()

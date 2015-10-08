@@ -3,21 +3,22 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <map>
+#include <hpx/exception.hpp>
+#include <hpx/config/asio.hpp>
+#include <hpx/util/parse_command_line.hpp>
+#include <hpx/util/thread_mapper.hpp>
+#include <hpx/components/papi/util/papi.hpp>
 
 #include <boost/format.hpp>
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/generator_iterator.hpp>
 
-#include <hpx/exception.hpp>
-#include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/thread_mapper.hpp>
-#include <hpx/components/papi/util/papi.hpp>
+#include <map>
 
 #define NS_STR "hpx::performance_counters::papi::util::"
 

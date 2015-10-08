@@ -125,10 +125,10 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        typedef util::tuple<thread_data_base*, boost::uint64_t>
+        typedef util::tuple<thread_data*, boost::uint64_t>
             thread_description;
 #else
-        typedef thread_data_base thread_description;
+        typedef thread_data thread_description;
 #endif
 
         typedef typename PendingQueuing::template
@@ -138,7 +138,7 @@ namespace hpx { namespace threads { namespace policies
             apply<task_description*>::type task_items_type;
 
         typedef typename TerminatedQueuing::template
-            apply<thread_data_base*>::type terminated_items_type;
+            apply<thread_data*>::type terminated_items_type;
 
     protected:
         template <typename Lock>
@@ -146,6 +146,7 @@ namespace hpx { namespace threads { namespace policies
             threads::thread_init_data& data, thread_state_enum state, Lock& lk)
         {
             HPX_ASSERT(lk.owns_lock());
+            HPX_ASSERT(data.stacksize != 0);
 
             std::ptrdiff_t stacksize = data.stacksize;
 
@@ -167,10 +168,6 @@ namespace hpx { namespace threads { namespace policies
             {
                 heap = &thread_heap_huge_;
             }
-            else if (stacksize == get_stack_size(thread_stacksize_nostack))
-            {
-                heap = &thread_heap_nostack_;
-            }
             else {
                 switch(stacksize) {
                 case thread_stacksize_small:
@@ -187,10 +184,6 @@ namespace hpx { namespace threads { namespace policies
 
                 case thread_stacksize_huge:
                     heap = &thread_heap_huge_;
-                    break;
-
-                case thread_stacksize_nostack:
-                    heap = &thread_heap_nostack_;
                     break;
 
                 default:
@@ -213,12 +206,8 @@ namespace hpx { namespace threads { namespace policies
                 hpx::util::unlock_guard<Lock> ull(lk);
 
                 // Allocate a new thread object.
-                if (data.stacksize != 0)
-                    thrd.reset(new (memory_pool_) threads::thread_data(
-                        data, memory_pool_, state));
-                else
-                    thrd.reset(new threads::stackless_thread_data(
-                        data, &memory_pool_, state));
+                thrd = threads::thread_data::create(
+                    data, memory_pool_, state);
             }
         }
 
@@ -280,7 +269,7 @@ namespace hpx { namespace threads { namespace policies
 
                 // this thread has to be in the map now
                 HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
-                HPX_ASSERT(thrd->is_created_from(&memory_pool_));
+                HPX_ASSERT(thrd->get_pool() == &memory_pool_);
             }
 
             if (added) {
@@ -391,10 +380,6 @@ namespace hpx { namespace threads { namespace policies
             {
                 thread_heap_huge_.push_front(thrd);
             }
-            else if (stacksize == get_stack_size(thread_stacksize_nostack))
-            {
-                thread_heap_nostack_.push_front(thrd);
-            }
             else
             {
                 switch(stacksize) {
@@ -412,10 +397,6 @@ namespace hpx { namespace threads { namespace policies
 
                 case thread_stacksize_huge:
                     thread_heap_huge_.push_front(thrd);
-                    break;
-
-                case thread_stacksize_nostack:
-                    thread_heap_nostack_.push_front(thrd);
                     break;
 
                 default:
@@ -442,7 +423,7 @@ namespace hpx { namespace threads { namespace policies
 
             if (delete_all) {
                 // delete all threads
-                thread_data_base* todelete;
+                thread_data* todelete;
                 while (terminated_items_.pop(todelete))
                 {
                     --terminated_items_count_;
@@ -465,7 +446,7 @@ namespace hpx { namespace threads { namespace policies
                         static_cast<boost::int64_t>(terminated_items_count_ / 10),
                         static_cast<boost::int64_t>(max_delete_count));
 
-                thread_data_base* todelete;
+                thread_data* todelete;
                 while (delete_count && terminated_items_.pop(todelete))
                 {
                     --terminated_items_count_;
@@ -552,7 +533,6 @@ namespace hpx { namespace threads { namespace policies
             thread_heap_medium_(),
             thread_heap_large_(),
             thread_heap_huge_(),
-            thread_heap_nostack_(),
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
             add_new_time_(0),
             cleanup_terminated_time_(0),
@@ -730,7 +710,7 @@ namespace hpx { namespace threads { namespace policies
 
                     // this thread has to be in the map now
                     HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
-                    HPX_ASSERT(thrd->is_created_from(&memory_pool_));
+                    HPX_ASSERT(thrd->get_pool() == &memory_pool_);
 
                     // push the new thread in the pending queue thread
                     if (initial_state == pending)
@@ -814,7 +794,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if non is
         /// available
-        bool get_next_thread(threads::thread_data_base*& thrd,
+        bool get_next_thread(threads::thread_data*& thrd,
             bool steal = false) HPX_HOT
         {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
@@ -847,7 +827,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data_base* thrd, bool other_end = false)
+        void schedule_thread(threads::thread_data* thrd, bool other_end = false)
         {
             ++work_items_count_;
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
@@ -859,9 +839,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
+        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
         {
-            if (thrd->is_created_from(&memory_pool_))
+            if (thrd->get_pool() == &memory_pool_)
             {
                 terminated_items_.push(thrd);
 
@@ -1030,7 +1010,6 @@ namespace hpx { namespace threads { namespace policies
         std::list<thread_id_type> thread_heap_medium_;
         std::list<thread_id_type> thread_heap_large_;
         std::list<thread_id_type> thread_heap_huge_;
-        std::list<thread_id_type> thread_heap_nostack_;
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         boost::uint64_t add_new_time_;

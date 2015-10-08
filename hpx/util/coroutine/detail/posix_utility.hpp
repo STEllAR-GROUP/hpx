@@ -52,6 +52,8 @@
 #include <sys/mman.h>
 #include <sys/param.h>
 #include <errno.h>
+
+#include <stdexcept>
 #endif
 
 #if defined(__FreeBSD__)

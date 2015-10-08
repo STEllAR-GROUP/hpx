@@ -237,7 +237,7 @@ namespace hpx { namespace parcelset
             enqueue_parcel(
                 dest, std::move(p), std::move(f), std::move(future_await->new_gids_));
 
-            if (trigger && enable_parcel_handling_)
+            if (trigger)
             {
                 get_connection_and_send_parcels(dest);
             }
@@ -274,10 +274,7 @@ namespace hpx { namespace parcelset
                     false);
             }
 
-            if (enable_parcel_handling_)
-            {
-                get_connection_and_send_parcels(locality_id);
-            }
+            get_connection_and_send_parcels(locality_id);
         }
 
         void send_early_parcel(locality const & dest, parcel p)
@@ -348,16 +345,6 @@ namespace hpx { namespace parcelset
             threads::set_thread_state(id,
                 boost::chrono::milliseconds(100), threads::pending,
                 threads::wait_signaled, threads::thread_priority_boost, ec);
-        }
-
-        /// Temporarily enable/disable all parcel handling activities in the
-        /// parcelport
-        void enable(bool new_state)
-        {
-            enable_parcel_handling_ = new_state;
-            do_enable_parcel_handling_impl<ConnectionHandler>(new_state);
-            if (new_state)
-                trigger_pending_work();
         }
 
         /// Return the name of this locality
@@ -482,28 +469,6 @@ namespace hpx { namespace parcelset
         do_background_work_impl(std::size_t)
         {
             return false;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ConnectionHandler_>
-        typename boost::enable_if<
-            typename connection_handler_traits<
-                ConnectionHandler_
-            >::do_enable_parcel_handling
-        >::type
-        do_enable_parcel_handling_impl(bool new_state)
-        {
-            connection_handler().enable_parcel_handling(new_state);
-        }
-
-        template <typename ConnectionHandler_>
-        typename boost::disable_if<
-            typename connection_handler_traits<
-                ConnectionHandler_
-            >::do_enable_parcel_handling
-        >::type
-        do_enable_parcel_handling_impl(bool new_state)
-        {
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -666,9 +631,6 @@ namespace hpx { namespace parcelset
             new_gids_map & new_gids)
         {
             typedef pending_parcels_map::iterator iterator;
-
-            if (!enable_parcel_handling_)
-                return false;
 
             {
                 boost::lock_guard<lcos::local::spinlock> l(mtx_);
@@ -924,8 +886,7 @@ namespace hpx { namespace parcelset
             if(threads::get_self_ptr())
             {
                 num_thread = hpx::get_worker_thread_num();
-                while(do_background_work(num_thread))
-                    ;
+                do_background_work(num_thread);
             }
         }
 

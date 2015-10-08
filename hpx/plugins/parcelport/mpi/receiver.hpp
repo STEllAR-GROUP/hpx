@@ -31,17 +31,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef
             receiver_connection
             connection_type;
-        typedef std::unique_ptr<connection_type> connection_ptr;
+        typedef std::shared_ptr<connection_type> connection_ptr;
         typedef std::list<connection_ptr> connection_list;
 
         receiver(parcelport & pp, memory_pool_type & chunk_pool)
           : pp_(pp)
           , chunk_pool_(chunk_pool)
-          , max_connections_(16)
         {}
 
         void run()
         {
+            util::mpi_environment::scoped_lock l;
             new_header();
         }
 
@@ -49,44 +49,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             // We accept as many connections as we can ...
             connection_list connections;
-            while(true)
-            {
-                connection_ptr rcv = accept();
-                if(rcv)
-                {
-                    if(!rcv->receive(num_thread))
-                    {
-                        boost::unique_lock<mutex_type> l(connections_mtx_);
-                        connections.push_back(std::move(rcv));
-                        if(connections.size() > max_connections_)
-                            break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-
             {
                 boost::unique_lock<mutex_type> l(connections_mtx_);
-                if(!connections_.empty())
-                {
-                    if(connections.empty())
-                    {
-                        std::swap(connections, connections_);
-                    }
-                    else
-                    {
-                        connections.insert(
-                            connections.end()
-                          , std::make_move_iterator(connections_.begin())
-                          , std::make_move_iterator(connections_.end())
-                        );
-                        connections_.clear();
-                    }
-                }
+                std::swap(connections, connections_);
             }
+
+            connection_ptr rcv;
+            do
+            {
+                rcv = accept();
+                if(rcv && !rcv->receive())
+                {
+                    connections.push_back(rcv);
+                }
+            } while(rcv);
+            rcv.reset();
 
             if(!connections.empty())
             {
@@ -101,36 +78,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             connection_list connections
         )
         {
-            // Handle all receives
-            for(connection_list::iterator it = connections.begin();
-                it != connections.end();)
-            {
-                connection_type & rcv = **it;
-                if(rcv.receive())
-                {
-                    it = connections.erase(it);
-                }
-                else
-                {
-                    ++it;
-                }
-            }
+            // We try to handle all receives
+            connection_list::iterator end = std::remove_if(
+                connections.begin()
+              , connections.end()
+              , [](connection_ptr & rcv) -> bool
+              {
+                    return rcv->receive();
+              }
+            );
 
-            if(!connections.empty())
+            // If some are still in progress, give them back
+//             if(end != connections.end())
             {
                 boost::unique_lock<mutex_type> l(connections_mtx_);
-                if(connections_.empty())
-                {
-                    std::swap(connections, connections_);
-                }
-                else
-                {
-                    connections_.insert(
-                        connections_.end()
-                      , std::make_move_iterator(connections.begin())
-                      , std::make_move_iterator(connections.end())
-                    );
-                }
+                connections_.insert(
+                    connections_.end()
+                  , std::make_move_iterator(connections.begin())
+                  , std::make_move_iterator(end)
+                );
             }
         }
 
@@ -139,14 +105,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             boost::unique_lock<mutex_type> l(headers_mtx_, boost::try_to_lock);
             if(l)
                 return accept_locked(l);
-            return std::unique_ptr<connection_type>();
+            return connection_ptr();
         }
 
         connection_ptr accept_locked(boost::unique_lock<mutex_type> & header_lock)
         {
+            connection_ptr res;
             util::mpi_environment::scoped_try_lock l;
 
-            connection_ptr res;
             if(l.locked)
             {
                 MPI_Status status;
@@ -198,8 +164,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         mutex_type connections_mtx_;
         connection_list connections_;
-
-        std::size_t max_connections_;
 
         bool request_done_locked(MPI_Request & r, MPI_Status *status)
         {

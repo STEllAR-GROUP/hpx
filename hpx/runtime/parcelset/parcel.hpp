@@ -368,7 +368,7 @@ namespace hpx { namespace parcelset
 
         bool does_termination_detection() const
         {
-            return action_->does_termination_detection();
+            return action_ ? action_->does_termination_detection() : false;
         }
 
         // generate unique parcel id
