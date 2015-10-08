@@ -111,6 +111,19 @@ namespace boost { namespace cache
 
         typedef typename statistics_type::update_on_exit update_on_exit;
 
+        template <typename Storage>
+        static void reserve(Storage & storage, size_type size,
+            typename Storage::key_compare * d = 0)
+        {
+        }
+
+        template <typename Storage>
+        static auto reserve(Storage & storage, size_type size)
+         -> decltype(storage.reserve(size))
+        {
+            storage.reserve(size);
+        }
+
     public:
         ///////////////////////////////////////////////////////////////////////
         /// \brief Construct an instance of a local_cache.
@@ -134,7 +147,9 @@ namespace boost { namespace cache
                 insert_policy_type const& ip = insert_policy_type())
           : max_size_(max_size), current_size_(0),
             update_policy_(up), insert_policy_(ip)
-        {}
+        {
+            reserve(store_, max_size);
+        }
 
         local_cache(local_cache&& other)
           : max_size_(other.max_size_)

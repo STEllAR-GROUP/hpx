@@ -20,16 +20,18 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
-#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
 #include <boost/cache/local_cache.hpp>
 #include <boost/cache/statistics/local_full_statistics.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/icl/closed_interval.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 // TODO: split into a base class and two implementations (one for bootstrap,
@@ -40,6 +42,86 @@ namespace hpx { namespace util
 {
     class runtime_configuration;
 }}
+
+namespace hpx { namespace agas { namespace detail
+{
+struct gva_cache_key
+{ // {{{ gva_cache_key implementation
+  private:
+    typedef boost::icl::closed_interval<naming::gid_type, std::less>
+        key_type;
+
+    key_type key_;
+
+  public:
+    gva_cache_key()
+      : key_()
+    {}
+
+    explicit gva_cache_key(
+        naming::gid_type const& id_
+      , boost::uint64_t count_ = 1
+        )
+      : key_(naming::detail::get_stripped_gid(id_)
+           , naming::detail::get_stripped_gid(id_) + (count_ - 1))
+    {
+        HPX_ASSERT(count_);
+    }
+
+    naming::gid_type get_gid() const
+    {
+        return boost::icl::lower(key_);
+    }
+
+    boost::uint64_t get_count() const
+    {
+        naming::gid_type const size = boost::icl::length(key_);
+        HPX_ASSERT(size.get_msb() == 0);
+        return size.get_lsb();
+    }
+
+    friend bool operator<(
+        gva_cache_key const& lhs
+      , gva_cache_key const& rhs
+        )
+    {
+        return boost::icl::exclusive_less(lhs.key_, rhs.key_);
+    }
+
+    friend bool operator==(
+        gva_cache_key const& lhs
+      , gva_cache_key const& rhs
+        )
+    {
+        // Is lhs in rhs?
+        if (1 == lhs.get_count() && 1 != rhs.get_count())
+            return boost::icl::contains(rhs.key_, lhs.key_);
+
+        // Is rhs in lhs?
+        else if (1 != lhs.get_count() && 1 == rhs.get_count())
+            return boost::icl::contains(lhs.key_, rhs.key_);
+
+        // Direct hit
+        return lhs.key_ == rhs.key_;
+    }
+}; // }}}
+}}}
+
+namespace std
+{
+    // specialize std::hash for hpx::agas::detail::gva_cache_key
+    template <>
+    struct hash<hpx::agas::detail::gva_cache_key>
+    {
+        typedef hpx::agas::detail::gva_cache_key argument_type;
+        typedef std::size_t result_type;
+
+        result_type operator()(argument_type const& key) const
+        {
+            return std::hash<hpx::naming::gid_type>()(key.get_gid());
+        }
+    };
+}
 
 namespace hpx { namespace agas
 {
@@ -65,7 +147,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     // }}}
 
     // {{{ gva cache
-    struct gva_cache_key;
+    typedef detail::gva_cache_key gva_cache_key;
     struct gva_erase_policy;
     typedef boost::cache::entries::lfu_entry<gva> gva_entry_type;
 
@@ -73,19 +155,19 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         gva_cache_key, gva_entry_type,
         std::less<gva_entry_type>,
         boost::cache::policies::always<gva_entry_type>,
-        std::map<gva_cache_key, gva_entry_type>,
+        std::unordered_map<gva_cache_key, gva_entry_type>,
         boost::cache::statistics::local_full_statistics
     > gva_cache_type;
     // }}}
 
     typedef std::set<naming::gid_type> migrated_objects_table_type;
-    typedef std::map<naming::gid_type, boost::int64_t> refcnt_requests_type;
+    typedef std::unordered_map<naming::gid_type, boost::int64_t> refcnt_requests_type;
 
     struct bootstrap_data_type;
     struct hosted_data_type;
 
     mutable cache_mutex_type gva_cache_mtx_;
-    boost::shared_ptr<gva_cache_type> gva_cache_;
+    gva_cache_type gva_cache_;
     migrated_objects_table_type migrated_objects_table_;
 
     mutable mutex_type console_cache_mtx_;
@@ -97,7 +179,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     std::size_t refcnt_requests_count_;
     bool enable_refcnt_caching_;
 
-    boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
+    refcnt_requests_type refcnt_requests_;
 
     service_mode const service_type;
     runtime_mode const runtime_type;
@@ -269,7 +351,7 @@ private:
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
-    std::vector<hpx::future<std::vector<response> > >
+    std::vector<hpx::future<std::vector<boost::int64_t> > >
     send_refcnt_requests_async(
         boost::unique_lock<mutex_type>& l
         );

@@ -34,6 +34,7 @@
 #endif
 
 #include <map>
+#include <unordered_map>
 
 namespace hpx { namespace agas
 {
@@ -121,7 +122,7 @@ struct HPX_EXPORT primary_namespace
 
     typedef std::pair<gva, naming::gid_type> gva_table_data_type;
     typedef std::map<naming::gid_type, gva_table_data_type> gva_table_type;
-    typedef std::map<naming::gid_type, boost::int64_t> refcnt_table_type;
+    typedef std::unordered_map<naming::gid_type, boost::int64_t> refcnt_table_type;
 
     typedef boost::fusion::vector3<naming::gid_type, gva, naming::gid_type>
         resolved_type;
@@ -239,10 +240,8 @@ struct HPX_EXPORT primary_namespace
     /// Dump the credit counts of all matching ranges. Expects that \p l
     /// is locked.
     void dump_refcnt_matches(
-        refcnt_table_type::iterator lower_it
-      , refcnt_table_type::iterator upper_it
-      , naming::gid_type const& lower
-      , naming::gid_type const& upper
+        refcnt_table_type::iterator it
+      , naming::gid_type const& gid
       , boost::unique_lock<mutex_type>& l
       , const char* func_name
         );
@@ -339,14 +338,17 @@ struct HPX_EXPORT primary_namespace
       , error_code& ec = throws
         );
 
-    response increment_credit(
-        request const& req
-      , error_code& ec = throws
+    boost::int64_t increment_credit(
+        naming::gid_type gid, boost::int64_t credits
         );
 
-    response decrement_credit(
-        request const& req
-      , error_code& ec = throws
+    boost::int64_t decrement_credit(
+        naming::gid_type gid
+      , boost::int64_t credit
+        );
+
+    std::vector<boost::int64_t> decrement_credit_bulk(
+        std::vector<std::pair<naming::gid_type, boost::int64_t> > request
         );
 
     response allocate(
@@ -367,15 +369,16 @@ struct HPX_EXPORT primary_namespace
         );
 
     void increment(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
+        naming::gid_type const& gid
       , boost::int64_t& credits
-      , error_code& ec
         );
 
     ///////////////////////////////////////////////////////////////////////////
     struct free_entry
     {
+        free_entry()
+        {}
+
         free_entry(agas::gva gva, naming::gid_type const& gid,
                 naming::gid_type const& loc)
           : gva_(gva), gid_(gid), locality_(loc)
@@ -386,28 +389,18 @@ struct HPX_EXPORT primary_namespace
         naming::gid_type locality_;
     };
 
-    void resolve_free_list(
+    free_entry resolve_free(
         boost::unique_lock<mutex_type>& l
-      , std::list<refcnt_table_type::iterator> const& free_list
-      , std::list<free_entry>& free_entry_list
-      , naming::gid_type const& lower
-      , naming::gid_type const& upper
-      , error_code& ec
+      , refcnt_table_type::iterator free_it
         );
 
-    void decrement_sweep(
-        std::list<free_entry>& free_list
-      , naming::gid_type const& lower
-      , naming::gid_type const& upper
+    free_entry decrement_sweep(
+        naming::gid_type const& gid
       , boost::int64_t credits
-      , error_code& ec
         );
 
     void free_components_sync(
-        std::list<free_entry>& free_list
-      , naming::gid_type const& lower
-      , naming::gid_type const& upper
-      , error_code& ec
+        free_entry const & entry
         );
 
   public:
@@ -435,6 +428,12 @@ struct HPX_EXPORT primary_namespace
         bulk_service_action);
 
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route, route_action);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, increment_credit,
+        increment_credit_action);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, decrement_credit,
+        decrement_credit_action);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, decrement_credit_bulk,
+        decrement_credit_bulk_action);
 
     static parcelset::policies::message_handler* get_message_handler(
         parcelset::parcelhandler* ph
@@ -460,6 +459,18 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::route_action,
     primary_namespace_route_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::increment_credit_action,
+    primary_namespace_decrement_credit_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::decrement_credit_action,
+    primary_namespace_decrement_credit_action)
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::decrement_credit_bulk_action,
+    primary_namespace_decrement_credit_bulk_action)
 
 namespace hpx { namespace traits
 {
