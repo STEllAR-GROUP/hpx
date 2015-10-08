@@ -216,11 +216,7 @@ namespace hpx { namespace parcelset
             addrs_(std::move(other.addrs_)),
             cont_(std::move(other.cont_)),
             action_(std::move(other.action_))
-       {
-            HPX_ASSERT(action_.get());
-       }
-
-        ~parcel() {}
+        {}
 
         parcel &operator=(parcel && other)
         {
@@ -230,7 +226,6 @@ namespace hpx { namespace parcelset
             addrs_ = std::move(other.addrs_);
             cont_ = std::move(other.cont_);
             action_ = std::move(other.action_);
-            HPX_ASSERT(action_.get());
             return *this;
         }
 
