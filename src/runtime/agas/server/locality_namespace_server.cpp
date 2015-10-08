@@ -463,9 +463,36 @@ response locality_namespace::free(
         if (primary_)
         {
             l.unlock();
-            request req(primary_ns_unbind_gid, locality, 0);
-            response resp = primary_->service(req, ec);
-            if (ec) return resp;
+
+            boost::uint32_t locality_id =
+                naming::get_locality_id_from_gid(locality);
+
+            // remove primary namespace
+            {
+                naming::gid_type service(HPX_AGAS_PRIMARY_NS_MSB,
+                    HPX_AGAS_PRIMARY_NS_LSB);
+                request req(primary_ns_unbind_gid,
+                    naming::replace_locality_id(service, locality_id), 1);
+                response resp = primary_->service(req, ec);
+                if (ec) return resp;
+            }
+
+            // remove symbol namespace
+            {
+                naming::gid_type service(HPX_AGAS_SYMBOL_NS_MSB,
+                    HPX_AGAS_SYMBOL_NS_LSB);
+                request req(primary_ns_unbind_gid,
+                    naming::replace_locality_id(service, locality_id), 1);
+                response resp = primary_->service(req, ec);
+                if (ec) return resp;
+            }
+
+            // remove locality itself
+            {
+                request req(primary_ns_unbind_gid, locality, 0);
+                response resp = primary_->service(req, ec);
+                if (ec) return resp;
+            }
         }
 
         /*

@@ -1831,7 +1831,7 @@ bool addressing_service::resolve_cached(
 ///////////////////////////////////////////////////////////////////////////////
 void addressing_service::route(
     parcelset::parcel p
-  , util::function_nonser<void(boost::system::error_code const&,
+  , util::unique_function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> && f
     )
 {

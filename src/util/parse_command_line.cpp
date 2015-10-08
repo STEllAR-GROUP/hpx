@@ -405,6 +405,9 @@ namespace hpx { namespace util
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
                 ("hpx:ignore-batch-env", "ignore batch environment variables")
+                ("hpx:expect-connecting-localities",
+                  "this locality expects other localities to dynamically connect "
+                  "(implied if the number of initial localities is larger than 1)")
 #if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
