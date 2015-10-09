@@ -512,25 +512,9 @@ namespace hpx { namespace util
         std::string hpx_host =
             cfgmap.get_value<std::string>("hpx.parcel.address",
                 env.host_name(HPX_INITIAL_IP_ADDRESS));
-
-        // we expect dynamic connections if:
-        //  - --hpx:expect-connecting-localities or
-        //  - hpx.expect_connecting_localities=1 is given, or
-        //  - num_localities > 1
-        bool expect_connections =
-            cfgmap.get_value<int>("hpx.expect_connecting_localities",
-                num_localities_ > 1 ? 0 : 1) ? true : false;
-
-        if (vm.count("hpx:expect-connecting-localities"))
-            expect_connections = true;
-
-        ini_config += std::string("hpx.expect_connecting_localities=") +
-            (expect_connections ? "1" : "0");
-
         boost::uint16_t hpx_port =
             cfgmap.get_value<boost::uint16_t>("hpx.parcel.port",
-                (num_localities_ == 1 && !expect_connections) ?
-                    0 : HPX_INITIAL_IP_PORT);
+                num_localities_ == 1 ? 0 : HPX_INITIAL_IP_PORT);
 
         bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))

@@ -42,9 +42,5 @@ int main(int argc, char* argv[])
           "time to wait before this application exits ([s], default: 600)")
         ;
 
-    // we expect other localities to connect
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.expect_connecting_localities=1");
-
-    return hpx::init(desc_commandline, argc, argv, cfg);
+    return hpx::init(desc_commandline, argc, argv);
 }

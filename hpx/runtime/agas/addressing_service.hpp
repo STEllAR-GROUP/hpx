@@ -19,7 +19,6 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/unique_function.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
@@ -1143,7 +1142,7 @@ public:
     ///                   destination.
     void route(
         parcelset::parcel p
-      , util::unique_function_nonser<void(boost::system::error_code const&,
+      , util::function_nonser<void(boost::system::error_code const&,
             parcelset::parcel const&)> &&
         );
 

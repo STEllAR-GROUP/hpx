@@ -282,38 +282,36 @@ namespace hpx { namespace lcos { namespace local
             }
 
             // synchronous execution
-            template <typename ...Ts>
-            void invoke(boost::mpl::false_, Ts&&... vs)
+            template <typename F>
+            void invoke(F&& f, boost::mpl::false_, error_code& ec = throws)
             {
-                if (function_.empty())
-                {
-                    HPX_THROW_EXCEPTION(no_state,
+                if (function_.empty()) {
+                    HPX_THROWS_IF(ec, no_state,
                         "packaged_task_base<Signature>::get_future",
                         "this packaged_task has no valid shared state");
                     return;
                 }
 
                 try {
-                    promise_.set_value(function_(std::forward<Ts>(vs)...));
+                    promise_.set_value(f());
                 }
                 catch(...) {
                     promise_.set_exception(boost::current_exception());
                 }
             }
 
-            template <typename ...Ts>
-            void invoke(boost::mpl::true_, Ts&&... vs)
+            template <typename F>
+            void invoke(F&& f, boost::mpl::true_, error_code& ec = throws)
             {
-                if (function_.empty())
-                {
-                    HPX_THROW_EXCEPTION(no_state,
+                if (function_.empty()) {
+                    HPX_THROWS_IF(ec, no_state,
                         "packaged_task_base<Signature>::get_future",
                         "this packaged_task has no valid shared state");
                     return;
                 }
 
                 try {
-                    function_(std::forward<Ts>(vs)...);
+                    f();
                     promise_.set_value();
                 }
                 catch(...) {
@@ -402,10 +400,11 @@ namespace hpx { namespace lcos { namespace local
             base_type::swap(other);
         }
 
-        template <typename ... Vs>
-        void operator()(Vs&&... vs)
+        void operator()(Ts... vs)
         {
-            base_type::invoke(boost::is_void<R>(), std::forward<Vs>(vs)...);
+            base_type::invoke(
+                util::deferred_call(this->function_, std::forward<Ts>(vs)...),
+                boost::is_void<R>());
         }
 
         // result retrieval

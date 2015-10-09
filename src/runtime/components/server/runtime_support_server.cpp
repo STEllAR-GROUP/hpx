@@ -39,7 +39,6 @@
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/reduce.hpp>
 #endif
-#include <hpx/lcos/local/packaged_task.hpp>
 
 #include <hpx/util/assert.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -140,13 +139,6 @@ namespace hpx
 {
     // helper function to stop evaluating counters during shutdown
     void stop_evaluating_counters();
-
-    namespace parcelset
-    {
-        // default parcel-sent handler function
-        void default_write_handler(boost::system::error_code const& ec,
-            parcelset::parcel const& p);
-    }
 }
 
 namespace hpx { namespace components
@@ -1236,22 +1228,11 @@ namespace hpx { namespace components { namespace server
         typedef server::runtime_support::remove_from_connection_cache_action
             action_type;
 
-        typedef void write_handler_type(
-            boost::system::error_code const&, parcelset::parcel const&);
-
-        std::vector<future<void> > callbacks;
-        callbacks.reserve(locality_ids.size());
-
         action_type act;
         for (naming::id_type const& id : locality_ids)
         {
-            lcos::local::packaged_task<write_handler_type> pt(
-                &parcelset::default_write_handler);
-            callbacks.push_back(pt.get_future());
-            apply_cb(act, id, std::move(pt), hpx::get_locality(), rt->endpoints());
+            apply(act, id, hpx::get_locality(), rt->endpoints());
         }
-
-        wait_all(callbacks);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -137,12 +137,11 @@ namespace hpx { namespace util
 #endif
 #ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
 #ifdef HPX_DEBUG
-            "minimal_deadlock_detection = ${HPX_MINIMAL_DEADLOCK_DETECTION:1}",
+            "minimal_deadlock_detection = ${MINIMAL_DEADLOCK_DETECTION:1}",
 #else
-            "minimal_deadlock_detection = ${HPX_MINIMAL_DEADLOCK_DETECTION:0}",
+            "minimal_deadlock_detection = ${MINIMAL_DEADLOCK_DETECTION:0}",
 #endif
 #endif
-            "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
             // add placeholders for keys to be added by command line handling
             "os_threads = 1",

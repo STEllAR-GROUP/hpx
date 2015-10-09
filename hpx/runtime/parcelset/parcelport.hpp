@@ -16,7 +16,6 @@
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/unique_function.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/locks.hpp>
@@ -59,13 +58,9 @@ namespace hpx { namespace parcelset
         friend struct agas::big_boot_barrier;
 
     public:
-        typedef util::unique_function_nonser<
-            void(boost::system::error_code const&, parcel const&)
-        > write_handler_type;
-
         typedef util::function_nonser<
             void(boost::system::error_code const&, parcel const&)
-        > global_write_handler_type;
+        > write_handler_type;
 
         typedef util::function_nonser<
             void(parcelport& pp, boost::shared_ptr<std::vector<char> >,
