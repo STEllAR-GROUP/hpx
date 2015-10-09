@@ -72,7 +72,6 @@ namespace hpx { namespace parcelset
 
         typedef parcelport::read_handler_type read_handler_type;
         typedef parcelport::write_handler_type write_handler_type;
-        typedef parcelport::global_write_handler_type global_write_handler_type;
 
         /// Construct a new \a parcelhandler initializing it from a AGAS client
         /// instance (parameter \a resolver) and the parcelport to be used for
@@ -321,7 +320,7 @@ namespace hpx { namespace parcelset
         void invoke_write_handler(
             boost::system::error_code const& ec, parcel const & p) const
         {
-            global_write_handler_type f;
+            write_handler_type f;
             {
                 boost::lock_guard<mutex_type> l(mtx_);
                 f = write_handler_;
@@ -329,7 +328,7 @@ namespace hpx { namespace parcelset
             f(ec, p);
         }
 
-        global_write_handler_type set_write_handler(global_write_handler_type f)
+        write_handler_type set_write_handler(write_handler_type f)
         {
             boost::lock_guard<mutex_type> l(mtx_);
             std::swap(f, write_handler_);
@@ -402,7 +401,7 @@ namespace hpx { namespace parcelset
         /// global exception handler for unhandled exceptions thrown from the
         /// parcel layer
         mutable mutex_type mtx_;
-        global_write_handler_type write_handler_;
+        write_handler_type write_handler_;
 
     private:
         static std::vector<plugins::parcelport_factory_base *> &

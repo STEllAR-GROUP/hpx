@@ -13,7 +13,7 @@ namespace hpx { namespace parcelset { namespace policies
 {
     struct message_handler
     {
-        typedef util::unique_function_nonser<
+        typedef util::function_nonser<
             void(boost::system::error_code const&, parcel const&)
         > write_handler_type;
 

@@ -120,6 +120,27 @@ namespace hpx
         inline bool
         put_parcel_cb(naming::id_type const& id, naming::address&& addr,
             threads::thread_priority priority,
+            parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
+        {
+            typedef
+                typename hpx::actions::extract_action<Action>::type
+                action_type;
+
+            parcelset::parcelhandler& ph =
+                hpx::applier::get_applier().get_parcel_handler();
+
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
+                action_type(), priority, std::forward<Ts>(vs)...);
+
+            ph.put_parcel(std::move(p), cb);
+
+            return false;     // destinations are remote
+        }
+
+        template <typename Action, typename ...Ts>
+        inline bool
+        put_parcel_cb(naming::id_type const& id, naming::address&& addr,
+            threads::thread_priority priority,
             parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
         {
             typedef
@@ -133,6 +154,29 @@ namespace hpx
                 action_type(), priority, std::forward<Ts>(vs)...);
 
             ph.put_parcel(std::move(p), std::move(cb));
+
+            return false;     // destinations are remote
+        }
+
+        template <typename Action, typename Continuation, typename ...Ts>
+        inline bool
+        put_parcel_cont_cb(naming::id_type const& id,
+            naming::address&& addr, threads::thread_priority priority,
+            Continuation && cont,
+            parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
+        {
+            typedef
+                typename hpx::actions::extract_action<Action>::type
+                action_type;
+
+            parcelset::parcelhandler& ph =
+                hpx::applier::get_applier().get_parcel_handler();
+
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
+                std::forward<Continuation>(cont),
+                action_type(), priority, std::forward<Ts>(vs)...);
+
+            ph.put_parcel(std::move(p), cb);
 
             return false;     // destinations are remote
         }

@@ -1225,6 +1225,32 @@ namespace hpx { namespace components { namespace server
         return true;
     }
 
+    // working around non-copy-ability of packaged_task
+    struct indirect_packaged_task
+    {
+        typedef void write_handler_type(
+            boost::system::error_code const&, parcelset::parcel const&);
+        typedef lcos::local::packaged_task<write_handler_type> packaged_task_type;
+
+        indirect_packaged_task()
+          : pt(boost::make_shared<packaged_task_type>(
+                &parcelset::default_write_handler))
+        {}
+
+        hpx::future<void> get_future()
+        {
+            return pt->get_future();
+        }
+
+        template <typename ...Ts>
+        void operator()(Ts&& ... vs)
+        {
+            (*pt)(std::forward<Ts>(vs)...);
+        }
+
+        boost::shared_ptr<packaged_task_type> pt;
+    };
+
     void runtime_support::remove_here_from_connection_cache()
     {
         runtime* rt = get_runtime_ptr();
@@ -1236,19 +1262,15 @@ namespace hpx { namespace components { namespace server
         typedef server::runtime_support::remove_from_connection_cache_action
             action_type;
 
-        typedef void write_handler_type(
-            boost::system::error_code const&, parcelset::parcel const&);
-
         std::vector<future<void> > callbacks;
         callbacks.reserve(locality_ids.size());
 
         action_type act;
         for (naming::id_type const& id : locality_ids)
         {
-            lcos::local::packaged_task<write_handler_type> pt(
-                &parcelset::default_write_handler);
-            callbacks.push_back(pt.get_future());
-            apply_cb(act, id, std::move(pt), hpx::get_locality(), rt->endpoints());
+            indirect_packaged_task ipt;
+            callbacks.push_back(ipt.get_future());
+            apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
         }
 
         wait_all(callbacks);
