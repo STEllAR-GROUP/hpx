@@ -274,7 +274,7 @@ hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
 
 if(NOT (${HPX_WITH_MAX_CPU_COUNT} LESS 65))
   set(HPX_WITH_MORE_THAN_64_THREADS_DEFAULT OFF)
-  hpx_option(HPX_WITH_MORE_THAN_64_THREADS STRING
+  hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
     "HPX applications will be able to run on more than 64 cores"
     ${HPX_WITH_MORE_THAN_64_THREADS_DEFAULT}
     CATEGORY "Thread Manager" ADVANCED)
