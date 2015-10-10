@@ -412,7 +412,8 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_HAVE_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
-  if(HPX_WITH_APEX)
+  # The throttle scheduler is not supported neither on Windows nor on Mac
+  if(HPX_WITH_APEX AND NOT WIN32 AND NOT APPLE)
     if(_scheduler STREQUAL "THROTTLE" OR _all)
       hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
       set(HPX_HAVE_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
@@ -491,9 +492,9 @@ if(HPX_WITH_GOOGLE_PERFTOOLS)
   hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
 endif()
 hpx_option(HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
-if(HPX_WITH_ITTNOTIFY)
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
-endif()
+#if(HPX_WITH_ITTNOTIFY)
+  #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+#endif()
 
 ## Debugging related build options
 hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")
@@ -1118,7 +1119,7 @@ if(HPX_WITH_APEX)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
     master
-    NO_UPDATE VERBOSE)
+    VERBOSE)
 
   LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
   add_subdirectory(apex/src/apex)
@@ -1130,7 +1131,6 @@ if(HPX_WITH_APEX)
   endif()
 
   include_directories(${APEX_SOURCE_DIR})
-  hpx_add_config_define(HPX_HAVE_APEX 1)
   set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
       ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} apex_lib)
   if(APEX_WITH_MSR)

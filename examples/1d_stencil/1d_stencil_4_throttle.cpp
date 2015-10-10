@@ -1,6 +1,5 @@
 //  Copyright (c) 2014 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
-//  Copyright (c) 2015 Oregon University
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,30 +18,26 @@
 #include <hpx/hpx.hpp>
 
 #include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/include/performance_counters.hpp>
-
 #include <boost/range/irange.hpp>
+
+#include "print_time_results.hpp"
+#include <hpx/include/performance_counters.hpp>
+#include <hpx/include/actions.hpp>
+#include <hpx/include/util.hpp>
+
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-#include <limits>
-#include <algorithm>
-
 #include <apex_api.hpp>
-
-#include "print_time_results.hpp"
 
 using hpx::naming::id_type;
 using hpx::performance_counters::get_counter;
 using hpx::performance_counters::stubs::performance_counter;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::status_is_valid;
-
 static bool counters_initialized = false;
-static const char * counter_name = "/threads{locality#%d/total}/idle-rate";
-static apex_event_type end_iteration_event = APEX_CUSTOM_EVENT_1;
-static hpx::naming::id_type counter_id;
-
+static const char * counter_name = "/threadqueue{locality#%d/total}/length";
+hpx::naming::id_type counter_id;
 
 id_type get_counter_id() {
     // Resolve the GID of the performances counter using it's symbolic name.
@@ -61,33 +56,41 @@ void setup_counters() {
         performance_counter::start(id);
         std::cout << "Counters initialized! " << id << std::endl;
         counter_value value = performance_counter::get_value(id);
-        std::cout << "Idle Rate " << value.get_value<boost::int64_t>() << std::endl;
+        std::cout << "Active threads " << value.get_value<int>() << std::endl;
         counter_id = id;
-        end_iteration_event = apex::register_custom_event("Repartition");
     }
     catch(hpx::exception const& e) {
-        std::cerr << "apex_policy_engine_active_thread_count: caught exception: "
+        std::cerr
+            << "apex_policy_engine_active_thread_count: caught exception: "
             << e.what() << std::endl;
-        counter_id = hpx::naming::invalid_id;
-        return;
     }
     counters_initialized = true;
 }
 
-double get_idle_rate() {
+bool test_function(apex_context const& context) {
     if (!counters_initialized) return false;
     try {
-        counter_value value1 = performance_counter::get_value(counter_id, true);
-        boost::int64_t idle_rate = value1.get_value<boost::int64_t>();
-        std::cerr << "idle rate " << idle_rate << std::endl;
-        return (double)(idle_rate);
+        counter_value value1 = performance_counter::get_value(counter_id);
+        apex::sample_value("thread_queue_length", value1.get_value<int>());
+        return APEX_NOERROR;
     }
     catch(hpx::exception const& e) {
-        std::cerr << "get_idle_rate(): caught exception: " << e.what() << std::endl;
-        return (std::numeric_limits<double>::max)();
+        std::cerr
+            << "apex_policy_engine_active_thread_count: caught exception: "
+            << e.what() << std::endl;
+        return APEX_ERROR;
     }
 }
 
+void register_policies() {
+    apex::register_periodic_policy(100000, test_function);
+
+    apex::setup_timer_throttling(std::string("thread_queue_length"),
+        APEX_MINIMIZE_ACCUMULATED, APEX_ACTIVE_HARMONY, 200000);
+
+    // to just set a power cap, do this.
+    //apex::setup_power_cap_throttling();
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
 bool header = true; // print csv heading
@@ -125,15 +128,6 @@ public:
             data_[i] = base_value + double(i);
     }
 
-    partition_data(std::size_t size, std::vector<double> const& other,
-            std::size_t base_idx)
-      : data_(new double[size]),
-        size_(size)
-    {
-        for(std::size_t i = 0; i != size; ++i)
-            data_[i] = other[base_idx+i];
-    }
-
     partition_data(partition_data && other)
       : data_(std::move(other.data_))
       , size_(other.size_)
@@ -141,12 +135,6 @@ public:
 
     double& operator[](std::size_t idx) { return data_[idx]; }
     double operator[](std::size_t idx) const { return data_[idx]; }
-
-    void copy_into_array(std::vector<double>& a, std::size_t base_idx) const
-    {
-        for(std::size_t i = 0; i != size(); ++i)
-            a[base_idx+i] = data_[i];
-    }
 
     std::size_t size() const { return size_; }
 
@@ -178,7 +166,7 @@ struct stepper
     typedef std::vector<partition> space;
 
     // Our operator
-    static inline double heat(double left, double middle, double right)
+    static double heat(double left, double middle, double right)
     {
         return middle + (k*dt/dx*dx) * (left - 2*middle + right);
     }
@@ -205,8 +193,7 @@ struct stepper
 
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
     // time steps
-    hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt,
-        std::vector<double>& data)
+    hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt)
     {
         using hpx::lcos::local::dataflow;
         using hpx::util::unwrapped;
@@ -216,32 +203,16 @@ struct stepper
         for (space& s: U)
             s.resize(np);
 
-        if (data.empty()) {
-            // Initial conditions: f(0, i) = i
-            std::size_t b = 0;
-            auto range = boost::irange(b, np);
-            using hpx::parallel::par;
-            hpx::parallel::for_each(
-                par, boost::begin(range), boost::end(range),
-                [&U, nx](std::size_t i)
-                {
-                    U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
-                }
-            );
-        }
-        else {
-            // Initialize from existing data
-            std::size_t b = 0;
-            auto range = boost::irange(b, np);
-            using hpx::parallel::par;
-            hpx::parallel::for_each(
-                par, boost::begin(range), boost::end(range),
-                [&U, nx, data](std::size_t i)
-                {
-                    U[0][i] = hpx::make_ready_future(partition_data(nx, data, i*nx));
-                }
-            );
-        }
+        // Initial conditions: f(0, i) = i
+        std::size_t b = 0;
+        auto range = boost::irange(b, np);
+        using hpx::parallel::par;
+        hpx::parallel::for_each(par, boost::begin(range), boost::end(range),
+            [&U, nx](std::size_t i)
+            {
+                U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
+            }
+        );
 
         auto Op = unwrapped(&stepper::heat_part);
 
@@ -268,90 +239,37 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    /* Number of partitions dynamically determined
-    // Number of partitions.
-    // boost::uint64_t np = vm["np"].as<boost::uint64_t>();
-    */
-
-    // Number of grid points.
-    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();
-    // Number of steps.
-    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();
-    // Number of runs (repartition between runs).
-    boost::uint64_t nr = vm["nr"].as<boost::uint64_t>();
+    boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
+    boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
+    boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
 
     if (vm.count("no-header"))
         header = false;
 
-    // Find divisors of nx
-    std::vector<boost::uint64_t> divisors;
-    for(boost::uint64_t i = 1; i < std::sqrt(nx); ++i) {
-        if(nx % i == 0) {
-            divisors.push_back(i);
-            divisors.push_back(nx/i);
-        }
-    }
-    divisors.push_back(static_cast<boost::uint64_t>(std::sqrt(nx)));
-    std::sort(divisors.begin(), divisors.end());
-
-    // Set up APEX tuning
-    // The tunable parameter -- how many partitions to divide data into
-    long np_index = 1;
-    long * tune_params[1] = { 0L };
-    long num_params = 1;
-    long mins[1]  = { 0 };
-    long maxs[1]  = { (long)divisors.size() };
-    long steps[1] = { 1 };
-    tune_params[0] = &np_index;
-    apex::setup_custom_tuning(get_idle_rate, end_iteration_event, num_params,
-            tune_params, mins, maxs, steps);
 
     // Create the stepper object
     stepper step;
-    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
-    std::vector<double> data;
-    for(boost::uint64_t i = 0; i < nr; ++i)
+    // Measure execution time.
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+
+    // Execute nt time steps on nx grid points and print the final solution.
+    hpx::future<stepper::space> result = step.do_work(np, nx, nt);
+
+    stepper::space solution = result.get();
+    hpx::wait_all(solution);
+
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
+    // Print the final solution
+    if (vm.count("results"))
     {
-        boost::uint64_t parts = divisors[np_index];
-        boost::uint64_t size_per_part = nx / parts;
-        boost::uint64_t total_size = parts * size_per_part;
-
-        //std::cerr << "parts: " << parts << " Per part: " << size_per_part
-        //std::cerr << " Overall: " << total_size << std::endl;
-
-        // Measure execution time.
-        boost::uint64_t t = hpx::util::high_resolution_clock::now();
-
-        // Execute nt time steps on nx grid points and print the final solution.
-        hpx::future<stepper::space> result =
-            step.do_work(parts, size_per_part, nt, data);
-
-        stepper::space solution = result.get();
-        hpx::wait_all(solution);
-
-        boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
-
-        // Get new partition size
-        apex::custom_event(end_iteration_event, 0);
-
-        // Gather data together
-        data.resize(total_size);
-        for(boost::uint64_t partition = 0; partition != parts; ++partition) {
-            solution[partition].get().copy_into_array(
-                data, partition*size_per_part);
-        }
-
-        // Print the final solution
-        if (vm.count("results"))
-        {
-            for (boost::uint64_t i = 0; i != parts; ++i)
-                std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
-        }
-
-        print_time_results(os_thread_count, elapsed, size_per_part, parts, nt, header);
-        header = false; // only print header once
+        for (std::size_t i = 0; i != np; ++i)
+            std::cout << "U[" << i << "] = " << solution[i].get() << std::endl;
     }
+
+    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+    print_time_results(os_thread_count, elapsed, nx, np, nt, header);
 
     return hpx::finalize();
 }
@@ -365,12 +283,12 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ("results", "print generated results (default: false)")
-        ("nx", value<boost::uint64_t>()->default_value(10),
+        ("nx", value<boost::uint64_t>()->default_value(100000),
          "Local x dimension (of each partition)")
-        ("nt", value<boost::uint64_t>()->default_value(45),
+        ("nt", value<boost::uint64_t>()->default_value(450),
          "Number of time steps")
-        ("nr", value<boost::uint64_t>()->default_value(10),
-         "Number of runs")
+        ("np", value<boost::uint64_t>()->default_value(1000),
+         "Number of partitions")
         ("k", value<double>(&k)->default_value(0.5),
          "Heat transfer coefficient (default: 0.5)")
         ("dt", value<double>(&dt)->default_value(1.0),
@@ -381,6 +299,8 @@ int main(int argc, char* argv[])
     ;
 
     hpx::register_startup_function(&setup_counters);
+    hpx::register_startup_function(&register_policies);
+    hpx::register_startup_function(&apex::print_options);
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);

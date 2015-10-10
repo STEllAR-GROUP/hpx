@@ -78,7 +78,7 @@ namespace hpx
             class HPX_EXPORT static_queue_scheduler;
 #endif
 
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
             // single priority scheduler with work-stealing and throttling
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo

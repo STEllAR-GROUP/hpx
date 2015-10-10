@@ -20,6 +20,7 @@ set(example_programs
 if(HPX_WITH_APEX)
   set(example_programs ${example_programs}
       1d_stencil_4_repart
+      1d_stencil_4_throttle
      )
 endif()
 

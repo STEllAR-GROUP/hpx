@@ -3,10 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#pragma once // prevent multiple inclusions of this header file.
+
 #include <hpx/config/defines.hpp>
 
 #ifdef HPX_HAVE_APEX
-#include <apex.hpp>
 #include "apex_api.hpp"
 #endif
 
