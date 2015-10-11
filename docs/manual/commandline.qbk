@@ -152,7 +152,7 @@ described in the table below:
     [[`--hpx:no-csv-header`][print the performance counter(s) specified with
         `--hpx:print-counter` and `csv` or `csv-short` format specified with
         `--hpx:print-counter-format` without header]]
-    [[`--hpx:print-counter-at arg`][print the performance counter(s)
+    [[`--hpx:printer-counter-at arg`][print the performance counter(s)
         specified with `--hpx:print-counter` at the given point in time,
         possible argument values: `startup`, `shutdown` (default), `noshutdown`]]
     [[`--hpx:reset-counters`][reset the performance counter(s) specified with

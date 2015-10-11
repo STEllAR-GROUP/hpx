@@ -155,7 +155,7 @@ namespace hpx { namespace threads { namespace executors
     };
 #endif
 
-#if defined(HPX_HAVE_THROTTLE_SCHEDULER)
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
     struct HPX_EXPORT throttle_queue_executor : public scheduled_executor
     {
         throttle_queue_executor();

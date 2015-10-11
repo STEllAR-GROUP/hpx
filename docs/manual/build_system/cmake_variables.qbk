@@ -109,6 +109,7 @@ The options are split into these categories:
 
 [#build_system.cmake_variables.Thread_Manager][h3 Thread Manager Options]
 * [link build_system.cmake_variables.HPX_WITH_MAX_CPU_COUNT HPX_WITH_MAX_CPU_COUNT]
+* [link build_system.cmake_variables.HPX_WITH_MORE_THAN_64_THREADS HPX_WITH_MORE_THAN_64_THREADS]
 * [link build_system.cmake_variables.HPX_WITH_SCHEDULER_LOCAL_STORAGE HPX_WITH_SCHEDULER_LOCAL_STORAGE]
 * [link build_system.cmake_variables.HPX_WITH_STACKTRACES HPX_WITH_STACKTRACES]
 * [link build_system.cmake_variables.HPX_WITH_SWAP_CONTEXT_EMULATION HPX_WITH_SWAP_CONTEXT_EMULATION]
@@ -128,6 +129,7 @@ The options are split into these categories:
 
 [variablelist
         [[[#build_system.cmake_variables.HPX_WITH_MAX_CPU_COUNT] `HPX_WITH_MAX_CPU_COUNT:STRING`][HPX applications will not use more that this number of OS-Threads (default: 64)]]
+        [[[#build_system.cmake_variables.HPX_WITH_MORE_THAN_64_THREADS] `HPX_WITH_MORE_THAN_64_THREADS:STRING`][HPX applications will be able to run on more than 64 cores]]
         [[[#build_system.cmake_variables.HPX_WITH_SCHEDULER_LOCAL_STORAGE] `HPX_WITH_SCHEDULER_LOCAL_STORAGE:BOOL`][Enable scheduler local storage for all HPX schedulers (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_STACKTRACES] `HPX_WITH_STACKTRACES:BOOL`][Attach backtraces to HPX exceptions (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_SWAP_CONTEXT_EMULATION] `HPX_WITH_SWAP_CONTEXT_EMULATION:BOOL`][Emulate SwapContext API for coroutines (default: OFF)]]
