@@ -33,6 +33,9 @@
 
 namespace hpx { namespace parcelset
 {
+    // default callback for put_parcel
+    void default_write_handler(boost::system::error_code const&,
+        parcel const& p);
 
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
@@ -40,10 +43,6 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcelhandler : boost::noncopyable
     {
     private:
-        // default callback for put_parcel
-        static void default_write_handler(boost::system::error_code const&,
-            parcel const& p);
-
         void parcel_sink(parcel const& p);
 
         threads::thread_state_enum decode_parcel(

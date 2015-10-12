@@ -16,6 +16,7 @@
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/function.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/locks.hpp>

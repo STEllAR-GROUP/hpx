@@ -19,6 +19,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/function.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
