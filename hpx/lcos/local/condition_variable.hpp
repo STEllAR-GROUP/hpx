@@ -39,7 +39,6 @@ namespace hpx { namespace lcos { namespace local
 
         void notify_all(error_code& ec = throws)
         {
-            util::ignore_all_while_checking ignore_lock;
             boost::unique_lock<mutex_type> l(mtx_);
             cond_.notify_all(std::move(l), ec);
         }
@@ -47,8 +46,8 @@ namespace hpx { namespace lcos { namespace local
         template <class Lock>
         void wait(Lock& lock, error_code& ec = throws)
         {
-            util::ignore_all_while_checking ignore_lock;
             boost::unique_lock<mutex_type> l(mtx_);
+            util::ignore_while_checking<boost::unique_lock<mutex_type> > il(&l);
             util::unlock_guard<Lock> unlock(lock);
 
             cond_.wait(l, ec);
@@ -70,8 +69,8 @@ namespace hpx { namespace lcos { namespace local
         wait_until(Lock& lock, util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
-            util::ignore_all_while_checking ignore_lock;
             boost::unique_lock<mutex_type> l(mtx_);
+            util::ignore_while_checking<boost::unique_lock<mutex_type> > il(&l);
             util::unlock_guard<Lock> unlock(lock);
 
             threads::thread_state_ex_enum const reason =
