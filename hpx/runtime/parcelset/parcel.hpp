@@ -126,6 +126,12 @@ namespace hpx { namespace parcelset
             return true;
         }
 #endif
+#else
+        // Only used in debug mode.
+        bool is_valid() const
+        {
+            return true;
+        }
 #endif
 
     public:
