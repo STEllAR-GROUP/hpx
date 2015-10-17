@@ -147,7 +147,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         // re-add the remaining items to the original queue
         template <typename Mutex>
-        void prepend_entries(boost::unique_lock<Mutex> lock, queue_type& queue)
+        void prepend_entries(boost::unique_lock<Mutex>& lock, queue_type& queue)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
@@ -180,7 +180,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                     if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
                     {
-                        prepend_entries(std::move(lock), queue);
+                        prepend_entries(lock, queue);
+                        lock.unlock();
 
                         HPX_THROWS_IF(ec, null_thread_id,
                             "condition_variable::notify_all",
@@ -188,21 +189,17 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         return;
                     }
 
-                    // unlock while notifying thread as this can suspend
                     error_code local_ec;
-
-                    {
-                        util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
-
-                        threads::set_thread_state(threads::thread_id_type(
-                                reinterpret_cast<threads::thread_data*>(id)),
-                            threads::pending, threads::wait_signaled,
-                            threads::thread_priority_default, local_ec);
-                    }
+                    threads::set_thread_state(threads::thread_id_type(
+                            reinterpret_cast<threads::thread_data*>(id)),
+                        threads::pending, threads::wait_signaled,
+                        threads::thread_priority_default, local_ec);
 
                     if (local_ec)
                     {
-                        prepend_entries(std::move(lock), queue);
+                        prepend_entries(lock, queue);
+                        lock.unlock();
+
                         if (&ec != &throws)
                         {
                             ec = std::move(local_ec);
