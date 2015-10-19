@@ -8,7 +8,9 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "apple_macro_check.hpp"
+#include "function_hyper.hpp"
 #include <functional>
+#include <string>
 #include "boost/regex.hpp"
 #include "boost/lexical_cast.hpp"
 #include "boost/filesystem/operations.hpp"
@@ -89,6 +91,7 @@ namespace boost
               }
           }
 
+          std::string lineloc = linelink(full_path, std::to_string(line_number));
           ++errors;
           error( library_name, full_path,
             "Apple macro clash: " + std::string((*cur)[0].first, (*cur)[0].second-1),

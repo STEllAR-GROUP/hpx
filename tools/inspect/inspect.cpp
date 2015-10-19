@@ -28,12 +28,14 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include <iostream>
 #include <fstream>
 #include <limits>
+#include <string>
 
 #include "boost/shared_ptr.hpp"
 #include "boost/lexical_cast.hpp"
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/fstream.hpp"
 #include "boost/program_options.hpp"
+#include "function_hyper.hpp"
 
 #include <stdio.h>  // for popen, pclose
 #if defined(_MSC_VER)
@@ -444,6 +446,13 @@ namespace
       case '&':
         result += "&amp;";
         break;
+        //† and ‡ are used to force html formatting when needed, as these obscure ascii characters are practically unused
+      case '†':
+          result += "<";
+          break;
+      case '‡':
+          result += ">";
+          break;
       default:
         result += *it;
       }
@@ -520,7 +529,7 @@ namespace
         {
           if ( !first ) out << "</pre>\n";
           out << "\n<h3><a name=\"" << itr->library
-                    << "\">" << itr->library << "</a></h3>\n<pre>";
+              << "\">" << itr->library << "</a></h3>\n<pre>";
         }
         if ( current.library != itr->library
           || current.rel_path != itr->rel_path )
@@ -543,7 +552,12 @@ namespace
 
           // print the message
           if (itr->line_number)
-            out << sep << "(line " << itr->line_number << ") " << html_encode(itr->msg);
+          {
+              string line = std::to_string(itr->line_number);
+              const path & full_path = itr->library;
+              string link = linelink(full_path, line);
+              out << sep << "(line " << link << ") " << html_encode(itr->msg);
+          }
           else out << sep << html_encode(itr->msg);
 
           first_sep = false;

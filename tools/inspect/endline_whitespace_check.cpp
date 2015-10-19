@@ -7,6 +7,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "endline_whitespace_check.hpp"
+#include "function_hyper.hpp"
 #include <iostream>
 #include <functional>
 #include <string>
@@ -15,6 +16,7 @@
 #include "boost/regex.hpp"
 #include "boost/lexical_cast.hpp"
 #include "boost/filesystem/operations.hpp"
+
 
 using namespace std;
 namespace fs = boost::filesystem;
@@ -95,7 +97,7 @@ namespace boost
             p = 0;
             while (p < lineorder.size())
             {
-                total += lineorder[p];
+                total += linelink(full_path, lineorder[p]);  //linelink is located in function_hyper.hpp
                 if (p < lineorder.size() - 1)
                 {
                     total += ", ";
@@ -104,7 +106,7 @@ namespace boost
             }
             if (errors > 0)
             {
-                string errored = "Endline Whitespace*: " + total;
+                string errored = "*Endline Whitespace*: " + total;
                 error(library_name, full_path, errored);
                 ++m_files_with_errors;
             }
