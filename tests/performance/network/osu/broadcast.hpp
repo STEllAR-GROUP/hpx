@@ -4,8 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/util/bind_action.hpp>
-
-#include <boost/thread/locks.hpp>
+#include <utility>
 
 #define HPX_DEFINE_COMPONENT_BROADCAST(NAME, TYPE)                              \
     void BOOST_PP_CAT(NAME, _)(TYPE const & value)                              \
@@ -86,7 +85,7 @@ namespace hpx { namespace lcos
             else
             {
                 {
-                    boost::lock_guard<mutex_type> lk(mtx);
+                    mutex_type::scoped_lock lk(mtx);
                     bcast_future = bcast_gate.get_future(1);
 
                     ready_promise.set_value();
@@ -102,7 +101,7 @@ namespace hpx { namespace lcos
         {
             hpx::wait_all(ready_future);
             {
-                boost::lock_guard<mutex_type> lk(mtx);
+                mutex_type::scoped_lock lk(mtx);
                 recv_value = v;
                 bcast_gate.set(0);
                 ready_future = ready_promise.get_future();

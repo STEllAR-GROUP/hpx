@@ -64,6 +64,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "unnamed_namespace_check.hpp"
 #include "endline_whitespace_check.hpp"
 #include "length_check.hpp"
+#include "preferred_namespace_check.hpp"
 
 //#include "cvs_iterator.hpp"
 
@@ -819,6 +820,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     bool unnamed_ck = false;
     bool whitespace_ck = false;
     bool length_ck = false;
+    bool pref_name_ck = false;
 
     desc_commandline.add_options()
         ("help,h", "print some command line help")
@@ -859,6 +861,8 @@ int cpp_main( int argc_param, char * argv_param[] )
             "check for endline whitespace violations (default: off)")
         ("length", value<bool>(&length_ck)->implicit_value(false),
             "check for exceeding character limit (default: off)")
+        ("prefspace", value<bool>(&pref_name_ck)->implicit_value(false),
+            "check for namespace violations (default: off)")
 
         ("all,a", "check for all violations (default: no checks are performed)")
         ;
@@ -934,6 +938,7 @@ int cpp_main( int argc_param, char * argv_param[] )
         unnamed_ck = true;
         whitespace_ck = true;
         length_ck = true;
+        pref_name_ck = true;
     }
 
     std::string output_path("-");
@@ -975,6 +980,8 @@ int cpp_main( int argc_param, char * argv_param[] )
       inspectors.push_back( inspector_element( new boost::inspect::whitespace_check) );
   if ( length_ck)
       inspectors.push_back(inspector_element ( new boost::inspect::length_check(limit)) );
+  if (pref_name_ck)
+      inspectors.push_back(inspector_element(new boost::inspect::preferred_namespace_check));
 
   //// perform the actual inspection, using the requested type of iteration
     for(auto const& search_root: search_roots)

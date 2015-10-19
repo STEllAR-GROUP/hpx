@@ -12,6 +12,7 @@
 #include <hpx/include/serialization.hpp>
 
 #include <vector>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 const std::size_t vsize_default = 1024*1024;

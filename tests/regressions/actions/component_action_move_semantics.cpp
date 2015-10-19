@@ -11,6 +11,8 @@
 
 #include <boost/assign/std/vector.hpp>
 
+#include <utility>
+
 #include <tests/regressions/actions/components/action_move_semantics.hpp>
 #include <tests/regressions/actions/components/movable_objects.hpp>
 
@@ -29,7 +31,7 @@ std::size_t pass_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::async<Action>(test.get_id(), obj).get();
+    return hpx::async<Action>(test.get_gid(), obj).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,7 +45,7 @@ std::size_t move_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::async<Action>(test.get_id(), std::move(obj)).get();
+    return hpx::async<Action>(test.get_gid(), std::move(obj)).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,7 +56,7 @@ std::size_t return_object(hpx::naming::id_type id)
 
     action_move_semantics test = action_move_semantics::create(id);
 
-    Object obj(hpx::async<Action>(test.get_id()).get());
+    Object obj(hpx::async<Action>(test.get_gid()).get());
     return obj.get_count();
 }
 
@@ -66,7 +68,7 @@ std::size_t return_move_object(hpx::naming::id_type id)
 
     action_move_semantics test = action_move_semantics::create(id);
 
-    Object obj(std::move(hpx::async<Action>(test.get_id()).move_out()));
+    Object obj(std::move(hpx::async<Action>(test.get_gid()).move_out()));
     return obj.get_count();
 }
 

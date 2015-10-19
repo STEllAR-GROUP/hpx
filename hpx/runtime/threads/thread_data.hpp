@@ -32,6 +32,7 @@
 #include <boost/lockfree/stack.hpp>
 
 #include <stack>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 

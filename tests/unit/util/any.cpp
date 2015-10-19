@@ -14,6 +14,8 @@
 
 #include <boost/any.hpp>
 
+#include <utility>
+
 #include "small_big_object.hpp"
 
 using boost::program_options::variables_map;
