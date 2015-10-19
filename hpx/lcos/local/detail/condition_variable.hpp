@@ -48,7 +48,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         typedef boost::intrusive::slist<
             queue_entry, slist_option_type,
             boost::intrusive::cache_last<true>,
-            boost::intrusive::constant_time_size<false>
+            boost::intrusive::constant_time_size<true>
         > queue_type;
 
         struct reset_queue_entry
@@ -133,7 +133,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 lock.unlock();
 
                 threads::set_thread_state(threads::thread_id_type(
-                    reinterpret_cast<threads::thread_data*>(id)),
+                        reinterpret_cast<threads::thread_data*>(id)),
                     threads::pending, threads::wait_signaled,
                     threads::thread_priority_default, ec);
                 return not_empty;
@@ -143,6 +143,17 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 ec = make_success_code();
 
             return false;
+        }
+
+        // re-add the remaining items to the original queue
+        template <typename Mutex>
+        void prepend_entries(boost::unique_lock<Mutex>& lock, queue_type& queue)
+        {
+            HPX_ASSERT_OWNS_LOCK(lock);
+
+            // splice is constant time only if it == end
+            queue.splice(queue.end(), queue_);
+            queue_.swap(queue);
         }
 
         template <typename Mutex>
@@ -169,6 +180,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                     if (HPX_UNLIKELY(id == threads::invalid_thread_id_repr))
                     {
+                        prepend_entries(lock, queue);
                         lock.unlock();
 
                         HPX_THROWS_IF(ec, null_thread_id,
@@ -177,14 +189,28 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         return;
                     }
 
-                    // unlock while notifying thread as this can suspend
-                    util::unlock_guard<boost::unique_lock<Mutex> > unlock(lock);
-
+                    error_code local_ec;
                     threads::set_thread_state(threads::thread_id_type(
-                        reinterpret_cast<threads::thread_data*>(id)),
+                            reinterpret_cast<threads::thread_data*>(id)),
                         threads::pending, threads::wait_signaled,
-                        threads::thread_priority_default, ec);
-                    if (ec) return;
+                        threads::thread_priority_default, local_ec);
+
+                    if (local_ec)
+                    {
+                        prepend_entries(lock, queue);
+                        lock.unlock();
+
+                        if (&ec != &throws)
+                        {
+                            ec = std::move(local_ec);
+                        }
+                        else
+                        {
+                            boost::rethrow_exception(
+                                hpx::detail::access_exception(local_ec));
+                        }
+                        return;
+                    }
 
                 } while (!queue.empty());
             }
