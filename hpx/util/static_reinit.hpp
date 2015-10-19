@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_STATIC_REINIT_OCT_25_2012_0921AM)
 #define HPX_UTIL_STATIC_REINIT_OCT_25_2012_0921AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/function.hpp>
 
 namespace hpx { namespace util

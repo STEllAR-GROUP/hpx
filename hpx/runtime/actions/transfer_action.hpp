@@ -10,13 +10,13 @@
 #if !defined(HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_NOV_14_2008_0711PM)
 #define HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_NOV_14_2008_0711PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/invocation_count_registry.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
@@ -37,6 +37,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/atomic.hpp>
 
 #include <memory>
 
@@ -274,7 +275,8 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            data.parent_id = reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
 #endif
             data.priority = priority_;
@@ -297,7 +299,8 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-            data.parent_id = reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
 #endif
             data.priority = priority_;
@@ -310,10 +313,12 @@ namespace hpx { namespace actions
         // schedule a new thread
         void schedule_thread(naming::id_type const& target,
             naming::address::address_type lva,
-            threads::thread_state_enum initial_state)
+            threads::thread_state_enum initial_state,
+            std::size_t num_thread)
         {
             std::unique_ptr<continuation> cont;
             threads::thread_init_data data;
+            data.num_os_thread = num_thread;
             if (traits::action_decorate_continuation<derived_type>::call(cont))
             {
                 traits::action_schedule_thread<derived_type>::call(lva,
@@ -325,19 +330,28 @@ namespace hpx { namespace actions
                 traits::action_schedule_thread<derived_type>::call(lva,
                     get_thread_init_data(target, lva, data), initial_state);
             }
+
+            // keep track of number of invocations
+            increment_invocation_count();
         }
 
         void schedule_thread(std::unique_ptr<continuation> cont,
             naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_state_enum initial_state)
+            threads::thread_state_enum initial_state,
+            std::size_t num_thread)
         {
             // first decorate the continuation
             traits::action_decorate_continuation<derived_type>::call(cont);
 
             // now, schedule the thread
             threads::thread_init_data data;
+            data.num_os_thread = num_thread;
             traits::action_schedule_thread<derived_type>::call(lva,
-                get_thread_init_data(std::move(cont), target, lva, data), initial_state);
+                get_thread_init_data(std::move(cont), target, lva, data),
+                initial_state);
+
+            // keep track of number of invocations
+            increment_invocation_count();
         }
 
         /// Return a pointer to the filter to be used while serializing an
@@ -378,7 +392,7 @@ namespace hpx { namespace actions
         // loading ...
         void serialize(hpx::serialization::input_archive & ar)
         {
-            serialization::serialize_sequence(ar, arguments_);
+            ar >> arguments_;
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
@@ -398,7 +412,7 @@ namespace hpx { namespace actions
         // saving ...
         void serialize(hpx::serialization::output_archive & ar)
         {
-            serialization::serialize_sequence(ar, arguments_);
+            ar << arguments_;
 
             // Always serialize the parent information to maintain binary
             // compatibility on the wire.
@@ -422,6 +436,12 @@ namespace hpx { namespace actions
         HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(
             transfer_action, detail::get_action_name<derived_type>());
 
+        /// Extract the current invocation count for this action
+        static boost::int64_t get_invocation_count(bool reset)
+        {
+            return util::get_and_reset_value(invocation_count_, reset);
+        }
+
     private:
         static boost::uint32_t get_locality_id()
         {
@@ -439,7 +459,33 @@ namespace hpx { namespace actions
 #endif
         threads::thread_priority priority_;
         threads::thread_stacksize stacksize_;
+
+    private:
+        static boost::atomic<boost::int64_t> invocation_count_;
+
+    protected:
+        static void increment_invocation_count()
+        {
+            ++invocation_count_;
+        }
     };
+
+    template <typename Action>
+    boost::atomic<boost::int64_t>
+        transfer_action<Action>::invocation_count_(0);
+
+    namespace detail
+    {
+        template <typename Action>
+        void register_remote_action_invocation_count(
+            invocation_count_registry& registry)
+        {
+            registry.register_class(
+                hpx::actions::detail::get_action_name<Action>(),
+                &transfer_action<Action>::get_invocation_count
+            );
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t N, typename Action>
@@ -453,7 +499,8 @@ namespace hpx { namespace actions
     /// \endcond
 }}
 
-namespace hpx { namespace traits {
+namespace hpx { namespace traits
+{
     template <typename Action>
     struct needs_automatic_registration<hpx::actions::transfer_action<Action> >
       : needs_automatic_registration<Action>

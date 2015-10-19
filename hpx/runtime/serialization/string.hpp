@@ -6,6 +6,7 @@
 #ifndef HPX_SERIALIZATION_STRING_HPP
 #define HPX_SERIALIZATION_STRING_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <string>
@@ -30,7 +31,7 @@ namespace hpx { namespace serialization
 
     // save string
     template <typename Char, typename CharTraits, typename Allocator>
-    void serialize(output_archive & ar, std::basic_string<Char, CharTraits,
+    void serialize(output_archive & ar, const std::basic_string<Char, CharTraits,
         Allocator> & s, unsigned)
     {
         ar << s.size(); //-V128

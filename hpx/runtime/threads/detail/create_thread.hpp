@@ -74,8 +74,7 @@ namespace hpx { namespace threads { namespace detail
 
         // create the new thread
         std::size_t num_thread = data.num_os_thread;
-        scheduler->create_thread(data, &id, initial_state, run_now, ec,
-            data.num_os_thread);
+        scheduler->create_thread(data, &id, initial_state, run_now, ec, num_thread);
 
         LTM_(info) << "register_thread(" << id << "): initial_state("
                    << get_thread_state_name(initial_state) << "), "

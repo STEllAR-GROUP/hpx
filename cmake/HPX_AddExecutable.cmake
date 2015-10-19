@@ -6,7 +6,7 @@
 
 macro(add_hpx_executable name)
   # retrieve arguments
-  set(options EXCLUDE_FROM_ALL AUTOGLOB NOLIBS NOHPX_INIT)
+  set(options EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD AUTOGLOB NOLIBS NOHPX_INIT)
   set(one_value_args INI FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX LANGUAGE HPX_PREFIX)
   set(multi_value_args SOURCES HEADERS DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -98,10 +98,8 @@ macro(add_hpx_executable name)
   set(_target_flags)
 
   # add the executable build target
-  set(exclude_from_all)
-  set(install_options)
   if(${name}_EXCLUDE_FROM_ALL)
-    set(exclude_from_all EXCLUDE_FROM_ALL)
+    set(exclude_from_all EXCLUDE_FROM_ALL TRUE)
   else()
     set(install_destination bin)
     if(${name}_INSTALL_SUFFIX)
@@ -114,7 +112,11 @@ macro(add_hpx_executable name)
     )
   endif()
 
-  add_executable(${name}_exe ${exclude_from_all}
+  if(${name}_EXCLUDE_FROM_DEFAULT_BUILD)
+    set(exclude_from_all ${exclude_from_all} EXCLUDE_FROM_DEFAULT_BUILD TRUE)
+  endif()
+
+  add_executable(${name}_exe
     ${${name}_SOURCES} ${${name}_HEADERS})
 
   if(${name}_OUTPUT_SUFFIX)
@@ -131,6 +133,10 @@ macro(add_hpx_executable name)
   endif()
 
   set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
+
+  if(exclude_from_all)
+    set_target_properties(${name}_exe PROPERTIES ${exclude_from_all})
+  endif()
 
   if(${${name}_NOLIBS})
     set(_target_flags ${_target_flags} NOLIBS)
@@ -150,7 +156,6 @@ macro(add_hpx_executable name)
     COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
     HPX_PREFIX ${${name}_HPX_PREFIX}
     ${_target_flags}
-    ${install_optional}
   )
 endmacro()
 

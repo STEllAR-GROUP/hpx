@@ -9,6 +9,7 @@
 #ifndef HPX_PARCELSET_POLICIES_TCP_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_TCP_SENDER_HPP
 
+#include <hpx/config/asio.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>

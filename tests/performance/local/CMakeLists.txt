@@ -1,3 +1,4 @@
+# Copyright (c) 2014-2015 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -116,16 +117,19 @@ if(HPX_WITH_CXX11_LAMBDAS)
       spinlock_overhead1
       spinlock_overhead2
       stencil3_iterators
+      stream
       transform_reduce_scaling
-      vector_foreach
+      partitioned_vector_foreach
      )
 
   set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component)
   set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
   set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)
   set(stencil3_iterators_FLAGS DEPENDENCIES iostreams_component)
+  set(stream_FLAGS DEPENDENCIES iostreams_component)
   set(transform_reduce_scaling_FLAGS DEPENDENCIES iostreams_component)
-  set(vector_foreach_FLAGS DEPENDENCIES iostreams_component)
+  set(partitioned_vector_foreach_FLAGS
+    DEPENDENCIES iostreams_component partitioned_vector_component)
 endif()
 
 
@@ -156,8 +160,10 @@ foreach(benchmark ${benchmarks})
 endforeach()
 
 if(OPENMP_FOUND)
-  set_target_properties(openmp_homogeneous_timed_task_spawn_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_homogeneous_timed_task_spawn_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(openmp_homogeneous_timed_task_spawn_exe
+    PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(openmp_homogeneous_timed_task_spawn_exe
+    PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
 
 add_hpx_pseudo_target(tests.performance.local.htts_v2)

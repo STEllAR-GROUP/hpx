@@ -66,17 +66,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             sender_type * s
           , int dst
           , memory_pool_type & chunk_pool
-          , boost::atomic<bool> & enable
           , performance_counters::parcels::gatherer & parcels_sent
         )
           : base_type(allocator_type(chunk_pool))
           , state_(initialized)
           , sender_(s)
           , dst_(dst)
+          , request_(MPI_REQUEST_NULL)
           , request_ptr_(0)
           , chunks_idx_(0)
+          , ack_(0)
           , chunk_pool_(chunk_pool)
-          , enable_(enable)
           , parcels_sent_(parcels_sent)
           , there_(
                 parcelset::locality(
@@ -107,21 +107,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             header_ = header(buffer_, tag_);
             header_.assert_valid();
 
+            state_ = initialized;
+
             handler_ = std::forward<Handler>(handler);
-            postprocess_handler_ = std::forward<ParcelPostprocess>(parcel_postprocess);
 
             if(!send())
+            {
+                postprocess_handler_
+                    = std::forward<ParcelPostprocess>(parcel_postprocess);
                 add_connection(sender_, shared_from_this());
+            }
             else
             {
                 error_code ec;
-                postprocess_handler_(ec, there_, shared_from_this());
+                parcel_postprocess(ec, there_, shared_from_this());
             }
         }
 
         bool send()
         {
-            if(!enable_) return false;
             switch(state_)
             {
                 case initialized:
@@ -266,8 +270,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             parcels_sent_.add_data(buffer_.data_point_);
             buffer_.clear();
 
-            state_ = initialized;
-
             return true;
         }
 
@@ -275,12 +277,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if(request_ptr_ == 0) return true;
 
-            util::mpi_environment::scoped_lock l;
+            util::mpi_environment::scoped_try_lock l;
+
+            if(!l.locked) return false;
 
             int completed = 0;
-            MPI_Status status;
             int ret = 0;
-            ret = MPI_Test(request_ptr_, &completed, &status);
+            ret = MPI_Test(request_ptr_, &completed, MPI_STATUS_IGNORE);
             HPX_ASSERT(ret == MPI_SUCCESS);
             if(completed)// && status.MPI_ERROR != MPI_ERR_PENDING)
             {
@@ -315,8 +318,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         char ack_;
 
         memory_pool_type & chunk_pool_;
-
-        boost::atomic<bool> & enable_;
 
         performance_counters::parcels::gatherer & parcels_sent_;
 

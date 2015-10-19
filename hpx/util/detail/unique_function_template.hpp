@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/is_callable.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
@@ -172,11 +171,11 @@ namespace hpx { namespace util
             reset();
 
             bool is_empty = false;
-            ar.load(is_empty);
+            ar >> is_empty;
             if (!is_empty)
             {
                 std::string name;
-                ar.load(name);
+                ar >> name;
 
                 this->vptr = detail::get_table_ptr<vtable_ptr>(name);
                 this->vptr->load_object(&this->object, ar, version);
@@ -186,11 +185,11 @@ namespace hpx { namespace util
         void save(OArchive& ar, const unsigned version) const
         {
             bool is_empty = empty();
-            ar.save(is_empty);
+            ar << is_empty;
             if (!is_empty)
             {
                 std::string function_name = this->vptr->name;
-                ar.save(function_name);
+                ar << function_name;
 
                 this->vptr->save_object(&this->object, ar, version);
             }
@@ -261,7 +260,7 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#   ifndef BOOST_NO_CXX11_TEMPLATE_ALIASES
+#   ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
 
     template <typename Sig>
     using unique_function_nonser = unique_function<Sig, void, void>;
@@ -313,7 +312,7 @@ namespace hpx { namespace util
         return f.empty();
     }
 
-#   endif /*BOOST_NO_CXX11_TEMPLATE_ALIASES*/
+#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 #endif

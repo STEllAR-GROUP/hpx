@@ -1,58 +1,67 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#pragma once // prevent multiple inclusions of this header file.
+
+#include <hpx/config/defines.hpp>
 
 #ifdef HPX_HAVE_APEX
-#include <apex.hpp>
+#include "apex_api.hpp"
 #endif
 
-#ifdef HPX_HAVE_APEX
-extern bool use_ittnotify_api;
-#endif
 
 namespace hpx { namespace util
 {
 #ifdef HPX_HAVE_APEX
     inline void apex_init()
     {
-        if (use_ittnotify_api)
-        {
-            apex::init();
-            apex::set_node_id(hpx::get_locality_id());
-        }
+        apex::init(NULL);
+        apex::set_node_id(hpx::get_locality_id());
     }
 
     inline void apex_finalize()
     {
-        if (use_ittnotify_api)
-            apex::finalize();
+        apex::finalize();
     }
 
     struct apex_wrapper
     {
         apex_wrapper(char const* const name)
-          : name_(name)
+          : name_(name), stopped(false)
         {
-            if (use_ittnotify_api)
-                apex::start(name_);
+            profiler_ = apex::start(name_);
         }
         ~apex_wrapper()
         {
-            if (use_ittnotify_api)
-                apex::stop(name_);
+            stop();
+        }
+
+        void stop() {
+            if(!stopped) {
+                stopped = true;
+                apex::stop(profiler_);
+            }
+        }
+
+        void yield() {
+            if(!stopped) {
+                stopped = true;
+                apex::yield(profiler_);
+            }
         }
 
         char const* const name_;
+        bool stopped;
+        apex::profiler * profiler_;
     };
 
     struct apex_wrapper_init
     {
         apex_wrapper_init(int argc, char **argv)
         {
-            apex::init(argc, argv);
+            apex::init(argc, argv, NULL);
         }
         ~apex_wrapper_init()
         {

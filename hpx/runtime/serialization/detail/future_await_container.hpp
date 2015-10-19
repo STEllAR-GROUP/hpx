@@ -46,9 +46,16 @@ namespace hpx { namespace serialization { namespace detail
 
         void trigger()
         {
-            boost::lock_guard<mutex_type> l(mtx_);
-            ++triggered_futures_;
-            if(done_ && num_futures_ == triggered_futures_)
+            // hpx::lcos::local::promise<void>::set_value() might need to acquire
+            // a lock, as such, we check the our triggering condition inside a
+            // critical section and trigger the promise outside of it.
+            bool set_value = true;
+            {
+                boost::lock_guard<mutex_type> l(mtx_);
+                ++triggered_futures_;
+                set_value = (done_ && num_futures_ == triggered_futures_);
+            }
+            if(set_value)
             {
                 promise_.set_value();
             }

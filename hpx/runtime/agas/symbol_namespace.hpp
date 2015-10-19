@@ -10,6 +10,7 @@
 
 #include <hpx/include/client.hpp>
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 namespace hpx { namespace agas
 {

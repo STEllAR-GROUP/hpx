@@ -17,6 +17,8 @@
 #include <memory>
 #endif
 
+#include <boost/cstdint.hpp>
+
 namespace hpx { namespace serialization
 {
     namespace detail
@@ -30,8 +32,10 @@ namespace hpx { namespace serialization
 #endif
     }
 
+    class access;
     struct input_archive;
     struct output_archive;
+    struct binary_filter;
 
     BOOST_FORCEINLINE
     void register_pointer(input_archive & ar, boost::uint64_t pos,
@@ -39,9 +43,6 @@ namespace hpx { namespace serialization
 
     template <typename Helper>
     Helper & tracked_pointer(input_archive & ar, boost::uint64_t pos);
-
-    template <typename Archive, typename T>
-    void serialize(Archive & ar, T & t, unsigned);
 
     template <typename T>
     output_archive & operator<<(output_archive & ar, T const & t);

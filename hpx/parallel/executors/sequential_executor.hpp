@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 bulk_async_execute(std::forward<F>(f), shape));
         }
 
-        std::size_t os_thread_count()
+        std::size_t processing_units_count()
         {
             return 1;
         }

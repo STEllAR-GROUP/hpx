@@ -44,17 +44,33 @@ namespace boost
             limit = setting;
         }
 
+        struct pattern
+        {
+            char const* const rx_;
+            int pos_;
+        };
+
+        static pattern const patterns[] =
+        {
+            { "\\s*#\\s*error", 0 },
+            { "\\s*#\\s*include", 0 },
+            { "https?://", -1 },
+        };
+
         void length_check::inspect(
             const string & library_name,
             const path & full_path,   // ex: c:/foo/boost/filesystem/path.hpp
             const string & contents)     // contents of file to be inspected
         {
-            if (contents.find("hpxinspect:" "length") != string::npos)
+            if (contents.find("hpxinspect:" "linelength") != string::npos)
                 return;
+
             string pathname = full_path.string();
             if (pathname.find("CMakeLists.txt") != string::npos)
                 return;
-            //Temporary, until we are ready to format documentation files in this limitation.
+
+            // Temporary, until we are ready to format documentation files in
+            // this limitation.
             if (library_name.find(".qbk") != string::npos)
                 return;
 
@@ -80,26 +96,29 @@ namespace boost
                     }
                 }
             }
+
             while (p < someline.size())
             {
                 currline++;
                 size_t rend = someline[p].find_last_of("\r");
                 bool check_not = 0;
                 boost::regex error_note, http_note;
-                error_note = "\\s*#\\s*error";
-                http_note = "https?://";
-                boost::smatch m;
-                if (boost::regex_search(someline[p], m, error_note)) //#error
+
+                for (std::size_t i = 0;
+                     i != sizeof(patterns)/sizeof(patterns[0]);
+                     ++i)
                 {
-                    if (m.position() == 0)
+                    boost::regex rx(patterns[i].rx_);
+                    boost::smatch m;
+                    if (boost::regex_search(someline[p], m, rx))
                     {
-                        check_not = 1;
+                        // skip this line if either no position is specified
+                        // or the pattern was found at the given position
+                        if (patterns[i].pos_ == -1 || m.position() == patterns[i].pos_)
+                            check_not = 1;
                     }
                 }
-                else if (boost::regex_search(someline[p], m, http_note)) //http:://
-                {
-                    check_not = 1;
-                }
+
                 size_t size = someline[p].size();
                 if (size > limit && check_not == 0)
                 {
@@ -107,8 +126,9 @@ namespace boost
                     linenum = to_string(currline);
                     lineorder.push_back(linenum);
                 }
-                p++;
+                ++p;
             }
+
             p = 0;
             while (p < lineorder.size())
             {
@@ -121,7 +141,7 @@ namespace boost
             }
             if (errors > 0)
             {
-                string errored = "Character Limit*: " + total;
+                string errored = "Line length limit*: " + total;
                 error(library_name, full_path, errored);
                 ++m_files_with_errors;
             }

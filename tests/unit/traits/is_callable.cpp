@@ -1,17 +1,21 @@
-//  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_init.hpp>
-
 #include <hpx/traits/is_callable.hpp>
-
 #include <hpx/util/lightweight_test.hpp>
 
 struct X { void operator()(int); };
 struct Xc { void operator()(int) const; };
+
+template <typename T>
+struct smart_ptr
+{
+    T* p;
+    T& operator*() const { return *p; }
+};
 
 void nullary_function()
 {
@@ -24,7 +28,7 @@ void nullary_function()
 void lambdas()
 {
     using hpx::traits::is_callable;
-#   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_DECLTYPE)
+#   if defined(HPX_HAVE_CXX11_LAMBDAS)
     auto lambda = [](){};
 
     typedef decltype(lambda) f;
@@ -113,6 +117,10 @@ void member_function_pointers()
     HPX_TEST_MSG((is_callable<f(X &&, float)>::value == true), "mem-fun-ptr/rvref");
     HPX_TEST_MSG((is_callable<f(X const &&, float)>::value == false),
         "mem-fun-ptr/const-rvref");
+    HPX_TEST_MSG((is_callable<f(smart_ptr<X>, float)>::value == true),
+        "mem-fun-ptr/smart-ptr");
+    HPX_TEST_MSG((is_callable<f(smart_ptr<X const>, float)>::value == false),
+        "mem-fun-ptr/smart-const-ptr");
 
     typedef int (X::*fc)(double) const;
     HPX_TEST_MSG((is_callable<fc(X*, float)>::value == true), "const-mem-fun-ptr/ptr");
@@ -126,6 +134,10 @@ void member_function_pointers()
         "const-mem-fun-ptr/rvref");
     HPX_TEST_MSG((is_callable<fc(X const &&, float)>::value == true),
         "const-mem-fun-ptr/const-rvref");
+    HPX_TEST_MSG((is_callable<fc(smart_ptr<X>, float)>::value == true),
+        "const-mem-fun-ptr/smart-ptr");
+    HPX_TEST_MSG((is_callable<fc(smart_ptr<X const>, float)>::value == true),
+        "const-mem-fun-ptr/smart-const-ptr");
 }
 
 void member_object_pointers()
@@ -141,6 +153,10 @@ void member_object_pointers()
     HPX_TEST_MSG((is_callable<f(X &&)>::value == true), "mem-obj-ptr/rvref");
     HPX_TEST_MSG((is_callable<f(X const &&)>::value == true),
         "mem-obj-ptr/const-rvref");
+    HPX_TEST_MSG((is_callable<f(smart_ptr<X>)>::value == true),
+        "mem-obj-ptr/smart-ptr");
+    HPX_TEST_MSG((is_callable<f(smart_ptr<X const>)>::value == true),
+        "mem-obj-ptr/smart-const-ptr");
 }
 
 void function_objects()

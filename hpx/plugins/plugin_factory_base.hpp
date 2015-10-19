@@ -9,10 +9,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
-
-#include <boost/mpl/list.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace plugins
@@ -29,7 +28,7 @@ namespace hpx { namespace plugins
 namespace hpx { namespace util { namespace plugin
 {
     ///////////////////////////////////////////////////////////////////////////
-    // The following specialization of the virtual_constructors template
+    // The following specialization of the virtual_constructor template
     // defines the argument list for the constructor of the concrete component
     // factory (derived from the component_factory_base above). This magic is needed
     // because we use hpx::plugin for the creation of instances of derived
@@ -47,13 +46,12 @@ namespace hpx { namespace util { namespace plugin
     //     };
     //
     template <>
-    struct virtual_constructors<hpx::plugins::plugin_factory_base>
+    struct virtual_constructor<hpx::plugins::plugin_factory_base>
     {
-        typedef boost::mpl::list<
-            boost::mpl::list<
+        typedef
+            hpx::util::detail::pack<
                 hpx::util::section const*, hpx::util::section const*, bool
-            >
-        > type;
+            > type;
     };
 }}}
 

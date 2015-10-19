@@ -18,17 +18,20 @@ inline std::string linelink(const path & full_path, std::string linenumb)
 {
     std::string commit = HPX_HAVE_GIT_COMMIT;
     std::string total, location = full_path.string();
-    total += "†a href = \"https://github.com/STEllAR-GROUP/hpx/blob/" + commit + "/" + location + "#L" + linenumb + "\"‡";
+    total += "†a href = \"https://github.com/STEllAR-GROUP/hpx/blob/"
+        + commit + "/" + location + "#L" + linenumb + "\"‡";
     total = total + linenumb;
     total = total + "†/a‡";
     return total;
 }
 //When you have a specific line, but a word is the location of the link
-inline std::string wordlink(const path & full_path, std::string linenumb, std::string word)
+inline std::string wordlink(const path & full_path,
+    std::string linenumb, std::string word)
 {
     std::string commit = HPX_HAVE_GIT_COMMIT;
     std::string total, location = full_path.string();
-    total += "†a href = \"https://github.com/STEllAR-GROUP/hpx/blob/" + commit + "/" + location + "#L" + linenumb + "\"‡";
+    total += "†a href = \"https://github.com/STEllAR-GROUP/hpx/blob/"
+        + commit + "/" + location + "#L" + linenumb + "\"‡";
     total = total + word;
     total = total + "†/a‡";
     return total;
@@ -38,7 +41,8 @@ inline std::string loclink(const path & full_path, std::string word)
 {
     std::string commit = HPX_HAVE_GIT_COMMIT;
     std::string total, location = full_path.string();
-    total += "†a href = \"https://github.com/STEllAR-GROUP/hpx/blob/" + commit + "/" + location + "\"‡";
+    total += "†a href = \"https://github.com/STEllAR-GROUP/hpx/blob/"
+        + commit + "/" + location + "\"‡";
     total = total + word;
     total = total + "†/a‡";
     return total;

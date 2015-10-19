@@ -6,8 +6,7 @@
 #if !defined(HPX_TRAITS_ACTION_DECORATE_CONTINUATION_MAR_30_2014_0725PM)
 #define HPX_TRAITS_ACTION_DECORATE_CONTINUATION_MAR_30_2014_0725PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/runtime/actions/continuation_fwd.hpp>
 
 #include <memory>
 
@@ -24,12 +23,6 @@ namespace hpx { namespace traits
             return false; // continuation has not been modified
         }
     };
-
-    template <typename Action>
-    struct action_decorate_continuation<Action
-      , typename util::always_void<typename Action::type>::type>
-      : action_decorate_continuation<typename Action::type>
-    {};
 }}
 
 #endif

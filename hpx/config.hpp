@@ -15,13 +15,18 @@
 #endif
 
 #include <hpx/config/defines.hpp>
-#include <hpx/version.hpp>
+#include <hpx/config/version.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/constexpr.hpp>
-#include <hpx/config/cxx11_macros.hpp>
+
+#include <boost/version.hpp>
+
+#if BOOST_VERSION == 105400
+#include <cstdint> // Boost.Atomic has trouble finding [u]intptr_t
+#endif
 
 #if BOOST_VERSION < 105600
 #include <boost/exception/detail/attribute_noreturn.hpp>
@@ -30,7 +35,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-#if defined(BOOST_MSVC)
+#if defined(_MSC_VER)
 // On Windows, make sure winsock.h is not included even if windows.h is
 // included before winsock2.h
 #define _WINSOCKAPI_
@@ -368,7 +373,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(BOOST_WINDOWS)
+#if defined(BOOST_WINDOWS) && _MSC_VER < 1900
 #  define snprintf _snprintf
 #endif
 
@@ -463,7 +468,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Older Boost versions do not have BOOST_NOINLINE defined
 #if !defined(BOOST_NOINLINE)
-#  if defined(BOOST_MSVC)
+#  if defined(_MSC_VER)
 #    define BOOST_NOINLINE __declspec(noinline)
 #  else
 #    define BOOST_NOINLINE
@@ -478,14 +483,6 @@
 #  define HPX_ATTRIBUTE_NORETURN BOOST_ATTRIBUTE_NORETURN
 #else
 #  define HPX_ATTRIBUTE_NORETURN
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// GCC has issues with forceinline and member function pointers
-#if defined(HPX_GCC_VERSION)
-#  define HPX_MAYBE_FORCEINLINE inline
-#else
-#  define HPX_MAYBE_FORCEINLINE BOOST_FORCEINLINE
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -522,7 +519,7 @@
 #if !defined(HPX_NO_DEPRECATED)
 #  define HPX_DEPRECATED_MSG \
    "This function is deprecated and will be removed in the future."
-#  if defined(BOOST_MSVC)
+#  if defined(_MSC_VER)
 #    define HPX_DEPRECATED(x) __declspec(deprecated(x))
 #  elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
 #    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
@@ -533,8 +530,5 @@
 #    define HPX_DEPRECATED(x)  /**/
 #  endif
 #endif
-
-///////////////////////////////////////////////////////////////////////////////
-#include <hpx/config/defaults.hpp>
 
 #endif

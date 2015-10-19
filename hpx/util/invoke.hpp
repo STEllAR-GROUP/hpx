@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2013-2015 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,240 +7,150 @@
 #define HPX_UTIL_INVOKE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
-#include <hpx/util/void_guard.hpp>
-#include <hpx/util/detail/pack.hpp>
 
 #include <boost/ref.hpp>
-#include <boost/type_traits/is_function.hpp>
-#include <boost/type_traits/is_base_of.hpp>
-#include <boost/type_traits/is_member_function_pointer.hpp>
-#include <boost/type_traits/is_member_pointer.hpp>
-#include <boost/type_traits/is_pointer.hpp>
-#include <boost/type_traits/remove_pointer.hpp>
-#include <boost/utility/enable_if.hpp>
+
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F>
-    struct invoke_result_of
-      : hpx::util::result_of<F>
-    {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // (t1.*f)(t2, ..., tN)
-    template <typename R, typename FR, typename C, typename ...Ps
-      , typename T, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if_c<
-        boost::is_base_of<C, typename util::decay<T>::type>::value
-     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
-      , R
-    >::type
-    invoke_r(FR (C::*f)(Ps...), T&& t, Ts&&... vs)
+    namespace detail
     {
-        return util::void_guard<R>(),
-            (std::forward<T>(t).*f)(std::forward<Ts>(vs)...);
-    }
+        template <typename FD>
+        struct invoke_impl
+        {
+            // f(t0, t1, ..., tN)
+            template <typename F, typename ...Ts>
+            inline typename util::result_of<F&&(Ts&&...)>::type
+            operator()(F&& f, Ts&&... vs)
+            {
+                return std::forward<F>(f)(std::forward<Ts>(vs)...);
+            }
+        };
 
-    template <typename R, typename FR, typename C, typename ...Ps
-      , typename T, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if_c<
-        boost::is_base_of<C, typename util::decay<T>::type>::value
-     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
-      , R
-    >::type
-    invoke_r(FR (C::*f)(Ps...) const, T&& t, Ts&&... vs)
-    {
-        return util::void_guard<R>(),
-            (std::forward<T>(t).*f)(std::forward<Ts>(vs)...);
-    }
+        template <typename M, typename C>
+        struct invoke_impl<M C::*>
+        {
+            // t0.*f
+            template <typename F, typename T0>
+            inline typename std::enable_if<
+                std::is_base_of<C, typename std::decay<T0>::type>::value,
+                typename util::result_of<F&&(T0&)>::type
+            >::type
+            operator()(F f, T0& v0)
+            {
+                return (v0.*f);
+            }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // (t1.get().*f)(t2, ..., tN)
-    template <typename R, typename FR, typename C, typename ...Ps
-      , typename T, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if_c<
-        boost::is_reference_wrapper<typename util::decay<T>::type>::value
-      , R
-    >::type
-    invoke_r(FR (C::*f)(Ps...), T&& t, Ts&&... vs)
-    {
-        return
-            util::void_guard<R>(), ((t.get()).*f)
-                (std::forward<Ts>(vs)...);
-    }
+            template <typename F, typename T0>
+            inline typename std::enable_if<
+                std::is_base_of<C, typename std::decay<T0>::type>::value
+             && !std::is_lvalue_reference<T0>::value,
+                typename util::result_of<F&&(T0&&)>::type
+            >::type
+            operator()(F f, T0&& v0)
+            {
+                return std::move(v0.*f);
+            }
 
-    template <typename R, typename FR, typename C, typename ...Ps
-      , typename T, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if_c<
-        boost::is_reference_wrapper<typename util::decay<T>::type>::value
-      , R
-    >::type
-    invoke_r(FR (C::*f)(Ps...) const, T&& t, Ts&&... vs)
-    {
-        return util::void_guard<R>(),
-            ((t.get()).*f)(std::forward<Ts>(vs)...);
-    }
+            // (*t0).*f
+            template <typename F, typename T0>
+            inline typename std::enable_if<
+                !std::is_base_of<C, typename std::decay<T0>::type>::value,
+                typename util::result_of<F&&(T0&&)>::type
+            >::type
+            operator()(F f, T0&& v0)
+            {
+                return (*this)(f, *std::forward<T0>(v0));
+            }
+        };
 
-    ///////////////////////////////////////////////////////////////////////////
-    // ((*t1).*f)(t2, ..., tN)
-    template <typename R, typename FR, typename C, typename ...Ps
-      , typename T, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if_c<
-        boost::is_base_of<C, typename util::decay<T>::type>::value
-     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
-      , R
-    >::type
-    invoke_r(FR (C::*f)(Ps...), T&& t, Ts&&... vs)
-    {
-        return util::void_guard<R>(),
-            ((*std::forward<T>(t)).*f)(std::forward<Ts>(vs)...);
-    }
+        template <typename R, typename C, typename ...Ps>
+        struct invoke_impl<R (C::*)(Ps...)>
+        {
+            // (t0.*f)(t1, ..., tN)
+            template <typename F, typename T0, typename ...Ts>
+            inline typename std::enable_if<
+                std::is_base_of<C, typename std::decay<T0>::type>::value,
+                typename util::result_of<F&&(T0&&, Ts&&...)>::type
+            >::type
+            operator()(F f, T0&& v0, Ts&&... vs)
+            {
+                return (std::forward<T0>(v0).*f)(std::forward<Ts>(vs)...);
+            }
 
-    template <typename R, typename FR, typename C, typename ...Ps
-      , typename T, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if_c<
-        boost::is_base_of<C, typename util::decay<T>::type>::value
-     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
-      , R
-    >::type
-    invoke_r(FR (C::*f)(Ps...) const, T&& t, Ts&&... vs)
-    {
-        return util::void_guard<R>(),
-            ((*std::forward<T>(t)).*f)(std::forward<Ts>(vs)...);
-    }
+            // ((*t0).*f)(t1, ..., tN)
+            template <typename F, typename T0, typename ...Ts>
+            inline typename std::enable_if<
+                !std::is_base_of<C, typename std::decay<T0>::type>::value,
+                typename util::result_of<F&&(T0&&, Ts&&...)>::type
+            >::type
+            operator()(F f, T0&& v0, Ts&&... vs)
+            {
+                return (*this)(f, *std::forward<T0>(v0), std::forward<Ts>(vs)...);
+            }
+        };
 
-    ///////////////////////////////////////////////////////////////////////////
-    // t1.*f
-    template <typename R, typename FR, typename C, typename T>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if_c<
-        boost::is_base_of<C, typename util::decay<T>::type>::value
-     && !boost::is_reference_wrapper<typename util::decay<T>::type>::value
-      , R
-    >::type
-    invoke_r(FR C::*f, T && t)
-    {
-        return util::void_guard<R>(), (std::forward<T>(t).*f);
-    }
+        template <typename R, typename C, typename ...Ps>
+        struct invoke_impl<R (C::*)(Ps...) const>
+          : invoke_impl<R (C::*)(Ps...)>
+        {};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // t1.get().*f
-    template <typename R, typename FR, typename C, typename T>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if_c<
-        boost::is_reference_wrapper<typename util::decay<T>::type>::value
-      , R
-    >::type
-    invoke_r(FR C::*f, T && t)
-    {
-        return util::void_guard<R>(), ((t.get()).*f);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // (*t1).*f
-    template <typename R, typename FR, typename C, typename T>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if_c<
-        boost::is_base_of<C, typename util::decay<T>::type>::value
-     || boost::is_reference_wrapper<typename util::decay<T>::type>::value
-      , R
-    >::type
-    invoke_r(FR C::*f, T && t)
-    {
-        return util::void_guard<R>(), ((*std::forward<T>(t)).*f);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // f(t1, t2, ..., tN)
-    template <typename R, typename FR, typename ...Ps, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    R
-    invoke_r(FR (*f)(Ps...), Ts&&... vs)
-    {
-        return util::void_guard<R>(),
-            f(std::forward<Ts>(vs)...);
-    }
-
-    template <typename R, typename F, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::enable_if_c<
-        boost::is_reference_wrapper<typename util::decay<F>::type>::value
-      , R
-    >::type
-    invoke_r(F&& f, Ts&&... vs)
-    {
-        return util::void_guard<R>(),
-            (f.get())(std::forward<Ts>(vs)...);
-    }
-
-    template <typename R, typename F, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if_c<
-        boost::is_function<typename boost::remove_pointer<typename
-                           util::decay<F>::type>::type>::value
-     || boost::is_member_pointer<typename util::decay<F>::type>::value
-     || boost::is_reference_wrapper<typename util::decay<F>::type>::value
-      , R
-    >::type
-    invoke_r(F&& f, Ts&&... vs)
-    {
-        return util::void_guard<R>(),
-            std::forward<F>(f)(std::forward<Ts>(vs)...);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename ...Ps, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    R
-    invoke(R (*f)(Ps...), Ts&&... vs)
-    {
-        return util::invoke_r<R>(
-            f, std::forward<Ts>(vs)...);
-    }
-
-    template <typename R, typename C, typename ...Ps
-      , typename T, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    R
-    invoke(R (C::*f)(Ps...), T&& t, Ts&&... vs)
-    {
-        return util::invoke_r<R>(
-            f, std::forward<T>(t), std::forward<Ts>(vs)...);
-    }
-
-    template <typename R, typename C, typename ...Ps
-      , typename T, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    R
-    invoke(R (C::*f)(Ps...) const, T&& t, Ts&&... vs)
-    {
-        return util::invoke_r<R>(
-            f, std::forward<T>(t), std::forward<Ts>(vs)...);
+        template <typename X>
+        struct invoke_impl< ::boost::reference_wrapper<X> >
+          : invoke_impl<X&>
+        {
+            // support boost::[c]ref, which is not callable as std::[c]ref
+            template <typename F, typename ...Ts>
+            inline typename util::result_of<F&&(Ts&&...)>::type
+            operator()(F f, Ts&&... vs)
+            {
+                return f.get()(std::forward<Ts>(vs)...);
+            }
+        };
     }
 
     template <typename F, typename ...Ts>
-    HPX_MAYBE_FORCEINLINE
-    typename boost::disable_if_c<
-        boost::is_function<typename boost::remove_pointer<typename
-                           util::decay<F>::type>::type>::value
-     || boost::is_member_function_pointer<typename util::decay<F>::type>::value
-      , typename invoke_result_of<F(Ts...)>::type
-    >::type
+    inline typename util::result_of<F&&(Ts&&...)>::type
     invoke(F&& f, Ts&&... vs)
     {
-        typedef typename invoke_result_of<F(Ts...)>::type result_type;
+        return detail::invoke_impl<typename std::decay<F>::type>()(
+            std::forward<F>(f), std::forward<Ts>(vs)...);
+    }
 
-        return util::invoke_r<result_type>(
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename R>
+        struct invoke_guard
+        {
+            template <typename F, typename ...Ts>
+            inline R operator()(F&& f, Ts&&... vs)
+            {
+                return detail::invoke_impl<typename std::decay<F>::type>()(
+                    std::forward<F>(f), std::forward<Ts>(vs)...);
+            }
+        };
+
+        template <>
+        struct invoke_guard<void>
+        {
+            template <typename F, typename ...Ts>
+            inline void operator()(F&& f, Ts&&... vs)
+            {
+                detail::invoke_impl<typename std::decay<F>::type>()(
+                    std::forward<F>(f), std::forward<Ts>(vs)...);
+            }
+        };
+    }
+
+    template <typename R, typename F, typename ...Ts>
+    inline R invoke(F&& f, Ts&&... vs)
+    {
+        return detail::invoke_guard<R>()(
             std::forward<F>(f), std::forward<Ts>(vs)...);
     }
 }}

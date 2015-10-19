@@ -8,6 +8,7 @@
 #ifndef HPX_SERIALIZATION_OUTPUT_CONTAINER_HPP
 #define HPX_SERIALIZATION_OUTPUT_CONTAINER_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/serialization/container.hpp>

@@ -1,0 +1,177 @@
+Copyright (c) 2014 University of Oregon
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+
+*** APEX Development with git submodules ***
+
+APEX is now a git submodule. After cloning the repository, run
+    git submodule init
+to check out the submodule.
+
+After pulling the latest changes to the parent HPX repo, run
+    git submodule update
+to check out the specific APEX commit that corresponds to the current
+HPX commit.
+
+If you are going to be making changes in the submodule, you should
+be running at least git 1.8.2. Earlier versions check out the correct
+commit in an "detached head" state which makes it easy to lose
+local changes accidentally.
+
+*** git submodule Tutorial ***
+
+The HPX repo contains a pointer to a particular commit inside the submodule:
+
+   ~/src/hpx-lsu $ git submodule status
+   a1b90fe1f86f784c046c1b113ff0a23eda686157 apex (heads/master)
+
+This is the current HEAD in the submodule
+
+   ~/src/hpx-lsu $ cd apex
+   ~/src/hpx-lsu/apex $ git rev-parse HEAD
+   a1b90fe1f86f784c046c1b113ff0a23eda686157
+
+Let's say that I make a change to the submodule:
+   
+   ~/src/hpx-lsu/apex $ git add README
+   ~/src/hpx-lsu/apex $ git commit -m 'Add note about standalone vs. in-HPX-tree builds to readme'
+   [master 5e87d83] Add note about standalone vs. in-HPX-tree builds to readme
+   1 file changed, 3 insertions(+)
+   ~/src/hpx-lsu/apex $ git rev-parse HEAD
+   5e87d834a16d1606a0700f5f0e1e6ee8d997db33
+
+Now the HEAD commit in the submodule repo is different (5e87d83),
+but this doesn't change the HPX repo, which still points to a1b90fe.
+If I go back up a directory and look at the status, I'll see that the
+apex submodule is has been modified with unstaged new commits:
+
+   ~/src/hpx-lsu $ git status
+   On branch apex_integration
+   Your branch is up-to-date with 'origin/apex_integration'.
+
+   Changes not staged for commit:
+     (use "git add <file>..." to update what will be committed)
+     (use "git checkout -- <file>..." to discard changes in working directory)
+
+           modified:   apex (new commits)
+
+   no changes added to commit (use "git add" and/or "git commit -a")
+
+So I need to stage and commit the update to the pointer:
+
+  ~/src/hpx-lsu $ git add apex
+  ~/src/hpx-lsu $ git commit -m 'Update apex submodule'
+  [apex_integration a76b500] Update apex submodule
+  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Now the submodule pointer points to the right commit:
+
+  ~/src/hpx-lsu $ git submodule
+  5e87d834a16d1606a0700f5f0e1e6ee8d997db33 apex (heads/master)
+
+
+*** Building HPX with APEX ***
+
+HPX with APEX is known to build with
+- BOOST 1.53.0
+- gcc 4.8.1
+- TAU 2.23.1 configured with pthread support
+
+To build, create a build directory outside of the source tree.
+From the build directory, run
+
+cmake $PATH_TO_HPX_APEX_SOURCE -DTAU_ROOT=$PATH_TO_TAU -DBOOST_ROOT=$PATH_TO_BOOST
+      -DHPX_WITH_APEX=1 -DCMAKE_INSTALL_PREFIX=$PATH_TO_HPX_INSTALL -DCMAKE_BUILD_TYPE=Debug
+
+TAU is no longer required to create profiles, so it can be omitted:
+
+cmake $PATH_TO_HPX_APEX_SOURCE -DBOOST_ROOT=$PATH_TO_BOOST
+      -DHPX_WITH_APEX=1 -DCMAKE_INSTALL_PREFIX=$PATH_TO_HPX_INSTALL -DCMAKE_BUILD_TYPE=Debug
+
+You can also use CMAKE_BUILD_TYPEs of Release (optimization on, no debug info) or
+RelWithDebInfo (optimization on, debug info included). Note that if you are using
+Release or RelWithDebInfo, you must also specify -DHPX_THREAD_DEBUG_INFO=1, or all
+thread names will be reported to APEX as "<unknown>".
+
+
+
+
+=========================================================================
+FULL INSTRUCTIONS:
+=========================================================================
+
+-------------------------------------------------------------------------
+To configure/build PAPI:
+-------------------------------------------------------------------------
+wget http://icl.cs.utk.edu/projects/papi/downloads/papi-5.3.2.tar.gz
+tar -xvzf papi-5.3.2.tar.gz
+cd papi-5.3.2/src
+./configure --prefix=$HOME/install/papi-5.3.2
+make
+make install
+
+-------------------------------------------------------------------------
+To configure/build TAU:
+-------------------------------------------------------------------------
+wget http://tau.uoregon.edu/tau.tgz
+tar -xvzf tau.tgz
+cd tau-2.x.x
+./configure  -pthread -tag=hpx -prefix=$HOME/install/tau \
+-bfd=download -unwind=download -iowrapper -papi=$HOME/install/papi-5.3.2
+make install
+
+-------------------------------------------------------------------------
+To configure HPX:
+-------------------------------------------------------------------------
+
+After getting the source code from git, follow the instructions below.
+These instructions will work on Hermione, other machines will have 
+different paths to installed libraries.
+
+-------------------------------------------------------------------------
+# contents of a sourceme.sh file....
+# set configuration parameters
+export TAU_ROOT=$HOME/install/tau
+export BOOST_ROOT=/opt/boost/1.55.0-release
+export HPX_HAVE_ITTNOTIFY=1
+
+# set runtime parameters
+export APEX_POLICY=1
+export APEX_TAU=1
+export HPX_HAVE_ITTNOTIFY=1
+
+alias confighpxapex='cmake -DTCMALLOC_ROOT=/usr \
+-DBOOST_ROOT=$BOOST_ROOT \
+-DCMAKE_BUILD_TYPE=Debug \
+-DCMAKE_INSTALL_PREFIX=. \
+-DHPX_WITH_APEX=1 \
+-DTAU_ROOT=$TAU_ROOT \
+..'
+-------------------------------------------------------------------------
+
+source sourceme.sh
+mkdir build
+cd build
+confighpxapex
+make 
+make install
+make examples.apex
+make examples.mini_ghost
+
+-------------------------------------------------------------------------
+To run and collect hardware counters for each HPX task:
+-------------------------------------------------------------------------
+# select some combination of counters
+export TAU_METRICS=TIME:PAPI_TOT_INS:PAPI_L2_TCM
+./bin/mini_ghost --hpx:threads 12
+# check the total instructions
+cd MULTI__PAPI_TOT_INS
+$TAU_ROOT/x86_64/bin/pprof
+# check the L2 cache misses
+cd MULTI__PAPI_L2_TCM
+$TAU_ROOT/x86_64/bin/pprof
+
+
+

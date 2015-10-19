@@ -10,6 +10,7 @@
 #ifndef HPX_PARCELSET_POLICIES_TCP_LOCALITY_HPP
 #define HPX_PARCELSET_POLICIES_TCP_LOCALITY_HPP
 
+#include <hpx/config/asio.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -57,14 +58,14 @@ namespace hpx { namespace parcelset
 
             void save(serialization::output_archive & ar) const
             {
-                ar.save(address_);
-                ar.save(port_);
+                ar << address_;
+                ar << port_;
             }
 
             void load(serialization::input_archive & ar)
             {
-                ar.load(address_);
-                ar.load(port_);
+                ar >> address_;
+                ar >> port_;
             }
 
         private:

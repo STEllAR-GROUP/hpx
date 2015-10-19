@@ -31,7 +31,6 @@ namespace hpx { namespace parcelset
         allow_zero_copy_optimizations_(true),
         enable_security_(false),
         async_serialization_(false),
-        enable_parcel_handling_(true),
         priority_(hpx::util::get_entry_as<int>(ini, "hpx.parcel." + type + ".priority",
             "0")),
         type_(type)
@@ -60,7 +59,7 @@ namespace hpx { namespace parcelset
         }
     }
 
-    void parcelport::add_received_parcel(parcel p)
+    void parcelport::add_received_parcel(parcel p, std::size_t num_thread)
     {
         // do some work (notify event handlers)
         if(applier_)

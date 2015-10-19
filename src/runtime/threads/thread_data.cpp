@@ -28,67 +28,21 @@ namespace hpx { namespace threads
     };
 #endif
 
-    void intrusive_ptr_add_ref(thread_data_base* p)
+    void intrusive_ptr_add_ref(thread_data* p)
     {
         ++p->count_;
     }
-    void intrusive_ptr_release(thread_data_base* p)
+    void intrusive_ptr_release(thread_data* p)
     {
         if (0 == --p->count_)
-            delete p;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void* thread_data::operator new(std::size_t size, thread_pool& pool)
-    {
-        HPX_ASSERT(sizeof(thread_data) == size);
-
-        void *ret = reinterpret_cast<void*>(pool.allocate());
-        if (0 == ret)
         {
-            HPX_THROW_EXCEPTION(out_of_memory,
-                "thread_data::operator new",
-                "could not allocate memory for thread_data");
-        }
-
-#ifdef HPX_DEBUG_THREAD_POOL
-        using namespace std;    // some systems have memset in namespace std
-        memset (ret, initial_value, sizeof(thread_data));
-#endif
-        return ret;
-    }
-
-    void thread_data::operator delete(void *p, std::size_t size)
-    {
-        HPX_ASSERT(sizeof(thread_data) == size);
-
-        if (0 != p)
-        {
-            thread_data* pt = static_cast<thread_data*>(p);
-            thread_pool* pool = pt->pool_;
-            HPX_ASSERT(pool);
-
-#ifdef HPX_DEBUG_THREAD_POOL
-            using namespace std;    // some systems have memset in namespace std
-            memset (static_cast<void*>(pt), freed_value, sizeof(thread_data)); //-V598
-#endif
-            pool->deallocate(pt);
+            thread_data::pool_type* pool = p->get_pool();
+            p->~thread_data();
+            pool->deallocate(p);
         }
     }
 
-    void thread_data::operator delete(void *p, thread_pool& pool)
-    {
-        if (0 != p)
-        {
-#ifdef HPX_DEBUG_THREAD_POOL
-            using namespace std;    // some systems have memset in namespace std
-            memset (p, freed_value, sizeof(thread_data));
-#endif
-            pool.deallocate(static_cast<thread_data*>(p));
-        }
-    }
-
-    void thread_data_base::run_thread_exit_callbacks()
+    void thread_data::run_thread_exit_callbacks()
     {
         mutex_type::scoped_lock l(this);
 
@@ -104,7 +58,7 @@ namespace hpx { namespace threads
         ran_exit_funcs_ = true;
     }
 
-    bool thread_data_base::add_thread_exit_callback(util
+    bool thread_data::add_thread_exit_callback(util
         ::function_nonser<void()> const& f)
     {
         mutex_type::scoped_lock l(this);
@@ -118,7 +72,7 @@ namespace hpx { namespace threads
         return true;
     }
 
-    void thread_data_base::free_thread_exit_callbacks()
+    void thread_data::free_thread_exit_callbacks()
     {
         mutex_type::scoped_lock l(this);
 
@@ -128,7 +82,7 @@ namespace hpx { namespace threads
         exit_funcs_.clear();
     }
 
-    bool thread_data_base::interruption_point(bool throw_on_interrupt)
+    bool thread_data::interruption_point(bool throw_on_interrupt)
     {
         // We do not protect enabled_interrupt_ and requested_interrupt_
         // from concurrent access here (which creates a benign data race) in
@@ -204,7 +158,7 @@ namespace hpx { namespace threads
             return threads::invalid_thread_id;
 
         return thread_id_type(
-                reinterpret_cast<thread_data_base*>(self->get_thread_id())
+                reinterpret_cast<thread_data*>(self->get_thread_id())
             );
     }
 

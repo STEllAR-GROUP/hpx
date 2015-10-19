@@ -6,7 +6,8 @@
 #if !defined(HPX_COMPONENTS_MEMORY_JUN_25_2008_0122PM)
 #define HPX_COMPONENTS_MEMORY_JUN_25_2008_0122PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -145,6 +146,15 @@ namespace hpx { namespace components { namespace server
 
     HPX_DEFINE_PLAIN_ACTION(allocate, allocate_action);
 }}}
+
+namespace hpx { namespace traits
+{
+    // memory is a (hand-rolled) component
+    template <>
+    struct is_component<components::server::memory>
+      : boost::mpl::true_
+    {};
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the runtime_support actions

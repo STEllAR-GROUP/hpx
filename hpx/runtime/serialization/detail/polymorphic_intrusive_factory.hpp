@@ -8,6 +8,7 @@
 #ifndef HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 #define HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 
+#include <hpx/exception.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <hpx/util/jenkins_hash.hpp>
@@ -24,18 +25,14 @@
 
 namespace hpx { namespace serialization { namespace detail
 {
-    class HPX_EXPORT polymorphic_intrusive_factory: boost::noncopyable
+    class polymorphic_intrusive_factory : boost::noncopyable
     {
     public:
         typedef void* (*ctor_type) ();
         typedef boost::unordered_map<std::string,
                 ctor_type, hpx::util::jenkins_hash> ctor_map_type;
 
-        static polymorphic_intrusive_factory& instance()
-        {
-            hpx::util::static_<polymorphic_intrusive_factory> factory;
-            return factory.get();
-        }
+        HPX_EXPORT static polymorphic_intrusive_factory& instance();
 
         void register_class(const std::string& name, ctor_type fun)
         {

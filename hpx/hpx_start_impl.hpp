@@ -6,9 +6,9 @@
 #if !defined(HPX_START_IMPL_OCT_04_2012_0252PM)
 #define HPX_START_IMPL_OCT_04_2012_0252PM
 
-#if !defined(HPX_START_OCT_04_2012_0148PM)
-#  error Do not directly include hpx/hpx_start_impl.hpp, use hpx/hpx_start.hpp instead!
-#endif
+#include <hpx/hpx_start.hpp>
+
+#include <hpx/util/find_prefix.hpp>
 
 namespace hpx
 {

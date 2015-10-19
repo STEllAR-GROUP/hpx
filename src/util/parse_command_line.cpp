@@ -3,7 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -406,6 +405,9 @@ namespace hpx { namespace util
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
                 ("hpx:ignore-batch-env", "ignore batch environment variables")
+                ("hpx:expect-connecting-localities",
+                  "this locality expects other localities to dynamically connect "
+                  "(implied if the number of initial localities is larger than 1)")
 #if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
@@ -431,7 +433,7 @@ namespace hpx { namespace util
                   "the detailed affinity description for the OS threads, see "
                   "the documentation for a detailed description of possible "
                   "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
-                  "--hpx:affinity options. Implies --hpx:numa-sensitive "
+                  "--hpx:affinity options. Implies --hpx:numa-sensitive=1"
                   "(--hpx:bind=none disables defining thread affinities).")
                 ("hpx:print-bind",
                   "print to the console the bit masks calculated from the "
@@ -441,7 +443,7 @@ namespace hpx { namespace util
                  "the number of operating system threads to spawn for this HPX "
                  "locality (default: 1, using 'all' will spawn one thread for "
                  "each processing unit")
-                ("hpx:cores", value<std::string>()->default_value("all"),
+                ("hpx:cores", value<std::string>(),
                  "the number of cores to utilize for this HPX "
                  "locality (default: 'all', i.e. the number of cores is based on "
                  "the number of total cores in the system)")
@@ -459,8 +461,11 @@ namespace hpx { namespace util
                   "priority queue (default: number of OS threads), valid for "
                   "--hpx:queuing=local-priority,--hpx:queuing=static-priority, "
                   " and --hpx:queuing=abp-priority only)")
-                ("hpx:numa-sensitive",
-                  "makes the local-priority scheduler NUMA sensitive")
+                ("hpx:numa-sensitive", value<std::size_t>()->implicit_value(0),
+                  "makes the local-priority scheduler NUMA sensitive ("
+                  "allowed values: 0 - no NUMA sensitivity, 1 - allow only for "
+                  "boundary cores to steal across NUMA domains, 2 - "
+                  "no cross boundary stealing is allowed (default value: 0)")
             ;
 
             options_description config_options("HPX configuration options");
@@ -532,13 +537,21 @@ namespace hpx { namespace util
                   "print the performance counter(s) specified with --hpx:print-counter "
                   "in a given format (default: normal)")
                 ("hpx:csv-header",
-                  "print the performance counter(s) specified with --hpx:print-counter"
+                  "print the performance counter(s) specified with --hpx:print-counter "
                   "with header when format specified with --hpx:print-counter-format"
                   "is csv or csv-short")
                 ("hpx:no-csv-header",
-                  "print the performance counter(s) specified with --hpx:print-counter"
+                  "print the performance counter(s) specified with --hpx:print-counter "
                   "without header when format specified with --hpx:print-counter-format"
                   "is csv or csv-short")
+                ("hpx:print-counter-at",
+                    value<std::vector<std::string> >()->composing(),
+                  "print the performance counter(s) specified with "
+                  "--hpx:print-counter at the given point in time, possible "
+                  "argument values: 'startup', 'shutdown' (default), 'noshutdown'")
+                ("hpx:reset-counters",
+                  "reset the performance counter(s) specified with --hpx:print-counter "
+                  "after they have been evaluated")
             ;
 
             hidden_options.add_options()

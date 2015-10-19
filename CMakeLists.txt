@@ -183,6 +183,7 @@ hpx_option(HPX_WITH_TESTS BOOL "Build the HPX tests (default ON)" ON CATEGORY "B
 hpx_option(HPX_WITH_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_WITH_TESTS_HEADERS BOOL "Build HPX header tests (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
@@ -273,7 +274,7 @@ hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
 
 if(NOT (${HPX_WITH_MAX_CPU_COUNT} LESS 65))
   set(HPX_WITH_MORE_THAN_64_THREADS_DEFAULT OFF)
-  hpx_option(HPX_WITH_MORE_THAN_64_THREADS STRING
+  hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
     "HPX applications will be able to run on more than 64 cores"
     ${HPX_WITH_MORE_THAN_64_THREADS_DEFAULT}
     CATEGORY "Thread Manager" ADVANCED)
@@ -411,6 +412,13 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_HAVE_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
+  # The throttle scheduler is not supported neither on Windows nor on Mac
+  if(HPX_WITH_APEX AND NOT WIN32 AND NOT APPLE)
+    if(_scheduler STREQUAL "THROTTLE" OR _all)
+      hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
+      set(HPX_HAVE_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
+    endif()
+  endif(HPX_WITH_APEX)
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
     set(HPX_HAVE_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
@@ -468,10 +476,25 @@ hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
 
 ## Profiling related build options
 hpx_option(HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
+if(HPX_WITH_APEX)
+  hpx_add_config_define(HPX_HAVE_APEX)
+endif()
 hpx_option(HPX_WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
+if(HPX_WITH_PAPI)
+  hpx_add_config_define(HPX_HAVE_PAPI)
+endif()
 hpx_option(HPX_WITH_TAU BOOL "Enable TAU profiling support." OFF CATEGORY "Profiling")
+if(HPX_WITH_TAU)
+  hpx_add_config_define(HPX_HAVE_TAU)
+endif()
 hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
+if(HPX_WITH_GOOGLE_PERFTOOLS)
+  hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
+endif()
 hpx_option(HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
+#if(HPX_WITH_ITTNOTIFY)
+  #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+#endif()
 
 ## Debugging related build options
 hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")
@@ -518,6 +541,12 @@ endif()
 
 if(HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF)
   hpx_add_config_define(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+endif()
+
+# If APEX is defined, the action timers need thread debug info.
+if(HPX_WITH_APEX)
+    hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
+    set(HPX_HAVE_THREAD_DESCRIPTION ON CACHE INTERNAL "")
 endif()
 
 if(HPX_WITH_THREAD_DEBUG_INFO)
@@ -688,6 +717,9 @@ hpx_check_for_cxx11_explicit_cvt_ops(
 hpx_check_for_cxx11_function_template_default_args(
   REQUIRED "HPX needs support for C++11 defaulted function template arguments")
 
+hpx_check_for_cxx11_initializer_list(
+  DEFINITIONS HPX_HAVE_CXX11_INITIALIZER_LIST)
+
 hpx_check_for_cxx11_inline_namespaces(
   DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
 
@@ -728,11 +760,20 @@ hpx_check_for_cxx11_std_chrono(
 hpx_check_for_cxx11_std_initializer_list(
   DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
 
+hpx_check_for_cxx11_std_is_bind_expression(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION)
+
 hpx_check_for_cxx11_std_is_final(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_FINAL)
 
 hpx_check_for_cxx11_std_is_null_pointer(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_NULL_POINTER)
+
+hpx_check_for_cxx11_std_is_placeholder(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
+
+hpx_check_for_cxx11_std_reference_wrapper(
+  DEFINITIONS HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 
 hpx_check_for_cxx11_std_unique_ptr(
   REQUIRED "HPX needs support for C++11 std::unique_ptr")
@@ -871,7 +912,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
     # OpenMPI triggers a lot of forcing value to bool 'true' or 'false'
     # (performance warning)
-    if(MPI_FOUND)
+    if(MPI_FOUND OR HPX_WITH_APEX)
       hpx_add_compile_flag(-wd4800)
     endif()
   else() # Trial and error approach for any other compiler ...
@@ -962,6 +1003,7 @@ else()
   endif()
 
   # Check if our libraries have unresolved symbols
+  #if(NOT APPLE AND NOT HPX_WITH_APEX)
   if(NOT APPLE)
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
@@ -1072,16 +1114,49 @@ endif()
 # Enable integration with Apex event counters
 ################################################################################
 if(HPX_WITH_APEX)
-  find_package(APEX)
+  # handle APEX library
+  include(GitExternal)
+  git_external(apex
+    https://github.com/khuck/xpress-apex.git
+    master
+    VERBOSE)
+
+  LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
+  add_subdirectory(apex/src/apex)
   if(NOT APEX_FOUND)
-    hpx_error("Apex could not be found and HPX_WITH_APEX=On, please specify APEX_ROOT to point to the root of your Apex installation")
+    hpx_error("Apex could not be found and HPX_WITH_APEX=On")
   endif()
-  hpx_libraries(${APEX_LIBRARIES})
-  include_directories(${APEX_INCLUDE_DIR})
   if(AMPLIFIER_FOUND)
     hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
   endif()
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+
+  include_directories(${APEX_SOURCE_DIR})
+  set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+      ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} apex_lib)
+  if(APEX_WITH_MSR)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
+  endif()
+  if(APEX_WITH_ACTIVEHARMONY)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+  endif()
+  if(APEX_WITH_TAU)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${TAU_ROOT}/lib -lTAU)
+  endif()
+
+  # handle optional ITTNotify library
+  if(HPX_WITH_ITTNOTIFY)
+    add_subdirectory(apex/src/ITTNotify)
+    if(NOT ITTNOTIFY_FOUND)
+      hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
+    endif()
+    include_directories(${ITTNOTIFY_SOURCE_DIR})
+    hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} ittnotify_lib)
+  endif()
 endif()
 
 if(HPX_WITH_GOOGLE_PERFTOOLS)
@@ -1402,11 +1477,11 @@ install( # Install HPX Python scripts
 #       #make copy, so that we have intact symlink in CMAKE_BINARY_DIR
 #       execute_process(
 #         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${script}" "${script_name}"
-# 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+#   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 #
 #       execute_process(
 #         COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
-# 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+#   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 #
 #       install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "bin")
 #     endforeach()

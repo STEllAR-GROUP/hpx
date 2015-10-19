@@ -6,12 +6,12 @@
 #if !defined(HPX_LCOS_ASYNC_IMPLEMENTATIONS_APR_13_2015_0829AM)
 #define HPX_LCOS_ASYNC_IMPLEMENTATIONS_APR_13_2015_0829AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/util/move.hpp>
 

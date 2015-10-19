@@ -15,6 +15,7 @@
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/serialization/detail/future_await_container.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
@@ -22,6 +23,8 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/thread/locks.hpp>
+
+#include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -100,6 +103,13 @@ namespace hpx { namespace parcelset
           , connection_cache_(max_connections(ini), max_connections_per_loc(ini))
           , archive_flags_(0)
           , operations_in_flight_(0)
+          , num_thread_(0)
+          , max_background_thread_(hpx::util::safe_lexical_cast<std::size_t>(
+                hpx::get_config_entry(
+                    "hpx.max_background_threads",
+                        (std::numeric_limits<std::size_t>::max)()
+                )
+            ))
         {
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -170,6 +180,7 @@ namespace hpx { namespace parcelset
                 connection_cache_.clear();
                 io_service_pool_.clear();
             }
+
         }
 
         void put_parcel(locality const & dest, parcel p, write_handler_type f)
@@ -226,16 +237,9 @@ namespace hpx { namespace parcelset
             enqueue_parcel(
                 dest, std::move(p), std::move(f), std::move(future_await->new_gids_));
 
-            if (trigger && enable_parcel_handling_)
+            if (trigger)
             {
-                if (hpx::is_running() && async_serialization())
-                {
-                    trigger_sending_parcels(dest);
-                }
-                else
-                {
-                    get_connection_and_send_parcels(dest);
-                }
+                get_connection_and_send_parcels(dest);
             }
         }
 
@@ -270,17 +274,7 @@ namespace hpx { namespace parcelset
                     false);
             }
 
-            if (enable_parcel_handling_)
-            {
-                if (hpx::is_running() && async_serialization())
-                {
-                    trigger_sending_parcels(locality_id);
-                }
-                else
-                {
-                    get_connection_and_send_parcels(locality_id);
-                }
-            }
+            get_connection_and_send_parcels(locality_id);
         }
 
         void send_early_parcel(locality const & dest, parcel p)
@@ -297,13 +291,8 @@ namespace hpx { namespace parcelset
 
         bool do_background_work(std::size_t num_thread)
         {
-            bool did_some_work = false;
-            did_some_work = do_background_work_impl<ConnectionHandler>(num_thread);
-            if(num_thread == 0)
-            {
-                trigger_pending_work();
-            }
-            return did_some_work;
+            trigger_pending_work();
+            return do_background_work_impl<ConnectionHandler>(num_thread);
         }
 
         /// support enable_shared_from_this
@@ -331,7 +320,8 @@ namespace hpx { namespace parcelset
                         this, loc),
                     "remove_from_connection_cache",
                     threads::pending, true, threads::thread_priority_normal,
-                    std::size_t(-1), threads::thread_stacksize_default, ec);
+                    get_next_num_thread(), threads::thread_stacksize_default,
+                    ec);
                 if (!ec) return;
             }
 
@@ -348,22 +338,13 @@ namespace hpx { namespace parcelset
                         this, loc),
                     "remove_from_connection_cache",
                     threads::suspended, true, threads::thread_priority_normal,
-                    std::size_t(-1), threads::thread_stacksize_default, ec);
+                    get_next_num_thread(), threads::thread_stacksize_default,
+                    ec);
             if (ec) return;
 
             threads::set_thread_state(id,
                 boost::chrono::milliseconds(100), threads::pending,
                 threads::wait_signaled, threads::thread_priority_boost, ec);
-        }
-
-        /// Temporarily enable/disable all parcel handling activities in the
-        /// parcelport
-        void enable(bool new_state)
-        {
-            enable_parcel_handling_ = new_state;
-            do_enable_parcel_handling_impl<ConnectionHandler>(new_state);
-            if (new_state)
-                trigger_pending_work();
         }
 
         /// Return the name of this locality
@@ -488,28 +469,6 @@ namespace hpx { namespace parcelset
         do_background_work_impl(std::size_t)
         {
             return false;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename ConnectionHandler_>
-        typename boost::enable_if<
-            typename connection_handler_traits<
-                ConnectionHandler_
-            >::do_enable_parcel_handling
-        >::type
-        do_enable_parcel_handling_impl(bool new_state)
-        {
-            connection_handler().enable_parcel_handling(new_state);
-        }
-
-        template <typename ConnectionHandler_>
-        typename boost::disable_if<
-            typename connection_handler_traits<
-                ConnectionHandler_
-            >::do_enable_parcel_handling
-        >::type
-        do_enable_parcel_handling_impl(bool new_state)
-        {
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -673,9 +632,6 @@ namespace hpx { namespace parcelset
         {
             typedef pending_parcels_map::iterator iterator;
 
-            if (!enable_parcel_handling_)
-                return false;
-
             {
                 boost::lock_guard<lcos::local::spinlock> l(mtx_);
 
@@ -714,25 +670,6 @@ namespace hpx { namespace parcelset
             }
         }
 
-
-        ///////////////////////////////////////////////////////////////////////
-        bool trigger_sending_parcels(locality const& loc,
-            bool background = false)
-        {
-            if (!enable_parcel_handling_)
-                return true;         // do not schedule sending parcels
-
-            error_code ec(lightweight);
-            hpx::applier::register_thread_nullary(
-                util::bind(
-                    &parcelport_impl::get_connection_and_send_parcels,
-                    this, loc, background),
-                "get_connection_and_send_parcels",
-                threads::pending, true, threads::thread_priority_boost,
-                std::size_t(-1), threads::thread_stacksize_default, ec);
-            return ec ? false : true;
-        }
-
         bool trigger_pending_work()
         {
             if(hpx::is_stopped()) return true;
@@ -758,8 +695,7 @@ namespace hpx { namespace parcelset
             // pending.
             for (locality const& loc : destinations)
             {
-                if (!trigger_sending_parcels(loc, true))
-                    return false;
+                get_connection_and_send_parcels(loc);
             }
 
             return true;
@@ -770,14 +706,16 @@ namespace hpx { namespace parcelset
             locality const& locality_id, bool background = false)
         {
             // repeat until no more parcels are to be sent
-            while (!hpx::is_stopped())
+//             while (!hpx::is_stopped())
             {
                 std::vector<parcel> parcels;
                 std::vector<write_handler_type> handlers;
                 new_gids_map new_gids;
 
                 if(!dequeue_parcels(locality_id, parcels, handlers, new_gids))
-                    break;
+                {
+                    return;
+                }
 
                 // If one of the sending threads are in suspended state, we
                 // need to force a new connection to avoid deadlocks.
@@ -800,28 +738,25 @@ namespace hpx { namespace parcelset
                     return;
                 }
 
-                threads::thread_id_type new_send_thread;
                 // send parcels if they didn't get sent by another connection
-                if (!hpx::is_starting() && threads::get_self_ptr() == 0)
+                if (!hpx::is_starting())
                 {
                     // Re-schedule if this is not executed by an HPX thread
-                    std::size_t thread_num = get_worker_thread_num();
-                    new_send_thread =
-                        hpx::applier::register_thread_nullary(
-                            hpx::util::bind(
-                                hpx::util::one_shot(&parcelport_impl
-                                    ::send_pending_parcels)
-                              , this
-                              , locality_id
-                              , sender_connection
-                              , std::move(parcels)
-                              , std::move(handlers)
-                              , std::move(new_gids)
-                            )
-                          , "parcelport_impl::send_pending_parcels"
-                          , threads::pending, true, threads::thread_priority_boost,
-                            thread_num, threads::thread_stacksize_default
-                        );
+                    hpx::applier::register_thread_nullary(
+                        hpx::util::bind(
+                            hpx::util::one_shot(&parcelport_impl
+                                ::send_pending_parcels)
+                          , this
+                          , locality_id
+                          , sender_connection
+                          , std::move(parcels)
+                          , std::move(handlers)
+                          , std::move(new_gids)
+                        )
+                      , "parcelport_impl::send_pending_parcels"
+                      , threads::pending, true, threads::thread_priority_boost,
+                        get_next_num_thread(), threads::thread_stacksize_default
+                    );
                 }
                 else
                 {
@@ -834,8 +769,8 @@ namespace hpx { namespace parcelset
                 // We yield here for a short amount of time to give another
                 // HPX thread the chance to put a subsequent parcel which
                 // leads to a more effective parcel buffering
-                if (hpx::threads::get_self_ptr())
-                    hpx::this_thread::yield();
+//                 if (hpx::threads::get_self_ptr())
+//                     hpx::this_thread::yield();
             }
         }
 
@@ -875,7 +810,7 @@ namespace hpx { namespace parcelset
 
             // Create a new HPX thread which sends parcels that are still
             // pending.
-            trigger_sending_parcels(locality_id);
+            get_connection_and_send_parcels(locality_id);
         }
 
         void send_pending_parcels(
@@ -949,8 +884,16 @@ namespace hpx { namespace parcelset
 
             std::size_t num_thread(0);
             if(threads::get_self_ptr())
+            {
                 num_thread = hpx::get_worker_thread_num();
-            do_background_work_impl<ConnectionHandler>(num_thread);
+                do_background_work(num_thread);
+            }
+        }
+
+    public:
+        std::size_t get_next_num_thread()
+        {
+            return ++num_thread_ % max_background_thread_;
         }
 
     protected:
@@ -964,6 +907,9 @@ namespace hpx { namespace parcelset
 
         int archive_flags_;
         boost::atomic<std::size_t> operations_in_flight_;
+
+        boost::atomic<std::size_t> num_thread_;
+        std::size_t const max_background_thread_;
     };
 }}
 

@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -24,9 +25,9 @@
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
+#include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/asio/io_service.hpp>
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
@@ -88,7 +89,7 @@ namespace hpx { namespace parcelset
             util::get_entry_as<int>(cfg, "hpx.parcel.message_handlers", "0") != 0
         ),
         count_routed_(0),
-        write_handler_(&parcelhandler::default_write_handler)
+        write_handler_(&default_write_handler)
     {
         for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
         {
@@ -198,7 +199,7 @@ namespace hpx { namespace parcelset
     /// \brief Make sure the specified locality is not held by any
     /// connection caches anymore
     void parcelhandler::remove_from_connection_cache(
-        endpoints_type const& endpoints)
+        naming::gid_type const& gid, endpoints_type const& endpoints)
     {
         for (endpoints_type::value_type const& loc : endpoints)
         {
@@ -210,6 +211,9 @@ namespace hpx { namespace parcelset
                 }
             }
         }
+
+        HPX_ASSERT(resolver_);
+        resolver_->remove_resolved_locality(gid);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -301,7 +305,8 @@ namespace hpx { namespace parcelset
         naming::gid_type const& dest_gid)
     {
         HPX_ASSERT(resolver_);
-        endpoints_type const & dest_endpoints = resolver_->resolve_locality(dest_gid);
+        endpoints_type const & dest_endpoints =
+            resolver_->resolve_locality(dest_gid);
 
         for (pports_type::value_type& pp : pports_)
         {
@@ -342,7 +347,7 @@ namespace hpx { namespace parcelset
 
     namespace detail
     {
-        void parcel_sent_handler(parcelhandler::write_handler_type f,
+        void parcel_sent_handler(parcelhandler::write_handler_type && f,
             boost::system::error_code const & ec, parcel const & p)
         {
             // inform termination detection of a sent message
@@ -398,7 +403,8 @@ namespace hpx { namespace parcelset
         using util::placeholders::_1;
         using util::placeholders::_2;
         write_handler_type wrapped_f =
-            util::bind(&detail::parcel_sent_handler, std::move(f), _1, _2);
+            util::bind(util::one_shot(&detail::parcel_sent_handler),
+                std::move(f), _1, _2);
 
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.
@@ -443,8 +449,8 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     // default callback for put_parcel
-    void parcelhandler::default_write_handler(
-        boost::system::error_code const& ec, parcel const& p)
+    void default_write_handler(boost::system::error_code const& ec,
+        parcel const& p)
     {
         if (ec) {
             // If we are in a stopped state, ignore some errors
@@ -463,7 +469,7 @@ namespace hpx { namespace parcelset
             // all unhandled exceptions terminate the whole application
             boost::exception_ptr exception =
                 hpx::detail::get_exception(hpx::exception(ec),
-                    "parcelhandler::default_write_handler", __FILE__,
+                    "default_write_handler", __FILE__,
                     __LINE__, parcelset::dump_parcel(p));
 
             hpx::report_error(exception);
@@ -556,21 +562,6 @@ namespace hpx { namespace parcelset
             }
         }
         return "<unknown>";
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    bool parcelhandler::enable(bool new_state)
-    {
-        new_state = enable_parcel_handling_.exchange(
-            new_state, boost::memory_order_acquire);
-
-        for (pports_type::value_type& pp : pports_)
-        {
-            if(pp.first > 0)
-                pp.second->enable(enable_parcel_handling_);
-        }
-
-        return new_state;
     }
 
     ///////////////////////////////////////////////////////////////////////////

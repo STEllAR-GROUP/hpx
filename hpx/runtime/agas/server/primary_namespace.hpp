@@ -17,6 +17,7 @@
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -360,7 +361,8 @@ struct HPX_EXPORT primary_namespace
 
   private:
     resolved_type resolve_gid_locked(
-        naming::gid_type const& gid
+        boost::unique_lock<mutex_type>& l
+      , naming::gid_type const& gid
       , error_code& ec
         );
 

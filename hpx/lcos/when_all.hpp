@@ -26,20 +26,21 @@ namespace hpx
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to \a when_all.
-    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///           - future<Container<future<R>>>: If the input cardinality is
     ///             unknown at compile time and the futures are all of the
-    ///             same type. The order of the futures in the output vector
+    ///             same type. The order of the futures in the output container
     ///             will be the same as given by the input iterator.
     ///
     /// \note Calling this version of \a when_all where first == last, returns
-    ///       a future with an empty vector that is immediately ready.
+    ///       a future with an empty container that is immediately ready.
     ///       Each future and shared_future is waited upon and then copied into
     ///       the collection of the output (returned) future, maintaining the
     ///       order of the futures in the input collection.
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
-    template <typename InputIter>
-    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    template <typename InputIter, typename Container =
+        vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<Container>
     when_all(InputIter first, InputIter last);
 
     /// The function \a when_all is an operator allowing to join on the result
@@ -47,27 +48,27 @@ namespace hpx
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
-    /// \param futures  [in] A vector holding an arbitrary amount of \a future
+    /// \param futures  [in] A container holding an arbitrary amount of \a future
     ///                 or \a shared_future objects for which \a when_all
     ///                 should wait.
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_all.
-    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///           - future<Container<future<R>>>: If the input cardinality is
     ///             unknown at compile time and the futures are all of the
     ///             same type.
     ///
-    /// \note Calling this version of \a when_all where the input vector is
-    ///       empty, returns a future with an empty vector that is immediately
+    /// \note Calling this version of \a when_all where the input container is
+    ///       empty, returns a future with an empty container that is immediately
     ///       ready.
     ///       Each future and shared_future is waited upon and then copied into
     ///       the collection of the output (returned) future, maintaining the
     ///       order of the futures in the input collection.
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
-    template <typename R>
-    future<std::vector<future<R>>>
-    when_all(std::vector<future<R>>&& futures);
+    template <typename Range>
+    future<Range>
+    when_all(Range&& values)
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -108,7 +109,7 @@ namespace hpx
     ///
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to \a when_all_n.
-    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///           - future<Container<future<R>>>: If the input cardinality is
     ///             unknown at compile time and the futures are all of the
     ///             same type. The order of the futures in the output vector
     ///             will be the same as given by the input iterator.
@@ -125,8 +126,9 @@ namespace hpx
     ///           hpx::exception.
     ///
     /// \note     None of the futures in the input sequence are invalidated.
-    template <typename InputIter>
-    future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    template <typename InputIter, typename Container =
+        vector<future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<Container>
     when_all_n(InputIter begin, std::size_t count);
 }
 
@@ -174,8 +176,8 @@ namespace hpx { namespace lcos
 
         template <typename T>
         struct when_all_result<util::tuple<T>,
-            typename util::always_void<
-                typename traits::is_future_range<T>::type
+            typename std::enable_if<
+                traits::is_future_range<T>::value
             >::type>
         {
             typedef T type;
@@ -217,7 +219,7 @@ namespace hpx { namespace lcos
                 this->set_value(when_all_result<Tuple>::call(std::move(t_)));
             }
 
-            // Current element is a range (vector) of futures
+            // Current element is a range of futures
             template <typename TupleIter, typename Iter>
             void await_range(TupleIter iter, Iter next, Iter end)
             {
@@ -352,12 +354,13 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future>
-    lcos::future<std::vector<Future> > //-V659
-    when_all(std::vector<Future>&& values)
+    template <typename Range>
+    typename boost::enable_if<traits::is_future_range<Range>,
+        lcos::future<typename util::decay<Range>::type> >::type //-V659
+    when_all(Range&& values)
     {
         typedef detail::when_all_frame<
-                hpx::util::tuple<std::vector<Future> >
+                hpx::util::tuple<Range>
             > frame_type;
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
@@ -368,34 +371,28 @@ namespace hpx { namespace lcos
         return future_access<typename frame_type::type>::create(std::move(p));
     }
 
-    template <typename Future>
-    lcos::future<std::vector<Future> >
-    when_all(std::vector<Future>& values)
+    template <typename Range>
+    typename boost::enable_if<traits::is_future_range<Range>,
+        lcos::future<typename util::decay<Range>::type> >::type
+    when_all(Range& values)
     {
-        typedef Future future_type;
-        typedef std::vector<future_type> result_type;
-
-        result_type values_;
-        values_.reserve(values.size());
-
-        std::transform(boost::begin(values), boost::end(values),
-            std::back_inserter(values_),
-            traits::acquire_future_disp());
-
+        Range values_ = traits::acquire_future<Range>()(values);
         return lcos::when_all(std::move(values_));
     }
 
-    template <typename Iterator>
-    lcos::future<std::vector<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    > >
+    template <typename Iterator, typename Container =
+        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+    lcos::future<Container>
     when_all(Iterator begin, Iterator end)
     {
-        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
-            future_type;
-        typedef std::vector<future_type> result_type;
+        Container values;
 
-        result_type values;
+        typename std::iterator_traits<Iterator>::
+            difference_type difference = std::distance(begin, end);
+        if (difference > 0)
+            traits::detail::reserve_if_vector(
+                values, static_cast<std::size_t>(difference));
+
         std::transform(begin, end, std::back_inserter(values),
             traits::acquire_future_disp());
 
@@ -410,18 +407,13 @@ namespace hpx { namespace lcos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator>
-    lcos::future<std::vector<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    > >
+    template <typename Iterator, typename Container =
+        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+    lcos::future<Container>
     when_all_n(Iterator begin, std::size_t count)
     {
-        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
-            future_type;
-        typedef std::vector<future_type> result_type;
-
-        result_type values;
-        values.reserve(count);
+        Container values;
+        traits::detail::reserve_if_vector(values, count);
 
         traits::acquire_future_disp func;
         for (std::size_t i = 0; i != count; ++i)
@@ -432,9 +424,9 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
-    lcos::future<
+    typename detail::when_all_frame<
         hpx::util::tuple<typename traits::acquire_future<Ts>::type...>
-    >
+    >::type
     when_all(Ts&&... ts)
     {
         typedef hpx::util::tuple<

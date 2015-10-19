@@ -12,6 +12,9 @@
 
 //  See http://www.boost.org for most recent version.
 
+// make sure header testing does not throw errors
+#if defined(__INTEL_COMPILER)
+
 //  Intel compiler setup:
 
 #include "boost/config/compiler/common_edg.hpp"
@@ -288,3 +291,4 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 #  endif
 #endif
 
+#endif

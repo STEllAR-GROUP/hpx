@@ -8,56 +8,27 @@
 #define HPX_TRAITS_POLYMORPHIC_TRAITS_HPP
 
 #include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/traits/has_member_xxx.hpp>
 
-#include <boost/mpl/bool.hpp>
-#include <boost/mpl/or.hpp>
 #include <boost/mpl/has_xxx.hpp>
-#include <boost/type_traits/is_class.hpp>
-#include <boost/utility/enable_if.hpp>
-
-#include <boost/cstdint.hpp>
 
 namespace hpx { namespace traits {
 
     namespace is_intrusive_detail {
 
-        struct helper
-        {
-            boost::uint64_t hpx_serialization_get_name() const;
-        };
-
-        template <class T>
-        struct helper_composed: T, helper {};
-
-        template <boost::uint64_t (helper::*) () const>
-        struct member_function_holder {};
-
-        template <class T, class Ambiguous =
-            member_function_holder<
-                &helper::hpx_serialization_get_name> >
-        struct impl: boost::mpl::true_ {};
-
-        template <class T>
-        struct impl<T,
-            member_function_holder<
-                &helper_composed<T>::hpx_serialization_get_name> >
-        : boost::mpl::false_ {};
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(hpx_serialization_get_name)
 
     } // namespace detail
 
-    BOOST_MPL_HAS_XXX_TRAIT_DEF(serialized_with_id);
-
-    template <class T, class Enable = void>
-    struct is_intrusive_polymorphic: boost::mpl::false_ {};
-
     template <class T>
-    struct is_intrusive_polymorphic<T,
-        typename boost::enable_if<boost::is_class<T> >::type>:
-            is_intrusive_detail::impl<T> {};
+    struct is_intrusive_polymorphic:
+        is_intrusive_detail::has_hpx_serialization_get_name<T> {};
 
     template <class T>
     struct is_nonintrusive_polymorphic:
         boost::mpl::false_ {};
+
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(serialized_with_id);
 
     template <class T>
     struct is_serialized_with_id:

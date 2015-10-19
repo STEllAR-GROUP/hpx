@@ -8,6 +8,7 @@
 
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/version.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
@@ -15,6 +16,7 @@
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/command_line_handling.hpp>
@@ -691,7 +693,8 @@ namespace hpx
 
             // uptime counters
             { "/runtime/uptime", performance_counters::counter_elapsed_time,
-              "returns the up time of the runtime instance for the referenced locality",
+              "returns the up time of the runtime instance for the referenced "
+              "locality",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::uptime_counter_creator,
               &performance_counters::locality_counter_discoverer,
@@ -706,6 +709,28 @@ namespace hpx
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::component_instance_counter_creator,
               &performance_counters::locality_counter_discoverer,
+              ""
+            },
+
+            // action invocation counters
+            { "/runtime/count/action_invocation", performance_counters::counter_raw,
+              "returns the number of (local) invocations of a specific action "
+              "on this locality (the action type has to be specified as the "
+              "counter parameter)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::local_action_invocation_counter_creator,
+              &performance_counters::local_action_invocation_counter_discoverer,
+              ""
+            },
+
+            { "/runtime/count/remote_action_invocation",
+              performance_counters::counter_raw,
+              "returns the number of (remote) invocations of a specific action "
+              "on this locality (the action type has to be specified as the "
+              "counter parameter)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::remote_action_invocation_counter_creator,
+              &performance_counters::remote_action_invocation_counter_discoverer,
               ""
             }
         };
@@ -1217,6 +1242,22 @@ namespace hpx { namespace threads
     std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize)
     {
         return get_runtime().get_config().get_stack_size(stacksize);
+    }
+
+    HPX_API_EXPORT void reset_thread_distribution()
+    {
+        get_runtime().get_thread_manager().reset_thread_distribution();
+    }
+
+    HPX_API_EXPORT void set_scheduler_mode(threads::policies::scheduler_mode m)
+    {
+        get_runtime().get_thread_manager().set_scheduler_mode(m);
+    }
+
+    HPX_API_EXPORT threads::mask_cref_type get_pu_mask(
+        threads::topology& topo, std::size_t thread_num)
+    {
+        return get_runtime().get_thread_manager().get_pu_mask(topo, thread_num);
     }
 }}
 

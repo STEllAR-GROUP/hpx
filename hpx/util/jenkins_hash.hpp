@@ -13,6 +13,8 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #endif
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {

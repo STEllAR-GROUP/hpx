@@ -6,8 +6,10 @@
 #if !defined(HPX_UTIL_AGAS_INIT_LOGGING_SEP_07_2013_0754PM)
 #define HPX_UTIL_AGAS_INIT_LOGGING_SEP_07_2013_0754PM
 
+#include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/util/ini.hpp>
+
 #include <string>
-#include <hpx/hpx_fwd.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace detail
@@ -17,7 +19,7 @@ namespace hpx { namespace util { namespace detail
     struct init_logging
     {
         init_logging(runtime_configuration& ini, bool isconsole,
-            naming::resolver_client& agas_client);
+            agas::addressing_service& agas_client);
     };
 }}}
 

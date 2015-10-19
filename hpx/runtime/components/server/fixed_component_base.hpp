@@ -9,12 +9,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
+
+#include <boost/mpl/bool.hpp>
+#include <boost/type_traits/is_base_and_derived.hpp>
 
 #include <sstream>
 
@@ -26,7 +30,7 @@ class fixed_component;
 
 ///////////////////////////////////////////////////////////////////////////
 template <typename Component>
-class fixed_component_base : public detail::fixed_component_tag
+class fixed_component_base : public traits::detail::fixed_component_tag
 {
 private:
     typedef typename boost::mpl::if_<

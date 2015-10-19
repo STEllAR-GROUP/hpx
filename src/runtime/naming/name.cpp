@@ -240,7 +240,6 @@ namespace hpx { namespace naming
                 );
                 return;
             }
-
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -254,7 +253,7 @@ namespace hpx { namespace naming
         gid_type postprocess_incref(gid_type &gid)
         {
             typedef gid_type::mutex_type::scoped_lock scoped_lock;
-            scoped_lock ll(gid.get_mutex());
+            scoped_lock l(gid.get_mutex());
             gid_type new_gid = gid;
             HPX_ASSERT(new_gid != invalid_gid);
             // Mark the gids as being split
@@ -283,7 +282,7 @@ namespace hpx { namespace naming
             {
                 HPX_ASSERT(
                     overflow_credit <= HPX_GLOBALCREDIT_INITIAL-1);
-                util::unlock_guard<scoped_lock> ul(ll);
+                util::unlock_guard<scoped_lock> ul(l);
                 agas::decref(new_gid, overflow_credit);
             }
 
@@ -294,14 +293,13 @@ namespace hpx { namespace naming
             gid_type::mutex_type::scoped_lock &l, gid_type& gid)
         {
             typedef gid_type::mutex_type::scoped_lock scoped_lock;
-            naming::gid_type new_gid;
 
             if (naming::detail::has_credits(gid))
             {
                 // The splitting is happening in two parts:
                 // First get the current current and split it:
                 // Case 1: credit == 1 ==> we need to request new credit from AGAS
-                //                         This is happening synchronously
+                //                         This is happening asynchronously
                 // Case 2: credit != 1 ==> Just fill with new credit
                 //
                 // Scenario that might happen:
@@ -314,6 +312,7 @@ namespace hpx { namespace naming
                 // An early decref can't happen as the id_type with the new credit
                 // is garuanteed to
                 // arrive only after we incremented the credit successfully in agas.
+                naming::gid_type new_gid = gid;
 
                 boost::int16_t src_log2credits = get_log2credit_from_gid(gid);
                 HPX_ASSERT(get_log2credit_from_gid(gid) > 0);
@@ -333,7 +332,6 @@ namespace hpx { namespace naming
                 HPX_ASSERT(src_log2credits > 1);
 
 
-                new_gid = gid;
                 // Mark the gids as being split
                 set_credit_split_mask_for_gid(gid);
                 set_credit_split_mask_for_gid(new_gid);
@@ -349,37 +347,14 @@ namespace hpx { namespace naming
 
                 HPX_ASSERT(detail::has_credits(gid));
                 HPX_ASSERT(detail::has_credits(new_gid));
+                return hpx::make_ready_future(new_gid);
             }
             else
             {
-                new_gid = gid;        // strips lock-bit
+                naming::gid_type new_gid = gid; // strips lock-bit
+                return hpx::make_ready_future(new_gid);
             }
 
-            return hpx::make_ready_future(new_gid);
-        }
-
-        hpx::future<gid_type> replenish_new_gid_if_needed(gid_type const& gid)
-        {
-            naming::gid_type new_gid = gid;     // strips lock bit
-
-            if (naming::detail::has_credits(new_gid))
-            {
-                naming::detail::strip_credits_from_gid(new_gid);
-                boost::int64_t added_credit =
-                    naming::detail::fill_credit_for_gid(new_gid);
-                naming::detail::set_credit_split_mask_for_gid(new_gid);
-                HPX_ASSERT(new_gid != invalid_gid);
-                return
-                    agas::incref_async(new_gid, added_credit).then(
-                        [new_gid](future<boost::int64_t>&&) -> gid_type
-                        {
-                            HPX_ASSERT(new_gid != invalid_gid);
-                            return new_gid;
-                        }
-                    );
-            }
-
-            return hpx::make_ready_future(new_gid);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -418,7 +393,7 @@ namespace hpx { namespace naming
 
             gid_type unlocked_gid = gid;        // strips lock-bit
 
-            return agas::incref(unlocked_gid, HPX_GLOBALCREDIT_INITIAL);
+            return agas::incref(unlocked_gid, added_credit);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -449,6 +424,7 @@ namespace hpx { namespace naming
                 id_type_management type = type_;
                 if (managed_move_credit == type)
                     type = managed;
+
                 gid_type new_gid;
                 if (unmanaged == type_)
                 {
@@ -504,7 +480,7 @@ namespace hpx { namespace naming
     }   // detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <class T>
+    template <typename T>
     void gid_type::save(
         T& ar
       , const unsigned int version) const
@@ -512,7 +488,7 @@ namespace hpx { namespace naming
         ar << id_msb_ << id_lsb_;
     }
 
-    template <class T>
+    template <typename T>
     void gid_type::load(
         T& ar
       , const unsigned int /*version*/)
@@ -522,25 +498,25 @@ namespace hpx { namespace naming
         id_msb_ &= ~is_locked_mask;     // strip lock-bit upon receive
     }
 
-    template void gid_type::save<serialization::output_archive>(
+    template HPX_EXPORT void gid_type::save<serialization::output_archive>(
         serialization::output_archive&
       , const unsigned int) const;
-    template void gid_type::load<serialization::input_archive>(
+    template HPX_EXPORT void gid_type::load<serialization::input_archive>(
         serialization::input_archive&
       , const unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <class T>
+    template <typename T>
     void id_type::save(T& ar,
         const unsigned int version) const
     {
         bool isvalid = gid_ != 0;
-        ar.save(isvalid);
+        ar << isvalid;
         if (isvalid)
             gid_->save(ar);
     }
 
-    template <class T>
+    template <typename T>
     void id_type::load(T& ar,
         const unsigned int version)
     {
@@ -550,7 +526,7 @@ namespace hpx { namespace naming
         }
 
         bool isvalid;
-        ar.load(isvalid);
+        ar >> isvalid;
         if (isvalid) {
             boost::intrusive_ptr<detail::id_type_impl> gid(
                 new detail::id_type_impl);
@@ -559,9 +535,9 @@ namespace hpx { namespace naming
         }
     }
 
-    template void id_type::save<serialization::output_archive>(
+    template HPX_EXPORT void id_type::save<serialization::output_archive>(
         serialization::output_archive&, const unsigned int) const;
-    template void id_type::load<serialization::input_archive>(
+    template HPX_EXPORT void id_type::load<serialization::input_archive>(
         serialization::input_archive&, const unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////

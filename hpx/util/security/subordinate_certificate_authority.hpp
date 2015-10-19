@@ -6,13 +6,18 @@
 #if !defined(HPX_UTIL_SECURITY_SUB_CERTIFICATE_AUTHORITY_MAY_30_2013_0415PM)
 #define HPX_UTIL_SECURITY_SUB_CERTIFICATE_AUTHORITY_MAY_30_2013_0415PM
 
+#include <hpx/config/defines.hpp>
+
 #if defined(HPX_HAVE_SODIUM)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/components/security/key_pair.hpp>
 #include <hpx/components/security/server/subordinate_certificate_authority.hpp>
 
 #include <hpx/util/assert.hpp>
+
+#include <boost/cstdint.hpp>
 
 namespace hpx { namespace util { namespace security
 {

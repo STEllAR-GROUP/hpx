@@ -1136,6 +1136,38 @@ system and application performance.
         [Returns the overall number of currently active components of the
          specified type on the given locality.]
     ]
+    [   [`/runtime/count/action_invocation`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of
+          action invocations should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [The action type. This is the string which has been used
+         while registering the action with __hpx__, e.g. which has been
+         passed as the second parameter to the macro
+         [macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`] or
+         [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`].
+        ]
+        [Returns the overall (local) invocation count of the specified action
+         type on the given locality.]
+    ]
+    [   [`/runtime/count/remote_action_invocation`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of
+          action invocations should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [The action type. This is the string which has been used
+         while registering the action with __hpx__, e.g. which has been
+         passed as the second parameter to the macro
+         [macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`] or
+         [macroref HPX_REGISTER_ACTION_ID `HPX_REGISTER_ACTION_ID`].
+        ]
+        [Returns the overall (remote) invocation count of the specified action
+         type on the given locality.]
+    ]
     [   [`/runtime/uptime`]
         [`locality#*/total`
 
@@ -1169,6 +1201,93 @@ system and application performance.
         [None]
         [Returns the amount of resident memory currently allocated by the
          referenced locality (in bytes).]
+    ]
+    [   [`/runtime/io/read_bytes_issued`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of bytes
+          read should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of bytes read by the process (aggregate of count
+         arguments passed to read() call or its analogues). This performance
+         counter is available only on systems which expose the related data
+         through the /proc file system.]
+    ]
+    [   [`/runtime/io/write_bytes_issued`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of bytes
+          written should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of bytes written by the process (aggregate of count
+         arguments passed to write() call or its analogues). This performance
+         counter is available only on systems which expose the related data
+         through the /proc file system.]
+    ]
+    [   [`/runtime/io/read_syscalls`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of
+          system calls should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of system calls that perform I/O reads. This
+         performance counter is available only on systems which expose the
+         related data through the /proc file system.]
+    ]
+    [   [`/runtime/io/write_syscalls`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of
+          system calls should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of system calls that perform I/O writes. This
+         performance counter is available only on systems which expose the
+         related data through the /proc file system.]
+    ]
+    [   [`/runtime/io/read_bytes_transferred`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of bytes
+          transferred should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of bytes retrieved from storage by I/O operations.
+         This performance counter is available only on systems which expose the
+         related data through the /proc file system.]
+    ]
+    [   [`/runtime/io/write_bytes_transferred`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of bytes
+          transferred should be queried. The locality id is a (zero based)
+          number identifying the locality.
+        ]
+        [None]
+        [Returns the number of bytes retrieved from storage by I/O operations.
+         This performance counter is available only on systems which expose the
+         related data through the /proc file system.]
+    ]
+    [   [`/runtime/io/write_bytes_cancelled`]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of bytes
+          not being transferred should be queried. The locality id is a (zero
+          based) number identifying the locality.
+        ]
+        [None]
+        [Returns the number of bytes accounted by write_bytes_transferred that
+         has not been ultimately stored due to truncation or deletion.
+         This performance counter is available only on systems which expose the
+         related data through the /proc file system.]
     ]
 ]
 

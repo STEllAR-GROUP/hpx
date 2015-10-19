@@ -180,6 +180,11 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
+        static std::string get_scheduler_name()
+        {
+            return "hierarchy_scheduler";
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
         boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
@@ -607,7 +612,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if none is
         /// available
         bool get_next_thread(std::size_t num_thread,
-            boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
+            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree[0].size());
@@ -631,7 +636,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data_base* thrd, std::size_t num_thread,
+        void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority /*priority*/ = thread_priority_normal)
         {
             HPX_ASSERT(tree.size());
@@ -639,7 +644,7 @@ namespace hpx { namespace threads { namespace policies
             tree.back()[0]->schedule_thread(thrd);
         }
 
-        void schedule_thread_last(threads::thread_data_base* thrd,
+        void schedule_thread_last(threads::thread_data* thrd,
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
@@ -649,7 +654,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
+        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
         {
             for(size_type i = 0; i < tree.size(); ++i)
             {

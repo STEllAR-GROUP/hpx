@@ -12,6 +12,8 @@
 
 #include <boost/detail/scoped_enum_emulation.hpp>
 
+#include <type_traits>
+
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////

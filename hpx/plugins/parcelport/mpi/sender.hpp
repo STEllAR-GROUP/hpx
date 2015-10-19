@@ -53,12 +53,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
 
         connection_ptr create_connection(int dest,
-            boost::atomic<bool> & enable,
             performance_counters::parcels::gatherer & parcels_sent)
         {
             return
                 boost::make_shared<connection_type>(
-                    this, dest, chunk_pool_, enable, parcels_sent);
+                    this, dest, chunk_pool_, parcels_sent);
         }
 
         void add(connection_ptr const & ptr)
@@ -76,51 +75,31 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             connection_list connections
         )
         {
-            std::size_t k = 0;
-            connection_list::iterator it = connections.begin();
-            hpx::util::high_resolution_timer timer;
-
-            // We try to handle all receives within 1 second
-            while(it != connections.end())
-            {
-                if(timer.elapsed() > 1.0) break;
-
-                connection_type & sender = **it;
-                if(sender.send())
-                {
-                    connection_ptr s = *it;
-                    it = connections.erase(it);
-                    error_code ec;
-                    s->postprocess_handler_(ec, s->destination(), s);
-                }
-                else
-                {
-                    if(k < 32 || k & 1) //-V112
+            // We try to handle all sends
+            connection_list::iterator end = std::remove_if(
+                connections.begin()
+              , connections.end()
+              , [](connection_ptr sender) -> bool
+              {
+                    if(sender->send())
                     {
-                        if(threads::get_self_ptr())
-                            hpx::this_thread::suspend(hpx::threads::pending,
-                                "mpi::sender::wait_done");
+                        error_code ec;
+                        sender->postprocess_handler_(ec, sender->destination(), sender);
+                        return true;
                     }
-                    ++k;
-                    ++it;
-                }
-            }
+                    return false;
+              }
+            );
 
-            if(!connections.empty())
+            // If some are still in progress, give them back
+//             if(end != connections.end())
             {
                 boost::unique_lock<mutex_type> l(connections_mtx_);
-                if(connections_.empty())
-                {
-                    std::swap(connections, connections_);
-                }
-                else
-                {
-                    connections_.insert(
-                        connections_.end()
-                      , std::make_move_iterator(connections.begin())
-                      , std::make_move_iterator(connections.end())
-                    );
-                }
+                connections_.insert(
+                    connections_.end()
+                  , std::make_move_iterator(connections.begin())
+                  , std::make_move_iterator(end)
+                );
             }
         }
 
@@ -134,21 +113,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             bool has_work = false;
             if(!connections.empty())
             {
-                if(hpx::is_starting())
-                {
-                    send_messages(std::move(connections));
-                }
-                else
-                {
-//                     error_code ec(lightweight);
-                    hpx::applier::register_thread_nullary(
-                        util::bind(
-                            util::one_shot(&sender::send_messages),
-                            this, std::move(connections)),
-                        "mpi::sender::send_messages",
-                        threads::pending, true, threads::thread_priority_boost,
-                        num_thread, threads::thread_stacksize_default);
-                }
+                send_messages(std::move(connections));
                 has_work = true;
             }
             next_free_tag();
@@ -209,7 +174,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
 
         mutex_type connections_mtx_;
-        lcos::local::detail::condition_variable connections_cond_;
         connection_list connections_;
 
         mutex_type next_free_tag_mtx_;
