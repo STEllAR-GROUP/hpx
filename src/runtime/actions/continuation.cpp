@@ -113,6 +113,18 @@ namespace hpx
             apply_c(set, cont, id, std::move(e));
         }
     }
+
+#if defined(BOOST_MSVC) && !defined(HPX_DEBUG)
+    ///////////////////////////////////////////////////////////////////////////
+    // Explicitly instantiate specific apply needed for set_lco_value for MSVC
+    // (in release mode only, leads to missing symbols otherwise).
+    template bool apply<
+        lcos::base_lco_with_value<
+            util::unused_type, util::unused_type
+        >::set_value_action,
+        util::unused_type
+    >(naming::id_type const &, util::unused_type &&);
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
