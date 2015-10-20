@@ -8,6 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <iostream>
 #include <vector>
@@ -40,7 +41,7 @@ HPX_REGISTER_COMPONENT(server_type, test_server);
 typedef test_server::call_action call_action;
 HPX_REGISTER_ACTION(call_action);
 
-std::string genName(int source, int target)
+std::string gen_name(int source, int target)
 {
     std::string basename = "/0/HPXSimulatorUpdateGroupSdfafafasdasd";
 
@@ -49,7 +50,7 @@ std::string genName(int source, int target)
         itoa(target);
 }
 
-void testBar()
+void test()
 {
     int rank = hpx::get_locality_id();
 
@@ -59,7 +60,7 @@ void testBar()
         if (i == rank)
             continue;
 
-        std::string name = genName(i, rank);
+        std::string name = gen_name(i, rank);
         std::cout << "registration: " << name << "\n";
 
         hpx::id_type id = hpx::new_<test_server>(hpx::find_here()).get();
@@ -71,7 +72,7 @@ void testBar()
         if (i == rank)
             continue;
 
-        std::string name = genName(rank, i);
+        std::string name = gen_name(rank, i);
         std::cout << "lookup: " << name << "\n";
         std::vector<hpx::future<hpx::id_type> > ids =
             hpx::find_all_from_basename(name, 1);
@@ -83,7 +84,10 @@ void testBar()
 
 int hpx_main(int argc, char **argv)
 {
-    testBar();
+    // this test must run using 4 localities
+    HPX_TEST_EQ(hpx::get_num_localities().get(), 4u);
+
+    test();
     return hpx::finalize();
 }
 
@@ -94,5 +98,6 @@ int main(int argc, char **argv)
     // all other localities:
     std::vector<std::string> config(1, "hpx.run_hpx_main!=1");
 
-    return hpx::init(argc, argv, config);
+    HPX_TEST_EQ(hpx::init(argc, argv, config), 0);
+    return hpx::util::report_errors();
 }

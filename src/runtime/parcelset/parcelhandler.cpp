@@ -374,7 +374,9 @@ namespace hpx { namespace parcelset
         if (0 == hpx::threads::get_self_ptr() && !hpx::is_starting())
         {
             HPX_ASSERT(resolver_);
-            if (!resolver_->has_resolved_locality(ids[0].get_gid()))
+            naming::gid_type locality =
+                naming::get_locality_from_gid(ids[0].get_gid());
+            if (!resolver_->has_resolved_locality(locality))
             {
                 // reschedule request as an HPX thread to avoid hangs
                 void (parcelhandler::*put_parcel_ptr) (
