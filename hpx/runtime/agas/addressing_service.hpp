@@ -324,6 +324,10 @@ public:
       , error_code& ec = throws
         );
 
+    bool has_resolved_locality(
+        naming::gid_type const & gid
+        );
+
     /// \brief Remove a locality from the runtime.
     bool unregister_locality(
         naming::gid_type const & gid

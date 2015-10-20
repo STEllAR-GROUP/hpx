@@ -538,6 +538,14 @@ void addressing_service::register_console(parcelset::endpoints_type const & eps)
     HPX_ASSERT(res.second);
 }
 
+bool addressing_service::has_resolved_locality(
+    naming::gid_type const & gid
+    )
+{ // {{{
+    boost::unique_lock<mutex_type> l(resolved_localities_mtx_);
+    return resolved_localities_.find(gid) != resolved_localities_.end();
+} // }}}
+
 parcelset::endpoints_type const & addressing_service::resolve_locality(
     naming::gid_type const & gid
   , error_code& ec
@@ -578,9 +586,7 @@ parcelset::endpoints_type const & addressing_service::resolve_locality(
                 if (0 == threads::get_self_ptr())
                 {
                     // this should happen only during bootstrap
-                    // FIXME: Disabled this assert cause it fires.
-                    // It should not, but doesn't do any harm
-                    //HPX_ASSERT(hpx::is_starting());
+                    HPX_ASSERT(hpx::is_starting());
 
                     while(!endpoints_future.is_ready())
                         /**/;
