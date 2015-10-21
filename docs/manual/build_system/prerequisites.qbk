@@ -73,6 +73,11 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
       for compiling __hpx__ if you use gcc V4.6.x. Please use either
       an earlier or a later version of Boost with this compiler.]
 
+[important When compiling with the Intel Compiler on Linux systems, we only support
+      C++ Standard Libraries provided by gcc 4.6 and upwards. If the 'g++' in your
+      path is something below that requirement, please add this to your CMAKE_CXX_FLAGS
+      with the `-gxx-name=/path/to/g++` flag.]
+
 [table Software Prerequisites for __hpx__ on Windows systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
