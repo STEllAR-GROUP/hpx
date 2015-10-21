@@ -137,17 +137,17 @@ printed out.
 
 [fib_hpx_main]
 
-Upon a closer look we see that the [classref hpx::future]`<>` we created is assigned
-the return of [funcref hpx::async]`<fibonacci_action>(`[funcref hpx::find_here]`(), n)`.
-[funcref hpx::async]`<>()`, and
-asynchronously kicks of the computation of the action (`fibonacci_action`), returning a future which
-represents the result of the computation. But wait, what is an action? And what
+Upon a closer look we see that we've created a `boost::uint64_t` to store the result of
+invoking our `fibonacci_action` ['fib]. This action will launch synchronously ( as the work
+done inside of the action will be asynchronous itself) and return the result of the fibonacci
+sequence. But wait, what is an action? And what
 is this `fibonacci_action`? For starters, an action is a wrapper for a
 function. By wrapping functions, __hpx__ can send packets of work to different
 processing units. These vehicles allow users to calculate work now, later, or
-on certain nodes. The first argument to [funcref hpx::async]`<>()` is the location
+on certain nodes. The first argument to our action is the location
 where the action should be run. In this case, we just want to run the action on
-the machine that we are currently on, so we use [funcref hpx::find_here]`()`. To further
+the machine that we are currently on, so we use [funcref hpx::find_here]`()`. The second parameter
+simply forward the fibonacci sequence ['n] that we wish to calculate. To further
 understand this we turn to the code to find where `fibonacci_action` was
 defined:
 
@@ -163,8 +163,8 @@ function that is to be wrapped and the name of the action that you are
 creating.
 
 This picture should now start making sense. The function `fibonacci()` is
-wrapped in an action `fibonacci_action`, which was spawned
-by [funcref hpx::async]`<>()`, where the action returns a future
+wrapped in an action `fibonacci_action`, which was run synchronously but 
+created asynchronous work, then returns a `boost::uint64_t`
 representing the result of the function `fibonacci()`. Now, lets look at the
 function `fibonacci()`:
 
@@ -183,7 +183,7 @@ producing the n-th value of the Fibonacci sequence.
 
 [endsect] [/Fibonacci]
 
-[/Last Edit: 4-13-12]
+[/Last Edit: 10-16-15]
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
@@ -290,8 +290,7 @@ that all of the futures have finished being calculated without having to call
 non-blocking wait, which acts on an `std::vector<>`. It queries the state of
 the futures, waiting for them to finish. Whenever a future becomes marked as
 ready, [funcref hpx::lcos::wait_each]`()` invokes a callback function provided by the user,
-supplying the callback function with the index of the future in the
-`std::vector<>` and the result of the future.
+supplying the callback function with the result of the future.
 
 In `hello_world_foreman()`, an `std::set<>` called `attendance` keeps track of
 which OS-threads have printed out the hello world message. When the OS-thread
@@ -318,6 +317,8 @@ that an action will be scheduled on a particular OS-thread. This is why we must
 use a guess-and-check approach.
 
 [endsect] [/Hello World]
+
+[/Last Edit: 10-16-15]
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
@@ -657,37 +658,40 @@ Next we look at hpx_main.
 
 Here we find our command line variables read in,
 the rate is converted from a percent to a decimal, the number of calculation
-iterations is determined, and then our dataflows are set up. Notice that we
-first place our principal and rate into a dataflow by passing the variables
-`p` and `i_rate` to an action called `identity_action`:
+iterations is determined, and then our shared_futures are set up. Notice that we
+first place our principal and rate into shares futures by passing the variables
+`init_principal` and `init_rate` using [classref hpx::make_ready_future].
 
-[interest_id_action]
-
-In this way [classref hpx::lcos::dataflow_base]`<double> principal` and `rate`
-will be initialized to `p` and `i_rate` when
-[classref hpx::lcos::dataflow]`<identity_action>` returns a value. These
-dataflows enter for loop and are passed to `interest`. Next `principal`
-and `interest` are passed to the reassignment of `principal`. This loop
-continues for each compound period that must be calculated. To see how
-`interest` and `principal` are calculated in the loop let us look at
-`calc_action` and `add_action`:
+In this way [classref hpx::shared_future]`<double> principal` and `rate`
+will be initialized to `init_principal` and `init_rate` when
+[classref hpx::make_ready_future]`<double>` returns a future containing
+those inital values. These shared futures then enter the for loop and are 
+passed to `interest`. Next `principal` and `interest` are passed to the 
+reassignment of `principal` using a [classref dataflow]. A dataflow will 
+first wait for it's arguments to be ready before launching any callbacks,
+so `add` in this case will not begin until both `principal` and `interest` are ready.
+This loop continues for each compound period that must be calculated. To 
+see how `interest` and `principal` are calculated in the loop let us look 
+at `calc_action` and `add_action`:
 
 [interest_calc_add_action]
 
-After the dataflow dependencies have been defined in hpx_main, we see the
+After the shared future dependencies have been defined in hpx_main, we see the
 following statement:
 
 ``
-    double result = principal.get_future().get();
+    double result = principal.get();
 ``
 
-This statement calls [memberref hpx::future::get]`()` on the last dataflow
-created by our for loop. The program will wait here until the entire dataflow
-tree has been calculated and the value assigned to result. The program then prints
-out the final value of the investment and the amount of interest made by subtracting
+This statement calls [memberref hpx::future::get]`()` on the shared future prinipcal
+which had it's value calculated by our for loop. The program will wait here until the 
+entire dataflow tree has been calculated and the value assigned to result. The program 
+then prints out the final value of the investment and the amount of interest made by subtracting
 the final value of the investment from the initial value of the investment.
 
 [endsect] [/Interest Calculator]
+
+[/Last Edit: 10-16-26]
 
 [/Proofread by:]
 
