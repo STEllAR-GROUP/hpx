@@ -1523,6 +1523,15 @@ bool addressing_service::resolve_cached(
         return false;
     }
 
+    // don't look at the cache if the id is locally managed
+    if (naming::get_locality_id_from_gid(id) ==
+        naming::get_locality_id_from_gid(locality_))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return false;
+    }
+
     // first look up the requested item in the cache
     gva_cache_key k(id);
     gva_cache_key idbase;
@@ -1532,7 +1541,11 @@ bool addressing_service::resolve_cached(
 
     // force routing if target object was migrated
     if (was_object_migrated_locked(id))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
         return false;
+    }
 
     // Check if the entry is currently in the cache
     if (gva_cache_->get_entry(k, idbase, e))
@@ -2312,9 +2325,21 @@ void addressing_service::insert_cache_entry(
   , error_code& ec
     )
 { // {{{
+
+    // If caching is disabled, we silently pretend success.
     if (!caching_)
     {
-        // If caching is disabled, we silently pretend success.
+        if (&ec != &throws)
+            ec = make_success_code();
+        return;
+    }
+
+    // don't look at the cache if the id is locally managed
+    if (naming::get_locality_id_from_gid(gid) ==
+        naming::get_locality_id_from_gid(locality_))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
         return;
     }
 
@@ -2383,13 +2408,17 @@ void addressing_service::update_cache_entry(
     if (!caching_)
     {
         // If caching is disabled, we silently pretend success.
+        if (&ec != &throws)
+            ec = make_success_code();
         return;
     }
 
+    // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
         naming::get_locality_id_from_gid(locality_))
     {
-        // we prefer not to store any local items in the AGAS cache
+        if (&ec != &throws)
+            ec = make_success_code();
         return;
     }
 
@@ -2448,6 +2477,8 @@ void addressing_service::clear_cache(
     if (!caching_)
     {
         // If caching is disabled, we silently pretend success.
+        if (&ec != &throws)
+            ec = make_success_code();
         return;
     }
 
@@ -2473,7 +2504,20 @@ void addressing_service::remove_cache_entry(
 {
     // If caching is disabled, we silently pretend success.
     if (!caching_)
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
         return;
+    }
+
+    // don't look at the cache if the id is locally managed
+    if (naming::get_locality_id_from_gid(gid) ==
+        naming::get_locality_id_from_gid(locality_))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return;
+    }
 
     try {
         LAGAS_(warning) << "addressing_service::remove_cache_entry";
