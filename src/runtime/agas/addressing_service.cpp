@@ -1523,6 +1523,14 @@ bool addressing_service::resolve_cached(
         return false;
     }
 
+    // don't look at cache if id is marked as non-cache-able
+    if (!naming::detail::store_in_cache(id))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return false;
+    }
+
     // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(id) ==
         naming::get_locality_id_from_gid(locality_))
@@ -2334,6 +2342,14 @@ void addressing_service::insert_cache_entry(
         return;
     }
 
+    // don't look at cache if id is marked as non-cacheable
+    if (!naming::detail::store_in_cache(gid))
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return;
+    }
+
     // don't look at the cache if the id is locally managed
     if (naming::get_locality_id_from_gid(gid) ==
         naming::get_locality_id_from_gid(locality_))
@@ -2408,6 +2424,14 @@ void addressing_service::update_cache_entry(
     if (!caching_)
     {
         // If caching is disabled, we silently pretend success.
+        if (&ec != &throws)
+            ec = make_success_code();
+        return;
+    }
+
+    // don't look at cache if id is marked as non-cache-able
+    if (!naming::detail::store_in_cache(gid))
+    {
         if (&ec != &throws)
             ec = make_success_code();
         return;
@@ -2504,6 +2528,14 @@ void addressing_service::remove_cache_entry(
 {
     // If caching is disabled, we silently pretend success.
     if (!caching_)
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return;
+    }
+
+    // don't look at cache if id is marked as non-cache-able
+    if (!naming::detail::store_in_cache(gid))
     {
         if (&ec != &throws)
             ec = make_success_code();
