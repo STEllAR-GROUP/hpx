@@ -24,6 +24,19 @@ namespace hpx { namespace detail
             static_cast<int>(launch::async_policies)) ? true : false;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct keep_id_alive
+    {
+        explicit keep_id_alive(naming::id_type const& gid)
+            : gid_(gid)
+        {}
+
+        void operator()() const {}
+
+        naming::id_type gid_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     struct sync_local_invoke
     {
@@ -158,18 +171,6 @@ namespace hpx { namespace detail
 
             return f;
         }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct keep_id_alive
-    {
-        explicit keep_id_alive(naming::id_type const& gid)
-            : gid_(gid)
-        {}
-
-        void operator()() const {}
-
-        naming::id_type gid_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
