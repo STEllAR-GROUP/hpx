@@ -741,8 +741,7 @@ namespace detail
         {
             if (!started_test())
                 return future_status::deferred; //-V110
-            else
-                return this->future_data<Result>::wait_until(abs_time, ec);
+            return this->future_data<Result>::wait_until(abs_time, ec);
         };
 
     private:
