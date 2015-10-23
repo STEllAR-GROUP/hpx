@@ -95,7 +95,7 @@ namespace hpx { namespace agas { namespace server
                 // update remote cache if the id is not flagged otherwise
                 resolved_type const& r = cache_addresses[i];
                 naming::gid_type const& id = boost::fusion::at_c<0>(r);
-                if (id && !naming::detail::store_in_cache(id))
+                if (id && naming::detail::store_in_cache(id))
                 {
                     gva const& g = boost::fusion::at_c<1>(r);
                     naming::address addr(g.prefix, g.type, g.lva());
