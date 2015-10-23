@@ -7,7 +7,6 @@
 #define HPX_UTIL_DEMANGLE_HELPER_OCT_28_2011_0410PM
 
 #include <hpx/config.hpp>
-#include <string>
 
 // disable the code specific to gcc for now as this causes problems
 // (see #811: simple_central_tuplespace_client run error)
@@ -40,6 +39,8 @@ namespace hpx { namespace util
 }}
 
 #else
+
+#include <typeinfo>
 
 namespace hpx { namespace util
 {

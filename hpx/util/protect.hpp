@@ -10,7 +10,6 @@
 #if !defined(HPX_UTIL_PROTECT_SEP_23_2011_1230PM)
 #define HPX_UTIL_PROTECT_SEP_23_2011_1230PM
 
-#include <boost/config.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>

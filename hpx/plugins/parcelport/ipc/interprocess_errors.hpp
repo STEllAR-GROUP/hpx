@@ -6,6 +6,9 @@
 #if !defined(HPX_PARCELSET_IPC_INTERPROCESS_ERRORS_NOV_25_2012_0703PM)
 #define HPX_PARCELSET_IPC_INTERPROCESS_ERRORS_NOV_25_2012_0703PM
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+
 #include <hpx/config.hpp>
 #include <boost/interprocess/errors.hpp>
 #include <boost/system/system_error.hpp>
@@ -109,5 +112,7 @@ namespace boost { namespace system
 #define HPX_IPC_RESET_EC(ec)                                                  \
         if (&ec != &boost::system::throws) ec = boost::system::error_code();  \
     /**/
+
+#endif
 
 #endif

@@ -7,6 +7,9 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_SENDER_HPP
 #define HPX_PARCELSET_POLICIES_MPI_SENDER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
@@ -185,5 +188,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
 
 }}}}
+
+#endif
 
 #endif

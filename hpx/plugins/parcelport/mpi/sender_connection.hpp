@@ -6,6 +6,9 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_SENDER_CONNECTION_HPP
 #define HPX_PARCELSET_POLICIES_MPI_SENDER_CONNECTION_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/locality.hpp>
@@ -324,6 +327,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         parcelset::locality there_;
     };
 }}}}
+
+#endif
 
 #endif
 

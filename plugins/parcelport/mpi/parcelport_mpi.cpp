@@ -210,7 +210,7 @@ namespace hpx { namespace parcelset
             memory_pool_type chunk_pool_;
 
             sender sender_;
-            receiver receiver_;
+            receiver<parcelport> receiver_;
 
             boost::thread receive_early_parcels_thread_;
 

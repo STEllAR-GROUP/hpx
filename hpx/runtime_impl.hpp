@@ -10,12 +10,14 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
@@ -28,6 +30,7 @@
 #include <boost/detail/atomic_count.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 #include <boost/exception_ptr.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>

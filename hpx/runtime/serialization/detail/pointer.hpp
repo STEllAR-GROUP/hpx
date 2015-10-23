@@ -8,6 +8,7 @@
 #define HPX_SERIALIZATION_DETAIL_POINTER_HPP
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/access.hpp>
 #include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>

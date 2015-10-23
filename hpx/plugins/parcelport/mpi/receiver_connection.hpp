@@ -6,6 +6,9 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_RECEIVER_CONNECTION_HPP
 #define HPX_PARCELSET_POLICIES_MPI_RECEIVER_CONNECTION_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
@@ -17,8 +20,7 @@
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
-    class parcelport;
-
+    template <typename Parcelport>
     struct receiver_connection
     {
     private:
@@ -46,7 +48,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         receiver_connection(
             int src
           , header h
-          , parcelport & pp
+          , Parcelport & pp
           , memory_pool_type & chunk_pool
         )
           : state_(initialized)
@@ -255,8 +257,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         MPI_Request *request_ptr_;
         std::size_t chunks_idx_;
 
-        parcelport & pp_;
+        Parcelport & pp_;
     };
 }}}}
+
+#endif
 
 #endif

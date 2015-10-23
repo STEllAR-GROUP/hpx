@@ -7,6 +7,9 @@
 #ifndef HPX_PARCELSET_POLICIES_IBVERBS_CONNECTION_HANDLER_HPP
 #define HPX_PARCELSET_POLICIES_IBVERBS_CONNECTION_HANDLER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -146,5 +149,7 @@ namespace hpx { namespace parcelset {
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
+
+#endif
 
 #endif

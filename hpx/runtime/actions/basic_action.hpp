@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/async_fwd.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>

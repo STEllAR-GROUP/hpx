@@ -12,6 +12,7 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_callback_fwd.hpp>
+#include <hpx/runtime/applier/detail/apply_implementations.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/name.hpp>

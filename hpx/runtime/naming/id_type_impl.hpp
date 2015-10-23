@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
 #include <boost/cstdint.hpp>
 

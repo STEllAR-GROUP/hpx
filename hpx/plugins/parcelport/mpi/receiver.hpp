@@ -8,6 +8,9 @@
 #ifndef HPX_PARCELSET_POLICIES_MPI_RECEIVER_HPP
 #define HPX_PARCELSET_POLICIES_MPI_RECEIVER_HPP
 
+#include <hpx/config/defines.hpp>
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver_connection.hpp>
 
@@ -20,8 +23,7 @@
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
-    class parcelport;
-
+    template <typename Parcelport>
     struct receiver
     {
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -29,12 +31,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef std::set<std::pair<int, int> > handles_header_type;
         typedef util::memory_chunk_pool<mutex_type> memory_pool_type;
         typedef
-            receiver_connection
+            receiver_connection<Parcelport>
             connection_type;
         typedef std::shared_ptr<connection_type> connection_ptr;
         typedef std::list<connection_ptr> connection_list;
 
-        receiver(parcelport & pp, memory_pool_type & chunk_pool)
+        receiver(Parcelport & pp, memory_pool_type & chunk_pool)
           : pp_(pp)
           , chunk_pool_(chunk_pool)
         {}
@@ -79,7 +81,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         )
         {
             // We try to handle all receives
-            connection_list::iterator end = std::remove_if(
+            typename connection_list::iterator end = std::remove_if(
                 connections.begin()
               , connections.end()
               , [](connection_ptr & rcv) -> bool
@@ -151,7 +153,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return h;
         }
 
-        parcelport & pp_;
+        Parcelport & pp_;
 
         memory_pool_type & chunk_pool_;
 
@@ -180,5 +182,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     };
 
 }}}}
+
+#endif
 
 #endif

@@ -6,15 +6,15 @@
 #if !defined(HPX_NAMING_ADDRESS_MAR_24_2008_0949AM)
 #define HPX_NAMING_ADDRESS_MAR_24_2008_0949AM
 
-#include <boost/io/ios_state.hpp>
-#include <boost/cstdint.hpp>
-
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#include <boost/io/ios_state.hpp>
+#include <boost/cstdint.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 //  address serialization format version

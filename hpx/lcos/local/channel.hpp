@@ -27,32 +27,8 @@ struct channel_future_data : future_data<Result>
   public:
     result_type move_data(error_code& ec = throws)
     {
-        typedef typename future_data<Result>::data_type data_type;
-        // yields control if needed
-        data_type d;
-        {
-            boost::unique_lock<mutex_type> l(this->mtx_);
-            // moves the data from the store
-            this->data_.read_and_empty(d, l, ec);
-            if (ec) return result_type();
-        }
-
-        if (d.is_empty()) {
-            // the value has already been moved out of this future
-            HPX_THROWS_IF(ec, no_state,
-                "future_data::move_data",
-                "this future has not been initialized");
-            return result_type();
-        }
-
-        // the thread has been re-activated by one of the actions
-        // supported by this promise (see \a promise::set_event
-        // and promise::set_exception).
-        if (d.stores_error())
-            return handle_error(d, ec);
-
-        // no error has been reported, return the result
-        return d.move_value();
+        typedef typename future_data<Result>::result_type data_type;
+        return std::move(*this->get_result(ec));
     }
 };
 
@@ -194,8 +170,6 @@ struct channel<void>
 
     boost::intrusive_ptr<future_data> data_;
 
-    (channel<void>);
-
   public:
     typedef future_data::completed_callback_type
         completed_callback_type;
@@ -257,7 +231,7 @@ struct channel<void>
     void get(hpx::error_code& ec = hpx::throws) const
     {
         HPX_ASSERT(data_);
-        hpx::util::unused_type tmp = data_->get_data(ec);
+        hpx::util::unused_type tmp = data_->get_result(ec);
     }
 
     void move(hpx::error_code& ec = hpx::throws) const
