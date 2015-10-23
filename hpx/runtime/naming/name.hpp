@@ -68,21 +68,26 @@ namespace hpx { namespace naming
         typedef gid_type size_type;
         typedef gid_type difference_type;
 
-        static boost::uint64_t const credit_base_mask = 0x1ful;
+        static boost::uint64_t const credit_base_mask = 0x1full;
         static boost::uint16_t const credit_shift = 24;
 
         static boost::uint64_t const credit_mask = credit_base_mask << credit_shift;
-        static boost::uint64_t const was_split_mask = 0x80000000ul; //-V112
-        static boost::uint64_t const has_credits_mask = 0x40000000ul; //-V112
-        static boost::uint64_t const is_locked_mask = 0x20000000ul; //-V112
+        static boost::uint64_t const was_split_mask = 0x80000000ull; //-V112
+        static boost::uint64_t const has_credits_mask = 0x40000000ull; //-V112
+        static boost::uint64_t const is_locked_mask = 0x20000000ull; //-V112
 
         static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
-        static boost::uint64_t const virtual_memory_mask = 0xffffffull;
+        static boost::uint16_t const locality_id_shift = 32;
+
+        static boost::uint64_t const virtual_memory_mask = 0x7fffffull;
+
+        // don't cache this id in the AGAS caches
+        static boost::uint64_t const dont_cache_mask = 0x800000ull; //-V112
 
         static boost::uint64_t const credit_bits_mask =
             credit_mask | was_split_mask | has_credits_mask;
         static boost::uint64_t const internal_bits_mask =
-            credit_bits_mask | is_locked_mask;
+            credit_bits_mask | is_locked_mask | dont_cache_mask;
         static boost::uint64_t const special_bits_mask =
             locality_id_mask | internal_bits_mask;
 
@@ -404,14 +409,16 @@ namespace hpx { namespace naming
 
     inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id)
     {
-        return gid_type(boost::uint64_t(locality_id+1) << 32, 0); //-V112
+        return gid_type(
+            boost::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            0);
     }
 
     inline boost::uint32_t get_locality_id_from_gid(boost::uint64_t msb) HPX_PURE;
 
     inline boost::uint32_t get_locality_id_from_gid(boost::uint64_t msb)
     {
-        return boost::uint32_t(msb >> 32)-1; //-V112
+        return boost::uint32_t(msb >> gid_type::locality_id_shift) - 1;
     }
 
     inline boost::uint32_t get_locality_id_from_gid(gid_type const& id) HPX_PURE;
@@ -495,6 +502,17 @@ namespace hpx { namespace naming
         inline void set_credit_split_mask_for_gid(gid_type& id)
         {
             id.set_msb(id.get_msb() | gid_type::was_split_mask);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        inline bool store_in_cache(gid_type const& id)
+        {
+            return (id.get_msb() & gid_type::dont_cache_mask) ? false : true;
+        }
+
+        inline void set_dont_store_in_cache(id_type& id)
+        {
+            id.set_msb(id.get_msb() | gid_type::dont_cache_mask);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -853,15 +871,16 @@ namespace hpx { namespace naming
 
     inline id_type get_id_from_locality_id(boost::uint32_t locality_id)
     {
-        return id_type(boost::uint64_t(locality_id+1) << 32, 0, id_type::unmanaged);
-        //-V112
+        return id_type(
+            boost::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            0, id_type::unmanaged);
     }
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id)
     {
-        return boost::uint32_t(id.get_msb() >> 32) - 1; //-V112
+        return boost::uint32_t(id.get_msb() >> gid_type::locality_id_shift) - 1;
     }
 
     inline id_type get_locality_from_id(id_type const& id)
