@@ -10,7 +10,8 @@
 #include <hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp>
 #include <hpx/util/spinlock.hpp>
 
-namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { namespace detail
+namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
+{ namespace detail
 {
     struct server
     {
@@ -23,11 +24,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { n
           , id_(0)
         {
             int ret = 0;
-            ret = posix_memalign(reinterpret_cast<void **>(&server_msg_), EXEC_PAGESIZE, sizeof(message));
+            ret = posix_memalign(reinterpret_cast<void **>(&server_msg_),
+                EXEC_PAGESIZE, sizeof(message));
             if(ret != 0)
                 throw std::bad_alloc();
 
-            ret = posix_memalign(reinterpret_cast<void **>(&client_msg_), EXEC_PAGESIZE, sizeof(message));
+            ret = posix_memalign(reinterpret_cast<void **>(&client_msg_),
+                EXEC_PAGESIZE, sizeof(message));
             if(ret != 0)
                 throw std::bad_alloc();
         }
@@ -175,7 +178,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { n
                 if(!server_msg_mr_)
                 {
                     int verrno = errno;
-                    boost::system::error_code err(verrno, boost::system::system_category());
+                    boost::system::error_code err(verrno,
+                        boost::system::system_category());
                     HPX_IBVERBS_THROWS_IF(
                         ec
                       , err
@@ -190,7 +194,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { n
                 if(!client_msg_mr_)
                 {
                     int verrno = errno;
-                    boost::system::error_code err(verrno, boost::system::system_category());
+                    boost::system::error_code err(verrno,
+                        boost::system::system_category());
                     HPX_IBVERBS_THROWS_IF(
                         ec
                       , err

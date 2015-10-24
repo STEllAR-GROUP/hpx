@@ -28,7 +28,6 @@ The options are split into these categories:
 [#build_system.cmake_variables.Generic][h3 Generic Options]
 * [link build_system.cmake_variables.HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION]
 * [link build_system.cmake_variables.HPX_WITH_BENCHMARK_SCRIPTS_PATH HPX_WITH_BENCHMARK_SCRIPTS_PATH]
-* [link build_system.cmake_variables.HPX_WITH_BOOST_ALL_DYNAMIC_LINK HPX_WITH_BOOST_ALL_DYNAMIC_LINK]
 * [link build_system.cmake_variables.HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY]
 * [link build_system.cmake_variables.HPX_WITH_COMPILER_WARNINGS HPX_WITH_COMPILER_WARNINGS]
 * [link build_system.cmake_variables.HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY]
@@ -50,7 +49,6 @@ The options are split into these categories:
 [variablelist
         [[[#build_system.cmake_variables.HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION] `HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION:BOOL`][Use automatic serialization registration for actions and functions. This affects compatibility between HPX applications compiled with different compilers (default ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_BENCHMARK_SCRIPTS_PATH] `HPX_WITH_BENCHMARK_SCRIPTS_PATH:PATH`][Directory to place batch scripts in]]
-        [[[#build_system.cmake_variables.HPX_WITH_BOOST_ALL_DYNAMIC_LINK] `HPX_WITH_BOOST_ALL_DYNAMIC_LINK:BOOL`][Add BOOST_ALL_DYN_LINK to compile flags]]
         [[[#build_system.cmake_variables.HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY] `HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY:BOOL`][Enable backwards compatibility for apply_colocated, async_colocated and friends]]
         [[[#build_system.cmake_variables.HPX_WITH_COMPILER_WARNINGS] `HPX_WITH_COMPILER_WARNINGS:BOOL`][Enable compiler warnings (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY] `HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY:BOOL`][Enable backwards compatibility for component::get_gid() functions]]
@@ -76,6 +74,7 @@ The options are split into these categories:
 * [link build_system.cmake_variables.HPX_WITH_DOCUMENTATION HPX_WITH_DOCUMENTATION]
 * [link build_system.cmake_variables.HPX_WITH_DOCUMENTATION_SINGLEPAGE HPX_WITH_DOCUMENTATION_SINGLEPAGE]
 * [link build_system.cmake_variables.HPX_WITH_EXAMPLES HPX_WITH_EXAMPLES]
+* [link build_system.cmake_variables.HPX_WITH_IO_COUNTERS HPX_WITH_IO_COUNTERS]
 * [link build_system.cmake_variables.HPX_WITH_PSEUDO_DEPENDENCIES HPX_WITH_PSEUDO_DEPENDENCIES]
 * [link build_system.cmake_variables.HPX_WITH_RUNTIME HPX_WITH_RUNTIME]
 * [link build_system.cmake_variables.HPX_WITH_TESTS HPX_WITH_TESTS]
@@ -92,7 +91,8 @@ The options are split into these categories:
         [[[#build_system.cmake_variables.HPX_WITH_DOCUMENTATION] `HPX_WITH_DOCUMENTATION:BOOL`][Build the HPX documentation (default OFF).]]
         [[[#build_system.cmake_variables.HPX_WITH_DOCUMENTATION_SINGLEPAGE] `HPX_WITH_DOCUMENTATION_SINGLEPAGE:BOOL`][The HPX documentation should be build as a single page HTML (default OFF).]]
         [[[#build_system.cmake_variables.HPX_WITH_EXAMPLES] `HPX_WITH_EXAMPLES:BOOL`][Build the HPX examples (default ON)]]
-        [[[#build_system.cmake_variables.HPX_WITH_PSEUDO_DEPENDENCIES] `HPX_WITH_PSEUDO_DEPENDENCIES:BOOL`][Force creating pseudo targets and pseudo dependencies (default OFF).]]
+        [[[#build_system.cmake_variables.HPX_WITH_IO_COUNTERS] `HPX_WITH_IO_COUNTERS:BOOL`][Build HPX runtime (default: ON)]]
+        [[[#build_system.cmake_variables.HPX_WITH_PSEUDO_DEPENDENCIES] `HPX_WITH_PSEUDO_DEPENDENCIES:BOOL`][Force creating pseudo targets and pseudo dependencies (default ON).]]
         [[[#build_system.cmake_variables.HPX_WITH_RUNTIME] `HPX_WITH_RUNTIME:BOOL`][Build HPX runtime (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_TESTS] `HPX_WITH_TESTS:BOOL`][Build the HPX tests (default ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_TESTS_BENCHMARKS] `HPX_WITH_TESTS_BENCHMARKS:BOOL`][Build HPX benchmark tests (default: ON)]]
@@ -105,7 +105,6 @@ The options are split into these categories:
 
 [#build_system.cmake_variables.Thread_Manager][h3 Thread Manager Options]
 * [link build_system.cmake_variables.HPX_WITH_MAX_CPU_COUNT HPX_WITH_MAX_CPU_COUNT]
-* [link build_system.cmake_variables.HPX_WITH_SCHEDULER_LOCAL_STORAGE HPX_WITH_SCHEDULER_LOCAL_STORAGE]
 * [link build_system.cmake_variables.HPX_WITH_STACKTRACES HPX_WITH_STACKTRACES]
 * [link build_system.cmake_variables.HPX_WITH_SWAP_CONTEXT_EMULATION HPX_WITH_SWAP_CONTEXT_EMULATION]
 * [link build_system.cmake_variables.HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION]
@@ -124,7 +123,6 @@ The options are split into these categories:
 
 [variablelist
         [[[#build_system.cmake_variables.HPX_WITH_MAX_CPU_COUNT] `HPX_WITH_MAX_CPU_COUNT:STRING`][HPX applications will not use more that this number of OS-Threads (default: 64)]]
-        [[[#build_system.cmake_variables.HPX_WITH_SCHEDULER_LOCAL_STORAGE] `HPX_WITH_SCHEDULER_LOCAL_STORAGE:BOOL`][Enable scheduler local storage for all HPX schedulers (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_STACKTRACES] `HPX_WITH_STACKTRACES:BOOL`][Attach backtraces to HPX exceptions (default: ON)]]
         [[[#build_system.cmake_variables.HPX_WITH_SWAP_CONTEXT_EMULATION] `HPX_WITH_SWAP_CONTEXT_EMULATION:BOOL`][Emulate SwapContext API for coroutines (default: OFF)]]
         [[[#build_system.cmake_variables.HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION] `HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION:BOOL`][Enable thread stack back trace being captured on suspension (default: OFF)]]

@@ -31,6 +31,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
+    /// \cond NOINTERNAL
+
     namespace detail
     {
         struct plain_function
@@ -50,7 +52,6 @@ namespace hpx { namespace actions
             }
         };
     }
-    /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic plain (free) action types allowing to hold a
@@ -60,9 +61,7 @@ namespace hpx { namespace actions
         typename R, typename ...Ps,
         typename TF, TF F, typename Derived>
     class basic_action_impl<R (*)(Ps...), TF, F, Derived>
-      : public basic_action<
-            detail::plain_function,
-            R(Ps...), Derived>
+      : public basic_action<detail::plain_function, R(Ps...), Derived>
     {
     public:
 
@@ -84,6 +83,8 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static R invoke(naming::address::address_type /*lva*/, Ts&&... vs)
         {
+            basic_action<detail::plain_function, R(Ps...), Derived>::
+                increment_invocation_count();
             return F(std::forward<Ts>(vs)...);
         }
     };
@@ -91,17 +92,22 @@ namespace hpx { namespace actions
     /// \endcond
 }}
 
-namespace hpx { namespace traits {
-
+namespace hpx { namespace traits
+{
     template <> HPX_ALWAYS_EXPORT
     inline components::component_type
     component_type_database<hpx::actions::detail::plain_function>::get()
-    { return hpx::components::component_plain_function; }
+    {
+        return hpx::components::component_plain_function;
+    }
+
     template <> HPX_ALWAYS_EXPORT
     inline void
-    component_type_database<hpx::actions::detail::plain_function>::
-        set(components::component_type)
-    { HPX_ASSERT(false); }
+    component_type_database<hpx::actions::detail::plain_function>::set(
+        components::component_type)
+    {
+        HPX_ASSERT(false);      // shouldn't be ever called
+    }
 }}
 
 /// \def HPX_DEFINE_PLAIN_ACTION(func, name)
@@ -178,7 +184,8 @@ namespace hpx { namespace traits {
 
 /// \def HPX_PLAIN_ACTION(func, name)
 ///
-/// \brief Defines a plain action type based on the given function \a func and registers it with HPX.
+/// \brief Defines a plain action type based on the given function
+/// \a func and registers it with HPX.
 ///
 /// The macro \a HPX_PLAIN_ACTION can be used to define a plain action (e.g. an
 /// action encapsulating a global or free function) based on the given function
@@ -227,7 +234,8 @@ namespace hpx { namespace traits {
 
 /// \def HPX_PLAIN_ACTION_ID(func, actionname, actionid)
 ///
-/// \brief Defines a plain action type based on the given function \a func and registers it with HPX.
+/// \brief Defines a plain action type based on the given function \a func and
+///   registers it with HPX.
 ///
 /// The macro \a HPX_PLAIN_ACTION_ID can be used to define a plain action (e.g. an
 /// action encapsulating a global or free function) based on the given function
@@ -258,7 +266,8 @@ namespace hpx { namespace traits {
 ///
 ///     // This will define the action type 'some_global_action' which represents
 ///     // the function 'app::some_global_function'.
-///     HPX_PLAIN_ACTION_ID(app::some_global_function, some_global_action, some_unique_id);
+///     HPX_PLAIN_ACTION_ID(app::some_global_function, some_global_action,
+///       some_unique_id);
 /// \endcode
 ///
 /// \note The macro \a HPX_PLAIN_ACTION_ID has to be used at global namespace even

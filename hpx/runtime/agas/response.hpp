@@ -9,7 +9,7 @@
 #if !defined(HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED)
 #define HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/export_definitions.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
@@ -381,14 +381,16 @@ struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::resp
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<std::pair<naming::id_type, naming::address>, agas::response>::call",
+            "get_remote_result<std::pair<naming::id_type, naming::address>,"
+            " agas::response>::call",
             "unexpected action code in result conversion");
         return std::pair<naming::id_type, naming::address>();
     }
 };
 
 template <>
-struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>, agas::response>
+struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>,
+    agas::response>
 {
     static std::map<naming::gid_type, parcelset::endpoints_type> call(
         agas::response const& rep

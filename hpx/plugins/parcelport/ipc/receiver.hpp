@@ -50,7 +50,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         /// Get the data window associated with the receiver.
         data_window& window() { return window_; }
 
-        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p = parcel(), std::size_t arg_size = 0)
+        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p = parcel(),
+            std::size_t arg_size = 0)
         {
             if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
             {

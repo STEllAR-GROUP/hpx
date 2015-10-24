@@ -45,9 +45,12 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        on_startstop_type on_start_thread_;    ///< function to call for each created thread
-        on_startstop_type on_stop_thread_;     ///< function to call in case of unexpected stop
-        on_error_type on_error_;               ///< function to call in case of error
+        on_startstop_type on_start_thread_;
+        ///< function to call for each created thread
+        on_startstop_type on_stop_thread_;
+        ///< function to call in case of unexpected stop
+        on_error_type on_error_;
+        ///< function to call in case of error
     };
 
 }}}

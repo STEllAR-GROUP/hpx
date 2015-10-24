@@ -319,7 +319,8 @@ namespace hpx { namespace threads { namespace detail
         resize(core_mask, size);
 
         std::size_t core_index = 0;
-        for (bounds_type::const_iterator it = b.begin(); it != b.end(); ++it, ++core_index)
+        for (bounds_type::const_iterator it = b.begin(); it != b.end();
+            ++it, ++core_index)
         {
             if (index == std::size_t(-1) || core_index == index)
             {
@@ -392,7 +393,8 @@ namespace hpx { namespace threads { namespace detail
         resize(mask, size);
 
         std::size_t socket_index = 0;
-        for (bounds_type::const_iterator it = b.begin(); it != b.end(); ++it, ++socket_index)
+        for (bounds_type::const_iterator it = b.begin(); it != b.end();
+            ++it, ++socket_index)
         {
             if (index == std::size_t(-1) || socket_index == index)
                 mask |= t.init_socket_affinity_mask_from_socket(std::size_t(*it));
@@ -429,7 +431,8 @@ namespace hpx { namespace threads { namespace detail
         resize(mask, size);
 
         std::size_t node_index = 0;
-        for (bounds_type::const_iterator it = b.begin(); it != b.end(); ++it, ++node_index)
+        for (bounds_type::const_iterator it = b.begin(); it != b.end();
+            ++it, ++node_index)
         {
             if (index == std::size_t(-1) || node_index == index)
                 mask |= t.init_numa_node_affinity_mask_from_numa_node(std::size_t(*it));
@@ -570,7 +573,7 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::size_t>& num_pus, error_code& ec)
     {
         std::size_t num_threads = affinities.size();
-        std::size_t num_cores = max_cores % (t.get_number_of_cores()+1);
+        std::size_t num_cores = (std::min)(max_cores, t.get_number_of_cores());
         num_pus.resize(num_threads);
 
         for (std::size_t num_thread = 0; num_thread != num_threads; /**/)
@@ -605,7 +608,7 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::size_t>& num_pus, error_code& ec)
     {
         std::size_t num_threads = affinities.size();
-        std::size_t num_cores = max_cores % (t.get_number_of_cores()+1);
+        std::size_t num_cores = (std::min)(max_cores, t.get_number_of_cores());
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
         num_pus.resize(num_threads);
@@ -622,7 +625,8 @@ namespace hpx { namespace threads { namespace detail
                     return;
                 }
 
-                num_pus[num_thread] = t.get_pu_number(num_core + used_cores, num_pus_cores[num_core]);
+                num_pus[num_thread] = t.get_pu_number(num_core + used_cores,
+                    num_pus_cores[num_core]);
                 affinities[num_thread] = t.init_thread_affinity_mask(
                     num_core + used_cores, num_pus_cores[num_core]++);
 
@@ -638,7 +642,7 @@ namespace hpx { namespace threads { namespace detail
         std::vector<std::size_t>& num_pus, error_code& ec)
     {
         std::size_t num_threads = affinities.size();
-        std::size_t num_cores = max_cores % (t.get_number_of_cores()+1);
+        std::size_t num_cores = (std::min)(max_cores, t.get_number_of_cores());
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
         num_pus.resize(num_threads);
@@ -766,6 +770,15 @@ namespace hpx { namespace threads
 
                     detail::decode_mappings(t, m, affinities, ec);
                     if (ec) return;
+                }
+
+                if(num_pus.empty())
+                {
+                    num_pus.resize(affinities.size());
+                    for (std::size_t i = 0; i != affinities.size(); ++i)
+                    {
+                        num_pus[i] = threads::find_first(affinities[i]);
+                    }
                 }
             }
             break;

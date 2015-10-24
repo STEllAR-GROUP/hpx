@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
@@ -177,7 +178,7 @@ namespace hpx { namespace components
     template <typename Component, typename Wrapper,
         typename CtorPolicy, typename DtorPolicy>
     class managed_component_base
-      : public detail::managed_component_tag, boost::noncopyable
+      : public traits::detail::managed_component_tag, boost::noncopyable
     {
     public:
         typedef typename boost::mpl::if_<
@@ -195,7 +196,8 @@ namespace hpx { namespace components
         // lifetime of the managed_component
         BOOST_STATIC_ASSERT((
             boost::is_same<ctor_policy, traits::construct_without_back_ptr>::value ||
-            boost::is_same<dtor_policy, traits::managed_object_controls_lifetime>::value));
+            boost::is_same<dtor_policy,
+            traits::managed_object_controls_lifetime>::value));
 
         managed_component_base()
           : back_ptr_(0)

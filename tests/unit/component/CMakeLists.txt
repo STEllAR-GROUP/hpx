@@ -1,3 +1,4 @@
+#  Copyright (c) 2014-2015 Hartmut Kaiser
 #  Copyright (c) 2011 Thomas Heller
 #
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +7,7 @@
 set(tests
     action_invoke_no_more_than
     copy_component
+    distribution_policy_executor
     get_gid
     get_ptr
     inheritance_2_classes_abstract
@@ -19,12 +21,12 @@ set(tests
     new_binpacking
     new_colocated
     unordered_map
-    vector_copy
-    vector_for_each
-    vector_handle_values
-    vector_iter
-    vector_move
-    vector_transform_reduce
+    partitioned_vector_copy
+    partitioned_vector_for_each
+    partitioned_vector_handle_values
+    partitioned_vector_iter
+    partitioned_vector_move
+    partitioned_vector_transform_reduce
    )
 
 
@@ -33,6 +35,10 @@ set(action_invoke_no_more_than_PARAMETERS
     THREADS_PER_LOCALITY 4)
 set(action_invoke_no_more_than_FLAGS
     DEPENDENCIES iostreams_component)
+
+set(colocated_distribution_policy_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 2)
 
 set(copy_component_PARAMETERS
     LOCALITIES 2
@@ -74,10 +80,12 @@ set(new__PARAMETERS LOCALITIES 2)
 set(new_binpacking_PARAMETERS LOCALITIES 2)
 set(new_colocated_PARAMETERS LOCALITIES 2)
 
-set(vector_iter_FLAGS DEPENDENCIES vector_component)
-set(vector_algorithms_FLAGS DEPENDENCIES vector_component)
-set(vector_copy_FLAGS DEPENDENCIES vector_component)
-set(vector_handle_values_FLAGS DEPENDENCIES vector_component)
+set(partitioned_vector_copy_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_for_each_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_handle_values_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_iter_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_move_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_transform_reduce_FLAGS DEPENDENCIES partitioned_vector_component)
 
 foreach(test ${tests})
   set(sources

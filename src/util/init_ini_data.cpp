@@ -4,9 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/config/defaults.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
@@ -92,7 +91,8 @@ namespace hpx { namespace util
         bool result = false;
         for (tokenizer_type::iterator it = tok_paths.begin (); it != end_paths; ++it) {
             std::string path = *it;
-            for (tokenizer_type::iterator jt = tok_suffixes.begin (); jt != end_suffixes; ++jt) {
+            for (tokenizer_type::iterator jt = tok_suffixes.begin ();
+                jt != end_suffixes; ++jt) {
                 path += *jt;
                 bool result2 = handle_ini_file (ini, path + "/hpx.ini");
                 if (result2) {

@@ -4,17 +4,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/asio_util.hpp>
 
+#include <boost/cstdint.hpp>
+#include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/asio/ip/address_v4.hpp>
+#include <boost/asio/ip/address_v6.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <ctime>
+#include <string>
 #include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -156,7 +160,8 @@ namespace hpx { namespace util
     }
 
 
-    endpoint_iterator_type connect_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type connect_begin(std::string const & address,
+        boost::uint16_t port,
         boost::asio::io_service& io_service)
     {
         using boost::asio::ip::tcp;
@@ -206,7 +211,8 @@ namespace hpx { namespace util
         return endpoint_iterator_type();
     }
 
-    endpoint_iterator_type accept_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type accept_begin(std::string const & address,
+        boost::uint16_t port,
         boost::asio::io_service& io_service)
     {
         using boost::asio::ip::tcp;

@@ -11,6 +11,7 @@
 #define HPX_PARCELSET_POLICIES_TCP_CONNECTION_HANDLER_HPP
 
 #include <hpx/config/warnings_prefix.hpp>
+#include <hpx/config/asio.hpp>
 
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
@@ -34,7 +35,6 @@ namespace hpx { namespace parcelset
         typedef policies::tcp::sender connection_type;
         typedef boost::mpl::true_  send_early_parcel;
         typedef boost::mpl::false_ do_background_work;
-        typedef boost::mpl::false_ do_enable_parcel_handling;
 
         static const char * type()
         {
@@ -70,7 +70,8 @@ namespace hpx { namespace parcelset
             }
 
             connection_handler(util::runtime_configuration const& ini,
-                util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+                util::function_nonser<void(std::size_t, char const*)>
+                  const& on_start_thread,
                 util::function_nonser<void()> const& on_stop_thread);
 
             ~connection_handler();
@@ -90,7 +91,8 @@ namespace hpx { namespace parcelset
             boost::shared_ptr<sender> create_connection(
                 parcelset::locality const& l, error_code& ec);
 
-            parcelset::locality agas_locality(util::runtime_configuration const & ini) const;
+            parcelset::locality agas_locality(util::runtime_configuration const & ini)
+                const;
 
             parcelset::locality create_locality() const;
 

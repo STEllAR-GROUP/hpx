@@ -10,6 +10,7 @@
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
 #include <hpx/traits/has_serialize.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/type_traits/is_empty.hpp>
 #include <boost/mpl/eval_if.hpp>
@@ -17,12 +18,14 @@
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/identity.hpp>
 
+#include <string>
+
 namespace hpx { namespace serialization
 {
     namespace detail
     {
-        template <class Archive, class T>
-        BOOST_FORCEINLINE void serialize_force_adl(Archive& ar, T& t, unsigned)
+        template <class Archive, class T> BOOST_FORCEINLINE
+        void serialize_force_adl(Archive& ar, T& t, unsigned)
         {
             serialize(ar, t, 0);
         }
@@ -43,13 +46,14 @@ namespace hpx { namespace serialization
                     t.serialize(ar, 0);
                 }
 
-                static void call(hpx::serialization::output_archive& ar, const T& t, unsigned)
+                static void call(hpx::serialization::output_archive& ar,
+                    const T& t, unsigned)
                 {
                     t.serialize(ar, 0);
                 }
             };
 
-            struct non_intrusive_polymorphic
+            struct non_intrusive
             {
                 // this additional indirection level is needed to
                 // force ADL on the second phase of template lookup.
@@ -71,12 +75,15 @@ namespace hpx { namespace serialization
                 }
             };
 
-            struct usual
+            struct intrusive_usual
             {
                 template <class Archive>
                 static void call(Archive& ar, T& t, unsigned)
                 {
-                    t.serialize(ar, 0);
+                    // cast it to let it be run for templated
+                    // member functions
+                    const_cast<typename util::decay<T>::type&>(
+                            t).serialize(ar, 0);
                 }
             };
 
@@ -84,22 +91,15 @@ namespace hpx { namespace serialization
             typedef typename boost::mpl::eval_if<
                 hpx::traits::is_intrusive_polymorphic<T>,
                     boost::mpl::identity<intrusive_polymorphic>,
-                    boost::mpl::eval_if<
-                        hpx::traits::is_nonintrusive_polymorphic<T>,
-                            boost::mpl::identity<non_intrusive_polymorphic>,
-                            boost::mpl::eval_if<
-                                boost::mpl::and_<
-                                    boost::mpl::not_<
-                                        hpx::traits::has_serialize<T>
-                                    >,
-                                    boost::is_empty<T>
-                                >,
-                                    boost::mpl::identity<empty>,
-                                    boost::mpl::identity<usual>
-                            >
-
-
-                    >
+                        boost::mpl::eval_if<
+                            hpx::traits::has_serialize<T>,
+                                boost::mpl::identity<intrusive_usual>,
+                                boost::mpl::eval_if<
+                                    boost::is_empty<T>,
+                                        boost::mpl::identity<empty>,
+                                        boost::mpl::identity<non_intrusive>
+                                >
+                        >
             >::type type;
         };
 

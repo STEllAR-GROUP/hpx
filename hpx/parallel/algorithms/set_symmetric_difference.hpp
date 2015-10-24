@@ -10,7 +10,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -140,7 +139,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     output iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a set_symmetric_difference requires \a F to meet the
+    ///                     overload of \a set_symmetric_difference requires
+    ///                     \a F to meet the
     ///                     requirements of \a CopyConstructible.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -180,12 +180,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a set_symmetric_difference algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a set_symmetric_difference algorithm returns a
+    ///           \a hpx::future<OutIter>
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
-    ///           The \a set_symmetric_difference algorithm returns the output iterator to the
+    ///           The \a set_symmetric_difference algorithm returns the output
+    ///           iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
@@ -296,12 +298,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a set_symmetric_difference algorithm returns a \a hpx::future<OutIter>
+    /// \returns  The \a set_symmetric_difference algorithm returns a
+    ///           \a hpx::future<OutIter>
     ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.
-    ///           The \a set_symmetric_difference algorithm returns the output iterator to the
+    ///           The \a set_symmetric_difference algorithm returns the output
+    ///           iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///

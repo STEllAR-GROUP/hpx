@@ -8,10 +8,11 @@
 #ifndef HPX_SERIALIZATION_ARRAY_HPP
 #define HPX_SERIALIZATION_ARRAY_HPP
 
-#include <cstddef>
-
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
+
+#include <cstddef>
 
 #include <boost/array.hpp>
 #ifndef BOOST_NO_CXX11_HDR_ARRAY
@@ -44,24 +45,8 @@ namespace hpx { namespace serialization
         template <class Archive>
         void serialize_optimized(Archive& ar, unsigned int v, boost::mpl::false_)
         {
-#ifdef BOOST_BIG_ENDIAN
-            if (ar.endian_little())
-            {
-                for (std::size_t i = 0; i != m_element_count; ++i)
-                    ar & m_t[i];
-            }
-#else
-            if (ar.endian_big())
-            {
-                for (std::size_t i = 0; i != m_element_count; ++i)
-                    ar & m_t[i];
-            }
-#endif
-            else
-            {
-                // this behaviour has been kept from old version with portable boost archives
-                serialize_optimized(ar, v, boost::mpl::true_());
-            }
+            for (std::size_t i = 0; i != m_element_count; ++i)
+                ar & m_t[i];
         }
 
         void serialize_optimized(output_archive& ar, unsigned int, boost::mpl::true_)
@@ -82,7 +67,13 @@ namespace hpx { namespace serialization
             typedef typename hpx::traits::is_bitwise_serializable<T>::type
                 use_optimized;
 
-            if (ar.disable_array_optimization())
+#ifdef BOOST_BIG_ENDIAN
+            bool archive_endianess_differs = ar.endian_little();
+#else
+            bool archive_endianess_differs = ar.endian_big();
+#endif
+
+            if (ar.disable_array_optimization() || archive_endianess_differs)
                 serialize_optimized(ar, v, boost::mpl::false_());
             else
                 serialize_optimized(ar, v, use_optimized());

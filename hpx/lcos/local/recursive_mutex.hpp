@@ -158,7 +158,8 @@ namespace hpx { namespace lcos { namespace local
                 util::unregister_lock(this);
                 if (0 == --recursion_count)
                 {
-                    locking_thread_id.exchange(thread_id_from_mutex<Mutex>::invalid_id());
+                    locking_thread_id.exchange(thread_id_from_mutex<Mutex>
+                        ::invalid_id());
                     util::reset_ignored(&mtx);
                     mtx.unlock();
                 }
@@ -204,7 +205,8 @@ namespace hpx { namespace lcos { namespace local
 
         public:
             typedef boost::unique_lock<recursive_mutex_impl> scoped_lock;
-            typedef boost::detail::try_lock_wrapper<recursive_mutex_impl> scoped_try_lock;
+            typedef boost::detail
+                ::try_lock_wrapper<recursive_mutex_impl> scoped_try_lock;
         };
     }
 

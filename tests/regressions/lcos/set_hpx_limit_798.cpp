@@ -21,7 +21,8 @@ using hpx::lcos::make_ready_future;
 using hpx::util::unwrapped;
 
 // define large action
-double func(double x1 , double x2 , double x3 , double x4 , double x5 , double x6 , double x7)
+double func(double x1 , double x2 , double x3 , double x4 ,
+    double x5 , double x6 , double x7)
 {
     return x1;
 }

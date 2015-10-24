@@ -69,7 +69,8 @@ namespace hpx { namespace lcos
 
                 if(bcast_ids.size() > 0)
                 {
-                    hpx::id_type locality = hpx::naming::get_locality_from_id(bcast_ids[0]);
+                    hpx::id_type locality =
+                        hpx::naming::get_locality_from_id(bcast_ids[0]);
                     Action act;
 
                     bcast_future =
@@ -92,7 +93,8 @@ namespace hpx { namespace lcos
                     ready_promise = hpx::lcos::local::promise<void>();
                 }
 
-                return bcast_future.then(hpx::util::bind(&broadcast::when_dst<A0>, this));
+                return bcast_future.then(hpx::util::bind(&broadcast::when_dst<A0>,
+                    this));
             }
         }
 
@@ -155,10 +157,12 @@ namespace hpx { namespace lcos
                         hpx::id_type dst = hpx::naming::get_locality_from_id(next[0]);
 
                         broadcast_futures.push_back(
-                            hpx::async<broadcast_impl_action>(dst, std::move(next), fun, fan_out)
+                            hpx::async<broadcast_impl_action>(dst, std::move(next),
+                                fun, fan_out)
                         );
                         /*
-                        hpx::apply<broadcast_impl_action>(dst, std::move(next), fun, fan_out);
+                        hpx::apply<broadcast_impl_action>(dst, std::move(next),
+                        fun, fan_out);
                         */
                     }
 

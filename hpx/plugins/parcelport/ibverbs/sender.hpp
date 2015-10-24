@@ -49,9 +49,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             >
             postprocess_function_type;
 
-        sender(connection_handler & handler, util::memory_chunk_pool & pool, parcelset::locality const& there,
+        sender(connection_handler & handler, util::memory_chunk_pool & pool,
+            parcelset::locality const& there,
             performance_counters::parcels::gatherer& parcels_sent)
-          : context_(), parcelport_(handler), there_(there), parcels_sent_(parcels_sent), memory_pool_(pool)
+          : context_(), parcelport_(handler), there_(there),
+            parcels_sent_(parcels_sent), memory_pool_(pool)
         {
         }
 
@@ -76,7 +78,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             return there_;
         }
 
-        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p, std::size_t arg_size)
+        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p,
+            std::size_t arg_size)
         {
             if(!buffer_)
             {

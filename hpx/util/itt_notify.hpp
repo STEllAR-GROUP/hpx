@@ -116,7 +116,8 @@ HPX_EXPORT void itt_heap_allocate_end(__itt_heap_function, void**, std::size_t, 
 HPX_EXPORT void itt_heap_free_begin(__itt_heap_function, void*);
 HPX_EXPORT void itt_heap_free_end(__itt_heap_function, void*);
 HPX_EXPORT void itt_heap_reallocate_begin(__itt_heap_function, void*, std::size_t, int);
-HPX_EXPORT void itt_heap_reallocate_end(__itt_heap_function, void*, void**, std::size_t, int);
+HPX_EXPORT void itt_heap_reallocate_end(__itt_heap_function, void*, void**,
+           std::size_t, int);
 HPX_EXPORT void itt_heap_internal_access_begin();
 HPX_EXPORT void itt_heap_internal_access_end();
 
@@ -284,7 +285,8 @@ namespace hpx { namespace util { namespace itt
     struct heap_allocate
     {
         template <typename T>
-        heap_allocate(heap_function& heap_function, T**& addr, std::size_t size, int init)
+        heap_allocate(heap_function& heap_function, T**& addr, std::size_t size,
+                      int init)
           : heap_function_(heap_function),
             addr_(reinterpret_cast<void**&>(addr)), size_(size), init_(init)
         {
@@ -293,7 +295,8 @@ namespace hpx { namespace util { namespace itt
 
         ~heap_allocate()
         {
-            HPX_ITT_HEAP_ALLOCATE_END(heap_function_.heap_function_, addr_, size_, init_);
+            HPX_ITT_HEAP_ALLOCATE_END(heap_function_.heap_function_, addr_,
+                size_, init_);
         }
 
     private:
@@ -358,13 +361,15 @@ inline ___itt_id* itt_make_id(void*, unsigned long) { return 0; }
 inline void itt_id_create(___itt_domain const*, ___itt_id*) {}
 inline void itt_id_destroy(___itt_id*) {}
 
-inline __itt_heap_function itt_heap_function_create(const char*, const char*) { return 0; }
+inline __itt_heap_function itt_heap_function_create(const char*,
+            const char*) { return 0; }
 inline void itt_heap_allocate_begin(__itt_heap_function, std::size_t, int) {}
 inline void itt_heap_allocate_end(__itt_heap_function, void**, std::size_t, int) {}
 inline void itt_heap_free_begin(__itt_heap_function, void*) {}
 inline void itt_heap_free_end(__itt_heap_function, void*) {}
 inline void itt_heap_reallocate_begin(__itt_heap_function, void*, std::size_t, int) {}
-inline void itt_heap_reallocate_end(__itt_heap_function, void*, void**, std::size_t, int) {}
+inline void itt_heap_reallocate_end(__itt_heap_function, void*, void**,
+            std::size_t, int) {}
 inline void itt_heap_internal_access_begin() {}
 inline void itt_heap_internal_access_end() {}
 

@@ -85,6 +85,7 @@ namespace hpx { namespace parcelset
         Parcelport & pp
       , Buffer buffer
       , std::size_t parcel_count
+      , std::size_t num_thread = -1
     )
     {
         std::vector<serialization::serialization_chunk> chunks(
@@ -115,12 +116,12 @@ namespace hpx { namespace parcelset
                         // make sure this parcel ended up on the right locality
 #ifdef HPX_DEBUG
                         if(hpx::get_runtime_ptr() && hpx::get_locality())
-                            HPX_ASSERT(p.get_destination_locality() == hpx::get_locality());
+                            HPX_ASSERT(p.destination_locality() == hpx::get_locality());
 #endif
 
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
-                        pp.add_received_parcel(p);
+                        pp.add_received_parcel(std::move(p), num_thread);
                         overall_add_parcel_time += timer.elapsed_nanoseconds() -
                             add_parcel_time;
                     }
@@ -169,38 +170,40 @@ namespace hpx { namespace parcelset
     }
 
     template <typename Parcelport, typename Buffer>
-    void decode_parcel(Parcelport & parcelport, Buffer buffer)
+    void decode_parcel(Parcelport & parcelport, Buffer buffer, std::size_t num_thread)
     {
-        if(hpx::is_running() && parcelport.async_serialization())
+//         if(hpx::is_running() && parcelport.async_serialization())
+//         {
+//             hpx::applier::register_thread_nullary(
+//                 util::bind(
+//                     util::one_shot(&decode_message<Parcelport, Buffer>),
+//                     boost::ref(parcelport), std::move(buffer), 1, num_thread),
+//                 "decode_parcels",
+//                 threads::pending, true, threads::thread_priority_boost,
+//                 parcelport.get_next_num_thread());
+//         }
+//         else
         {
-            hpx::applier::register_thread_nullary(
-                util::bind(
-                    util::one_shot(&decode_message<Parcelport, Buffer>),
-                    boost::ref(parcelport), std::move(buffer), 1),
-                "decode_parcels",
-                threads::pending, true, threads::thread_priority_boost);
-        }
-        else
-        {
-            decode_message(parcelport, std::move(buffer), 1);
+            decode_message(parcelport, std::move(buffer), 1, num_thread);
         }
     }
 
     template <typename Parcelport, typename Buffer>
-    void decode_parcels(Parcelport & parcelport, Buffer buffer)
+    void decode_parcels(Parcelport & parcelport, Buffer buffer, std::size_t num_thread)
     {
-        if(hpx::is_running() && parcelport.async_serialization())
+//         if(hpx::is_running() && parcelport.async_serialization())
+//         {
+//             hpx::applier::register_thread_nullary(
+//                 util::bind(
+//                     util::one_shot(&decode_message<Parcelport, Buffer>),
+//                     boost::ref(parcelport), std::move(buffer), 0, num_thread),
+//                 "decode_parcels",
+//                 threads::pending, true, threads::thread_priority_boost,
+//                 parcelport.get_next_num_thread());
+//         }
+//         else
         {
-            hpx::applier::register_thread_nullary(
-                util::bind(
-                    util::one_shot(&decode_message<Parcelport, Buffer>),
-                    boost::ref(parcelport), std::move(buffer), 0),
-                "decode_parcels",
-                threads::pending, true, threads::thread_priority_boost);
-        }
-        else
-        {
-            decode_message(parcelport, std::move(buffer), 0);
+            decode_message(parcelport, std::move(buffer), 0, num_thread);
         }
     }
 

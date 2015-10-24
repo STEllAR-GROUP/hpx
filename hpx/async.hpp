@@ -10,12 +10,14 @@
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -26,7 +28,8 @@ namespace hpx { namespace detail
 {
     // Defer the evaluation of result_of during the SFINAE checks below
 #if defined(__clang__)
-    template <typename F, typename Result = typename util::deferred_call_result_of<F>::type>
+    template <typename F, typename Result =
+        typename util::deferred_call_result_of<F>::type>
     struct create_future
     {
         typedef lcos::future<Result> type;
@@ -52,7 +55,8 @@ namespace hpx { namespace detail
         {
             return lcos::make_ready_future(boost::ref(f()));
         } catch (...) {
-            return lcos::make_exceptional_future<result_type>(boost::current_exception());
+            return lcos::make_exceptional_future<result_type>
+                (boost::current_exception());
         }
     }
 
@@ -69,7 +73,8 @@ namespace hpx { namespace detail
         {
             return lcos::make_ready_future(f());
         } catch (...) {
-            return lcos::make_exceptional_future<result_type>(boost::current_exception());
+            return lcos::make_exceptional_future<result_type>
+                (boost::current_exception());
         }
     }
 

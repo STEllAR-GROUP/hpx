@@ -9,7 +9,8 @@
 MACRO (hpx_set_lib_name target name)
   # there is no need to change debug/release names explicitly
   # as we use CMAKE_DEBUG_POSTFIX to alter debug names
-  
+
+  hpx_debug("hpx_set_lib_name: target:" ${target} "name: " ${name})
   set_target_properties (${target}
       PROPERTIES
       DEBUG_OUTPUT_NAME          hpx_${name}

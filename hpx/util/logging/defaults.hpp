@@ -35,12 +35,14 @@ The logging lib has a few default types, used throughout the lib. They are:
 - @c hold_string_type - the type used to hold a string; by default, it's @c std::string
 - @c filter_type - the default filter; by default, it's filter::no_ts
 - @c lock_resource - used to lock resources for access. See locker namespace.
-- @c mutex - the mutex class used throughout the library. By default, it's mutex_win32 for Windows, or mutex_posix for POSIX
+- @c mutex - the mutex class used throughout the library. By default,
+-    it's mutex_win32 for Windows, or mutex_posix for POSIX
 
 They are all present in @c default_types structure.
 
 If you want to override any of the above, you should do the following:
-- before including anything from Boost Logging Library, <tt>\#include <hpx/util/logging/defaults.hpp> </tt>
+- before including anything from Boost Logging Library,
+  <tt>\#include <hpx/util/logging/defaults.hpp> </tt>
 - override the types
 - do <tt>\#include <hpx/util/logging/logging.hpp> </tt>
 
@@ -108,9 +110,11 @@ Example:
             template<class lock_type> struct finder {
 //#if !defined( HPX_HAVE_LOG_NO_TSS) && defined(BOOST_WINDOWS)
                 // on Windows, I've tested the threading
-//                typedef typename locker::tss_resource_with_cache<lock_type, 5, hpx::util::logging::threading::mutex > type;
+//                typedef typename locker::tss_resource_with_cache<lock_type,
+//                            5, hpx::util::logging::threading::mutex > type;
 //#else
-                typedef typename locker::ts_resource<lock_type, hpx::util::logging::threading::mutex > type;
+                typedef typename locker::ts_resource<lock_type,
+                    hpx::util::logging::threading::mutex > type;
 //#endif
             };
         };

@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
 
@@ -323,7 +323,8 @@ namespace hpx { namespace util
             if (0 != component_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint64_t)*2) << std::setfill('0')
+                out << std::hex << std::setw(sizeof(boost::uint64_t)*2)
+                    << std::setfill('0')
                     << component_id;
                 str.prepend_string(out.str());
             }
@@ -608,7 +609,8 @@ namespace hpx { namespace util
             hpx_level()->set_enabled(lvl);
 
             // errors are logged to the given destination and to cerr
-            error_writer.add_destination("console", console(lvl, destination_hpx)); //-V106
+            error_writer.add_destination("console", console(lvl, destination_hpx));
+            //-V106
 #if !defined(ANDROID) && !defined(__ANDROID__)
             if (logdest != "cerr")
                 error_writer.write(logformat, logdest + " cerr");
@@ -621,7 +623,8 @@ namespace hpx { namespace util
         else {
             // errors are always logged to cerr
             if (!isconsole) {
-                error_writer.add_destination("console", console(lvl, destination_hpx)); //-V106
+                error_writer.add_destination("console", console(lvl,
+                    destination_hpx)); //-V106
                 error_writer.write(logformat, "console");
             }
             else {
@@ -736,7 +739,8 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.add_destination("console", console(lvl, destination_debuglog)); //-V106
+            writer.add_destination("console", console(lvl, destination_debuglog));
+            //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -948,7 +952,8 @@ namespace hpx { namespace util
         std::string loglevel, logdest, logformat;
 
         if (ini.has_section("hpx.logging.console.application")) {
-            util::section const* logini = ini.get_section("hpx.logging.console.application");
+            util::section const* logini =
+                ini.get_section("hpx.logging.console.application");
             HPX_ASSERT(NULL != logini);
 
             std::string empty;
@@ -996,7 +1001,8 @@ namespace hpx { namespace util
         std::string loglevel, logdest, logformat;
 
         if (ini.has_section("hpx.logging.console.debuglog")) {
-            util::section const* logini = ini.get_section("hpx.logging.console.debuglog");
+            util::section const* logini =
+                ini.get_section("hpx.logging.console.debuglog");
             HPX_ASSERT(NULL != logini);
 
             std::string empty;
@@ -1070,7 +1076,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_LOGDESTINATION:file(hpx.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_LOGDESTINATION:\
+                    file(hpx.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_LOGFORMAT:|}",
 
@@ -1089,7 +1096,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:file(hpx.timing.$[system.pid].log)}",
+                "destination = \
+            ${HPX_CONSOLE_TIMING_LOGDESTINATION:file(hpx.timing.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
 
@@ -1097,7 +1105,8 @@ namespace hpx { namespace util { namespace detail
                 "[hpx.logging.agas]",
                 "level = ${HPX_AGAS_LOGLEVEL:-1}",
 //                     "destination = ${HPX_AGAS_LOGDESTINATION:console}",
-                "destination = ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
+                "destination = \
+                ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
                 "format = ${HPX_AGAS_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
@@ -1109,14 +1118,16 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:file\
+                    (hpx.agas.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
 
                 // logging related to the parcel transport
                 "[hpx.logging.parcel]",
                 "level = ${HPX_PARCEL_LOGLEVEL:-1}",
-                "destination = ${HPX_PARCEL_LOGDESTINATION:file(hpx.parcel.$[system.pid].log)}",
+                "destination = ${HPX_PARCEL_LOGDESTINATION:file\
+                (hpx.parcel.$[system.pid].log)}",
                 "format = ${HPX_PARCEL_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
@@ -1128,7 +1139,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:file(hpx.parcel.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:file\
+                    (hpx.parcel.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:|}",
 
@@ -1147,7 +1159,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file(hpx.application.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file\
+                    (hpx.application.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}",
 
@@ -1165,7 +1178,8 @@ namespace hpx { namespace util { namespace detail
 #if defined(ANDROID) || defined(__ANDROID__)
                 "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:android_log}",
 #else
-                "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:file(hpx.debuglog.$[system.pid].log)}",
+                "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:file\
+                    (hpx.debuglog.$[system.pid].log)}",
 #endif
                 "format = ${HPX_CONSOLE_DEB_LOGFORMAT:|}"
             ;

@@ -60,7 +60,8 @@ namespace hpx { namespace performance_counters { namespace server
 
         hpx::performance_counters::counter_value value;
 
-        prev_value_.value_ = detail::counter_type_from_statistic<Statistic>::call(*value_);
+        prev_value_.value_ =
+            detail::counter_type_from_statistic<Statistic>::call(*value_);
         prev_value_.status_ = status_new_data;
         prev_value_.time_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         prev_value_.count_ = ++invocation_count_;
@@ -70,7 +71,8 @@ namespace hpx { namespace performance_counters { namespace server
         {
             value_.reset(detail::counter_type_from_statistic<Statistic>::create(
                 parameter2_)); // reset accumulator
-            (*value_)(static_cast<double>(prev_value_.value_));  // start off with last base value
+            (*value_)(static_cast<double>(prev_value_.value_));
+            // start off with last base value
         }
 
         return value;
@@ -98,7 +100,8 @@ namespace hpx { namespace performance_counters { namespace server
         }
         else {
             boost::lock_guard<mutex_type> l(mtx_);
-            (*value_)(static_cast<double>(base_value.value_));          // accumulate new value
+            (*value_)(static_cast<double>(base_value.value_));
+            // accumulate new value
         }
         return true;
     }
@@ -192,7 +195,8 @@ namespace hpx { namespace performance_counters { namespace server
 
         value_.reset(detail::counter_type_from_statistic<Statistic>::create(
             parameter2_)); // reset accumulator
-        (*value_)(static_cast<double>(prev_value_.value_));  // start off with last base value
+        (*value_)(static_cast<double>(prev_value_.value_));
+        // start off with last base value
     }
 }}}
 

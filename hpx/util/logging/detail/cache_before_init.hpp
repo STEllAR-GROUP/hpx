@@ -52,12 +52,14 @@ inline thread_id_type get_thread_id()
 #endif
 }
 
-#if defined( HPX_LOG_BEFORE_INIT_USE_CACHE_FILTER) || defined( HPX_LOG_BEFORE_INIT_USE_LOG_ALL)
+#if defined( HPX_LOG_BEFORE_INIT_USE_CACHE_FILTER) \
+ || defined( HPX_LOG_BEFORE_INIT_USE_LOG_ALL)
 //////////////////////////////////////////////////////////////////
 // Messages that were logged before initializing the log - Caching them
 
 /**
-    The library will make sure your logger derives from this in case you want to cache messages that are logged before logs are initialized.
+    The library will make sure your logger derives from this in case you want to
+    cache messages that are logged before logs are initialized.
 
     Note:
     - you should initialize your logs ASAP
@@ -69,7 +71,8 @@ private:
     typedef bool (*is_enabled_func)();
 
     struct message {
-        message(is_enabled_func is_enabled_, msg_type string_) : is_enabled(is_enabled_), string(string_) {}
+        message(is_enabled_func is_enabled_, msg_type string_)
+            : is_enabled(is_enabled_), string(string_) {}
         // function that sees if the filter is enabled or not
         is_enabled_func is_enabled;
         // the message itself
@@ -122,7 +125,8 @@ public:
             mutex::scoped_lock lk(m_cs);
             std::swap( m_cache.msgs, msgs);
         }
-        for ( typename cache::message_array::iterator b = msgs.begin(), e = msgs.end(); b != e; ++b) {
+        for ( typename cache::message_array::iterator b = msgs.begin(),
+            e = msgs.end(); b != e; ++b) {
             if ( !(b->is_enabled) )
                 // no filter
                 writer_( b->string );
@@ -134,7 +138,8 @@ public:
 
     void add_msg(const msg_type & msg) const {
         mutex::scoped_lock lk(m_cs);
-        // note : last_enabled can be null, if we don't want to use filters (HPX_LOG_BEFORE_INIT_USE_LOG_ALL)
+        // note : last_enabled can be null, if we don't want to use filters
+        //        (HPX_LOG_BEFORE_INIT_USE_LOG_ALL)
         is_enabled_func func = m_cache.threads[ get_thread_id() ].last_enabled ;
         m_cache.msgs.push_back( message(func, msg) );
     }
@@ -149,15 +154,18 @@ private:
     mutable mutex m_cs;
     mutable cache m_cache;
     /**
-    IMPORTANT: to make sure we know when the cache is off as efficiently as possible, I have this mechanism:
+    IMPORTANT: to make sure we know when the cache is off as efficiently as possible,
+    I have this mechanism:
     - first, query m_is_enabled, which at the beginning is false
       - if this is true, it's clear that caching has been turned off
       - if this is false, we don't know for sure, thus, continue to ask
 
-    - second, use the thread-safe resource 'm_cache' (use a mutex, a bit slow, but that's life)
+    - second, use the thread-safe resource 'm_cache' (use a mutex,
+      a bit slow, but that's life)
       - if m_cache.is_using_cache is true, we're still using cache
       - if m_cache.is_using_cache is false, caching has been turned off
-        - set m_is_enabled to true, thus this will propagate to all threads soon (depending on your lock_resource)
+        - set m_is_enabled to true, thus this will propagate to all threads soon
+          (depending on your lock_resource)
     */
     mutable bool m_is_caching_off;
 };

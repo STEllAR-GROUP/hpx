@@ -15,6 +15,7 @@
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/function.hpp>
@@ -234,7 +235,8 @@ struct HPX_EXPORT symbol_namespace
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, remote_bulk_service, bulk_service_action);
+    HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, remote_bulk_service,
+        bulk_service_action);
 };
 
 }}}

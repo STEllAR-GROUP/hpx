@@ -7,12 +7,16 @@
 #if!defined(HPX_INIT_INI_DATA_SEP_26_2008_0344PM)
 #define HPX_INIT_INI_DATA_SEP_26_2008_0344PM
 
-#include <string>
-
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
-#include <hpx/util/plugin/virtual_constructors.hpp>
+#include <hpx/util/plugin/virtual_constructor.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
+
+#include <boost/filesystem/path.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

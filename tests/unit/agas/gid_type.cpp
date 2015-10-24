@@ -605,7 +605,8 @@ int main()
       // ------------------------------------
       //   0xfffffffffffffffffffffffffffffffe
       HPX_TEST_EQ((gid + gid).get_lsb(), 0xfffffffffffffffeULL);
-      HPX_TEST_EQ((gid + gid).get_msb() & ~special_bits_mask, ~0x0ULL & ~special_bits_mask);
+      HPX_TEST_EQ((gid + gid).get_msb() & ~special_bits_mask,
+          ~0x0ULL & ~special_bits_mask);
 
       // addition should not mutate the originals
       HPX_TEST_EQ(gid.get_lsb(), ~0x0ULL);

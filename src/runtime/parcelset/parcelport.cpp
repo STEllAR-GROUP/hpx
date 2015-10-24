@@ -8,22 +8,22 @@
 #include <hpx/config/defines.hpp>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/state.hpp>
 
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/exception.hpp>
-
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini, locality const & here,
             std::string const& type)
-      : parcels_(),
+      : applier_(0),
         here_(here),
         max_inbound_message_size_(ini.get_max_inbound_message_size()),
         max_outbound_message_size_(ini.get_max_outbound_message_size()),
@@ -31,8 +31,8 @@ namespace hpx { namespace parcelset
         allow_zero_copy_optimizations_(true),
         enable_security_(false),
         async_serialization_(false),
-        enable_parcel_handling_(true),
-        priority_(hpx::util::get_entry_as<int>(ini, "hpx.parcel." + type + ".priority", "0")),
+        priority_(hpx::util::get_entry_as<int>(ini, "hpx.parcel." + type + ".priority",
+            "0")),
         type_(type)
     {
         std::string key("hpx.parcel.");
@@ -43,7 +43,8 @@ namespace hpx { namespace parcelset
             allow_zero_copy_optimizations_ = false;
         }
         else {
-            if (hpx::util::get_entry_as<int>(ini, key + ".zero_copy_optimization", "1") == 0)
+            if (hpx::util::get_entry_as<int>(ini, key + ".zero_copy_optimization",
+                "1") == 0)
                 allow_zero_copy_optimizations_ = false;
         }
 
@@ -55,6 +56,56 @@ namespace hpx { namespace parcelset
         if(hpx::util::get_entry_as<int>(ini, key + ".async_serialization", "0") != 0)
         {
             async_serialization_ = true;
+        }
+    }
+
+    void parcelport::add_received_parcel(parcel p, std::size_t num_thread)
+    {
+        // do some work (notify event handlers)
+        if(applier_)
+        {
+            while (threads::threadmanager_is(state_starting))
+            {
+                boost::this_thread::sleep(boost::get_system_time() +
+                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+            }
+
+            // Give up if we're shutting down.
+            if (threads::threadmanager_is(state_stopping))
+            {
+    //             LPT_(debug) << "parcelport: add_received_parcel: dropping late "
+    //                             "parcel " << p;
+                return;
+            }
+
+            // write this parcel to the log
+    //         LPT_(debug) << "parcelport: add_received_parcel: " << p;
+
+            applier_->schedule_action(std::move(p));
+        }
+        // If the applier has not been set yet, we are in bootstrapping and
+        // need to execute the action directly
+        else
+        {
+            // TODO: Make assertions exceptions
+            // decode the action-type in the parcel
+            actions::base_action * act = p.get_action();
+
+            // early parcels should only be plain actions
+            HPX_ASSERT(actions::base_action::plain_action == act->get_action_type());
+
+            // early parcels can't have continuations
+            HPX_ASSERT(!p.get_continuation());
+
+            // We should not allow any exceptions to escape the execution of the
+            // action as this would bring down the ASIO thread we execute in.
+            try {
+                act->get_thread_function(0)
+                    (threads::thread_state_ex(threads::wait_signaled));
+            }
+            catch (...) {
+                hpx::report_error(boost::current_exception());
+            }
         }
     }
 

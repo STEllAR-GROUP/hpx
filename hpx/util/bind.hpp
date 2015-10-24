@@ -12,7 +12,6 @@
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_placeholder.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
@@ -24,6 +23,7 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>
+#include <boost/mpl/eval_if.hpp>
 #include <boost/ref.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -135,15 +135,15 @@ namespace hpx { namespace util
             >::type
         >
         {
-            typedef typename util::invoke_fused_result_of<
+            typedef typename util::detail::fused_result_of<
                 T&(UnboundArgs)
             >::type type;
 
             static BOOST_FORCEINLINE
             type call(T& t, UnboundArgs&& unbound_args)
             {
-                return util::invoke_fused_r<type>
-                    (t, std::forward<UnboundArgs>(unbound_args));
+                return util::invoke_fused(
+                    t, std::forward<UnboundArgs>(unbound_args));
             }
         };
 
@@ -176,6 +176,15 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename F, typename ...Ts>
+        struct bind_result_of_guard
+          : boost::mpl::eval_if_c<
+                traits::is_callable<F(Ts...)>::value
+              , util::result_of<F(Ts...)>
+              , boost::mpl::identity<cannot_be_called>
+            >
+        {};
+
         template <typename F, typename BoundArgs, typename UnboundArgs>
         struct bind_invoke_impl;
 
@@ -184,9 +193,8 @@ namespace hpx { namespace util
             F, util::tuple<Ts...>, UnboundArgs
         >
         {
-            typedef typename util::detail::result_of_or<
-                  F(typename bind_eval_impl<F, Ts, UnboundArgs>::type...)
-                , cannot_be_called
+            typedef typename bind_result_of_guard<
+                F, typename bind_eval_impl<F, Ts, UnboundArgs>::type...
             >::type type;
 
             template <std::size_t ...Is>
@@ -197,7 +205,7 @@ namespace hpx { namespace util
               , UnboundArgs&& unbound_args
             )
             {
-                return util::invoke_r<type>(f, bind_eval<F>(
+                return util::invoke(f, bind_eval<F>(
                     util::get<Is>(bound_args),
                     std::forward<UnboundArgs>(unbound_args))...);
             }
@@ -208,9 +216,8 @@ namespace hpx { namespace util
             F, util::tuple<Ts...> const, UnboundArgs
         >
         {
-            typedef typename util::detail::result_of_or<
-                F(typename bind_eval_impl<F, Ts const, UnboundArgs>::type...)
-              , cannot_be_called
+            typedef typename bind_result_of_guard<
+                F, typename bind_eval_impl<F, Ts const, UnboundArgs>::type...
             >::type type;
 
             template <std::size_t ...Is>
@@ -221,7 +228,7 @@ namespace hpx { namespace util
               , UnboundArgs&& unbound_args
             )
             {
-                return util::invoke_r<type>(f, bind_eval<F>(
+                return util::invoke(f, bind_eval<F>(
                     util::get<Is>(bound_args),
                     std::forward<UnboundArgs>(unbound_args))...);
             }
@@ -324,7 +331,7 @@ namespace hpx { namespace util
 
             template <typename This, typename ...Ts>
             struct result<This(Ts...)>
-              : util::detail::result_of_or<F(Ts...), cannot_be_called>
+              : bind_result_of_guard<F, Ts...>
             {};
 
             template <typename This, typename ...Ts>
@@ -337,12 +344,8 @@ namespace hpx { namespace util
             typename result<one_shot_wrapper(Ts...)>::type
             operator()(Ts&&... vs)
             {
-                typedef typename result<
-                    one_shot_wrapper(Ts...)
-                >::type result_type;
-
                 check_call();
-                return util::invoke_r<result_type>(_f, std::forward<Ts>(vs)...);
+                return util::invoke(_f, std::forward<Ts>(vs)...);
             }
 
         public: // exposition-only
@@ -475,36 +478,14 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename BoundArgs>
     struct is_bind_expression<util::detail::bound<F, BoundArgs> >
-      : boost::mpl::true_
+      : boost::true_type
     {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t I>
     struct is_placeholder<util::detail::placeholder<I> >
-      : util::detail::placeholder<I>
+      : boost::integral_constant<int, I>
     {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename BoundArgs>
-    struct serialize_as_future<util::detail::bound<F, BoundArgs> >
-      : boost::mpl::bool_<
-            serialize_as_future<F>::value ||
-            serialize_as_future<BoundArgs>::value
-        >
-    {
-        static BOOST_FORCEINLINE
-        bool call_if(util::detail::bound<F, BoundArgs>& b)
-        {
-            return serialize_as_future<F>::call_if(b._f) ||
-                serialize_as_future<BoundArgs>::call_if(b._bound_args);
-        }
-
-        static void call(util::detail::bound<F, BoundArgs> & b)
-        {
-            traits::serialize_as_future<F>::call(b._f);
-            traits::serialize_as_future<BoundArgs>::call(b._bound_args);
-        }
-    };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

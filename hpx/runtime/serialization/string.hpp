@@ -6,6 +6,7 @@
 #ifndef HPX_SERIALIZATION_STRING_HPP
 #define HPX_SERIALIZATION_STRING_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include <string>
@@ -14,7 +15,8 @@ namespace hpx { namespace serialization
 {
     // load string
     template <typename Char, typename CharTraits, typename Allocator>
-    void serialize(input_archive & ar, std::basic_string<Char, CharTraits, Allocator> & s, unsigned)
+    void serialize(input_archive & ar, std::basic_string<Char, CharTraits,
+        Allocator> & s, unsigned)
     {
         typedef std::basic_string<Char, CharTraits, Allocator> string_type;
         typedef typename string_type::size_type size_type;
@@ -29,7 +31,8 @@ namespace hpx { namespace serialization
 
     // save string
     template <typename Char, typename CharTraits, typename Allocator>
-    void serialize(output_archive & ar, std::basic_string<Char, CharTraits, Allocator> & s, unsigned)
+    void serialize(output_archive & ar, const std::basic_string<Char, CharTraits,
+        Allocator> & s, unsigned)
     {
         ar << s.size(); //-V128
         save_binary(ar, s.data(), s.size() * sizeof(Char));

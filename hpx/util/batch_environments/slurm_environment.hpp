@@ -229,8 +229,10 @@ namespace hpx { namespace util { namespace batch_environments {
                             else
                             {
                                 using hpx::util::safe_lexical_cast;
-                                std::size_t begin = safe_lexical_cast<std::size_t>(range[0]);
-                                std::size_t end = safe_lexical_cast<std::size_t>(range[1]);
+                                std::size_t begin = safe_lexical_cast<std::size_t>
+                                    (range[0]);
+                                std::size_t end = safe_lexical_cast<std::size_t>
+                                    (range[1]);
                                 if(begin > end) std::swap(begin, end);
 
                                 std::vector<std::string> vs;

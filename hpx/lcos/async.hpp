@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async_fwd.hpp>

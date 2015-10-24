@@ -5,6 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_PAPI)
+
 #include <cctype>
 #include <set>
 
@@ -197,7 +200,8 @@ namespace hpx { namespace performance_counters { namespace papi
                     !p.countername_.empty())
                 { // validate specific PAPI event
                     int code;
-                    if (PAPI_event_name_to_code(const_cast<char *>(p.countername_.c_str()), &code) != PAPI_OK)
+                    if (PAPI_event_name_to_code(const_cast<char *>
+                        (p.countername_.c_str()), &code) != PAPI_OK)
                         return false;
                     hpx::performance_counters::counter_status status =
                         get_counter_name(p, cnt_info.fullname_, ec);
@@ -320,3 +324,5 @@ HPX_REGISTER_STARTUP_MODULE_DYNAMIC(
 // register related command line options
 HPX_REGISTER_COMMANDLINE_MODULE_DYNAMIC(
     hpx::performance_counters::papi::util::get_options_description);
+
+#endif

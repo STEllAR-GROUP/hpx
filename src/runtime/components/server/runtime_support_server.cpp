@@ -5,9 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/config/defaults.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
@@ -37,6 +39,7 @@
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/reduce.hpp>
 #endif
+#include <hpx/lcos/local/packaged_task.hpp>
 
 #include <hpx/util/assert.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -137,6 +140,13 @@ namespace hpx
 {
     // helper function to stop evaluating counters during shutdown
     void stop_evaluating_counters();
+
+    namespace parcelset
+    {
+        // default parcel-sent handler function
+        void default_write_handler(boost::system::error_code const& ec,
+            parcelset::parcel const& p);
+    }
 }
 
 namespace hpx { namespace components
@@ -427,7 +437,8 @@ namespace hpx { namespace components { namespace server
 
                 strm << "list of registered components: \n";
                 component_map_type::iterator end = components_.end();
-                for (component_map_type::iterator cit = components_.begin(); cit!= end; ++cit)
+                for (component_map_type::iterator cit = components_.begin();
+                    cit!= end; ++cit)
                 {
                     strm << "  "
                          << components::get_component_type_name((*cit).first)
@@ -981,13 +992,14 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Remove the given locality from our connection cache
-    void runtime_support::remove_from_connection_cache(parcelset::endpoints_type const& eps)
+    void runtime_support::remove_from_connection_cache(
+        naming::gid_type const& gid, parcelset::endpoints_type const& eps)
     {
         runtime* rt = get_runtime_ptr();
         if (rt == 0) return;
 
         // instruct our connection cache to drop all connections it is holding
-        rt->get_parcel_handler().remove_from_connection_cache(eps);
+        rt->get_parcel_handler().remove_from_connection_cache(gid, eps);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1056,7 +1068,8 @@ namespace hpx { namespace components { namespace server
                 cleanup_threads(tm, l);
 
                 // obey timeout
-                if ((std::abs(timeout - 1.) < 1e-16)  && timeout < (t.elapsed() - start_time)) {
+                if ((std::abs(timeout - 1.) < 1e-16)  && timeout <
+                    (t.elapsed() - start_time)) {
                     // we waited long enough
                     timed_out = true;
                     break;
@@ -1212,6 +1225,32 @@ namespace hpx { namespace components { namespace server
         return true;
     }
 
+    // working around non-copy-ability of packaged_task
+    struct indirect_packaged_task
+    {
+        typedef void write_handler_type(
+            boost::system::error_code const&, parcelset::parcel const&);
+        typedef lcos::local::packaged_task<write_handler_type> packaged_task_type;
+
+        indirect_packaged_task()
+          : pt(boost::make_shared<packaged_task_type>(
+                &parcelset::default_write_handler))
+        {}
+
+        hpx::future<void> get_future()
+        {
+            return pt->get_future();
+        }
+
+        template <typename ...Ts>
+        void operator()(Ts&& ... vs)
+        {
+            (*pt)(std::forward<Ts>(vs)...);
+        }
+
+        boost::shared_ptr<packaged_task_type> pt;
+    };
+
     void runtime_support::remove_here_from_connection_cache()
     {
         runtime* rt = get_runtime_ptr();
@@ -1220,12 +1259,21 @@ namespace hpx { namespace components { namespace server
 
         std::vector<naming::id_type> locality_ids = find_remote_localities();
 
-        typedef server::runtime_support::remove_from_connection_cache_action action_type;
+        typedef server::runtime_support::remove_from_connection_cache_action
+            action_type;
+
+        std::vector<future<void> > callbacks;
+        callbacks.reserve(locality_ids.size());
+
         action_type act;
         for (naming::id_type const& id : locality_ids)
         {
-            apply(act, id, rt->endpoints());
+            indirect_packaged_task ipt;
+            callbacks.push_back(ipt.get_future());
+            apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
         }
+
+        wait_all(callbacks);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1573,7 +1621,8 @@ namespace hpx { namespace components { namespace server
                 boost::program_options::variables_map vm;
 
                 util::commandline_error_mode mode = util::rethrow_on_error;
-                std::string allow_unknown(ini.get_entry("hpx.commandline.allow_unknown", "0"));
+                std::string allow_unknown(ini.get_entry("hpx.commandline.allow_unknown",
+                    "0"));
                 if (allow_unknown != "0") mode = util::allow_unregistered;
 
                 util::parse_commandline(ini, options, unknown_cmd_line, vm,

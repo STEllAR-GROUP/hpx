@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/version.hpp>
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/defaults.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/itt_notify.hpp>
@@ -54,9 +54,13 @@
 #  define HPX_DLL_STRING   "hpx" HPX_SHARED_LIB_EXTENSION
 #endif
 
+#include <limits>
+
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__) || defined(__APPLE__)
-namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix
+#if defined(__linux) || defined(linux) || defined(__linux__)\
+         || defined(__FreeBSD__) || defined(__APPLE__)
+namespace hpx { namespace util { namespace coroutines
+{ namespace detail { namespace posix
 {
     ///////////////////////////////////////////////////////////////////////////
     // this global (urghhh) variable is used to control whether guard pages
@@ -133,19 +137,25 @@ namespace hpx { namespace util
 #endif
 #ifdef HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
 #ifdef HPX_DEBUG
-            "minimal_deadlock_detection = ${MINIMAL_DEADLOCK_DETECTION:1}",
+            "minimal_deadlock_detection = ${HPX_MINIMAL_DEADLOCK_DETECTION:1}",
 #else
-            "minimal_deadlock_detection = ${MINIMAL_DEADLOCK_DETECTION:0}",
+            "minimal_deadlock_detection = ${HPX_MINIMAL_DEADLOCK_DETECTION:0}",
 #endif
 #endif
+            "expect_connecting_localities = ${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
             // add placeholders for keys to be added by command line handling
             "os_threads = 1",
-            "cores = 1",
+            "cores = all",
             "localities = 1",
             "first_pu = 0",
             "runtime_mode = console",
             "scheduler = local-priority",
+            "affinity = pu",
+            "pu_step = 1",
+            "pu_offset = 0",
+            "numa_sensitive = 0",
+            "max_background_threads = ${MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
@@ -172,7 +182,7 @@ namespace hpx { namespace util
             // enable aliasing
             "aliasing = ${HPX_COMMANDLINE_ALIASING:1}",
 
-            // allow for unknown options to passes through
+            // allow for unknown options to passed through
             "allow_unknown = ${HPX_COMMANDLINE_ALLOW_UNKNOWN:0}",
 
             // predefine command line aliases
@@ -497,7 +507,8 @@ namespace hpx { namespace util
             if(NULL != sec)
             {
                 return hpx::util::get_entry_as<std::size_t>(
-                    *sec, "data_buffer_cache_size", HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE);
+                    *sec, "data_buffer_cache_size",
+                    HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE);
             }
         }
         return HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE;
@@ -600,7 +611,8 @@ namespace hpx { namespace util
         return cache_size;
     }
 
-    std::size_t runtime_configuration::get_agas_local_cache_size_per_thread(std::size_t dflt) const
+    std::size_t runtime_configuration
+        ::get_agas_local_cache_size_per_thread(std::size_t dflt) const
     {
         std::size_t cache_size = dflt;
 
@@ -648,7 +660,8 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return hpx::util::get_entry_as<std::size_t>(
-                    *sec, "max_pending_refcnt_requests", HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS);
+                    *sec, "max_pending_refcnt_requests",
+                    HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS);
             }
         }
         return HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS;
@@ -921,9 +934,6 @@ namespace hpx { namespace util
 
         case threads::thread_stacksize_huge:
             return huge_stacksize;
-
-        case threads::thread_stacksize_nostack:
-            return 0;       // stackless thread
 
         default:
         case threads::thread_stacksize_small:

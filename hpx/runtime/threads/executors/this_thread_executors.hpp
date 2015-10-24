@@ -61,6 +61,12 @@ namespace hpx { namespace threads { namespace executors
             // Return an estimate of the number of waiting tasks.
             boost::uint64_t num_pending_closures(error_code& ec) const;
 
+            // Reset internal (round robin) thread distribution scheme
+            void reset_thread_distribution();
+
+            /// Set the new scheduler mode
+            void set_scheduler_mode(threads::policies::scheduler_mode mode);
+
         protected:
             friend class manage_thread_executor<this_thread_executor>;
 

@@ -14,7 +14,7 @@
 #define HPX_LCOS_LOCAL_SPINLOCK_POOL_HPP
 
 #include <hpx/config/emulate_deleted.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -114,8 +114,9 @@ namespace hpx { namespace lcos { namespace local
     }
 
     template <typename Tag>
-    lcos::local::itt_spinlock_init<Tag>
-        lcos::local::spinlock_pool<Tag>::init_ = lcos::local::itt_spinlock_init<Tag>();
+    lcos::local::detail::itt_spinlock_init<Tag>
+        lcos::local::spinlock_pool<Tag>::init_ =
+            lcos::local::detail::itt_spinlock_init<Tag>();
 #endif
 }}}
 

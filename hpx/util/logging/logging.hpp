@@ -38,8 +38,10 @@ namespace hpx { namespace util { namespace logging {
 /**
 @file hpx/util/logging/logging.hpp
 
-Include this file when you're using the logging lib, but don't necessarily want to use @ref manipulator "formatters and destinations".
-If you want to use @ref manipulator "formatters and destinations", then you can include this one instead:
+Include this file when you're using the logging lib, but don't necessarily want to
+use @ref manipulator "formatters and destinations".
+If you want to use @ref manipulator "formatters and destinations",
+then you can include this one instead:
 
 @code
 #include <hpx/util/logging/format_fwd.hpp>

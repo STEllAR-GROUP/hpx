@@ -183,6 +183,7 @@ hpx_option(HPX_WITH_TESTS BOOL "Build the HPX tests (default ON)" ON CATEGORY "B
 hpx_option(HPX_WITH_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
+hpx_option(HPX_WITH_TESTS_HEADERS BOOL "Build HPX header tests (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TESTS_EXTERNAL_BUILD BOOL "Build external cmake build tests (default: ON)" ON ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED CATEGORY "Build Targets")
 hpx_option(HPX_WITH_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED CATEGORY "Build Targets")
@@ -191,8 +192,21 @@ hpx_option(HPX_WITH_COMPILE_ONLY_TESTS BOOL
   "Create build system support for compile time only HPX tests (default ON)"
   ON CATEGORY "Build Targets")
 
+# Enable IO-counters on linux systems only
+set(HPX_WITH_IO_COUNTERS_DEFAULT OFF)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+  set(HPX_WITH_IO_COUNTERS_DEFAULT ON)
+endif()
+
+hpx_option(HPX_WITH_IO_COUNTERS BOOL
+  "Build HPX runtime (default: ${HPX_WITH_IO_COUNTERS_DEFAULT})"
+  ${HPX_WITH_IO_COUNTERS_DEFAULT} ADVANCED CATEGORY "Build Targets")
+if(HPX_WITH_IO_COUNTERS)
+  hpx_add_config_define(HPX_HAVE_IO_COUNTERS)
+endif()
+
 set(HPX_FULL_RPATH_DEFAULT ON)
-if(APPLE)
+if(APPLE OR MSVC)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_WITH_FULL_RPATH BOOL
@@ -260,7 +274,7 @@ hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
 
 if(NOT (${HPX_WITH_MAX_CPU_COUNT} LESS 65))
   set(HPX_WITH_MORE_THAN_64_THREADS_DEFAULT OFF)
-  hpx_option(HPX_WITH_MORE_THAN_64_THREADS STRING
+  hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
     "HPX applications will be able to run on more than 64 cores"
     ${HPX_WITH_MORE_THAN_64_THREADS_DEFAULT}
     CATEGORY "Thread Manager" ADVANCED)
@@ -406,6 +420,13 @@ foreach(_scheduler ${HPX_WITH_THREAD_SCHEDULERS_UC})
     hpx_add_config_define(HPX_HAVE_STATIC_SCHEDULER)
     set(HPX_HAVE_STATIC_SCHEDULER ON CACHE INTERNAL "")
   endif()
+  # The throttle scheduler is not supported neither on Windows nor on Mac
+  if(HPX_WITH_APEX AND NOT WIN32 AND NOT APPLE)
+    if(_scheduler STREQUAL "THROTTLE" OR _all)
+      hpx_add_config_define(HPX_HAVE_THROTTLE_SCHEDULER)
+      set(HPX_HAVE_THROTTLE_SCHEDULER ON CACHE INTERNAL "")
+    endif()
+  endif()
   if(_scheduler STREQUAL "HIERARCHY" OR _all)
     hpx_add_config_define(HPX_HAVE_HIERARCHY_SCHEDULER)
     set(HPX_HAVE_HIERARCHY_SCHEDULER ON CACHE INTERNAL "")
@@ -463,10 +484,25 @@ hpx_option(HPX_WITH_PARCELPORT_MPI_MULTITHREADED BOOL
 
 ## Profiling related build options
 hpx_option(HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF CATEGORY "Profiling")
+if(HPX_WITH_APEX)
+  hpx_add_config_define(HPX_HAVE_APEX)
+endif()
 hpx_option(HPX_WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
+if(HPX_WITH_PAPI)
+  hpx_add_config_define(HPX_HAVE_PAPI)
+endif()
 hpx_option(HPX_WITH_TAU BOOL "Enable TAU profiling support." OFF CATEGORY "Profiling")
+if(HPX_WITH_TAU)
+  hpx_add_config_define(HPX_HAVE_TAU)
+endif()
 hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL "Enable Google Perftools instrumentation support." OFF CATEGORY "Profiling")
+if(HPX_WITH_GOOGLE_PERFTOOLS)
+  hpx_add_config_define(HPX_HAVE_GOOGLE_PERFTOOLS)
+endif()
 hpx_option(HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF CATEGORY "Profiling")
+#if(HPX_WITH_ITTNOTIFY)
+  #hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+#endif()
 
 ## Debugging related build options
 hpx_option(HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF CATEGORY "Debugging")
@@ -513,6 +549,12 @@ endif()
 
 if(HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF)
   hpx_add_config_define(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+endif()
+
+# If APEX is defined, the action timers need thread debug info.
+if(HPX_WITH_APEX)
+    hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
+    set(HPX_HAVE_THREAD_DESCRIPTION ON CACHE INTERNAL "")
 endif()
 
 if(HPX_WITH_THREAD_DEBUG_INFO)
@@ -659,7 +701,7 @@ hpx_check_for_cxx11_alias_templates(
   DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
 
 hpx_check_for_cxx11_auto(
-  DEFINITIONS HPX_HAVE_CXX11_AUTO)
+  REQUIRED "HPX needs support for C++11 auto")
 
 hpx_check_for_cxx11_constexpr(
   DEFINITIONS HPX_HAVE_CXX11_CONSTEXPR)
@@ -682,6 +724,9 @@ hpx_check_for_cxx11_explicit_cvt_ops(
 
 hpx_check_for_cxx11_function_template_default_args(
   REQUIRED "HPX needs support for C++11 defaulted function template arguments")
+
+hpx_check_for_cxx11_initializer_list(
+  DEFINITIONS HPX_HAVE_CXX11_INITIALIZER_LIST)
 
 hpx_check_for_cxx11_inline_namespaces(
   DEFINITIONS HPX_HAVE_CXX11_INLINE_NAMESPACES)
@@ -723,11 +768,20 @@ hpx_check_for_cxx11_std_chrono(
 hpx_check_for_cxx11_std_initializer_list(
   DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
 
+hpx_check_for_cxx11_std_is_bind_expression(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION)
+
 hpx_check_for_cxx11_std_is_final(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_FINAL)
 
 hpx_check_for_cxx11_std_is_null_pointer(
   DEFINITIONS HPX_HAVE_CXX11_STD_IS_NULL_POINTER)
+
+hpx_check_for_cxx11_std_is_placeholder(
+  DEFINITIONS HPX_HAVE_CXX11_STD_IS_PLACEHOLDER)
+
+hpx_check_for_cxx11_std_reference_wrapper(
+  DEFINITIONS HPX_HAVE_CXX11_STD_REFERENCE_WRAPPER)
 
 hpx_check_for_cxx11_std_unique_ptr(
   REQUIRED "HPX needs support for C++11 std::unique_ptr")
@@ -780,8 +834,7 @@ endif()
 
 if(MSVC)
   enable_language(ASM_MASM)
-  hpx_add_compile_flag(-Ox
-    CONFIGURATIONS Release LANGUAGES CXX C)
+  hpx_add_compile_flag(-Ox CONFIGURATIONS Release LANGUAGES CXX C)
 
   if(NOT HPX_WITH_AWAIT)
     hpx_add_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
@@ -792,18 +845,15 @@ if(MSVC)
 
   # VS2012 and above has a special flag for improving the debug experience by
   # adding more symbol information to the build (-d2Zi)
-  hpx_add_compile_flag(-d2Zi+
-    CONFIGURATIONS RelWithDebInfo)
+  hpx_add_compile_flag(-d2Zi+ CONFIGURATIONS RelWithDebInfo)
 
   # VS2013 and above know how to do link time constant data segment folding
   # VS2013 update 2 and above know how to remove debug information for
   #     non-referenced functions and data (-Zc:inline)
   if(MSVC12 OR MSVC14)
     hpx_add_compile_flag(-Zc:inline)
-    hpx_add_compile_flag(-Gw
-      CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
-    hpx_add_compile_flag(-Zo
-      CONFIGURATIONS RelWithDebInfo)
+    hpx_add_compile_flag(-Gw CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
+    hpx_add_compile_flag(-Zo CONFIGURATIONS RelWithDebInfo)
   endif()
 
   # Exceptions
@@ -811,6 +861,9 @@ if(MSVC)
   if(MSVC14)
     # assume conforming (throwing) operator new implementations
     hpx_add_compile_flag(-Zc:throwingNew)
+    # enable faster linking (requires VS2015 Update1)
+    hpx_remove_link_flag(/debug CONFIGURATIONS Debug)
+    hpx_add_link_flag(/debug:fastlink CONFIGURATIONS Debug)
   endif()
 
   # Runtime type information
@@ -866,7 +919,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
     # OpenMPI triggers a lot of forcing value to bool 'true' or 'false'
     # (performance warning)
-    if(MPI_FOUND)
+    if(MPI_FOUND OR HPX_WITH_APEX)
       hpx_add_compile_flag(-wd4800)
     endif()
   else() # Trial and error approach for any other compiler ...
@@ -957,6 +1010,7 @@ else()
   endif()
 
   # Check if our libraries have unresolved symbols
+  #if(NOT APPLE AND NOT HPX_WITH_APEX)
   if(NOT APPLE)
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
   endif()
@@ -1067,16 +1121,49 @@ endif()
 # Enable integration with Apex event counters
 ################################################################################
 if(HPX_WITH_APEX)
-  find_package(APEX)
+  # handle APEX library
+  include(GitExternal)
+  git_external(apex
+    https://github.com/khuck/xpress-apex.git
+    master
+    VERBOSE)
+
+  LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
+  add_subdirectory(apex/src/apex)
   if(NOT APEX_FOUND)
-    hpx_error("Apex could not be found and HPX_WITH_APEX=On, please specify APEX_ROOT to point to the root of your Apex installation")
+    hpx_error("Apex could not be found and HPX_WITH_APEX=On")
   endif()
-  hpx_libraries(${APEX_LIBRARIES})
-  include_directories(${APEX_INCLUDE_DIR})
   if(AMPLIFIER_FOUND)
     hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
   endif()
-  hpx_add_config_define(HPX_HAVE_ITTNOTIFY)
+
+  include_directories(${APEX_SOURCE_DIR})
+  set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+      ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} apex_lib)
+  if(APEX_WITH_MSR)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${MSR_ROOT}/lib -lmsr)
+  endif()
+  if(APEX_WITH_ACTIVEHARMONY)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
+  endif()
+  if(APEX_WITH_TAU)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${TAU_ROOT}/lib -lTAU)
+  endif()
+
+  # handle optional ITTNotify library
+  if(HPX_WITH_ITTNOTIFY)
+    add_subdirectory(apex/src/ITTNotify)
+    if(NOT ITTNOTIFY_FOUND)
+      hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
+    endif()
+    include_directories(${ITTNOTIFY_SOURCE_DIR})
+    hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
+    set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
+        ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} ittnotify_lib)
+  endif()
 endif()
 
 if(HPX_WITH_GOOGLE_PERFTOOLS)
@@ -1397,11 +1484,11 @@ install( # Install HPX Python scripts
 #       #make copy, so that we have intact symlink in CMAKE_BINARY_DIR
 #       execute_process(
 #         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${script}" "${script_name}"
-# 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+#   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 #
 #       execute_process(
 #         COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
-# 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+#   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
 #
 #       install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "bin")
 #     endforeach()

@@ -157,7 +157,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
     /// the value of
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, conv(*first), ..., conv(*(first + (i - result) - 1))).
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, conv(*first), ...,
+    /// conv(*(first + (i - result) - 1))).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicates \a op and \a conv.
@@ -240,7 +241,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK), GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
+    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK),
+    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
     /// Neither \a conv nor \a op shall invalidate iterators or subranges, or

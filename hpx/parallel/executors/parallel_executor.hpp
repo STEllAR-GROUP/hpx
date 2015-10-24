@@ -10,11 +10,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_executor.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/executors/auto_chunk_size.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/decay.hpp>
+
+#include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -33,10 +37,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         // with this executor.
         typedef auto_chunk_size executor_parameters_type;
 
-#if defined(DOXYGEN)
         /// Create a new parallel executor
-        parallel_executor() {}
-#endif
+        explicit parallel_executor(BOOST_SCOPED_ENUM(launch) l = launch::async)
+          : l_(l)
+        {}
 
         /// \cond NOINTERNAL
         template <typename F>
@@ -46,13 +50,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         }
 
         template <typename F>
-        static hpx::future<typename hpx::util::result_of<
+        hpx::future<typename hpx::util::result_of<
             typename hpx::util::decay<F>::type()
         >::type>
         async_execute(F && f)
         {
-            return hpx::async(launch::async, std::forward<F>(f));
+            return hpx::async(l_, std::forward<F>(f));
         }
+        /// \endcond
+
+    private:
+        /// \cond NOINTERNAL
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & l_;
+        }
+        /// \endcond
+
+    private:
+        /// \cond NOINTERNAL
+        BOOST_SCOPED_ENUM(launch) l_;
         /// \endcond
     };
 }}}

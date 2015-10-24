@@ -237,8 +237,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a remove_copy_if algorithm returns a \a hpx::future<OutIter> if the
-    ///           execution policy is of type
+    /// \returns  The \a remove_copy_if algorithm returns a \a hpx::future<OutIter>
+    ///           if the execution policy is of type
     ///           \a sequential_task_execution_policy or
     ///           \a parallel_task_execution_policy and
     ///           returns \a OutIter otherwise.

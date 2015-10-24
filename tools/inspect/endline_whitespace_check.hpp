@@ -22,7 +22,7 @@ namespace boost
 
             whitespace_check();
             std::string a = "*Endline Whitespace*";
-            std::string b = "Unnecessary whitespace at end of file";
+            std::string b = "Unnecessary whitespace at end of line";
             virtual const char * name() const { return a.c_str(); }
             virtual const char * desc() const { return b.c_str(); }
 

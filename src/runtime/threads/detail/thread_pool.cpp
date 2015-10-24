@@ -48,13 +48,13 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     thread_pool<Scheduler>::thread_pool(Scheduler& sched,
             threads::policies::callback_notifier& notifier,
-            char const* pool_name, bool do_background_work)
+            char const* pool_name, policies::scheduler_mode m)
       : sched_(sched),
         notifier_(notifier),
         pool_name_(pool_name),
         thread_count_(0),
         used_processing_units_(),
-        do_background_work_(do_background_work)
+        mode_(m)
     {
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS) && \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
@@ -81,7 +81,10 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     hpx::state thread_pool<Scheduler>::get_state() const
     {
-        std::size_t num_thread = get_worker_thread_num();
+        // get_worker_thread_num returns the global thread number which might
+        // be too large. This function might get called from within
+        // background_work inside the os executors
+        std::size_t num_thread = get_worker_thread_num() % thread_count_;
         if (num_thread != std::size_t(-1))
             return get_state(num_thread);
         return sched_.get_minmax_state().second;
@@ -187,6 +190,16 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
+    thread_state thread_pool<Scheduler>::set_state(
+        thread_id_type const& id, thread_state_enum new_state,
+        thread_state_ex_enum new_state_ex, thread_priority priority,
+        error_code& ec)
+    {
+        return detail::set_thread_state(id, new_state, //-V107
+            new_state_ex, priority, get_worker_thread_num(), ec);
+    }
+
+    template <typename Scheduler>
     thread_id_type thread_pool<Scheduler>::set_state(
         util::steady_time_point const& abs_time,
         thread_id_type const& id, thread_state_enum newstate,
@@ -230,6 +243,19 @@ namespace hpx { namespace threads { namespace detail
         std::size_t num, bool reset) const
     {
         return sched_.Scheduler::get_thread_count(state, priority, num, reset);
+    }
+
+    template <typename Scheduler>
+    void thread_pool<Scheduler>::reset_thread_distribution()
+    {
+        return sched_.Scheduler::reset_thread_distribution();
+    }
+
+    template <typename Scheduler>
+    void thread_pool<Scheduler>::set_scheduler_mode(
+        threads::policies::scheduler_mode mode)
+    {
+        return sched_.set_scheduler_mode(mode);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -487,7 +513,8 @@ namespace hpx { namespace threads { namespace detail
 
         // Setting priority of worker threads to a lower priority, this needs to
         // be done in order to give the parcel pool threads higher priority
-        if (any(mask & used_processing_units_))
+        if ((mode_ & policies::reduce_thread_priority) &&
+            any(mask & used_processing_units_))
         {
             topology.reduce_thread_priority(ec);
             if (ec)
@@ -530,13 +557,14 @@ namespace hpx { namespace threads { namespace detail
                         ),
                         detail::scheduling_callbacks::callback_type());
 
-                    if (do_background_work_)
+                    if (mode_ & policies::do_background_work)
                     {
                         callbacks.background_ = util::bind(
                             &policies::scheduler_base::background_callback,
                             &sched_, num_thread);
                     }
 
+                    sched_.set_scheduler_mode(mode_);
                     detail::scheduling_loop(num_thread, sched_, counters,
                         callbacks);
 
@@ -980,6 +1008,12 @@ namespace hpx { namespace threads { namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
+#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::threads::detail::thread_pool<
+    hpx::threads::policies::throttle_queue_scheduler<> >;
+#endif
+
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::threads::detail::thread_pool<

@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace detail
         HPX_ASSERT(l.owns_lock());
     }
 
-#   if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
+#   if !defined(BOOST_NO_SFINAE_EXPR)
     template <typename Lock>
     decltype(boost::declval<Lock>().owns_lock())
     assert_owns_lock(Lock const& l, long)
@@ -49,7 +49,7 @@ namespace hpx { namespace util { namespace detail
 
 #else
 
-#   if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
+#   if !defined(BOOST_NO_SFINAE_EXPR)
     template <typename Lock>
     decltype(boost::declval<Lock>().owns_lock())
     assert_owns_lock(Lock const&, long)

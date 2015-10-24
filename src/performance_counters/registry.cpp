@@ -130,8 +130,7 @@ namespace hpx { namespace performance_counters
             return result;
         }
 
-        inline std::string
-        regex_from_pattern(std::string const& pattern, error_code& ec)
+        std::string regex_from_pattern(std::string const& pattern, error_code& ec)
         {
             std::string result;
             std::string::const_iterator end = pattern.end();
@@ -234,6 +233,11 @@ namespace hpx { namespace performance_counters
                     discover_counter, boost::ref(ec));
             }
 
+            // split name
+            counter_path_elements p;
+            get_counter_path_elements(fullname, p, ec);
+            if (ec) return status_invalid_data;
+
             bool found_one = false;
             boost::regex rx(str_rx, boost::regex::perl);
 
@@ -245,8 +249,13 @@ namespace hpx { namespace performance_counters
                     continue;
                 found_one = true;
 
+                // propagate parameters
+                counter_info info = (*it).second.info_;
+                if (!p.parameters_.empty())
+                    info.fullname_ += "@" + p.parameters_;
+
                 if (!(*it).second.discover_counters_.empty() &&
-                    !(*it).second.discover_counters_((*it).second.info_,
+                    !(*it).second.discover_counters_(info,
                         discover_counter, mode, ec))
                 {
                     return status_invalid_data;
@@ -525,7 +534,8 @@ namespace hpx { namespace performance_counters
             switch (complemented_info.type_) {
             case counter_elapsed_time:
                 {
-                    typedef components::managed_component<server::elapsed_time_counter> counter_t;
+                    typedef components::managed_component<server::elapsed_time_counter>
+                        counter_t;
                     id = components::server::construct<counter_t>(complemented_info);
                 }
                 break;
@@ -584,7 +594,8 @@ namespace hpx { namespace performance_counters
             counter_aggregating != info.type_)
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_statistics_counter",
-                "invalid counter type requested (only counter_aggregating is supported)");
+                "invalid counter type requested \
+                 (only counter_aggregating is supported)");
             return status_counter_type_unknown;
         }
 
@@ -710,7 +721,8 @@ namespace hpx { namespace performance_counters
             counter_aggregating != info.type_)
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_arithmetics_counter",
-                "invalid counter type requested (only counter_aggregating is supported)");
+                "invalid counter type requested \
+                 (only counter_aggregating is supported)");
             return status_counter_type_unknown;
         }
 

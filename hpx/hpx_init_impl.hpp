@@ -7,10 +7,7 @@
 #if !defined(HPX_INIT_IMPL_OCT_04_2012_0123PM)
 #define HPX_INIT_IMPL_OCT_04_2012_0123PM
 
-#if !defined(HPX_INIT_OCT_04_2012_0132PM)
-#  error Do not directly include hpx/hpx_init_impl.hpp, use hpx/hpx_init.hpp instead!
-#endif
-
+#include <hpx/hpx_init.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/find_prefix.hpp>
 

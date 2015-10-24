@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/assert_owns_lock.hpp>
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -56,11 +57,8 @@ response primary_namespace::service(
     {
         case primary_ns_route:
             {
-                update_time_on_exit update(
-                    counter_data_.route_.time_
-                );
-                counter_data_.increment_route_count();
-                return route(req, ec);
+                HPX_ASSERT(false);
+                return response();
             }
         case primary_ns_bind_gid:
             {
@@ -213,7 +211,8 @@ void primary_namespace::register_counter_types(
         std::string::size_type p = name.find_last_of('/');
         HPX_ASSERT(p != std::string::npos);
 
-        if (detail::primary_namespace_services[i].target_ == detail::counter_target_count)
+        if (detail::primary_namespace_services[i].target_
+            == detail::counter_target_count)
             help = boost::str(help_count % name.substr(p+1));
         else
             help = boost::str(help_time % name.substr(p+1));
@@ -245,12 +244,15 @@ void primary_namespace::register_global_counter_types(
           ++i)
     {
         // local counters are handled elsewhere
-        if (detail::primary_namespace_services[i].code_ != primary_ns_statistics_counter)
+        if (detail::primary_namespace_services[i].code_
+            != primary_ns_statistics_counter)
             continue;
 
         std::string help;
-        if (detail::primary_namespace_services[i].target_ == detail::counter_target_count)
-            help = "returns the overall number of invocations of all primary AGAS services";
+        if (detail::primary_namespace_services[i].target_
+            == detail::counter_target_count)
+            help = "returns the overall number of invocations \
+                     of all primary AGAS services";
         else
             help = "returns the overall execution time of all primary AGAS services";
 
@@ -316,18 +318,12 @@ parcelset::policies::message_handler* primary_namespace::get_message_handler(
     )
 {
     typedef hpx::actions::transfer_action<
-        server::primary_namespace::service_action
+        server::primary_namespace::route_action
     > action_type;
 
-    boost::shared_ptr<action_type> act =
-        boost::static_pointer_cast<action_type>(p.get_action());
-    agas::request const& req = hpx::actions::get<0>(*act);
+    action_type * act = static_cast<action_type *>(p.get_action());
 
-    // only routing is handled in a special way
-    if (req.get_action_code() != primary_ns_route)
-        return 0;
-
-    parcelset::parcel routed_p = req.get_parcel();
+    parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
     return routed_p.get_message_handler(ph, loc);
 }
 
@@ -336,18 +332,12 @@ serialization::binary_filter* primary_namespace::get_serialization_filter(
     )
 {
     typedef hpx::actions::transfer_action<
-        server::primary_namespace::service_action
+        server::primary_namespace::route_action
     > action_type;
 
-    boost::shared_ptr<action_type> act =
-        boost::static_pointer_cast<action_type>(p.get_action());
-    agas::request const& req = hpx::actions::get<0>(*act);
+    action_type * act = static_cast<action_type *>(p.get_action());
 
-    // only routing is handled in a special way
-    if (req.get_action_code() != primary_ns_route)
-        return 0;
-
-    parcelset::parcel routed_p = req.get_parcel();
+    parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
     return routed_p.get_serialization_filter();
 }
 
@@ -381,9 +371,11 @@ response primary_namespace::begin_migration(
 
     boost::unique_lock<mutex_type> l(mutex_);
 
-    resolved_type r = resolve_gid_locked(id, ec);
+    resolved_type r = resolve_gid_locked(l, id, ec);
     if (at_c<0>(r) == naming::invalid_gid)
     {
+        l.unlock();
+
         LAGAS_(info) << (boost::format(
             "primary_namespace::begin_migration, gid(%1%), response(no_success)")
             % id);
@@ -444,7 +436,7 @@ void primary_namespace::wait_for_migration_locked(
   , naming::gid_type id
   , error_code& ec)
 {
-    HPX_ASSERT(l.owns_lock());
+    HPX_ASSERT_OWNS_LOCK(l);
 
     migration_table_type::iterator it = migrating_objects_.find(id);
     if (it != migrating_objects_.end())
@@ -531,6 +523,8 @@ response primary_namespace::bind_gid(
             gaddr.lva(g.lva());
             gaddr.offset = g.offset;
             loc = locality;
+
+            l.unlock();
 
             LAGAS_(info) << (boost::format(
                 "primary_namespace::bind_gid, gid(%1%), gva(%2%), "
@@ -620,6 +614,8 @@ response primary_namespace::bind_gid(
         return response();
     }
 
+    l.unlock();
+
     LAGAS_(info) << (boost::format(
         "primary_namespace::bind_gid, gid(%1%), gva(%2%), locality(%3%)")
         % id % g % locality);
@@ -649,7 +645,7 @@ response primary_namespace::resolve_gid(
         wait_for_migration_locked(l, id, ec);
 
         // now, resolve the id
-        r = resolve_gid_locked(id, ec);
+        r = resolve_gid_locked(l, id, ec);
     }
 
     if (at_c<0>(r) == naming::invalid_gid)
@@ -702,12 +698,14 @@ response primary_namespace::unbind_gid(
 
         gva_table_data_type& data = it->second;
         response r(primary_ns_unbind_gid, data.first, data.second);
+
+        gvas_.erase(it);
+
+        l.unlock();
         LAGAS_(info) << (boost::format(
             "primary_namespace::unbind_gid, gid(%1%), count(%2%), gva(%3%), "
             "locality_id(%4%)")
             % id % count % data.first % data.second);
-
-        gvas_.erase(it);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -990,7 +988,7 @@ void primary_namespace::resolve_free_list(
   , error_code& ec
     )
 {
-    HPX_ASSERT(l.owns_lock());
+    HPX_ASSERT_OWNS_LOCK(l);
 
     using boost::fusion::at_c;
 
@@ -1007,7 +1005,7 @@ void primary_namespace::resolve_free_list(
         wait_for_migration_locked(l, gid, ec);
 
         // Resolve the query GID.
-        resolved_type r = resolve_gid_locked(gid, ec);
+        resolved_type r = resolve_gid_locked(l, gid, ec);
         if (ec) return;
 
         naming::gid_type& raw = at_c<0>(r);
@@ -1127,7 +1125,8 @@ void primary_namespace::decrement_sweep(
             refcnt_table_type::iterator it = refcnts_.find(raw);
             if (it == refcnts_.end())
             {
-                boost::int64_t count = boost::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits;
+                boost::int64_t count = boost::int64_t(HPX_GLOBALCREDIT_INITIAL)
+                    - credits;
                 std::pair<refcnt_table_type::iterator, bool> p =
                     refcnts_.insert(refcnt_table_type::value_type(raw, count));
                 if (!p.second)
@@ -1240,10 +1239,13 @@ void primary_namespace::free_components_sync(
 } // }}}
 
 primary_namespace::resolved_type primary_namespace::resolve_gid_locked(
-    naming::gid_type const& gid
+    boost::unique_lock<mutex_type>& l
+  , naming::gid_type const& gid
   , error_code& ec
     )
 { // {{{ resolve_gid implementation
+    HPX_ASSERT_OWNS_LOCK(l);
+
     // parameters
     naming::gid_type id = gid;
     naming::detail::strip_internal_bits_from_gid(id);
@@ -1276,6 +1278,8 @@ primary_namespace::resolved_type primary_namespace::resolve_gid_locked(
             {
                 if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
                 {
+                    l.unlock();
+
                     HPX_THROWS_IF(ec, internal_server_error
                       , "primary_namespace::resolve_gid_locked"
                       , "MSBs of lower and upper range bound do not match");
@@ -1301,6 +1305,8 @@ primary_namespace::resolved_type primary_namespace::resolve_gid_locked(
         {
             if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
             {
+                l.unlock();
+
                 HPX_THROWS_IF(ec, internal_server_error
                   , "primary_namespace::resolve_gid_locked"
                   , "MSBs of lower and upper range bound do not match");
@@ -1377,28 +1383,36 @@ response primary_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_bind_gid_count, &counter_data_, ::_1);
             break;
         case primary_ns_resolve_gid:
-            get_data_func = boost::bind(&cd::get_resolve_gid_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolve_gid_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_unbind_gid:
-            get_data_func = boost::bind(&cd::get_unbind_gid_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_unbind_gid_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_increment_credit:
-            get_data_func = boost::bind(&cd::get_increment_credit_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_increment_credit_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_decrement_credit:
-            get_data_func = boost::bind(&cd::get_decrement_credit_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_decrement_credit_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_allocate_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_begin_migration:
-            get_data_func = boost::bind(&cd::get_begin_migration_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_begin_migration_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_end_migration:
-            get_data_func = boost::bind(&cd::get_end_migration_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_end_migration_count,
+                &counter_data_, ::_1);
             break;
         case primary_ns_statistics_counter:
-            get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_overall_count,
+                &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1423,22 +1437,27 @@ response primary_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_increment_credit:
-            get_data_func = boost::bind(&cd::get_increment_credit_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_increment_credit_time,
+                &counter_data_, ::_1);
             break;
         case primary_ns_decrement_credit:
-            get_data_func = boost::bind(&cd::get_decrement_credit_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_decrement_credit_time,
+                &counter_data_, ::_1);
             break;
         case primary_ns_allocate:
             get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
             break;
         case primary_ns_begin_migration:
-            get_data_func = boost::bind(&cd::get_begin_migration_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_begin_migration_time,
+                &counter_data_, ::_1);
             break;
         case primary_ns_end_migration:
-            get_data_func = boost::bind(&cd::get_end_migration_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_end_migration_time,
+                &counter_data_, ::_1);
             break;
         case primary_ns_statistics_counter:
-            get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_overall_time,
+                &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter

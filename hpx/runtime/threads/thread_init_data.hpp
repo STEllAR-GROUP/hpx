@@ -7,7 +7,7 @@
 #if !defined(HPX_THREAD_INIT_DATA_SEP_22_2009_1034AM)
 #define HPX_THREAD_INIT_DATA_SEP_22_2009_1034AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/move.hpp>

@@ -52,7 +52,8 @@ const char pattern_comment[] =  "^([^#]*)(#.*)$";
 const char pattern_section[] = "^\\[([^\\]]+)\\]$";
 
 // example uses ini line: sec.ssec.key = val
-const char pattern_qualified_entry[] = "^([^\\s=]+)\\.([^\\s=\\.]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
+const char pattern_qualified_entry[] =
+"^([^\\s=]+)\\.([^\\s=\\.]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
 
 // example uses ini line: key = val
 const char pattern_entry[] = "^([^\\s=]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
@@ -210,8 +211,10 @@ void section::parse (std::string const& sourcename,
     int linenum = 0;
     section* current = this;
 
-    boost::regex regex_comment (pattern_comment, boost::regex::perl | boost::regex::icase);
-    boost::regex regex_section (pattern_section, boost::regex::perl | boost::regex::icase);
+    boost::regex regex_comment (pattern_comment, boost::regex::perl
+        | boost::regex::icase);
+    boost::regex regex_section (pattern_section, boost::regex::perl
+        | boost::regex::icase);
     boost::regex regex_qualified_entry
         (pattern_qualified_entry, boost::regex::perl | boost::regex::icase);
     boost::regex regex_entry (pattern_entry,   boost::regex::perl | boost::regex::icase);
@@ -662,7 +665,8 @@ void section::expand_bracket(std::string& value, std::string::size_type begin) c
         std::string to_expand = value.substr(begin+2, end-begin-2);
         std::string::size_type colon = find_next(":", to_expand);
         if (colon == std::string::npos) {
-            value.replace(begin, end-begin+1, root_->get_entry(to_expand, std::string("")));
+            value.replace(begin, end-begin+1, root_->get_entry(to_expand,
+                std::string("")));
         }
         else {
             value.replace(begin, end-begin+1,

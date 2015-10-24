@@ -7,16 +7,7 @@
 #if !defined(HPX_UTIL_WRAPPER_HEAP_JUN_12_2008_0904AM)
 #define HPX_UTIL_WRAPPER_HEAP_JUN_12_2008_0904AM
 
-#include <new>
-#include <memory>
-#include <string>
-
-#include <boost/noncopyable.hpp>
-#include <boost/aligned_storage.hpp>
-#include <boost/type_traits/alignment_of.hpp>
-
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -26,6 +17,14 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/unlock_guard.hpp>
+
+#include <boost/noncopyable.hpp>
+#include <boost/aligned_storage.hpp>
+#include <boost/type_traits/alignment_of.hpp>
+
+#include <new>
+#include <memory>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail

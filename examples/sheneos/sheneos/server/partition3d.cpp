@@ -174,8 +174,10 @@ namespace sheneos { namespace server
         std::size_t idx_logrho = get_index(dimension::rho, logrho);
 
         double delta_ye = (ye - ye_values_[idx_ye]) / delta_[dimension::ye];
-        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp]) / delta_[dimension::temp];
-        double delta_logrho = (logrho - logrho_values_[idx_logrho]) / delta_[dimension::rho];
+        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp])
+            / delta_[dimension::temp];
+        double delta_logrho = (logrho - logrho_values_[idx_logrho])
+            / delta_[dimension::rho];
 
         std::vector<double> results;
         results.reserve(19);
@@ -255,8 +257,10 @@ namespace sheneos { namespace server
         std::size_t idx_logrho = get_index(dimension::rho, logrho);
 
         double delta_ye = (ye - ye_values_[idx_ye]) / delta_[dimension::ye];
-        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp]) / delta_[dimension::temp];
-        double delta_logrho = (logrho - logrho_values_[idx_logrho]) / delta_[dimension::rho];
+        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp])
+            / delta_[dimension::temp];
+        double delta_logrho = (logrho - logrho_values_[idx_logrho])
+            / delta_[dimension::rho];
 
         if (detail::more_than_one_value_requested(eosvalue)) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,

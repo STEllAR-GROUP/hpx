@@ -176,14 +176,14 @@ void test_multi_array(T first)
                 HPX_TEST_EQ(oarray[i][j][k], iarray[i][j][k]);
 }
 
-template <typename T, std::size_t SIZE>
+template <typename T, std::size_t N>
 void test_plain_array()
 {
     std::vector<char> buffer;
-    T iarray[SIZE];
-    T oarray[SIZE];
+    T iarray[N];
+    T oarray[N];
 
-    for(std::size_t i = 0; i < SIZE; ++i) {
+    for(std::size_t i = 0; i < N; ++i) {
         iarray[i] = i * i;
         oarray[i] = -1;
     }
@@ -194,27 +194,67 @@ void test_plain_array()
     hpx::serialization::input_archive iarchive(buffer);
     iarchive >> oarray;
 
-    for(std::size_t i = 0; i < SIZE; ++i) {
+    for(std::size_t i = 0; i < N; ++i) {
         HPX_TEST_EQ(oarray[i], iarray[i]);
     }
 }
 
+template <typename T, std::size_t N>
+void test_array_of_vectors()
+{
+    std::vector<char> buffer;
+    std::vector<T> iarray[N];
+    std::vector<T> oarray[N];
+
+    for(std::size_t i = 0; i < N; ++i) {
+        for (std::size_t j = 0; j < i; ++j) {
+            iarray[i].push_back(i * i);
+        }
+    }
+
+    hpx::serialization::output_archive oarchive(buffer);
+    oarchive << iarray;
+
+    hpx::serialization::input_archive iarchive(buffer);
+    iarchive >> oarray;
+
+    for(std::size_t i = 0; i < N; ++i) {
+        HPX_TEST_EQ(oarray[i].size(), iarray[i].size());
+
+        for (std::size_t j = 0; j < i; ++j) {
+            HPX_TEST_EQ(oarray[i][j], iarray[i][j]);
+        }
+    }
+}
+
+
 int main()
 {
-    test<char>((std::numeric_limits<char>::min)(), (std::numeric_limits<char>::max)());
-    test<int>((std::numeric_limits<int>::min)(), (std::numeric_limits<int>::min)() + 100);
-    test<int>((std::numeric_limits<int>::max)() - 100, (std::numeric_limits<int>::max)());
+    test<char>((std::numeric_limits<char>::min)(),
+        (std::numeric_limits<char>::max)());
+    test<int>((std::numeric_limits<int>::min)(),
+        (std::numeric_limits<int>::min)() + 100);
+    test<int>((std::numeric_limits<int>::max)() - 100,
+        (std::numeric_limits<int>::max)());
     test<int>(-100, 100);
-    test<unsigned>((std::numeric_limits<unsigned>::min)(), (std::numeric_limits<unsigned>::min)() + 100);
-    test<unsigned>((std::numeric_limits<unsigned>::max)() - 100, (std::numeric_limits<unsigned>::max)());
-    test<long>((std::numeric_limits<long>::min)(), (std::numeric_limits<long>::min)() + 100);
-    test<long>((std::numeric_limits<long>::max)() - 100, (std::numeric_limits<long>::max)());
+    test<unsigned>((std::numeric_limits<unsigned>::min)(),
+        (std::numeric_limits<unsigned>::min)() + 100);
+    test<unsigned>((std::numeric_limits<unsigned>::max)() - 100,
+        (std::numeric_limits<unsigned>::max)());
+    test<long>((std::numeric_limits<long>::min)(),
+        (std::numeric_limits<long>::min)() + 100);
+    test<long>((std::numeric_limits<long>::max)() - 100,
+        (std::numeric_limits<long>::max)());
     test<long>(-100, 100);
-    test<unsigned long>((std::numeric_limits<unsigned long>::min)(), (std::numeric_limits<unsigned long>::min)() + 100);
-    test<unsigned long>((std::numeric_limits<unsigned long>::max)() - 100, (std::numeric_limits<unsigned long>::max)());
-    test_fp<float>((std::numeric_limits<float>::min)(), (std::numeric_limits<float>::min)() + 100);
+    test<unsigned long>((std::numeric_limits<unsigned long>::min)(),
+        (std::numeric_limits<unsigned long>::min)() + 100);
+    test<unsigned long>((std::numeric_limits<unsigned long>::max)() - 100,
+        (std::numeric_limits<unsigned long>::max)());
+    test_fp<float>((std::numeric_limits<float>::min)(),
+        (std::numeric_limits<float>::min)() + 100);
     test_fp<float>(-100, 100);
-    test<double>((std::numeric_limits<double>::min)(), (std::numeric_limits<double>::min)() + 100);
+    test<double>((std::numeric_limits<double>::min)(),
+        (std::numeric_limits<double>::min)() + 100);
     test<double>(-100, 100);
 
     test_boost_array<char, 100U>('\0');
@@ -226,5 +266,9 @@ int main()
 
     test_plain_array<double, 20>();
     test_plain_array<int, 200>();
+
+    test_array_of_vectors<double, 20>();
+    test_array_of_vectors<int, 200>();
+
     return hpx::util::report_errors();
 }

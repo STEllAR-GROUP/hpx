@@ -34,7 +34,8 @@ void increment(hpx::id_type const& there, boost::int32_t i)
 }
 HPX_PLAIN_ACTION(increment);
 
-void increment_with_future(hpx::id_type const& there, hpx::shared_future<boost::int32_t> fi)
+void increment_with_future(hpx::id_type const& there,
+    hpx::shared_future<boost::int32_t> fi)
 {
     accumulator += fi.get();
     hpx::apply(receive_result_action(), there, accumulator.load());

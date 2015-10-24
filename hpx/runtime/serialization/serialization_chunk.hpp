@@ -7,6 +7,8 @@
 #ifndef HPX_SERIALIZATION_SERIALIZATION_CHUNK_HPP
 #define HPX_SERIALIZATION_SERIALIZATION_CHUNK_HPP
 
+#include <hpx/config.hpp>
+
 #include <cstddef>
 #include <climits>
 #include <cstring>
@@ -38,7 +40,8 @@ namespace hpx { namespace serialization
     struct serialization_chunk
     {
         chunk_data data_;       // index or pointer
-        std::size_t size_;      // size of the serialization_chunk starting at index_/pos_
+        std::size_t size_;
+        // size of the serialization_chunk starting at index_/pos_
         boost::uint8_t type_;   // chunk_type
     };
 

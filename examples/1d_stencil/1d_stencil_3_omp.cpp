@@ -142,7 +142,8 @@ struct stepper
             // Visual Studio requires OMP loop variables to be signed :/
             # pragma omp for schedule(static)
             for (boost::int64_t i = 0; i < (boost::int64_t)np; ++i)
-                next[i] = heat_part(current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
+                next[i] =
+                heat_part(current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
         }
         }
         // Return the solution at time-step 'nt'.

@@ -184,7 +184,8 @@ void locality_namespace::register_counter_types(
           ++i)
     {
         // global counters are handled elsewhere
-        if (detail::locality_namespace_services[i].code_ == locality_ns_statistics_counter)
+        if (detail::locality_namespace_services[i].code_ ==
+            locality_ns_statistics_counter)
             continue;
 
         std::string name(detail::locality_namespace_services[i].name_);
@@ -192,7 +193,8 @@ void locality_namespace::register_counter_types(
         std::string::size_type p = name.find_last_of('/');
         HPX_ASSERT(p != std::string::npos);
 
-        if (detail::locality_namespace_services[i].target_ == detail::counter_target_count)
+        if (detail::locality_namespace_services[i].target_ ==
+            detail::counter_target_count)
             help = boost::str(help_count % name.substr(p+1));
         else
             help = boost::str(help_time % name.substr(p+1));
@@ -224,12 +226,15 @@ void locality_namespace::register_global_counter_types(
           ++i)
     {
         // local counters are handled elsewhere
-        if (detail::locality_namespace_services[i].code_ != locality_ns_statistics_counter)
+        if (detail::locality_namespace_services[i].code_ !=
+            locality_ns_statistics_counter)
             continue;
 
         std::string help;
-        if (detail::locality_namespace_services[i].target_ == detail::counter_target_count)
-            help = "returns the overall number of invocations of all locality AGAS services";
+        if (detail::locality_namespace_services[i].target_ ==
+            detail::counter_target_count)
+            help = "returns the overall number of invocations \
+                    of all locality AGAS services";
         else
             help = "returns the overall execution time of all locality AGAS services";
 
@@ -458,9 +463,36 @@ response locality_namespace::free(
         if (primary_)
         {
             l.unlock();
-            request req(primary_ns_unbind_gid, locality, 0);
-            response resp = primary_->service(req, ec);
-            if (ec) return resp;
+
+            boost::uint32_t locality_id =
+                naming::get_locality_id_from_gid(locality);
+
+            // remove primary namespace
+            {
+                naming::gid_type service(HPX_AGAS_PRIMARY_NS_MSB,
+                    HPX_AGAS_PRIMARY_NS_LSB);
+                request req(primary_ns_unbind_gid,
+                    naming::replace_locality_id(service, locality_id), 1);
+                response resp = primary_->service(req, ec);
+                if (ec) return resp;
+            }
+
+            // remove symbol namespace
+            {
+                naming::gid_type service(HPX_AGAS_SYMBOL_NS_MSB,
+                    HPX_AGAS_SYMBOL_NS_LSB);
+                request req(primary_ns_unbind_gid,
+                    naming::replace_locality_id(service, locality_id), 1);
+                response resp = primary_->service(req, ec);
+                if (ec) return resp;
+            }
+
+            // remove locality itself
+            {
+                request req(primary_ns_unbind_gid, locality, 0);
+                response resp = primary_->service(req, ec);
+                if (ec) return resp;
+            }
         }
 
         /*
@@ -647,25 +679,32 @@ response locality_namespace::statistics_counter(
     {
         switch (code) {
         case locality_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_allocate_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_resolve_locality:
-            get_data_func = boost::bind(&cd::get_resolve_locality_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolve_locality_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_free:
-            get_data_func = boost::bind(&cd::get_free_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_free_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_localities:
-            get_data_func = boost::bind(&cd::get_localities_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_localities_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_resolved_localities:
-            get_data_func = boost::bind(&cd::get_resolved_localities_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolved_localities_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_num_localities_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_num_threads:
-            get_data_func = boost::bind(&cd::get_num_threads_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_num_threads_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
@@ -681,22 +720,27 @@ response locality_namespace::statistics_counter(
         HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case locality_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_allocate_time,
+                &counter_data_, ::_1);
             break;
         case locality_ns_resolve_locality:
-            get_data_func = boost::bind(&cd::get_resolve_locality_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolve_locality_time,
+                &counter_data_, ::_1);
             break;
         case locality_ns_free:
             get_data_func = boost::bind(&cd::get_free_time, &counter_data_, ::_1);
             break;
         case locality_ns_localities:
-            get_data_func = boost::bind(&cd::get_localities_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_localities_time,
+                &counter_data_, ::_1);
             break;
         case locality_ns_resolved_localities:
-            get_data_func = boost::bind(&cd::get_resolved_localities_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolved_localities_time,
+                &counter_data_, ::_1);
             break;
         case locality_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_num_localities_time,
+                &counter_data_, ::_1);
             break;
         case locality_ns_num_threads:
             get_data_func = boost::bind(&cd::get_num_threads_time, &counter_data_, ::_1);
@@ -760,7 +804,8 @@ boost::int64_t locality_namespace::counter_data::get_num_threads_count(bool rese
     return util::get_and_reset_value(num_threads_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_resolved_localities_count(bool reset)
+boost::int64_t locality_namespace::counter_data
+        ::get_resolved_localities_count(bool reset)
 {
     return util::get_and_reset_value(resolved_localities_.count_, reset);
 }

@@ -180,7 +180,8 @@ void component_namespace::register_counter_types(
           ++i)
     {
         // global counters are handled elsewhere
-        if (detail::component_namespace_services[i].code_ == component_ns_statistics_counter)
+        if (detail::component_namespace_services[i].code_ ==
+            component_ns_statistics_counter)
             continue;
 
         std::string name(detail::component_namespace_services[i].name_);
@@ -188,7 +189,8 @@ void component_namespace::register_counter_types(
         std::string::size_type p = name.find_last_of('/');
         HPX_ASSERT(p != std::string::npos);
 
-        if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
+        if (detail::component_namespace_services[i].target_ ==
+             detail::counter_target_count)
             help = boost::str(help_count % name.substr(p+1));
         else
             help = boost::str(help_time % name.substr(p+1));
@@ -220,12 +222,15 @@ void component_namespace::register_global_counter_types(
           ++i)
     {
         // local counters are handled elsewhere
-        if (detail::component_namespace_services[i].code_ != component_ns_statistics_counter)
+        if (detail::component_namespace_services[i].code_ !=
+            component_ns_statistics_counter)
             continue;
 
         std::string help;
-        if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
-            help = "returns the overall number of invocations of all component AGAS services";
+        if (detail::component_namespace_services[i].target_ ==
+            detail::counter_target_count)
+            help = "returns the overall number of invocations of all \
+                     component AGAS services";
         else
             help = "returns the overall execution time of all component AGAS services";
 
@@ -592,16 +597,20 @@ response component_namespace::get_component_type_name(
         result = get_component_name(component_ids_.right, t);
     }
     else if (components::get_derived_type(t) != 0) {
-        result = get_component_name(component_ids_.right, components::get_derived_type(t));
+        result = get_component_name(component_ids_.right,
+            components::get_derived_type(t));
         result += "/";
-        result += get_component_name(component_ids_.right, components::get_base_type(t));
+        result += get_component_name(component_ids_.right,
+            components::get_base_type(t));
     }
 
     if (result.empty())
     {
         LAGAS_(info) << (boost::format(
-            "component_namespace::get_component_typename, key(%1%/%2%), response(no_success)")
-            % int(components::get_derived_type(t)) % int(components::get_base_type(t)));
+            "component_namespace::get_component_typename, \
+             key(%1%/%2%), response(no_success)")
+            % int(components::get_derived_type(t)) %
+              int(components::get_base_type(t)));
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -611,7 +620,8 @@ response component_namespace::get_component_type_name(
 
     LAGAS_(info) << (boost::format(
         "component_namespace::get_component_typename, key(%1%/%2%), response(%3%)")
-        % int(components::get_derived_type(t)) % int(components::get_base_type(t)) % result);
+        % int(components::get_derived_type(t)) % int(components::get_base_type(t))
+        % result);
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -709,28 +719,36 @@ response component_namespace::statistics_counter(
     {
         switch (code) {
         case component_ns_bind_prefix:
-            get_data_func = boost::bind(&cd::get_bind_prefix_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_bind_prefix_count,
+                &counter_data_, ::_1);
             break;
         case component_ns_bind_name:
-            get_data_func = boost::bind(&cd::get_bind_name_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_bind_name_count,
+                &counter_data_, ::_1);
             break;
         case component_ns_resolve_id:
-            get_data_func = boost::bind(&cd::get_resolve_id_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolve_id_count,
+                &counter_data_, ::_1);
             break;
         case component_ns_unbind_name:
-            get_data_func = boost::bind(&cd::get_unbind_name_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_unbind_name_count,
+                &counter_data_, ::_1);
             break;
         case component_ns_iterate_types:
-            get_data_func = boost::bind(&cd::get_iterate_types_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_iterate_types_count,
+                &counter_data_, ::_1);
             break;
         case component_ns_get_component_type_name:
-            get_data_func = boost::bind(&cd::get_component_type_name_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_component_type_name_count,
+                &counter_data_, ::_1);
             break;
         case component_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_num_localities_count,
+                &counter_data_, ::_1);
             break;
         case component_ns_statistics_counter:
-            get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_overall_count,
+                &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -743,7 +761,8 @@ response component_namespace::statistics_counter(
         HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case component_ns_bind_prefix:
-            get_data_func = boost::bind(&cd::get_bind_prefix_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_bind_prefix_time,
+                &counter_data_, ::_1);
             break;
         case component_ns_bind_name:
             get_data_func = boost::bind(&cd::get_bind_name_time, &counter_data_, ::_1);
@@ -755,13 +774,16 @@ response component_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_name_time, &counter_data_, ::_1);
             break;
         case component_ns_iterate_types:
-            get_data_func = boost::bind(&cd::get_iterate_types_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_iterate_types_time,
+                &counter_data_, ::_1);
             break;
         case component_ns_get_component_type_name:
-            get_data_func = boost::bind(&cd::get_component_type_name_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_component_type_name_time,
+                &counter_data_, ::_1);
             break;
         case component_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_num_localities_time,
+                &counter_data_, ::_1);
             break;
         case component_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);
@@ -817,7 +839,8 @@ boost::int64_t component_namespace::counter_data::get_iterate_types_count(bool r
     return util::get_and_reset_value(iterate_types_.count_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_component_type_name_count(bool reset)
+boost::int64_t component_namespace::counter_data
+        ::get_component_type_name_count(bool reset)
 {
     return util::get_and_reset_value(get_component_type_name_.count_, reset);
 }
@@ -864,7 +887,8 @@ boost::int64_t component_namespace::counter_data::get_iterate_types_time(bool re
     return util::get_and_reset_value(iterate_types_.time_, reset);
 }
 
-boost::int64_t component_namespace::counter_data::get_component_type_name_time(bool reset)
+boost::int64_t component_namespace::counter_data
+        ::get_component_type_name_time(bool reset)
 {
     return util::get_and_reset_value(get_component_type_name_.time_, reset);
 }

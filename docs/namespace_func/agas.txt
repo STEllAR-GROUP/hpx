@@ -44,7 +44,8 @@ hpx::agas::addressing_service
     naming::address primary_ns_addr_;
     naming::address component_ns_addr_;
     naming::address symbol_ns_addr_;
-    addressing_service(parcelset::parcelport&,util::runtime_configuration const&,runtime_mode)
+    addressing_service(parcelset::parcelport&,
+         util::runtime_configuration const&,runtime_mode)
     void launch_bootstrap(parcelset::parcelport&,util::runtime_configuration const&)
     void launch_hosted(parcelset::parcelport&,util::runtime_configuration const&)
     state status() const
@@ -66,22 +67,28 @@ hpx::agas::addressing_service
     // lots of params documented that aren't present
     bool get_console_locality(naming::gid_type&,error_code& ec = throw)
     // type refers to component type. what are the types?
-    bool get_localities(std::vector<naming::gid_type>&,components::component_type,**throws)
+    bool get_localities
+        (std::vector<naming::gid_type>&,components::component_type,**throws)
     bool get_localities(std::vector<naming::gid_type>&,**throws)
     components::component_type get_component_id(std::string const& name,**throws)
     void iterate_types(iterate_types_function_type const&,**throws)
     // factory for components by type
-    components::component_type register_factory(naming::gid_type const& locality_id,std::string const& name,**throws)
-    components::component_type register_factory(boost::uint32_t locality_id,std::string const& name,**throws)
+    components::component_type register_factory(naming::gid_type const& locality_id,
+        std::string const& name,**throws)
+    components::component_type register_factory(boost::uint32_t locality_id,
+        std::string const& name,**throws)
     /// \brief Get unique range of freely assignable global ids.
-    bool get_id_range(naming::locality const&,boost::uint64_t count,naming::gid_type& lower_bound,naming::gid_type& upper_bound,**throws)
+    bool get_id_range(naming::locality const&,boost::uint64_t count,
+        naming::gid_type& lower_bound,naming::gid_type& upper_bound,**throws)
     /// \brief Bind a global address to a local address.
     bool bind(naming::gid_type const&,naming::address const&,**throws)
-    bool bind_range(naming::gid_type const& lower_id,boost::uint64_t count,naming::address const&,boost::uint64_t offset,**throws)
+    bool bind_range(naming::gid_type const& lower_id,boost::uint64_t count,
+        naming::address const&,boost::uint64_t offset,**throws)
     bool unbind(naming::gid_type const&,**throws)
     bool unbind(naming::gid_type const&,naming::address&,**throws)
     bool unbind_range(naming::gid_type const& lower_id,boost::uint64_t count,**throws)
-    bool unbind_range(naming::gid_type const& lower_id,boost::uint64_t countnaming::address& addr,**throws)
+    bool unbind_range(naming::gid_type const& lower_id,
+        boost::uint64_t countnaming::address& addr,**throws)
 
     bool is_local_address(naming::gid_type const&,**throws)
     bool is_local_address(naming::gid_type const&,naming::address& addr,**throws)
@@ -95,9 +102,11 @@ hpx::agas::addressing_service
     bool resolve_full(naming::id_type const&,naming::address&,**throws)
     bool resolve_cached(naming::gid_type const&,naming::address&,**throws)
 
-    void incref(naming::gid_type const& lower,naming::gid_type const& upper,boost::int64_t credits = 1,**throws)
+    void incref(naming::gid_type const& lower,naming::gid_type const& upper,
+    boost::int64_t credits = 1,**throws)
     void incref(naming::gid_type const& id,boost::int64_t credits = 1,**throws)
-    void decref(naming::gid_type const& lower,naming::gid_type const& upper,boost::int64_t credits = 1,**throws)
+    void decref(naming::gid_type const& lower,
+    naming::gid_type const& upper,boost::int64_t credits = 1,**throws)
     void decref(naming::gid_type const& id,boost::int64_t credits = 1,**throws)
     bool iterate_ids(iterate_names_function_type const&,**throws)
     bool register_name(std::string const& name,naming::gid_type const&,**throws)
@@ -110,25 +119,32 @@ hpx::agas::addressing_service
 
 
 hpx::agas::big_boot_barrier
-    big_boot_barrier(parcelset::parcelport&,util::runtime_configuration const&,runtime_mode)
+    big_boot_barrier
+        (parcelset::parcelport&,util::runtime_configuration const&,runtime_mode)
     void apply(boost::uint32_t prefix,naming::address const&,actions::base_action*)
     void wait()
     void trigger()
     void add_thunk(HPX_STD_FUNCTION<void()>* f)
-void create_big_boot_barrier(parcelset::parcelport&,util::runtime_configuration const&,runtime_mode)
+void create_big_boot_barrier(parcelset::parcelport&,util::runtime_configuration const&,
+    runtime_mode)
 void destroy_big_boot_barrier()
 big_boot_barrier& get_big_boot_barrier()
 
 hpx::agas::component_namespace
     component_namespace()
     explicit component_namespace(naming::id_type const& id)
-    void service[_non_blocking](request const&,threads::thread_priority priority = default,**throws)
-    std::vector<response> bulk_service[_non_blocking](std::vector<request> const&,threads::thread_priority priority = default,**throws)
+    void service[_non_blocking](request const&,threads::thread_priority priority =
+      default,**throws)
+    std::vector<response> bulk_service[_non_blocking](std::vector<request> const&,
+        threads::thread_priority priority = default,**throws)
 
 hpx::agas::gva
     gva()
-    gva(naming::locality const&,component_type t = components::component_invalid, boost::uint64_t c = 1,lva_type a = 0, boost::uint64_t o = 0)
-    gva(naming::locality const& ep, component_type t, boost::uint64_t c, void* a,boost::uint64_t o = 0)
+    gva(naming::locality const&,component_type t =
+     components::component_invalid, boost::uint64_t c =
+     1,lva_type a = 0, boost::uint64_t o = 0)
+    gva(naming::locality const& ep, component_type t,
+     boost::uint64_t c, void* a,boost::uint64_t o = 0)
     gva(lva_type a)
     gva(void* a)
     gva& operator=(lva_type a)
@@ -138,7 +154,9 @@ hpx::agas::gva
     bool operator!=(gva const& rhs) const
     void lva(lva_type a)
     void lva(void* a)
-    lva_type lva(naming::gid_type const& gid = naming::invalid_gid,naming::gid_type const& gidbase = naming::invalid_gid) const
+    lva_type lva(naming::gid_type const& gid
+         = naming::invalid_gid,naming::gid_type const& gidbase
+           = naming::invalid_gid) const
     gva resolve(naming::gid_type const& gid,naming::gid_type const& gidbase) const
     naming::locality endpoint;
     component_type type;
@@ -148,7 +166,8 @@ operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 
 hpx::agas
     bool register_name(std::string const&,naming::id_type const&,**throws)
-    lcos::future<bool, response> register_name_async(std::string const&,naming::id_type const&)
+    lcos::future<bool, response> register_name_async(std::string const&,
+        naming::id_type const&)
     bool unregister_name(std::string const& name,**throws)
     bool unregister_name(std::string const&,naming::id_type&,**throws)
     lcos::future<naming::id_type, response> unregister_name_async(std::string const&)
@@ -161,7 +180,8 @@ hpx::agas
     bool is_local_address_cached(naming::gid_type const&,**throws)
     bool is_local_address_cached(naming::gid_type const&,naming::address&,**throws)
     bool is_local_address_cached(naming::id_type const&,**throws)
-    bool is_local_address_cached(naming::id_type const&,naming::address&,**throws)obool is_local_lva_encoded_address(naming::gid_type const&)
+    bool is_local_address_cached(naming::id_type const&,naming::address&,**throws)
+        obool is_local_lva_encoded_address(naming::gid_type const&)
     bool is_local_lva_encoded_address(naming::id_type const&)
     void garbage_collect[_non_blocking](**throws)
     void garbage_collect[_non_blocking](naming::id_type const&,**throws)
@@ -174,12 +194,16 @@ hpx::agas::primary_namespace
     explicit primary_namespace(naming::id_type const& id)
     response service(request const&,threads::thread_priority priority = default,**throws)
     void service_non_blocking(request const&,threads::thread_priority priority = default)
-    std::vector<response> bulk_service[_non_blocking](std::vector<request> const&,threads::thread_priority priority = default,**throws)
-    bool route(parcelset::parcel const,threads::thread_priority priority = default,**throws)
+    std::vector<response>
+        bulk_service[_non_blocking](std::vector<request> const&,
+        threads::thread_priority priority = default,**throws)
+    bool route
+        (parcelset::parcel const,threads::thread_priority priority = default,**throws)
 
 hpx::agas::request
     request()
-    request(namespace_action_code,naming::gid_type const& lower_,naming::gid_type const& upper_,boost::int64_t count_)
+    request(namespace_action_code,naming::gid_type const& lower_,
+        naming::gid_type const& upper_,boost::int64_t count_)
     request(namespace_action_code,naming::gid_type const&,boost::uint64_t count_)
     // Should this be here?
     request(namespace_action_code,naming::gid_type const&,gva const&)
@@ -214,7 +238,8 @@ hpx::agas::response
     response()
     // should error_status = success be **throws?
     response(namespace_action_code,
-        naming::gid_type lower_,naming::gid_type upper_,boost::uint32_t prefix_,error status_ = success)
+        naming::gid_type lower_,
+        naming::gid_type upper_,boost::uint32_t prefix_,error status_ = success)
     response(namespace_action_code,
         naming::gid_type const&,gva const&,error status_ = success)
     response(namespace_action_code,
@@ -251,4 +276,5 @@ hpx::agas::traits
 hpx::agas::symbol_namespace
     symbol_namespace()
     explicit symbol_namespace(naming::id_type const& id)
-    response [block_]service[_non_blocking](request const&,threads::thread_priority priority = default,**throws)
+    response [block_]service[_non_blocking]
+        (request const&,threads::thread_priority priority = default,**throws)

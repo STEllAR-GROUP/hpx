@@ -6,7 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_STUBS_CERTIFICATE_AUTHORITY_BASE_HPP
 #define HPX_COMPONENTS_SECURITY_STUBS_CERTIFICATE_AUTHORITY_BASE_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
 #include <hpx/include/components.hpp>
 #include <hpx/components/security/server/certificate_authority_base.hpp>
 
@@ -23,7 +26,8 @@ namespace hpx { namespace components { namespace security { namespace stubs
           , signed_type<certificate_signing_request> const & signed_csr)
         {
             return hpx::async<
-                server::certificate_authority_base::sign_certificate_signing_request_action
+                server::certificate_authority_base
+                      ::sign_certificate_signing_request_action
             >(gid, signed_csr).get();
         }
 
@@ -42,5 +46,7 @@ namespace hpx { namespace components { namespace security { namespace stubs
         }
     };
 }}}}
+
+#endif
 
 #endif

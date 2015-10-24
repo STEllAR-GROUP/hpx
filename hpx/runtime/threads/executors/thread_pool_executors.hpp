@@ -62,6 +62,23 @@ namespace hpx { namespace threads { namespace executors
             // Return an estimate of the number of waiting tasks.
             boost::uint64_t num_pending_closures(error_code& ec) const;
 
+            // Reset internal (round robin) thread distribution scheme
+            void reset_thread_distribution();
+
+            /// Return the mask for processing units the given thread is allowed
+            /// to run on.
+            mask_cref_type get_pu_mask(topology const& topology,
+                std::size_t num_thread) const
+            {
+                return scheduler_.Scheduler::get_pu_mask(topology, num_thread);
+            }
+
+            /// Set the new scheduler mode
+            void set_scheduler_mode(threads::policies::scheduler_mode mode)
+            {
+                scheduler_.set_scheduler_mode(mode);
+            }
+
         protected:
             friend class manage_thread_executor<thread_pool_executor>;
 
@@ -135,6 +152,16 @@ namespace hpx { namespace threads { namespace executors
         static_queue_executor();
 
         explicit static_queue_executor(std::size_t max_punits,
+            std::size_t min_punits = 1);
+    };
+#endif
+
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
+    struct HPX_EXPORT throttle_queue_executor : public scheduled_executor
+    {
+        throttle_queue_executor();
+
+        explicit throttle_queue_executor(std::size_t max_punits,
             std::size_t min_punits = 1);
     };
 #endif

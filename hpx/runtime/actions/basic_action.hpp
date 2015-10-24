@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -10,20 +10,24 @@
 #if !defined(HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM)
 #define HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/invocation_count_registry.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/void_guard.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pack.hpp>
 
@@ -35,6 +39,7 @@
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/type_traits/is_array.hpp>
 #include <boost/type_traits/is_pointer.hpp>
+#include <boost/atomic.hpp>
 
 #include <sstream>
 
@@ -58,9 +63,11 @@ namespace hpx { namespace actions
 
         public:
             template <typename F_, typename ...Ts_>
-            explicit continuation_thread_function(continuation_type cont,
-                naming::address::address_type lva, F_&& f, Ts_&&... vs)
-              : cont_(std::move(cont)), lva_(lva)
+            explicit continuation_thread_function(
+                    std::unique_ptr<continuation> cont,
+                    naming::address::address_type lva, F_&& f, Ts_&&... vs)
+              : cont_(std::move(cont))
+              , lva_(lva)
               , f_(util::deferred_call(
                     std::forward<F_>(f), std::forward<Ts_>(vs)...))
             {}
@@ -82,7 +89,7 @@ namespace hpx { namespace actions
             }
 
         private:
-            continuation_type cont_;
+            std::unique_ptr<continuation> cont_;
             naming::address::address_type lva_;
             util::detail::deferred_call_impl<
                 typename util::decay<F>::type
@@ -99,13 +106,6 @@ namespace hpx { namespace actions
             >
         {};
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \tparam Component         component type
-    /// \tparam Signature         return type and arguments
-    /// \tparam Derived           derived action class
-    template <typename Component, typename Signature, typename Derived>
-    struct basic_action;
 
     template <typename Component, typename R, typename ...Args, typename Derived>
     struct basic_action<Component, R(Args...), Derived>
@@ -251,7 +251,7 @@ namespace hpx { namespace actions
         // case a continuation has been supplied
         template <typename ...Ts>
         static threads::thread_function_type
-        construct_thread_function(continuation_type& cont,
+        construct_thread_function(std::unique_ptr<continuation> cont,
             naming::address::address_type lva, Ts&&... vs)
         {
             typedef detail::continuation_thread_function<
@@ -402,13 +402,44 @@ namespace hpx { namespace actions
             return base_action::plain_action;
         }
 
+        /// Extract the current invocation count for this action
+        static boost::int64_t get_invocation_count(bool reset)
+        {
+            return util::get_and_reset_value(invocation_count_, reset);
+        }
+
     private:
         // serialization support
         friend class hpx::serialization::access;
 
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
+
+        static boost::atomic<boost::int64_t> invocation_count_;
+
+    protected:
+        static void increment_invocation_count()
+        {
+            ++invocation_count_;
+        }
     };
+
+    template <typename Component, typename R, typename ...Args, typename Derived>
+    boost::atomic<boost::int64_t>
+        basic_action<Component, R(Args...), Derived>::invocation_count_(0);
+
+    namespace detail
+    {
+        template <typename Action>
+        void register_local_action_invocation_count(
+            invocation_count_registry& registry)
+        {
+            registry.register_class(
+                hpx::actions::detail::get_action_name<Action>(),
+                &Action::get_invocation_count
+            );
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -557,6 +588,7 @@ namespace hpx { namespace actions
         performance_counter_stop_action_id,
         primary_namespace_bulk_service_action_id,
         primary_namespace_service_action_id,
+        primary_namespace_route_action_id,
         remove_from_connection_cache_action_id,
         set_value_action_agas_bool_response_type_id,
         set_value_action_agas_id_type_response_type_id,
@@ -662,7 +694,9 @@ namespace hpx { namespace actions
 /**/
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
+    HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                              \
 /**/
+
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
     namespace hpx { namespace actions { namespace detail {                    \
@@ -718,8 +752,16 @@ namespace hpx { namespace actions
 #define HPX_ACTION_USES_HUGE_STACK(action)                                    \
     HPX_ACTION_USES_STACK(action, threads::thread_stacksize_huge)             \
 /**/
-#define HPX_ACTION_DOES_NOT_SUSPEND(action)                                   \
-    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_nostack)          \
+// This macro is deprecated. It expands to an inline function which will emit a
+// warning.
+#define HPX_ACTION_DOES_NOT_SUSPEND(action)                                    \
+    HPX_DEPRECATED("HPX_ACTION_DOES_NOT_SUSPEND is deprecated and will be "    \
+                   "removed in the next release")                              \
+    static inline void BOOST_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();   \
+    void BOOST_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)()                  \
+    {                                                                          \
+        BOOST_PP_CAT(HPX_ACTION_DOES_NOT_SUSPEND_, action)();                  \
+    }                                                                          \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -780,7 +822,8 @@ namespace hpx { namespace actions
 ///
 ///              // Component actions need to be declared, this also defines the
 ///              // type 'print_greeting_action' representing the action.
-///              HPX_DEFINE_COMPONENT_ACTION(server, print_greeting, print_greeting_action);
+///              HPX_DEFINE_COMPONENT_ACTION(server,
+///                  print_greeting, print_greeting_action);
 ///          };
 ///      }
 ///
