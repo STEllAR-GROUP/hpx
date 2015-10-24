@@ -8,6 +8,9 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "end_check.hpp"
+#include "function_hyper.hpp"
+#include <string>
+#include <boost/tokenizer.hpp>
 #include <boost/next_prior.hpp>
 
 namespace boost
@@ -31,7 +34,13 @@ namespace boost
       const string & contents )     // contents of file to be inspected
     {
       if (contents.find( "hpxinspect:" "noend" ) != string::npos) return;
-
+      int linenumb = 0;
+      char_separator<char> sep("\n", "", boost::keep_empty_tokens);
+      tokenizer<char_separator<char>> tokens(contents, sep);
+      for (const auto& t : tokens) {
+          linenumb++;
+      }
+      std::string lineloc = std::to_string(linenumb);
       // this file deliberately contains errors
       const char test_file_name[] = "wrong_line_ends_test.cpp";
 
@@ -49,7 +58,7 @@ namespace boost
       if (!failed && full_path.leaf() == test_file_name)
       {
         ++m_files_with_errors;
-        error( library_name, full_path, string(name()) + " should not end with a newline" );
+        error( library_name, full_path, string(name()) + wordlink(full_path, lineloc, " should end with a newline") );
       }
     }
   } // namespace inspect
