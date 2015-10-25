@@ -64,7 +64,7 @@ namespace hpx { namespace  threads
         static resource_manager& get();
 
     protected:
-        // allocate virtual cores 
+        // allocate virtual cores
         // called by initial_allocation
         std::vector<coreids_type> allocate_virt_cores(
                 detail::manage_executor* proxy, std::size_t min_punits,
@@ -162,10 +162,10 @@ namespace hpx { namespace  threads
             // Scaled allocation value during proportional allocation.
             double scaled_allocation;
 
-            std::size_t num_borrowed_cores; // borrowed cores held by scheduler 
+            std::size_t num_borrowed_cores; // borrowed cores held by scheduler
             std::size_t num_owned_cores;    // owned cores held by scheduler
             std::size_t min_proxy_cores;    // min cores required by scheduler
-            std::size_t max_proxy_cores;    // max cores required by scheduler 
+            std::size_t max_proxy_cores;    // max cores required by scheduler
         };
 
         struct static_allocation_data : public allocation_data
@@ -184,7 +184,7 @@ namespace hpx { namespace  threads
 
         // stores static allocation data for all schedulers
         void preprocess_static_allocation(std::size_t min_punits,
-            std::size_t max_punits); 
+            std::size_t max_punits);
 
         // constants used for parameters to the release_scheduler API
         std::size_t const release_borrowed_cores = std::size_t(-1);
@@ -197,13 +197,13 @@ namespace hpx { namespace  threads
             std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
 
         // release cores from all schedulers
-        // calls release_scheduler_resources                
+        // calls release_scheduler_resources
         std::size_t release_cores_on_existing_scedulers(
             std::size_t number_to_free,
             std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
 
         // distribute cores to schedulers proportional to max_punits of
-        // the schedulers 
+        // the schedulers
         std::size_t redistribute_cores_among_all(std::size_t reserved,
             std::size_t min_punits, std::size_t max_punits,
             std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);

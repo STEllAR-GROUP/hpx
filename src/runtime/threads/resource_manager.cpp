@@ -426,12 +426,17 @@ namespace hpx { namespace threads
         return available;
     }
 
-    /// Denote the doubles in the input array AllocationData[*].m_scaledAllocation by: r[1],..., r[n].
-    /// Split r[j] into b[j] and fract[j] where b[j] is the integral floor of r[j] and fract[j] is the fraction truncated.
+    /// Denote the doubles in the input array AllocationData[*].m_scaledAllocation
+    /// by: r[1],..., r[n].
+    /// Split r[j] into b[j] and fract[j] where b[j] is the integral floor of
+    /// r[j] and fract[j] is the fraction truncated.
     /// Sort the set { r[j] | j = 1,...,n } from largest fract[j] to smallest.
-    /// For each j = 0, 1, 2,...  if fract[j] > 0, then set b[j] += 1 and pay for the cost of 1-fract[j] by rounding
-    /// fract[j0] -> 0 from the end (j0 = n-1, n-2,...) -- stop before j > j0. b[j] is stored in AllocationData[*].m_allocation.
-    /// totalAllocated is the sum of all AllocationData[*].m_scaledAllocation upon entry, which after the function call is over will
+    /// For each j = 0, 1, 2,...  if fract[j] > 0, then set b[j] += 1 and pay
+    /// for the cost of 1-fract[j] by rounding fract[j0] -> 0 from the end
+    /// (j0 = n-1, n-2,...) -- stop before j > j0. b[j] is stored in
+    /// AllocationData[*].m_allocation.
+    /// totalAllocated is the sum of all AllocationData[*].m_scaledAllocation
+    /// upon entry, which after the function call is over will
     /// necessarily be equal to the sum of all AllocationData[*].m_allocation.
     void resource_manager::roundup_scaled_allocations(
         allocation_data_map_type& scaled_static_allocation_data,
