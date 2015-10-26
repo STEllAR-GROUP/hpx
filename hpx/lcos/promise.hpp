@@ -617,7 +617,7 @@ namespace hpx { namespace lcos
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<Result>::get_future",
-                    "future already has been retrieved from this packaged_action");
+                    "future already has been retrieved from this promise");
                 return lcos::future<Result>();
             }
 

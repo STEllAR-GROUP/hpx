@@ -92,12 +92,10 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // BOOST_SCOPED_ENUM(launch)
-    template <typename Policy>
-    struct async_dispatch<Policy,
+    template <typename Action>
+    struct async_launch_policy_dispatch<Action,
         typename boost::enable_if_c<
-            traits::is_launch_policy<Policy>::value
-         && !traits::is_action<Policy>::value
+            !traits::is_action<Action>::value
         >::type>
     {
         template <typename F, typename ...Ts>
@@ -106,7 +104,7 @@ namespace hpx { namespace detail
             traits::detail::is_deferred_callable<F(Ts...)>::value,
             hpx::future<typename util::deferred_call_result_of<F(Ts...)>::type>
         >::type
-        call(BOOST_SCOPED_ENUM(launch) const& launch_policy, F&& f, Ts&&... ts)
+        call(BOOST_SCOPED_ENUM(launch) launch_policy, F&& f, Ts&&... ts)
         {
             typedef typename util::deferred_call_result_of<
                 F(Ts...)
