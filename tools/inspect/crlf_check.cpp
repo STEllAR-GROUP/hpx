@@ -59,7 +59,8 @@ namespace boost
       if (!failed && full_path.leaf() == test_file_name)
       {
         ++m_files_with_errors;
-        error( library_name, full_path, loclink(full_path, string(name()) + " should have cr-only line endings" ));
+        error( library_name, full_path, loclink(full_path,
+            string(name()) + " should have cr-only line endings" ));
       }
 
 /*

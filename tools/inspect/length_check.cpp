@@ -132,7 +132,8 @@ namespace boost
             p = 0;
             while (p < lineorder.size())
             {
-                total += linelink(full_path, lineorder[p]);  //linelink is located in function_hyper.hpp
+                total += linelink(full_path, lineorder[p]);
+                //linelink is located in function_hyper.hpp
                 if (p < lineorder.size() - 1)
                 {
                     total += ", ";
