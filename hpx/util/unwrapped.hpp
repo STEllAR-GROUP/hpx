@@ -305,8 +305,6 @@ namespace hpx { namespace util
             typename result<unwrapped_impl()>::type
             operator()()
             {
-                typedef typename result<unwrapped_impl()>::type result_type;
-
                 return util::invoke_fused(f_,
                     util::make_tuple());
             }
@@ -330,7 +328,6 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
-                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<util::tuple<typename decay<T0>::type> >
                     unwrap_impl_t;
@@ -348,7 +345,6 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
-                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
@@ -365,7 +361,6 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
-                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
@@ -383,7 +378,6 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
-                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
@@ -397,9 +391,6 @@ namespace hpx { namespace util
             typename result<unwrapped_impl(Ts...)>::type
             operator()(Ts&&... vs)
             {
-                typedef
-                    typename result<unwrapped_impl(Ts...)>::type
-                    result_type;
                 typedef
                     unwrap_impl<util::tuple<
                         typename util::decay<Ts>::type...> >

@@ -344,10 +344,6 @@ namespace hpx { namespace util
             typename result<one_shot_wrapper(Ts...)>::type
             operator()(Ts&&... vs)
             {
-                typedef typename result<
-                    one_shot_wrapper(Ts...)
-                >::type result_type;
-
                 check_call();
                 return util::invoke(_f, std::forward<Ts>(vs)...);
             }

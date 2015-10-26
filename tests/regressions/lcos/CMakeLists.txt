@@ -6,6 +6,7 @@
 
 set(tests
     after_588
+    async_action_1813
     async_callback_with_bound_callback
     async_callback_non_deduced_context
     async_unwrap_1037
@@ -35,6 +36,7 @@ set(tests
 set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
 set(after_588_PARAMETERS LOCALITIES 2)
+set(async_action_1813_PARAMETERS LOCALITIES 2)
 set(async_callback_with_bound_callback_PARAMETERS LOCALITIES 2)
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)

@@ -98,8 +98,7 @@ namespace boost
         ++m_files_with_errors;
         std::size_t ln = std::count( contents.begin(), bad_char, '\n' ) + 1;
         string the_line = find_line ( contents, bad_char );
-        string location = linelink(full_path, the_line);
-        error( library_name, full_path, "Non-ASCII: ", ln );
+        error( library_name, full_path, "Non-ASCII: ", ln);
       }
     }
   } // namespace inspect

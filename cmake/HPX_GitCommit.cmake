@@ -16,7 +16,7 @@ endif()
 
 if(NOT GIT_FOUND OR NOT HPX_WITH_GIT_COMMIT OR "${HPX_WITH_GIT_COMMIT}" STREQUAL "None")
   hpx_warn("GIT commit not found (set to 'unknown').")
-  set(HPX_GIT_COMMIT "unknown")
+  set(HPX_WITH_GIT_COMMIT "unknown")
 else()
   hpx_info("GIT commit is ${HPX_WITH_GIT_COMMIT}.")
 endif()

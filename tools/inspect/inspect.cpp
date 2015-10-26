@@ -549,7 +549,7 @@ namespace
               string line = std::to_string(itr->line_number);
               const path & full_path = itr->library;
               string link = linelink(full_path, line);
-              out << sep << "(line " << link << ") " << itr->msg;
+              out << sep << itr->msg << "(line " << link << ") ";
               //Since the brackets are not used in inspect besides for formatting
               //html_encode is unneccessary
               //out << sep << "(line " << link << ") " << html_encode(itr->msg);
@@ -1077,8 +1077,8 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
       "<tr>\n"
       "<td>"
       "<a href = \"https://github.com/STEllAR-GROUP/hpx\">"
-      "<img src=\"http://stellar.cct.lsu.edu/files/stellar100.png\"\
-        alt=\"STE||AR logo\" />"
+      "<img src=\"http://stellar.cct.lsu.edu/files/stellar100.png\""
+      " alt=\"STE||AR logo\" />"
       "</a>\n"
       "</td>\n"
       "<td>\n"
