@@ -198,7 +198,7 @@ namespace hpx { namespace  threads
 
         // release cores from all schedulers
         // calls release_scheduler_resources
-        std::size_t release_cores_on_existing_scedulers(
+        std::size_t release_cores_on_existing_schedulers(
             std::size_t number_to_free,
             std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits);
 

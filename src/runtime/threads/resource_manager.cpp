@@ -184,7 +184,7 @@ namespace hpx { namespace threads
 
     // Instructs existing schedulers to release cores. Then tries to reserve
     // available cores for the new scheduler
-    std::size_t resource_manager::release_cores_on_existing_scedulers(
+    std::size_t resource_manager::release_cores_on_existing_schedulers(
         std::size_t number_to_free,
         std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits)
     {
@@ -517,7 +517,7 @@ namespace hpx { namespace threads
             // processing units
             preprocess_static_allocation(min_punits, max_punits);
 
-            reserved += release_cores_on_existing_scedulers(
+            reserved += release_cores_on_existing_schedulers(
                 release_borrowed_cores, available_punits);
 
             if(reserved < max_punits)
@@ -527,7 +527,7 @@ namespace hpx { namespace threads
 
                 if (reserved < min_punits)
                 {
-                    reserved += release_cores_on_existing_scedulers(
+                    reserved += release_cores_on_existing_schedulers(
                         release_cores_to_min, available_punits);
                     if (reserved < min_punits)
                     {
