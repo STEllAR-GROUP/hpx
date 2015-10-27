@@ -28,7 +28,7 @@ namespace hpx { namespace parcelset
         ar >> t;
         if(t.empty()) return;
         HPX_ASSERT(get_runtime_ptr());
-        impl_ = std::move(get_runtime().get_parcel_handler().create_locality(t).impl_);
+        impl_ = get_runtime().get_parcel_handler().create_locality(t).impl_;
         impl_->load(ar);
         HPX_ASSERT(impl_->valid());
     }
