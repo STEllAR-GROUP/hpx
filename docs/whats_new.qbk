@@ -22,6 +22,11 @@ to the master branch commits since the last release.
 
 [heading General Changes]
 
+* We are moving into the direction of unifying managed and simple components. As
+  such, the classes [classref hpx::components::component] and
+  [classref hpx::components::component_base] have been added which currently just
+  forward to the currently existing simple component facilities. The examples
+  have been converted to only use those two classes.
 * Added integration with the [@https://circleci.com/gh/STEllAR-GROUP/hpx CircleCI]
   hosted continuous integration service. This gives us constant and immediate
   feedback on the health of our master branch.
@@ -77,6 +82,11 @@ to the master branch commits since the last release.
 
 [heading Breaking Changes]
 
+* We are moving into the direction of unifying managed and simple components. In
+  order to stop exposing the old facilities, all examples have been converted to
+  use the new classes. The breaking change in this release is that performance
+  counters are now a [classref hpx::components::component_base] instead of
+  [classref hpx::components::managed_component_base].
 * We removed the support for stackless threads. It turned out that there was no
   performance benefit when using stackless threads. As such, we decided to clean
   up our codebase. This feature was not documented.

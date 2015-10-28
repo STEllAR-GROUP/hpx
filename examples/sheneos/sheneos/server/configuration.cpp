@@ -57,7 +57,7 @@ HPX_REGISTER_ACTION(configuration_type::get_action,
     sheneos_configuration_get_action);
 
 HPX_REGISTER_COMPONENT(
-    hpx::components::simple_component<configuration_type>,
+    hpx::components::component<configuration_type>,
     sheneos_configuration_type);
 
 HPX_REGISTER_ACTION(

@@ -18,7 +18,7 @@ namespace jacobi
     }
 }
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     jacobi::server::row
 > row_type;
 

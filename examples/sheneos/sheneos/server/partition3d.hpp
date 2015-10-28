@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
 #include "../dimension.hpp"
@@ -33,7 +33,7 @@ namespace sheneos { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT partition3d
-      : public hpx::components::simple_component_base<partition3d>
+      : public hpx::components::component_base<partition3d>
     {
         inline void init_dimension(std::string const&, int, dimension const&,
             char const*, boost::scoped_array<double>&);

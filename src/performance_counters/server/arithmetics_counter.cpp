@@ -257,7 +257,7 @@ template class HPX_EXPORT hpx::performance_counters::server::arithmetics_counter
 
 ///////////////////////////////////////////////////////////////////////////////
 // Addition
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::arithmetics_counter<std::plus<double> >
 > adding_counter_type;
 
@@ -268,7 +268,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(adding_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Subtraction
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::arithmetics_counter<std::minus<double> >
 > subtracting_counter_type;
 
@@ -279,7 +279,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(subtracting_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Multiply
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::arithmetics_counter<std::multiplies<double> >
 > multiplying_counter_type;
 
@@ -290,7 +290,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(multiplying_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Division
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::arithmetics_counter<std::divides<double> >
 > dividing_counter_type;
 

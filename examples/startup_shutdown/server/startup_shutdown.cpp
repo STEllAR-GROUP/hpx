@@ -11,7 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
 HPX_REGISTER_COMPONENT(
-    hpx::components::simple_component<
+    hpx::components::component<
         startup_shutdown::server::startup_shutdown_component>,
     startup_shutdown_component);
 

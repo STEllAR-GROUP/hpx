@@ -4,12 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_B808C8CA_810E_4583_9EA2_528553C8B511)
-#define HPX_B808C8CA_810E_4583_9EA2_528553C8B511
+#if !defined(HPX_4C46C86D_A43F_42A8_8164_C9EBA3B210CC)
+#define HPX_4C46C86D_A43F_42A8_8164_C9EBA3B210CC
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/components/server/locking_hook.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,9 +18,8 @@ namespace examples { namespace server
     /// This class is a very simple example of an HPX component. An HPX
     /// component is a class that:
     ///
-    ///     * Inherits from a component base class (either
-    ///       \a hpx::components::managed_component_base or
-    ///       \a hpx::components::simple_component_base).
+    ///     * Inherits from a component base class:
+    ///       \a hpx::components::component_base
     ///     * Exposes methods that can be called asynchronously and/or remotely.
     ///       These constructs are known as HPX actions.
     ///
@@ -34,42 +32,36 @@ namespace examples { namespace server
     /// Components are first-class objects in HPX. This means that they are
     /// globally addressable; all components have a unique GID.
     ///
-    /// This example demonstrates how to write a managed component. Managed
-    /// components are allocated in bulk by HPX. When a component needs to be
-    /// created in large quantities, managed components should be used. Because
-    /// managed components are allocated in bulk, the creation of a new managed
-    /// component usually does not require AGAS requests.
+    /// This example demonstrates how to write a simple component. Simple
+    /// components are allocated one at a time with the C++'s new allocator.
+    /// When a component needs to be created in small quantities, simple
+    /// components should be used. At least two AGAS requests will be made when
+    /// a simple component is created.
     ///
     /// This component exposes 3 different actions: reset, add and query.
-    //[managed_accumulator_server_inherit
-    class managed_accumulator
+    class accumulator
       : public hpx::components::locking_hook<
-            hpx::components::managed_component_base<managed_accumulator>
-        >
-    //]
+            hpx::components::component_base<accumulator> >
     {
     public:
         typedef boost::int64_t argument_type;
 
-        //[managed_accumulator_server_ctor
-        managed_accumulator() : value_(0) {}
-        //]
+        accumulator() : value_(0) {}
 
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        //[managed_accumulator_methods
-        /// Reset the value to 0.
+        /// Reset the components value to 0.
         void reset()
         {
-            // set value_ to 0.
-            value_= 0;
+            //  set value_ to 0.
+            value_ = 0;
         }
 
         /// Add the given number to the accumulator.
         void add(argument_type arg)
         {
-            // add value_ to arg, and store the result in value_.
+            //  add value_ to arg, and store the result in value_.
             value_ += arg;
         }
 
@@ -79,39 +71,32 @@ namespace examples { namespace server
             // Get the value of value_.
             return value_;
         }
-        //]
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
 
-        //[managed_accumulator_action_types
-        HPX_DEFINE_COMPONENT_ACTION(managed_accumulator, reset);
-        HPX_DEFINE_COMPONENT_ACTION(managed_accumulator, add);
-        HPX_DEFINE_COMPONENT_ACTION(managed_accumulator, query);
-        //]
+        HPX_DEFINE_COMPONENT_ACTION(accumulator, reset);
+        HPX_DEFINE_COMPONENT_ACTION(accumulator, add);
+        HPX_DEFINE_COMPONENT_ACTION(accumulator, query);
 
-    //[managed_accumulator_server_data_member
     private:
         argument_type value_;
-    //]
     };
 }}
 
-//[managed_accumulator_registration_declarations
 HPX_REGISTER_ACTION_DECLARATION(
-    examples::server::managed_accumulator::reset_action,
-    managed_accumulator_reset_action);
+    examples::server::accumulator::reset_action,
+    accumulator_reset_action);
 
 HPX_REGISTER_ACTION_DECLARATION(
-    examples::server::managed_accumulator::add_action,
-    managed_accumulator_add_action);
+    examples::server::accumulator::add_action,
+    accumulator_add_action);
 
 HPX_REGISTER_ACTION_DECLARATION(
-    examples::server::managed_accumulator::query_action,
-    managed_accumulator_query_action);
-//]
+    examples::server::accumulator::query_action,
+    accumulator_query_action);
 
 #endif
 

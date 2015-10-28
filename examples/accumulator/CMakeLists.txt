@@ -4,23 +4,26 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-add_subdirectory(accumulators)
-
 set(examples
-    managed_accumulator
-    simple_accumulator
+    accumulator
     template_function_accumulator
    )
 
 # for all targets specified above
 foreach(example ${examples})
-  set(sources ${example}_client.cpp)
+  set(client_sources ${example}_client.cpp)
+  set(component_sources ${example}.cpp)
 
-  source_group("Source Files" FILES ${sources})
+  source_group("Source Files" FILES ${client_sources} ${component_sources})
+
+  # add example components
+  add_hpx_component(${example}
+    SOURCES ${component_sources}
+    FOLDER "Examples/Quickstart/Accumulators/${example}")
 
   # add example executable
   add_hpx_executable(${example}_client
-    SOURCES ${sources}
+    SOURCES ${client_sources}
     DEPENDENCIES ${example}_component
     FOLDER "Examples/Quickstart/Accumulators/${example}")
 

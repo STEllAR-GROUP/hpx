@@ -21,7 +21,7 @@ namespace hpx::threads
         static threads::thread* allocate_clone(threads::thread const&)
         static void deallocate_clone(threads::thread const *)
 
-    class thread : public components::managed_component<detail::thread,thread>
+    class thread : public components::component<detail::thread,thread>
         thread()
         thread(thread_init_data const&,thread_pool&,thread_state_enum)
         thread(BOOST_RV_REF(thread_init_data),thread_pool&,thread_state_enum)

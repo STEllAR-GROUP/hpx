@@ -14,7 +14,7 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::simple_component<
+typedef hpx::components::component<
     examples::server::simple_central_tuplespace
 > central_tuplespace_type;
 

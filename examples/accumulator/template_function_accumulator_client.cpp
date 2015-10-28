@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 
-#include "accumulators/template_function_accumulator.hpp"
+#include "template_function_accumulator.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>

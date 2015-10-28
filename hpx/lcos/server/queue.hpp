@@ -11,7 +11,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 
@@ -31,14 +31,14 @@ namespace hpx { namespace lcos { namespace server
     template <typename ValueType, typename RemoteType>
     class queue
       : public lcos::base_lco_with_value<ValueType, RemoteType>
-      , public components::managed_component_base<queue<ValueType, RemoteType> >
+      , public components::component_base<queue<ValueType, RemoteType> >
     {
     public:
         typedef lcos::base_lco_with_value<ValueType, RemoteType> base_type_holder;
 
     private:
         typedef lcos::local::spinlock mutex_type;
-        typedef components::managed_component_base<queue> base_type;
+        typedef components::component_base<queue> base_type;
 
         typedef std::queue<ValueType> queue_type;
 

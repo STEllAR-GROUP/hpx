@@ -205,7 +205,7 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 // component which allows for it to be created and accessed remotely through
 // a global address (hpx::id_type).
 struct partition_server
-  : hpx::components::simple_component_base<partition_server>
+  : hpx::components::component_base<partition_server>
 {
     enum partition_type
     {
@@ -262,7 +262,7 @@ private:
 //
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
-typedef hpx::components::simple_component<partition_server> partition_server_type;
+typedef hpx::components::component<partition_server> partition_server_type;
 HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
@@ -313,7 +313,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Data for one time step on one locality
-struct stepper_server : hpx::components::simple_component_base<stepper_server>
+struct stepper_server : hpx::components::component_base<stepper_server>
 {
     // Our data for one time step
     typedef std::vector<partition> space;
@@ -396,7 +396,7 @@ private:
 //
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
-typedef hpx::components::simple_component<stepper_server> stepper_server_type;
+typedef hpx::components::component<stepper_server> stepper_server_type;
 HPX_REGISTER_COMPONENT(stepper_server_type, stepper_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
