@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,10 +17,11 @@ namespace hpx
     namespace detail
     {
         HPX_EXPORT int run_or_start(
-            util::function_nonser<int(boost::program_options::variables_map& vm)>
-                const& f,
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            > const& f,
             boost::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> const& ini_config,
+            int argc, char** argv, std::vector<std::string> && ini_config,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown, hpx::runtime_mode mode,
             bool blocking);
@@ -34,7 +35,9 @@ namespace hpx
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread.
     inline int init(
-        util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+        util::function_nonser<
+            int(boost::program_options::variables_map& vm)
+        > const& f,
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         util::function_nonser<void()> const& startup,
@@ -42,7 +45,8 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         util::set_hpx_prefix(HPX_PREFIX);
-        return detail::run_or_start(f, desc_cmdline, argc, argv, cfg,
+        return detail::run_or_start(f, desc_cmdline, argc, argv,
+            hpx_startup::user_main_config(cfg),
             startup, shutdown, mode, true);
     }
 
@@ -127,8 +131,8 @@ namespace hpx
     /// In console mode it will execute the user supplied function `hpx_main`,
     /// in worker mode it will execute an empty `hpx_main`.
     inline int
-    init(boost::program_options::options_description const& desc_cmdline, int argc,
-        char** argv, hpx::runtime_mode mode)
+    init(boost::program_options::options_description const& desc_cmdline,
+        int argc, char** argv, hpx::runtime_mode mode)
     {
         util::function_nonser<void()> const empty;
         return init(static_cast<hpx_main_type>(::hpx_main), desc_cmdline,

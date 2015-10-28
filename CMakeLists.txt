@@ -378,6 +378,14 @@ if(HPX_WITH_THREAD_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_THREAD_LOCAL_STORAGE)
 endif()
 
+hpx_option(HPX_WITH_SCHEDULER_LOCAL_STORAGE BOOL
+  "Enable scheduler local storage for all HPX schedulers (default: OFF)"
+  OFF CATEGORY "Thread Manager" ADVANCED)
+
+if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
+  hpx_add_config_define(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
+endif()
+
 hpx_option(HPX_WITH_SWAP_CONTEXT_EMULATION BOOL
   "Emulate SwapContext API for coroutines (default: OFF)"
   OFF CATEGORY "Thread Manager" ADVANCED)

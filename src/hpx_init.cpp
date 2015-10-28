@@ -53,6 +53,13 @@ namespace hpx
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx_startup
+{
+    std::vector<std::string> (*user_main_config_function)(
+        std::vector<std::string> const&) = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
 {
     // forward declarations only
@@ -725,7 +732,8 @@ namespace hpx
             typedef hpx::threads::policies::local_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000, numa_sensitive);
+                cfg.num_threads_, 1000, numa_sensitive,
+                "core-local_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
@@ -765,7 +773,8 @@ namespace hpx
             typedef hpx::threads::policies::throttle_queue_scheduler<>
                 throttle_queue_policy;
             throttle_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000, numa_sensitive);
+                cfg.num_threads_, 1000, numa_sensitive,
+                "core-throttle_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
@@ -801,13 +810,16 @@ namespace hpx
             std::size_t pu_step = get_pu_step(cfg);
             std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
-            get_affinity_description(cfg, affinity_desc);
+            std::size_t numa_sensitive =
+                get_affinity_description(cfg, affinity_desc);
 
             // scheduling policy
             typedef hpx::threads::policies::static_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, num_high_priority_queues, 1000);
+                cfg.num_threads_, num_high_priority_queues,
+                1000, numa_sensitive,
+                "core-static_priority_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
@@ -827,9 +839,9 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // local static scheduler with priority queue (one queue for each OS
-        // threads plus one separate queue for high priority HPX-threads). Doesn't
-        // steal.
+        // local static scheduler without priority queue (one queue for each OS
+        // threads plus one separate queue for high priority HPX-threads).
+        // Doesn't steal.
         int run_static(startup_function_type const& startup,
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
@@ -842,13 +854,15 @@ namespace hpx
             std::size_t pu_step = get_pu_step(cfg);
             std::string affinity_domain = get_affinity_domain(cfg);
             std::string affinity_desc;
-            get_affinity_description(cfg, affinity_desc);
+            std::size_t numa_sensitive =
+                get_affinity_description(cfg, affinity_desc);
 
             // scheduling policy
             typedef hpx::threads::policies::static_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000);
+                cfg.num_threads_, 1000, numa_sensitive,
+                "core-static_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
@@ -890,7 +904,7 @@ namespace hpx
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
-                numa_sensitive);
+                numa_sensitive, "core-local_priority_queue_scheduler");
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
 
@@ -922,7 +936,7 @@ namespace hpx
                 abp_priority_queue_policy;
             abp_priority_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
-                cfg.numa_sensitive_);
+                cfg.numa_sensitive_, "core-abp_fifo_priority_queue_scheduler");
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
@@ -956,7 +970,8 @@ namespace hpx
             if (cfg.vm_.count("hpx:hierarchy-arity"))
                 arity = cfg.vm_["hpx:hierarchy-arity"].as<std::size_t>();
 
-            queue_policy::init_parameter_type init(cfg.num_threads_, arity, 1000);
+            queue_policy::init_parameter_type init(cfg.num_threads_, arity,
+                1000, 0, "core-hierarchy_scheduler");
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<queue_policy> runtime_type;
@@ -990,7 +1005,8 @@ namespace hpx
             typedef hpx::threads::policies::periodic_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(cfg.num_threads_,
-                num_high_priority_queues, 1000, cfg.numa_sensitive_);
+                num_high_priority_queues, 1000, cfg.numa_sensitive_,
+                "core-periodic_priority_queue_scheduler");
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
@@ -1008,10 +1024,11 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT int run_or_start(
-            util::function_nonser<int(boost::program_options::variables_map& vm)>
-                const& f,
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            > const& f,
             boost::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> const& ini_config,
+            int argc, char** argv, std::vector<std::string> && ini_config,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown, hpx::runtime_mode mode,
             bool blocking)
@@ -1046,7 +1063,8 @@ namespace hpx
                 }
 
                 // handle all common command line switches
-                util::command_line_handling cfg(mode, f, ini_config, argv[0]);
+                util::command_line_handling cfg(
+                    mode, f, std::move(ini_config), argv[0]);
 
                 util::apex_wrapper_init apex(argc, argv);
 
