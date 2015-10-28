@@ -17,7 +17,7 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>

@@ -17,7 +17,7 @@ overall stability of our code base has significantly increased, the development
 process itself has been simplified. This change manifests itself in a large
 number of pull-requests which has been merged (please see below for a full list
 of closed issues and pull-requests). All in all for this release, we closed
-almost 100 issues and merged over 220 pull-requests. There have been over 1500
+almost 100 issues and merged over 220 pull-requests. There have been over 1600
 to the master branch commits since the last release.
 
 [heading General Changes]
@@ -137,10 +137,76 @@ to the master branch commits since the last release.
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    1822] - applying fixes suggested by clang 3.7
+* [pr    1820] - added parallel multi-locality sanity test
+* [pr    1819] - Fixing #1667
+* [pr    1814] - Fix async to dispatch to the correct locality in all cases
+* [issue 1813] - async(launch::..., action(), ...) always invokes locally
+* [pr    1812] - fixed syntax error in CMakeLists.txt
+* [pr    1811] - Agas optimizations
+* [pr    1810] - drop superfluous typedefs
+* [pr    1809] - Allow HPX to be used as an optional package in 3rd party code
+* [pr    1808] - Fixing #1723
+* [pr    1807] - Making sure resolve_localities does not hang during normal
+                 operation
+* [issue 1806] - Spinlock no longer movable and deletes operator '=', breaks
+                 MiniGhost
+* [issue 1804] - register_with_basename causes hangs
+* [pr    1801] - Enhanced the inspect tool to take user directly to the problem
+                 with hyperlinks
+* [issue 1800] - Problems compiling application on smic
+* [pr    1799] - Fixing cv exceptions
+* [pr    1798] - Documentation refactoring & updating
+* [pr    1797] - Updating the activeharmony CMake module
+* [pr    1795] - Fixing cv
+* [pr    1794] - Fix connect with hpx::runtime_mode_connect
+* [pr    1793] - fix a wrong use of HPX_MAX_CPU_COUNT instead of
+                 HPX_HAVE_MAX_CPU_COUNT
+* [pr    1792] - Allow for default constructed parcel instances to be moved
+* [pr    1791] - Fix connect with hpx::runtime_mode_connect
+* [issue 1790] - assertion 'action_.get()' failed: HPX(assertion_failure) when
+                 running Octotiger with pull request 1786
+* [pr    1789] - Fixing discover_counter_types API function
+* [issue 1788] - connect with hpx::runtime_mode_connect
+* [issue 1787] - discover_counter_types not working
+* [pr    1786] - Changing addressing_service to use std::unordered_map instead
+                 of std::map
+* [pr    1785] - Fix is_iterator for container algorithms
+* [pr    1784] - Adding new command line options:
+* [pr    1783] - Minor changes for APEX support
+* [pr    1782] - Drop legacy forwarding action traits
+* [pr    1781] - Attempt to resolve the race between cv::wait_xxx and
+                 cv::notify_all
+* [pr    1780] - Removing serialize_sequence
+* [pr    1779] - Fixed #1501: hwloc configuration options are wrong for MIC
+* [pr    1778] - Removing ability to enable/disable parcel handling
+* [pr    1777] - Completely removing stackless threads
+* [pr    1776] - Cleaning up util/plugin
+* [pr    1775] - Agas fixes
+* [pr    1774] - Action invocation count
+* [pr    1772] - Fixing Problems in MPI parcelport and future serialization.
+* [pr    1771] - Fixing intel 13 compiler errors related to variadic template
+                 template parameters for lcos::when_ tests
+* [pr    1770] - Forwarding decay to std::
+* [pr    1769] - Add more characters with special regex meaning to the existing
+                 patch
+* [pr    1768] - Adding test for receive_buffer
+* [pr    1767] - Making sure that uptime counter throws exception on any attempt
+                 to be reset
+* [pr    1766] - Cleaning up code related to throttling scheduler
+* [pr    1765] - Restricting thread_data to creating only with intrusive_pointers
+* [pr    1764] - Fixing 1763
+* [issue 1763] - UB in thread_data::operator delete
+* [pr    1762] - Making sure all serialization registries/factories are unique
+* [pr    1761] - Fixed #1751: hpx::future::wait_for fails a simple test
 * [pr    1758] - Fixing #1757
 * [issue 1757] - pinning not correct using --hpx:bind
 * [pr    1755] - Making output serialization const-correct
+* [issue 1752] - Error in AGAS
+* [issue 1751] - hpx::future::wait_for fails a simple test
+* [pr    1750] - Removing hpx_fwd.hpp includes
 * [pr    1749] - Simplify result_of and friends
+* [pr    1747] - Removed superfluous code from message_buffer.hpp
 * [pr    1746] - Tuple dependencies
 * [issue 1745] - Broken when_some which takes iterators
 * [pr    1744] - Refining archive interface
@@ -149,9 +215,11 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1741] - Os executors
 * [issue 1740] - hpx::promise has some problems
 * [pr    1739] - Parallel composition with generic containers
+* [issue 1737] - Uptime problems
 * [pr    1736] - added convenience c-tor and begin()/end() to serialize_buffer
 * [pr    1735] - Config includes
 * [pr    1734] - Fixed #1688: Add timer counters for tfunc_total and exec_total
+* [issue 1733] - Add unit test for hpx/lcos/local/receive_buffer.hpp
 * [pr    1732] - Renaming get_os_thread_count
 * [pr    1731] - Basename registration
 * [issue 1730] - Use after move of thread_init_data
@@ -161,6 +229,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1726] - Apex integration
 * [pr    1725] - fixed test timeouts
 * [pr    1724] - Renaming vector
+* [issue 1723] - Drop support for intel compilers and gcc 4.4. based standard libs
 * [issue 1722] - Add support for detecting non-ready futures before serialization
 * [pr    1721] - Unifying parallel executors, initializing from launch policy
 * [pr    1720] - dropped superfluous typedef
@@ -246,6 +315,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1646] - Cache insert and update performance counters are broken
 * [issue 1644] - Remove leftovers of traits::type_size
 * [issue 1643] - Remove traits::action_may_require_id_splitting
+* [pr    1642] - Adds spell checker to the inspect tool for qbk and doxygen
+                 comments
 * [pr    1640] - First step towards fixing 688
 * [pr    1639] - Re-apply remaining changes from limit_dataflow_recursion branch
 * [pr    1638] - This fixes possible deadlock in the test
@@ -296,6 +367,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1594] - Fixing preprocessor constant used to enable C++11 chrono
 * [pr    1593] - Adding operator|() for hpx::launch
 * [issue 1592] - Error (typo) in the docs
+* [issue 1590] - CMake fails when CMAKE_BINARY_DIR contains '+'.
 * [issue 1589] - Disconnecting a locality results in segfault using heartbeat
                  example
 * [pr    1588] - Fix doc string for config option HPX_WITH_EXAMPLES
@@ -386,6 +458,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1506] - Properly handle deferred futures
 * [pr    1505] - Adding #include - would not compile without this
 * [issue 1502] - `boost::filesystem::exists` throws unexpected exception
+* [issue 1501] - hwloc configuration options are wrong for MIC
 * [pr    1504] - Making sure boost::filesystem::exists() does not throw
 * [pr    1500] - Exit application on `--hpx:version`/`-v` and `--hpx:info`
 * [pr    1498] - Extended task block
@@ -420,6 +493,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1468] - Fixed container creation
 * [issue 1467] - HPX application fail during finalization
 * [issue 1466] - HPX doesn't pick up Torque's nodefile on SuperMIC
+* [issue 1464] - HPX option for pre and post bootstrap performance counters
 * [pr    1463] - Replacing `async_colocated(id, ...)` with `async(colocated(id), ...)`
 * [pr    1462] - Consolidated task_region with N4411
 * [pr    1461] - Consolidate inconsistent CMake option names
@@ -478,7 +552,9 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1309] - `hpx::vector` partitions are not easily extendable by
                  applications
 * [pr    1300] - Added serialization/de-serialization to examples.tuplespace
+* [issue 1251] - hpx::threads::get_thread_count doesn't consider pending threads
 * [issue 1001] - Zero copy serialization raises assert
+* [issue  524] - Extend scheduler to support threads which can't be stolen
 
 [endsect]
 

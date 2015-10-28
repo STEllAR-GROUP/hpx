@@ -13,7 +13,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>

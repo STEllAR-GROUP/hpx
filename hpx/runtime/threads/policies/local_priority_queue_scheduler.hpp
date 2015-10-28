@@ -78,31 +78,43 @@ namespace hpx { namespace threads { namespace policies
             init_parameter()
               : num_queues_(1),
                 max_queue_thread_count_(max_thread_count),
-                numa_sensitive_(0)
+                numa_sensitive_(0),
+                description_("local_priority_queue_scheduler")
             {}
 
             init_parameter(std::size_t num_queues,
                     std::size_t num_high_priority_queues = std::size_t(-1),
                     std::size_t max_queue_thread_count = max_thread_count,
-                    std::size_t numa_sensitive = 0)
+                    std::size_t numa_sensitive = 0,
+                    char const* description = "local_priority_queue_scheduler")
               : num_queues_(num_queues),
                 num_high_priority_queues_(
                     num_high_priority_queues == std::size_t(-1) ?
                         num_queues : num_high_priority_queues),
                 max_queue_thread_count_(max_queue_thread_count),
-                numa_sensitive_(numa_sensitive)
+                numa_sensitive_(numa_sensitive),
+                description_(description)
+            {}
+
+            init_parameter(std::size_t num_queues, char const* description)
+              : num_queues_(num_queues),
+                num_high_priority_queues_(num_queues),
+                max_queue_thread_count_(max_thread_count),
+                numa_sensitive_(false),
+                description_(description)
             {}
 
             std::size_t num_queues_;
             std::size_t num_high_priority_queues_;
             std::size_t max_queue_thread_count_;
             std::size_t numa_sensitive_;
+            char const* description_;
         };
         typedef init_parameter init_parameter_type;
 
         local_priority_queue_scheduler(init_parameter_type const& init,
                 bool deferred_initialization = true)
-          : scheduler_base(init.num_queues_),
+          : scheduler_base(init.num_queues_, init.description_),
             max_queue_thread_count_(init.max_queue_thread_count_),
             queues_(init.num_queues_),
             high_priority_queues_(init.num_high_priority_queues_),

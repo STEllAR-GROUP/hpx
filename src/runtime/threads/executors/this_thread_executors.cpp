@@ -34,8 +34,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    this_thread_executor<Scheduler>::this_thread_executor()
-      : scheduler_(1, false), shutdown_sem_(0),
+    this_thread_executor<Scheduler>::this_thread_executor(char const* description)
+      : scheduler_(
+            typename Scheduler::init_parameter_type(1, description),
+            false
+        ),
+        shutdown_sem_(0),
         thread_num_(std::size_t(-1)),
         parent_thread_num_(std::size_t(-1)), orig_thread_num_(std::size_t(-1)),
         tasks_scheduled_(0), tasks_completed_(0), cookie_(0),
@@ -414,7 +418,8 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     this_thread_static_queue_executor::this_thread_static_queue_executor()
       : scheduled_executor(new detail::this_thread_executor<
-            policies::static_queue_scheduler<> >())
+            policies::static_queue_scheduler<> >(
+                "this_thread_static_queue_executor"))
     {}
 #endif
 
@@ -423,7 +428,8 @@ namespace hpx { namespace threads { namespace executors
     this_thread_static_priority_queue_executor::
             this_thread_static_priority_queue_executor()
       : scheduled_executor(new detail::this_thread_executor<
-            policies::static_priority_queue_scheduler<> >())
+            policies::static_priority_queue_scheduler<> >(
+                "this_thread_static_priority_queue_executor"))
     {}
 #endif
 }}}
