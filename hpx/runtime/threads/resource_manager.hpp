@@ -187,8 +187,8 @@ namespace hpx { namespace  threads
             std::size_t max_punits);
 
         // constants used for parameters to the release_scheduler API
-        std::size_t const release_borrowed_cores = std::size_t(-1);
-        std::size_t const release_cores_to_min = std::size_t(-2);
+        static std::size_t const release_borrowed_cores = std::size_t(-1);
+        static std::size_t const release_cores_to_min = std::size_t(-2);
 
         // release cores from scheduler
         bool release_scheduler_resources(
