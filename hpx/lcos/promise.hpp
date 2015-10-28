@@ -215,6 +215,9 @@ namespace hpx { namespace lcos { namespace detail
     class promise;
 
     template <typename Result, typename RemoteResult>
+    void intrusive_ptr_add_ref(promise<Result, RemoteResult>* p);
+
+    template <typename Result, typename RemoteResult>
     void intrusive_ptr_release(promise<Result, RemoteResult>* p);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -315,12 +318,16 @@ namespace hpx { namespace lcos { namespace detail
             return false;
         }
 
+        // disambiguate reference counting
+        friend void intrusive_ptr_add_ref(promise* p)
+        {
+            ++p->count_;
+        }
+
         friend void intrusive_ptr_release(promise* p)
         {
             if (p->requires_delete())
-            {
                 delete p;
-            }
         }
 
         template <typename>
@@ -427,12 +434,16 @@ namespace hpx { namespace lcos { namespace detail
             return false;
         }
 
+        // disambiguate reference counting
+        friend void intrusive_ptr_add_ref(promise* p)
+        {
+            ++p->count_;
+        }
+
         friend void intrusive_ptr_release(promise* p)
         {
             if (p->requires_delete())
-            {
                 delete p;
-            }
         }
 
         template <typename>
