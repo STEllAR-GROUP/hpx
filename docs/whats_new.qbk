@@ -219,6 +219,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1761] - Fixed #1751: hpx::future::wait_for fails a simple test
 * [pr    1758] - Fixing #1757
 * [issue 1757] - pinning not correct using --hpx:bind
+* [issue 1756] - compilation error with MinGW
 * [pr    1755] - Making output serialization const-correct
 * [issue 1752] - Error in AGAS
 * [issue 1751] - hpx::future::wait_for fails a simple test
@@ -308,6 +309,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1671] - Adapt transform for #1668
 * [pr    1670] - Started to work on #1668
 * [pr    1669] - Add this_thread_executors
+* [issue 1667] - Apple build instructions in docs are out of date
 * [pr    1666] - Apex integration
 * [pr    1665] - Fixes an error with the whitespace check that showed the
                  incorrect location of the error
