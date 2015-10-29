@@ -863,6 +863,10 @@ if(WIN32)
     if(MSVC14)
       # assume conforming (throwing) operator new implementations
       hpx_add_compile_flag(-Zc:throwingNew)
+
+      # enable faster linking (requires VS2015 Update1)
+      hpx_remove_link_flag(/debug CONFIGURATIONS Debug)
+      hpx_add_link_flag(/debug:fastlink CONFIGURATIONS Debug)
     endif()
 
     # Runtime type information
@@ -871,9 +875,6 @@ if(WIN32)
     hpx_add_compile_flag(-MP)
     # Increase the maximum size of object file sections
     hpx_add_compile_flag(-bigobj)
-    # enable faster linking (requires VS2015 Update1)
-    hpx_remove_link_flag(/debug CONFIGURATIONS Debug)
-    hpx_add_link_flag(/debug:fastlink CONFIGURATIONS Debug)
   endif()
 
   hpx_libraries(psapi shlwapi)
