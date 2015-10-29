@@ -162,8 +162,7 @@ namespace hpx { namespace lcos { namespace detail
         naming::id_type get_id() const
         {
             boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
-            // The GID needs to be split in order to keep the promise alive.
-            return get_gid_locked(std::move(l), true);
+            return get_gid_locked(std::move(l));
         }
 
         naming::id_type get_unmanaged_id() const
@@ -180,21 +179,14 @@ namespace hpx { namespace lcos { namespace detail
 #endif
 
     protected:
+        // The GID needs to be split in order to keep the shared state alive.
         naming::id_type get_gid_locked(
-            boost::unique_lock<naming::gid_type> l, bool split) const
+            boost::unique_lock<naming::gid_type> l) const
         {
-            if (split)
-            {
-                hpx::future<naming::gid_type> gid
-                    = naming::detail::split_gid_if_needed_locked(l, gid_);
-                l.unlock();
-                return naming::id_type(gid.get(), naming::id_type::managed);
-            }
-            else
-            {
-                l.unlock();
-                return naming::id_type(gid_, naming::id_type::managed);
-            }
+            hpx::future<naming::gid_type> gid =
+                naming::detail::split_gid_if_needed_locked(l, gid_);
+            l.unlock();
+            return naming::id_type(gid.get(), naming::id_type::managed);
         }
 
     protected:
@@ -297,20 +289,24 @@ namespace hpx { namespace lcos { namespace detail
             boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
             long counter = --this->count_;
 
-            // if this promise was never asked for its id we need to take
             // special precautions for it to go out of scope
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
-                // this will trigger normal destruction
-                // don't split the GID to avoid self references.
-                naming::id_type id = this->get_gid_locked(std::move(l), false);
+                // At this point, the remaining count has to be held by AGAS
+                // for this reason, we break the self-reference to allow for
+                // proper destruction
+
+                // move all credits to a temporary id_type
+                naming::gid_type gid = this->gid_;
+                naming::detail::strip_credits_from_gid(this->gid_);
+
+                naming::id_type id (gid, id_type::managed);
+                l.unlock();
+
                 return false;
             }
-            else if (0 == counter)
-            {
-                return true;
-            }
-            return false;
+
+            return 0 == counter;
         }
 
         friend void intrusive_ptr_release(promise* p)
@@ -410,20 +406,24 @@ namespace hpx { namespace lcos { namespace detail
             boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
             long counter = --this->count_;
 
-            // if this promise was never asked for its id we need to take
             // special precautions for it to go out of scope
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
-                // this will trigger normal destruction
-                // don't split the GID to avoid self references.
-                naming::id_type id = this->get_gid_locked(std::move(l), false);
+                // At this point, the remaining count has to be held by AGAS
+                // for this reason, we break the self-reference to allow for
+                // proper destruction
+
+                // move all credits to a temporary id_type
+                naming::gid_type gid = this->gid_;
+                naming::detail::strip_credits_from_gid(this->gid_);
+
+                naming::id_type id (gid, id_type::managed);
+                l.unlock();
+
                 return false;
             }
-            else if (0 == counter)
-            {
-                return true;
-            }
-            return false;
+
+            return 0 == counter;
         }
 
         friend void intrusive_ptr_release(promise* p)
