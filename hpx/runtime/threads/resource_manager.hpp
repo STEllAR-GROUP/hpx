@@ -152,30 +152,44 @@ namespace hpx { namespace  threads
         // Used to store information during static and dynamic allocation.
         struct allocation_data
         {
+            allocation_data()
+              : allocation_(0),
+                scaled_allocation_(0.0),
+                num_borrowed_cores_(0),
+                num_owned_cores_(0),
+                min_proxy_cores_(0),
+                max_proxy_cores_(0)
+            {}
+
             // The scheduler proxy this allocation data is for.
             boost::shared_ptr<detail::manage_executor> proxy_;  // hold on to proxy
 
             // Additional allocation to give to a scheduler after proportional
             // allocation decisions are made.
-            std::size_t allocation;
+            std::size_t allocation_;
 
             // Scaled allocation value during proportional allocation.
-            double scaled_allocation;
+            double scaled_allocation_;
 
-            std::size_t num_borrowed_cores; // borrowed cores held by scheduler
-            std::size_t num_owned_cores;    // owned cores held by scheduler
-            std::size_t min_proxy_cores;    // min cores required by scheduler
-            std::size_t max_proxy_cores;    // max cores required by scheduler
+            std::size_t num_borrowed_cores_; // borrowed cores held by scheduler
+            std::size_t num_owned_cores_;    // owned cores held by scheduler
+            std::size_t min_proxy_cores_;    // min cores required by scheduler
+            std::size_t max_proxy_cores_;    // max cores required by scheduler
         };
 
         struct static_allocation_data : public allocation_data
         {
+            static_allocation_data()
+              : adjusted_desired_(0),
+                num_cores_stolen_(0)
+            {}
+
             // A field used during static allocation to decide on an allocation
             // proportional to each scheduler's desired value.
-            double adjusted_desired;
+            double adjusted_desired_;
 
             // Keeps track of stolen cores during static allocation.
-            std::size_t num_cores_stolen;
+            std::size_t num_cores_stolen_;
         };
 
         typedef std::map<std::size_t, static_allocation_data>
