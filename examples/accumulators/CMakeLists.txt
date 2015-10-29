@@ -28,14 +28,14 @@ foreach(example ${examples})
     FOLDER "Examples/Quickstart/Accumulators/${example}")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(examples.accumulator.${example})
+  add_hpx_pseudo_target(examples.accumulators.${example})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.accumulator
-                              examples.accumulator.${example})
+  add_hpx_pseudo_dependencies(examples.accumulators
+                              examples.accumulators.${example})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.accumulator.${example}
+  add_hpx_pseudo_dependencies(examples.accumulators.${example}
                               ${example}_client_exe)
 endforeach()
 

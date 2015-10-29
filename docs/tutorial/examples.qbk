@@ -360,7 +360,7 @@ accumulator instance.
 [teletype]
 
 The source code for this example can be found here:
-[hpx_link examples/accumulator/accumulator_client.cpp..accumulator_client.cpp].
+[hpx_link examples/accumulators/accumulator_client.cpp..accumulator_client.cpp].
 
 To compile this program, go to your __hpx__ build directory (see __getting_started__
 for information on configuring and building __hpx__) and enter:
@@ -403,7 +403,7 @@ example consists of two parts: an __hpx__ component library (a library that expo
 an __hpx__ component) and a client application which uses the library. This
 walkthrough will cover the __hpx__ component library. The code for the client
 application can be found here:
-[hpx_link examples/accumulator/accumulator_client.cpp..accumulator_client.cpp].
+[hpx_link examples/accumulators/accumulator_client.cpp..accumulator_client.cpp].
 
 An __hpx__ component is represented by three C++ classes:
 
@@ -424,7 +424,7 @@ accumulator are:
 [heading The Server Class]
 
 The following code is from:
-[hpx_link examples/accumulator/accumulators/server/accumulator.hpp..server/accumulator.hpp].
+[hpx_link examples/accumulators/accumulators/server/accumulator.hpp..server/accumulator.hpp].
 
 All __hpx__ component server classes must inherit publicly from the __hpx__ component
 base class: [classref hpx::components::component_base]`<>`
@@ -439,7 +439,7 @@ from [classref hpx::components::component_base]`<>` (the template
 argument passed to locking_hook is used as its base class). The following
 snippet shows the corresponding code:
 
-[import ../../examples/accumulator/accumulators/server/accumulator.hpp]
+[import ../../examples/accumulators/accumulators/server/accumulator.hpp]
 [accumulator_server_inherit]
 
 Our accumulator class will need a data member to store its value in, so let's
@@ -470,9 +470,9 @@ action type registration code:
 [note The code above must be placed in the global namespace.]
 
 The rest of the registration code is in
-[hpx_link examples/accumulator/accumulators/accumulator.cpp..accumulator.cpp].
+[hpx_link examples/accumulators/accumulators/accumulator.cpp..accumulator.cpp].
 
-[import ../../examples/accumulator/accumulators/accumulator.cpp]
+[import ../../examples/accumulators/accumulators/accumulator.cpp]
 [accumulator_registration_definitions]
 
 [note The code above must be placed in the global namespace.]
@@ -480,11 +480,11 @@ The rest of the registration code is in
 [heading The Stubs Class]
 
 The following code is from
-[hpx_link examples/accumulator/accumulators/stubs/accumulator.hpp..stubs/accumulator.hpp].
+[hpx_link examples/accumulators/accumulators/stubs/accumulator.hpp..stubs/accumulator.hpp].
 
 All stubs classes must inherit from the stubs base class, [classref hpx::components::stub_base]`<>`:
 
-[import ../../examples/accumulator/accumulators/stubs/accumulator.hpp]
+[import ../../examples/accumulators/accumulators/stubs/accumulator.hpp]
 [accumulator_stubs_inherit]
 
 The stubs class contains helper functions which invoke actions on component
@@ -520,7 +520,7 @@ type specifies the target of an action.
 [heading The Client Class]
 
 The following code is from
-[hpx_link examples/accumulator/accumulators/accumulator.hpp..accumulator.hpp].
+[hpx_link examples/accumulators/accumulators/accumulator.hpp..accumulator.hpp].
 
 The client class is the primary interface to a component instance. Client classes
 are used to create components:
@@ -539,7 +539,7 @@ and to invoke component actions:
 Clients, like stubs and servers, need to inherit from a base class, this time,
 [classref hpx::components::client_base]`<>`:
 
-[import ../../examples/accumulator/accumulators/accumulator.hpp]
+[import ../../examples/accumulators/accumulators/accumulator.hpp]
 [accumulator_client_inherit]
 
 For readability, we typedef the base class like so:

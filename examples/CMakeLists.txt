@@ -7,7 +7,7 @@
 
 set(subdirs
     1d_hydro
-    accumulator
+    accumulators
     allgather
     async_io
     balancing
