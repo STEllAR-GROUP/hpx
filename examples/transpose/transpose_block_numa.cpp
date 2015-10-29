@@ -136,7 +136,7 @@ typedef
 executors_vector execs;
 
 struct block_component
-  : hpx::components::simple_component_base<block_component>
+  : hpx::components::component_base<block_component>
 {
     block_component()
       : data_(0, 0.0, allocator_type(execs_, retrieve_topology()))
@@ -193,7 +193,7 @@ struct block
 //
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
-typedef hpx::components::simple_component<block_component> block_component_type;
+typedef hpx::components::component<block_component> block_component_type;
 HPX_REGISTER_COMPONENT(block_component_type, block_component);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote

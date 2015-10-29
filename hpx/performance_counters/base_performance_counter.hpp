@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
@@ -28,10 +28,10 @@ namespace hpx { namespace performance_counters
     template <typename Derived>
     class base_performance_counter
       : public hpx::performance_counters::server::base_performance_counter,
-        public hpx::components::managed_component_base<Derived>
+        public hpx::components::component_base<Derived>
     {
     private:
-        typedef hpx::components::managed_component_base<Derived> base_type;
+        typedef hpx::components::component_base<Derived> base_type;
 
     public:
         typedef Derived type_holder;

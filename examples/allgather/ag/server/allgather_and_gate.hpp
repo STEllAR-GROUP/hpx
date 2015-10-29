@@ -19,7 +19,7 @@ namespace ag { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT allgather_and_gate
-      : public hpx::components::managed_component_base<allgather_and_gate>
+      : public hpx::components::component_base<allgather_and_gate>
     {
     private:
         typedef hpx::lcos::local::spinlock mutex_type;

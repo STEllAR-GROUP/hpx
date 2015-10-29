@@ -5,30 +5,28 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/serialization.hpp>
 
-#include "server/simple_accumulator.hpp"
+#include "server/template_function_accumulator.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality.
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::simple_component<
-    examples::server::simple_accumulator
+typedef hpx::components::component<
+    examples::server::template_function_accumulator
 > accumulator_type;
 
-HPX_REGISTER_COMPONENT(accumulator_type, simple_accumulator);
+HPX_REGISTER_COMPONENT(accumulator_type, template_function_accumulator);
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for simple_accumulator actions.
+// Serialization support for managed_accumulator actions.
 HPX_REGISTER_ACTION(
     accumulator_type::wrapped_type::reset_action,
-    simple_accumulator_reset_action);
-HPX_REGISTER_ACTION(
-    accumulator_type::wrapped_type::add_action,
-    simple_accumulator_add_action);
+    managed_accumulator_reset_action);
 HPX_REGISTER_ACTION(
     accumulator_type::wrapped_type::query_action,
-    simple_accumulator_query_action);
+    managed_accumulator_query_action);
 

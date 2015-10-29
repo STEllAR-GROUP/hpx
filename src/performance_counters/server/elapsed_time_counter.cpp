@@ -14,7 +14,7 @@
 #include <boost/version.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::elapsed_time_counter
 > elapsed_time_counter_type;
 

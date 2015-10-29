@@ -19,7 +19,7 @@ void hello_world::invoke()
 
 HPX_REGISTER_COMPONENT_MODULE();
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     examples::server::hello_world
 > hello_world_type;
 

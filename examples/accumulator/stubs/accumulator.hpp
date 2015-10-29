@@ -11,15 +11,15 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/include/async.hpp>
 
-#include "../server/simple_accumulator.hpp"
+#include "../server/accumulator.hpp"
 
 namespace examples { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct simple_accumulator
-      : hpx::components::stub_base<server::simple_accumulator>
+    struct accumulator
+      : hpx::components::stub_base<server::accumulator>
     {
-        typedef server::simple_accumulator::argument_type argument_type;
+        typedef server::accumulator::argument_type argument_type;
 
         ///////////////////////////////////////////////////////////////////////
         /// Reset the accumulator's value to 0.
@@ -29,7 +29,7 @@ namespace examples { namespace stubs
         ///       immediately after the action has has been dispatched.
         static void reset_non_blocking(hpx::naming::id_type const& gid)
         {
-            typedef server::simple_accumulator::reset_action action_type;
+            typedef server::accumulator::reset_action action_type;
             hpx::apply<action_type>(gid);
         }
 
@@ -38,7 +38,7 @@ namespace examples { namespace stubs
         /// \note This function is fully synchronous.
         static void reset_sync(hpx::naming::id_type const& gid)
         {
-            typedef server::simple_accumulator::reset_action action_type;
+            typedef server::accumulator::reset_action action_type;
             hpx::async<action_type>(gid).get();
         }
 
@@ -51,7 +51,7 @@ namespace examples { namespace stubs
         static void
         add_non_blocking(hpx::naming::id_type const& gid, argument_type arg)
         {
-            typedef server::simple_accumulator::add_action action_type;
+            typedef server::accumulator::add_action action_type;
             hpx::apply<action_type>(gid, arg);
         }
 
@@ -61,7 +61,7 @@ namespace examples { namespace stubs
         static void
         add_sync(hpx::naming::id_type const& gid, argument_type arg)
         {
-            typedef server::simple_accumulator::add_action action_type;
+            typedef server::accumulator::add_action action_type;
             hpx::async<action_type>(gid, arg).get();
         }
 
@@ -76,7 +76,7 @@ namespace examples { namespace stubs
         static hpx::lcos::future<argument_type>
         query_async(hpx::naming::id_type const& gid)
         {
-            typedef server::simple_accumulator::query_action action_type;
+            typedef server::accumulator::query_action action_type;
             return hpx::async<action_type>(gid);
         }
 

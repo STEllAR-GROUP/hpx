@@ -1,13 +1,13 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser,
-//  Copyright (c) 2007 Richard D Guidry Jr.
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2008 Richard D Guidry Jr.
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
 
-#include "accumulators/managed_accumulator.hpp"
+#include "accumulator.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -20,7 +20,7 @@ char const* const help = "commands: reset, add [amount], query, help, quit";
 int hpx_main()
 {
     {
-        typedef examples::server::managed_accumulator accumulator_type;
+        typedef examples::server::accumulator accumulator_type;
         typedef accumulator_type::argument_type argument_type;
 
         // Find the localities connected to this application.
@@ -29,7 +29,7 @@ int hpx_main()
         // Create an accumulator component either on this locality (if the
         // example is executed on one locality only) or on any of the remote
         // localities (otherwise).
-        examples::managed_accumulator accu(
+        examples::accumulator accu(
             hpx::components::new_<accumulator_type>(localities.back()));
 
         // Print out the available commands.
@@ -78,7 +78,7 @@ int hpx_main()
                 }
             }
 
-            std::cout << "> ";
+            std:: cout << "> ";
         }
     }
 

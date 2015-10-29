@@ -20,9 +20,8 @@ namespace examples { namespace server
     /// This class is a very simple example of an HPX component. An HPX
     /// component is a class that:
     ///
-    ///     * Inherits from a component base class (either
-    ///       \a hpx::components::managed_component_base or
-    ///       \a hpx::components::simple_component_base).
+    ///     * Inherits from a component base class:
+    ///       \a hpx::components::component_base
     ///     * Exposes methods that can be called asynchronously and/or remotely.
     ///       These constructs are known as HPX actions.
     ///
@@ -37,7 +36,7 @@ namespace examples { namespace server
     ///
     /// This component exposes 3 different actions: reset, add and query.
     class template_function_accumulator
-      : public hpx::components::managed_component_base<template_function_accumulator>
+      : public hpx::components::component_base<template_function_accumulator>
     {
     private:
         typedef hpx::lcos::local::spinlock mutex_type;

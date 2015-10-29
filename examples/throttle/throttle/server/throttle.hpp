@@ -7,10 +7,10 @@
 #define HPX_THROTTLE_SERVER_AUG_09_2011_0702PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -18,10 +18,10 @@ namespace throttle { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT throttle
-      : public hpx::components::simple_component_base<throttle>
+      : public hpx::components::component_base<throttle>
     {
     private:
-        typedef hpx::components::simple_component_base<throttle> base_type;
+        typedef hpx::components::component_base<throttle> base_type;
         typedef hpx::lcos::local::mutex mutex_type;
 
     public:
