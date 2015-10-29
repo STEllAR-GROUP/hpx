@@ -17,8 +17,8 @@ overall stability of our code base has significantly increased, the development
 process itself has been simplified. This change manifests itself in a large
 number of pull-requests which has been merged (please see below for a full list
 of closed issues and pull-requests). All in all for this release, we closed
-almost 100 issues and merged over 220 pull-requests. There have been over 1600
-to the master branch commits since the last release.
+almost 100 issues and merged over 270 pull-requests. There have been over 1600
+commits to the master branch since the last release.
 
 [heading General Changes]
 
@@ -79,6 +79,7 @@ to the master branch commits since the last release.
   based on executors. All existing parallelism APIs have been adapted to this.
   We have added a large number of different executor types, such as a
   numa-aware executor, a this-thread executor, etc.
+* Added support for the MingW toolchain on Windows (thanks to Eric Lemanissier).
 
 [heading Breaking Changes]
 
@@ -147,9 +148,15 @@ to the master branch commits since the last release.
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    1827] - Fixing a memory management issue for the Parquet application
+* [pr    1825] - Adding hpx::components::component and
+                 hpx::components::component_base
+* [pr    1823] - Adding git commit id to circleci build
 * [pr    1822] - applying fixes suggested by clang 3.7
+* [pr    1821] - Hyperlink fixes
 * [pr    1820] - added parallel multi-locality sanity test
 * [pr    1819] - Fixing #1667
+* [pr    1816] - Support hpxrx
 * [pr    1814] - Fix async to dispatch to the correct locality in all cases
 * [issue 1813] - async(launch::..., action(), ...) always invokes locally
 * [pr    1812] - fixed syntax error in CMakeLists.txt
@@ -194,6 +201,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1776] - Cleaning up util/plugin
 * [pr    1775] - Agas fixes
 * [pr    1774] - Action invocation count
+* [pr    1773] - replaced MSVC variable with WIN32
 * [pr    1772] - Fixing Problems in MPI parcelport and future serialization.
 * [pr    1771] - Fixing intel 13 compiler errors related to variadic template
                  template parameters for lcos::when_ tests
