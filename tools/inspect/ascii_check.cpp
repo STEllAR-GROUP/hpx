@@ -33,7 +33,8 @@ namespace boost
          if ( c >= 'A' && c <= 'Z' ) return false;
          if ( c >= '0' && c <= '9' ) return false;
       // Horizontal/Vertical tab, newline, and form feed
-         if ( c == '\t' || c == '\n' || c == '\r' || c == '\v' || c == '\f' ) return false;
+         if ( c == '\t' || c == '\n'
+             || c == '\r' || c == '\v' || c == '\f' ) return false;
          return gPunct.find ( c ) == string::npos;
       }
    };
@@ -51,13 +52,15 @@ namespace boost
    const char *kCRLF = "\012\015";
 
 // Given a position in the file, extract and return the line
-   std::string find_line ( const std::string &contents, std::string::const_iterator iter_pos )
+   std::string find_line ( const std::string &contents,
+       std::string::const_iterator iter_pos )
    {
       std::size_t pos = iter_pos - contents.begin ();
 
    // Search backwards for a CR or LR
       std::size_t start_pos = contents.find_last_of ( kCRLF, pos );
-      std::string::const_iterator line_start = contents.begin () + ( start_pos == std::string::npos ? 0 : start_pos + 1 );
+      std::string::const_iterator line_start =
+          contents.begin () + ( start_pos == std::string::npos ? 0 : start_pos + 1 );
 
 
    // Search forwards for a CR or LF
@@ -88,14 +91,14 @@ namespace boost
       const string & contents )     // contents of file to be inspected
     {
       if (contents.find( "hpxinspect:" "noascii" ) != string::npos) return;
-      string::const_iterator bad_char = std::find_if ( contents.begin (), contents.end (), non_ascii ());
+      string::const_iterator bad_char = std::find_if ( contents.begin (),
+          contents.end (), non_ascii ());
       if ( bad_char != contents.end ())
       {
         ++m_files_with_errors;
         std::size_t ln = std::count( contents.begin(), bad_char, '\n' ) + 1;
         string the_line = find_line ( contents, bad_char );
-        string location = linelink(full_path, the_line);
-        error( library_name, full_path, "Non-ASCII: ", ln );
+        error( library_name, full_path, "Non-ASCII: ", ln);
       }
     }
   } // namespace inspect
