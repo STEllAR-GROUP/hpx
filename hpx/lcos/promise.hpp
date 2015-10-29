@@ -162,7 +162,8 @@ namespace hpx { namespace lcos { namespace detail
         naming::id_type get_id() const
         {
             boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
-            return get_gid_locked(std::move(l));
+            // The GID needs to be split in order to keep the promise alive.
+            return get_gid_locked(std::move(l), true);
         }
 
         naming::id_type get_unmanaged_id() const
@@ -180,24 +181,20 @@ namespace hpx { namespace lcos { namespace detail
 
     protected:
         naming::id_type get_gid_locked(
-            boost::unique_lock<naming::gid_type> l) const
+            boost::unique_lock<naming::gid_type> l, bool split) const
         {
-            naming::gid_type gid = gid_;
-            if (naming::detail::has_credits(gid))
+            if (split)
             {
-                // first invocation: take all credits to avoid a self reference
-                naming::detail::strip_credits_from_gid(
-                    const_cast<naming::gid_type&>(gid_));
-
+                hpx::future<naming::gid_type> gid
+                    = naming::detail::split_gid_if_needed_locked(l, gid_);
                 l.unlock();
-                return naming::id_type(gid, naming::id_type::managed);
+                return naming::id_type(gid.get(), naming::id_type::managed);
             }
-
-            l.unlock();
-
-            // any (subsequent) invocation causes the credits to be replenished
-            naming::detail::replenish_credits(gid);
-            return naming::id_type(gid, naming::id_type::managed);
+            else
+            {
+                l.unlock();
+                return naming::id_type(gid_, naming::id_type::managed);
+            }
         }
 
     protected:
@@ -207,7 +204,7 @@ namespace hpx { namespace lcos { namespace detail
             return gid_;
         }
 
-        naming::gid_type gid_;
+        mutable naming::gid_type gid_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -305,7 +302,8 @@ namespace hpx { namespace lcos { namespace detail
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
                 // this will trigger normal destruction
-                naming::id_type id = this->get_gid_locked(std::move(l));
+                // don't split the GID to avoid self references.
+                naming::id_type id = this->get_gid_locked(std::move(l), false);
                 return false;
             }
             else if (0 == counter)
@@ -417,7 +415,8 @@ namespace hpx { namespace lcos { namespace detail
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
                 // this will trigger normal destruction
-                naming::id_type id = this->get_gid_locked(std::move(l));
+                // don't split the GID to avoid self references.
+                naming::id_type id = this->get_gid_locked(std::move(l), false);
                 return false;
             }
             else if (0 == counter)
