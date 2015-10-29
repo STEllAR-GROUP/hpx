@@ -151,7 +151,7 @@ hpx_option(HPX_WITH_DOCUMENTATION_SINGLEPAGE BOOL
   "The HPX documentation should be build as a single page HTML (default OFF)."
   OFF CATEGORY "Build Targets")
 
-if(WIN32)
+if(MSVC)
   hpx_option(HPX_WITH_PSEUDO_DEPENDENCIES BOOL
     "Force creating pseudo targets and pseudo dependencies (default OFF)."
     OFF CATEGORY "Build Targets")
@@ -206,7 +206,7 @@ if(HPX_WITH_IO_COUNTERS)
 endif()
 
 set(HPX_FULL_RPATH_DEFAULT ON)
-if(APPLE OR MSVC)
+if(APPLE OR WIN32)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_WITH_FULL_RPATH BOOL
@@ -301,7 +301,7 @@ hpx_option(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION BOOL
 if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   hpx_info("Stack traces are enabled.")
   hpx_add_config_define(HPX_HAVE_STACKTRACES)
-  if(MSVC)
+  if(WIN32)
     hpx_libraries(dbghelp)
   endif()
 endif()
@@ -539,11 +539,11 @@ if(HPX_WITH_VERIFY_LOCKS_GLOBALLY)
 endif()
 
 # Additional debug support
-if(NOT MSVC AND HPX_WITH_THREAD_GUARD_PAGE)
+if(NOT WIN32 AND HPX_WITH_THREAD_GUARD_PAGE)
   hpx_add_config_define(HPX_HAVE_THREAD_GUARD_PAGE)
 endif()
 
-if(NOT MSVC AND HPX_WITH_THREAD_STACK_MMAP)
+if(NOT WIN32 AND HPX_WITH_THREAD_STACK_MMAP)
   hpx_add_config_define(HPX_HAVE_THREAD_STACK_MMAP)
 endif()
 
@@ -803,7 +803,7 @@ hpx_check_for_cxx14_std_integer_sequence(
 hpx_check_for_cxx14_std_result_of_sfinae(
   DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
 
-if(NOT MSVC)
+if(NOT WIN32)
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
@@ -832,46 +832,49 @@ if(NOT MSVC)
   endif()
 endif()
 
-if(MSVC)
-  enable_language(ASM_MASM)
-  hpx_add_compile_flag(-Ox CONFIGURATIONS Release LANGUAGES CXX C)
+if(WIN32)
+  if(MSVC)
+    enable_language(ASM_MASM)
+    hpx_add_compile_flag(-Ox
+      CONFIGURATIONS Release LANGUAGES CXX C)
 
-  if(NOT HPX_WITH_AWAIT)
-    hpx_add_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
-  else()
-    # /RTC1 is incompatible with /await
-    hpx_remove_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
-  endif()
+    if(NOT HPX_WITH_AWAIT)
+      hpx_add_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
+    else()
+      # /RTC1 is incompatible with /await
+      hpx_remove_compile_flag(/RTC1 CONFIGURATIONS Debug LANGUAGES CXX C)
+    endif()
 
-  # VS2012 and above has a special flag for improving the debug experience by
-  # adding more symbol information to the build (-d2Zi)
-  hpx_add_compile_flag(-d2Zi+ CONFIGURATIONS RelWithDebInfo)
+    # VS2012 and above has a special flag for improving the debug experience by
+    # adding more symbol information to the build (-d2Zi)
+    hpx_add_compile_flag(-d2Zi+ CONFIGURATIONS RelWithDebInfo)
 
-  # VS2013 and above know how to do link time constant data segment folding
-  # VS2013 update 2 and above know how to remove debug information for
-  #     non-referenced functions and data (-Zc:inline)
-  if(MSVC12 OR MSVC14)
-    hpx_add_compile_flag(-Zc:inline)
-    hpx_add_compile_flag(-Gw CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
-    hpx_add_compile_flag(-Zo CONFIGURATIONS RelWithDebInfo)
-  endif()
+    # VS2013 and above know how to do link time constant data segment folding
+    # VS2013 update 2 and above know how to remove debug information for
+    #     non-referenced functions and data (-Zc:inline)
+    if(MSVC12 OR MSVC14)
+      hpx_add_compile_flag(-Zc:inline)
+      hpx_add_compile_flag(-Gw CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
+      hpx_add_compile_flag(-Zo CONFIGURATIONS RelWithDebInfo)
+    endif()
 
-  # Exceptions
-  hpx_add_compile_flag(-EHsc)
-  if(MSVC14)
-    # assume conforming (throwing) operator new implementations
-    hpx_add_compile_flag(-Zc:throwingNew)
+    # Exceptions
+    hpx_add_compile_flag(-EHsc)
+    if(MSVC14)
+      # assume conforming (throwing) operator new implementations
+      hpx_add_compile_flag(-Zc:throwingNew)
+    endif()
+
+    # Runtime type information
+    hpx_add_compile_flag(-GR)
+    # Multiprocessor build
+    hpx_add_compile_flag(-MP)
+    # Increase the maximum size of object file sections
+    hpx_add_compile_flag(-bigobj)
     # enable faster linking (requires VS2015 Update1)
     hpx_remove_link_flag(/debug CONFIGURATIONS Debug)
     hpx_add_link_flag(/debug:fastlink CONFIGURATIONS Debug)
   endif()
-
-  # Runtime type information
-  hpx_add_compile_flag(-GR)
-  # Multiprocessor build
-  hpx_add_compile_flag(-MP)
-  # Increase the maximum size of object file sections
-  hpx_add_compile_flag(-bigobj)
 
   hpx_libraries(psapi shlwapi)
 
@@ -1011,8 +1014,12 @@ else()
 
   # Check if our libraries have unresolved symbols
   #if(NOT APPLE AND NOT HPX_WITH_APEX)
-  if(NOT APPLE)
+  if(NOT APPLE AND NOT WIN32)
     hpx_add_link_flag_if_available(-Wl,-z,defs TARGETS SHARED EXE)
+  endif()
+  if(WIN32)
+    hpx_libraries(WS2_32)
+    hpx_libraries(mswsock)
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
@@ -1226,7 +1233,7 @@ endif()
 ################################################################################
 # Emulation of SwapContext on Windows
 ################################################################################
-if(MSVC)
+if(WIN32)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
     if(NOT CMAKE_ASM_MASM_COMPILER)
       hpx_error("SwitchToFiber emulation can not be enabled. The masm compiler could not be found. Try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe) or disable the emulation by setting HPX_WITH_SWAP_CONTEXT_EMULATION to Off")
