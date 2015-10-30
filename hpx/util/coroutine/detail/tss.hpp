@@ -53,6 +53,7 @@ namespace hpx { namespace util { namespace coroutines
                 value_(val)
             {}
 
+#if !(defined(HPX_INTEL_VERSION) && __GNUC__ == 4 && __GNUC_MINOR__ == 6)
             tss_data_node(tss_data_node&& rhs)
               : func_(std::move(rhs.func_)),
                 value_(rhs.value_)
@@ -60,12 +61,14 @@ namespace hpx { namespace util { namespace coroutines
                 rhs.func_.reset();
                 rhs.value_ = 0;
             }
+#endif
 
             ~tss_data_node()
             {
                 cleanup();
             }
 
+#if !(defined(HPX_INTEL_VERSION) && __GNUC__ == 4 && __GNUC_MINOR__ == 6)
             tss_data_node& operator=(tss_data_node&& rhs)
             {
                 func_ = std::move(rhs.func_);
@@ -75,6 +78,7 @@ namespace hpx { namespace util { namespace coroutines
                 rhs.value_ = 0;
                 return *this;
             }
+#endif
 
             template <typename T>
             T get_data() const
@@ -107,7 +111,9 @@ namespace hpx { namespace util { namespace coroutines
                 return value_;
             }
 
+#if !(defined(HPX_INTEL_VERSION) && __GNUC__ == 4 && __GNUC_MINOR__ == 6)
             HPX_MOVABLE_BUT_NOT_COPYABLE(tss_data_node)
+#endif
         };
 
         ///////////////////////////////////////////////////////////////////////

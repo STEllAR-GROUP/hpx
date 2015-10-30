@@ -2257,7 +2257,13 @@ namespace detail
                 "request 'symbol_ns_on_event' failed");
             return hpx::future<hpx::id_type>();
         }
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+        // The move was added to silence an error produced by intel13
+        return std::move(result_f);
+#else
+        // All other compilers do the right thing (tm)
         return result_f;
+#endif
     }
 }
 
