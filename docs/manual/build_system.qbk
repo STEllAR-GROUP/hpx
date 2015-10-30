@@ -51,6 +51,7 @@ TODO ...
 [include build_system/recipe_windows.qbk]
 [include build_system/recipe_bgq.qbk]
 [include build_system/recipe_mic.qbk]
+[include build_system/recipe_fedora.qbk]
 
 [endsect] [/ Build reciepts]
 
