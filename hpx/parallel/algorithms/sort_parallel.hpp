@@ -37,8 +37,6 @@ namespace parallel
 namespace algorithms
 {
 
-//using hpx::parallel::algorithms::algorithm::intro_sort_internal;
-
 ///---------------------------------------------------------------------------
 /// @struct iter_value
 /// @brief This is for to obtain the type of data pointed by an iterator
@@ -88,12 +86,6 @@ struct parallel_sort_comp
     size_t Min_Parallel = 65536;
     compare comp;
 
-    //-------------------------------------------------------------------------
-    //                 Variables
-    //-------------------------------------------------------------------------
-//    std::atomic<bspu::difference_type > ND ;
-
-    //
     //------------------------------------------------------------------------
     //  function : parallel_sort_comp
     /// @brief constructor
@@ -115,61 +107,51 @@ struct parallel_sort_comp
     /// @param [in] first : iterator to the first element to sort
     /// @param [in] last : iterator to the next element after the last
     /// @param [in] comp : object for to compare
-    /// @param [in] NT : variable indicating the number of threads used in the
-    ///                  sorting
     /// @exception
     /// @return
     /// @remarks
     //------------------------------------------------------------------------
     parallel_sort_comp ( iter_t first, iter_t last, compare comp1)
       : comp(comp1)
-    {   //------------------------- begin ----------------------
+    {
         size_t N = last - first;
         assert ( N >=0);
-//        uint32_t Level = (NBits (N)<<1)  ;
 
         if ( (size_t)N < Min_Parallel )
         {
             std::sort(first, last, comp);
-//            intro_sort_internal ( first, last, Level,comp) ;
             return ;
         } ;
-        //------------------- check if sort ----------------------------------
+
+        // check if already sorted
         bool SW = true ;
         for ( iter_t it1 = first, it2 = first+1 ;
             it2 != last and (SW = not comp(*it2,*it1));it1 = it2++);
         if (SW) return ;
 
-        //-------------------------------------------------------------------
-//        std::atomic_store (&ND, N);
-
-        hpx::future<void> dummy = hpx::async(&parallel_sort_comp::sort_thread, this, first, last, 0/*Level*/);
+        hpx::future<void> dummy = hpx::async(&parallel_sort_comp::sort_thread, this, first, last);
         dummy.get();
 
     };
 
-    //
     //------------------------------------------------------------------------
     //  function : sort_thread
-    /// @brief this function is the work asigned to each thread in the parallel
+    /// @brief this function is the work assigned to each thread in the parallel
     ///        process
     /// @exception
     /// @return
     /// @remarks
     //------------------------------------------------------------------------
-    hpx::future<void> sort_thread( iter_t first, iter_t last, uint32_t level)
+    hpx::future<void> sort_thread( iter_t first, iter_t last)
     {
         using hpx::lcos::local::dataflow;
 
         //------------------------- begin ----------------------
         size_t N = last - first ;
-        if ( (size_t)N <= MaxPerThread /*or level == 0*/)
-        {
-//            atomic_sub ( ND, N );
+        if (N <= MaxPerThread) {
             return hpx::async(
-                [this, first, last, level](){
+                [this, first, last](){
                 std::sort(first, last, comp);
-//                intro_sort_internal(first, last, level, comp);
                 }
             );
         };
@@ -185,7 +167,6 @@ struct parallel_sort_comp
                 it2 != last and (SW = not comp(*it2,*it1));it1 = it2++);
         if (SW)
         {
-//            atomic_sub ( ND, N );
             return hpx::make_ready_future();
         };
         //---------------------- pivot select ----------------------------
@@ -215,15 +196,9 @@ struct parallel_sort_comp
         }; // End while
         std::swap ( *first , *c_last);
 
-        //----------------------------------------------------------------
-        //   Store the tokens en ST
-        //----------------------------------------------------------------
-        auto N1 = (c_last - first);
-        auto N2 = (last - first);
-//        auto N3 = N - N1- N2 ;
-//        if ( N3 != 0) atomic_sub ( ND, N3 );
-        hpx::future<void> hk1 = hpx::async(&parallel_sort_comp::sort_thread, this, first, c_last, 0/*level-1*/);
-        hpx::future<void> hk2 = hpx::async(&parallel_sort_comp::sort_thread, this, c_first, last, 0/*level-1*/);
+        // spawn threads for each sub section
+        hpx::future<void> hk1 = hpx::async(&parallel_sort_comp::sort_thread, this, first, c_last);
+        hpx::future<void> hk2 = hpx::async(&parallel_sort_comp::sort_thread, this, c_first, last);
         return dataflow(
         [] (future<void> f1, future<void> f2) -> void
             {
