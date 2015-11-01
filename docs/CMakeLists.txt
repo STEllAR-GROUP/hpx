@@ -89,6 +89,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_intersection.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_symmetric_difference.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_union.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/sort.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/swap_ranges.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_exclusive_scan.hpp"
