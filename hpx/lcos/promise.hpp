@@ -235,8 +235,6 @@ namespace hpx { namespace lcos { namespace detail
         // actual managed component object
         ~promise()
         {
-            // This lock is needed to not interfere with the intrusive pointer
-            // deletion
             this->finalize();
         }
 
@@ -359,8 +357,6 @@ namespace hpx { namespace lcos { namespace detail
         // actual managed component object
         ~promise()
         {
-            // This lock is needed to not interfere with the intrusive pointer
-            // deletion
             this->finalize();
         }
 
@@ -573,6 +569,27 @@ namespace hpx { namespace lcos
                 << impl_->get_unmanaged_id() << ")";
         }
 
+        promise(promise && rhs)
+          : impl_(std::move(rhs.impl_)),
+            future_obtained_(rhs.future_obtained_)
+        {
+            rhs.future_obtained_ = false;
+        }
+
+        virtual ~promise()
+        {}
+
+        promise& operator=(promise && rhs)
+        {
+            if (this != &rhs)
+            {
+                impl_ = std::move(rhs.impl_);
+                future_obtained_ = rhs.future_obtained_;
+                rhs.future_obtained_ = false;
+            }
+            return *this;
+        }
+
     protected:
         template <typename Impl>
         promise(Impl* impl)
@@ -599,6 +616,13 @@ namespace hpx { namespace lcos
             return (*impl_)->get_unmanaged_id();
         }
 
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_id();
+        }
+#endif
+
     private:
         // Return the global id of this \a future instance
         naming::gid_type get_base_gid() const
@@ -621,9 +645,6 @@ namespace hpx { namespace lcos
         }
 
         typedef Result result_type;
-
-        virtual ~promise()
-        {}
 
         lcos::future<Result> get_future(error_code& ec = throws)
         {
@@ -694,6 +715,27 @@ namespace hpx { namespace lcos
                 << impl_->get_unmanaged_id() << ")";
         }
 
+        promise(promise && rhs)
+          : impl_(std::move(rhs.impl_)),
+            future_obtained_(rhs.future_obtained_)
+        {
+            rhs.future_obtained_ = false;
+        }
+
+        virtual ~promise()
+        {}
+
+        promise& operator=(promise && rhs)
+        {
+            if (this != &rhs)
+            {
+                impl_ = std::move(rhs.impl_);
+                future_obtained_ = rhs.future_obtained_;
+                rhs.future_obtained_ = false;
+            }
+            return *this;
+        }
+
     protected:
         template <typename Impl>
         promise(Impl* impl)
@@ -720,6 +762,13 @@ namespace hpx { namespace lcos
             return (*impl_)->get_unmanaged_id();
         }
 
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_id();
+        }
+#endif
+
     private:
         /// \brief Return the global id of this \a future instance
         naming::gid_type get_base_gid() const
@@ -736,9 +785,6 @@ namespace hpx { namespace lcos
         }
 
         typedef util::unused_type result_type;
-
-        virtual ~promise()
-        {}
 
         lcos::future<void> get_future(error_code& ec = throws)
         {
