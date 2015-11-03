@@ -40,7 +40,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         //----------------------------------------------------------------------------
         template <typename RandomIt>
         struct iter_value
-        {   typedef typename
+        {
+            typedef typename
                 std::remove_reference<decltype(*(std::declval<RandomIt>()))>::type type;
         };
 
@@ -51,7 +52,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///          for to compare the objects pointed. The pointers can't be nullptr
         //---------------------------------------------------------------------------
         template <  class RandomIt ,
-        class Comp = std::less<typename iter_value<RandomIt>::type> >
+                    class Comp = std::less<typename iter_value<RandomIt>::type> >
         struct less_ptr_no_null
         {
             Comp comp;
@@ -81,6 +82,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             Comp   comp;
 
             parallel_sort_comp(Comp && op) : comp(op)
+            {}
+
+            parallel_sort_comp() : comp(Comp())
             {}
 
             //------------------------------------------------------------------------
@@ -203,24 +207,42 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             sort_internal()
               : sort_internal::algorithm("sort")
             {}
-
-            template <typename ExPolicy, typename Comp,
-                typename Proj = util::projection_identity>
-            static RandomIt
+/*
+            // default comparison object std::less<>
+            template <
+                typename ExPolicy,
+                typename Proj = util::projection_identity >
+            static typename util::detail::algorithm_result<ExPolicy>::type
+            sequential(ExPolicy, RandomIt first, RandomIt last,
+                Proj && proj = Proj())
+            {
+                std::sort(first, last);
+            }
+*/
+            // user supplied comparison object
+            template <
+                typename ExPolicy,
+                typename Comp,
+                typename Proj = util::projection_identity >
+            static hpx::util::unused_type
             sequential(ExPolicy, RandomIt first, RandomIt last, Comp && comp,
                 Proj && proj = Proj())
             {
-                std::sort(first, last, std::forward<Comp>(comp));
+                        std::sort(first, last, std::forward<Comp>(comp));
+                        return hpx::util::unused;
             }
 
-            template <typename ExPolicy, typename Comp,
+            // user supplied comparison object
+            template <
+                typename ExPolicy, typename Comp,
                 typename Proj = util::projection_identity>
             static typename util::detail::algorithm_result<ExPolicy>::type
             parallel(ExPolicy policy, RandomIt first, RandomIt last, Comp && comp,
                 Proj && proj = Proj())
             {
                 parallel_sort_comp<RandomIt, Comp> sorter(comp);
-                sorter.parallel_sort(first, last);
+                return hpx::util::void_guard<typename util::detail::algorithm_result<ExPolicy>::type>(),
+                        sorter.parallel_sort_async(first, last);
             }
         };
     /// \endcond
@@ -272,10 +294,32 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         typedef is_sequential_execution_policy<ExPolicy> is_seq;
 
-        detail::sort_internal<RandomIt>().call(
+        return detail::sort_internal<RandomIt>().call(
             std::forward<ExPolicy>(policy), is_seq(),
             first, last, comp);
-        return ;
+    }
+
+    template <typename ExPolicy, typename RandomIt>
+    inline typename boost::enable_if<
+        is_execution_policy<ExPolicy>,
+        typename util::detail::algorithm_result<ExPolicy, void>::type
+    >::type
+    sort(ExPolicy && policy, RandomIt first, RandomIt last)
+    {
+        typedef typename std::iterator_traits<RandomIt>::iterator_category
+            iterator_category;
+
+        BOOST_STATIC_ASSERT_MSG(
+            (boost::is_base_of<
+                std::random_access_iterator_tag, iterator_category
+            >::value),
+            "Requires a random access iterator.");
+
+        typedef is_sequential_execution_policy<ExPolicy> is_seq;
+
+        return detail::sort_internal<RandomIt>().call(
+            std::forward<ExPolicy>(policy), is_seq(),
+            first, last);
     }
 
 }; }; };
