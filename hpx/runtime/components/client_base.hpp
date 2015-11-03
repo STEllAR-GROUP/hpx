@@ -364,15 +364,17 @@ namespace hpx { namespace components
 
     protected:
         template <typename F>
-        static typename lcos::detail::future_then_result<client_base, F>::cont_result
+        static typename lcos::detail::future_then_result<Derived, F>::cont_result
         on_ready(future_type && fut, F f)
         {
-            return f(client_base(std::move(fut)));
+            return f(Derived(std::move(fut)));
         }
 
     public:
         template <typename F>
-        typename lcos::detail::future_then_result<client_base, F>::type
+        typename lcos::detail::future_then_result<
+            Derived, typename util::decay<F>::type
+        >::type
         then(F && f)
         {
             typedef typename util::decay<F>::type func_type;
