@@ -51,45 +51,58 @@ int verify(const std::vector <IA> &A, Compare comp, bool print) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_sort1(ExPolicy && policy, IteratorTag)
+template <typename ExPolicy>
+void test_sort1(ExPolicy && policy)
+{
+  BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+
+  // Fill vector with random values
+  std::vector<std::size_t> c(5000000);
+  rnd_fill<std::size_t>(c, 0, 10000000, std::random_device{}());
+
+  // sort, blocking when seq, par, par_vec
+  hpx::parallel::sort(std::forward<ExPolicy>(policy),
+    c.begin(), c.end());
+
+  bool is_sorted = (verify(c, std::less<std::size_t>(), true) != 0);
+  HPX_TEST(is_sorted);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename Compare>
+void test_sort1_comp(ExPolicy && policy, Compare comp)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
+    // Fill vector with random values
     std::vector<std::size_t> c(5000000);
-    // Fill with random values
-    rnd_fill<std::size_t>(c, 0, 1000000, std::random_device{}());
+    rnd_fill<std::size_t>(c, 0, 10000000, std::random_device{}());
 
-    // sort
+    // sort, blocking when seq, par, par_vec
     hpx::parallel::sort(std::forward<ExPolicy>(policy),
-        c.begin(), c.end(), std::less<std::size_t>());
+        c.begin(), c.end(), comp);
 
-    bool is_sorted = (verify(c, std::less<std::size_t>(), true)!=0);
+    bool is_sorted = (verify(c, comp, true)!=0);
     HPX_TEST(is_sorted);
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_sort1_async(ExPolicy && p, IteratorTag)
+////////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename Compare>
+void test_sort1_async(ExPolicy && policy, Compare comp)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
+    // Fill vector with random values
     std::vector<std::size_t> c(5000000);
-    // Fill with random values
-    rnd_fill<std::size_t>(c, 0, 1000000, std::random_device{}());
+    rnd_fill<std::size_t>(c, 0, 10000000, std::random_device{}());
 
-    // sort
-    hpx::future<void> f = hpx::parallel::sort(std::forward<ExPolicy>(p),
+    // sort, non blocking
+    hpx::future<void> f = hpx::parallel::sort(std::forward<ExPolicy>(policy),
         c.begin(), c.end(), std::less<std::size_t>());
 
     f.get();
     bool is_sorted = (verify(c, std::less<std::size_t>(), true)!=0);
-
     HPX_TEST(is_sorted);
 }
+
 /*
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>

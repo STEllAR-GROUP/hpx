@@ -8,136 +8,49 @@
 
 #include "sort_tests.hpp"
 
+#define msg(a,b,c) \
+  std::cout << #a << "\t " << #b << "\t " << #c << "\t ";
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
 void test_sort1()
 {
     using namespace hpx::parallel;
-    test_sort1(seq, IteratorTag());
-    test_sort1(par, IteratorTag());
-    test_sort1(par_vec, IteratorTag());
 
-    test_sort1_async(seq(task), IteratorTag());
-    test_sort1_async(par(task), IteratorTag());
+    // default comparison operator (std::less)
+    msg(seq,      ., sync); test_sort1(seq);
+    msg(par,      ., sync); test_sort1(par);
+    msg(par_vec,  ., sync); test_sort1(par_vec);
 
+    // user supplied comparison operator (std::less)
+    msg(seq,     <, sync); test_sort1_comp(seq, std::less<std::size_t>());
+    msg(par,     <, sync); test_sort1_comp(par, std::less<std::size_t>());
+    msg(par_vec, <, sync); test_sort1_comp(par_vec, std::less<std::size_t>());
 
-    test_sort1(execution_policy(seq), IteratorTag());
-    test_sort1(execution_policy(par), IteratorTag());
-    test_sort1(execution_policy(par_vec), IteratorTag());
-    test_sort1(execution_policy(seq(task)), IteratorTag());
-    test_sort1(execution_policy(par(task)), IteratorTag());
+    // user supplied comparison operator (std::greater)
+    msg(seq,     >, sync); test_sort1_comp(seq, std::greater<std::size_t>());
+    msg(par,     >, sync); test_sort1_comp(par, std::greater<std::size_t>());
+    msg(par_vec, >, sync); test_sort1_comp(par_vec, std::greater<std::size_t>());
+
+    // Async execution, default comparison operator
+    msg(seq_task, <, async); test_sort1_async(seq(task), std::less<std::size_t>());
+    // can't use async task execution yet because we need to keep internal sort
+    // structure allocated inside dispatch alive until the function completes
+//    msg(par_task, <, async); test_sort1_async(par(task), std::less<std::size_t>());
+
+    /*
+    msg(seq, default); test_sort1(execution_policy(seq));
+    msg(seq, default); test_sort1(execution_policy(par));
+    msg(seq, default); test_sort1(execution_policy(par_vec));
+    msg(seq, default); test_sort1(execution_policy(seq(task)));
+    msg(seq, default); test_sort1(execution_policy(par(task)));
+*/
 }
 
 void sort_test1()
 {
-    test_sort1<std::random_access_iterator_tag>();
-    test_sort1<std::forward_iterator_tag>();
-}
-/*
-////////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_sorted2()
-{
-    using namespace hpx::parallel;
-    test_sorted2(seq, IteratorTag());
-    test_sorted2(par, IteratorTag());
-    test_sorted2(par_vec, IteratorTag());
-
-    test_sorted2_async(seq(task), IteratorTag());
-    test_sorted2_async(par(task), IteratorTag());
-
-
-    test_sorted2(execution_policy(seq), IteratorTag());
-    test_sorted2(execution_policy(par), IteratorTag());
-    test_sorted2(execution_policy(par_vec), IteratorTag());
-    test_sorted2(execution_policy(seq(task)), IteratorTag());
-    test_sorted2(execution_policy(par(task)), IteratorTag());
+    test_sort1();
 }
 
-void sorted_test2()
-{
-    test_sorted2<std::random_access_iterator_tag>();
-    test_sorted2<std::forward_iterator_tag>();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_sorted3()
-{
-    using namespace hpx::parallel;
-    test_sorted3(seq, IteratorTag());
-    test_sorted3(par, IteratorTag());
-    test_sorted3(par_vec, IteratorTag());
-
-    test_sorted3_async(seq(task), IteratorTag());
-    test_sorted3_async(par(task), IteratorTag());
-
-
-    test_sorted3(execution_policy(seq), IteratorTag());
-    test_sorted3(execution_policy(par), IteratorTag());
-    test_sorted3(execution_policy(par_vec), IteratorTag());
-    test_sorted3(execution_policy(seq(task)), IteratorTag());
-    test_sorted3(execution_policy(par(task)), IteratorTag());
-}
-
-void sorted_test3()
-{
-    test_sorted3<std::random_access_iterator_tag>();
-    test_sorted3<std::forward_iterator_tag>();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_sorted_exception()
-{
-    using namespace hpx::parallel;
-    //If the execution policy object is of type vector_execution_policy,
-    //  std::terminate shall be called. Therefore we do not test exceptions
-    //  with a vector execution policy
-    test_sorted_exception(seq, IteratorTag());
-    test_sorted_exception(par, IteratorTag());
-
-    test_sorted_exception_async(seq(task), IteratorTag());
-    test_sorted_exception_async(par(task), IteratorTag());
-
-    test_sorted_exception(execution_policy(par), IteratorTag());
-    test_sorted_exception(execution_policy(seq(task)), IteratorTag());
-    test_sorted_exception(execution_policy(par(task)), IteratorTag());
-}
-void sorted_exception_test()
-{
-    test_sorted_exception<std::random_access_iterator_tag>();
-    test_sorted_exception<std::forward_iterator_tag>();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_sorted_bad_alloc()
-{
-    using namespace hpx::parallel;
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_sorted_bad_alloc(par, IteratorTag());
-    test_sorted_bad_alloc(seq, IteratorTag());
-
-    test_sorted_bad_alloc_async(seq(task), IteratorTag());
-    test_sorted_bad_alloc_async(par(task), IteratorTag());
-
-    test_sorted_bad_alloc(execution_policy(par), IteratorTag());
-    test_sorted_bad_alloc(execution_policy(seq), IteratorTag());
-    test_sorted_bad_alloc(execution_policy(seq(task)), IteratorTag());
-    test_sorted_bad_alloc(execution_policy(par(task)), IteratorTag());
-}
-
-void sorted_bad_alloc_test()
-{
-    test_sorted_bad_alloc<std::random_access_iterator_tag>();
-    test_sorted_bad_alloc<std::forward_iterator_tag>();
-}
-*/
 ////////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
