@@ -18,6 +18,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/traits/projected.hpp>
+#include <hpx/lcos/local/dataflow.hpp>
 
 #include <algorithm>
 #include <iterator>
