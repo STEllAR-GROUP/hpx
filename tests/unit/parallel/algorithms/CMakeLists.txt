@@ -87,6 +87,7 @@ set(tests
     set_intersection
     set_symmetric_difference
     set_union
+    sort
     swapranges
     transform
     transform_binary
