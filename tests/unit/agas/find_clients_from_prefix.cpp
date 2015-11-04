@@ -36,8 +36,11 @@ struct test_client
         base_type;
 
     test_client() {}
-    test_client(hpx::id_type const& id) : base_type(id) {}
-    test_client(hpx::future<hpx::id_type> && f) : base_type(std::move(f)) {}
+
+    template <typename ... Ts>
+    test_client(Ts && ...vs)
+      : base_type(std::forward<Ts>(vs)...)
+    {}
 
     hpx::id_type call() const { return call_action()(this->get_id()); }
 };

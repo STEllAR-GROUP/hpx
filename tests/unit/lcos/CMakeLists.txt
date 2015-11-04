@@ -19,6 +19,7 @@ set(tests
     async_remote
     broadcast
     broadcast_apply
+    client_then
     condition_variable
     counting_semaphore
     barrier
