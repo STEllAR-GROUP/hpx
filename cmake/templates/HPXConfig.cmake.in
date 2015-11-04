@@ -35,8 +35,8 @@ set(HPX_CXX_COMPILER "@CMAKE_CXX_COMPILER@" CACHE STRING "CXX compiler for HPX")
 
 set(HPX_Fortran_COMPILER "@CMAKE_Fortran_COMPILER@" CACHE STRING "Fortran compiler for HPX")
 
-# Enforce C++11 mode
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} @CXX_FLAG@")
+# Export C++ standard flag (C++11/C++14 mode)
+set(HPX_CXX_FLAGS "@CXX_FLAG@")
 
 set(HPX_BOOST_ROOT @BOOST_ROOT@)
 set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)
