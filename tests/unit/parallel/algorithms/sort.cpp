@@ -9,7 +9,7 @@
 #include "sort_tests.hpp"
 
 #define msg(a,b,c) \
-  std::cout << #a << "\t " << #b << "\t " << #c << "\t ";
+  std::cout << std::setw(12) << #a << std::setw(4) << #b << std::setw(6) << #c << "\t";
 
 ////////////////////////////////////////////////////////////////////////////////
 void test_sort1()
@@ -37,13 +37,13 @@ void test_sort1()
     // structure allocated inside dispatch alive until the function completes
     msg(par_task, <, async); test_sort1_async(par(task), std::less<std::size_t>());
 
-    /*
-    msg(seq, default); test_sort1(execution_policy(seq));
-    msg(seq, default); test_sort1(execution_policy(par));
-    msg(seq, default); test_sort1(execution_policy(par_vec));
-    msg(seq, default); test_sort1(execution_policy(seq(task)));
-    msg(seq, default); test_sort1(execution_policy(par(task)));
-*/
+
+    msg(exe_seq,      ., sync); test_sort1(execution_policy(seq));
+    msg(exe_par,      ., sync); test_sort1(execution_policy(par));
+    msg(exe_par_vec,  ., sync); test_sort1(execution_policy(par_vec));
+    msg(exe_seq_task, ., async); test_sort1(execution_policy(seq(task)));
+    msg(exe_par_task, ., async); test_sort1(execution_policy(par(task)));
+
 }
 
 void sort_test1()
