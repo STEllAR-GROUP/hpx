@@ -15,10 +15,21 @@ commits to our main branch (`master`) are prohibited. Any change has to go
 through a peer review before it will be merged to `master`. As a result the
 overall stability of our code base has significantly increased, the development
 process itself has been simplified. This change manifests itself in a large
-number of pull-requests which has been merged (please see below for a full list
+number of pull-requests which have been merged (please see below for a full list
 of closed issues and pull-requests). All in all for this release, we closed
 almost 100 issues and merged over 270 pull-requests. There have been over 1600
 commits to the master branch since the last release.
+
+Our main focus for this release was the design and development of a coherent
+set of higher-level APIs exposing various types of parallelism to the
+application programmer. We introduced the concepts of an `executor`, which can
+be used to customize the `where` and `when` of execution of tasks in the
+context parallelizing codes. We extended all APIs related to managing parallel
+tasks to support executors which gives the user the choce of either using
+one of the predefined executor types or to provide its own, possibly application
+specific, executor. Me paid very close attention to align all of these changes
+with the existing C++ Standards documents or with the ongoing proposals for
+standardization.
 
 [heading General Changes]
 
@@ -30,9 +41,10 @@ commits to the master branch since the last release.
 * Added integration with the [@https://circleci.com/gh/STEllAR-GROUP/hpx CircleCI]
   hosted continuous integration service. This gives us constant and immediate
   feedback on the health of our master branch.
-* The compiler configuration subsystem has been reimplemented. Instead of using
-  Boost.Config we now use our own lightweight set of cmake scripts to determine
-  the available language and library features supported by the used compiler.
+* The compiler configuration subsystem in the build system has been reimplemented.
+  Instead of using Boost.Config we now use our own lightweight set of cmake
+  scripts to determine the available language and library features supported by
+  the used compiler.
 * The API for creating instances of components has been consolidated. All
   component instances should be created using the [funcref hpx::new_ `hpx::new_<>()`]
   only. It allows to instantiate both, single component instances and multiple
@@ -148,7 +160,18 @@ commits to the master branch since the last release.
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    1838] - Update version rc1
+* [pr    1835] - Adding exlicit move constructor and assignment operator to
+                 hpx::lcos::promise
+* [pr    1834] - Making hpx::lcos::promise move-only
+* [pr    1833] - Adding fedora docs
+* [issue 1832] - hpx::lcos::promise<> must be move-only
+* [pr    1831] - Fixing resource manager gcc5.2
+* [pr    1830] - Fix intel13
+* [pr    1829] - Unbreaking thread test
+* [pr    1828] - Fixing #1620
 * [pr    1827] - Fixing a memory management issue for the Parquet application
+* [issue 1826] - Memory management issue in hpx::lcos::promise
 * [pr    1825] - Adding hpx::components::component and
                  hpx::components::component_base
 * [pr    1823] - Adding git commit id to circleci build
@@ -360,6 +383,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1623] - hpx::wait_all() invoked with two vector<future<T>> fails
 * [pr    1622] - Executor partitioners
 * [pr    1621] - Clean up coroutines implementation
+* [issue 1620] - Revert #1535
 * [pr    1619] - Fix result type calculation for hpx::make_continuation
 * [pr    1618] - Fixing RDTSC on Xeon/Phi
 * [issue 1617] - hpx cmake not working when run as a subproject
@@ -574,6 +598,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1300] - Added serialization/de-serialization to examples.tuplespace
 * [issue 1251] - hpx::threads::get_thread_count doesn't consider pending threads
 * [issue 1001] - Zero copy serialization raises assert
+* [issue  721] - Make HPX usable for Xeon Phi
 * [issue  524] - Extend scheduler to support threads which can't be stolen
 
 [endsect]
