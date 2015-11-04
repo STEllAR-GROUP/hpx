@@ -52,13 +52,12 @@ public:
     }
 
     template <typename F>
-    T reduce (F const& f) const
+    void reduce (F const& f) const
     {
-        std::size_t cores = hpx::get_os_thread_count();
-        T result;
-        for (std::size_t i = 0; i != cores; ++i)
-            f(data_[i], result);
-        return result;
+        for (T const& d : data_)
+        {
+            f(d);
+        }
     }
 
 private:
@@ -96,12 +95,12 @@ int hpx_main(int argc, char* argv[])
         });
 
     // invoke the given reduce operation on the safe-object
-    std::vector<int> result =
-        ho.reduce(
-            [](std::vector<int> const& chunk, std::vector<int>& result)
-            {
-                result.insert(result.end(), chunk.begin(), chunk.end());
-            });
+    std::vector<int> result;
+    ho.reduce(
+        [&result](std::vector<int> const& chunk)
+        {
+            result.insert(result.end(), chunk.begin(), chunk.end());
+        });
 
     // make sure all numbers conform to criteria
     for (int i : result)
