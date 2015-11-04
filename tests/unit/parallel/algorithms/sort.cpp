@@ -101,8 +101,6 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     test_sort1();
     test_sort2();
-//    sorted_exception_test();
-//    sorted_bad_alloc_test();
     return hpx::finalize();
 }
 

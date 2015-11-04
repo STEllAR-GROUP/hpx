@@ -1,6 +1,6 @@
 //  Copyright (c) 2015 John Biddiscombe
 //  Copyright (c) 2015 Hartmut Kaiser
-//  Copyright (c) 2015 Francisco José Tapia
+//  Copyright (c) 2015 Francisco Jose Tapia
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -45,25 +45,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename
                 std::remove_reference<decltype(*(std::declval<RandomIt>()))>::type type;
         };
-/*
-        //---------------------------------------------------------------------------
-        /// @typename less_ptr_no_null
-        ///
-        /// @remarks this is the comparison object for pointers. Receive an object
-        ///          for to compare the objects pointed. The pointers can't be nullptr
-        //---------------------------------------------------------------------------
-        template < typename RandomIt,
-                   typename Comp = std::less<typename iter_value<RandomIt>::type> >
-        struct less_ptr_no_null
-        {
-            Comp comp;
-            inline less_ptr_no_null (Comp C1 = Comp()) : comp(C1) {};
-            inline bool operator ()(RandomIt  T1,  RandomIt  T2) const
-            {
-                return comp(*T1 ,*T2);
-            };
-        };
-*/
 
         static const std::size_t SortLimitPerTask = 65536;
 
@@ -78,75 +59,77 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         template < typename RandomIt, typename Compare>
         hpx::future<void> sort_thread(RandomIt first, RandomIt last, Compare comp)
         {
-          using hpx::lcos::local::dataflow;
+            using hpx::lcos::local::dataflow;
 
-          //------------------------- begin ----------------------
-          size_t N = last - first;
-          if (N <= SortLimitPerTask) {
-            return hpx::async(
-              [first, last, comp]() {
-              std::sort(first, last, comp);
-            }
-            );
-          };
+            //------------------------- begin ----------------------
+            size_t N = last - first;
+            if (N <= SortLimitPerTask) {
+                return hpx::async(
+                        [first, last, comp]() {
+                    std::sort(first, last, comp);
+                }
+                );
+            };
 
-          //----------------------------------------------------------------
-          //                     split
-          //----------------------------------------------------------------
-          typedef typename iter_value<RandomIt>::type value_t;
+            //----------------------------------------------------------------
+            //                     split
+            //----------------------------------------------------------------
+            typedef typename iter_value<RandomIt>::type value_t;
 
-          //------------------- check if sort ------------------------------
-          bool SW = true;
-          for (RandomIt it1 = first, it2 = first + 1;
-          it2 != last && (SW = !comp(*it2, *it1)); it1 = it2++);
+            //------------------- check if sort ------------------------------
+            bool SW = true;
+            for (RandomIt it1 = first, it2 = first + 1;
+                    it2 != last && (SW = !comp(*it2, *it1)); it1 = it2++) {};
             if (SW)
             {
-              return hpx::make_ready_future();
+                return hpx::make_ready_future();
             };
-          //---------------------- pivot select ----------------------------
-          size_t Nx = (size_t(N) >> 1);
+            //---------------------- pivot select ----------------------------
+            size_t Nx = (size_t(N) >> 1);
 
-          RandomIt itA = first + 1;
-          RandomIt itB = first + Nx;
-          RandomIt itC = last - 1;
+            RandomIt itA = first + 1;
+            RandomIt itB = first + Nx;
+            RandomIt itC = last - 1;
 
-          if (comp(*itB, *itA)) std::swap(*itA, *itB);
-          if (comp(*itC, *itB))
-          {
-            std::swap(*itC, *itB);
             if (comp(*itB, *itA)) std::swap(*itA, *itB);
-          };
-          std::swap(*first, *itB);
-          value_t &  val = const_cast < value_t &>(*first);
-          RandomIt c_first = first + 2, c_last = last - 2;
+            if (comp(*itC, *itB))
+            {
+                std::swap(*itC, *itB);
+                if (comp(*itB, *itA)) std::swap(*itA, *itB);
+            };
+            std::swap(*first, *itB);
+            value_t &  val = const_cast < value_t &>(*first);
+            RandomIt c_first = first + 2, c_last = last - 2;
 
-          while (c_first != last && comp(*c_first, val)) ++c_first;
-          while (comp(val, *c_last)) --c_last;
-          while (!(c_first > c_last))
-          {
-            std::swap(*(c_first++), *(c_last--));
-            while (comp(*c_first, val)) ++c_first;
+            while (c_first != last && comp(*c_first, val)) ++c_first;
             while (comp(val, *c_last)) --c_last;
-          }; // End while
-          std::swap(*first, *c_last);
+            while (!(c_first > c_last))
+            {
+                std::swap(*(c_first++), *(c_last--));
+                while (comp(*c_first, val)) ++c_first;
+                while (comp(val, *c_last)) --c_last;
+            }; // End while
+            std::swap(*first, *c_last);
 
-          // spawn tasks for each sub section
-          hpx::future<void> hk1 = hpx::async< decltype(&sort_thread<RandomIt, Compare>) >(&sort_thread, first, c_last, comp);
-          hpx::future<void> hk2 = hpx::async< decltype(&sort_thread<RandomIt, Compare>) >(&sort_thread, c_first, last, comp);
-          return dataflow(
-            [](future<void> f1, future<void> f2) -> void
-          {
-            f1.get();
-            f2.get();
-            return;
-          }, std::move(hk1), std::move(hk2)
+            // spawn tasks for each sub section
+            hpx::future<void> hk1 =
+                hpx::async< decltype(&sort_thread<RandomIt, Compare>) >
+                (&sort_thread, first, c_last, comp);
+            hpx::future<void> hk2 =
+                hpx::async< decltype(&sort_thread<RandomIt, Compare>) >
+                (&sort_thread, c_first, last, comp);
+            return dataflow(
+                [](future<void> f1, future<void> f2) -> void
+                {
+                    f1.get();
+                    f2.get();
+                }, std::move(hk1), std::move(hk2)
             );
         }
-        
+
         //------------------------------------------------------------------------
         //  function : parallel_sort_async
         //------------------------------------------------------------------------
-        /// @brief constructor of the struct
         /// @param [in] first : iterator to the first element to sort
         /// @param [in] last : iterator to the next element after the last
         /// @param [in] comp : object for to compare
@@ -158,7 +141,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         hpx::future<void> parallel_sort_async(RandomIt first, RandomIt last, Compare comp)
         {
             size_t N = last - first;
-            assert (N >=0);
+            HPX_ASSERT(N>=0);
 
             if (N < SortLimitPerTask)
             {
@@ -169,10 +152,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             // check if already sorted
             bool SW = true;
             for ( RandomIt it1 = first, it2 = first+1;
-                it2 != last && (SW = !comp(*it2,*it1));it1 = it2++);
+                    it2 != last && (SW = !comp(*it2,*it1));it1 = it2++);
             if (SW) return hpx::make_ready_future();
 
-                return hpx::async< decltype(&sort_thread<RandomIt, Compare>) >(&sort_thread, first, last, comp);
+            return hpx::async< decltype(&sort_thread<RandomIt, Compare>) >
+                (&sort_thread, first, last, comp);
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -190,8 +174,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typename Compare = std::less<typename iter_value<RandomIt>::type>,
                 typename Proj = util::projection_identity >
             static hpx::util::unused_type
-            sequential(ExPolicy, RandomIt first, RandomIt last, Compare && comp = Compare(),
-                Proj && proj = Proj())
+            sequential(ExPolicy, RandomIt first, RandomIt last,
+                Compare && comp = Compare(), Proj && proj = Proj())
             {
                 std::sort(first, last, std::forward<Compare>(comp));
                 return hpx::util::unused;
@@ -202,15 +186,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 typename Compare = std::less<typename iter_value<RandomIt>::type>,
                 typename Proj = util::projection_identity>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy policy, RandomIt first, RandomIt last, Compare && comp = Compare(),
-                Proj && proj = Proj())
+            parallel(ExPolicy policy, RandomIt first, RandomIt last,
+                Compare && comp = Compare(), Proj && proj = Proj())
             {
-                // call the sort routine and return the right type, depending on execution policy
+                // call the sort routine and return the right type,
+                // depending on execution policy
                 return util::detail::algorithm_result<ExPolicy>::get(
                     parallel_sort_async(first, last, std::forward<Compare>(comp)));
             }
         };
-    /// \endcond
+        /// \endcond
     }
 
     //-----------------------------------------------------------------------------
@@ -235,14 +220,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param comp         comparison operator used to order the elements pointed by RandomIt
-    ///                     iterators
+    /// \param comp         comparison operator used to order the elements
+    ///                     pointed by RandomIt iterators
     /// @exception
     /// @return
     /// @remarks
     //-----------------------------------------------------------------------------
-    template <typename ExPolicy, 
-              typename RandomIt, 
+    template <typename ExPolicy,
+              typename RandomIt,
               typename Compare = std::less<typename detail::iter_value<RandomIt>::type > >
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
