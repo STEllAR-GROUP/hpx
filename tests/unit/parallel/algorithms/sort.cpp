@@ -35,7 +35,7 @@ void test_sort1()
     msg(seq_task, <, async); test_sort1_async(seq(task), std::less<std::size_t>());
     // can't use async task execution yet because we need to keep internal sort
     // structure allocated inside dispatch alive until the function completes
-//    msg(par_task, <, async); test_sort1_async(par(task), std::less<std::size_t>());
+    msg(par_task, <, async); test_sort1_async(par(task), std::less<std::size_t>());
 
     /*
     msg(seq, default); test_sort1(execution_policy(seq));

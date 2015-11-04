@@ -64,140 +64,116 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             };
         };
 */
-        ///---------------------------------------------------------------------------
-        /// @struct parallel_sort_comp
-        /// @brief implement the parallel sort using the intro_sort algorithm
-        /// @tparam RandomIt : iterators pointing to the elements
-        /// @tparam compare : objects for to compare two elements pointed by RandomIt
-        ///                   iterators
+
+        static const std::size_t SortLimitPerTask = 65536;
+
+        //------------------------------------------------------------------------
+        //  function : sort_thread
+        /// @brief this function is the work assigned to each thread in the parallel
+        ///        process
+        /// @exception
+        /// @return
         /// @remarks
-        //----------------------------------------------------------------------------
-        template < typename RandomIt,
-                   typename Comp = std::less <typename iter_value<RandomIt>::type> >
-        struct parallel_sort_comp
+        //------------------------------------------------------------------------
+        template < typename RandomIt, typename Compare>
+        hpx::future<void> sort_thread(RandomIt first, RandomIt last, Compare comp)
         {
-            // These are not optimal on all machines,
-            // we require a way to change them according to policy etc.
-            size_t MaxPerThread = 65536;
-            size_t Min_Parallel = 65536;
-            Comp   comp;
+          using hpx::lcos::local::dataflow;
 
-            parallel_sort_comp(Comp && op) : comp(op)
-            {}
+          //------------------------- begin ----------------------
+          size_t N = last - first;
+          if (N <= SortLimitPerTask) {
+            return hpx::async(
+              [first, last, comp]() {
+              std::sort(first, last, comp);
+            }
+            );
+          };
 
-            parallel_sort_comp() : comp(Comp())
-            {}
+          //----------------------------------------------------------------
+          //                     split
+          //----------------------------------------------------------------
+          typedef typename iter_value<RandomIt>::type value_t;
 
-            //------------------------------------------------------------------------
-            //  function : parallel_sort_comp
-            /// @brief constructor of the struct
-            /// @param [in] first : iterator to the first element to sort
-            /// @param [in] last : iterator to the next element after the last
-            /// @param [in] comp : object for to compare
-            /// @exception
-            /// @return
-            /// @remarks
-            //------------------------------------------------------------------------
-            hpx::future<void> parallel_sort_async(RandomIt first, RandomIt last)
+          //------------------- check if sort ------------------------------
+          bool SW = true;
+          for (RandomIt it1 = first, it2 = first + 1;
+          it2 != last && (SW = !comp(*it2, *it1)); it1 = it2++);
+            if (SW)
             {
-                size_t N = last - first;
-                assert ( N >=0);
+              return hpx::make_ready_future();
+            };
+          //---------------------- pivot select ----------------------------
+          size_t Nx = (size_t(N) >> 1);
 
-                if ( (size_t)N < Min_Parallel )
-                {
-                    std::sort(first, last, comp);
-                    return hpx::make_ready_future();
-                };
+          RandomIt itA = first + 1;
+          RandomIt itB = first + Nx;
+          RandomIt itC = last - 1;
 
-                // check if already sorted
-                bool SW = true;
-                for ( RandomIt it1 = first, it2 = first+1;
-                    it2 != last && (SW = !comp(*it2,*it1));it1 = it2++);
-                if (SW) return hpx::make_ready_future();
+          if (comp(*itB, *itA)) std::swap(*itA, *itB);
+          if (comp(*itC, *itB))
+          {
+            std::swap(*itC, *itB);
+            if (comp(*itB, *itA)) std::swap(*itA, *itB);
+          };
+          std::swap(*first, *itB);
+          value_t &  val = const_cast < value_t &>(*first);
+          RandomIt c_first = first + 2, c_last = last - 2;
 
-                return hpx::async(&parallel_sort_comp::sort_thread, this, first, last);;
+          while (c_first != last && comp(*c_first, val)) ++c_first;
+          while (comp(val, *c_last)) --c_last;
+          while (!(c_first > c_last))
+          {
+            std::swap(*(c_first++), *(c_last--));
+            while (comp(*c_first, val)) ++c_first;
+            while (comp(val, *c_last)) --c_last;
+          }; // End while
+          std::swap(*first, *c_last);
+
+          // spawn tasks for each sub section
+          hpx::future<void> hk1 = hpx::async< decltype(&sort_thread<RandomIt, Compare>) >(&sort_thread, first, c_last, comp);
+          hpx::future<void> hk2 = hpx::async< decltype(&sort_thread<RandomIt, Compare>) >(&sort_thread, c_first, last, comp);
+          return dataflow(
+            [](future<void> f1, future<void> f2) -> void
+          {
+            f1.get();
+            f2.get();
+            return;
+          }, std::move(hk1), std::move(hk2)
+            );
+        }
+        
+        //------------------------------------------------------------------------
+        //  function : parallel_sort_async
+        //------------------------------------------------------------------------
+        /// @brief constructor of the struct
+        /// @param [in] first : iterator to the first element to sort
+        /// @param [in] last : iterator to the next element after the last
+        /// @param [in] comp : object for to compare
+        /// @exception
+        /// @return
+        /// @remarks
+
+        template < typename RandomIt, typename Compare>
+        hpx::future<void> parallel_sort_async(RandomIt first, RandomIt last, Compare comp)
+        {
+            size_t N = last - first;
+            assert (N >=0);
+
+            if (N < SortLimitPerTask)
+            {
+                std::sort(first, last, comp);
+                return hpx::make_ready_future();
             };
 
-            void parallel_sort(RandomIt first, RandomIt last)
-            {
-                parallel_sort_async(first, last).get();
-            }
+            // check if already sorted
+            bool SW = true;
+            for ( RandomIt it1 = first, it2 = first+1;
+                it2 != last && (SW = !comp(*it2,*it1));it1 = it2++);
+            if (SW) return hpx::make_ready_future();
 
-            //------------------------------------------------------------------------
-            //  function : sort_thread
-            /// @brief this function is the work assigned to each thread in the parallel
-            ///        process
-            /// @exception
-            /// @return
-            /// @remarks
-            //------------------------------------------------------------------------
-            hpx::future<void> sort_thread(RandomIt first, RandomIt last)
-            {
-                using hpx::lcos::local::dataflow;
-
-                //------------------------- begin ----------------------
-                size_t N = last - first;
-                if (N <= MaxPerThread) {
-                    return hpx::async(
-                        [this, first, last]() {
-                            std::sort(first, last, comp);
-                        }
-                    );
-                };
-
-                //----------------------------------------------------------------
-                //                     split
-                //----------------------------------------------------------------
-                typedef typename iter_value<RandomIt>::type value_t;
-
-                //------------------- check if sort ------------------------------
-                bool SW = true;
-                for ( RandomIt it1 = first, it2 = first+1;
-                        it2 != last && (SW = !comp(*it2,*it1));it1 = it2++);
-                if (SW)
-                {
-                    return hpx::make_ready_future();
-                };
-                //---------------------- pivot select ----------------------------
-                size_t Nx = ( size_t (N ) >>1 );
-
-                RandomIt itA = first +1;
-                RandomIt itB = first + Nx;
-                RandomIt itC = last -1;
-
-                if ( comp( *itB , *itA )) std::swap ( *itA, *itB);
-                if ( comp (*itC , *itB))
-                {
-                    std::swap (*itC , *itB );
-                    if ( comp( *itB , *itA )) std::swap ( *itA, *itB);
-                };
-                std::swap ( *first , *itB);
-                value_t &  val = const_cast < value_t &>(* first);
-                RandomIt c_first = first+2 , c_last  = last-2;
-
-                while ( c_first != last && comp (*c_first, val)) ++c_first;
-                while ( comp(val ,*c_last ) ) --c_last;
-                while (!( c_first > c_last ))
-                {
-                    std::swap ( *(c_first++), *(c_last--));
-                    while ( comp(*c_first,val) ) ++c_first;
-                    while ( comp(val, *c_last) ) --c_last;
-                }; // End while
-                std::swap ( *first , *c_last);
-
-                // spawn tasks for each sub section
-                hpx::future<void> hk1 = hpx::async(&parallel_sort_comp::sort_thread, this, first, c_last);
-                hpx::future<void> hk2 = hpx::async(&parallel_sort_comp::sort_thread, this, c_first, last);
-                return dataflow(
-                [] (future<void> f1, future<void> f2) -> void
-                    {
-                        f1.get();
-                        f2.get();
-                        return;
-                    }, std::move(hk1), std::move(hk2)
-                );
-             }
-         };
+                return hpx::async< decltype(&sort_thread<RandomIt, Compare>) >(&sort_thread, first, last, comp);
+        }
 
         ///////////////////////////////////////////////////////////////////////////
         // sort
@@ -211,29 +187,27 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <
                 typename ExPolicy,
-                typename Comp = std::less<typename iter_value<RandomIt>::type>,
+                typename Compare = std::less<typename iter_value<RandomIt>::type>,
                 typename Proj = util::projection_identity >
             static hpx::util::unused_type
-            sequential(ExPolicy, RandomIt first, RandomIt last, Comp && comp = Comp(),
+            sequential(ExPolicy, RandomIt first, RandomIt last, Compare && comp = Compare(),
                 Proj && proj = Proj())
             {
-                std::sort(first, last, std::forward<Comp>(comp));
+                std::sort(first, last, std::forward<Compare>(comp));
                 return hpx::util::unused;
             }
 
             template <
                 typename ExPolicy,
-                typename Comp = std::less<typename iter_value<RandomIt>::type>,
+                typename Compare = std::less<typename iter_value<RandomIt>::type>,
                 typename Proj = util::projection_identity>
             static typename util::detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy policy, RandomIt first, RandomIt last, Comp && comp = Comp(),
+            parallel(ExPolicy policy, RandomIt first, RandomIt last, Compare && comp = Compare(),
                 Proj && proj = Proj())
             {
-                // contruct a parallel sort struct and set the comparison object
-                parallel_sort_comp<RandomIt, Comp> sorter(std::forward<Comp>(comp));
                 // call the sort routine and return the right type, depending on execution policy
                 return util::detail::algorithm_result<ExPolicy>::get(
-                    sorter.parallel_sort_async(first, last));
+                    parallel_sort_async(first, last, std::forward<Compare>(comp)));
             }
         };
     /// \endcond
@@ -269,12 +243,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     //-----------------------------------------------------------------------------
     template <typename ExPolicy, 
               typename RandomIt, 
-              typename Comp = std::less<typename detail::iter_value<RandomIt>::type > >
+              typename Compare = std::less<typename detail::iter_value<RandomIt>::type > >
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
         typename util::detail::algorithm_result<ExPolicy, void>::type
     >::type
-    sort(ExPolicy && policy, RandomIt first, RandomIt last, Comp && comp = Comp())
+    sort(ExPolicy && policy, RandomIt first, RandomIt last, Compare && comp = Compare())
     {
         typedef typename std::iterator_traits<RandomIt>::iterator_category
             iterator_category;
