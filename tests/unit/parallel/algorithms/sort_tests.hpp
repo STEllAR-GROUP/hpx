@@ -8,6 +8,7 @@
 
 //
 #include <random>
+#include <limits>
 //
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
@@ -50,125 +51,143 @@ int verify(const std::vector <IA> &A, Compare comp, bool print) {
     return 1;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy>
-void test_sort1(ExPolicy && policy)
-{
-  BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
-  // Fill vector with random values
-  std::vector<std::size_t> c(5000000);
-  rnd_fill<std::size_t>(c, 0, 10000000, std::random_device{}());
-
-  // sort, blocking when seq, par, par_vec
-  hpx::parallel::sort(std::forward<ExPolicy>(policy),
-    c.begin(), c.end());
-
-  bool is_sorted = (verify(c, std::less<std::size_t>(), true) != 0);
-  HPX_TEST(is_sorted);
-}
+#define msg(a,b,c,d,e) \
+        std::cout \
+        << std::setw(60) << a << std::setw(3) <<  b \
+        << std::setw(20) << c << std::setw(6) << #d \
+        << std::setw(8)  << #e << "\t";
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename Compare>
-void test_sort1_comp(ExPolicy && policy, Compare comp)
+// call sort with no comparison operator
+template <typename ExPolicy, typename T>
+void test_sort1(ExPolicy && policy, T)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), "default", sync, random);
 
     // Fill vector with random values
-    std::vector<std::size_t> c(5000000);
-    rnd_fill<std::size_t>(c, 0, 10000000, std::random_device{}());
+    std::vector<T> c(5000000);
+    rnd_fill<T>(c, std::numeric_limits<T>::min(), std::numeric_limits<T>::max(), std::random_device{}());
 
     // sort, blocking when seq, par, par_vec
     hpx::parallel::sort(std::forward<ExPolicy>(policy),
-        c.begin(), c.end(), comp);
+            c.begin(), c.end());
+
+    bool is_sorted = (verify(c, std::less<T>(), true) != 0);
+    HPX_TEST(is_sorted);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// call sort with a comparison operator
+template <typename ExPolicy, typename T, typename Compare = std::less<T>>
+        void test_sort1_comp(ExPolicy && policy, T, Compare comp = Compare())
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync, random);
+
+    // Fill vector with random values
+    std::vector<T> c(5000000);
+    rnd_fill<T>(c, std::numeric_limits<T>::min(), std::numeric_limits<T>::max(), std::random_device{}());
+
+    // sort, blocking when seq, par, par_vec
+    hpx::parallel::sort(std::forward<ExPolicy>(policy),
+            c.begin(), c.end(), comp);
 
     bool is_sorted = (verify(c, comp, true)!=0);
     HPX_TEST(is_sorted);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename Compare>
-void test_sort1_async(ExPolicy && policy, Compare comp)
+template <typename ExPolicy, typename T, typename Compare = std::less<T>>
+        void test_sort1_async(ExPolicy && policy, T, Compare comp = Compare())
 {
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), async, random);
+
     // Fill vector with random values
-    std::vector<std::size_t> c(5000000);
-    rnd_fill<std::size_t>(c, 0, 10000000, std::random_device{}());
+    std::vector<T> c(5000000);
+    rnd_fill<T>(c, std::numeric_limits<T>::min(), std::numeric_limits<T>::max(), std::random_device{}());
 
     // sort, non blocking
     hpx::future<void> f = hpx::parallel::sort(std::forward<ExPolicy>(policy),
-        c.begin(), c.end(), std::less<std::size_t>());
+            c.begin(), c.end(), comp);
 
     f.get();
-    bool is_sorted = (verify(c, std::less<std::size_t>(), true)!=0);
+    bool is_sorted = (verify(c, comp, true)!=0);
     HPX_TEST(is_sorted);
 }
 
-/*
 ////////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_sorted2(ExPolicy policy, IteratorTag)
+// already sorted
+template <typename ExPolicy, typename T>
+void test_sort2(ExPolicy && policy, T)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), "default", sync, sorted);
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c(10007);
-    //Fill with sorted values from 0 to 10006
+    // Fill vector with increasing values
+    std::vector<T> c(5000000);
     std::iota(boost::begin(c), boost::end(c), 0);
-    //Add a certain large value in middle of array to ignore
-    std::size_t ignore = 20000;
-    c[c.size()/2] = ignore;
-    //Provide custom predicate to ignore the value of ignore
-    //pred should return true when it is given something deemed not sorted
-    auto pred = [&ignore](std::size_t ahead, std::size_t behind)
-    {
-        return behind > ahead && behind != ignore;
-    };
 
-    bool is_ordered = hpx::parallel::is_sorted(policy,
-        iterator(boost::begin(c)), iterator(boost::end(c)), pred);
+    // sort, blocking when seq, par, par_vec
+    hpx::parallel::sort(std::forward<ExPolicy>(policy),
+            c.begin(), c.end());
 
-    HPX_TEST(is_ordered);
+    bool is_sorted = (verify(c, std::less<T>(), true) != 0);
+    HPX_TEST(is_sorted);
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_sorted2_async(ExPolicy p, IteratorTag)
+////////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename T, typename Compare = std::less<T> >
+void test_sort2_comp(ExPolicy && policy, T, Compare comp = Compare())
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync, sorted);
 
-    std::vector<std::size_t> c(10007);
-    //Fill with sorted values from 0 to 10006
+    // Fill vector with increasing values
+    std::vector<T> c(5000000);
     std::iota(boost::begin(c), boost::end(c), 0);
-    //Add a certain large value in middle of array to ignore
-    std::size_t ignore = 20000;
-    c[c.size()/2] = ignore;
-    //Provide custom predicate to ignore the value of ignore
-    //pred should return true when it is given something deemed not sorted
-    auto pred = [&ignore](std::size_t ahead, std::size_t behind)
-    {
-        return behind > ahead && behind != ignore;
-    };
 
-    hpx::future<bool> f = hpx::parallel::is_sorted(p,
-        iterator(boost::begin(c)), iterator(boost::end(c)), pred);
-    f.wait();
+    // sort, blocking when seq, par, par_vec
+    hpx::parallel::sort(std::forward<ExPolicy>(policy),
+            c.begin(), c.end(), comp);
 
-    HPX_TEST(f.get());
+    bool is_sorted = (verify(c, comp, true)!=0);
+    HPX_TEST(is_sorted);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+template <typename ExPolicy, typename T, typename Compare = std::less<T> >
+void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), async, sorted);
+
+    // Fill vector with random values
+    std::vector<T> c(5000000);
+    std::iota(boost::begin(c), boost::end(c), 0);
+
+    // sort, non blocking
+    hpx::future<void> f = hpx::parallel::sort(std::forward<ExPolicy>(policy),
+            c.begin(), c.end(), comp);
+
+    f.get();
+    bool is_sorted = (verify(c, comp, true)!=0);
+    HPX_TEST(is_sorted);
+}
+/*
 ////////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_sorted3(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<T>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c_beg(10007);
-    std::vector<std::size_t> c_end(10007);
+    std::vector<T> c_beg(10007);
+    std::vector<T> c_end(10007);
     //Fill with sorted values from 0 to 10006
     std::iota(boost::begin(c_beg), boost::end(c_beg), 0);
     std::iota(boost::begin(c_end), boost::end(c_end), 0);
@@ -190,11 +209,11 @@ void test_sorted3_async(ExPolicy p, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<T>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c_beg(10007);
-    std::vector<std::size_t> c_end(10007);
+    std::vector<T> c_beg(10007);
+    std::vector<T> c_end(10007);
     //Fill with sorted values from 0 to 10006
     std::iota(boost::begin(c_beg), boost::end(c_beg), 0);
     std::iota(boost::begin(c_end), boost::end(c_end), 0);
@@ -218,10 +237,10 @@ void test_sorted_exception(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<T>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
-    std::vector<std::size_t> c(10007);
+    std::vector<T> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
 
     bool caught_exception = false;
@@ -248,11 +267,11 @@ void test_sorted_exception(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_sorted_exception_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<T>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<T> c(10007);
     std::iota(boost::begin(c), boost::end(c), std::rand() + 1);
 
     bool caught_exception = false;
@@ -288,11 +307,11 @@ void test_sorted_bad_alloc(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<T>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(100007);
+    std::vector<T> c(100007);
     std::iota(boost::begin(c), boost::end(c), 0);
 
     bool caught_bad_alloc = false;
@@ -319,11 +338,11 @@ void test_sorted_bad_alloc(ExPolicy policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_sorted_bad_alloc_async(ExPolicy p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef std::vector<T>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(10007);
+    std::vector<T> c(10007);
     std::iota(boost::begin(c), boost::end(c), 0);
 
     bool caught_bad_alloc = false;
@@ -349,5 +368,5 @@ void test_sorted_bad_alloc_async(ExPolicy p, IteratorTag)
 
     HPX_TEST(caught_bad_alloc);
 }
-*/
+ */
 #endif

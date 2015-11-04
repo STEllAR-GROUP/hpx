@@ -8,55 +8,99 @@
 
 #include "sort_tests.hpp"
 
-#define msg(a,b,c) \
-  std::cout << std::setw(12) << #a << std::setw(4) << #b << std::setw(6) << #c << "\t";
-
 ////////////////////////////////////////////////////////////////////////////////
 void test_sort1()
 {
     using namespace hpx::parallel;
 
     // default comparison operator (std::less)
-    msg(seq,      ., sync); test_sort1(seq);
-    msg(par,      ., sync); test_sort1(par);
-    msg(par_vec,  ., sync); test_sort1(par_vec);
+    test_sort1(seq,     int());
+    test_sort1(par,     int());
+    test_sort1(par_vec, int());
+
+    // default comparison operator (std::less)
+    test_sort1(seq,     double());
+    test_sort1(par,     double());
+    test_sort1(par_vec, double());
 
     // user supplied comparison operator (std::less)
-    msg(seq,     <, sync); test_sort1_comp(seq, std::less<std::size_t>());
-    msg(par,     <, sync); test_sort1_comp(par, std::less<std::size_t>());
-    msg(par_vec, <, sync); test_sort1_comp(par_vec, std::less<std::size_t>());
+    test_sort1_comp(seq,     int(), std::less<std::size_t>());
+    test_sort1_comp(par,     int(), std::less<std::size_t>());
+    test_sort1_comp(par_vec, int(), std::less<std::size_t>());
 
     // user supplied comparison operator (std::greater)
-    msg(seq,     >, sync); test_sort1_comp(seq, std::greater<std::size_t>());
-    msg(par,     >, sync); test_sort1_comp(par, std::greater<std::size_t>());
-    msg(par_vec, >, sync); test_sort1_comp(par_vec, std::greater<std::size_t>());
+    test_sort1_comp(seq,     double(), std::greater<std::size_t>());
+    test_sort1_comp(par,     double(), std::greater<std::size_t>());
+    test_sort1_comp(par_vec, double(), std::greater<std::size_t>());
 
     // Async execution, default comparison operator
-    msg(seq_task, <, async); test_sort1_async(seq(task), std::less<std::size_t>());
-    // can't use async task execution yet because we need to keep internal sort
-    // structure allocated inside dispatch alive until the function completes
-    msg(par_task, <, async); test_sort1_async(par(task), std::less<std::size_t>());
+    test_sort1_async(seq(task), int());
+    test_sort1_async(par(task), char());
+    test_sort1_async(seq(task), double());
+    test_sort1_async(par(task), float());
 
+    // Async execution, user comparison operator
+    test_sort1_async(seq(task), int(),    std::less<unsigned int>());
+    test_sort1_async(par(task), char(),   std::less<char>());
+    //
+    test_sort1_async(seq(task), double(), std::greater<double>());
+    test_sort1_async(par(task), float(),  std::greater<float>());
 
-    msg(exe_seq,      ., sync); test_sort1(execution_policy(seq));
-    msg(exe_par,      ., sync); test_sort1(execution_policy(par));
-    msg(exe_par_vec,  ., sync); test_sort1(execution_policy(par_vec));
-    msg(exe_seq_task, ., async); test_sort1(execution_policy(seq(task)));
-    msg(exe_par_task, ., async); test_sort1(execution_policy(par(task)));
-
+    test_sort1(execution_policy(seq),       int());
+    test_sort1(execution_policy(par),       int());
+    test_sort1(execution_policy(par_vec),   int());
+    test_sort1(execution_policy(seq(task)), int());
+    test_sort1(execution_policy(par(task)), int());
 }
 
-void sort_test1()
+void test_sort2()
 {
-    test_sort1();
+    using namespace hpx::parallel;
+    // default comparison operator (std::less)
+    test_sort2(seq,     int());
+    test_sort2(par,     int());
+    test_sort2(par_vec, int());
+
+    // default comparison operator (std::less)
+    test_sort2(seq,     double());
+    test_sort2(par,     double());
+    test_sort2(par_vec, double());
+
+    // user supplied comparison operator (std::less)
+    test_sort2_comp(seq,     int(), std::less<std::size_t>());
+    test_sort2_comp(par,     int(), std::less<std::size_t>());
+    test_sort2_comp(par_vec, int(), std::less<std::size_t>());
+
+    // user supplied comparison operator (std::greater)
+    test_sort2_comp(seq,     double(), std::greater<std::size_t>());
+    test_sort2_comp(par,     double(), std::greater<std::size_t>());
+    test_sort2_comp(par_vec, double(), std::greater<std::size_t>());
+
+    // Async execution, default comparison operator
+    test_sort2_async(seq(task), int());
+    test_sort2_async(par(task), char());
+    test_sort2_async(seq(task), double());
+    test_sort2_async(par(task), float());
+
+    // Async execution, user comparison operator
+    test_sort2_async(seq(task), int(),    std::less<unsigned int>());
+    test_sort2_async(par(task), char(),   std::less<char>());
+    //
+    test_sort2_async(seq(task), double(), std::greater<double>());
+    test_sort2_async(par(task), float(),  std::greater<float>());
+
+    test_sort2(execution_policy(seq),       int());
+    test_sort2(execution_policy(par),       int());
+    test_sort2(execution_policy(par_vec),   int());
+    test_sort2(execution_policy(seq(task)), int());
+    test_sort2(execution_policy(par(task)), int());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    sort_test1();
- //   sorted_test2();
- //   sorted_test3();
+    test_sort1();
+    test_sort2();
 //    sorted_exception_test();
 //    sorted_bad_alloc_test();
     return hpx::finalize();
