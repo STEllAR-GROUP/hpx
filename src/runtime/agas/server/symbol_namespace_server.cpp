@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -15,6 +16,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <boost/make_shared.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace agas
 {
@@ -210,7 +212,8 @@ void symbol_namespace::register_global_counter_types(
 
         std::string help;
         if (detail::symbol_namespace_services[i].target_ == detail::counter_target_count)
-            help = "returns the overall number of invocations of all symbol AGAS services";
+            help = "returns the overall number of invocations \
+                    of all symbol AGAS services";
         else
             help = "returns the overall execution time of all symbol AGAS services";
 
@@ -248,7 +251,7 @@ void symbol_namespace::register_server_instance(
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name_sync(instance_name_, get_gid().get_gid(), ec);
+    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
 }
 
 void symbol_namespace::unregister_server_instance(
@@ -277,7 +280,7 @@ std::vector<response> symbol_namespace::bulk_service(
     std::vector<response> r;
     r.reserve(reqs.size());
 
-    BOOST_FOREACH(request const& req, reqs)
+    for (request const& req : reqs)
     {
         error_code ign;
         r.push_back(service(req, ign));
@@ -295,7 +298,7 @@ response symbol_namespace::bind(
     std::string key = req.get_name();
     naming::gid_type gid = req.get_gid();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key);
     gid_table_type::iterator end = gids_.end();
@@ -371,7 +374,7 @@ response symbol_namespace::bind(
         on_event_data_.erase(p.first, p.second);
 
         // notify all LCOS which were registered with this name
-        BOOST_FOREACH(hpx::id_type const& id, lcos)
+        for (hpx::id_type const& id : lcos)
         {
             // re-locate the entry in the GID table for each LCO anew, as we
             // need to unlock the mutex protecting the table for each iteration
@@ -391,12 +394,12 @@ response symbol_namespace::bind(
             boost::shared_ptr<naming::gid_type> current_gid = gid_it->second;
 
             {
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
 
                 // split the credit as the receiving end will expect to keep the
                 // object alive
                 naming::gid_type new_gid =
-                    naming::detail::split_gid_if_needed(*current_gid);
+                    naming::detail::split_gid_if_needed(*current_gid).get();
 
                 // trigger the lco
                 set_lco_value(id, new_gid);
@@ -424,7 +427,7 @@ response symbol_namespace::resolve(
     // parameters
     std::string key = req.get_name();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key);
     gid_table_type::iterator end = gids_.end();
@@ -450,7 +453,7 @@ response symbol_namespace::resolve(
     boost::shared_ptr<naming::gid_type> current_gid(it->second);
 
     l.unlock();
-    naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid);
+    naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid).get();
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::resolve, key(%1%), gid(%2%)")
@@ -467,7 +470,7 @@ response symbol_namespace::unbind(
     // parameters
     std::string key = req.get_name();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     gid_table_type::iterator it = gids_.find(key);
     gid_table_type::iterator end = gids_.end();
@@ -506,7 +509,7 @@ response symbol_namespace::iterate(
 { // {{{ iterate implementation
     iterate_names_function_type f = req.get_iterate_names_function();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     for (gid_table_type::iterator it = gids_.begin(); it != gids_.end(); ++it)
     {
@@ -514,7 +517,7 @@ response symbol_namespace::iterate(
         naming::gid_type gid = *(it->second);
 
         {
-            util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+            util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
             f(key, gid);
         }
 
@@ -548,7 +551,7 @@ response symbol_namespace::on_event(
         return response(symbol_ns_on_event, no_success);
     }
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     bool handled = false;
     if (call_for_past_events)
@@ -562,9 +565,9 @@ response symbol_namespace::on_event(
             // split the credit as the receiving end will expect to keep the
             // object alive
             {
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 naming::gid_type new_gid = naming::detail::split_gid_if_needed(
-                    *current_gid);
+                    *current_gid).get();
 
                 // trigger the lco
                 handled = true;
@@ -667,7 +670,11 @@ response symbol_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_count, &counter_data_, ::_1);
             break;
         case symbol_ns_iterate_names:
-            get_data_func = boost::bind(&cd::get_iterate_names_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_iterate_names_count,
+                &counter_data_, ::_1);
+            break;
+        case symbol_ns_on_event:
+            get_data_func = boost::bind(&cd::get_on_event_count, &counter_data_, ::_1);
             break;
         case symbol_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
@@ -692,7 +699,11 @@ response symbol_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_time, &counter_data_, ::_1);
             break;
         case symbol_ns_iterate_names:
-            get_data_func = boost::bind(&cd::get_iterate_names_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_iterate_names_time,
+                &counter_data_, ::_1);
+            break;
+        case symbol_ns_on_event:
+            get_data_func = boost::bind(&cd::get_on_event_time, &counter_data_, ::_1);
             break;
         case symbol_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);

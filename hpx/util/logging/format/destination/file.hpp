@@ -29,15 +29,17 @@
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/destination/convert_destination.hpp>
-
-#include <fstream>
 #include <boost/config.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <fstream>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 
 /**
-    @brief settings for when constructing a file class. To see how it's used, see @ref dealing_with_flags.
+    @brief settings for when constructing a file class. To see how it's used,
+    see @ref dealing_with_flags.
 */
 struct file_settings {
     typedef ::hpx::util::logging::detail::flag<file_settings> flag;
@@ -79,7 +81,8 @@ namespace detail {
               settings(settings_) {}
 
         void open() {
-            out.reset( new std::basic_ofstream<char_type>( name.c_str(), open_flags(settings) ) );
+            out.reset( new std::basic_ofstream<char_type>( name.c_str(),
+                open_flags(settings) ) );
         }
 
         void close() {
@@ -105,16 +108,17 @@ struct file_t : is_generic, non_const_context<detail::file_info>
         @brief constructs the file destination
 
         @param file_name name of the file
-        @param set [optional] file settings - see file_settings class, and @ref dealing_with_flags
+        @param set [optional] file settings - see file_settings class,
+        and @ref dealing_with_flags
     */
-    file_t(const std::string & file_name, file_settings set = file_settings() ) 
+    file_t(const std::string & file_name, file_settings set = file_settings() )
       : non_const_context_base(file_name,set)
     {}
 
     template <class msg_type>
     void operator()(const msg_type & msg) const
     {
-        typename mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         if (!non_const_context_base::context().out)
             non_const_context_base::context().open();   // make sure file is opened

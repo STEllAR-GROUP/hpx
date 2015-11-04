@@ -11,10 +11,9 @@
 #include <map>
 #include <iosfwd>
 
+#include <hpx/runtime/serialization/serialize.hpp>
+
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/map.hpp>
-#include <boost/serialization/string.hpp>
 
 // suppress warnings about dependent classes not being exported from the dll
 #if defined(BOOST_MSVC)
@@ -46,7 +45,7 @@ namespace hpx { namespace util
         std::string parent_name_;
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void save(Archive& ar, const unsigned int version) const;
@@ -54,7 +53,7 @@ namespace hpx { namespace util
         template <typename Archive>
         void load(Archive& ar, const unsigned int version);
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
     protected:
         bool regex_init();
@@ -150,22 +149,6 @@ namespace hpx { namespace util
     };
 
 }} // namespace hpx::util
-
-///////////////////////////////////////////////////////////////////////////////
-// this is the current version of the parcel serialization format
-// this definition needs to be in the global namespace
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-BOOST_CLASS_VERSION(hpx::util::section, HPX_SECTION_VERSION)
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
 
 #endif
 

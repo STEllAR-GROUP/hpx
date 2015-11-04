@@ -87,7 +87,8 @@ int hpx_main()
         HPX_TEST_EQ(f.get(), 87);
 
         f = hpx::async_continue(inc,
-            make_continuation(mult, make_continuation(inc, make_continuation())), hpx::find_here(), 42);
+            make_continuation(mult, make_continuation(inc, make_continuation())),
+            hpx::find_here(), 42);
         HPX_TEST_EQ(f.get(), 87);
     }
 
@@ -99,7 +100,8 @@ int hpx_main()
         HPX_TEST_EQ(f.get(), 86);
 
         f = hpx::async_continue(inc,
-            make_continuation(mult, localities[0], make_continuation()), localities[0], 42);
+            make_continuation(mult, localities[0], make_continuation()),
+            localities[0], 42);
         HPX_TEST_EQ(f.get(), 86);
 
         f = hpx::async_continue(inc,
@@ -119,7 +121,8 @@ int hpx_main()
 
         f = hpx::async_continue(inc,
             make_continuation(mult, localities[0],
-                make_continuation(inc, localities[0], make_continuation())), localities[0], 42);
+                make_continuation(inc, localities[0], make_continuation())),
+            localities[0], 42);
         HPX_TEST_EQ(f.get(), 87);
 
         f = hpx::async_continue(inc,

@@ -24,7 +24,7 @@ namespace boost { namespace lockfree
         typedef lockfree::detail::freelist_stack<T, Alloc> base_type;
 
     public:
-        caching_freelist (std::size_t n = 0) 
+        caching_freelist (std::size_t n = 0)
           : lockfree::detail::freelist_stack<T, Alloc>(Alloc(), n)
         {}
 
@@ -46,7 +46,7 @@ namespace boost { namespace lockfree
         typedef lockfree::detail::freelist_stack<T, Alloc> base_type;
 
     public:
-        static_freelist (std::size_t n = 0) 
+        static_freelist (std::size_t n = 0)
           : lockfree::detail::freelist_stack<T, Alloc>(Alloc(), n)
         {}
 

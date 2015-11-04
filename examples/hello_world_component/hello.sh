@@ -32,7 +32,7 @@ path = ${HOME}/my_hpx_libs
 EOF
 
 # Compile the client
-c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -liostreams -lhello_world -L ~/my_hpx_libs
+c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -lhpx_iostreams -lhello_world -L ~/my_hpx_libs
 
 # Prepare the environment so that we can run the command
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/my_hpx_libs"

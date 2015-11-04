@@ -4,23 +4,24 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <stdexcept>
-
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/chrono/duration.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <stdexcept>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -56,8 +57,10 @@ std::size_t k3 = 0;
 
 namespace test
 {
-    struct local_spinlock : boost::noncopyable
+    struct local_spinlock
     {
+        HPX_NON_COPYABLE(local_spinlock);
+
     private:
         boost::uint64_t v_;
 
@@ -148,7 +151,7 @@ namespace test
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
             BOOST_COMPILER_FENCE
 #else
@@ -169,7 +172,7 @@ namespace test
         {
             HPX_ITT_SYNC_RELEASING(this);
 
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             BOOST_COMPILER_FENCE
             *const_cast<boost::uint64_t volatile*>(&v_) = 0;
 #else
@@ -179,9 +182,6 @@ namespace test
             HPX_ITT_SYNC_RELEASED(this);
             hpx::util::unregister_lock(this);
         }
-
-        typedef boost::unique_lock<local_spinlock> scoped_lock;
-        typedef boost::detail::try_lock_wrapper<local_spinlock> scoped_try_lock;
     };
 }
 
@@ -193,7 +193,7 @@ double null_function(std::size_t i)
     double d = 0.;
     std::size_t idx = i % N;
     {
-        test::local_spinlock::scoped_lock l(mtx[idx]);
+        boost::lock_guard<test::local_spinlock> l(mtx[idx]);
         d = global_init[idx];
     }
     for (double j = 0; j < num_iterations; ++j)
@@ -201,7 +201,7 @@ double null_function(std::size_t i)
         d += 1 / (2. * j + 1);
     }
     {
-        test::local_spinlock::scoped_lock l(mtx[idx]);
+        boost::lock_guard<test::local_spinlock> l(mtx[idx]);
         global_init[idx] = d;
     }
     return d;
@@ -262,7 +262,8 @@ int hpx_main(
                             )
                          << flush;
                 else
-                    cout << ( boost::format("invoked %1% futures in %2% seconds (k1 = %3%, k2 = %4%, k3 = %5%)\n")
+                    cout << ( boost::format("invoked %1% futures in %2% seconds \
+                                (k1 = %3%, k2 = %4%, k3 = %5%)\n")
                             % count
                             % duration
                             % k1

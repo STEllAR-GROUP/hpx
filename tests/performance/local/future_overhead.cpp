@@ -9,7 +9,6 @@
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>

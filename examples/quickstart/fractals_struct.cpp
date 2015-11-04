@@ -11,11 +11,9 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/serialization.hpp>
 
 #include <vector>
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 
 const std::size_t sizeY = 256;
 const std::size_t sizeX = sizeY;
@@ -28,7 +26,7 @@ class FracInfo
     std::size_t max_iteration;
 
   private:
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
     template <class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -57,7 +55,7 @@ std::size_t fractals(boost::shared_ptr<FracInfo> Info)
         iteration++;
     }
 
-    return iteration; 
+    return iteration;
 }
 
 int hpx_main()

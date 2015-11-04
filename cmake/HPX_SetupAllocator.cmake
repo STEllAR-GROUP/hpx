@@ -7,23 +7,23 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT HPX_MALLOC)
-  set(HPX_MALLOC ${DEFAULT_MALLOC})
+if(NOT HPX_WITH_MALLOC)
+  set(HPX_WITH_MALLOC ${DEFAULT_MALLOC})
   set(allocator_error
     "The default allocator for your system is ${DEFAULT_MALLOC}, but ${DEFAULT_MALLOC} could not be found. "
       "The system allocator has poor performance. As such ${DEFAULT_MALLOC} is a strong optional requirement. "
-      "Being aware of the performance hit, you can override this default and get rid of this dependency by setting -DHPX_MALLOC=system. "
-      "Other valid options for HPX_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc")
+      "Being aware of the performance hit, you can override this default and get rid of this dependency by setting -DHPX_WITH_MALLOC=system. "
+      "Valid options for HPX_WITH_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc, and custom")
 else()
   set(allocator_error
-    "HPX_MALLOC was set to ${HPX_MALLOC}, but ${HPX_MALLOC} could not be found. "
-      "Other valid options for HPX_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc")
+    "HPX_WITH_MALLOC was set to ${HPX_WITH_MALLOC}, but ${HPX_WITH_MALLOC} could not be found. "
+      "Valid options for HPX_WITH_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc, and custom")
 endif()
 
-string(TOUPPER "${HPX_MALLOC}" HPX_MALLOC_UPPER)
+string(TOUPPER "${HPX_WITH_MALLOC}" HPX_WITH_MALLOC_UPPER)
 
-if(NOT HPX_MALLOC_DEFAULT)
-  if("${HPX_MALLOC_UPPER}" STREQUAL "TCMALLOC")
+if(NOT HPX_WITH_MALLOC_DEFAULT)
+  if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "TCMALLOC")
     find_package(TCMalloc)
     if(NOT TCMALLOC_LIBRARIES)
       hpx_error(${allocator_error})
@@ -38,7 +38,7 @@ if(NOT HPX_MALLOC_DEFAULT)
     set(_use_custom_allocator TRUE)
   endif()
 
-  if("${HPX_MALLOC_UPPER}" STREQUAL "JEMALLOC")
+  if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "JEMALLOC")
     if(MSVC)
       hpx_error("jemalloc is not usable with MSVC")
     endif()
@@ -53,7 +53,7 @@ if(NOT HPX_MALLOC_DEFAULT)
     set(_use_custom_allocator TRUE)
   endif()
 
-  if("${HPX_MALLOC_UPPER}" STREQUAL "TBBMALLOC")
+  if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "TBBMALLOC")
     find_package(TBBmalloc)
     if(NOT TBBMALLOC_LIBRARY AND NOT TBBMALLOC_PROXY_LIBRARY)
       hpx_error(${allocator_error})
@@ -68,30 +68,18 @@ if(NOT HPX_MALLOC_DEFAULT)
     set(_use_custom_allocator TRUE)
   endif()
 
-  if("${HPX_MALLOC_UPPER}" STREQUAL "CUSTOM")
+  if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "CUSTOM")
     set(_use_custom_allocator TRUE)
   endif()
 else()
   set(_use_custom_allocator TRUE)
 endif()
 
-if("${HPX_MALLOC_UPPER}" MATCHES "SYSTEM")
+if("${HPX_WITH_MALLOC_UPPER}" MATCHES "SYSTEM")
   if(NOT MSVC)
     hpx_warn("HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
   endif()
   set(_use_custom_allocator FALSE)
 endif()
 
-if(_use_custom_allocator)
-  hpx_add_compile_flag_if_available(-fno-builtin-cfree LANGUAGES CXX C)
-  hpx_add_compile_flag_if_available(-fno-builtin-pvalloc LANGUAGES CXX C)
-  hpx_add_compile_flag_if_available(-fno-builtin-malloc LANGUAGES CXX C)
-  hpx_add_compile_flag_if_available(-fno-builtin-free LANGUAGES CXX C)
-  hpx_add_compile_flag_if_available(-fno-builtin-calloc LANGUAGES CXX C)
-  hpx_add_compile_flag_if_available(-fno-builtin-realloc LANGUAGES CXX C)
-  hpx_add_compile_flag_if_available(-fno-builtin-valloc LANGUAGES CXX C)
-  hpx_add_compile_flag_if_available(-fno-builtin-memalign LANGUAGES CXX C)
-  hpx_add_compile_flag_if_available(-fno-builtin-posix_memalign LANGUAGES CXX C)
-endif()
-
-hpx_info("Using ${HPX_MALLOC} allocator.")
+hpx_info("Using ${HPX_WITH_MALLOC} allocator.")

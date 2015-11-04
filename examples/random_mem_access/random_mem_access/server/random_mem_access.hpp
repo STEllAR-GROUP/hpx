@@ -11,17 +11,18 @@
 #include <iostream>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <boost/thread/locks.hpp>
 
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class random_mem_access random_mem_access.hpp hpx/components/random_mem_access.hpp
+    /// \class random_mem_access random_mem_access.hpp
+    /// hpx/components/random_mem_access.hpp
     ///
     /// The random_mem_access is a small example components demonstrating
     /// the main principles of writing your own components. It exposes 4
@@ -35,7 +36,7 @@ namespace hpx { namespace components { namespace server
     /// from.
     ///
     class random_mem_access
-      : public simple_component_base<random_mem_access>
+      : public component_base<random_mem_access>
     {
     public:
         // constructor: initialize random_mem_access value
@@ -53,7 +54,7 @@ namespace hpx { namespace components { namespace server
         /// Initialize the accumulator
         void init(int i)
         {
-            hpx::lcos::local::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::mutex> l(mtx_);
 
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
@@ -67,7 +68,7 @@ namespace hpx { namespace components { namespace server
         /// Add the given number to the accumulator
         void add()
         {
-            hpx::lcos::local::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::mutex> l(mtx_);
 
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
@@ -81,7 +82,7 @@ namespace hpx { namespace components { namespace server
         /// Return the current value to the caller
         int query()
         {
-            hpx::lcos::local::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::mutex> l(mtx_);
 
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"
@@ -94,7 +95,7 @@ namespace hpx { namespace components { namespace server
         /// Print the current value of the accumulator
         void print()
         {
-            hpx::lcos::local::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::mutex> l(mtx_);
 
             std::ostringstream oss;
             oss << "[L" << prefix_ << "/" << this << "]"

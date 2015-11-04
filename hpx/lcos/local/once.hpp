@@ -11,14 +11,13 @@
 #define HPX_LCOS_LOCAL_ONCE_JAN_03_2013_0810PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/lcos/local/event.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
-#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/config.hpp>
-#include <boost/noncopyable.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {

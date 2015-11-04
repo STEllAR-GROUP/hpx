@@ -15,8 +15,6 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/serialization/access.hpp>
-
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
@@ -30,7 +28,7 @@ struct functor
     }
 };
 
-int pass_functor(hpx::util::function<int()> const& f) 
+int pass_functor(hpx::util::function<int()> const& f)
 {
     return f();
 }

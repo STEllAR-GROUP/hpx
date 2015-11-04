@@ -29,9 +29,7 @@
 #ifndef HPX_COROUTINE_DETAIL_SIGNATURE_HPP_20060609
 #define HPX_COROUTINE_DETAIL_SIGNATURE_HPP_20060609
 
-#include <boost/preprocessor/repetition.hpp>
-#include <boost/preprocessor/arithmetic/inc.hpp>
-#include <hpx/util/coroutine/detail/arg_max.hpp>
+#include <boost/mpl/vector.hpp>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
@@ -39,23 +37,18 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
    * Derived from an  mpl::vector describing
    * 'Function' arguments types.
    */
-  template<typename Function>
-  struct signature;
+    template <typename Function>
+    struct signature;
 
-  /*
-   * Generate specializations for the signature trait class.
-   */
-#define HPX_COROUTINE_SIGNATURE_GENERATOR(z, n, unused)                       \
-  template <typename R BOOST_PP_ENUM_TRAILING_PARAMS(n, class A)>             \
-  struct signature<R( BOOST_PP_ENUM_PARAMS(n, A) ) >                          \
-    : boost::mpl::BOOST_PP_CAT(vector, n)<BOOST_PP_ENUM_PARAMS(n,A)>          \
-  {};                                                                         \
-/**/
+    template <typename R>
+    struct signature<R()>
+      : boost::mpl::vector0<>
+    {};
 
-  BOOST_PP_REPEAT(BOOST_PP_INC(HPX_COROUTINE_ARG_MAX), 
-    HPX_COROUTINE_SIGNATURE_GENERATOR, ~)
-
-#undef HPX_COROUTINE_SIGNATURE_GENERATOR
+    template <typename R, typename A0>
+    struct signature<R(A0)>
+      : boost::mpl::vector1<A0>
+    {};
 
 }}}}
 

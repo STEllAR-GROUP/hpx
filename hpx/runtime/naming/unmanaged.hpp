@@ -15,7 +15,7 @@ namespace hpx { namespace naming
     /// The helper function \a hpx::unmanaged can be used to generate
     /// a global identifier which does not participate in the automatic
     /// garbage collection.
-    /// 
+    ///
     /// \param id   [in] The id to generated the unmanaged global id from
     ///             This parameter can be itself a managed or a unmanaged
     ///             global id.

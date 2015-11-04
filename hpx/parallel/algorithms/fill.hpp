@@ -14,10 +14,10 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename InIter, typename T>
             static hpx::util::unused_type
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 T const& val)
             {
                 std::fill(first, last, val);
@@ -49,16 +49,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename T>
-            static typename detail::algorithm_result<ExPolicy>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<ExPolicy>::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                  T const& val)
             {
-                typedef typename detail::algorithm_result<ExPolicy>::type
+                typedef typename util::detail::algorithm_result<ExPolicy>::type
                     result_type;
                 typedef typename std::iterator_traits<FwdIter>::value_type type;
 
                 if(first == last)
-                    return detail::algorithm_result<ExPolicy>::get();
+                    return util::detail::algorithm_result<ExPolicy>::get();
 
                 return hpx::util::void_guard<result_type>(),
                     for_each_n<FwdIter>().call(
@@ -113,7 +113,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, void>::type
+        typename util::detail::algorithm_result<ExPolicy, void>::type
     >::type
     fill(ExPolicy && policy, InIter first, InIter last, T value)
     {
@@ -145,15 +145,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename T>
             static OutIter
-            sequential(ExPolicy const&, OutIter first, std::size_t count,
+            sequential(ExPolicy, OutIter first, std::size_t count,
                 T const& val)
             {
                 return std::fill_n(first, count, val);
             }
 
             template <typename ExPolicy, typename T>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
-            parallel(ExPolicy const& policy, OutIter first, std::size_t count,
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutIter
+            >::type
+            parallel(ExPolicy policy, OutIter first, std::size_t count,
                 T const& val)
             {
                 typedef typename std::iterator_traits<OutIter>::value_type type;
@@ -214,7 +216,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename OutIter, typename Size, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     fill_n(ExPolicy && policy, OutIter first, Size count, T value)
     {
@@ -233,7 +235,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // if count is representing a negative value, we do nothing
         if (detail::is_negative<Size>::call(count))
         {
-            return detail::algorithm_result<ExPolicy, OutIter>::get(
+            return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                 std::move(first));
         }
 

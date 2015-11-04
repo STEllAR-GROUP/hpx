@@ -82,9 +82,12 @@ public:
     /**
      * \return true, if implementation is lock-free.
      *
-     * \warning \b Warning: It only checks, if the queue head node is lockfree. On most platforms, the whole implementation is
-     *                      lockfree, if this is true. Using c++0x-style atomics, there is no possibility to provide a completely
-     *                      accurate implementation, because one would need to test every internal node, which is impossible
+     * \warning \b Warning: It only checks, if the queue head node is lockfree.
+     *                      On most platforms, the whole implementation is
+     *                      lockfree, if this is true. Using c++0x-style atomics, there
+     *                      is no possibility to provide a completely
+     *                      accurate implementation, because one would need to test every
+     *                      internal node, which is impossible
      *                      if further nodes will be allocated from the operating system.
      * */
     bool is_lock_free (void) const
@@ -139,12 +142,14 @@ public:
         return head_.load().get_ptr() == tail_.load().get_ptr();
     }
 
-    /** Enqueues object t to the queue. Enqueueing may fail, if the freelist is not able to allocate a new queue node.
+    /** Enqueues object t to the queue. Enqueueing may fail,
+     *  if the freelist is not able to allocate a new queue node.
      *
      * \returns true, if the push operation is successful.
      *
      * \note Thread-safe and non-blocking
-     * \warning \b Warning: May block if node needs to be allocated from the operating system
+     * \warning \b Warning:
+     *  May block if node needs to be allocated from the operating system
      * */
     bool push(T const & t)
     {
@@ -161,23 +166,28 @@ public:
             tagged_node_ptr tail2 = tail_.load(memory_order_acquire);
             if (likely(tail == tail2)) {
                 if (next_ptr == 0) {
-                    if ( tail->next.compare_exchange_weak(next, tagged_node_ptr(n, next.get_tag() + 1)) ) {
-                        tail_.compare_exchange_strong(tail, tagged_node_ptr(n, tail.get_tag() + 1));
+                    if ( tail->next.compare_exchange_weak(next, tagged_node_ptr(n,
+                        next.get_tag() + 1)) ) {
+                        tail_.compare_exchange_strong(tail, tagged_node_ptr(n,
+                            tail.get_tag() + 1));
                         return true;
                     }
                 }
                 else
-                    tail_.compare_exchange_strong(tail, tagged_node_ptr(next_ptr, tail.get_tag() + 1));
+                    tail_.compare_exchange_strong(tail, tagged_node_ptr(next_ptr,
+                        tail.get_tag() + 1));
             }
         }
     }
 
-    /** Enqueues object t to the queue. Enqueueing may fail, if the freelist is not able to allocate a new queue node.
+    /** Enqueues object t to the queue. Enqueueing may fail,
+     *  if the freelist is not able to allocate a new queue node.
      *
      * \returns true, if the push operation is successful.
      *
      * \note Not thread-safe
-     * \warning \b Warning: May block if node needs to be allocated from the operating system
+     * \warning \b Warning: May block if node needs to be
+     * allocated from the operating system
      * */
     bool push_unsafe(T const & t)
     {
@@ -193,18 +203,22 @@ public:
             node * next_ptr = next.get_ptr();
 
             if (next_ptr == 0) {
-                tail->next.store(tagged_node_ptr(n, next.get_tag() + 1), memory_order_relaxed);
-                tail_.store(tagged_node_ptr(n, tail.get_tag() + 1), memory_order_relaxed);
+                tail->next.store(tagged_node_ptr(n, next.get_tag() + 1),
+                    memory_order_relaxed);
+                tail_.store(tagged_node_ptr(n, tail.get_tag() + 1),
+                    memory_order_relaxed);
                 return true;
             }
             else
-                tail_.store(tagged_node_ptr(next_ptr, tail.get_tag() + 1), memory_order_relaxed);
+                tail_.store(tagged_node_ptr(next_ptr, tail.get_tag() + 1),
+                    memory_order_relaxed);
         }
     }
 
     /** Dequeue object from queue.
      *
-     * if pop operation is successful, object is written to memory location denoted by ret.
+     * if pop operation is successful,
+     * object is written to memory location denoted by ret.
      *
      * \returns true, if the pop operation is successful, false if queue was empty.
      *
@@ -220,22 +234,26 @@ public:
             node * next_ptr = next.get_ptr();
 
 //             tagged_node_ptr head2 = head_.load(memory_order_acquire);
-//             if (likely(head == head2)) 
+//             if (likely(head == head2))
             {
                 if (head.get_ptr() == tail.get_ptr()) {
                     if (next_ptr == 0)
                         return false;
-                    tail_.compare_exchange_strong(tail, tagged_node_ptr(next_ptr, tail.get_tag() + 1));
+                    tail_.compare_exchange_strong(tail, tagged_node_ptr(next_ptr,
+                        tail.get_tag() + 1));
                 } else {
                     if (next_ptr == 0)
-                        /* this check is not part of the original algorithm as published by michael and scott
+                        /* this check is not part of the original algorithm
+                         * as published by michael and scott
                          *
-                         * however we reuse the tagged_ptr part for the and clear the next part during node
+                         * however we reuse the tagged_ptr part for the and
+                         * clear the next part during node
                          * allocation. we can observe a null-pointer here.
                          * */
                         continue;
                     ret = next_ptr->data;
-                    if (head_.compare_exchange_weak(head, tagged_node_ptr(next_ptr, head.get_tag() + 1))) {
+                    if (head_.compare_exchange_weak(head, tagged_node_ptr(next_ptr,
+                        head.get_tag() + 1))) {
                         pool.destruct(head.get_ptr());
                         return true;
                     }
@@ -246,7 +264,8 @@ public:
 
     /** Dequeue object from queue.
      *
-     * if pop operation is successful, object is written to memory location denoted by ret.
+     * if pop operation is successful,
+     * object is written to memory location denoted by ret.
      *
      * \returns true, if the pop operation is successful, false if queue was empty.
      *
@@ -265,17 +284,21 @@ public:
             if (head.get_ptr() == tail.get_ptr()) {
                 if (next_ptr == 0)
                     return false;
-                tail_.store(tagged_node_ptr(next_ptr, tail.get_tag() + 1), memory_order_relaxed);
+                tail_.store(tagged_node_ptr(next_ptr, tail.get_tag() + 1),
+                    memory_order_relaxed);
             } else {
                 if (next_ptr == 0)
-                    /* this check is not part of the original algorithm as published by michael and scott
+                    /* this check is not part of the original algorithm as
+                     * published by michael and scott
                      *
-                     * however we reuse the tagged_ptr part for the and clear the next part during node
+                     * however we reuse the tagged_ptr part for the and clear
+                     * the next part during node
                      * allocation. we can observe a null-pointer here.
                      * */
                     continue;
                 ret = next_ptr->data;
-                head_.store(tagged_node_ptr(next_ptr, head.get_tag() + 1), memory_order_relaxed);
+                head_.store(tagged_node_ptr(next_ptr, head.get_tag() + 1),
+                    memory_order_relaxed);
                 pool.destruct_unsafe(head.get_ptr());
                 return true;
             }
@@ -286,7 +309,8 @@ public:
 private:
 #ifndef BOOST_DOXYGEN_INVOKED
     atomic<tagged_node_ptr> head_;
-    static const int padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(tagged_node_ptr);
+    static const int padding_size = BOOST_LOCKFREE_CACHELINE_BYTES
+        - sizeof(tagged_node_ptr);
     char padding1[padding_size];
     atomic<tagged_node_ptr> tail_;
     char padding2[padding_size];
@@ -297,14 +321,21 @@ private:
 
 } /* namespace detail */
 
-/** The queue class provides a multi-writer/multi-reader queue, pushing and poping is lockfree,
- *  construction/destruction has to be synchronized. It uses a freelist for memory management,
- *  freed nodes are pushed to the freelist and not returned to the os before the queue is destroyed.
+/** The queue class provides a multi-writer/multi-reader queue,
+ *  pushing and poping is lockfree,
+ *  construction/destruction has to be synchronized.
+ *  It uses a freelist for memory management,
+ *  freed nodes are pushed to the freelist and not returned to the os before
+ *  the queue is destroyed.
  *
- *  The memory management of the queue can be controlled via its freelist_t template argument. Two different
- *  freelists can be used. struct caching_freelist_t selects a caching freelist, which can allocate more nodes
- *  from the operating system, and struct static_freelist_t uses a fixed-sized freelist. With a fixed-sized
- *  freelist, the push operation may fail, while with a caching freelist, the push operation may block.
+ *  The memory management of the queue can be controlled via its
+ *  freelist_t template argument. Two different
+ *  freelists can be used. struct caching_freelist_t selects a caching freelist,
+ *  which can allocate more nodes
+ *  from the operating system, and struct static_freelist_t uses a fixed-sized freelist.
+ *  With a fixed-sized
+ *  freelist, the push operation may fail, while with a caching freelist,
+ *  the push operation may block.
  *
  *  \b Limitation: The class T is required to have a trivial assignment operator.
  *
@@ -330,7 +361,8 @@ public:
 };
 
 
-/** Template specialization of the queue class for pointer arguments, that supports pop operations to
+/** Template specialization of the queue class for pointer arguments,
+ *  that supports pop operations to
  *  stl/boost-style smart pointers
  *
  * */
@@ -374,7 +406,8 @@ public:
 
     /** Dequeue object from queue to std::auto_ptr
      *
-     * if pop operation is successful, object is written to memory location denoted by ret.
+     * if pop operation is successful,
+     *  object is written to memory location denoted by ret.
      *
      * \returns true, if the pop operation is successful, false if queue was empty.
      *
@@ -388,7 +421,8 @@ public:
 
     /** Dequeue object from queue to boost::scoped_ptr
      *
-     * if pop operation is successful, object is written to memory location denoted by ret.
+     * if pop operation is successful,
+     *  object is written to memory location denoted by ret.
      *
      * \returns true, if the pop operation is successful, false if queue was empty.
      *
@@ -403,7 +437,8 @@ public:
 
     /** Dequeue object from queue to boost::shared_ptr
      *
-     * if pop operation is successful, object is written to memory location denoted by ret.
+     * if pop operation is successful,
+     *  object is written to memory location denoted by ret.
      *
      * \returns true, if the pop operation is successful, false if queue was empty.
      *

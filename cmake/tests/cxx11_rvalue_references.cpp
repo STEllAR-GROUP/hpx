@@ -9,12 +9,10 @@
 void g(int&) {}
 
 template<typename F, typename T>
-void forward(F f, T&& t) { f(static_cast<T&&>(t)); }
+void forward(F f, T&& t){ f(static_cast<T&&>(t)); }
 
 int main()
 {
    int x;
    forward(g, x);
-   return 0;
 }
-

@@ -80,8 +80,10 @@ namespace hpx { namespace lcos
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/calculate_fanout.hpp>
@@ -90,7 +92,6 @@ namespace hpx { namespace lcos
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-#include <boost/serialization/vector.hpp>
 
 #include <vector>
 
@@ -281,7 +282,7 @@ namespace hpx { namespace lcos
                 for (std::size_t i = 2; i != fres.size(); ++i)
                     res = reduce_op_(res, fres[i].get());
 
-                return std::move(res);
+                return res;
             }
 
             ReduceOp const& reduce_op_;
@@ -345,7 +346,7 @@ namespace hpx { namespace lcos
 
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
-                        hpx::async_colocated<reduce_impl_action>(
+                        hpx::detail::async_colocated<reduce_impl_action>(
                             id
                           , act
                           , std::move(ids_next)
@@ -397,7 +398,7 @@ namespace hpx { namespace lcos
         }
 
         return
-            hpx::async_colocated<reduce_impl_action>(
+            hpx::detail::async_colocated<reduce_impl_action>(
                 ids[0]
               , Action()
               , ids
@@ -506,14 +507,14 @@ namespace hpx { namespace lcos
 /**/
 
 #define HPX_REGISTER_REDUCE_ACTION_2(Action, ReduceOp)                        \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
             reduce_invoker<ReduceOp>::type                                    \
       , BOOST_PP_CAT(BOOST_PP_CAT(reduce_, Action), ReduceOp)                 \
     )                                                                         \
 /**/
 #define HPX_REGISTER_REDUCE_ACTION_3(Action, ReduceOp, Name)                  \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<Action>::                     \
             reduce_invoker<ReduceOp>::type                                    \
       , BOOST_PP_CAT(reduce_, Name)                                           \
@@ -559,7 +560,7 @@ namespace hpx { namespace lcos
 /**/
 
 #define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_2(Action, ReduceOp)             \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
         >::reduce_invoker<ReduceOp>::type                                     \
@@ -567,7 +568,7 @@ namespace hpx { namespace lcos
     )                                                                         \
 /**/
 #define HPX_REGISTER_REDUCE_WITH_INDEX_ACTION_3(Action, ReduceOp, Name)       \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_reduce_action<                              \
             ::hpx::lcos::detail::reduce_with_index<Action>                    \
         >::reduce_invoker<ReduceOp>::type                                     \

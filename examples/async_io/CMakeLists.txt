@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-    async_io
+    async_io_simple
     async_io_action
     async_io_external
     async_io_low_level)

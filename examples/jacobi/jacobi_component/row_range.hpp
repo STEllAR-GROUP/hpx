@@ -7,7 +7,6 @@
 #ifndef JACOBI_ROW_RANGE_HPP
 #define JACOBI_ROW_RANGE_HPP
 
-#include <boost/serialization/split_member.hpp>
 #include <boost/smart_ptr/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/range/iterator.hpp>
@@ -70,7 +69,8 @@ namespace jacobi
         row_range()
         {}
 
-        row_range(boost::intrusive_ptr<value_holder> values, std::ptrdiff_t b, std::ptrdiff_t e)
+        row_range(boost::intrusive_ptr<value_holder> values,
+              std::ptrdiff_t b, std::ptrdiff_t e)
             : begin_(b)
             , end_(e)
             , values_(values)
@@ -116,11 +116,12 @@ namespace jacobi
         void save(Archive & ar, unsigned) const
         {
             HPX_ASSERT(values_);
-            std::vector<double> tmp(values_->v_.begin() + begin_, values_->v_.begin() + end_);
+            std::vector<double> tmp(values_->v_.begin()
+                + begin_, values_->v_.begin() + end_);
             ar & tmp;
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
     };
 

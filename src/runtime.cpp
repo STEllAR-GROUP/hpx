@@ -8,6 +8,7 @@
 
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/version.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
@@ -15,6 +16,7 @@
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/command_line_handling.hpp>
@@ -32,8 +34,11 @@
 #include <hpx/util/security/subordinate_certificate_authority.hpp>
 #endif
 
+#include <boost/thread/locks.hpp>
+
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
@@ -186,23 +191,27 @@ namespace hpx
     {
         char const* const runtime_state_names[] =
         {
-            "invalid",      // -1
-            "initialized",  // 0
-            "pre_startup",  // 1
-            "startup",      // 2
-            "pre_main",     // 3
-            "running",      // 4
-            "pre_shutdown"  // 5
-            "shutdown",     // 6
-            "stopped"       // 7
+            "state_invalid",      // -1
+            "state_initialized",  // 0
+            "state_pre_startup",  // 1
+            "state_startup",      // 2
+            "state_pre_main",     // 3
+            "state_starting",     // 4
+            "state_running",      // 5
+            "state_suspended",    // 6
+            "state_pre_shutdown"  // 7
+            "state_shutdown",     // 8
+            "state_stopping",     // 9
+            "state_terminating",  // 10
+            "state_stopped"       // 11
         };
     }
 
-    char const* get_runtime_state_name(runtime::state state)
+    char const* get_runtime_state_name(state st)
     {
-        if (state < runtime::state_invalid || state >= runtime::state_last)
+        if (st < state_invalid || st >= last_valid_runtime_state)
             return "invalid (value out of bounds)";
-        return strings::runtime_state_names[state+1];
+        return strings::runtime_state_names[st+1];
     }
 
 #if defined(HPX_HAVE_SECURITY)
@@ -212,15 +221,17 @@ namespace hpx
         {
             // manage certificates for root-CA and sub-CA
             util::security::root_certificate_authority root_certificate_authority_;
-            util::security::subordinate_certificate_authority subordinate_certificate_authority_;
+            util::security::subordinate_certificate_authority
+                subordinate_certificate_authority_;
 
             // certificate store
-            HPX_STD_UNIQUE_PTR<components::security::certificate_store> cert_store_;
+            std::unique_ptr<components::security::certificate_store> cert_store_;
             components::security::signed_certificate locality_certificate_;
         };
     }
 
-    components::security::certificate_store const * runtime::cert_store(error_code& ec) const
+    components::security::certificate_store const * runtime::cert_store(error_code& ec)
+        const
     {
         HPX_ASSERT(security_data_.get() != 0);
         if (0 == security_data_->cert_store_.get())     // should have been created
@@ -247,7 +258,7 @@ namespace hpx
 
             {
                 // Initialize the root-CA
-                lcos::local::spinlock::scoped_lock l(security_mtx_);
+                boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
                 root_ca.initialize();
 
@@ -283,7 +294,7 @@ namespace hpx
     components::security::signed_certificate_signing_request
         runtime::get_certificate_signing_request() const
     {
-        lcos::local::spinlock::scoped_lock l(security_mtx_);
+        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
         // Initialize the sub-CA
         security_data_->subordinate_certificate_authority_.initialize();
@@ -303,7 +314,7 @@ namespace hpx
 
         {
             // tend to the given CSR
-            lcos::local::spinlock::scoped_lock l(security_mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
             cert = security_data_->root_certificate_authority_.
                 sign_certificate_signing_request(csr);
         }
@@ -330,7 +341,7 @@ namespace hpx
                 "root-CA(%1%)") % root_cert);
 
             // initialize our certificate store
-            lcos::local::spinlock::scoped_lock l(security_mtx_);
+            boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
             HPX_ASSERT(security_data_->cert_store_.get() == 0);
             security_data_->cert_store_.reset(
@@ -353,9 +364,10 @@ namespace hpx
 
             {
                 // finish initializing our sub-CA
-                lcos::local::spinlock::scoped_lock l(security_mtx_);
+                boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
                 security_data_->locality_certificate_ = subca_cert;
-                security_data_->subordinate_certificate_authority_.set_certificate(subca_cert);
+                security_data_
+                    ->subordinate_certificate_authority_.set_certificate(subca_cert);
             }
 
             // add the certificates of the root's sub-CA and our own
@@ -376,7 +388,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        lcos::local::spinlock::scoped_lock l(security_mtx_);
+        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
         HPX_ASSERT(security_data_.get() != 0);
         return security_data_->root_certificate_authority_.get_certificate(ec);
     }
@@ -384,7 +396,7 @@ namespace hpx
     components::security::signed_certificate
         runtime::get_certificate(error_code& ec) const
     {
-        lcos::local::spinlock::scoped_lock l(security_mtx_);
+        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
         HPX_ASSERT(security_data_.get() != 0);
         return security_data_->subordinate_certificate_authority_.get_certificate(ec);
     }
@@ -400,8 +412,9 @@ namespace hpx
             "runtime::add_locality_certificate: locality(%1%): adding locality "
             "certificate: %2%") % here() % cert);
 
-        lcos::local::spinlock::scoped_lock l(security_mtx_);
-        HPX_ASSERT(0 != security_data_->cert_store_.get());     // should have been created
+        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
+        HPX_ASSERT(0 != security_data_->cert_store_.get());
+        // should have been created
         security_data_->cert_store_->insert(cert);
     }
 
@@ -417,7 +430,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        lcos::local::spinlock::scoped_lock l(security_mtx_);
+        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
         return security_data_->locality_certificate_;
     }
 
@@ -434,7 +447,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        lcos::local::spinlock::scoped_lock l(security_mtx_);
+        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
 
         using util::security::get_subordinate_certificate_authority_gid;
         return security_data_->cert_store_->at(
@@ -457,7 +470,7 @@ namespace hpx
             return;
         }
 
-        lcos::local::spinlock::scoped_lock l(security_mtx_);
+        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
         signed_suffix = security_data_->subordinate_certificate_authority_.
             get_key_pair().sign(suffix, ec);
     }
@@ -531,7 +544,8 @@ namespace hpx
 
     boost::uint64_t runtime::get_system_uptime()
     {
-        boost::int64_t diff = util::high_resolution_clock::now() - *runtime::uptime_.get();
+        boost::int64_t diff =
+            util::high_resolution_clock::now() - *runtime::uptime_.get();
         return diff < 0LL ? 0ULL : static_cast<boost::uint64_t>(diff);
     }
 
@@ -597,9 +611,9 @@ namespace hpx
             action, pp, num_messages, interval, ec);
     }
 
-    util::binary_filter* runtime::create_binary_filter(
+    serialization::binary_filter* runtime::create_binary_filter(
         char const* binary_filter_type, bool compress,
-        util::binary_filter* next_filter, error_code& ec)
+        serialization::binary_filter* next_filter, error_code& ec)
     {
         return runtime_support_->create_binary_filter(binary_filter_type,
             compress, next_filter, ec);
@@ -679,7 +693,8 @@ namespace hpx
 
             // uptime counters
             { "/runtime/uptime", performance_counters::counter_elapsed_time,
-              "returns the up time of the runtime instance for the referenced locality",
+              "returns the up time of the runtime instance for the referenced "
+              "locality",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::uptime_counter_creator,
               &performance_counters::locality_counter_discoverer,
@@ -694,6 +709,28 @@ namespace hpx
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::component_instance_counter_creator,
               &performance_counters::locality_counter_discoverer,
+              ""
+            },
+
+            // action invocation counters
+            { "/runtime/count/action_invocation", performance_counters::counter_raw,
+              "returns the number of (local) invocations of a specific action "
+              "on this locality (the action type has to be specified as the "
+              "counter parameter)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::local_action_invocation_counter_creator,
+              &performance_counters::local_action_invocation_counter_discoverer,
+              ""
+            },
+
+            { "/runtime/count/remote_action_invocation",
+              performance_counters::counter_raw,
+              "returns the number of (remote) invocations of a specific action "
+              "on this locality (the action type has to be specified as the "
+              "counter parameter)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::remote_action_invocation_counter_creator,
+              &performance_counters::remote_action_invocation_counter_discoverer,
               ""
             }
         };
@@ -752,7 +789,7 @@ namespace hpx
     boost::uint32_t runtime::assign_cores(std::string const& locality_basename,
         boost::uint32_t cores_needed)
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
 
         used_cores_map_type::iterator it = used_cores_map_.find(locality_basename);
         if (it == used_cores_map_.end())
@@ -807,7 +844,7 @@ namespace hpx
     void report_error(std::size_t num_thread, boost::exception_ptr const& e)
     {
         // Early and late exceptions
-        if (!threads::threadmanager_is(running))
+        if (!threads::threadmanager_is(state_running))
         {
             hpx::runtime* rt = hpx::get_runtime_ptr();
             if (rt)
@@ -823,7 +860,7 @@ namespace hpx
     void report_error(boost::exception_ptr const& e)
     {
         // Early and late exceptions
-        if (!threads::threadmanager_is(running))
+        if (!threads::threadmanager_is(state_running))
         {
             hpx::runtime* rt = hpx::get_runtime_ptr();
             if (rt)
@@ -833,7 +870,7 @@ namespace hpx
             return;
         }
 
-        std::size_t num_thread = hpx::threads::threadmanager_base::get_worker_thread_num();
+        std::size_t num_thread = hpx::get_worker_thread_num();
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
@@ -1096,7 +1133,8 @@ namespace hpx
             return false;
 
         bool numa_sensitive = false;
-        if (std::size_t(-1) != rt->get_thread_manager().get_worker_thread_num(&numa_sensitive))
+        if (std::size_t(-1) !=
+            rt->get_thread_manager().get_worker_thread_num(&numa_sensitive))
             return numa_sensitive;
         return false;
     }
@@ -1122,7 +1160,7 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
-            return rt->get_state() == runtime::state_running;
+            return rt->get_state() == state_running;
         return false;
     }
 
@@ -1130,7 +1168,7 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
-            return rt->get_state() == runtime::state_stopped;
+            return rt->get_state() == state_stopped;
         return true;        // assume stopped
     }
 
@@ -1139,8 +1177,8 @@ namespace hpx
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
         {
-            runtime::state state = rt->get_state();
-            return state == runtime::state_stopped || state == runtime::state_shutdown;
+            state st = rt->get_state();
+            return st == state_stopped || st == state_shutdown;
         }
         return true;        // assume stopped
     }
@@ -1148,7 +1186,7 @@ namespace hpx
     bool HPX_EXPORT is_starting()
     {
         runtime* rt = get_runtime_ptr();
-        return NULL != rt ? rt->get_state() <= runtime::state_startup : true;
+        return NULL != rt ? rt->get_state() <= state_startup : true;
     }
 }
 
@@ -1205,6 +1243,22 @@ namespace hpx { namespace threads
     {
         return get_runtime().get_config().get_stack_size(stacksize);
     }
+
+    HPX_API_EXPORT void reset_thread_distribution()
+    {
+        get_runtime().get_thread_manager().reset_thread_distribution();
+    }
+
+    HPX_API_EXPORT void set_scheduler_mode(threads::policies::scheduler_mode m)
+    {
+        get_runtime().get_thread_manager().set_scheduler_mode(m);
+    }
+
+    HPX_API_EXPORT threads::mask_cref_type get_pu_mask(
+        threads::topology& topo, std::size_t thread_num)
+    {
+        return get_runtime().get_thread_manager().get_pu_mask(topo, thread_num);
+    }
 }}
 
 namespace hpx { namespace components { namespace detail
@@ -1227,8 +1281,8 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (0 == rt ||
-            rt->get_state() < runtime::state_initialized ||
-            rt->get_state() >= runtime::state_stopped)
+            rt->get_state() < state_initialized ||
+            rt->get_state() >= state_stopped)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
@@ -1251,8 +1305,8 @@ namespace hpx
     {
         runtime* rt = get_runtime_ptr();
         if (0 == rt ||
-            rt->get_state() < runtime::state_initialized ||
-            rt->get_state() >= runtime::state_stopped)
+            rt->get_state() < state_initialized ||
+            rt->get_state() >= state_stopped)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
@@ -1330,9 +1384,12 @@ namespace hpx
         return get_runtime().get_config();
     }
 
-    hpx::util::io_service_pool* get_thread_pool(char const* name)
+    hpx::util::io_service_pool* get_thread_pool(
+        char const* name, char const* name_suffix)
     {
-        return get_runtime().get_thread_pool(name);
+        std::string full_name(name);
+        full_name += name_suffix;
+        return get_runtime().get_thread_pool(full_name.c_str());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1404,12 +1461,13 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Create an instance of a binary filter plugin
-    util::binary_filter* create_binary_filter(char const* binary_filter_type,
-        bool compress, util::binary_filter* next_filter, error_code& ec)
+    serialization::binary_filter* create_binary_filter(char const* binary_filter_type,
+        bool compress, serialization::binary_filter* next_filter, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
-            return rt->create_binary_filter(binary_filter_type, compress, next_filter, ec);
+            return rt->create_binary_filter
+                    (binary_filter_type, compress, next_filter, ec);
 
         HPX_THROWS_IF(ec, invalid_status, "create_binary_filter",
             "the runtime system is not available at this time");

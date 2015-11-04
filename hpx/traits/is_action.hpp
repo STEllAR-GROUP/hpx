@@ -8,19 +8,28 @@
 
 #include <hpx/traits.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/decay.hpp>
 #include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace traits
 {
+    namespace detail
+    {
+        template <typename Action, typename Enable = void>
+        struct is_action_impl
+          : boost::mpl::false_
+        {};
+
+        template <typename Action>
+        struct is_action_impl<Action,
+            typename util::always_void<typename Action::action_tag>::type
+        > : boost::mpl::true_
+        {};
+    }
+
     template <typename Action, typename Enable>
     struct is_action
-      : boost::mpl::false_
-    {};
-
-    template <typename Action>
-    struct is_action<Action
-      , typename util::always_void<typename Action::action_tag>::type>
-      : boost::mpl::true_
+      : detail::is_action_impl<typename util::decay<Action>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

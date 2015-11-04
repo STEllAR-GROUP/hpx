@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/server/copy_component.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/async_colocated.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/traits/is_component.hpp>
 
 #include <boost/utility/enable_if.hpp>
@@ -49,7 +49,7 @@ namespace hpx { namespace components
     copy(naming::id_type const& to_copy)
     {
         typedef server::copy_component_action_here<Component> action_type;
-        return async_colocated<action_type>(to_copy, to_copy);
+        return hpx::detail::async_colocated<action_type>(to_copy, to_copy);
     }
 
     /// \brief Copy given component to the specified target locality
@@ -80,7 +80,8 @@ namespace hpx { namespace components
     copy(naming::id_type const& to_copy, naming::id_type const& target_locality)
     {
         typedef server::copy_component_action<Component> action_type;
-        return async_colocated<action_type>(to_copy, to_copy, target_locality);
+        return hpx::detail::async_colocated<action_type>(
+            to_copy, to_copy, target_locality);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -116,8 +117,8 @@ namespace hpx { namespace components
             component_type;
         typedef server::copy_component_action<component_type> action_type;
 
-        id_type id = to_copy.get_gid();
-        return Derived(async_colocated<action_type>(
+        id_type id = to_copy.get_id();
+        return Derived(hpx::detail::async_colocated<action_type>(
             to_copy, to_copy, target_locality));
     }
 }}

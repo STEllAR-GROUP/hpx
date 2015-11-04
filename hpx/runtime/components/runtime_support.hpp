@@ -34,14 +34,6 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        int get_factory_properties(components::component_type type);
-        lcos::future<int> get_factory_properties_async(components::component_type);
-
         /// Create a new component type using the runtime_support
         template <typename Component, typename ...Ts>
         naming::id_type create_component(Ts&&... vs)
@@ -93,12 +85,12 @@ namespace hpx { namespace components
             return this->base_type::create_memory_block_async(gid_, count, act);
         }
 
-        lcos::future<bool> load_components_async()
+        lcos::future<int> load_components_async()
         {
             return this->base_type::load_components_async(gid_);
         }
 
-        bool load_components()
+        int load_components()
         {
             return this->base_type::load_components(gid_);
         }
@@ -176,9 +168,21 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
         naming::id_type const& get_gid() const
         {
             return gid_;
+        }
+#endif
+
+        naming::id_type const& get_id() const
+        {
+            return gid_;
+        }
+
+        naming::gid_type const & get_raw_gid() const
+        {
+            return gid_.get_gid();
         }
 
     private:

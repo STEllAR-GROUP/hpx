@@ -6,14 +6,13 @@
 #if !defined(HPX_RUNTIME_COMPONENTS_SERVER_MIGRATE_COMPONENT_JAN_30_2014_0737AM)
 #define HPX_RUNTIME_COMPONENTS_SERVER_MIGRATE_COMPONENT_JAN_30_2014_0737AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-
-#include <boost/serialization/shared_ptr.hpp>
 
 namespace hpx { namespace components { namespace server
 {
@@ -198,15 +197,6 @@ namespace hpx { namespace components { namespace server
           , trigger_migrate_component_action<Component> >
     {};
 }}}
-
-HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
-    (template <typename Component>),
-    (hpx::components::server::migrate_component_action<Component>)
-)
-HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
-    (template <typename Component>),
-    (hpx::components::server::trigger_migrate_component_action<Component>)
-)
 
 #endif
 

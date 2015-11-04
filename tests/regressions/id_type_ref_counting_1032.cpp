@@ -76,7 +76,7 @@ struct test_server2
     hpx::id_type create_test_server1()
     {
         return hpx::new_<test_server1<ComponentBase> >(
-            hpx::find_here(), this->get_gid()).get();
+            hpx::find_here(), this->get_id()).get();
     }
 
     HPX_DEFINE_COMPONENT_ACTION(test_server2, create_test_server1,
@@ -98,16 +98,16 @@ typedef test_server1<managed_base> test_managed_server1;
 typedef test_server2<managed_base> test_managed_server2;
 
 typedef hpx::components::simple_component<test_simple_server1> simple_server1_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(simple_server1_type, test_simple_server1);
+HPX_REGISTER_COMPONENT(simple_server1_type, test_simple_server1);
 
 typedef hpx::components::simple_component<test_simple_server2> simple_server2_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(simple_server2_type, test_simple_server2);
+HPX_REGISTER_COMPONENT(simple_server2_type, test_simple_server2);
 
 typedef hpx::components::simple_component<test_managed_server1> managed_server1_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(managed_server1_type, test_managed_server1);
+HPX_REGISTER_COMPONENT(managed_server1_type, test_managed_server1);
 
 typedef hpx::components::simple_component<test_managed_server2> managed_server2_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(managed_server2_type, test_managed_server2);
+HPX_REGISTER_COMPONENT(managed_server2_type, test_managed_server2);
 
 template <template <typename> class ComponentBase>
 void test_server1<ComponentBase>::test()

@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -16,29 +16,29 @@ namespace hpx
 {
     namespace threads
     {
-        // return whether thread manager is in the state described by 'mask'
-        bool threadmanager_is(boost::uint8_t mask)
+        // return whether thread manager is in the state described by st
+        bool threadmanager_is(state st)
         {
             hpx::runtime* rt = get_runtime_ptr();
             if (NULL == rt) {
                 // we're probably either starting or stopping
-                return (mask & (starting | stopping)) != 0;
+                return st == state_starting || st == state_stopping;
             }
-            return (rt->get_thread_manager().status() & mask) != 0;
+            return (rt->get_thread_manager().status() == st);
         }
     }
 
     namespace agas
     {
-        // return whether resolver client is in state described by 'mask'
-        bool router_is(boost::uint8_t mask)
+        // return whether resolver client is in state described by st
+        bool router_is(state st)
         {
             runtime* rt = get_runtime_ptr();
             if (NULL == rt) {
                 // we're probably either starting or stopping
-                return (mask & (starting | stopping)) != 0;
+                return st == state_starting || st == state_stopping;
             }
-            return (rt->get_agas_client().get_status() & mask) != 0;
+            return (rt->get_agas_client().get_status() == st);
         }
     }
 }

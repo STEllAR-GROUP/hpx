@@ -1,3 +1,8 @@
+<!-- Copyright (c) 2013 Thomas Heller                                             -->
+<!--                                                                              -->
+<!-- Distributed under the Boost Software License, Version 1.0. (See accompanying -->
+<!-- file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)        -->
+
 This is a version of a Jacobi supposed to run on shared memory machines.
 It based on the dataflow ideas as presented in this paper:
 http://dl.acm.org/citation.cfm?id=2467126

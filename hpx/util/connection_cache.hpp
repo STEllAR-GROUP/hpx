@@ -15,7 +15,7 @@
 #if !defined(HPX_UTIL_CONNECTION_CACHE_MAY_20_0104PM)
 #define HPX_UTIL_CONNECTION_CACHE_MAY_20_0104PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/logging.hpp>
@@ -28,9 +28,10 @@
 #include <stdexcept>
 #include <string>
 
+#include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
-#include <boost/cstdint.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -177,7 +178,7 @@ namespace hpx { namespace util
         ///          \a reclaim().
         connection_type get(key_type const& l)
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
 
             // Check if this key already exists in the cache.
             typename cache_type::iterator const it = cache_.find(l);
@@ -234,7 +235,7 @@ namespace hpx { namespace util
         bool get_or_reserve(key_type const& l, connection_type& conn,
             bool force_insert = false)
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
 
             typename cache_type::iterator const it = cache_.find(l);
 
@@ -269,7 +270,8 @@ namespace hpx { namespace util
                 // Otherwise, if we have less connections for this locality
                 // than the maximum, try to reserve space in the cache for a new
                 // connection.
-                if (num_existing_connections(it->second) < max_num_connections(it->second) ||
+                if (num_existing_connections(it->second) <
+                    max_num_connections(it->second) ||
                     force_insert)
                 {
                     // See if we have enough space or can make space available.
@@ -350,7 +352,7 @@ namespace hpx { namespace util
         ///       a prior call to \a get() or \a get_or_reserve().
         void reclaim(key_type const& l, connection_type const& conn)
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
 
             // Search for an entry for this key.
             typename cache_type::iterator const ct = cache_.find(l);
@@ -359,13 +361,14 @@ namespace hpx { namespace util
                 // Update LRU meta data.
                 key_tracker_.splice(
                     key_tracker_.end()
-                    , key_tracker_
-                    , lru_reference(ct->second)
-                    );
+                  , key_tracker_
+                  , lru_reference(ct->second)
+                );
 
                 // Return the connection back to the cache only if the number
                 // of connections does not need to be shrunk.
-                if (num_existing_connections(ct->second) <= max_num_connections(ct->second))
+                if (num_existing_connections(ct->second) <=
+                    max_num_connections(ct->second))
                 {
                     // Add the connection to the entry.
                     cached_connections(ct->second).push_back(conn);
@@ -394,18 +397,18 @@ namespace hpx { namespace util
                 // as invariants could be invalidated here due to caller error.
                 check_invariants();
             }
-            else {
-                // Key should already exist in the cache. FIXME: This should
-                // probably throw as could easily be triggered by caller error.
-                HPX_ASSERT(shutting_down_);
-            }
+//             else {
+//                 // Key should already exist in the cache. FIXME: This should
+//                 // probably throw as could easily be triggered by caller error.
+//                 HPX_ASSERT(shutting_down_);
+//             }
         }
 
         /// Returns true if the overall connection count is equal to or larger
         /// than the maximum number of overall connections, and false otherwise.
         bool full() const
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
             return (connections_ >= max_connections_);
         }
 
@@ -413,14 +416,15 @@ namespace hpx { namespace util
         /// than the maximum connection count per locality, and false otherwise.
         bool full(key_type const& l) const
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
 
             if (!cache_.count(l))
                 return false || (connections_ >= max_connections_);
 
             typename cache_type::const_iterator ct = cache_.find(l);
             HPX_ASSERT(ct != cache_.end());
-            return (num_existing_connections(ct->second) >= max_num_connections(ct->second))
+            return (num_existing_connections(ct->second) >=
+                    max_num_connections(ct->second))
                 || (connections_ >= max_connections_);
         }
 
@@ -431,7 +435,7 @@ namespace hpx { namespace util
         ///       invariants.
         void clear()
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
             key_tracker_.clear();
             cache_.clear();
             connections_ = 0;
@@ -455,7 +459,7 @@ namespace hpx { namespace util
         ///       invariants.
         void clear(key_type const& l)
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
 
             // Check if this key already exists in the cache.
             typename cache_type::iterator it = cache_.find(l);
@@ -465,8 +469,9 @@ namespace hpx { namespace util
                 key_tracker_.erase(lru_reference(it->second));
 
                 // correct counter to avoid assertions later on
-                connections_ -= num_existing_connections(it->second);
-                evictions_ += num_existing_connections(it->second);
+                std::size_t num_existing = num_existing_connections(it->second);
+                connections_ -= num_existing;
+                evictions_ += num_existing;
 
                 // Erase entry if key exists in the cache.
                 cache_.erase(it);
@@ -479,13 +484,9 @@ namespace hpx { namespace util
 
         /// Destroys all connections for the given locality in the cache, reset
         /// all associated counts.
-        ///
-        /// \note Calling this function while connections are still checked out
-        ///       of the cache is a bad idea, and will violate this classes
-        ///       invariants.
         void clear(key_type const& l, connection_type const& conn)
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
 
             // Check if this key already exists in the cache.
             typename cache_type::iterator const it = cache_.find(l);
@@ -509,31 +510,31 @@ namespace hpx { namespace util
         // access statistics
         boost::int64_t get_cache_insertions(bool reset)
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
             return util::get_and_reset_value(insertions_, reset);
         }
 
         boost::int64_t get_cache_evictions(bool reset)
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
             return util::get_and_reset_value(evictions_, reset);
         }
 
         boost::int64_t get_cache_hits(bool reset)
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
             return util::get_and_reset_value(hits_, reset);
         }
 
         boost::int64_t get_cache_misses(bool reset)
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
             return util::get_and_reset_value(misses_, reset);
         }
 
         boost::int64_t get_cache_reclaims(bool reset)
         {
-            mutex_type::scoped_lock lock(mtx_);
+            boost::lock_guard<mutex_type> lock(mtx_);
             return util::get_and_reset_value(reclaims_, reset);
         }
 
@@ -550,14 +551,17 @@ namespace hpx { namespace util
             {
                 cache_value_type const& val = ct->second;
 
+                std::size_t num_connections = cached_connections(val).size();
+                std::size_t num_existing = num_existing_connections(val);
+
                 // The separate item counter has to properly count all the
                 // existing elements, not only those in the cache entry.
-                HPX_ASSERT(cached_connections(val).size() <= num_existing_connections(val));
+                HPX_ASSERT(num_connections <= num_existing);
 
                 // Count all connections (both those in the cache and those
                 // checked out of the cache).
-                in_cache_count += cached_connections(val).size();
-                total_count += num_existing_connections(val);
+                in_cache_count += num_connections;
+                total_count += num_existing;
             }
 
             // Overall connection count should be larger than or equal to the

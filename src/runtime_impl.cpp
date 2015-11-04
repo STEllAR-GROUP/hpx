@@ -5,10 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <boost/config.hpp>
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-#include <boost/foreach.hpp>
 
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
@@ -21,10 +17,15 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
-#include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
-#include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/include/performance_counters.hpp>
+
+#include <boost/config.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -51,7 +52,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_pre_startup) {
+            if (rt->get_state() > state_pre_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_startup_function",
                     "Too late to register a new pre-startup function.");
@@ -68,7 +69,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_startup) {
+            if (rt->get_state() > state_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_startup_function",
                     "Too late to register a new startup function.");
@@ -85,7 +86,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_pre_shutdown) {
+            if (rt->get_state() > state_pre_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_shutdown_function",
                     "Too late to register a new pre-shutdown function.");
@@ -102,7 +103,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() > runtime::state_shutdown) {
+            if (rt->get_state() > state_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_shutdown_function",
                     "Too late to register a new shutdown function.");
@@ -116,8 +117,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
+    template <typename SchedulingPolicy>
+    runtime_impl<SchedulingPolicy>::runtime_impl(
             util::runtime_configuration & rtcfg,
             runtime_mode locality_mode, std::size_t num_threads,
             init_scheduler_type const& init,
@@ -125,30 +126,30 @@ namespace hpx {
       : runtime(rtcfg, init_affinity),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
-            boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2, false),
+            boost::bind(&runtime_impl::init_tss, This(),
+                "main-thread", ::_1, ::_2, false),
             boost::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
         io_pool_(rtcfg.get_thread_pool_size("io_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "io-thread",
+                ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
-            boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "timer-thread",
+                ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         scheduler_(init),
-        notifier_(
-            boost::bind(&runtime_impl::init_tss, This(), "worker-thread", ::_1, ::_2, false),
-            boost::bind(&runtime_impl::deinit_tss, This()),
-            boost::bind(&runtime_impl::report_error, This(), _1, _2)),
-        thread_manager_(new hpx::threads::threadmanager_impl<
-            SchedulingPolicy, NotificationPolicy>(
+        notifier_(runtime_impl<SchedulingPolicy>::
+            get_notification_policy("worker-thread")),
+        thread_manager_(
+            new hpx::threads::threadmanager_impl<SchedulingPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
         parcel_handler_(rtcfg, thread_manager_.get(),
-            new parcelset::policies::global_parcelhandler_queue,
-            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2, true),
+            boost::bind(&runtime_impl::init_tss, This(), "parcel-thread",
+                ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This())),
         agas_client_(parcel_handler_, ini_, mode_),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
-        applier_(parcel_handler_, *thread_manager_),
-        action_manager_(applier_)
+        applier_(parcel_handler_, *thread_manager_)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
@@ -163,10 +164,12 @@ namespace hpx {
 #endif
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(
-            parcel_handler_, boost::uint64_t(runtime_support_.get()), boost::uint64_t(memory_.get()));
-        parcel_handler_.initialize(agas_client_);
+            parcel_handler_, boost::uint64_t(runtime_support_.get()),
+            boost::uint64_t(memory_.get()));
+        parcel_handler_.initialize(agas_client_, &applier_);
 
-        applier_.initialize(boost::uint64_t(runtime_support_.get()), boost::uint64_t(memory_.get()));
+        applier_.initialize(boost::uint64_t(runtime_support_.get()),
+        boost::uint64_t(memory_.get()));
 
 #if defined(HPX_HAVE_SECURITY)
         // enable parcel capability checking
@@ -174,25 +177,25 @@ namespace hpx {
 #endif
 
         // copy over all startup functions registered so far
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_pre_startup_functions)
+        for (util::function_nonser<void()> const& f : global_pre_startup_functions)
         {
             add_pre_startup_function(f);
         }
         global_pre_startup_functions.clear();
 
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_startup_functions)
+        for (util::function_nonser<void()> const& f : global_startup_functions)
         {
             add_startup_function(f);
         }
         global_startup_functions.clear();
 
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_pre_shutdown_functions)
+        for (util::function_nonser<void()> const& f : global_pre_shutdown_functions)
         {
             add_pre_shutdown_function(f);
         }
         global_pre_shutdown_functions.clear();
 
-        BOOST_FOREACH(util::function_nonser<void()> const& f, global_shutdown_functions)
+        for (util::function_nonser<void()> const& f : global_shutdown_functions)
         {
             add_shutdown_function(f);
         }
@@ -203,8 +206,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    runtime_impl<SchedulingPolicy, NotificationPolicy>::~runtime_impl()
+    template <typename SchedulingPolicy>
+    runtime_impl<SchedulingPolicy>::~runtime_impl()
     {
         LRT_(debug) << "~runtime_impl(entering)";
 
@@ -219,11 +222,11 @@ namespace hpx {
         LRT_(debug) << "~runtime_impl(finished)";
     }
 
-    bool pre_main(hpx::runtime_mode);
+    int pre_main(hpx::runtime_mode);
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename SchedulingPolicy>
     threads::thread_state
-    runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
+    runtime_impl<SchedulingPolicy>::run_helper(
         util::function_nonser<runtime::hpx_main_function_type> func, int& result)
     {
         LBT_(info) << "(2nd stage) runtime_impl::run_helper: launching pre_main";
@@ -232,7 +235,8 @@ namespace hpx {
         threads::set_thread_description(threads::get_self_id(), "pre_main");
 
         // Finish the bootstrap
-        if (!hpx::pre_main(mode_)) {
+        result = hpx::pre_main(mode_);
+        if (result) {
             LBT_(info) << "runtime_impl::run_helper: bootstrap "
                           "aborted, bailing out";
             return threads::thread_state(threads::terminated);
@@ -243,6 +247,17 @@ namespace hpx {
 
         parcel_handler_.enable_alternative_parcelports();
 
+        // reset all counters right before running main, if requested
+        if (get_config_entry("hpx.print_counter.startup", "0") == "1")
+        {
+            bool reset = false;
+            if (get_config_entry("hpx.print_counter.reset", "0") == "1")
+                reset = true;
+
+            error_code ec(lightweight);     // ignore errors
+            evaluate_active_counters(reset, "startup", ec);
+        }
+
         // Now, execute the user supplied thread function (hpx_main)
         if (!!func) {
             // Change our thread description, as we're about to call hpx_main
@@ -251,12 +266,11 @@ namespace hpx {
             // Call hpx_main
             result = func();
         }
-
         return threads::thread_state(threads::terminated);
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
+    template <typename SchedulingPolicy>
+    int runtime_impl<SchedulingPolicy>::start(
         util::function_nonser<hpx_main_function_type> const& func, bool blocking)
     {
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -320,21 +334,21 @@ namespace hpx {
         return 0;   // return zero as we don't know the outcome of hpx_main yet
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(bool blocking)
+    template <typename SchedulingPolicy>
+    int runtime_impl<SchedulingPolicy>::start(bool blocking)
     {
         util::function_nonser<hpx_main_function_type> empty_main;
         return start(empty_main, blocking);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::wait_helper(
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::wait_helper(
         boost::mutex& mtx, boost::condition& cond, bool& running)
     {
         // signal successful initialization
         {
-            boost::mutex::scoped_lock lk(mtx);
+            boost::lock_guard<boost::mutex> lk(mtx);
             running = true;
             cond.notify_all();
         }
@@ -345,6 +359,9 @@ namespace hpx {
         // set thread name as shown in Visual Studio
         util::set_thread_name("main-thread#wait_helper");
 
+#if defined(HPX_HAVE_APEX)
+        apex::register_thread("main-thread#wait_helper");
+#endif
         // wait for termination
         runtime_support_->wait();
 
@@ -352,8 +369,8 @@ namespace hpx {
         main_pool_.stop();
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    int runtime_impl<SchedulingPolicy, NotificationPolicy>::wait()
+    template <typename SchedulingPolicy>
+    int runtime_impl<SchedulingPolicy>::wait()
     {
         LRT_(info) << "runtime_impl: about to enter wait state";
 
@@ -363,13 +380,13 @@ namespace hpx {
         bool running = false;
 
         boost::thread t (boost::bind(
-                &runtime_impl<SchedulingPolicy, NotificationPolicy>::wait_helper,
+                &runtime_impl<SchedulingPolicy>::wait_helper,
                 this, boost::ref(mtx), boost::ref(cond), boost::ref(running)
             ));
 
         // wait for the thread to run
         {
-            boost::mutex::scoped_lock lk(mtx);
+            boost::unique_lock<boost::mutex> lk(mtx);
             while (!running)
                 cond.wait(lk);
         }
@@ -387,8 +404,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // First half of termination process: stop thread manager,
     // schedule a task managed by timer_pool to initiate second part
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::stop(bool blocking)
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::stop(bool blocking)
     {
         LRT_(warning) << "runtime_impl: about to stop services";
 
@@ -407,7 +424,7 @@ namespace hpx {
         // manager
         boost::mutex mtx;
         boost::condition cond;
-        boost::mutex::scoped_lock l(mtx);
+        boost::unique_lock<boost::mutex> l(mtx);
 
         boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking,
             boost::ref(cond), boost::ref(mtx)));
@@ -425,8 +442,8 @@ namespace hpx {
     // Second step in termination: shut down all services.
     // This gets executed as a task in the timer_pool io_service and not as
     // a HPX thread!
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::stopped(
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::stopped(
         bool blocking, boost::condition& cond, boost::mutex& mtx)
     {
         // wait for thread manager to exit
@@ -438,24 +455,24 @@ namespace hpx {
 
         LRT_(info) << "runtime_impl: stopped all services";
 
-        boost::mutex::scoped_lock l(mtx);
+        boost::lock_guard<boost::mutex> l(mtx);
         cond.notify_all();                  // we're done now
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::report_error(
         std::size_t num_thread, boost::exception_ptr const& e)
     {
         // Early and late exceptions, errors outside of HPX-threads
-        if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
+        if (!threads::get_self_ptr() || !threads::threadmanager_is(state_running))
         {
             // report the error to the local console
             detail::report_exception_and_continue(e);
 
             // store the exception to be able to rethrow it later
             {
-                boost::mutex::scoped_lock l(mtx_);
+                boost::lock_guard<boost::mutex> l(mtx_);
                 exception_ = e;
             }
 
@@ -487,21 +504,19 @@ namespace hpx {
             naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::report_error(
         boost::exception_ptr const& e)
     {
-        std::size_t num_thread =
-            hpx::threads::threadmanager_base::get_worker_thread_num();
-        return report_error(num_thread, e);
+        return report_error(hpx::get_worker_thread_num(), e);
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::rethrow_exception()
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::rethrow_exception()
     {
-        if (state_.load() > running)
+        if (state_.load() > state_running)
         {
-            boost::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<boost::mutex> l(mtx_);
             if (exception_)
             {
                 boost::exception_ptr e = exception_;
@@ -512,8 +527,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
+    template <typename SchedulingPolicy>
+    int runtime_impl<SchedulingPolicy>::run(
         util::function_nonser<hpx_main_function_type> const& func)
     {
         // start the main thread function
@@ -530,8 +545,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    int runtime_impl<SchedulingPolicy, NotificationPolicy>::run()
+    template <typename SchedulingPolicy>
+    int runtime_impl<SchedulingPolicy>::run()
     {
         // start the main thread function
         start();
@@ -547,8 +562,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::default_errorsink(
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::default_errorsink(
         std::string const& msg)
     {
         // log the exception information in any case
@@ -558,8 +573,18 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss(
+    template <typename SchedulingPolicy>
+    threads::policies::callback_notifier runtime_impl<SchedulingPolicy>::
+        get_notification_policy(char const* prefix)
+    {
+        return notification_policy_type(
+            boost::bind(&runtime_impl::init_tss, This(), prefix, ::_1, ::_2, false),
+            boost::bind(&runtime_impl::deinit_tss, This()),
+            boost::bind(&runtime_impl::report_error, This(), _1, _2));
+    }
+
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::init_tss(
         char const* context, std::size_t num, char const* postfix,
         bool service_thread)
     {
@@ -591,6 +616,10 @@ namespace hpx {
 
             // set thread name as shown in Visual Studio
             util::set_thread_name(name);
+
+#if defined(HPX_HAVE_APEX)
+            apex::register_thread(name);
+#endif
         }
 
         // if this is a service thread, set its service affinity
@@ -602,15 +631,19 @@ namespace hpx {
             threads::mask_cref_type used_processing_units =
                 thread_manager_->get_used_processing_units();
 
-            this->topology_.set_thread_affinity_mask(
-                this->topology_.get_service_affinity_mask(
-                    used_processing_units));
+            // --hpx:bind=none  should disable all affinity definitions
+            if (threads::any(used_processing_units))
+            {
+                this->topology_.set_thread_affinity_mask(
+                    this->topology_.get_service_affinity_mask(
+                        used_processing_units));
+            }
 #endif
         }
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::deinit_tss()
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::deinit_tss()
     {
         // initialize coroutines context switcher
         hpx::util::coroutines::thread_shutdown();
@@ -628,51 +661,51 @@ namespace hpx {
         runtime::thread_name_.reset();
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename SchedulingPolicy>
     naming::gid_type
-    runtime_impl<SchedulingPolicy, NotificationPolicy>::get_next_id(std::size_t count)
+    runtime_impl<SchedulingPolicy>::get_next_id(std::size_t count)
     {
         return id_pool_.get_id(count);
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::
         add_pre_startup_function(util::function_nonser<void()> const& f)
     {
         runtime_support_->add_pre_startup_function(f);
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::
         add_startup_function(util::function_nonser<void()> const& f)
     {
         runtime_support_->add_startup_function(f);
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::
         add_pre_shutdown_function(util::function_nonser<void()> const& f)
     {
         runtime_support_->add_pre_shutdown_function(f);
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
+    template <typename SchedulingPolicy>
+    void runtime_impl<SchedulingPolicy>::
         add_shutdown_function(util::function_nonser<void()> const& f)
     {
         runtime_support_->add_shutdown_function(f);
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    bool runtime_impl<SchedulingPolicy, NotificationPolicy>::
+    template <typename SchedulingPolicy>
+    bool runtime_impl<SchedulingPolicy>::
         keep_factory_alive(components::component_type type)
     {
         return runtime_support_->keep_factory_alive(type);
     }
 
-    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename SchedulingPolicy>
     hpx::util::io_service_pool*
-    runtime_impl<SchedulingPolicy, NotificationPolicy>::
+    runtime_impl<SchedulingPolicy>::
         get_thread_pool(char const* name)
     {
         HPX_ASSERT(name != 0);
@@ -690,8 +723,8 @@ namespace hpx {
     }
 
     /// Register an external OS-thread with HPX
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    bool runtime_impl<SchedulingPolicy, NotificationPolicy>::
+    template <typename SchedulingPolicy>
+    bool runtime_impl<SchedulingPolicy>::
         register_thread(char const* name, std::size_t num, bool service_thread)
     {
         if (NULL != runtime::thread_name_.get())
@@ -706,8 +739,8 @@ namespace hpx {
     }
 
     /// Unregister an external OS-thread with HPX
-    template <typename SchedulingPolicy, typename NotificationPolicy>
-    bool runtime_impl<SchedulingPolicy, NotificationPolicy>::
+    template <typename SchedulingPolicy>
+    bool runtime_impl<SchedulingPolicy>::
         unregister_thread()
     {
         if (NULL == runtime::thread_name_.get())
@@ -716,46 +749,59 @@ namespace hpx {
         deinit_tss();
         return true;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threads::policies::callback_notifier
+        get_notification_policy(char const* prefix)
+    {
+        return get_runtime().get_notification_policy(prefix);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice
-#if defined(HPX_LOCAL_SCHEDULER)
+#if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::local_queue_scheduler<>,
-    hpx::threads::policies::callback_notifier>;
+    hpx::threads::policies::local_queue_scheduler<> >;
 #endif
 
-#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_STATIC_SCHEDULER)
+#include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::runtime_impl<
+    hpx::threads::policies::static_queue_scheduler<> >;
+#endif
+
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
+#include <hpx/runtime/threads/policies/throttle_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::runtime_impl<
+    hpx::threads::policies::throttle_queue_scheduler<> >;
+#endif
+
+#if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::static_priority_queue_scheduler<>,
-    hpx::threads::policies::callback_notifier>;
+    hpx::threads::policies::static_priority_queue_scheduler<> >;
 #endif
 
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::local_priority_queue_scheduler<>,
-    hpx::threads::policies::callback_notifier>;
+    hpx::threads::policies::local_priority_queue_scheduler<> >;
 
-#if defined(HPX_ABP_SCHEDULER)
+#if defined(HPX_HAVE_ABP_SCHEDULER)
 template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::abp_fifo_priority_queue_scheduler,
-    hpx::threads::policies::callback_notifier>;
+    hpx::threads::policies::abp_fifo_priority_queue_scheduler>;
 #endif
 
-#if defined(HPX_HIERARCHY_SCHEDULER)
+#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
 #include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::hierarchy_scheduler<>,
-    hpx::threads::policies::callback_notifier>;
+    hpx::threads::policies::hierarchy_scheduler<> >;
 #endif
 
-#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/periodic_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::periodic_priority_queue_scheduler<>,
-    hpx::threads::policies::callback_notifier>;
+    hpx::threads::policies::periodic_priority_queue_scheduler<> >;
 #endif
 

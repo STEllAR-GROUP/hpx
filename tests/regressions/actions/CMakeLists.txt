@@ -6,7 +6,9 @@
 add_subdirectory(components)
 
 set(tests
+    make_continuation_1615
     plain_action_1330
+    plain_action_1550
     plain_action_move_semantics
     component_action_move_semantics
    )
@@ -43,14 +45,14 @@ foreach(test ${tests})
   add_hpx_regression_test("actions" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.actions.${test})
+  add_hpx_pseudo_target(tests.regressions.actions_dir.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.actions
-                              tests.regressions.actions.${test})
+  add_hpx_pseudo_dependencies(tests.regressions.actions_dir
+                              tests.regressions.actions_dir.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.actions.${test}
+  add_hpx_pseudo_dependencies(tests.regressions.actions_dir.${test}
                               ${test}_test_exe)
 endforeach()
 

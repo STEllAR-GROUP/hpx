@@ -39,7 +39,8 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 
 
 /**
-    @brief Settings you can pass to the rolling file. To see how it's used, see @ref dealing_with_flags.
+    @brief Settings you can pass to the rolling file.
+    To see how it's used, see @ref dealing_with_flags.
 */
 struct rolling_file_settings {
     typedef ::hpx::util::logging::detail::flag<rolling_file_settings> flag;
@@ -92,22 +93,27 @@ namespace detail {
             namespace fs = boost::filesystem;
 
             if ( m_flags.initial_erase()) {
-                for ( unsigned idx = 0; idx < m_flags.file_count(); ++idx)
-                    if ( fs::exists( file_name(idx) ))
+                for ( unsigned idx = 0; idx < m_flags.file_count(); ++idx) {
+                    boost::system::error_code ec;
+                    if ( fs::exists( file_name(idx), ec) && !ec)
                         fs::remove( file_name(idx) );
+                }
             }
 
             // see what file to start from
             if ( m_flags.start_where_size_not_exceeded() ) {
-                for ( m_cur_idx = 0; m_cur_idx < m_flags.file_count(); ++m_cur_idx )
-                    if ( fs::exists( file_name(m_cur_idx) )) {
-                        if ( fs::file_size( file_name(m_cur_idx))  < m_flags.max_size_bytes() )
+                for ( m_cur_idx = 0; m_cur_idx < m_flags.file_count(); ++m_cur_idx ) {
+                    boost::system::error_code ec;
+                    if ( fs::exists( file_name(m_cur_idx), ec) && !ec) {
+                        if ( fs::file_size( file_name(m_cur_idx))
+                            < m_flags.max_size_bytes() )
                             // file hasn't reached max size
                             break;
                     }
                     else
                         // file not found, we'll create it now
                         break;
+                }
 
                 if ( m_cur_idx >= m_flags.file_count())
                     // all files are too full (we'll overwrite the first one)
@@ -129,11 +135,13 @@ namespace detail {
         void recreate_file() {
             // many thanks to Benjamin de Dardel!
             namespace fs = boost::filesystem;
-            m_out = boost::shared_ptr< std::basic_ofstream<char_type> >(new std::basic_ofstream<char_type>( file_name(m_cur_idx).c_str(),
+            m_out = boost::shared_ptr< std::basic_ofstream<char_type> >
+                (new std::basic_ofstream<char_type>( file_name(m_cur_idx).c_str(),
                 m_flags.extra_flags() | std::ios_base::out | std::ios_base::app));
             if ( fs::file_size( file_name(m_cur_idx)) > m_flags.max_size_bytes()) {
                 // this file is already full - clear it first
-                m_out = boost::shared_ptr< std::basic_ofstream<char_type> >(new std::basic_ofstream<char_type>( file_name(m_cur_idx).c_str(),
+                m_out = boost::shared_ptr< std::basic_ofstream<char_type>
+                >(new std::basic_ofstream<char_type>( file_name(m_cur_idx).c_str(),
                     m_flags.extra_flags() | std::ios_base::out | std::ios_base::trunc));
             }
         }
@@ -162,31 +170,39 @@ namespace detail {
 }
 
 /**
-    @brief Writes to multiple files: name_prefix.1, name_prefix.2, ... name_prefix.N, and then restarts from 1.
+    @brief Writes to multiple files: name_prefix.1, name_prefix.2, ... name_prefix.N,
+    and then restarts from 1.
 
     We first write to name_prefix.1.
 
-    The log has a max_size. When max_size is reached, we start writing to name_prefix.2. When max_size is reached, we start writing to name_prefix.3.
-    And so on, until we reach name_prefix.N (N = file_count). When that gets fool, we start over, with name_prefix.1.
+    The log has a max_size. When max_size is reached, we start writing to name_prefix.2.
+    When max_size is reached, we start writing to name_prefix.3.
+    And so on, until we reach name_prefix.N (N = file_count). When that gets fool,
+    we start over, with name_prefix.1.
 */
-template<class convert_dest = do_convert_destination > struct rolling_file_t : is_generic, non_const_context<detail::rolling_file_info<convert_dest> > {
-    typedef non_const_context< detail::rolling_file_info<convert_dest> > non_const_context_base;
+template<class convert_dest = do_convert_destination > struct rolling_file_t
+    : is_generic, non_const_context<detail::rolling_file_info<convert_dest> > {
+    typedef non_const_context< detail::rolling_file_info<convert_dest> >
+        non_const_context_base;
 
     /**
         Constructs a rolling file
 
         @param name_prefix the name to be used as prefix for the files
 
-        @param flags [optional] extra settings to pass to the rolling file. See rolling_file_settings and @ref dealing_with_flags.
+        @param flags [optional] extra settings to pass to the rolling file.
+        See rolling_file_settings and @ref dealing_with_flags.
     */
-    rolling_file_t(const std::string & name_prefix, rolling_file_settings flags = rolling_file_settings() ) : non_const_context_base(name_prefix, flags) {}
+    rolling_file_t(const std::string & name_prefix, rolling_file_settings flags =
+        rolling_file_settings() ) : non_const_context_base(name_prefix, flags) {}
 
     template<class msg_type> void operator()( const msg_type & msg) const {
         non_const_context_base::context().write(msg);
     }
 
     bool operator==(const rolling_file_t & other) const {
-        return non_const_context_base::context().m_name_prefix == other.context().m_name_prefix;
+        return non_const_context_base::context().m_name_prefix ==
+            other.context().m_name_prefix;
     }
 
     /**

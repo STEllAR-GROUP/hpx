@@ -5,24 +5,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/util/spinlock_pool.hpp>
-#include <hpx/util/scoped_unlock.hpp>
-#include <hpx/util/logging.hpp>
-
-#include <boost/swap.hpp>
-#include <boost/format.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 namespace hpx { namespace util
 {
     naming::gid_type unique_id_ranges::get_id(std::size_t count)
     {
         // create a new id
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
 
         // ensure next_id doesn't overflow
         while (!lower_ || (lower_ + count) > upper_)
@@ -33,7 +25,7 @@ namespace hpx { namespace util
             std::size_t count_ = (std::max)(std::size_t(range_delta), count);
 
             {
-                scoped_unlock<mutex_type::scoped_lock> ul(l);
+                unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 lower = hpx::agas::get_next_id(count_);
             }
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //
@@ -16,6 +16,8 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/detail/thread_pool.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/spinlock.hpp>
@@ -26,28 +28,28 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <vector>
 #include <memory>
 #include <numeric>
 
-// TODO: add branch prediction and function heat
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a threadmanager class is the central instance of management for
+    /// The \a thread-manager class is the central instance of management for
     /// all (non-depleted) threads
-    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename SchedulingPolicy>
     class HPX_EXPORT threadmanager_impl : public threadmanager_base
     {
     private:
         // we use a simple mutex to protect the data members of the
-        // threadmanager for now
+        // thread manager for now
         typedef boost::mutex mutex_type;
 
     public:
         typedef SchedulingPolicy scheduling_policy_type;
-        typedef NotificationPolicy notification_policy_type;
+        typedef threads::policies::callback_notifier notification_policy_type;
 
 
         ///
@@ -134,87 +136,6 @@ namespace hpx { namespace threads
         ///               \a false.
         bool run(std::size_t num_threads = 1);
 
-        /// The get_interruption_enabled function is part of the thread related
-        /// API. It queries whether of one of the threads known can be
-        /// interrupted.
-        ///
-        /// \param id       [in] The thread id of the thread to query.
-        ///
-        /// \returns        This function returns whether the thread referenced
-        ///                 by the \a id parameter can be interrupted. If the
-        ///                 thread is not known to the thread-manager the return
-        ///                 value will be false.
-        bool get_interruption_enabled(thread_id_type const& id,
-            error_code& ec = throws);
-
-        /// The set_interruption_enabled function is part of the thread related
-        /// API. It sets whether of one of the threads known can be
-        /// interrupted.
-        ///
-        /// \param id       [in] The thread id of the thread to query.
-        bool set_interruption_enabled(thread_id_type const& id, bool enable,
-            error_code& ec = throws);
-
-        /// The get_interruption_requested function is part of the thread related
-        /// API. It queries whether of one of the threads known has been
-        /// interrupted.
-        ///
-        /// \param id       [in] The thread id of the thread to query.
-        ///
-        /// \returns        This function returns whether the thread referenced
-        ///                 by the \a id parameter has been interrupted. If the
-        ///                 thread is not known to the thread-manager the return
-        ///                 value will be false.
-        bool get_interruption_requested(thread_id_type const& id,
-            error_code& ec = throws);
-
-        /// The interrupt function is part of the thread related API. It
-        /// queries notifies one of the threads to abort at the next
-        /// interruption point.
-        ///
-        /// \param id       [in] The thread id of the thread to interrupt.
-        /// \param flag     [in] The flag encodes whether the thread should be
-        ///                 interrupted (if it is \a true), or 'uninterrupted'
-        ///                 (if it is \a false).
-        /// \param ec       [in,out] this represents the error status on exit,
-        ///                 if this is pre-initialized to \a hpx#throws
-        ///                 the function will throw on error instead.
-        void interrupt(thread_id_type const& id, bool flag, error_code& ec = throws);
-
-        /// Interrupt the current thread at this point if it was canceled. This
-        /// will throw a thread_interrupted exception, which will cancel the thread.
-        ///
-        /// \param id         [in] The thread id of the thread which should be
-        ///                   interrupted.
-        /// \param ec         [in,out] this represents the error status on exit,
-        ///                   if this is pre-initialized to \a hpx#throws
-        ///                   the function will throw on error instead.
-        void interruption_point(thread_id_type const& id, error_code& ec = throws);
-
-        /// The run_thread_exit_callbacks function is part of the thread related
-        /// API. It runs all exit functions for one of the threads.
-        ///
-        /// \param id       [in] The thread id of the thread to interrupt.
-        void run_thread_exit_callbacks(thread_id_type const& id,
-            error_code& ec = throws);
-
-        /// The add_thread_exit_callback function is part of the thread related
-        /// API. It adds a callback function to be executed at thread exit.
-        ///
-        /// \param id       [in] The thread id of the thread to interrupt.
-        ///
-        /// \returns        This function returns whether the function has been
-        ///                 added to the referenced thread
-        ///                 by the \a id parameter has been interrupted. If the
-        ///                 thread is not known to the thread-manager the return
-        ///                 value will be false.
-        bool add_thread_exit_callback(thread_id_type const& id,
-            util::function_nonser<void()> const& f, error_code& ec = throws);
-
-        ///
-        void free_thread_exit_callbacks(thread_id_type const& id,
-            error_code& ec = throws);
-
         /// \brief Forcefully stop the thread-manager
         ///
         /// \param blocking
@@ -224,14 +145,15 @@ namespace hpx { namespace threads
         /// \brief Return whether the thread manager is still running
         state status() const
         {
-            return state_.load();
+            return pool_.get_state();
         }
 
         /// \brief return the number of HPX-threads with the given state
         ///
         /// \note This function lock the internal OS lock in the thread manager
         boost::int64_t get_thread_count(thread_state_enum state = unknown,
-            thread_priority priority = thread_priority_default) const;
+            thread_priority priority = thread_priority_default,
+            std::size_t num_thread = std::size_t(-1), bool reset = false) const;
 
         // \brief Abort all threads which are in suspended state. This will set
         //        the state of all suspended threads to \a pending while
@@ -250,255 +172,54 @@ namespace hpx { namespace threads
         /// is running.
         std::size_t get_os_thread_count() const
         {
-            mutex_type::scoped_lock lk(mtx_);
-            return threads_.size();
+            boost::lock_guard<mutex_type> lk(mtx_);
+            return pool_.get_os_thread_count();
         }
 
-        boost::thread & get_os_thread_handle(std::size_t num_thread)
+        boost::thread& get_os_thread_handle(std::size_t num_thread)
         {
-            mutex_type::scoped_lock lk(mtx_);
-
-            HPX_ASSERT(num_thread < threads_.size());
-            return threads_[threads_.size() - num_thread - 1];
+            boost::lock_guard<mutex_type> lk(mtx_);
+            return pool_.get_os_thread_handle(num_thread);
         }
 
-        /// The set_state function is part of the thread related API and allows
-        /// to change the state of one of the threads managed by this
-        /// thread-manager.
-        ///
-        /// \param id       [in] The thread id of the thread the state should
-        ///                 be modified for.
-        /// \param newstate [in] The new state to be set for the thread
-        ///                 referenced by the \a id parameter.
-        /// \param newstate_ex [in] The new extended state to be set for the
-        ///                 thread referenced by the \a id parameter.
-        /// \param priority   [in] The priority with which the thread will be
-        ///                   executed if the parameter \a newstate is pending.
-        ///
-        /// \returns        This function returns the previous state of the
-        ///                 thread referenced by the \a id parameter. It will
-        ///                 return one of the values as defined by the
-        ///                 \a thread_state enumeration. If the
-        ///                 thread is not known to the thread-manager the return
-        ///                 value will be \a thread_state#unknown.
-        ///
-        /// \note           If the thread referenced by the parameter \a id
-        ///                 is in \a thread_state#active state this function
-        ///                 schedules a new thread which will set the state of
-        ///                 the thread as soon as its not active anymore. The
-        ///                 function returns \a thread_state#active in this case.
-        thread_state set_state(thread_id_type const& id, thread_state_enum newstate,
-            thread_state_ex_enum newstate_ex = wait_signaled,
-            thread_priority priority = thread_priority_default,
-            error_code& ec = throws);
-
-        /// The get_state function is part of the thread related API. It
-        /// queries the state of one of the threads known to the thread manager
-        ///
-        /// \param id       [in] The thread id of the thread the state should
-        ///                 be returned for.
-        ///
-        /// \returns        This function returns the current state of the
-        ///                 thread referenced by the \a id parameter. It will
-        ///                 return one of the values as defined by the
-        ///                 \a thread_state enumeration. If the
-        ///                 thread is not known to the thread manager the return
-        ///                 value will be \a thread_state#unknown.
-        thread_state get_state(thread_id_type const& id) const;
-
-        /// The get_phase function is part of the thread related API. It
-        /// queries the phase of one of the threads known to the thread manager
-        ///
-        /// \param id       [in] The thread id of the thread the phase should
-        ///                 be returned for.
-        ///
-        /// \returns        This function returns the current phase of the
-        ///                 thread referenced by the \a id parameter. If the
-        ///                 thread is not known to the thread manager the return
-        ///                 value will be ~0.
-        std::size_t get_phase(thread_id_type const& id) const;
-
-        /// The get_priority function is part of the thread related API. It
-        /// queries the priority of one of the threads known to the thread manager
-        ///
-        /// \param id       [in] The thread id of the thread the phase should
-        ///                 be returned for.
-        ///
-        /// \returns        This function returns the current priority of the
-        ///                 thread referenced by the \a id parameter. If the
-        ///                 thread is not known to the thread manager the return
-        ///                 value will be ~0.
-        thread_priority get_priority(thread_id_type const& id) const;
-
-        /// The get_stack_size function is part of the thread related API. It
-        /// queries the size of the stack allocated of one of the threads
-        /// known to the thread manager
-        ///
-        /// \param id       [in] The thread id of the thread the phase should
-        ///                 be returned for.
-        ///
-        /// \returns        This function returns the size of the stack
-        ///                 allocated for the thread referenced by the \a id
-        ///                 parameter. If thread is not known to the thread
-        ///                 manager the return value will be ~0.
-        std::ptrdiff_t get_stack_size(thread_id_type const& id) const;
-
-        /// Set a timer to set the state of the given \a thread to the given
-        /// new value after it expired (at the given time)
-        /// \brief  Set the thread state of the \a thread referenced by the
-        ///         thread_id \a id.
-        ///
-        /// Set a timer to set the state of the given \a thread to the given
-        /// new value after it expired (at the given time)
-        ///
-        /// \param id         [in] The thread id of the thread the state should
-        ///                   be modified for.
-        /// \param at_time
-        /// \param state      [in] The new state to be set for the thread
-        ///                   referenced by the \a id parameter.
-        /// \param newstate_ex [in] The new extended state to be set for the
-        ///                   thread referenced by the \a id parameter.
-        /// \param priority   [in] The priority with which the thread will be
-        ///                   executed if the parameter \a new_state is pending.
-        ///
-        /// \returns
-        thread_id_type set_state(
-            util::steady_time_point const& abs_time,
-            thread_id_type const& id, thread_state_enum newstate = pending,
-            thread_state_ex_enum newstate_ex = wait_timeout,
-            thread_priority priority = thread_priority_default,
-            error_code& ec = throws);
-
-        /// \brief  Set the thread state of the \a thread referenced by the
-        ///         thread_id \a id.
-        ///
-        /// Set a timer to set the state of the given \a thread to the given
-        /// new value after it expired (after the given duration)
-        ///
-        /// \param id         [in] The thread id of the thread the state should
-        ///                   be modified for.
-        /// \param after_duration
-        /// \param state      [in] The new state to be set for the thread
-        ///                   referenced by the \a id parameter.
-        /// \param newstate_ex [in] The new extended state to be set for the
-        ///                   thread referenced by the \a id parameter.
-        /// \param priority   [in] The priority with which the thread will be
-        ///                   executed if the parameter \a new_state is pending.
-        ///
-        /// \returns
-        thread_id_type set_state(
-            util::steady_duration const& rel_time,
-            thread_id_type const& id, thread_state_enum newstate = pending,
-            thread_state_ex_enum newstate_ex = wait_timeout,
-            thread_priority priority = thread_priority_default,
-            error_code& ec = throws)
-        {
-            return set_state(rel_time.from_now(), id, newstate, newstate_ex,
-                priority, ec);
-        }
-
-        /// The get_description function is part of the thread related API and
-        /// allows to query the description of one of the threads known to the
-        /// threadmanager
-        ///
-        /// \param id       [in] The thread id of the thread the description
-        ///                 should be returned for.
-        ///
-        /// \returns        This function returns the description of the
-        ///                 thread referenced by the \a id parameter. If the
-        ///                 thread is not known to the thread-manager the return
-        ///                 value will be the string "<unknown>".
-        char const* get_description(thread_id_type const& id) const;
-        char const* set_description(thread_id_type const& id, char const* desc = 0);
-
-        char const* get_lco_description(thread_id_type const& id) const;
-        char const* set_lco_description(thread_id_type const& id, char const* desc = 0);
-
-        /// The function get_thread_backtrace is part of the thread related API
-        /// allows to query the currently stored thread back trace (which is
-        /// captured during thread suspension).
-        ///
-        /// \param id         [in] The thread id of the thread being queried.
-        /// \param ec         [in,out] this represents the error status on exit,
-        ///                   if this is pre-initialized to \a hpx#throws
-        ///                   the function will throw on error instead.
-        ///
-        /// \returns          This function returns the currently captured stack
-        ///                   back trace of the thread referenced by the \a id
-        ///                   parameter. If the thread is not known to the
-        ///                   thread-manager the return value will be the zero.
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
-        char const* get_backtrace(thread_id_type const& id) const;
-        char const* set_backtrace(thread_id_type const& id, char const* bt = 0);
-#else
-        util::backtrace const* get_backtrace(thread_id_type const& id) const;
-        util::backtrace const* set_backtrace(thread_id_type const& id, util::backtrace const* bt = 0);
-#endif
-
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
-        /// The get_thread_data function is part of the thread related
-        /// API. It queries the currently stored thread specific data pointer.
-        ///
-        /// \param id       [in] The thread id of the thread to query.
-        ///
-        /// \returns        This function returns the thread specific data
-        ///                 pointer or zero if none is set.
-        std::size_t get_thread_data(thread_id_type const& id,
-            error_code& ec = throws) const;
-
-        /// The set_thread_data function is part of the thread related
-        /// API. It sets the currently stored thread specific data pointer.
-        ///
-        /// \param id       [in] The thread id of the thread to query.
-        /// \param data     [in] The thread specific data pointer to set for
-        ///                 the given thread.
-        ///
-        /// \returns        This function returns the previously set thread
-        ///                 specific data pointer or zero if none was set.
-        std::size_t set_thread_data(thread_id_type const& id,
-            std::size_t data, error_code& ec = throws);
-#endif
-
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_idle_rate(bool reset);
         boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 #endif
-#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         boost::int64_t avg_creation_idle_rate(bool reset);
         boost::int64_t avg_cleanup_idle_rate(bool reset);
 #endif
-
-    protected:
-        // this is the thread function executing the work items in the queue
-        void tfunc(std::size_t num_thread, topology const& topology_);
-        void tfunc_impl(std::size_t num_thread);
-
-        void idle_callback(std::size_t num_thread);
 
     public:
         /// this notifies the thread manager that there is some more work
         /// available
         void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
-            scheduler_.do_some_work(num_thread);
+            pool_.do_some_work(num_thread);
         }
 
         /// API functions forwarding to notification policy
         void report_error(std::size_t num_thread, boost::exception_ptr const& e)
         {
-            state_.store(terminating);
-            notifier_.on_error(num_thread, e);
-            scheduler_.on_error(num_thread, e);
+            pool_.report_error(num_thread, e);
         }
 
-#ifdef HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
+        std::size_t get_worker_thread_num(bool* numa_sensitive = 0)
+        {
+            if (get_self_ptr() == 0)
+                return std::size_t(-1);
+            return pool_.get_worker_thread_num();
+        }
+
+#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
         boost::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_executed_thread_phases(
             std::size_t num = std::size_t(-1), bool reset = false);
 
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
         boost::int64_t get_thread_phase_duration(
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_thread_duration(
@@ -506,6 +227,10 @@ namespace hpx { namespace threads
         boost::int64_t get_thread_phase_overhead(
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_thread_overhead(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        boost::int64_t get_cumulative_thread_duration(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        boost::int64_t get_cumulative_thread_overhead(
             std::size_t num = std::size_t(-1), bool reset = false);
 #endif
 #endif
@@ -534,25 +259,33 @@ namespace hpx { namespace threads
         /// is allowed to run on
         std::size_t get_pu_num(std::size_t num_thread) const
         {
-            return scheduler_.get_pu_num(num_thread);
+            return pool_.get_pu_num(num_thread);
         }
 
         /// Return the mask for processing units the given thread is allowed
         /// to run on.
-        mask_cref_type get_pu_mask(topology const& topology, std::size_t num_thread) const
+        mask_cref_type get_pu_mask(topology const& topology,
+            std::size_t num_thread) const
         {
-            return scheduler_.get_pu_mask(topology, num_thread);
+            return pool_.get_pu_mask(topology, num_thread);
         }
 
         // Returns the mask identifying all processing units used by this
         // thread manager.
         mask_cref_type get_used_processing_units() const
         {
-            return used_processing_units_;
+            return pool_.get_used_processing_units();
         }
 
-        // Return the executor associated with the given thread
-        executor get_executor(thread_id_type const& id, error_code& ec) const;
+        void set_scheduler_mode(threads::policies::scheduler_mode mode)
+        {
+            pool_.set_scheduler_mode(mode);
+        }
+
+        void reset_thread_distribution()
+        {
+            pool_.reset_thread_distribution();
+        }
 
     private:
         // counter creator functions
@@ -560,11 +293,11 @@ namespace hpx { namespace threads
             performance_counters::counter_info const& info, error_code& ec);
         naming::gid_type thread_counts_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-#ifdef HPX_THREAD_MAINTAIN_IDLE_RATES
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
         naming::gid_type idle_rate_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 #endif
-#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         naming::gid_type thread_wait_time_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
         naming::gid_type task_wait_time_counter_creator(
@@ -572,38 +305,17 @@ namespace hpx { namespace threads
 #endif
 
     private:
-        /// this thread manager has exactly as much threads as requested
-        mutable mutex_type mtx_;                    ///< mutex protecting the members
-        boost::barrier* startup_;                   ///< startup synchronization
+        mutable mutex_type mtx_;   // mutex protecting the members
 
         std::size_t num_threads_;
-        boost::ptr_vector<boost::thread> threads_;
-
-        // count number of executed HPX-threads and thread phases (invocations)
-        std::vector<boost::int64_t> executed_threads_;
-        std::vector<boost::int64_t> executed_thread_phases_;
-        boost::atomic<long> thread_count_;
-
-#if defined(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS) && defined(HPX_THREAD_MAINTAIN_IDLE_RATES)
-        double timestamp_scale_;            ///< scale timestamps to nanoseconds
-#endif
-
-        boost::atomic<hpx::state> state_;   ///< thread manager state
-        util::io_service_pool& timer_pool_; ///< used for timed set_state
+        util::io_service_pool& timer_pool_;     // used for timed set_state
 
         util::block_profiler<register_thread_tag> thread_logger_;
         util::block_profiler<register_work_tag> work_logger_;
         util::block_profiler<set_state_tag> set_state_logger_;
 
-        scheduling_policy_type& scheduler_;
+        detail::thread_pool<scheduling_policy_type> pool_;
         notification_policy_type& notifier_;
-
-        // tfunc_impl timers
-        std::vector<boost::uint64_t> exec_times, tfunc_times;
-
-        // Stores the mask identifying all processing units used by this
-        // thread manager.
-        threads::mask_type used_processing_units_;
     };
 }}
 

@@ -16,8 +16,6 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/config/compiler_specific.hpp>
 
-#include <boost/foreach.hpp>
-
 #include <tests/regressions/actions/components/movable_objects.hpp>
 
 using boost::program_options::variables_map;
@@ -46,19 +44,16 @@ std::size_t pass_movable_object(movable_object const& obj)
 }
 
 // 'normal' actions (execution is scheduled on a new thread)
-HPX_PLAIN_ACTION(pass_movable_object, pass_movable_object_action)
-HPX_PLAIN_ACTION(pass_movable_object_void, pass_movable_object_void_action)
+HPX_PLAIN_ACTION(pass_movable_object,
+    pass_movable_object_action)
+HPX_PLAIN_ACTION(pass_movable_object_void,
+    pass_movable_object_void_action)
 
 // direct actions (execution happens in the calling thread)
-typedef direct_action<
-    void (*)(movable_object const&), pass_movable_object_void
-> pass_movable_object_void_direct_action;
-typedef direct_action<
-    std::size_t (*)(movable_object const&), pass_movable_object
-> pass_movable_object_direct_action;
-
-HPX_REGISTER_PLAIN_ACTION(pass_movable_object_void_direct_action)
-HPX_REGISTER_PLAIN_ACTION(pass_movable_object_direct_action)
+HPX_PLAIN_DIRECT_ACTION(pass_movable_object,
+    pass_movable_object_direct_action)
+HPX_PLAIN_DIRECT_ACTION(pass_movable_object_void,
+    pass_movable_object_void_direct_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void pass_movable_object_value_void(movable_object) {}
@@ -68,19 +63,16 @@ std::size_t pass_movable_object_value(movable_object obj)
 }
 
 // 'normal' actions (execution is scheduled on a new thread)
-HPX_PLAIN_ACTION(pass_movable_object_value, pass_movable_object_value_action)
-HPX_PLAIN_ACTION(pass_movable_object_value_void, pass_movable_object_value_void_action)
+HPX_PLAIN_ACTION(pass_movable_object_value,
+    pass_movable_object_value_action)
+HPX_PLAIN_ACTION(pass_movable_object_value_void,
+    pass_movable_object_value_void_action)
 
 // direct actions (execution happens in the calling thread)
-typedef direct_action<
-    void (*)(movable_object), pass_movable_object_value_void
-> pass_movable_object_value_void_direct_action;
-typedef direct_action<
-    std::size_t (*)(movable_object), pass_movable_object_value
-> pass_movable_object_value_direct_action;
-
-HPX_REGISTER_PLAIN_ACTION(pass_movable_object_value_void_direct_action)
-HPX_REGISTER_PLAIN_ACTION(pass_movable_object_value_direct_action)
+HPX_PLAIN_DIRECT_ACTION(pass_movable_object_value,
+    pass_movable_object_value_direct_action)
+HPX_PLAIN_DIRECT_ACTION(pass_movable_object_value_void,
+    pass_movable_object_value_void_direct_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void pass_non_movable_object_void(non_movable_object const&) {}
@@ -90,26 +82,15 @@ std::size_t pass_non_movable_object(non_movable_object const& obj)
 }
 
 // 'normal' actions (execution is scheduled on a new thread)
-typedef action<
-    void (*)(non_movable_object const&), pass_non_movable_object_void
-> pass_non_movable_object_void_action;
-typedef action<
-    std::size_t (*)(non_movable_object const&), pass_non_movable_object
-> pass_non_movable_object_action;
-
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_action)
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_action)
+HPX_PLAIN_ACTION(pass_non_movable_object_void,
+    pass_non_movable_object_void_action)
+HPX_PLAIN_ACTION(pass_non_movable_object, pass_non_movable_object_action)
 
 // direct actions (execution happens in the calling thread)
-typedef direct_action<
-    void (*)(non_movable_object const&), pass_non_movable_object_void
-> pass_non_movable_object_void_direct_action;
-typedef direct_action<
-    std::size_t (*)(non_movable_object const&), pass_non_movable_object
-> pass_non_movable_object_direct_action;
-
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_direct_action)
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_direct_action)
+HPX_PLAIN_DIRECT_ACTION(pass_non_movable_object_void,
+    pass_non_movable_object_void_direct_action)
+HPX_PLAIN_DIRECT_ACTION(pass_non_movable_object,
+    pass_non_movable_object_direct_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void pass_non_movable_object_value_void(non_movable_object) {}
@@ -119,27 +100,15 @@ std::size_t pass_non_movable_object_value(non_movable_object obj)
 }
 
 // 'normal' actions (execution is scheduled on a new thread)
-typedef action<
-    void (*)(non_movable_object), pass_non_movable_object_value_void
-> pass_non_movable_object_value_void_action;
-typedef action<
-    std::size_t (*)(non_movable_object), pass_non_movable_object_value
-> pass_non_movable_object_value_action;
-
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_value_void_action)
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_value_action)
+HPX_PLAIN_ACTION(pass_non_movable_object_value_void,
+    pass_non_movable_object_value_void_action)
+HPX_PLAIN_ACTION(pass_non_movable_object_value, pass_non_movable_object_value_action)
 
 // direct actions (execution happens in the calling thread)
-typedef direct_action<
-    void (*)(non_movable_object), pass_non_movable_object_value_void
-> pass_non_movable_object_value_void_direct_action;
-typedef direct_action<
-    std::size_t (*)(non_movable_object), pass_non_movable_object_value
-> pass_non_movable_object_value_direct_action;
-
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_value_void_direct_action)
-HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_value_direct_action)
-
+HPX_PLAIN_DIRECT_ACTION(pass_non_movable_object_value_void,
+    pass_non_movable_object_value_void_direct_action)
+HPX_PLAIN_DIRECT_ACTION(pass_non_movable_object_value,
+    pass_non_movable_object_value_direct_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 non_movable_object return_non_movable_object()
@@ -152,28 +121,16 @@ movable_object return_movable_object()
 }
 
 // 'normal' actions (execution is scheduled on a new thread)
-typedef action<
-    movable_object (*)(), return_movable_object
-> return_movable_object_action;
-
-typedef action<
-    non_movable_object (*)(), return_non_movable_object
-> return_non_movable_object_action;
-
-HPX_REGISTER_PLAIN_ACTION(return_movable_object_action)
-HPX_REGISTER_PLAIN_ACTION(return_non_movable_object_action)
+HPX_PLAIN_ACTION(return_movable_object,
+    return_movable_object_action)
+HPX_PLAIN_ACTION(return_non_movable_object,
+    return_non_movable_object_action)
 
 // direct actions (execution happens in the calling thread)
-typedef direct_action<
-    movable_object (*)(), return_movable_object
-> return_movable_object_direct_action;
-
-typedef direct_action<
-    non_movable_object (*)(), return_non_movable_object
-> return_non_movable_object_direct_action;
-
-HPX_REGISTER_PLAIN_ACTION(return_movable_object_direct_action)
-HPX_REGISTER_PLAIN_ACTION(return_non_movable_object_direct_action)
+HPX_PLAIN_DIRECT_ACTION(return_movable_object,
+    return_movable_object_direct_action)
+HPX_PLAIN_DIRECT_ACTION(return_non_movable_object,
+    return_non_movable_object_direct_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename Object>
@@ -197,7 +154,7 @@ template <typename Action, typename Object>
 std::size_t move_object_void()
 {
     Object obj;
-    async<Action>(find_here(), boost::move(obj)).get();
+    async<Action>(find_here(), std::move(obj)).get();
 
     return obj.get_count();
 }
@@ -206,7 +163,7 @@ template <typename Action, typename Object>
 std::size_t move_object(id_type id)
 {
     Object obj;
-    return async<Action>(id, boost::move(obj)).get();
+    return async<Action>(id, std::move(obj)).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -358,7 +315,7 @@ void test_object_actions()
 {
     std::vector<id_type> localities = hpx::find_all_localities();
 
-    BOOST_FOREACH(id_type id, localities)
+    for (id_type const& id : localities)
     {
         bool is_local = id == find_here();
 
@@ -466,7 +423,7 @@ void test_object_actions()
                 return_object<
                     return_non_movable_object_action, non_movable_object
                 >(id)
-            ), 1u, 5u); // ?call + value_or_error(w) + ?return
+            ), 1u, 5u); // ?call + set_value + ?return
         } else {
             //FIXME: bumped number for intel compiler
             HPX_TEST_RANGE((
@@ -474,7 +431,7 @@ void test_object_actions()
                     return_non_movable_object_action, non_movable_object
                 >(id)
             ), 4u, 8u); // transfer_action + bind + function + ?call +
-                    // value_or_error(w) + ?return
+                    // set_value + ?return
         }
     }
 }
@@ -484,7 +441,7 @@ void test_object_direct_actions()
 {
     std::vector<id_type> localities = hpx::find_all_localities();
 
-    BOOST_FOREACH(id_type id, localities)
+    for (id_type const& id : localities)
     {
         bool is_local = id == find_here();
 
@@ -512,19 +469,23 @@ void test_object_direct_actions()
         if (is_local)
         {
             HPX_TEST_EQ((
-                pass_object<pass_non_movable_object_direct_action, non_movable_object>(id)
+                pass_object<pass_non_movable_object_direct_action,
+                non_movable_object>(id)
             ), 0u);
 
             HPX_TEST_EQ((
-                move_object<pass_non_movable_object_direct_action, non_movable_object>(id)
+                move_object<pass_non_movable_object_direct_action,
+                non_movable_object>(id)
             ), 0u);
         } else {
             HPX_TEST_EQ((
-                pass_object<pass_non_movable_object_direct_action, non_movable_object>(id)
+                pass_object<pass_non_movable_object_direct_action,
+                non_movable_object>(id)
             ), 3u); // transfer_action + bind + function
 
             HPX_TEST_EQ((
-                move_object<pass_non_movable_object_direct_action, non_movable_object>(id)
+                move_object<pass_non_movable_object_direct_action,
+                non_movable_object>(id)
             ), 3u); // transfer_action + bind + function
         }
 
@@ -552,19 +513,23 @@ void test_object_direct_actions()
         if (is_local)
         {
             HPX_TEST_EQ((
-                pass_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
+                pass_object<pass_non_movable_object_value_direct_action,
+                non_movable_object>(id)
             ), 1u); // call
 
             HPX_TEST_EQ((
-                move_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
+                move_object<pass_non_movable_object_value_direct_action,
+                non_movable_object>(id)
             ), 1u); // call
         } else {
             HPX_TEST_EQ((
-                pass_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
+                pass_object<pass_non_movable_object_value_direct_action,
+                non_movable_object>(id)
             ), 4u); // transfer_action + bind + function + call
 
             HPX_TEST_EQ((
-                move_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
+                move_object<pass_non_movable_object_value_direct_action,
+                non_movable_object>(id)
             ), 4u); // transfer_action + bind + function + call
         }
 
@@ -591,7 +556,7 @@ void test_object_direct_actions()
                 return_object<
                     return_non_movable_object_direct_action, non_movable_object
                 >(id)
-            ), 1u, 3u); // ?call + value_or_error(w) + ?return
+            ), 1u, 3u); // ?call + set_value + ?return
         } else {
             //FIXME: bumped number for intel compiler
             HPX_TEST_RANGE((
@@ -599,7 +564,7 @@ void test_object_direct_actions()
                     return_non_movable_object_direct_action, non_movable_object
                 >(id)
             ), 4u, 8u); // transfer_action + bind + function + ?call +
-                    // value_or_error(w) + ?return
+                    // set_value + ?return
         }
     }
 }

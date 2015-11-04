@@ -7,9 +7,9 @@
 #define HPX_PARTITION_AUG_04_2011_1204PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
 
 #include "../dimension.hpp"
 
@@ -17,10 +17,10 @@ namespace interpolate1d { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT partition
-      : public hpx::components::simple_component_base<partition>
+      : public hpx::components::component_base<partition>
     {
     private:
-        typedef hpx::components::simple_component_base<partition> base_type;
+        typedef hpx::components::component_base<partition> base_type;
 
     public:
         partition();

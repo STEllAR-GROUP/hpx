@@ -36,11 +36,12 @@ namespace hpx { namespace util
 
     inline boost::filesystem::path create_path(std::string const& p)
     {
-        char back = p[p.length()-1];
+        char back = p.empty() ? 0 : p[p.length()-1];
 #if BOOST_FILESYSTEM_VERSION >= 3
         return boost::filesystem::path(back == ':' ? p.substr(0, p.size()-1) : p);
 #else
-        return boost::filesystem::path(back == ':' ? p.substr(0, p.size()-1) : p, boost::filesystem::native);
+        return boost::filesystem::path(back == ':' ? p.substr(0, p.size()-1)
+            : p, boost::filesystem::native);
 #endif
     }
 

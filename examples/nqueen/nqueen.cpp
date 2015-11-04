@@ -7,23 +7,16 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-
 #include "server/nqueen.hpp"
 
 HPX_REGISTER_COMPONENT_MODULE();
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
         nqueen::server::board
         > board_type;
 
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(board_type, board);
+HPX_REGISTER_COMPONENT(board_type, board);
 
 // Serialization support for the board actions
 

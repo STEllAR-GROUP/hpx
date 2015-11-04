@@ -1,3 +1,8 @@
+# Copyright (c) 2015 Hartmut Kaiser
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 Namespce Threads
 
 API Component:		Comments:
@@ -16,7 +21,7 @@ namespace hpx::threads
         static threads::thread* allocate_clone(threads::thread const&)
         static void deallocate_clone(threads::thread const *)
 
-    class thread : public components::managed_component<detail::thread,thread>
+    class thread : public components::component<detail::thread,thread>
         thread()
         thread(thread_init_data const&,thread_pool&,thread_state_enum)
         thread(BOOST_RV_REF(thread_init_data),thread_pool&,thread_state_enum)
@@ -51,7 +56,8 @@ namespace hpx::threads
         // advanced?
         thread_state set_state(thread_state_enum)
 
-        bool set_state_tagged(thread_state_enum,thread_state& prevstate,thread_state& newstate)
+        bool set_state_tagged(thread_state_enum,thread_state& prevstate,
+            thread_state& newstate)
         bool restore_state(thread_state_enum newval,thread_state oldval)
 
         thread_state_ex get_state_ex() const

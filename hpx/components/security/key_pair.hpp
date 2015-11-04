@@ -6,7 +6,9 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_KEY_PAIR_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_KEY_PAIR_HPP
 
-#include <boost/serialization/serialization.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
 
 #include "public_key.hpp"
 #include "secret_key.hpp"
@@ -62,5 +64,7 @@ namespace hpx { namespace components { namespace security
 #  pragma pack(pop)
 #endif
 }}}
+
+#endif
 
 #endif

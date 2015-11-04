@@ -16,7 +16,7 @@ namespace hpx { namespace components { namespace security { namespace server
         capability capability(
             traits::capability<>::root_certificate_authority_capability);
 
-        naming::gid_type gid = get_gid().get_gid();
+        naming::gid_type gid = get_id().get_gid();
         certificate_ = key_pair_.sign(certificate(
             gid, gid, key_pair_.get_public_key(), capability));
 
@@ -32,7 +32,7 @@ namespace hpx { namespace components { namespace security { namespace server
         capability capability(
             traits::capability<>::root_certificate_authority_capability);
 
-        naming::gid_type gid = get_gid().get_gid();
+        naming::gid_type gid = get_id().get_gid();
         certificate_ = key_pair_.sign(certificate(
             gid, gid, key_pair_.get_public_key(), capability));
 
@@ -67,7 +67,8 @@ namespace hpx { namespace components { namespace security { namespace server
                 hpx::security_error
               , "subordinate_certificate_authority::sign_certificate_signing_request"
               , boost::str(boost::format(
-                    "The certificate signing request its capabilities can't be delegated: %1% %2%") %
+                    "The certificate signing request its capabilities can't be\
+                     delegated: %1% %2%") %
                     issuer_capability % csr.get_capability())
             )
         }
@@ -75,7 +76,7 @@ namespace hpx { namespace components { namespace security { namespace server
         signed_type<certificate> signed_certificate;
 
         signed_certificate = key_pair_.sign(certificate(
-            get_gid().get_gid(), csr));
+            get_id().get_gid(), csr));
 
         return signed_certificate;
     }

@@ -12,8 +12,8 @@
 
 using hpx::components::stub_base;
 using hpx::components::client_base;
-using hpx::components::managed_component;
-using hpx::components::managed_component_base;
+using hpx::components::component;
+using hpx::components::component_base;
 
 using hpx::id_type;
 using hpx::find_here;
@@ -22,7 +22,7 @@ using hpx::async;
 using hpx::cout;
 using hpx::flush;
 
-struct message_server : managed_component_base<message_server>
+struct message_server : component_base<message_server>
 {
     std::string msg;
 
@@ -35,8 +35,8 @@ struct message_server : managed_component_base<message_server>
     HPX_DEFINE_COMPONENT_ACTION(message_server, print, print_action);
 };
 
-typedef managed_component<message_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, message_server);
+typedef component<message_server> server_type;
+HPX_REGISTER_COMPONENT(server_type, message_server);
 
 typedef message_server::print_action print_action;
 HPX_REGISTER_ACTION_DECLARATION(print_action);
@@ -48,7 +48,7 @@ struct message : client_base<message, message_server>
 
     message(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
 
-    void print() { async<print_action>(this->get_gid()).get(); }
+    void print() { async<print_action>(this->get_id()).get(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////

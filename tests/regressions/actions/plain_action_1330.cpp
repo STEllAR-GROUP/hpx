@@ -18,7 +18,7 @@ namespace mynamespace
     HPX_DEFINE_PLAIN_ACTION(test, test_action);
 }
 
-HPX_REGISTER_PLAIN_ACTION(mynamespace::test_action, mynamespace_test_action);
+HPX_REGISTER_ACTION(mynamespace::test_action, mynamespace_test_action);
 
 // hpx_main, is the actual main called by hpx
 int hpx_main(int argc, char* argv[])

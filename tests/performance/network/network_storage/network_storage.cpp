@@ -11,12 +11,15 @@
 #include <boost/atomic.hpp>
 #include <boost/array.hpp>
 #include <boost/random.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <algorithm>
 #include <iostream>
 #include <vector>
 #include <memory>
 #include <cstdio>
+
+#include <hpx/runtime/serialization/serialize.hpp>
 
 //
 // This is a test program which reads and writes chunks of memory to storage
@@ -201,7 +204,7 @@ public:
 
 private:
   // serialization support
-  friend class boost::serialization::access;
+  friend class hpx::serialization::access;
 
   template <typename Archive>
   void load(Archive& ar, unsigned int const version)
@@ -218,7 +221,7 @@ private:
     ar << size_ << t;
   }
 
-  BOOST_SERIALIZATION_SPLIT_MEMBER()
+  HPX_SERIALIZATION_SPLIT_MEMBER()
 
 private:
   pointer pointer_;
@@ -229,14 +232,15 @@ private:
 // A simple Buffer for sending data, it does not need any special allocator
 // user data may be sent to another locality using zero copy by wrapping
 // it in one of these buffers
-typedef hpx::util::serialize_buffer<char> general_buffer_type;
+typedef hpx::serialization::serialize_buffer<char> general_buffer_type;
 
 
 // When receiving data, we receive a hpx::serialize_buffer, we try to minimize
 // copying of data by providing a receive buffer with a fixed data pointer
 // so that data is placed directly into it.
 typedef pointer_allocator<char>                             PointerAllocator;
-typedef hpx::util::serialize_buffer<char, PointerAllocator> transfer_buffer_type;
+typedef hpx::serialization::serialize_buffer<char,
+    PointerAllocator> transfer_buffer_type;
 
 //----------------------------------------------------------------------------
 //
@@ -271,13 +275,16 @@ namespace Storage {
     {
         // we must allocate a temporary buffer to copy from storage into
         // we can't use the remote buffer supplied because it is a handle to memory on
-        // the (possibly) remote node. We allocate here using a NULL deleter so the array will
+        // the (possibly) remote node. We allocate here using
+        // a NULL deleter so the array will
         // not be released by the shared_pointer
         std::allocator<char> local_allocator;
-        boost::shared_array<char> local_buffer(local_allocator.allocate(length), [](char*){});
+        boost::shared_array<char> local_buffer(local_allocator.allocate(length),
+            [](char*){});
 
         // allow the storage class to asynchronously copy the data into buffer
-        hpx::future<int> fut = copy_from_local_storage(local_buffer.get(), address, length);
+        hpx::future<int> fut = copy_from_local_storage(local_buffer.get(),
+            address, length);
 
         // wrap the remote buffer pointer in an allocator for return
         pointer_allocator<char> return_allocator(
@@ -304,16 +311,16 @@ namespace Storage {
 //----------------------------------------------------------------------------
 // normally these are in a header
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyToStorage, CopyToStorage_action);
-HPX_REGISTER_PLAIN_ACTION_DECLARATION(CopyToStorage_action);
+HPX_REGISTER_ACTION_DECLARATION(CopyToStorage_action);
 //HPX_ACTION_INVOKE_NO_MORE_THAN(CopyToStorage_action, 5);
 
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
-HPX_REGISTER_PLAIN_ACTION_DECLARATION(CopyFromStorage_action);
+HPX_REGISTER_ACTION_DECLARATION(CopyFromStorage_action);
 HPX_ACTION_INVOKE_NO_MORE_THAN(CopyFromStorage_action, 5);
 
 // and these in a cpp
-HPX_REGISTER_PLAIN_ACTION(CopyToStorage_action);
-HPX_REGISTER_PLAIN_ACTION(CopyFromStorage_action);
+HPX_REGISTER_ACTION(CopyToStorage_action);
+HPX_REGISTER_ACTION(CopyFromStorage_action);
 
 //----------------------------------------------------------------------------
 #ifdef USE_CLEANING_THREAD
@@ -327,7 +334,7 @@ int RemoveCompletions()
     while(FuturesActive)
     {
         {
-            hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
+            boost::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
             for(std::vector<hpx::future<int> > &futvec : ActiveFutures) {
                 for(std::vector<hpx::future<int> >::iterator fut = futvec.begin();
                     fut != futvec.end(); /**/)
@@ -373,7 +380,7 @@ hpx::lcos::barrier create_barrier(std::size_t num_localities, char const* symnam
     );
 
     hpx::lcos::barrier b = hpx::lcos::barrier::create(hpx::find_here(), num_localities);
-    hpx::agas::register_name_sync(symname, b.get_gid());
+    hpx::agas::register_name_sync(symname, b.get_id());
     return b;
 }
 
@@ -437,9 +444,11 @@ void test_write(
             hpx::id_type locality = hpx::naming::get_id_from_locality_id(send_rank);
             // pick a random slot to write our data into
             int memory_slot = random_slot(gen);
-            uint32_t memory_offset = static_cast<uint32_t>(memory_slot*options.transfer_size_B);
+            uint32_t memory_offset = static_cast<uint32_t>
+                (memory_slot*options.transfer_size_B);
             DEBUG_OUTPUT(5,
-                std::cout << "Rank " << rank << " sending block " << i << " to rank " << send_rank << std::endl;
+                std::cout << "Rank " << rank << " sending block "
+                << i << " to rank " << send_rank << std::endl;
             );
 
             // Execute a PUT on whatever locality we chose
@@ -448,11 +457,12 @@ void test_write(
             // background thread removing completed futures doesn't collide
             {
                 DEBUG_OUTPUT(5,
-                    std::cout << "Put from rank " << rank << " on rank " << send_rank << std::endl;
+                    std::cout << "Put from rank " << rank << " on rank "
+                    << send_rank << std::endl;
                 );
 #ifdef USE_CLEANING_THREAD
                 ++FuturesWaiting[send_rank];
-                hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
+                boost::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
 #endif
                 ActiveFutures[send_rank].push_back(
                     hpx::async(actWrite, locality,
@@ -479,7 +489,8 @@ void test_write(
         // wait for cleanup thread to terminate before we reduce any remaining futures
         removed = cleaner.get();
         DEBUG_OUTPUT(2,
-            std::cout << "Cleaning thread rank " << rank << " removed " << removed << std::endl;
+            std::cout << "Cleaning thread rank " << rank << " removed "
+            << removed << std::endl;
         );
 #endif
         //
@@ -500,13 +511,15 @@ void test_write(
         result.get();
         int total = numwait+removed;
         DEBUG_OUTPUT(3,
-            std::cout << "Future timer, rank " << rank << " waiting on " << numwait << " total " << total << " "
+            std::cout << "Future timer, rank " << rank
+            << " waiting on " << numwait << " total " << total << " "
             << futuretimer.elapsed() << " Move time " << movetime << std::endl;
         );
     }
     barrier_wait();
     //
-    double writeMB   = static_cast<double>(nranks*options.local_storage_MB*options.iterations);
+    double writeMB   = static_cast<double>
+        (nranks*options.local_storage_MB*options.iterations);
     double writeTime = timerWrite.elapsed();
     double writeBW   = writeMB / writeTime;
     double IOPS      = static_cast<double>(options.iterations*num_transfer_slots);
@@ -518,8 +531,11 @@ void test_write(
         std::cout << "IOPs/s             : " << IOPs_s    << "\n";
         std::cout << "Aggregate BW Write : " << writeBW   << "MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
-        char const* msg = "CSVData, write, network, %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, BW(MB/s), %7%, ";
-        std::cout << (boost::format(msg) % options.network % nranks % options.threads % writeMB % options.transfer_size_B
+        char const* msg = "CSVData, write, network, \
+            %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, \
+            IOPS/s, %6%, BW(MB/s), %7%, ";
+        std::cout << (boost::format(msg) % options.network
+            % nranks % options.threads % writeMB % options.transfer_size_B
           % IOPs_s % writeBW ) << std::endl;
     }
 }
@@ -602,7 +618,8 @@ void test_read(
 
             // pick a random slot to write our data into
             int memory_slot = random_slot(gen);
-            uint32_t memory_offset = static_cast<uint32_t>(memory_slot*options.transfer_size_B);
+            uint32_t memory_offset =
+                static_cast<uint32_t>(memory_slot*options.transfer_size_B);
 
 
             // create a transfer buffer object to receive the data being returned to us
@@ -617,14 +634,16 @@ void test_read(
             {
 #ifdef USE_CLEANING_THREAD
                 ++FuturesWaiting[send_rank];
-                hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
+                boost::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
 #endif
                 using hpx::util::placeholders::_1;
-                std::size_t buffer_address = reinterpret_cast<std::size_t>(general_buffer.data());
+                std::size_t buffer_address =
+                    reinterpret_cast<std::size_t>(general_buffer.data());
                 //
                 ActiveFutures[send_rank].push_back(
                     hpx::async(
-                        actRead, locality, memory_offset, options.transfer_size_B, buffer_address
+                        actRead, locality, memory_offset,
+                        options.transfer_size_B, buffer_address
                     ).then(
                         hpx::launch::sync,
                         hpx::util::bind(&transfer_data, general_buffer, _1)
@@ -649,7 +668,8 @@ void test_read(
         // futures
         int removed = cleaner.get();
         DEBUG_OUTPUT(2,
-            std::cout << "Cleaning thread rank " << rank << " removed " << removed << std::endl;
+            std::cout << "Cleaning thread rank " << rank << " removed "
+            << removed << std::endl;
         );
 #endif
         //
@@ -670,13 +690,15 @@ void test_read(
         result.get();
         int total = numwait+removed;
         DEBUG_OUTPUT(3,
-            std::cout << "Future timer, rank " << rank << " waiting on " << numwait << " total " << total << " "
+            std::cout << "Future timer, rank " << rank << " waiting on "
+            << numwait << " total " << total << " "
             << futuretimer.elapsed() << " Move time " << movetime << std::endl;
         );
     }
     barrier_wait();
     //
-    double readMB = static_cast<double>(nranks*options.local_storage_MB*options.iterations);
+    double readMB = static_cast<double>
+        (nranks*options.local_storage_MB*options.iterations);
     double readTime = timerRead.elapsed();
     double readBW = readMB / readTime;
     double IOPS      = static_cast<double>(options.iterations*num_transfer_slots);
@@ -688,8 +710,11 @@ void test_read(
         std::cout << "IOPs/s             : " << IOPs_s    << "\n";
         std::cout << "Aggregate BW Read  : " << readBW << "MB/s" << std::endl;
         // a complete set of results that our python matplotlib script will ingest
-        char const* msg = "CSVData, read, network, %1%, ranks, %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, BW(MB/s), %7%, ";
-        std::cout << (boost::format(msg) % options.network % nranks % options.threads % readMB % options.transfer_size_B
+        char const* msg = "CSVData, read, network, %1%, ranks, \
+          %2%, threads, %3%, Memory, %4%, IOPsize, %5%, IOPS/s, %6%, \
+            BW(MB/s), %7%, ";
+        std::cout << (boost::format(msg) % options.network % nranks
+            % options.threads % readMB % options.transfer_size_B
           % IOPs_s % readBW ) << std::endl;
     }
 }
@@ -736,12 +761,15 @@ int hpx_main(boost::program_options::variables_map& vm)
     //
     if (nranks>MAX_RANKS) {
       std::cerr << "This test can only be run using " << MAX_RANKS
-        << " nodes, please recompile this test with the MAX_RANKS set to a higher number " << std::endl;
+        << " nodes, please recompile this test with the \
+              MAX_RANKS set to a higher number " << std::endl;
       return 1;
     }
 
-    char const* msg = "hello world from OS-thread %1% on locality %2% rank %3% hostname %4%";
-    std::cout << (boost::format(msg) % current % hpx::get_locality_id() % rank % name.c_str()) << std::endl;
+    char const* msg = "hello world from OS-thread %1% on locality \
+                        %2% rank %3% hostname %4%";
+    std::cout << (boost::format(msg) % current % hpx::get_locality_id()
+        % rank % name.c_str()) << std::endl;
     //
     // extract command line argument
     test_options options;
@@ -760,14 +788,17 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
     allocate_local_storage(options.local_storage_MB*1024*1024);
     //
-    uint64_t num_transfer_slots = 1024*1024*options.local_storage_MB / options.transfer_size_B;
+    uint64_t num_transfer_slots = 1024*1024*options.local_storage_MB
+        / options.transfer_size_B;
     DEBUG_OUTPUT(1,
-        std::cout << "num ranks " << nranks << ", num_transfer_slots " << num_transfer_slots << " on rank " << rank << std::endl;
+        std::cout << "num ranks " << nranks << ", num_transfer_slots "
+                  << num_transfer_slots << " on rank " << rank << std::endl;
     );
     //
     boost::random::mt19937 gen;
     boost::random::uniform_int_distribution<> random_rank(0, (int)nranks - 1);
-    boost::random::uniform_int_distribution<> random_slot(0, (int)num_transfer_slots - 1);
+    boost::random::uniform_int_distribution<> random_slot(0,
+        (int)num_transfer_slots - 1);
     //
     ActiveFutures.reserve(nranks);
     for(uint64_t i = 0; i < nranks; i++) {
@@ -835,7 +866,8 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ( "all-to-all",
           boost::program_options::value<bool>()->default_value(true),
-          "When set, all ranks send to all others, when off, only rank 0 send to the others.\n")
+          "When set, all ranks send to all others, when off, \
+                only rank 0 send to the others.\n")
         ;
 
     // if the user does not set parceltype on the command line,
@@ -845,15 +877,18 @@ int main(int argc, char* argv[])
           boost::program_options::value<std::string>()->default_value("unknown"),
           "Pass in the parcelport network type being tested,"
           "this value has no effect on the code and is used only in output "
-          "so that plotting scripts know what network type was active during the test.\n")
+          "so that plotting scripts know what network type was active during \
+            the test.\n")
         ;
 
     desc_commandline.add_options()
         ( "distribution",
           boost::program_options::value<boost::uint64_t>()->default_value(1),
           "Specify the distribution of data blocks to send/receive,\n"
-          "in random mode, blocks of data are sent from one rank to any other rank (including itself),"
-          "in block-cyclic mode, blocks of data are sent from one rank to other ranks in block-cyclic order,"
+          "in random mode, blocks of data are sent from one rank to \
+            any other rank (including itself),"
+          "in block-cyclic mode, blocks of data are sent from one rank to \
+            other ranks in block-cyclic order,"
           "0 : random \n"
           "1 : block cyclic")
         ;

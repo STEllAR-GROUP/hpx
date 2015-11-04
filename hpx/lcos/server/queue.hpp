@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,25 +6,24 @@
 #if !defined(HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM)
 #define HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM
 
-#include <boost/intrusive/slist.hpp>
-
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 
+#include <boost/thread/locks.hpp>
+
 #include <memory>
+#include <queue>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
 {
     /// A queue can be used to 'collect' (queue) a number of incoming values
-    /// for consumption of an internal thread, which will invoke a given action
-    /// for each of the values.
     template <typename ValueType, typename RemoteType = ValueType>
     class queue;
 
@@ -32,40 +31,16 @@ namespace hpx { namespace lcos { namespace server
     template <typename ValueType, typename RemoteType>
     class queue
       : public lcos::base_lco_with_value<ValueType, RemoteType>
-      , public components::managed_component_base<queue<ValueType, RemoteType> >
+      , public components::component_base<queue<ValueType, RemoteType> >
     {
     public:
         typedef lcos::base_lco_with_value<ValueType, RemoteType> base_type_holder;
 
     private:
         typedef lcos::local::spinlock mutex_type;
-        typedef components::managed_component_base<queue> base_type;
+        typedef components::component_base<queue> base_type;
 
-        // queue holding the values to process
-        struct queue_entry
-        {
-            typedef boost::intrusive::slist_member_hook<
-                boost::intrusive::link_mode<boost::intrusive::normal_link>
-            > hook_type;
-
-            queue_entry(ValueType const& val)
-              : val_(val)
-            {}
-
-            ValueType val_;
-            hook_type slist_hook_;
-        };
-
-        typedef boost::intrusive::member_hook<
-            queue_entry, typename queue_entry::hook_type,
-            &queue_entry::slist_hook_
-        > slist_option_type;
-
-        typedef boost::intrusive::slist<
-            queue_entry, slist_option_type,
-            boost::intrusive::cache_last<true>,
-            boost::intrusive::constant_time_size<false>
-        > queue_type;
+        typedef std::queue<ValueType> queue_type;
 
     public:
         // This is the component id. Every component needs to have an embedded
@@ -98,17 +73,13 @@ namespace hpx { namespace lcos { namespace server
         void set_value (RemoteType && result)
         {
             // push back the new value onto the queue
-            HPX_STD_UNIQUE_PTR<queue_entry> node(
-                new queue_entry(
-                    traits::get_remote_result<ValueType, RemoteType>::call(result)));
-
-            mutex_type::scoped_lock l(mtx_);
-            queue_.push_back(*node);
-
-            node.release();
+            boost::unique_lock<mutex_type> l(mtx_);
+            queue_.push(
+                traits::get_remote_result<ValueType, RemoteType>::call(
+                    std::move(result)));
 
             // resume the first thread waiting to pick up that value
-            cond_.notify_one(l);
+            cond_.notify_one(std::move(l));
         }
 
         /// The \a function set_exception is called whenever a
@@ -118,25 +89,35 @@ namespace hpx { namespace lcos { namespace server
         ///               to this LCO instance.
         void set_exception(boost::exception_ptr const& /*e*/)
         {
-            mutex_type::scoped_lock l(mtx_);
-            cond_.abort_all(l);
+            boost::unique_lock<mutex_type> l(mtx_);
+            cond_.abort_all(std::move(l));
         }
 
         // Retrieve the next value from the queue (pop value from front of
         // queue). This method blocks if the value queue is empty. Waiting
         // threads are resumed automatically as soon as new values are placed
         // into the value queue.
-        ValueType get_value()
+        ValueType get_value(error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
-            if (queue_.empty()) {
-                cond_.wait(l, "queue::get_value");
+            boost::unique_lock<mutex_type> l(mtx_);
+
+            // cond_.wait() unlocks the lock before suspension and re-locks it
+            // afterwards. During this time span another thread may retrieve
+            // the next items from the queue for which the thread was resumed.
+            while (queue_.empty())
+            {
+                cond_.wait(l, "queue::get_value", ec);
+                if (ec) return ValueType();
             }
+            HPX_ASSERT(!queue_.empty());
 
             // get the first value from the value queue and return it to the
             // caller
-            ValueType value = queue_.front().val_;
-            queue_.pop_front();
+            ValueType value = std::move(queue_.front());
+            queue_.pop();
+
+            if (&ec != &throws)
+                ec = make_success_code();
 
             return value;
         }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,9 +6,9 @@
 #if !defined(HPX_START_IMPL_OCT_04_2012_0252PM)
 #define HPX_START_IMPL_OCT_04_2012_0252PM
 
-#if !defined(HPX_START_OCT_04_2012_0148PM)
-#  error Do not directly include hpx/hpx_start_impl.hpp, use hpx/hpx_start.hpp instead!
-#endif
+#include <hpx/hpx_start.hpp>
+
+#include <hpx/util/find_prefix.hpp>
 
 namespace hpx
 {
@@ -16,9 +16,11 @@ namespace hpx
     namespace detail
     {
         HPX_EXPORT int run_or_start(
-            util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+            util::function_nonser<
+                int(boost::program_options::variables_map& vm)
+            > const& f,
             boost::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> const& ini_config,
+            int argc, char** argv, std::vector<std::string> && ini_config,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown, hpx::runtime_mode mode,
             bool blocking);
@@ -34,7 +36,9 @@ namespace hpx
     /// immediatly after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
     inline bool start(
-        util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
+        util::function_nonser<
+            int(boost::program_options::variables_map& vm)
+        > const& f,
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         util::function_nonser<void()> const& startup,
@@ -42,7 +46,8 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         util::set_hpx_prefix(HPX_PREFIX);
-        return 0 == detail::run_or_start(f, desc_cmdline, argc, argv, cfg,
+        return 0 == detail::run_or_start(f, desc_cmdline, argc, argv,
+            hpx_startup::user_main_config(cfg),
             startup, shutdown, mode, false);
     }
 
@@ -125,8 +130,8 @@ namespace hpx
     /// settings). It will return immediatly after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool
-    start(boost::program_options::options_description const& desc_cmdline, int argc,
-        char** argv, hpx::runtime_mode mode)
+    start(boost::program_options::options_description const& desc_cmdline,
+        int argc, char** argv, hpx::runtime_mode mode)
     {
         util::function_nonser<void()> const empty;
         return start(static_cast<hpx_main_type>(::hpx_main), desc_cmdline,
@@ -145,8 +150,8 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         util::function_nonser<void()> const empty;
-        return start(static_cast<hpx_main_type>(::hpx_main), app_name, argc, argv,
-            empty, empty, mode);
+        return start(static_cast<hpx_main_type>(::hpx_main), app_name, argc,
+            argv, empty, empty, mode);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.

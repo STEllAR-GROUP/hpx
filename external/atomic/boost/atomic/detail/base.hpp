@@ -36,7 +36,8 @@ protected:
 };
 
 template<typename T, unsigned short Size=sizeof(T)>
-class platform_atomic_integral : public build_atomic_from_exchange<fallback_atomic<T> > {
+class platform_atomic_integral
+    : public build_atomic_from_exchange<fallback_atomic<T> > {
 public:
     typedef build_atomic_from_exchange<fallback_atomic<T> > super;
 
@@ -56,7 +57,8 @@ static inline void platform_atomic_thread_fence(T order)
     a.exchange(T(), order);
 }
 
-template<typename T, unsigned short Size=sizeof(T), typename Int=typename is_integral_type<T>::test>
+template<typename T, unsigned short Size=sizeof(T),
+    typename Int=typename is_integral_type<T>::test>
 class internal_atomic;
 
 template<typename T, unsigned short Size>
@@ -80,14 +82,16 @@ public:
         T desired,
         memory_order order=memory_order_seq_cst) volatile
     {
-        return super::compare_exchange_strong(expected, desired, order, calculate_failure_order(order));
+        return super::compare_exchange_strong(expected, desired,
+            order, calculate_failure_order(order));
     }
     bool compare_exchange_weak(
         T &expected,
         T desired,
         memory_order order=memory_order_seq_cst) volatile
     {
-        return super::compare_exchange_strong(expected, desired, order, calculate_failure_order(order));
+        return super::compare_exchange_strong(expected, desired,
+            order, calculate_failure_order(order));
     }
     bool compare_exchange_strong(
         T &expected,
@@ -95,7 +99,8 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        return super::compare_exchange_strong(expected, desired, success_order, failure_order);
+        return super::compare_exchange_strong(expected, desired,
+            success_order, failure_order);
     }
     bool compare_exchange_weak(
         T &expected,
@@ -103,7 +108,8 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        return super::compare_exchange_strong(expected, desired, success_order, failure_order);
+        return super::compare_exchange_strong(expected, desired,
+            success_order, failure_order);
     }
 private:
     internal_atomic(const internal_atomic &);
@@ -111,7 +117,8 @@ private:
 };
 
 template<typename T, unsigned short Size>
-class internal_atomic<T, Size, int> : private detail::atomic::platform_atomic_integral<T> {
+class internal_atomic<T, Size, int>
+    : private detail::atomic::platform_atomic_integral<T> {
 public:
     typedef detail::atomic::platform_atomic_integral<T> super;
     typedef typename super::integral_type integral_type;
@@ -149,14 +156,16 @@ public:
         integral_type desired,
         memory_order order=memory_order_seq_cst) volatile
     {
-        return super::compare_exchange_strong(expected, desired, order, calculate_failure_order(order));
+        return super::compare_exchange_strong(expected, desired,
+            order, calculate_failure_order(order));
     }
     bool compare_exchange_weak(
         integral_type &expected,
         integral_type desired,
         memory_order order=memory_order_seq_cst) volatile
     {
-        return super::compare_exchange_strong(expected, desired, order, calculate_failure_order(order));
+        return super::compare_exchange_strong(expected, desired, order,
+            calculate_failure_order(order));
     }
     bool compare_exchange_strong(
         integral_type &expected,
@@ -164,7 +173,8 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        return super::compare_exchange_strong(expected, desired, success_order, failure_order);
+        return super::compare_exchange_strong(expected, desired,
+            success_order, failure_order);
     }
     bool compare_exchange_weak(
         integral_type &expected,
@@ -172,7 +182,8 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        return super::compare_exchange_strong(expected, desired, success_order, failure_order);
+        return super::compare_exchange_strong(expected, desired,
+            success_order, failure_order);
     }
 private:
     internal_atomic(const internal_atomic &);

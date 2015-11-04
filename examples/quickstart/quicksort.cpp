@@ -7,7 +7,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/async.hpp>
 
@@ -180,7 +179,7 @@ int hpx_main(variables_map& vm)
 
         t.restart();
         future<void> n = async<quicksort_int_action>(
-            prefix, prefix, mb.get_gid(), 0, elements);
+            prefix, prefix, mb.get_id(), 0, elements);
         ::hpx::wait_all(n);
         elapsed = t.elapsed();
 

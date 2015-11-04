@@ -7,12 +7,16 @@
 #if !defined(PERFORMANCE_COUNTERS_PAPI_SERVER_PAPI_201111181426)
 #define PERFORMANCE_COUNTERS_PAPI_SERVER_PAPI_201111181426
 
-#include <vector>
-#include <map>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_PAPI)
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
+
+#include <vector>
+#include <map>
 
 #include <papi.h>
 
@@ -141,7 +145,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
         mutex_type& get_global_mtx()
         {
-            return base_mtx_; 
+            return base_mtx_;
         }
     };
 
@@ -186,7 +190,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // various reset flavors
         virtual void reset();
         virtual void reset_counter_value() {reset();}
-    
+
         // get the current value of this performance counter
         hpx::performance_counters::counter_value get_counter_value(bool reset=false);
 
@@ -257,5 +261,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         }
     };
 }}}}
+
+#endif
 
 #endif

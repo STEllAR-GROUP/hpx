@@ -7,13 +7,15 @@
 #include <hpx/hpx.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/iostreams.hpp>
 #include "worker_timed.hpp"
 
-#include <stdexcept>
-
-#include <boost/format.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/format.hpp>
+#include <boost/range/functions.hpp>
+
+#include <stdexcept>
 
 ///////////////////////////////////////////////////////////////////////////////
 int delay = 1000;
@@ -45,8 +47,11 @@ void measure_parallel_foreach(std::size_t size)
         boost::end(data_representation),
         std::rand());
 
+    // create executor parameters object
+    hpx::parallel::static_chunk_size cs(chunk_size);
+
     // invoke parallel for_each
-    hpx::parallel::for_each(hpx::parallel::par(chunk_size),
+    hpx::parallel::for_each(hpx::parallel::par.with(cs),
         boost::begin(data_representation),
         boost::end(data_representation),
         [](std::size_t) {
@@ -62,10 +67,13 @@ hpx::future<void> measure_task_foreach(std::size_t size)
         boost::end(*data_representation),
         std::rand());
 
+    // create executor parameters object
+    hpx::parallel::static_chunk_size cs(chunk_size);
+
     // invoke parallel for_each
     return
         hpx::parallel::for_each(
-            hpx::parallel::par(hpx::parallel::task, chunk_size),
+            hpx::parallel::par(hpx::parallel::task).with(cs),
             boost::begin(*data_representation),
             boost::end(*data_representation),
             [](std::size_t) {
@@ -99,7 +107,7 @@ boost::uint64_t average_out_task(std::size_t vector_size)
         return (hpx::util::high_resolution_clock::now() - start) / test_count;
     }
 
-    std::vector<hpx::future<void> > tests;
+    std::vector<hpx::shared_future<void> > tests;
     tests.resize(num_overlapping_loops);
 
     boost::uint64_t start = hpx::util::high_resolution_clock::now();
@@ -109,7 +117,7 @@ boost::uint64_t average_out_task(std::size_t vector_size)
         hpx::future<void> curr = measure_task_foreach(vector_size);
         if (i >= num_overlapping_loops)
             tests[(i-num_overlapping_loops) % tests.size()].wait();
-        tests[i % tests.size()] = std::move(curr);
+        tests[i % tests.size()] = curr.share();
     }
 
     hpx::wait_all(tests);
@@ -173,7 +181,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                 << std::left << "Average task execution time      : "
                              << std::right << std::setw(8) << task_time/1e9 << "\n"
                 << std::left << "Average sequential execution time: "
-                             << std::right << std::setw(8) << seq_time/1e9 << "\n" << hpx::flush;
+                             << std::right << std::setw(8) << seq_time/1e9 << "\n"
+                             << hpx::flush;
 
             hpx::cout << "---------Execution Time Difference---------\n"
                 << std::left << "Parallel Scale: " << std::right  << std::setw(27)

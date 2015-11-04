@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -101,13 +101,15 @@ namespace hpx { namespace components
                     // First call to get_component_type, ask AGAS for a unique id.
                     // NOTE: This assumes that the derived component is loaded.
                     base_type = agas_client.get_component_id(
-                        unique_component_name<derived_component_factory, base_name>::call());
+                        unique_component_name<derived_component_factory,
+                        base_name>::call());
                 }
 
                 component_type this_type;
                 if (isenabled_) {
                     this_type = agas_client.register_factory(
-                        locality, unique_component_name<derived_component_factory>::call());
+                        locality, unique_component_name<derived_component_factory>
+                        ::call());
 
                     if (component_invalid == this_type) {
                         HPX_THROW_EXCEPTION(duplicate_component_id,
@@ -136,16 +138,6 @@ namespace hpx { namespace components
         std::string get_component_name() const
         {
             return unique_component_name<derived_component_factory>::call();
-        }
-
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        factory_property get_factory_properties() const
-        {
-            return Component::get_factory_properties();
         }
 
         /// \brief Create one or more new component instances.
@@ -217,7 +209,8 @@ namespace hpx { namespace components
         {
             if (isenabled_)
             {
-                naming::gid_type id = server::create<Component>(assign_gid, ctor);
+                naming::gid_type id =
+                    server::create<Component>(assign_gid, ctor);
                 if (id)
                     ++refcnt_;
                 return id;

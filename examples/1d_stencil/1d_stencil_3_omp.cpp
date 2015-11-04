@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,8 @@
 // The only difference to 1d_stencil_3 is that this example uses OpenMP for
 // parallelizing the inner loop.
 
+#include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
+
 #include <boost/cstdint.hpp>
 #include <boost/program_options.hpp>
 #include <boost/chrono.hpp>
@@ -24,6 +26,7 @@
 #include <omp.h>
 
 #include "print_time_results.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 // Timer with nanosecond resolution
 inline boost::uint64_t now()
@@ -92,7 +95,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all
@@ -139,7 +142,8 @@ struct stepper
             // Visual Studio requires OMP loop variables to be signed :/
             # pragma omp for schedule(static)
             for (boost::int64_t i = 0; i < (boost::int64_t)np; ++i)
-                next[i] = heat_part(current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
+                next[i] =
+                heat_part(current[idx(i-1, np)], current[i], current[idx(i+1, np)]);
         }
         }
         // Return the solution at time-step 'nt'.
@@ -153,7 +157,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t np = vm["np"].as<boost::uint64_t>();   // Number of partitions.
     boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
     boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
-    
+
     if (vm.count("no-header"))
         header = false;
 

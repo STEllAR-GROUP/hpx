@@ -21,7 +21,7 @@ namespace hpx { namespace parcelset {
     boost::uint64_t get_max_inbound_size(parcelport&);
 
     template <typename Connection, typename BufferType,
-        typename ChunkType = util::serialization_chunk>
+        typename ChunkType = serialization::serialization_chunk>
     struct parcelport_connection
       : boost::enable_shared_from_this<Connection>
       , private boost::noncopyable
@@ -47,6 +47,12 @@ namespace hpx { namespace parcelset {
           : first_message_(true)
           , state_(state_initialized)
         {}
+
+        parcelport_connection(typename BufferType::allocator_type const & alloc)
+          : first_message_(true)
+          , state_(state_initialized)
+          , buffer_(alloc)
+        {}
         bool first_message_;
         state state_;
 #endif
@@ -56,13 +62,33 @@ namespace hpx { namespace parcelset {
           : first_message_(true)
         {}
         bool first_message_;
+
+        parcelport_connection(typename BufferType::allocator_type const & alloc)
+          : first_message_(true)
+          , buffer_(alloc)
+        {}
+        bool first_message_;
 #endif
 
 #if !defined(HPX_HAVE_SECURITY) && defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
         parcelport_connection()
           : state_(state_initialized)
         {}
+
+        parcelport_connection(typename BufferType::allocator_type const & alloc)
+          : state_(state_initialized)
+          , buffer_(alloc)
+        {}
         state state_;
+#endif
+
+#if !defined(HPX_HAVE_SECURITY) && !defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+        parcelport_connection()
+        {}
+
+        parcelport_connection(typename BufferType::allocator_type const & alloc)
+          : buffer_(alloc)
+        {}
 #endif
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
@@ -77,13 +103,6 @@ namespace hpx { namespace parcelset {
         ////////////////////////////////////////////////////////////////////////
         typedef BufferType buffer_type;
         typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
-
-        virtual parcel_buffer_type & get_buffer(
-            parcel const & p = parcel(), std::size_t arg_size = 0)
-        {
-            buffer_.data_.reserve(arg_size);
-            return buffer_;
-        }
 
         /// buffer for data
         parcel_buffer_type buffer_;

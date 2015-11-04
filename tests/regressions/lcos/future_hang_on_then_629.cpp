@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2012 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -10,6 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/include/plain_actions.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/random.hpp>
@@ -27,11 +28,11 @@ using hpx::finalize;
 template <typename T>
 inline T sign(T a)
 {
-    if (a > 0) 
+    if (a > 0)
         return 1;
-    else if (a < 0) 
+    else if (a < 0)
         return -1;
-    else 
+    else
         return 0;
 }
 
@@ -70,7 +71,7 @@ double null_function(
         double v1 = v(prng);
 
         if (compare_real(v1, 0.0, 1e-10))
-            v1 = 1e-10; 
+            v1 = 1e-10;
 
         d += (s(prng) ? 1.0 : -1.0) * (v0 / v1);
     }
@@ -106,7 +107,7 @@ double null_tree(
   , boost::uint64_t children
   , boost::uint64_t delay_iterations
   , boost::uint32_t num_localities
-    ) 
+    )
 {
     if (depth == max_depth)
         return null_function(seed, delay_iterations);
@@ -133,7 +134,8 @@ double null_tree(
                                         );
 
         futures.push_back(f.then
-            (hpx::util::bind(&null_callback, boost::ref(dd), j, hpx::util::placeholders::_1)));
+            (hpx::util::bind(&null_callback, boost::ref(dd), j,
+                hpx::util::placeholders::_1)));
     }
 
     null_function(seed, delay_iterations);
@@ -172,7 +174,7 @@ int hpx_main(
 
         for ( boost::uint64_t i = 0
             ; (test_runs == 0) || (i < test_runs)
-            ; ++i) 
+            ; ++i)
         {
             hpx::util::high_resolution_timer local_clock;
 
@@ -181,11 +183,11 @@ int hpx_main(
                                             , children
                                             , delay_iterations
                                             , num_localities
-                                              ).get(); 
+                                              ).get();
 
             if (verbose)
             {
-                double step_speed = (1 / local_clock.elapsed()); 
+                double step_speed = (1 / local_clock.elapsed());
 
                 char const* fmt =
                     "%016u, %.7g,%|31t| %.7g%|41t| [steps/second]\n";

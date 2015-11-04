@@ -8,6 +8,7 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -24,10 +25,12 @@
 #include <hpx/components/security/certificate_store.hpp>
 #endif
 
-#include <hpx/config/warnings_prefix.hpp>
-
-#include <boost/foreach.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <memory>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -54,10 +57,10 @@ namespace hpx
         class registry;
     }
 
-    bool pre_main(runtime_mode);
+    int pre_main(runtime_mode);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename SchedulingPolicy>
     class HPX_EXPORT runtime_impl;
 
 #if defined(HPX_HAVE_SECURITY)
@@ -70,19 +73,6 @@ namespace hpx
     class HPX_EXPORT runtime
     {
     public:
-        enum state
-        {
-            state_invalid = -1,
-            state_initialized = 0,
-            state_pre_startup = 1,
-            state_startup = 2,
-            state_pre_main = 3,
-            state_running = 4,
-            state_pre_shutdown = 5,
-            state_shutdown = 6,
-            state_stopped = 7,
-            state_last = state_stopped
-        };
 
         state get_state() const { return state_.load(); }
 
@@ -104,7 +94,7 @@ namespace hpx
         /// \brief Manage list of functions to call on exit
         void on_exit(util::function_nonser<void()> const& f)
         {
-            boost::mutex::scoped_lock l(mtx_);
+            boost::lock_guard<boost::mutex> l(mtx_);
             on_exit_functions_.push_back(f);
         }
 
@@ -121,8 +111,8 @@ namespace hpx
 
             typedef util::function_nonser<void()> value_type;
 
-            boost::mutex::scoped_lock l(mtx_);
-            BOOST_FOREACH(value_type f, on_exit_functions_)
+            boost::lock_guard<boost::mutex> l(mtx_);
+            for (value_type const& f : on_exit_functions_)
                 f();
         }
 
@@ -236,11 +226,13 @@ namespace hpx
 
         virtual util::unique_id_ranges& get_id_pool() = 0;
 
-        virtual void add_pre_startup_function(util::function_nonser<void()> const& f) = 0;
+        virtual void add_pre_startup_function(util::function_nonser<void()>
+            const& f) = 0;
 
         virtual void add_startup_function(util::function_nonser<void()> const& f) = 0;
 
-        virtual void add_pre_shutdown_function(util::function_nonser<void()> const& f) = 0;
+        virtual void add_pre_shutdown_function(util::function_nonser<void()>
+            const& f) = 0;
 
         virtual void add_shutdown_function(util::function_nonser<void()> const& f) = 0;
 
@@ -304,6 +296,12 @@ namespace hpx
         ///
         virtual bool unregister_thread() = 0;
 
+        /// Generate a new notification policy instance for the given thread
+        /// name prefix
+        typedef threads::policies::callback_notifier notification_policy_type;
+        virtual notification_policy_type
+            get_notification_policy(char const* prefix) = 0;
+
         /// This function creates anew base_lco_factory (if none is available
         /// for the given type yet), registers this factory with the
         /// runtime_support object and asks the factory for it's heap object
@@ -329,9 +327,9 @@ namespace hpx
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,
             std::size_t interval, error_code& ec = throws);
-        util::binary_filter* create_binary_filter(
+        serialization::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
-            util::binary_filter* next_filter, error_code& ec = throws);
+            serialization::binary_filter* next_filter, error_code& ec = throws);
 
 #if defined(HPX_HAVE_SECURITY)
         components::security::signed_certificate
@@ -415,7 +413,7 @@ namespace hpx
 #if defined(HPX_HAVE_SECURITY)
         // allocate dynamically to reduce dependencies
         mutable lcos::local::spinlock security_mtx_;
-        HPX_STD_UNIQUE_PTR<detail::manage_security_data> security_data_;
+        std::unique_ptr<detail::manage_security_data> security_data_;
         components::security::certificate_store const * cert_store(error_code& ec) const;
 #endif
     };
@@ -435,7 +433,7 @@ namespace hpx {
     bool runtime::verify_parcel_suffix(Buffer const& data,
         naming::gid_type& parcel_id, error_code& ec) const
     {
-        lcos::local::spinlock::scoped_lock l(security_mtx_);
+        boost::lock_guard<lcos::local::spinlock> l(security_mtx_);
         return components::security::verify(*cert_store(ec), data, parcel_id);
     }
 }

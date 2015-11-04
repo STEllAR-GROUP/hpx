@@ -12,6 +12,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/include/async.hpp>
 
@@ -58,7 +59,7 @@ namespace hpx { namespace components { namespace stubs
         /// Exposed functionality: get returns either the local memory pointers
         /// or a copy of the remote data.
 
-        HPX_EXPORT static 
+        HPX_EXPORT static
         lcos::future<components::memory_block_data> get_async(
             naming::id_type const& targetgid);
 
@@ -70,7 +71,7 @@ namespace hpx { namespace components { namespace stubs
             return get_async(targetgid).get();
         }
 
-        HPX_EXPORT static 
+        HPX_EXPORT static
         lcos::future<components::memory_block_data> get_async(
             naming::id_type const& targetgid,
             components::memory_block_data const& cfg);
@@ -85,7 +86,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT static 
+        HPX_EXPORT static
         lcos::future<components::memory_block_data> checkout_async(
             naming::id_type const& targetgid);
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +11,8 @@
 //
 // The only difference to 1d_stencil_1 is that this example uses OpenMP for
 // parallelizing the inner loop.
+
+#include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
 
 #include <boost/cstdint.hpp>
 #include <boost/program_options.hpp>
@@ -50,7 +52,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
     }
 
     // do all the work on 'nx' data points for 'nt' time steps
@@ -91,7 +93,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     boost::uint64_t nx = vm["nx"].as<boost::uint64_t>();   // Number of grid points.
     boost::uint64_t nt = vm["nt"].as<boost::uint64_t>();   // Number of steps.
-    
+
     if (vm.count("no-header"))
         header = false;
 

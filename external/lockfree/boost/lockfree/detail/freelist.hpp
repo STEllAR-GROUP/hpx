@@ -212,7 +212,7 @@ template <typename T, typename Alloc = std::allocator<T> >
 class caching_freelist : public detail::freelist_stack<T, true, Alloc>
 {
 public:
-    caching_freelist (std::size_t n = 0) 
+    caching_freelist (std::size_t n = 0)
       : detail::freelist_stack<T, true, Alloc>(n)
     {}
 };
@@ -221,7 +221,7 @@ template <typename T, typename Alloc = std::allocator<T> >
 class static_freelist :  public detail::freelist_stack<T, false, Alloc>
 {
 public:
-    static_freelist (std::size_t n = 0) 
+    static_freelist (std::size_t n = 0)
       : detail::freelist_stack<T, false, Alloc>(n)
     {}
 };

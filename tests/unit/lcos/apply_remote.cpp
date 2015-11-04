@@ -9,6 +9,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/thread/locks.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 bool root_locality = false;
 boost::int32_t final_result;
@@ -16,7 +18,7 @@ hpx::util::spinlock result_mutex;
 
 void receive_result(boost::int32_t i)
 {
-    hpx::util::spinlock::scoped_lock l(result_mutex);
+    boost::lock_guard<hpx::util::spinlock> l(result_mutex);
     if (i > final_result)
         final_result = i;
 }
@@ -32,7 +34,8 @@ void increment(hpx::id_type const& there, boost::int32_t i)
 }
 HPX_PLAIN_ACTION(increment);
 
-void increment_with_future(hpx::id_type const& there, hpx::shared_future<boost::int32_t> fi)
+void increment_with_future(hpx::id_type const& there,
+    hpx::shared_future<boost::int32_t> fi)
 {
     accumulator += fi.get();
     hpx::apply(receive_result_action(), there, accumulator.load());
@@ -53,7 +56,7 @@ struct increment_server
 };
 
 typedef hpx::components::managed_component<increment_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, increment_server);
+HPX_REGISTER_COMPONENT(server_type, increment_server);
 
 typedef increment_server::call_action call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action);

@@ -6,6 +6,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 
+#include <hpx/runtime/serialization/serialize.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 #define ZEROCOPY_DATASIZE   1024*1024
 
@@ -52,7 +54,7 @@ public:
 
 private:
     // serialization support
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template <typename Archive>
     void load(Archive& ar, unsigned int const version)
@@ -69,7 +71,7 @@ private:
         ar << size_ << t;
     }
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    HPX_SERIALIZATION_SPLIT_MEMBER()
 
 private:
     pointer pointer_;
@@ -79,15 +81,15 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 // Buffer object used on the client side to specify where to place the received
 // data
-typedef hpx::util::serialize_buffer<double> general_buffer_type;
+typedef hpx::serialization::serialize_buffer<double> general_buffer_type;
 
 // Buffer object used for sending the data back to the receiver.
-typedef hpx::util::serialize_buffer<double, pointer_allocator<double> >
+typedef hpx::serialization::serialize_buffer<double, pointer_allocator<double> >
     transfer_buffer_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 struct zerocopy_server
-  : hpx::components::managed_component_base<zerocopy_server>
+  : hpx::components::component_base<zerocopy_server>
 {
 private:
     void release_lock()
@@ -139,8 +141,8 @@ private:
     hpx::lcos::local::spinlock mtx_;
 };
 
-typedef hpx::components::managed_component<zerocopy_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, zerocopy_server);
+typedef hpx::components::component<zerocopy_server> server_type;
+HPX_REGISTER_COMPONENT(server_type, zerocopy_server);
 
 typedef zerocopy_server::get_here_action zerocopy_get_here_action;
 HPX_REGISTER_ACTION_DECLARATION(zerocopy_get_here_action);
@@ -184,7 +186,7 @@ public:
 
         using hpx::util::placeholders::_1;
         std::size_t buffer_address = reinterpret_cast<std::size_t>(buff.data());
-        return hpx::async(act, this->get_gid(), buff.size(), buffer_address)
+        return hpx::async(act, this->get_id(), buff.size(), buffer_address)
             .then(hpx::util::bind(&zerocopy::transfer_data, buff, _1));
     }
     void get_here_sync(general_buffer_type& buff) const
@@ -196,7 +198,7 @@ public:
     hpx::future<general_buffer_type> get(std::size_t size) const
     {
         zerocopy_get_action act;
-        return hpx::async(act, this->get_gid(), size);
+        return hpx::async(act, this->get_id(), size);
     }
     general_buffer_type get_sync(std::size_t size) const
     {
@@ -209,7 +211,7 @@ int main(int argc, char* argv[])
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    BOOST_FOREACH(hpx::id_type id, localities)
+    for (hpx::id_type const& id : localities)
     {
         zerocopy zc = hpx::new_<zerocopy_server>(id, ZEROCOPY_DATASIZE);
 

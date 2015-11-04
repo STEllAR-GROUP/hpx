@@ -44,26 +44,33 @@ and you want to define the logger classes, in a source file
 
 */
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Format and write
     //
 
     /**
-        @brief The @c %format_and_write classes know how to call the formatter and destination @c objects.
+        @brief The @c %format_and_write classes know how to call
+        the formatter and destination @c objects.
 
         Usually you'll be happy with the
-        format_and_write::simple class - which simply calls @c operator() on the formatters , and @c operator() on the destinations.
+        format_and_write::simple class - which simply calls @c
+        operator() on the formatters , and @c operator() on the destinations.
 
-        Note that usually the formatter and destination class just have an @c operator(), which when called, formats the message
-        or writes it to a destination. In case your formatters/destinations are more complex than that (for instance, more than
-        a member function needs to be called), you'll have to implement your own %format_and_write class.
+        Note that usually the formatter and destination class just have an @c operator(),
+        which when called, formats the message
+        or writes it to a destination. In case your formatters/destinations are
+        more complex than that (for instance, more than
+        a member function needs to be called),
+        you'll have to implement your own %format_and_write class.
     */
     namespace format_and_write {
 
     /**
-        @brief This uses a cache, when calling formatters/destinations - for writing a given message
+        @brief This uses a cache, when calling formatters/destinations
+        - for writing a given message
 
-        When a formatter is called, it caches its info. If it's called again, reuses that.
+        When a formatter is called, it caches its info. If it's called again,
+        reuses that.
     */
     template<class formatter_base, class destination_base, class msg_type>
     struct use_cache {
@@ -95,13 +102,18 @@ and you want to define the logger classes, in a source file
 
 
     /**
-        @brief Formats the message, and writes it to destinations - calls @c operator() on the formatters , and @c operator() on the destinations. Ignores @c clear_format() commands.
+        @brief Formats the message, and writes it to destinations
+        - calls @c operator() on the formatters , and @c operator() on the destinations.
+        Ignores @c clear_format() commands.
 
-        @param msg_type The message to pass to the formatter. This is the type that is passed to the formatter objects and to the destination objects.
-        Thus, it needs to be convertible to the argument to be sent to the formatter objects and to the argument to be sent to the destination objects.
+        @param msg_type The message to pass to the formatter. This is the
+        type that is passed to the formatter objects and to the destination objects.
+        Thus, it needs to be convertible to the argument to be sent to the
+        formatter objects and to the argument to be sent to the destination objects.
         Usually, it's the argument you pass on to your destination classes.
 
-        If you derive from @c destination::base, this type can be @c destination::base::raw_param (see below).
+        If you derive from @c destination::base, this type can be
+        @c destination::base::raw_param (see below).
 
         Example:
 
@@ -142,17 +154,22 @@ and you want to define the logger classes, in a source file
 
 
     /**
-        @brief Formats the message, and writes it to destinations - calls @c operator() on the formatters , and @c operator() on the destinations.
+        @brief Formats the message, and writes it to destinations
+        - calls @c operator() on the formatters , and @c operator() on the destinations.
 
         Cares for the @c clear_format() commands.
 
-        @param msg_type The message to pass to the formatter. This is the type that is passed to the formatter objects and to the destination objects.
-        Thus, it needs to be convertible to the argument to be sent to the formatter objects and to the argument to be sent to the destination objects.
+        @param msg_type The message to pass to the formatter. This is the
+        type that is passed to the formatter objects and to the destination objects.
+        Thus, it needs to be convertible to the argument to be sent to the
+        formatter objects and to the argument to be sent to the destination objects.
         Usually, it's the argument you pass on to your destination classes.
 
-        If you derive from @c destination::base, this type can be @c destination::base::raw_param (see below).
+        If you derive from @c destination::base, this type can be
+        @c destination::base::raw_param (see below).
 
-        @param string_type [optional] A class that can hold a string (that is, a copy of the message)
+        @param string_type [optional] A class that can hold a string
+        (that is, a copy of the message)
 
         Example:
 
@@ -181,7 +198,8 @@ and you want to define the logger classes, in a source file
     struct simple_care_for_clear_format : simple<msg_type> {
         typedef simple<msg_type> simple_base_type;
 
-        simple_care_for_clear_format( msg_type & msg) : simple_base_type(msg), m_original_msg( msg ) {}
+        simple_care_for_clear_format( msg_type & msg) : simple_base_type(msg),
+            m_original_msg( msg ) {}
 
         void clear_format() {
             simple_base_type::m_msg = m_original_msg;
@@ -194,7 +212,7 @@ and you want to define the logger classes, in a source file
 
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Message routing
     //
 
@@ -209,7 +227,8 @@ and you want to define the logger classes, in a source file
     namespace msg_route {
 
     /**
-        @brief Recomended base class for message routers that need access to the underlying formatter and/or destination array.
+        @brief Recomended base class for message routers that
+        need access to the underlying formatter and/or destination array.
     */
     template<class formatter_array, class destination_array>
     struct formatter_and_destination_array_holder {
@@ -227,7 +246,8 @@ and you want to define the logger classes, in a source file
     };
 
 /**
-@brief Represents a simple router - first calls all formatters - in the order they were added, then all destinations - in the order they were added
+@brief Represents a simple router - first calls all formatters
+- in the order they were added, then all destinations - in the order they were added
 
 Example:
 
@@ -252,16 +272,20 @@ L_ << "testing " << i << i+1 << i+2;
 @endcode
 
 In the above case:
-- First, the formatters are called: @c write_idx() is called, then @c write_time(), then @c append_newline().
+- First, the formatters are called: @c write_idx() is called, then @c write_time(),
+then @c append_newline().
 - Then, the destinations are called: @c write_to_cout(), and then @c write_to_file().
 
 
 
-@param format_base The base class for all formatter classes from your application. See manipulator.
+@param format_base The base class for all formatter classes from your application.
+See manipulator.
 
-@param destination_base The base class for all destination classes from your application. See manipulator.
+@param destination_base The base class for all destination classes from your application.
+See manipulator.
 
-@param lock_resource_type What class you use to do allow thread-safe access to an instance of this clas (used internally).
+@param lock_resource_type What class you use to do allow
+thread-safe access to an instance of this clas (used internally).
 
     */
     template<
@@ -273,7 +297,9 @@ In the above case:
         typedef typename destination_base::ptr_type destination_ptr;
 
         typedef typename detail::to_override<formatter_base>::type override_;
-        typedef typename use_default<lock_resource, typename hpx::util::logging::types<override_>::lock_resource > ::type lock_resource_type;
+        typedef typename use_default<lock_resource,
+            typename hpx::util::logging::types<override_>::lock_resource >
+            ::type lock_resource_type;
 
         typedef std::vector<formatter_ptr> f_array;
         typedef std::vector<destination_ptr> d_array;
@@ -284,7 +310,8 @@ In the above case:
 
         typedef typename lock_resource_type::template finder<write_info>::type data;
 
-        template<class formatter_array, class destination_array> simple(const formatter_array&, const destination_array&) {}
+        template<class formatter_array, class destination_array>
+        simple(const formatter_array&, const destination_array&) {}
 
         void append_formatter(formatter_ptr fmt) {
             typename data::write to_write(m_to_write);
@@ -292,7 +319,8 @@ In the above case:
         }
         void del_formatter(formatter_ptr fmt) {
             typename data::write to_write(m_to_write);
-            typename f_array::iterator del = std::remove(to_write->formats.begin(), to_write->formats.end(), fmt);
+            typename f_array::iterator del = std::remove(to_write->formats.begin(),
+                to_write->formats.end(), fmt);
             to_write->formats.erase(del, to_write->formats.end());
         }
 
@@ -303,19 +331,24 @@ In the above case:
 
         void del_destination(destination_ptr dest) {
             typename data::write to_write(m_to_write);
-            typename d_array::iterator del = std::remove(to_write->destinations.begin(), to_write->destinations.end(), dest);
+            typename d_array::iterator del =
+                std::remove(to_write->destinations.begin(),
+                    to_write->destinations.end(), dest);
             to_write->destinations.erase(del, to_write->destinations.end());
         }
 
-        template<class format_and_write, class msg_type> void write(msg_type & msg) const {
+        template<class format_and_write,
+        class msg_type> void write(msg_type & msg) const {
             format_and_write m(msg);
 
             // note: here, we're reading (data::read)!
             typename data::read to_write(m_to_write);
-            for ( typename f_array::const_iterator b_f = to_write->formats.begin(), e_f = to_write->formats.end(); b_f != e_f; ++b_f)
+            for ( typename f_array::const_iterator b_f = to_write->formats.begin(),
+                e_f = to_write->formats.end(); b_f != e_f; ++b_f)
                 m.format(*b_f);
 
-            for ( typename d_array::const_iterator b_d = to_write->destinations.begin(), e_d = to_write->destinations.end(); b_d != e_d; ++b_d)
+            for ( typename d_array::const_iterator b_d = to_write->destinations.begin(),
+                e_d = to_write->destinations.end(); b_d != e_d; ++b_d)
                 m.write(*b_d);
         }
 
@@ -325,15 +358,18 @@ In the above case:
 
 
     /**
-    @brief. Represents a router - by default, first calls all formatters, then all destinations. However you can overwrite this route
+    @brief. Represents a router - by default, first calls all formatters,
+    then all destinations. However you can overwrite this route
 
-    You can append a route - with append_route(), or set the route with set_route().
+    You can append a route - with append_route(),
+    or set the route with set_route().
 
     Example:
 
     @code
     typedef logger< default_,
-        writer::format_write< format_base, destination_base, format_and_write::simple<cache_string>,
+        writer::format_write< format_base, destination_base,
+        format_and_write::simple<cache_string>,
             msg_route::with_route<format_base,destination_base> > > logger_type;
     logger_type g_l();
 
@@ -350,9 +386,11 @@ In the above case:
         ;
     @endcode
 
-    @param format_base The base class for all formatter classes from your application. See manipulator.
+    @param format_base The base class for all
+    formatter classes from your application. See manipulator.
 
-    @param destination_base The base class for all destination classes from your application. See manipulator.
+    @param destination_base The base class for all
+    destination classes from your application. See manipulator.
 
     @remarks In the router - we don't own the objects - the array holder does that
     */
@@ -361,19 +399,26 @@ In the above case:
             class destination_base,
             class lock_resource = default_ ,
             // note: we're counting on these defaults in format_find_writer
-            class formatter_array = hpx::util::logging::array::shared_ptr_holder<formatter_base>,
-            class destination_array = hpx::util::logging::array::shared_ptr_holder<destination_base>
+            class formatter_array =
+                hpx::util::logging::array::shared_ptr_holder<formatter_base>,
+            class destination_array =
+                hpx::util::logging::array::shared_ptr_holder<destination_base>
     >
-    class with_route  : protected formatter_and_destination_array_holder<formatter_array, destination_array> {
+    class with_route  : protected formatter_and_destination_array_holder<formatter_array,
+        destination_array> {
         typedef typename formatter_base::ptr_type formatter_ptr;
         typedef typename destination_base::ptr_type destination_ptr;
 
         typedef typename detail::to_override<formatter_base>::type override_;
-        typedef typename use_default<lock_resource, typename hpx::util::logging::types<override_>::lock_resource > ::type lock_resource_type;
+        typedef typename use_default<lock_resource,
+            typename hpx::util::logging::types<override_>::lock_resource >
+            ::type lock_resource_type;
 
-        typedef formatter_and_destination_array_holder<formatter_array, destination_array> holder_base_type;
+        typedef formatter_and_destination_array_holder<formatter_array,
+            destination_array> holder_base_type;
 
-        typedef with_route<formatter_base, destination_base, lock_resource_type, formatter_array, destination_array> self_type;
+        typedef with_route<formatter_base, destination_base, lock_resource_type,
+            formatter_array, destination_array> self_type;
 
         typedef std::vector<formatter_ptr> f_array;
         typedef std::vector<destination_ptr> d_array;
@@ -389,7 +434,9 @@ In the above case:
         typedef typename lock_resource_type::template finder<write_array>::type data;
 
     public:
-        with_route(const formatter_array& formatters, const destination_array & destinations) : holder_base_type(formatters, destinations) {}
+        with_route(const formatter_array& formatters,
+            const destination_array & destinations) : holder_base_type(formatters,
+                destinations) {}
 
         class route;
         friend class route;
@@ -422,11 +469,13 @@ In the above case:
         public:
 
             template<class formatter> route & fmt(formatter f) {
-                fmt_impl(f, boost::is_base_of<hpx::util::logging::manipulator::is_generic,formatter>() );
+                fmt_impl(f, boost::is_base_of<hpx::util::logging::manipulator
+                    ::is_generic,formatter>() );
                 return *this;
             }
             template<class destination> route & dest(destination d) {
-                dest_impl(d, boost::is_base_of<hpx::util::logging::manipulator::is_generic,destination>() );
+                dest_impl(d, boost::is_base_of<hpx::util::logging::manipulator
+                    ::is_generic,destination>() );
                 return *this;
             }
             route & clear() {
@@ -436,22 +485,28 @@ In the above case:
 
         private:
             // not generic
-            template<class formatter> void fmt_impl(formatter f, const boost::false_type& ) {
+            template<class formatter> void fmt_impl(formatter f,
+                const boost::false_type& ) {
                 m_items.push_back( item().fmt( m_self.formats().get_ptr(f) )) ;
             }
             // not generic
-            template<class destination> void dest_impl(destination d, const boost::false_type&) {
+            template<class destination> void dest_impl(destination d,
+                const boost::false_type&) {
                 m_items.push_back( item().dest( m_self.destinations().get_ptr(d) ));
             }
 
             // generic
-            template<class formatter> void fmt_impl(formatter f, const boost::true_type& ) {
-                typedef hpx::util::logging::manipulator::detail::generic_holder<formatter,formatter_base> holder;
+            template<class formatter> void fmt_impl(formatter f,
+                const boost::true_type& ) {
+                typedef hpx::util::logging::manipulator::detail
+                    ::generic_holder<formatter,formatter_base> holder;
                 fmt_impl( holder(f) , boost::false_type() );
             }
             // generic
-            template<class destination> void dest_impl(destination d, const boost::true_type&) {
-                typedef hpx::util::logging::manipulator::detail::generic_holder<destination,destination_base> holder;
+            template<class destination> void dest_impl(destination d,
+                const boost::true_type&) {
+                typedef hpx::util::logging::manipulator::detail
+                    ::generic_holder<destination,destination_base> holder;
                 dest_impl( holder(d) , boost::false_type() );
             }
         protected:
@@ -503,8 +558,10 @@ In the above case:
         void del_formatter(formatter_ptr fmt) {
             typename data::write to_write(m_to_write);
 
-            for ( typename write_array::const_iterator b = to_write->begin(), e = to_write->end(); b != e; ++b) {
-                typename f_array::iterator del = std::remove( b->formats.begin(), b->formats.end(), fmt); //-V807
+            for ( typename write_array::const_iterator b = to_write->begin(),
+                e = to_write->end(); b != e; ++b) {
+                typename f_array::iterator del = std::remove( b->formats.begin(),
+                    b->formats.end(), fmt); //-V807
                 b->formats.erase(del, b->formats.end());
             }
         }
@@ -525,11 +582,14 @@ In the above case:
         void del_destination(destination_ptr dest) {
             typename data::write to_write(m_to_write);
 
-            for ( typename write_array::const_iterator b = to_write->begin(), e = to_write->end(); b != e; ++b) {
-                typename d_array::iterator del = std::remove( b->destinations.begin(), b->destinations.end(), dest); //-V807
+            for ( typename write_array::const_iterator b = to_write->begin(),
+                e = to_write->end(); b != e; ++b) {
+                typename d_array::iterator del = std::remove( b->destinations.begin(),
+                    b->destinations.end(), dest); //-V807
                 b->destinations.erase(del, b->destinations.end());
 
-                // if from a write_once - all destinations are gone, don't clear_afterwards
+                // if from a write_once - all destinations are gone,
+                // don't clear_afterwards
                 if ( b->destinations.empty() )
                     b->do_clear_afterwards = false;
             }
@@ -545,16 +605,21 @@ In the above case:
         }
 
 
-        template<class format_and_write, class msg_type> void write(msg_type & msg) const {
+        template<class format_and_write, class msg_type>
+        void write(msg_type & msg) const {
             format_and_write m(msg);
 
             // note: here, we're reading (data::read)!
             typename data::read to_write(m_to_write);
-            for ( typename write_array::const_iterator b = to_write->begin(), e = to_write->end(); b != e; ++b) {
-                for ( typename f_array::const_iterator b_f = b->formats.begin(), e_f = b->formats.end(); b_f != e_f; ++b_f)
+            for ( typename write_array::const_iterator b = to_write->begin(),
+                e = to_write->end(); b != e; ++b) {
+                for ( typename f_array::const_iterator b_f = b->formats.begin(),
+                    e_f = b->formats.end(); b_f != e_f; ++b_f)
                     m.format(*b_f);
 
-                for ( typename d_array::const_iterator b_d = b->destinations.begin(), e_d = b->destinations.end(); b_d != e_d; ++b_d)
+                for ( typename d_array::const_iterator
+                    b_d = b->destinations.begin(), e_d = b->destinations.end();
+                    b_d != e_d; ++b_d)
                     m.write(*b_d);
 
                 if ( b->do_clear_afterwards)
@@ -568,7 +633,8 @@ In the above case:
                 return; // no route to add
 
             typedef typename route::array array;
-            for ( typename array::const_iterator b = r.m_items.begin(), e = r.m_items.end(); b != e; ++b) {
+            for ( typename array::const_iterator b = r.m_items.begin(),
+                e = r.m_items.end(); b != e; ++b) {
                 switch ( b->m_type) {
                 case route::is_fmt:       append_formatter( b->m_fmt); break;
                 case route::is_dest:      append_destination( b->m_dest); break;
@@ -602,7 +668,7 @@ In the above case:
 #include <hpx/util/logging/format/destination/defaults.hpp>
 #include <hpx/util/logging/gather/ostream_like.hpp>
 
-#if !defined(HPX_LOG_NO_TS)
+#if !defined(HPX_HAVE_LOG_NO_TS)
 #include <hpx/util/logging/writer/ts_write.hpp>
 #endif
 

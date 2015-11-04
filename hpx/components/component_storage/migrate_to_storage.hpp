@@ -13,6 +13,7 @@
 #include <hpx/include/traits.hpp>
 
 #include <hpx/components/component_storage/server/migrate_to_storage.hpp>
+#include <hpx/components/component_storage/component_storage.hpp>
 
 #include <type_traits>
 
@@ -75,7 +76,7 @@ namespace hpx { namespace components
         typedef typename client_base<Derived, Stub>::server_component_type
             component_type;
         return Derived(migrate_to_storage<component_type>(
-            to_migrate.get_gid(), target_storage.get_gid()));
+            to_migrate.get_id(), target_storage.get_id()));
     }
 }}
 

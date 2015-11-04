@@ -14,7 +14,6 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/void_cast.hpp>
 
 #include <boost/fusion/include/vector.hpp>
 
@@ -79,19 +78,9 @@ namespace hpx { namespace components { namespace server
     };
 }}}
 
-namespace hpx { namespace traits
-{
-    template <typename Dummy>
-    struct needs_guid_initialization<
-            hpx::actions::transfer_action<
-                hpx::components::server::console_logging_action<Dummy> > >
-      : boost::mpl::false_
-    {};
-}}
-
-HPX_REGISTER_PLAIN_ACTION_DECLARATION(
-    hpx::components::server::console_logging_action<>
-)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::console_logging_action<>,
+    console_logging_action)
 
 #endif
 

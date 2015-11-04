@@ -15,17 +15,18 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/include/serialization.hpp>
+
+#include <boost/cstdint.hpp>
+#include <boost/format.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
 #include <sys/times.h>
 #include <vector>
-
-#include <boost/cstdint.hpp>
-#include <boost/format.hpp>
-#include <boost/shared_array.hpp>
-
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -62,11 +63,11 @@ typedef hpx::runtime rt_type;
 typedef hpx::lcos::local::spinlock mutex_type;
 
 struct RESULT {
-    double	real;
-    double	user;
-    double	sys;
+    double real;
+    double user;
+    double sys;
 
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -86,7 +87,7 @@ struct ofs_test_info_type
     std::string pvfs2tab_file;
 
 
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -151,10 +152,10 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
 {
     // perform the I/O operations here
    char filename[1024];
-   clock_t	start;
-   clock_t	end;
-   struct tms	t1;
-   struct tms	t2;
+   clock_t start;
+   clock_t end;
+   struct tms t1;
+   struct tms t2;
    RESULT r;
 
    uint64_t wfiles = ofs_test_info.wfiles;
@@ -172,8 +173,10 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
    boost::shared_array<ssize_t> num_written_array(new ssize_t[count * wfiles]);
    std::vector<hpx::lcos::future<int> > futures;
 
-   boost::shared_array<int_promise_type> int_promise_array(new int_promise_type[count * wfiles]);
-   boost::shared_array<promise_rt_ptr_type> promise_rt_ptr_array(new promise_rt_ptr_type[count * wfiles]);
+   boost::shared_array<int_promise_type>
+       int_promise_array(new int_promise_type[count * wfiles]);
+   boost::shared_array<promise_rt_ptr_type>
+       promise_rt_ptr_array(new promise_rt_ptr_type[count * wfiles]);
 
    srand((unsigned)time(0));
    for(ssize_t c = 0; c < bufsiz; c++)
@@ -185,10 +188,11 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
    for(boost::uint64_t i=0; i<wfiles; i++)
    {
        // using OrageFS syscalls
-       int	oflags;
+       int oflags;
 
        oflags = O_WRONLY|O_CREAT;
-       sprintf(filename, "%s/loc_%d_file%d.%ld", ofspath.c_str(), hpx::get_locality_id(), proc, i);
+       sprintf(filename, "%s/loc_%d_file%d.%ld",
+           ofspath.c_str(), hpx::get_locality_id(), proc, i);
 
        int_promise_type open_p;
        std::ostringstream sstream;
@@ -252,8 +256,10 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
    }
 
    r.real = ((double) end - (double) start) / (double) sysconf(_SC_CLK_TCK);
-   r.user = ((double) t2.tms_utime - (double) t1.tms_utime) / (double) sysconf(_SC_CLK_TCK);
-   r.sys = ((double) t2.tms_stime - (double) t1.tms_stime) / (double) sysconf(_SC_CLK_TCK);
+   r.user = ((double) t2.tms_utime - (double) t1.tms_utime)
+       / (double) sysconf(_SC_CLK_TCK);
+   r.sys = ((double) t2.tms_stime - (double) t1.tms_stime)
+       / (double) sysconf(_SC_CLK_TCK);
 
     for(uint64_t i=0; i<wfiles; i++)
     {
@@ -277,10 +283,10 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
 {
     // perform the I/O operations here
    char filename[1024];
-   clock_t	start;
-   clock_t	end;
-   struct tms	t1;
-   struct tms	t2;
+   clock_t start;
+   clock_t end;
+   struct tms t1;
+   struct tms t2;
    RESULT r;
 
    uint64_t rfiles = ofs_test_info.rfiles;
@@ -298,8 +304,10 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
    boost::shared_array<ssize_t> num_read_array(new ssize_t[count * rfiles]);
    std::vector<hpx::lcos::future<int> > futures;
 
-   boost::shared_array<int_promise_type> int_promise_array(new int_promise_type[count * rfiles]);
-   boost::shared_array<promise_rt_ptr_type> promise_rt_ptr_array(new promise_rt_ptr_type[count * rfiles]);
+   boost::shared_array<int_promise_type>
+       int_promise_array(new int_promise_type[count * rfiles]);
+   boost::shared_array<promise_rt_ptr_type>
+       promise_rt_ptr_array(new promise_rt_ptr_type[count * rfiles]);
 
    start = times(&t1);
 
@@ -307,10 +315,11 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
    for(boost::uint64_t i=0; i<rfiles; i++)
    {
        // using OrageFS syscalls
-       int	oflags;
+       int oflags;
 
        oflags = O_RDONLY;
-       sprintf(filename, "%s/loc_%d_file%d.%ld", ofspath.c_str(), hpx::get_locality_id(), proc, i);
+       sprintf(filename, "%s/loc_%d_file%d.%ld",
+           ofspath.c_str(), hpx::get_locality_id(), proc, i);
 
        int_promise_type open_p;
        std::ostringstream sstream;
@@ -375,8 +384,10 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
 
 
    r.real = ((double) end - (double) start) / (double) sysconf(_SC_CLK_TCK);
-   r.user = ((double) t2.tms_utime - (double) t1.tms_utime) / (double) sysconf(_SC_CLK_TCK);
-   r.sys = ((double) t2.tms_stime - (double) t1.tms_stime) / (double) sysconf(_SC_CLK_TCK);
+   r.user = ((double) t2.tms_utime - (double) t1.tms_utime)
+       / (double) sysconf(_SC_CLK_TCK);
+   r.sys = ((double) t2.tms_stime - (double) t1.tms_stime)
+       / (double) sysconf(_SC_CLK_TCK);
 
 
    for(uint64_t i=0; i<rfiles; i++)
@@ -424,7 +435,8 @@ int hpx_main(variables_map& vm)
         return hpx::finalize();
     }
 
-    hpx::cout<<"Disk performance test with OrangeFS PXFS APIs and HPX actions."<<hpx::endl;
+    hpx::cout<<
+        "Disk performance test with OrangeFS PXFS APIs and HPX actions."<<hpx::endl;
 
     if(vm.count("pvfs2tab"))
     {
@@ -472,7 +484,7 @@ int hpx_main(variables_map& vm)
         {
             ofs_test_info.rfiles = rfiles;
 
-            BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+            for (hpx::naming::id_type const& node : localities)
             {
                 // Initiate an asynchronous IO operation wait for it to complete without
                 // blocking any of the HPX thread-manager threads.
@@ -488,7 +500,7 @@ int hpx_main(variables_map& vm)
         {
             ofs_test_info.wfiles = wfiles;
 
-            BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+            for (hpx::naming::id_type const& node : localities)
             {
                 for(int proc=0; proc < procs; proc++)
                 {
@@ -501,7 +513,7 @@ int hpx_main(variables_map& vm)
         hpx::lcos::local::spinlock mtx;
         hpx::lcos::wait_each(futures,
                 hpx::util::unwrapped([&](RESULT r) {
-                    hpx::lcos::local::spinlock::scoped_lock lk(mtx);
+                    boost::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
                     result_vector.push_back(r);
                 }));
 
@@ -510,11 +522,13 @@ int hpx_main(variables_map& vm)
 
         if(rfiles > 0)
         {
-            hpx::cout << (boost::format("%1% localities each has %2% threads, Reading %3% files") % localities.size() % procs % rfiles);
+            hpx::cout << (boost::format("%1% localities each has %2% threads,
+                Reading %3% files") % localities.size() % procs % rfiles);
         }
         else
         {
-            hpx::cout << (boost::format("%1% localities each has %2% threads, Writing %3% files") % localities.size() % procs % wfiles);
+            hpx::cout << (boost::format("%1% localities each has %2% threads,
+                Writing %3% files") % localities.size() % procs % wfiles);
         }
 
         char const* fmt = " with count %1% x buffer size %2%M: \n";
@@ -545,7 +559,8 @@ int hpx_main(variables_map& vm)
         if(rfiles > 0)
         {
             hpx::cout<<(boost::format("Aggregate Reading Throughput: %1% [MB/s]\n") %
-                    (localities.size() * procs * rfiles * count * bufsiz / tt / (1024*1024)));
+                    (localities.size() * procs * rfiles
+                        * count * bufsiz / tt / (1024*1024)));
             hpx::cout<<(boost::format("\t Max Throughput per thread: %1% [MB/s]\n") %
                     (rfiles * count * bufsiz / min_time / (1024*1024)));
             hpx::cout<<(boost::format("\t Min Throughput per thread: %1% [MB/s]\n") %
@@ -554,7 +569,8 @@ int hpx_main(variables_map& vm)
         else
         {
             hpx::cout<<(boost::format("Aggregate Writing Throughput: %1% [MB/s]\n") %
-                    (localities.size() * procs * wfiles * count * bufsiz / tt / (1024*1024)));
+                    (localities.size() * procs * wfiles
+                        * count * bufsiz / tt / (1024*1024)));
             hpx::cout<<(boost::format("\t Max Throughput per thread: %1% [MB/s]\n") %
                     (wfiles * count * bufsiz / min_time / (1024*1024)));
             hpx::cout<<(boost::format("\t Min Throughput per thread: %1% [MB/s]\n") %
@@ -577,7 +593,8 @@ int hpx_main(variables_map& vm)
                 {
                     for(uint64_t i = 0; i < fileno; ++i)
                     {
-                        sprintf(filename, "%s/loc_%d_file%d.%ld", ofspath.c_str(), loc, proc, i);
+                        sprintf(filename, "%s/loc_%d_file%d.%ld",
+                            ofspath.c_str(), loc, proc, i);
                         pvfs_unlink(filename);
                     }
                 }

@@ -12,7 +12,6 @@
 #include <boost/unordered_map.hpp>
 #include <hpx/util/storage/tuple.hpp>
 
-#include <boost/serialization/access.hpp>
 #include <boost/any.hpp>
 
 #include "small_big_object.hpp"
@@ -45,7 +44,8 @@ int hpx_main(variables_map& vm)
             typedef hpx::util::any elem_type;
             typedef hpx::util::hash_any hash_elem_functor;
 
-            typedef boost::unordered_multimap<elem_type, index_type, hash_elem_functor> field_index_map_type;
+            typedef boost::unordered_multimap<elem_type, index_type,
+                hash_elem_functor> field_index_map_type;
             typedef field_index_map_type::iterator field_index_map_iterator_type;
 
             field_index_map_type field_index_map_;
@@ -69,8 +69,8 @@ int hpx_main(variables_map& vm)
             HPX_TEST_NEQ(any1, any3);
             HPX_TEST_NEQ(any1, any4);
 
-            std::string long_str = 
-                std::string("This is a looooooooooooooooooooooooooong string"); 
+            std::string long_str =
+                std::string("This is a looooooooooooooooooooooooooong string");
             std::string other_str = std::string("a different string");
             any1 = long_str;
             any2 = any1;
@@ -125,7 +125,7 @@ int hpx_main(variables_map& vm)
         {
             any any1(5);
             HPX_TEST(!any1.empty());
-            any any2(boost::move(any1));
+            any any2(std::move(any1));
             HPX_TEST(!any2.empty());
             HPX_TEST(any1.empty());
         }
@@ -136,7 +136,7 @@ int hpx_main(variables_map& vm)
             any any2;
             HPX_TEST(any2.empty());
 
-            any2 = boost::move(any1);
+            any2 = std::move(any1);
             HPX_TEST(!any2.empty());
             HPX_TEST(any1.empty());
         }
@@ -145,7 +145,8 @@ int hpx_main(variables_map& vm)
     {
         // test equality
         {
-            any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10), any4_nonser(std::string("seven"));
+            any_nonser any1_nonser(7), any2_nonser(7), any3_nonser(10),
+                any4_nonser(std::string("seven"));
 
             HPX_TEST_EQ(any1_nonser, 7);
             HPX_TEST_NEQ(any1_nonser, 10);
@@ -155,8 +156,8 @@ int hpx_main(variables_map& vm)
             HPX_TEST_NEQ(any1_nonser, any3_nonser);
             HPX_TEST_NEQ(any1_nonser, any4_nonser);
 
-            std::string long_str = 
-                std::string("This is a looooooooooooooooooooooooooong string"); 
+            std::string long_str =
+                std::string("This is a looooooooooooooooooooooooooong string");
             std::string other_str = std::string("a different string");
             any1_nonser = long_str;
             any2_nonser = any1_nonser;
@@ -211,7 +212,7 @@ int hpx_main(variables_map& vm)
         {
             any_nonser any1(5);
             HPX_TEST(!any1.empty());
-            any_nonser any2(boost::move(any1));
+            any_nonser any2(std::move(any1));
             HPX_TEST(!any2.empty());
             HPX_TEST(any1.empty());
         }
@@ -222,7 +223,7 @@ int hpx_main(variables_map& vm)
             any_nonser any2;
             HPX_TEST(any2.empty());
 
-            any2 = boost::move(any1);
+            any2 = std::move(any1);
             HPX_TEST(!any2.empty());
             HPX_TEST(any1.empty());
         }

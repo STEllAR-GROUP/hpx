@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // This test demonstrates the issue described in #1036: Scheduler hangs when
-// user code attempts to "block" OS-threads 
+// user code attempts to "block" OS-threads
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
@@ -55,7 +55,7 @@ int hpx_main()
         {
             hpx::threads::register_work(
                 boost::bind(&blocker, &entered, &started, &blocked_threads),
-                "blocker", hpx::threads::pending, 
+                "blocker", hpx::threads::pending,
                 hpx::threads::thread_priority_normal);
         }
 
@@ -63,7 +63,7 @@ int hpx_main()
             continue;
 
         {
-            double delay_sec = delay * 1e-6; 
+            double delay_sec = delay * 1e-6;
             hpx::util::high_resolution_timer td;
 
             while (true)
@@ -76,9 +76,9 @@ int hpx_main()
         }
 
         started.fetch_add(1);
-    
+
         for (boost::uint64_t i = 0; i < os_thread_count; ++i)
-            HPX_TEST(blocked_threads[i].load() <= 1); 
+            HPX_TEST(blocked_threads[i].load() <= 1);
     }
 
     return hpx::finalize();

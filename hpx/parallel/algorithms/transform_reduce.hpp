@@ -14,20 +14,21 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+
+#include <boost/range/functions.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/type_traits/is_base_of.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
 #include <numeric>
 #include <iterator>
 #include <type_traits>
-
-#include <boost/static_assert.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -47,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter, typename T_,
                 typename Reduce, typename Convert>
             static T
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 T_ && init, Reduce && r, Convert && conv)
             {
                 typedef typename std::iterator_traits<InIter>::value_type
@@ -62,14 +63,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T_,
                 typename Reduce, typename Convert>
-            static typename detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<ExPolicy, T>::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 T_ && init, Reduce && r, Convert && conv)
             {
                 if (first == last)
                 {
                     T init_ = init;
-                    return detail::algorithm_result<ExPolicy, T>::get(
+                    return util::detail::algorithm_result<ExPolicy, T>::get(
                         std::move(init_));
                 }
 
@@ -83,7 +84,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         T val = conv(*part_begin);
                         return util::accumulate_n(++part_begin, --part_size,
                             std::move(val),
-                            [&r, &conv](T const& res, reference next)
+                            // MSVC14 bails out if r and conv are captured by
+                            // reference
+                            [=](T const& res, reference next)
                             {
                                 return r(res, conv(next));
                             });
@@ -98,7 +101,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         template <typename ExPolicy, typename InIter, typename T,
             typename Reduce, typename Convert>
-        inline typename detail::algorithm_result<
+        inline typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
@@ -127,7 +130,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename T,
             typename Reduce, typename Convert>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last,
@@ -136,7 +139,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ..., conv_op(*(first + (last - first) - 1))).
+    /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
+    /// conv_op(*(first + (last - first) - 1))).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicates \a red_op and \a conv_op.
@@ -231,7 +235,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Convert>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, T>::type
+        typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     transform_reduce(ExPolicy&& policy, InIter first, InIter last,
         Convert && conv_op, T init, Reduce && red_op)

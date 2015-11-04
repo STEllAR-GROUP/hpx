@@ -8,11 +8,14 @@
 // (C) Copyright 2008 Anthony Williams
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
+#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/util/coroutine/detail/tss.hpp>
 #include <hpx/util/coroutine/detail/self.hpp>
 #include <hpx/util/assert.hpp>
+
+#include <hpx/runtime/threads_fwd.hpp>
 
 #include <map>
 
@@ -21,7 +24,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     void tss_data_node::cleanup(bool cleanup_existing)
     {
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         if (cleanup_existing && func_ && (value_ != 0))
         {
             (*func_)(value_);
@@ -31,97 +34,22 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #endif
     }
 
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
     ///////////////////////////////////////////////////////////////////////////
-    class tss_storage
-    {
-    private:
-        typedef std::map<void const*, tss_data_node> tss_node_data_map;
-
-        tss_data_node const* find_entry(void const* key) const
-        {
-            tss_node_data_map::const_iterator it = data_.find(key);
-            if (it == data_.end())
-                return 0;
-            return &(it->second);
-        }
-        tss_data_node* find_entry(void const* key)
-        {
-            tss_node_data_map::iterator it = data_.find(key);
-            if (it == data_.end())
-                return 0;
-            return &(it->second);
-        }
-
-    public:
-        tss_storage()
-        {
-        }
-
-        ~tss_storage()
-        {
-        }
-
-        std::size_t get_thread_data() const
-        {
-            return 0;
-        }
-        std::size_t set_thread_data(std::size_t val)
-        {
-            return 0;
-        }
-
-        tss_data_node* find(void const* key)
-        {
-            tss_node_data_map::iterator current_node = data_.find(key);
-            if (current_node != data_.end())
-                return &current_node->second;
-            return NULL;
-        }
-
-        void insert(void const* key,
-            boost::shared_ptr<tss_cleanup_function> const& func, void* tss_data)
-        {
-            data_.insert(std::make_pair(key, tss_data_node(func, tss_data)));
-        }
-
-        void insert(void const* key, void* tss_data)
-        {
-            boost::shared_ptr<tss_cleanup_function> func;
-            insert(key, func, tss_data);
-        }
-
-        void erase(void const* key, bool cleanup_existing)
-        {
-            tss_data_node* node = find(key);
-            if (node)
-            {
-                if (!cleanup_existing)
-                    node->cleanup(false);
-                data_.erase(key);
-            }
-        }
-
-    private:
-        tss_node_data_map data_;
-    };
-#endif
-
     tss_storage* create_tss_storage()
     {
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         return new tss_storage;
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_THREAD_MAINTAIN_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
 
     void delete_tss_storage(tss_storage*& storage)
     {
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         delete storage;
         storage = 0;
 #endif
@@ -129,7 +57,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     std::size_t get_tss_thread_data(tss_storage* storage)
     {
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (NULL == self)
         {
@@ -149,14 +77,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_THREAD_MAINTAIN_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
 
     std::size_t set_tss_thread_data(tss_storage* storage, std::size_t data)
     {
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (NULL == self)
         {
@@ -185,7 +113,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_THREAD_MAINTAIN_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
@@ -193,7 +121,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     tss_data_node* find_tss_data(void const* key)
     {
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (NULL == self)
         {
@@ -209,14 +137,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #else
         boost::throw_exception(std::runtime_error(
             "thread local storage has been disabled at configuration time, "
-            "please specify HPX_THREAD_MAINTAIN_LOCAL_STORAGE=ON to cmake"));
+            "please specify HPX_HAVE_THREAD_LOCAL_STORAGE=ON to cmake"));
         return 0;
 #endif
     }
 
     void* get_tss_data(void const* key)
     {
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         if (tss_data_node* const current_node = find_tss_data(key))
             return current_node->get_value();
 #endif
@@ -226,7 +154,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     void add_new_tss_node(void const* key,
         boost::shared_ptr<tss_cleanup_function> const& func, void* tss_data)
     {
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (NULL == self)
         {
@@ -247,7 +175,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     void erase_tss_node(void const* key, bool cleanup_existing)
     {
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (NULL == self)
         {
@@ -265,7 +193,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         boost::shared_ptr<tss_cleanup_function> const& func,
         void* tss_data, bool cleanup_existing)
     {
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         if (tss_data_node* const current_node = find_tss_data(key))
         {
             if (func || (tss_data != 0))

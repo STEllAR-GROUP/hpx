@@ -34,11 +34,14 @@ namespace hpx { namespace traits
         static char const* call()
         {
             return
-                "ifname = ${HPX_PARCEL_IBVERBS_IFNAME:" HPX_PARCELPORT_IBVERBS_IFNAME "}\n"
-                "memory_chunk_size = ${HPX_PARCEL_IBVERBS_MEMORY_CHUNK_SIZE:"
-                    BOOST_PP_STRINGIZE(HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE) "}\n"
-                "max_memory_chunks = ${HPX_PARCEL_IBVERBS_MAX_MEMORY_CHUNKS:"
-                    BOOST_PP_STRINGIZE(HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS) "}\n"
+                "ifname = ${HPX_HAVE_PARCEL_IBVERBS_IFNAME:"
+                HPX_HAVE_PARCELPORT_IBVERBS_IFNAME "}\n"
+                "memory_chunk_size = ${HPX_HAVE_PARCEL_IBVERBS_MEMORY_CHUNK_SIZE:"
+                    BOOST_PP_STRINGIZE(HPX_HAVE_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE)
+                "}\n"
+                "max_memory_chunks = ${HPX_HAVE_PARCEL_IBVERBS_MAX_MEMORY_CHUNKS:"
+                    BOOST_PP_STRINGIZE(HPX_HAVE_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS)
+                "}\n"
                 "zero_copy_optimization = 0\n"
                 "io_pool_size = 2\n"
                 "use_io_pool = 1\n"

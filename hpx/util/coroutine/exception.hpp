@@ -30,7 +30,7 @@
 #define HPX_COROUTINE_EXCEPTION_HPP_20060601
 #include <exception>
 #include <typeinfo>
-namespace hpx { namespace util { namespace coroutines 
+namespace hpx { namespace util { namespace coroutines
 {
   // All coroutine exceptions are derived from this base.
   class exception_base : public std::exception {};

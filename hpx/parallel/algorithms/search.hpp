@@ -13,11 +13,11 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <hpx/parallel/util/partitioner.hpp>
@@ -46,15 +46,17 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first, FwdIter last,
+            sequential(ExPolicy, FwdIter first, FwdIter last,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
                 return std::search(first, last, s_first, s_last, op);
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
                 typedef typename std::iterator_traits<FwdIter>::reference
@@ -63,7 +65,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type;
                 typedef typename std::iterator_traits<FwdIter2>::difference_type
                     s_difference_type;
-                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
 
                 s_difference_type diff = std::distance(s_first, s_last);
                 if (diff <= 0)
@@ -176,7 +178,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter, typename FwdIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search(ExPolicy && policy, FwdIter first, FwdIter last,
         FwdIter2 s_first, FwdIter2 s_last)
@@ -241,7 +243,15 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param op           Refers to the binary predicate which returns true if the
     ///                     elements should be treated as equal. the signature of
     ///                     the function should be equivalent to
-    ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a InIter1 and \a InIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
     ///
     /// The comparison operations in the parallel \a search algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -267,7 +277,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search(ExPolicy && policy, FwdIter first, FwdIter last,
         FwdIter2 s_first, FwdIter2 s_last, Pred && op)
@@ -313,7 +323,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first, std::size_t count,
+            sequential(ExPolicy, FwdIter first, std::size_t count,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
                 return std::search(first, std::next(first, count),
@@ -321,8 +331,10 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy const& policy, FwdIter first, std::size_t count,
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
+            parallel(ExPolicy policy, FwdIter first, std::size_t count,
                 FwdIter2 s_first, FwdIter2 s_last, Pred && op)
             {
                 typedef typename std::iterator_traits<FwdIter>::reference
@@ -331,7 +343,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     difference_type;
                 typedef typename std::iterator_traits<FwdIter2>::difference_type
                     s_difference_type;
-                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
 
                 s_difference_type diff = std::distance(s_first, s_last);
                 if (diff <= 0)
@@ -388,7 +400,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \endcond
     }
 
-    /// Searches the range [first, first+count) for any elements in the range [s_first, s_last).
+    /// Searches the range [first, first+count) for any elements in the range
+    /// [s_first, s_last).
     /// Uses the operator== to compare elements.
     ///
     /// \note   Complexity: at most (S*N) comparisons where
@@ -435,14 +448,15 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a search_n algorithm returns an iterator to the beginning of
     ///           the first subsequence [s_first, s_last) in range [first, first+count).
     ///           If the length of the subsequence [s_first, s_last) is greater
-    ///           than the length of the range [first, first+count), \a first is returned.
+    ///           than the length of the range [first, first+count),
+    ///           \a first is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a first is also returned.
     ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search_n(ExPolicy && policy, FwdIter first, std::size_t count,
         FwdIter2 s_first, FwdIter2 s_last)
@@ -507,7 +521,15 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param op           Refers to the binary predicate which returns true if the
     ///                     elements should be treated as equal. the signature of
     ///                     the function should be equivalent to
-    ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a InIter1 and \a InIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
     ///
     /// The comparison operations in the parallel \a search_n algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -525,7 +547,8 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           The \a search_n algorithm returns an iterator to the beginning of
     ///           the last subsequence [s_first, s_last) in range [first, first+count).
     ///           If the length of the subsequence [s_first, s_last) is greater
-    ///           than the length of the range [first, first+count), \a first is returned.
+    ///           than the length of the range [first, first+count),
+    ///           \a first is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a first is also returned.
     ///
@@ -533,7 +556,7 @@ namespace hpx {namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     search_n(ExPolicy && policy, FwdIter first, std::size_t count,
         FwdIter2 s_first, FwdIter2 s_last, Pred && op)

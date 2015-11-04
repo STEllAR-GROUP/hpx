@@ -10,6 +10,7 @@
 
 #include <hpx/include/client.hpp>
 #include <hpx/runtime/agas/stubs/component_namespace.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 namespace hpx { namespace agas
 {
@@ -41,7 +42,7 @@ struct component_namespace
       , error_code& ec = throws
         )
     {
-        return this->base_type::service(this->get_gid(), req, priority, ec);
+        return this->base_type::service(this->get_id(), req, priority, ec);
     }
 
     void service_non_blocking(
@@ -49,7 +50,7 @@ struct component_namespace
       , threads::thread_priority priority = threads::thread_priority_default
         )
     {
-        this->base_type::service_non_blocking(this->get_gid(), req, priority);
+        this->base_type::service_non_blocking(this->get_id(), req, priority);
     }
 
     std::vector<response> bulk_service(
@@ -58,7 +59,7 @@ struct component_namespace
       , error_code& ec = throws
         )
     {
-        return this->base_type::bulk_service(this->get_gid(), reqs, priority, ec);
+        return this->base_type::bulk_service(this->get_id(), reqs, priority, ec);
     }
 
     void bulk_service_non_blocking(
@@ -66,7 +67,7 @@ struct component_namespace
       , threads::thread_priority priority = threads::thread_priority_default
         )
     {
-        this->base_type::bulk_service_non_blocking(this->get_gid(), reqs, priority);
+        this->base_type::bulk_service_non_blocking(this->get_id(), reqs, priority);
     }
 };
 

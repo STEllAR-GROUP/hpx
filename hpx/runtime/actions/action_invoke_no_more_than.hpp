@@ -19,6 +19,8 @@
 
 #include <boost/static_assert.hpp>
 
+#include <memory>
+
 namespace hpx { namespace actions { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -44,9 +46,9 @@ namespace hpx { namespace actions { namespace detail
     template <typename Action, int N>
     struct action_decorate_function_semaphore
     {
-        typedef lcos::local::detail::counting_semaphore<
-            lcos::local::spinlock, N
-        > semaphore_type;
+        typedef lcos::local::counting_semaphore_var<
+                hpx::lcos::local::spinlock, N
+            > semaphore_type;
 
         struct tag {};
 
@@ -87,6 +89,7 @@ namespace hpx { namespace actions { namespace detail
         call(naming::address::address_type lva, F && f, boost::mpl::false_)
         {
             typedef typename Action::component_type component_type;
+
             return util::bind(
                 util::one_shot(&action_decorate_function::thread_function),
                 util::placeholders::_1,
@@ -110,6 +113,7 @@ namespace hpx { namespace actions { namespace detail
         call(naming::address::address_type lva, F && f, boost::mpl::true_)
         {
             typedef typename Action::component_type component_type;
+
             return util::bind(
                 util::one_shot(&action_decorate_function::thread_function_future),
                 util::placeholders::_1,
@@ -139,26 +143,30 @@ namespace hpx { namespace actions { namespace detail
         typedef typed_continuation<result_type> base_type;
 
     public:
-        wrapped_continuation(continuation_type& cont)
-          : cont_(cont)
+        wrapped_continuation(std::unique_ptr<continuation> cont)
+          : cont_(std::move(cont))
         {}
 
-        void trigger() const
+        wrapped_continuation(wrapped_continuation && o)
+          : cont_(std::move(o.cont_))
+        {}
+
+        void trigger()
         {
             if (cont_) cont_->trigger();
             construct_semaphore_type::get_sem().signal();
         }
 
-        void deferred_trigger(result_type&& result) const
+        void deferred_trigger(result_type&& result)
         {
             if (cont_) {
-                boost::static_pointer_cast<base_type const>(cont_)->
+                static_cast<base_type *>(cont_.get())->
                     deferred_trigger(std::move(result));
             }
             construct_semaphore_type::get_sem().signal();
         }
 
-        void trigger_value(result_type && result) const
+        void trigger_value(result_type && result)
         {
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {
@@ -170,24 +178,23 @@ namespace hpx { namespace actions { namespace detail
             // once its ready
             result.then(
                 util::bind(&wrapped_continuation::deferred_trigger,
-                    boost::static_pointer_cast<wrapped_continuation const>(
-                        this->shared_from_this()),
+                    std::move(*this),
                     util::placeholders::_1));
         }
 
-        void trigger_error(boost::exception_ptr const& e) const
+        void trigger_error(boost::exception_ptr const& e)
         {
             if (cont_) cont_->trigger_error(e);
             construct_semaphore_type::get_sem().signal();
         }
-        void trigger_error(boost::exception_ptr && e) const
+        void trigger_error(boost::exception_ptr && e)
         {
             if (cont_) cont_->trigger_error(std::move(e));
             construct_semaphore_type::get_sem().signal();
         }
 
     private:
-        continuation_type cont_;
+        std::unique_ptr<continuation> cont_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -216,13 +223,13 @@ namespace hpx { namespace actions { namespace detail
         template <typename Continuation>
         static bool call(Continuation& c, boost::mpl::true_)
         {
-            Continuation cont(new wrapped_continuation<Action, N>(c));
-            c = cont;
+            c = std::unique_ptr<continuation>(
+                new wrapped_continuation<Action, N>(std::move(c)));
             return true;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static bool call(hpx::actions::continuation_type& cont)
+        static bool call(std::unique_ptr<continuation>& cont)
         {
             typedef typename Action::result_type result_type;
             typedef typename traits::is_future<result_type>::type is_future;

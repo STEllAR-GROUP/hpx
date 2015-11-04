@@ -21,6 +21,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 
+#include <boost/preprocessor/cat.hpp>
+
 #include <iostream>
 #include <tuple>
 #include <vector>
@@ -81,7 +83,7 @@ namespace hpx { namespace server
             partition_unordered_map_(rhs.partition_unordered_map_)
         {}
 
-        partition_unordered_map operator=(partition_unordered_map const& rhs)
+        partition_unordered_map& operator=(partition_unordered_map const& rhs)
         {
             if (this != &rhs)
             {
@@ -96,7 +98,7 @@ namespace hpx { namespace server
             partition_unordered_map_(std::move(rhs.partition_unordered_map_))
         {}
 
-        partition_unordered_map operator=(partition_unordered_map && rhs)
+        partition_unordered_map& operator=(partition_unordered_map && rhs)
         {
             if (this != &rhs)
             {
@@ -405,7 +407,7 @@ namespace hpx { namespace server
     typedef ::hpx::components::simple_component<                              \
         BOOST_PP_CAT(partition_unordered_map, __LINE__)                       \
     > BOOST_PP_CAT(__unordered_map_, name);                                   \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(BOOST_PP_CAT(__unordered_map_, name)) \
+    HPX_REGISTER_COMPONENT(BOOST_PP_CAT(__unordered_map_, name))              \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -443,7 +445,7 @@ namespace hpx
         get_ptr() const
         {
             error_code ec(lightweight);
-            return hpx::get_ptr<server_type>(this->get_gid()).get(ec);
+            return hpx::get_ptr<server_type>(this->get_id()).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -455,8 +457,8 @@ namespace hpx
         ///
         future<std::size_t> size_async() const
         {
-            HPX_ASSERT(this->get_gid());
-            return hpx::async<typename server_type::size_action>(this->get_gid());
+            HPX_ASSERT(this->get_id());
+            return hpx::async<typename server_type::size_action>(this->get_id());
         }
 
         /// Return the size of the partition_unordered_map component.
@@ -492,9 +494,9 @@ namespace hpx
         ///
         future<T> get_value(Key const& pos, bool erase) const
         {
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::get_value_action>(
-                this->get_gid(), pos, erase);
+                this->get_id(), pos, erase);
         }
 
         /// Returns the value at position \a pos in the partition_unordered_map
@@ -519,9 +521,9 @@ namespace hpx
         ///
         future<std::vector<T> > get_values(std::vector<Key> const& keys) const
         {
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::get_values_action>(
-                this->get_gid(), keys);
+                this->get_id(), keys);
         }
 
         /// Copy the value of \a val in the element at position
@@ -547,9 +549,9 @@ namespace hpx
         template <typename T_>
         future<void> set_value(Key const& pos, T_ && val)
         {
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::set_value_action>(
-                this->get_gid(), pos, std::forward<T_>(val));
+                this->get_id(), pos, std::forward<T_>(val));
         }
 
         /// Copy the value of \a val in the element at position
@@ -575,9 +577,9 @@ namespace hpx
         future<void> set_values(std::vector<Key> const& keys,
             std::vector<T> const& vals)
         {
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::set_values_action>(
-                this->get_gid(), keys, vals);
+                this->get_id(), keys, vals);
         }
 
         /// Erase all values with the given key from the partition_unordered_map
@@ -602,9 +604,9 @@ namespace hpx
         ///
         future<std::size_t> erase(Key const& key)
         {
-            HPX_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_id());
             return hpx::async<typename server_type::erase_action>(
-                this->get_gid(), key);
+                this->get_id(), key);
         }
     };
 }

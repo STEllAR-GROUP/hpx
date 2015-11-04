@@ -10,11 +10,11 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -33,7 +33,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     namespace detail
     {
         /// \cond NOINTERNAL
-        struct lexicographical_compare : public detail::algorithm<lexicographical_compare, bool>
+        struct lexicographical_compare
+            : public detail::algorithm<lexicographical_compare, bool>
         {
             lexicographical_compare()
                 : lexicographical_compare::algorithm("lexicographical_compare")
@@ -42,7 +43,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
            template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename Pred>
            static bool
-           sequential(ExPolicy const&, InIter1 first1, InIter1 last1, InIter2 first2,
+           sequential(ExPolicy, InIter1 first1, InIter1 last1, InIter2 first2,
                 InIter2 last2, Pred && pred)
             {
                 return std::lexicographical_compare(first1, last1, first2, last2, pred);
@@ -50,8 +51,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename Pred>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+            static typename util::detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
                 FwdIter2 last2, Pred && pred)
             {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
@@ -60,15 +61,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count1 = std::distance(first1, last1);
                 std::size_t count2 = std::distance(first2, last2);
 
-                // An empty range is lexicographically less than any non-empty range
+                // An empty range is lexicographically less than any non-empty
+                // range
                 if (count1 == 0 && count2 != 0)
                 {
-                    return detail::algorithm_result<ExPolicy, bool>::get(true);
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
+                        true);
                 }
 
                 if (count2 == 0 && count1 != 0)
                 {
-                    return detail::algorithm_result<ExPolicy, bool>::get(false);
+                    return util::detail::algorithm_result<ExPolicy, bool>::get(
+                        false);
                 }
 
                 std::size_t count = (std::min)(count1, count2);
@@ -114,8 +118,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// the second range [first2, last2). uses operator< to comapre elements.
     ///
     /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation <, where \code N1 = std::distance(first1, last) \endcode
-    ///         and \code N2 = std::distance(first2, last2) \endcode .
+    ///         operation <, where N1 = std::distance(first1, last)
+    ///         and N2 = std::distance(first2, last2).
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -147,14 +151,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// calling thread.
     ///
     /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type \a parallel_execution_policy
+    /// algorithm invoked with an execution policy object of type
+    /// \a parallel_execution_policy
     /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparison is an operation with the following properties
+    /// \note     Lexicographical comparison is an operation
+    ///           with the following properties
     ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range is lexicographically
+    ///             - The first mismatching element defines which range
+    ///               is lexicographically
     ///               \a less or \a greater than the other
     ///             - If one range is a prefix of another, the shorter range is
     ///               lexicographically \a less than the other
@@ -176,7 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     lexicographical_compare(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2)
@@ -215,8 +222,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// elements.
     ///
     /// \note   Complexity: At most 2 * min(N1, N2) applications of the comparison
-    ///         operation, where \code N1 = std::distance(first1, last) \endcode
-    ///         and \code N2 = std::distance(first2, last2) \endcode .
+    ///         operation, where N1 = std::distance(first1, last)
+    ///         and N2 = std::distance(first2, last2).
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -252,14 +259,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// calling thread.
     ///
     /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type \a parallel_execution_policy
+    /// algorithm invoked with an execution policy object of type
+    /// \a parallel_execution_policy
     /// or \a parallel_task_execution_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     Lexicographical comparision is an operation with the following properties
+    /// \note     Lexicographical comparision is an operation with the
+    ///           following properties
     ///             - Two ranges are compared element by element
-    ///             - The first mismatching element defines which range is lexicographically
+    ///             - The first mismatching element defines which range
+    ///               is lexicographically
     ///               \a less or \a greater than the other
     ///             - If one range is a prefix of another, the shorter range is
     ///               lexicographically \a less than the other
@@ -282,7 +292,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     lexicographical_compare(ExPolicy && policy, InIter1 first1, InIter1 last1,
         InIter2 first2, InIter2 last2, Pred && pred)

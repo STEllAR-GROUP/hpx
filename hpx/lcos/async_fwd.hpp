@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,10 +8,10 @@
 #if !defined(HPX_LCOS_ASYNC_FWD_SEP_28_2011_0840AM)
 #define HPX_LCOS_ASYNC_FWD_SEP_28_2011_0840AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
-#include <hpx/util/always_void.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/decay.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -26,54 +26,41 @@ namespace hpx { namespace actions
         typedef typename type::result_type result_type;
         typedef typename type::remote_result_type remote_result_type;
     };
-
-    template <typename Action>
-    struct extract_action<Action
-      , typename util::always_void<typename Action::type>::type>
-      : extract_action<typename Action::type>
-    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
-        >::type>
-    async(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        Ts&&... vs);
+    namespace detail
+    {
+        // dispatch point used for async implementations
+        template <typename Func, typename Enable = void>
+        struct async_dispatch;
 
-    template <typename Action, typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
-        >::type>
-    async(naming::id_type const& gid, Ts&&... vs);
+        // dispatch point used for async<Action> implementations
+        template <typename Action, typename Func, typename Enable = void>
+        struct async_action_dispatch;
 
-    template <
-        typename Component, typename Signature, typename Derived,
-        typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Derived>::remote_result_type
-        >::type>
-    async(
-        hpx::actions::basic_action<Component, Signature, Derived> const& /*act*/,
-        naming::id_type const& gid, Ts&&... vs);
+        // dispatch point used for launch_policy implementations
+        template <typename Action, typename Enable = void>
+        struct async_launch_policy_dispatch;
+    }
 
-    template <
-        typename Component, typename Signature, typename Derived,
-        typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Derived>::remote_result_type
-        >::type>
-    async(BOOST_SCOPED_ENUM(launch) policy,
-        hpx::actions::basic_action<Component, Signature, Derived> const& /*act*/,
-        naming::id_type const& gid, Ts&&... vs);
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename F, typename ...Ts>
+    BOOST_FORCEINLINE
+    auto async(F&& f, Ts&&... ts)
+    ->  decltype(detail::async_action_dispatch<
+                    Action, typename util::decay<F>::type
+            >::call(std::forward<F>(f), std::forward<Ts>(ts)...
+        ));
+
+    template <typename F, typename ...Ts>
+    BOOST_FORCEINLINE auto async(F&& f, Ts&&... ts)
+    ->  decltype(detail::async_dispatch<typename util::decay<F>::type>::call(
+            std::forward<F>(f), std::forward<Ts>(ts)...
+        ));
 }
 
 #endif

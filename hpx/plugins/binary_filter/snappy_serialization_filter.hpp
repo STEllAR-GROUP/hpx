@@ -11,12 +11,8 @@
 #if defined(HPX_HAVE_COMPRESSION_SNAPPY)
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
-#include <hpx/util/binary_filter.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/iostreams/filter/zlib.hpp>
 
 #include <memory>
@@ -27,13 +23,12 @@
 namespace hpx { namespace plugins { namespace compression
 {
     struct HPX_LIBRARY_EXPORT snappy_serialization_filter
-      : public util::binary_filter
+      : public serialization::binary_filter
     {
         snappy_serialization_filter(bool compress = false,
-                util::binary_filter* next_filter = 0)
+                serialization::binary_filter* next_filter = 0)
           : current_(0), compress_(compress)
         {}
-        ~snappy_serialization_filter();
 
         void load(void* dst, std::size_t dst_count);
         void save(void const* src, std::size_t src_count);
@@ -43,15 +38,14 @@ namespace hpx { namespace plugins { namespace compression
         std::size_t init_data(char const* buffer,
             std::size_t size, std::size_t buffer_size);
 
-        /// serialization support
-        static void register_base();
-
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
+
+        HPX_SERIALIZATION_POLYMORPHIC(snappy_serialization_filter);
 
         std::vector<char> buffer_;
         std::size_t current_;
@@ -60,9 +54,6 @@ namespace hpx { namespace plugins { namespace compression
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>
-
-HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
-    hpx::plugins::compression::snappy_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_USES_SNAPPY_COMPRESSION(action)                            \
@@ -73,7 +64,8 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
         {                                                                     \
             /* Note that the caller is responsible for deleting the filter */ \
             /* instance returned from this function */                        \
-            static util::binary_filter* call(parcelset::parcel const& p)      \
+            static serialization::binary_filter* call(                        \
+                    parcelset::parcel const& p)                               \
             {                                                                 \
                 return hpx::create_binary_filter(                             \
                     "snappy_serialization_filter", true);                     \

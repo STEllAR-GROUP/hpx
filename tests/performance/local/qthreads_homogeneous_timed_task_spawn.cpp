@@ -84,21 +84,21 @@ void print_results(
 
 ///////////////////////////////////////////////////////////////////////////////
 extern "C" aligned_t worker(
-    void* 
+    void*
     )
 {
     int volatile i = 0;
-    
+
     //start timer
-	high_resolution_timer td;
-	
-	while(true) { 
-   		if(td.elapsed() > delay_sec) 
-          break; 
-        else  
-            ++i; 
+    high_resolution_timer td;
+
+    while(true) {
+        if(td.elapsed() > delay_sec)
+          break;
+        else
+            ++i;
     }
-    
+
     ++donecount;
 
     return aligned_t();
@@ -111,10 +111,10 @@ int qthreads_main(
 {
     if (vm.count("no-header"))
         header = false;
-        
+
     //time in seconds
     delay_sec = (delay) * 1.0E-6;
-    
+
     {
         // Validate command line.
         if (0 == tasks)
@@ -151,7 +151,7 @@ int main(
     cmdline.add_options()
        ( "help,h"
        , "print out program usage (this message)")
-        
+
         ( "shepherds,s"
         , value<boost::uint64_t>()->default_value(1),
          "number of shepherds to use")
@@ -167,8 +167,8 @@ int main(
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
         , "delay in micro-seconds for the loop")
-        
-        
+
+
         ( "no-header"
         , "do not print out the csv header row")
         ;
@@ -184,8 +184,6 @@ int main(
         std::cout << cmdline;
         return 0;
     }
-
- 
 
     // Set qthreads environment variables.
     std::string const shepherds = boost::lexical_cast<std::string>

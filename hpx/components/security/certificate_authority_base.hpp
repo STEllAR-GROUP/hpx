@@ -6,7 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_CERTIFICATE_AUTHORITY_BASE_HPP
 #define HPX_COMPONENTS_SECURITY_CERTIFICATE_AUTHORITY_BASE_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
 #include <hpx/include/components.hpp>
 #include <hpx/components/security/stubs/certificate_authority_base.hpp>
 
@@ -39,19 +42,21 @@ namespace hpx { namespace components { namespace security
             signed_type<certificate_signing_request> const & signed_csr) const
         {
             return this->base_type::sign_certificate_signing_request(
-                this->get_gid(), signed_csr);
+                this->get_id(), signed_csr);
         }
 
         signed_type<certificate> get_certificate() const
         {
-            return this->base_type::get_certificate(this->get_gid());
+            return this->base_type::get_certificate(this->get_id());
         }
 
         bool is_valid() const
         {
-            return this->base_type::is_valid(this->get_gid());
+            return this->base_type::is_valid(this->get_id());
         }
     };
 }}}
+
+#endif
 
 #endif

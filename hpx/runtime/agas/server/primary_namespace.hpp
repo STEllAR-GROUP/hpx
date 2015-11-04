@@ -12,27 +12,28 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/traits/action_may_require_id_splitting.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
 
-#include <map>
-
+#include <boost/atomic.hpp>
 #include <boost/format.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/atomic.hpp>
+#include <boost/thread/locks.hpp>
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
 #include <boost/shared_ptr.hpp>
 #endif
+
+#include <map>
 
 namespace hpx { namespace agas
 {
@@ -72,7 +73,10 @@ char const* const primary_namespace_service_name = "primary/";
 ///                  Bit 95 is a flag that is set if a GID's credit count is
 ///                  ever split (e.g. if the GID is ever passed to another
 ///                  locality).
-///     identifier - Bit 64 to bit 87 of the MSB, and the entire LSB. The
+///                - Bit 87 marks the gid such that it will not be stored in
+///                  any of the AGAS caches. This is used mainly for ids
+///                  which represent 'one-shot' objects (like promises).
+///     identifier - Bit 64 to bit 86 of the MSB, and the entire LSB. The
 ///                  content of these bits depends on the component type of
 ///                  the underlying object. For all user-defined components,
 ///                  these bits contain a unique 88-bit number which is
@@ -234,7 +238,7 @@ struct HPX_EXPORT primary_namespace
         boost::atomic<boost::int64_t>& t_;
     };
 
-#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+#if defined(HPX_HAVE_AGAS_DUMP_REFCNT_ENTRIES)
     /// Dump the credit counts of all matching ranges. Expects that \p l
     /// is locked.
     void dump_refcnt_matches(
@@ -242,7 +246,7 @@ struct HPX_EXPORT primary_namespace
       , refcnt_table_type::iterator upper_it
       , naming::gid_type const& lower
       , naming::gid_type const& upper
-      , mutex_type::scoped_lock& l
+      , boost::unique_lock<mutex_type>& l
       , const char* func_name
         );
 #endif
@@ -257,7 +261,7 @@ struct HPX_EXPORT primary_namespace
 
     // helper function
     void wait_for_migration_locked(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , naming::gid_type id
       , error_code& ec);
 
@@ -320,8 +324,7 @@ struct HPX_EXPORT primary_namespace
         );
 
     response route(
-        request const& req
-      , error_code& ec = throws
+        parcelset::parcel && p
         );
 
     response bind_gid(
@@ -361,7 +364,8 @@ struct HPX_EXPORT primary_namespace
 
   private:
     resolved_type resolve_gid_locked(
-        naming::gid_type const& gid
+        boost::unique_lock<mutex_type>& l
+      , naming::gid_type const& gid
       , error_code& ec
         );
 
@@ -386,7 +390,7 @@ struct HPX_EXPORT primary_namespace
     };
 
     void resolve_free_list(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , std::list<refcnt_table_type::iterator> const& free_list
       , std::list<free_entry>& free_entry_list
       , naming::gid_type const& lower
@@ -430,7 +434,10 @@ struct HPX_EXPORT primary_namespace
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service, bulk_service_action);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service,
+        bulk_service_action);
+
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route, route_action);
 
     static parcelset::policies::message_handler* get_message_handler(
         parcelset::parcelhandler* ph
@@ -438,7 +445,7 @@ struct HPX_EXPORT primary_namespace
       , parcelset::parcel const& p
         );
 
-    static util::binary_filter* get_serialization_filter(
+    static serialization::binary_filter* get_serialization_filter(
         parcelset::parcel const& p
         );
 };
@@ -453,11 +460,15 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::bulk_service_action,
     primary_namespace_bulk_service_action)
 
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::route_action,
+    primary_namespace_route_action)
+
 namespace hpx { namespace traits
 {
     // Parcel routing forwards the message handler request to the routed action
     template <>
-    struct action_message_handler<agas::server::primary_namespace::service_action>
+    struct action_message_handler<agas::server::primary_namespace::route_action>
     {
         static parcelset::policies::message_handler* call(
             parcelset::parcelhandler* ph
@@ -473,28 +484,11 @@ namespace hpx { namespace traits
     // Parcel routing forwards the binary filter request to the routed action
     template <>
     struct action_serialization_filter<
-        agas::server::primary_namespace::service_action>
+        agas::server::primary_namespace::route_action>
     {
-        static util::binary_filter* call(parcelset::parcel const& p)
+        static serialization::binary_filter* call(parcelset::parcel const& p)
         {
             return agas::server::primary_namespace::get_serialization_filter(p);
-        }
-    };
-
-    // id-splitting does not happen for incref operations
-    template <>
-    struct action_may_require_id_splitting<
-        agas::server::primary_namespace::service_action>
-    {
-        template <typename Arguments>
-        static bool call(Arguments const& args)
-        {
-            if (boost::fusion::at_c<0>(args).get_action_code() ==
-                agas::primary_ns_increment_credit)
-            {
-                return false;
-            }
-            return true;
         }
     };
 }}

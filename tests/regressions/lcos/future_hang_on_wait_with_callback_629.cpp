@@ -8,6 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/wait_each.hpp>
 #include <hpx/include/plain_actions.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/util/unwrapped.hpp>
 
 #include <boost/random.hpp>

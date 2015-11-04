@@ -13,7 +13,6 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/move/move.hpp>
 
@@ -49,7 +48,8 @@ namespace sheneos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_shutdown(hpx::util::function_nonser<void()>& shutdown_func, bool& pre_shutdown)
+    bool get_shutdown(hpx::util::function_nonser<void()>& shutdown_func,
+        bool& pre_shutdown)
     {
         shutdown_func = shutdown;
         pre_shutdown = false;       // run this as late as possible
@@ -171,7 +171,7 @@ namespace sheneos
         distributing_factory::iterator_range_type parts =
             hpx::util::locality_results(results);
 
-        BOOST_FOREACH(hpx::naming::id_type id, parts)
+        for (hpx::naming::id_type id : parts)
         {
             std::cout << "Partition " << partitions_.size() << ": " << id << "\n";
             partitions_.push_back(id);
@@ -241,8 +241,9 @@ namespace sheneos
         // Create the config object locally.
         hpx::naming::id_type config_id =
             hpx::find_locality(configuration::get_component_type());
-        cfg_ = configuration(config_id, datafilename, symbolic_name_base, num_localities);
-        hpx::agas::register_name(symbolic_name_base, cfg_.get_gid());
+        cfg_ = configuration(config_id, datafilename, symbolic_name_base,
+            num_localities);
+        hpx::agas::register_name(symbolic_name_base, cfg_.get_id());
 
         if (symbolic_name_base[symbolic_name_base.size() - 1] != '/')
             symbolic_name_base += "/";
@@ -250,7 +251,7 @@ namespace sheneos
         std::size_t i = 0;
 
         // Register symbolic names of all involved components.
-        BOOST_FOREACH(hpx::naming::id_type const& id, partitions_)
+        for (hpx::naming::id_type const& id : partitions_)
         {
             using boost::lexical_cast;
             hpx::agas::register_name(
@@ -264,7 +265,7 @@ namespace sheneos
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::naming::id_type const&
-    interpolator::get_gid(double ye, double temp, double rho)  const
+    interpolator::get_id(double ye, double temp, double rho)  const
     {
         std::size_t x = get_partition_index(dimension::ye, ye);
         std::size_t y = get_partition_index(dimension::temp, std::log10(temp));
@@ -380,7 +381,7 @@ namespace sheneos
             lazy_results.reserve(partitions->size());
 
             typedef std::map<naming::id_type, context_data>::value_type value_type;
-            BOOST_FOREACH(value_type& p, *partitions)
+            for (value_type& p : *partitions)
             {
                 typedef sheneos::server::partition3d::interpolate_one_bulk_action
                     action_type;
@@ -388,7 +389,7 @@ namespace sheneos
                 context_data& d = p.second;
                 lazy_results.push_back(
                     hpx::async<action_type>(
-                        p.first, boost::move(d.coords_), eosvalue
+                        p.first, std::move(d.coords_), eosvalue
                     ).then(
                         on_completed_bulk_one(partitions, d, overall_result)
                     )
@@ -425,7 +426,7 @@ namespace sheneos
         for (std::vector<sheneos_coord>::const_iterator it = coords.begin();
             it != end; ++it, ++index)
         {
-            context_data& d = parts[get_gid(*it)];
+            context_data& d = parts[get_id(*it)];
 
             d.indicies_.push_back(index);
             d.coords_.push_back(*it);
@@ -498,7 +499,7 @@ namespace sheneos
             lazy_results.reserve(partitions->size());
 
             typedef std::map<naming::id_type, context_data>::value_type value_type;
-            BOOST_FOREACH(value_type& p, *partitions)
+            for (value_type& p : *partitions)
             {
                 typedef sheneos::server::partition3d::interpolate_bulk_action
                     action_type;
@@ -506,7 +507,7 @@ namespace sheneos
                 context_data& d = p.second;
                 lazy_results.push_back(
                     hpx::async<action_type>(
-                        p.first, boost::move(d.coords_), eosvalues
+                        p.first, std::move(d.coords_), eosvalues
                     ).then(
                         on_completed_bulk(partitions, d, overall_results)
                     )
@@ -542,7 +543,7 @@ namespace sheneos
         for (std::vector<sheneos_coord>::const_iterator it = coords.begin();
             it != end; ++it, ++index)
         {
-            context_data& d = parts[get_gid(*it)];
+            context_data& d = parts[get_id(*it)];
 
             d.indicies_.push_back(index);
             d.coords_.push_back(*it);

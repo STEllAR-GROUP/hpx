@@ -56,7 +56,7 @@ void lock_and_wait(
     while (true)
     {
         // Try to acquire the mutex.
-        mutex::scoped_try_lock l(m);
+        boost::unique_lock<mutex> l(m, boost::try_to_lock);
 
         if (l.owns_lock())
         {

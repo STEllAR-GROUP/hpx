@@ -7,17 +7,16 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_TRANSFORM_REDUCE_DEC_17_2014_1157AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
-#include <hpx/parallel/algorithms/remote/dispatch.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
@@ -38,7 +37,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename T, typename Reduce, typename Convert>
-        static typename detail::algorithm_result<ExPolicy, T>::type
+        static typename util::detail::algorithm_result<ExPolicy, T>::type
         segmented_transform_reduce(Algo && algo, ExPolicy const& policy,
             SegIter first, SegIter last, T && init,
             Reduce && red_op, Convert && conv_op, boost::mpl::true_)
@@ -46,7 +45,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef detail::algorithm_result<ExPolicy, T> result;
+            typedef util::detail::algorithm_result<ExPolicy, T> result;
 
             using boost::mpl::true_;
 
@@ -63,11 +62,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     overall_result =
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, std::forward<T>(init),
-                            std::forward<Reduce>(red_op),
-                            std::forward<Convert>(conv_op));
+                        dispatch(traits::get_id(sit), algo, policy, true_(),
+                            beg, end, init, red_op, conv_op);
                 }
             }
             else {
@@ -78,11 +74,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     overall_result = red_op(
                         overall_result,
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, std::forward<T>(init),
-                            std::forward<Reduce>(red_op),
-                            std::forward<Convert>(conv_op))
+                        dispatch(traits::get_id(sit), algo, policy, true_(),
+                            beg, end, init, red_op, conv_op)
                     );
                 }
 
@@ -95,11 +88,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         overall_result = red_op(
                             overall_result,
-                            util::remote::dispatch(traits::get_id(sit),
-                                std::forward<Algo>(algo), policy, true_(),
-                                beg, end, std::forward<T>(init),
-                                std::forward<Reduce>(red_op),
-                                std::forward<Convert>(conv_op))
+                            dispatch(traits::get_id(sit), algo, policy,
+                                true_(), beg, end, init, red_op, conv_op)
                         );
                     }
                 }
@@ -111,11 +101,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 {
                     overall_result = red_op(
                         overall_result,
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, std::forward<T>(init),
-                            std::forward<Reduce>(red_op),
-                            std::forward<Convert>(conv_op))
+                        dispatch(traits::get_id(sit), algo, policy, true_(),
+                            beg, end, init, red_op, conv_op)
                     );
                 }
             }
@@ -126,7 +113,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename T, typename Reduce, typename Convert>
-        static typename detail::algorithm_result<ExPolicy, T>::type
+        static typename util::detail::algorithm_result<ExPolicy, T>::type
         segmented_transform_reduce(Algo && algo, ExPolicy const& policy,
             SegIter first, SegIter last, T && init,
             Reduce && red_op, Convert && conv_op, boost::mpl::false_)
@@ -134,7 +121,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
             typedef typename traits::local_iterator local_iterator_type;
-            typedef detail::algorithm_result<ExPolicy, T> result;
+            typedef util::detail::algorithm_result<ExPolicy, T> result;
 
             typedef typename std::iterator_traits<SegIter>::iterator_category
                 iterator_category;
@@ -156,11 +143,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, std::forward<T>(init),
-                            std::forward<Reduce>(red_op),
-                            std::forward<Convert>(conv_op))
+                        dispatch_async(traits::get_id(sit),
+                            algo, policy, forced_seq(),
+                            beg, end, init, red_op, conv_op)
                     );
                 }
             }
@@ -171,11 +156,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, std::forward<T>(init),
-                            std::forward<Reduce>(red_op),
-                            std::forward<Convert>(conv_op))
+                        dispatch_async(traits::get_id(sit),
+                            algo, policy, forced_seq(),
+                            beg, end, init, red_op, conv_op)
                     );
                 }
 
@@ -187,11 +170,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         segments.push_back(
-                            util::remote::dispatch_async(traits::get_id(sit),
-                                std::forward<Algo>(algo), policy, forced_seq(),
-                                beg, end, std::forward<T>(init),
-                                std::forward<Reduce>(red_op),
-                                std::forward<Convert>(conv_op))
+                            dispatch_async(traits::get_id(sit),
+                                algo, policy, forced_seq(),
+                                beg, end, init, red_op, conv_op)
                         );
                     }
                 }
@@ -202,11 +183,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, std::forward<T>(init),
-                            std::forward<Reduce>(red_op),
-                            std::forward<Convert>(conv_op))
+                        dispatch_async(traits::get_id(sit),
+                            algo, policy, forced_seq(),
+                            beg, end, init, red_op, conv_op)
                     );
                 }
             }
@@ -221,9 +200,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             ExPolicy
                         >::call(r, errors);
 
+                        // VS2015RC bails out if red_op is capture by ref
                         return std::accumulate(
                             r.begin(), r.end(), init,
-                            [&red_op](T const& val, shared_future<T>& curr)
+                            [=](T const& val, shared_future<T>& curr)
                             {
                                 return red_op(val, curr.get());
                             });
@@ -235,7 +215,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // segmented implementation
         template <typename ExPolicy, typename InIter, typename T, typename Reduce,
             typename Convert>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,
@@ -249,7 +229,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             if (first == last)
             {
-                return detail::algorithm_result<
+                return util::detail::algorithm_result<
                         ExPolicy, init_type
                     >::get(std::forward<T>(init));
             }
@@ -257,15 +237,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return segmented_transform_reduce(
                 transform_reduce<init_type>(),
                 std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
-                is_seq());
+                std::forward<T>(init), std::forward<Reduce>(red_op),
+                std::forward<Convert>(conv_op), is_seq());
         }
 
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename T, typename Reduce,
             typename Convert>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename hpx::util::decay<T>::type
         >::type
         transform_reduce_(ExPolicy&& policy, InIter first, InIter last, T && init,

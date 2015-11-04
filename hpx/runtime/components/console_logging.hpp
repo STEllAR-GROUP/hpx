@@ -8,7 +8,6 @@
 #define HPX_COMPONENTS_CONSOLE_LOGGING_DEC_16_2008_0435PM
 
 #include <boost/atomic.hpp>
-#include <boost/foreach.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>

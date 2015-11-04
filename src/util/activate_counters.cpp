@@ -17,7 +17,6 @@
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
 #include <iostream>
@@ -73,7 +72,7 @@ namespace hpx { namespace util
 
             ids_.reserve(names.size());
             uoms_.reserve(names.size());
-            BOOST_FOREACH(std::string& name, names)
+            for (std::string& name : names)
             {
                 // do INI expansion on counter name
                 util::expand(name);
@@ -94,7 +93,7 @@ namespace hpx { namespace util
         using performance_counters::stubs::performance_counter;
 
         // add counter prefix, if necessary
-        BOOST_FOREACH(std::string& name, names_)
+        for (std::string& name : names_)
             performance_counters::ensure_counter_prefix(name);
 
         find_counters();
@@ -109,7 +108,7 @@ namespace hpx { namespace util
         // wait for all counters to be started
         wait_all(started);
 
-        BOOST_FOREACH(future<bool>& f, started)
+        for (future<bool>& f : started)
         {
             if (f.has_exception())
             {
@@ -150,7 +149,7 @@ namespace hpx { namespace util
 
         ids_.clear();      // give up control over all performance counters
 
-        BOOST_FOREACH(future<bool>& f, stopped)
+        for (future<bool>& f : stopped)
         {
             if (f.has_exception())
             {
@@ -188,7 +187,7 @@ namespace hpx { namespace util
         // wait for all counters to be started
         wait_all(reset);
 
-        BOOST_FOREACH(future<void>& f, reset)
+        for (future<void>& f : reset)
         {
             if (f.has_exception())
             {
@@ -226,7 +225,7 @@ namespace hpx { namespace util
             values.push_back(performance_counter::get_value_async(ids_[i], reset));
 
         return values;
-    } 
+    }
 
     std::vector<performance_counters::counter_value>
     activate_counters::evaluate_counters_sync(bool reset, error_code& ec)
@@ -235,8 +234,8 @@ namespace hpx { namespace util
             futures = evaluate_counters_async(reset, ec);
 
         return util::unwrapped(futures);
-        
-    } 
+
+    }
 
 }}
 

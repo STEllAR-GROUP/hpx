@@ -7,9 +7,9 @@
 #define HPX_UTIL_STORAGE_TUPLE_HPP_APR_11_2013_1010AM
 
 #include <vector>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/access.hpp>
 
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/any.hpp>
 #include <hpx/util/decay.hpp>
 
@@ -18,7 +18,7 @@ namespace hpx { namespace util { namespace storage
 {
 
     ///////////////////////////////////////////////////////////////////////////
-    /// This class is an implementation of Tuple. 
+    /// This class is an implementation of Tuple.
     class tuple
     {
         public:
@@ -34,7 +34,7 @@ namespace hpx { namespace util { namespace storage
 
             ~tuple() {}
 
-            friend class boost::serialization::access;
+            friend class hpx::serialization::access;
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned const)
@@ -75,9 +75,9 @@ namespace hpx { namespace util { namespace storage
             }
 
             template <typename T>
-            tuple& push_back(const T& field, 
+            tuple& push_back(const T& field,
                     typename boost::disable_if<boost::is_same<
-                        elem_type, 
+                        elem_type,
                         typename util::decay<T>::type
                     > >::type* = 0)
             {

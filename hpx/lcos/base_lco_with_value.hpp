@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_BASE_LCO_WITH_VALUE_HPP)
 #define HPX_LCOS_BASE_LCO_WITH_VALUE_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -19,6 +19,7 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/preprocessor/cat.hpp>
 #include <boost/type_traits/is_same.hpp>
 
 namespace hpx { namespace lcos
@@ -177,14 +178,43 @@ namespace hpx { namespace traits
       , BOOST_PP_CAT(typed_continuation_, Name))                                \
 /**/
 
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(                                    \
+        Value, Name, ActionIdGet, ActionIdSet)                                  \
+    HPX_REGISTER_ACTION_ID(                                                     \
+        hpx::lcos::base_lco_with_value<Value>::set_value_action,                \
+        BOOST_PP_CAT(set_value_action_, Name), ActionIdSet)                     \
+    HPX_REGISTER_ACTION_ID(                                                     \
+        hpx::lcos::base_lco_with_value<Value>::get_value_action,                \
+        BOOST_PP_CAT(get_value_action_, Name), ActionIdGet)                     \
+    HPX_REGISTER_TYPED_CONTINUATION(                                            \
+        Value                                                                   \
+      , BOOST_PP_CAT(typed_continuation_, Name))                                \
+/**/
+#define HPX_REGISTER_BASE_LCO_WITH_VALUE_ID2(                                   \
+        Value, RemoteValue, Name, ActionIdGet, ActionIdSet)                     \
+    typedef hpx::lcos::base_lco_with_value<Value, RemoteValue>                  \
+        BOOST_PP_CAT(base_lco_with_value_, Name);                               \
+    HPX_REGISTER_ACTION_ID(                                                     \
+        BOOST_PP_CAT(base_lco_with_value_, Name)::set_value_action,             \
+        BOOST_PP_CAT(set_value_action_, Name), ActionIdSet)                     \
+    HPX_REGISTER_ACTION_ID(                                                     \
+        BOOST_PP_CAT(base_lco_with_value_, Name)::get_value_action,             \
+        BOOST_PP_CAT(get_value_action_, Name), ActionIdGet)                     \
+    HPX_REGISTER_TYPED_CONTINUATION(                                            \
+        Value                                                                   \
+      , BOOST_PP_CAT(typed_continuation_, Name))                                \
+/**/
+
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::gid_type, gid_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<hpx::naming::gid_type>,
-    vector_gid_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std::vector<hpx::naming::gid_type>, vector_gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::id_type, id_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<hpx::naming::id_type>,
-    vector_id_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::unused_type, unused_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    std::vector<hpx::naming::id_type>, vector_id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::util::unused_type, hpx_unused_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(float, float)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(double, double)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::int8_t, int8_t)
@@ -196,7 +226,7 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::uint32_t, uint32_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::int64_t, int64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(boost::uint64_t, uint64_t)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(bool, bool)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::section, section)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::section, hpx_section)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::string, std_string)
 
 #endif

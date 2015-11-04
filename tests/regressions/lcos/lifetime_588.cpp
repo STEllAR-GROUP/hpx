@@ -11,8 +11,6 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/foreach.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::simple_component_base<test_server>
@@ -27,7 +25,7 @@ struct test_server
 };
 
 typedef hpx::components::simple_component<test_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server);
 
 typedef test_server::create_new_action create_new_action;
 HPX_REGISTER_ACTION_DECLARATION(create_new_action);
@@ -56,7 +54,7 @@ struct test_client
     test_client create_new(hpx::id_type const& id) const
     {
         create_new_action new_;
-        return test_client(hpx::async(new_, this->get_gid(), id));
+        return test_client(hpx::async(new_, this->get_id(), id));
     }
 };
 
@@ -64,14 +62,14 @@ struct test_client
 hpx::id_type test_server::create_new(hpx::id_type const& id) const
 {
     // this waits for the new object to be created
-    return test_client::create(id).get_gid();
+    return test_client::create(id).get_id();
 }
 
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         // repeating this a couple of times forces the issue ...
         for (int i = 0; i != 100; ++i)

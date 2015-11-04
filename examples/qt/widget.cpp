@@ -6,6 +6,8 @@
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
 
+#include <boost/thread/locks.hpp>
+
 #include "widget.hpp"
 
 #include <QtGui/QLabel>
@@ -25,7 +27,8 @@ widget::widget(boost::function<void(widget *, std::size_t)> callback, QWidget *p
     QSpinBox * thread_number_widget = new QSpinBox;
     thread_number_widget->setValue(50);
     thread_number_widget->setRange(1, 100000);
-    QObject::connect(thread_number_widget, SIGNAL(valueChanged(int)), this, SLOT(set_threads(int)));
+    QObject::connect(thread_number_widget, SIGNAL(valueChanged(int)),
+        this, SLOT(set_threads(int)));
 
     run_button = new QPushButton("Run");
     QObject::connect(run_button, SIGNAL(clicked(bool)), this, SLOT(run_clicked(bool)));
@@ -45,7 +48,7 @@ widget::widget(boost::function<void(widget *, std::size_t)> callback, QWidget *p
 
 void widget::add_label(std::size_t i, double t)
 {
-    hpx::lcos::local::spinlock::scoped_lock l(mutex);
+    boost::lock_guard<hpx::lcos::local::spinlock> l(mutex);
     QString txt("Thread ");
     txt.append(QString::number(i))
        .append(" finished in ")
@@ -57,7 +60,7 @@ void widget::add_label(std::size_t i, double t)
 void widget::run_finished()
 {
   bool value = true;
-  QGenericArgument arg("bool",&value);  
+  QGenericArgument arg("bool",&value);
   QMetaObject::invokeMethod(run_button, "setEnabled", arg);
 }
 
@@ -70,5 +73,5 @@ void widget::run_clicked(bool)
 {
     run_button->setEnabled(false);
     list->clear();
-    hpx::apply(callback_, this, no_threads);   
+    hpx::apply(callback_, this, no_threads);
 }

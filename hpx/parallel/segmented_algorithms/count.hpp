@@ -7,17 +7,16 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_COUNT_DEC_25_2014_0207PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
-#include <hpx/parallel/algorithms/remote/dispatch.hpp>
 #include <hpx/parallel/algorithms/count.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
@@ -38,7 +37,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename T>
-        static typename detail::algorithm_result<
+        static typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<SegIter>::difference_type
         >::type
         segmented_count(Algo && algo, ExPolicy const& policy,
@@ -49,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename traits::local_iterator local_iterator_type;
             typedef typename std::iterator_traits<SegIter>::difference_type
                 value_type;
-            typedef detail::algorithm_result<ExPolicy, value_type> result;
+            typedef util::detail::algorithm_result<ExPolicy, value_type> result;
 
             using boost::mpl::true_;
 
@@ -65,10 +64,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result =
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, value);
+                    overall_result = dispatch(traits::get_id(sit),
+                        algo, policy, true_(), beg, end, value);
                 }
             }
             else {
@@ -77,10 +74,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    overall_result +=
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, value);
+                    overall_result += dispatch(traits::get_id(sit),
+                        algo, policy, true_(), beg, end, value);
                 }
 
                 // handle all of the full partitions
@@ -90,10 +85,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        overall_result +=
-                            util::remote::dispatch(traits::get_id(sit),
-                                std::forward<Algo>(algo), policy, true_(),
-                                beg, end, value);
+                        overall_result += dispatch(traits::get_id(sit),
+                            algo, policy, true_(), beg, end, value);
                     }
                 }
 
@@ -102,10 +95,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result +=
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, value);
+                    overall_result += dispatch(traits::get_id(sit),
+                        algo, policy, true_(), beg, end, value);
                 }
             }
 
@@ -115,7 +106,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename T>
-        static typename detail::algorithm_result<
+        static typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<SegIter>::difference_type
         >::type
         segmented_count(Algo && algo, ExPolicy const& policy,
@@ -132,7 +123,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 >::value> forced_seq;
             typedef typename std::iterator_traits<SegIter>::difference_type
                 value_type;
-            typedef detail::algorithm_result<ExPolicy, value_type> result;
+            typedef util::detail::algorithm_result<ExPolicy, value_type> result;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -147,10 +138,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, value));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        algo, policy, forced_seq(), beg, end, value));
                 }
             }
             else {
@@ -159,10 +148,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, value));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        algo, policy, forced_seq(), beg, end, value));
                 }
 
                 // handle all of the full partitions
@@ -172,10 +159,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        segments.push_back(
-                            util::remote::dispatch_async(traits::get_id(sit),
-                                std::forward<Algo>(algo), policy, forced_seq(),
-                                beg, end, value));
+                        segments.push_back(dispatch_async(traits::get_id(sit),
+                            algo, policy, forced_seq(), beg, end, value));
                     }
                 }
 
@@ -184,10 +169,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, value));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        algo, policy, forced_seq(), beg, end, value));
                 }
             }
 
@@ -203,7 +186,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
         template <typename ExPolicy, typename InIter, typename T>
-        inline typename detail::algorithm_result<
+        inline typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
@@ -218,7 +201,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             if (first == last)
             {
-                return detail::algorithm_result<
+                return util::detail::algorithm_result<
                     ExPolicy, difference_type>::get(difference_type());
             }
 
@@ -229,7 +212,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename T>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
@@ -248,7 +231,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename F>
-        static typename detail::algorithm_result<
+        static typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<SegIter>::difference_type
         >::type
         segmented_count_if(Algo && algo, ExPolicy const& policy,
@@ -259,7 +242,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             typedef typename traits::local_iterator local_iterator_type;
             typedef typename std::iterator_traits<SegIter>::difference_type
                 value_type;
-            typedef detail::algorithm_result<ExPolicy, value_type> result;
+            typedef util::detail::algorithm_result<ExPolicy, value_type> result;
 
             using boost::mpl::true_;
 
@@ -275,10 +258,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result =
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, std::forward<F>(f));
+                    overall_result = dispatch(traits::get_id(sit),
+                        algo, policy, true_(),
+                        beg, end, std::forward<F>(f));
                 }
             }
             else {
@@ -287,10 +269,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    overall_result +=
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, std::forward<F>(f));
+                    overall_result += dispatch(traits::get_id(sit),
+                        algo, policy, true_(),
+                        beg, end, std::forward<F>(f));
                 }
 
                 // handle all of the full partitions
@@ -300,10 +281,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        overall_result +=
-                            util::remote::dispatch(traits::get_id(sit),
-                                std::forward<Algo>(algo), policy, true_(),
-                                beg, end, std::forward<F>(f));
+                        overall_result += dispatch(traits::get_id(sit),
+                            algo, policy, true_(),
+                            beg, end, std::forward<F>(f));
                     }
                 }
 
@@ -312,10 +292,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result +=
-                        util::remote::dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, std::forward<F>(f));
+                    overall_result += dispatch(traits::get_id(sit),
+                        algo, policy, true_(),
+                        beg, end, std::forward<F>(f));
                 }
             }
 
@@ -325,7 +304,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename F>
-        static typename detail::algorithm_result<
+        static typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<SegIter>::difference_type
         >::type
         segmented_count_if(Algo && algo, ExPolicy const& policy,
@@ -342,7 +321,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 >::value> forced_seq;
             typedef typename std::iterator_traits<SegIter>::difference_type
                 value_type;
-            typedef detail::algorithm_result<ExPolicy, value_type> result;
+            typedef util::detail::algorithm_result<ExPolicy, value_type> result;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -357,10 +336,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, std::forward<F>(f)));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        algo, policy, forced_seq(),
+                        beg, end, std::forward<F>(f)));
                 }
             }
             else {
@@ -369,10 +347,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, std::forward<F>(f)));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        algo, policy, forced_seq(),
+                        beg, end, std::forward<F>(f)));
                 }
 
                 // handle all of the full partitions
@@ -382,10 +359,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        segments.push_back(
-                            util::remote::dispatch_async(traits::get_id(sit),
-                                std::forward<Algo>(algo), policy, forced_seq(),
-                                beg, end, std::forward<F>(f)));
+                        segments.push_back(dispatch_async(traits::get_id(sit),
+                            algo, policy, forced_seq(),
+                            beg, end, std::forward<F>(f)));
                     }
                 }
 
@@ -394,10 +370,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        util::remote::dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, std::forward<F>(f)));
+                    segments.push_back(dispatch_async(traits::get_id(sit),
+                        algo, policy, forced_seq(),
+                        beg, end, std::forward<F>(f)));
                 }
             }
 
@@ -422,7 +397,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         }
 
         template <typename ExPolicy, typename InIter, typename F>
-        inline typename detail::algorithm_result<
+        inline typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
@@ -437,7 +412,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             if (first == last)
             {
-                return detail::algorithm_result<
+                return util::detail::algorithm_result<
                     ExPolicy, difference_type>::get(difference_type());
             }
 
@@ -448,7 +423,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,

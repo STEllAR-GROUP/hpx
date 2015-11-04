@@ -38,7 +38,6 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
-#include <hpx/util/coroutine/detail/argument_unpacker.hpp>
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/util/coroutine/detail/context_base.hpp>
 #include <hpx/util/coroutine/detail/self.hpp>
@@ -98,36 +97,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     static inline void rebind(type* p, BOOST_FWD_REF(Functor),
         BOOST_RV_REF(naming::id_type) target, thread_id_repr_type = 0);
 
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES) || HPX_COROUTINE_ARG_MAX > 1
-    result_slot_type * result() {
-      HPX_ASSERT(m_result);
-      HPX_ASSERT(*m_result);
-      return *this->m_result;
-    }
-
-    arg_slot_type * args() {
-      HPX_ASSERT(m_arg);
-      return m_arg;
-    };
-
-    void bind_args(arg_slot_type* arg) {
-      m_arg = arg;
-    }
-
-    void bind_result(result_slot_type* res) {
-      *m_result = res;
-    }
-
-    // Another level of indirection is needed to handle
-    // yield_to correctly.
-    void bind_result_pointer(result_slot_type** resp) {
-      m_result = resp;
-    }
-
-    result_slot_type** result_pointer() {
-      return m_result;
-    }
-#else
     result_type * result()
     {
       HPX_ASSERT(m_result);
@@ -162,7 +131,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     {
       return m_result;
     }
-#endif
 
     // This function must be called only for void
     // coroutines. It wakes up the coroutine.
@@ -181,7 +149,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       this->wake_up();
     }
 
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
     std::size_t get_thread_phase() const
     {
         return this->phase();
@@ -200,19 +168,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     HPX_COROUTINE_EXPORT static void init_self();
     HPX_COROUTINE_EXPORT static void reset_self();
 
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-  protected:
-    boost::optional<result_slot_type> m_result_last;
-
-  private:
-    arg_slot_type * m_arg;
-    result_slot_type ** m_result;
-#else
   protected:
     result_type m_result_last;
     arg0_type* m_arg;
     result_type** m_result;
-#endif
   };
 
   // the TLS holds a pointer to the self instance as stored on the stack
@@ -301,9 +260,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         try {
           this->check_exit_state();
 
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-          do_call<result_type>();
-#else
           HPX_ASSERT(this->count() > 0);
 
           typedef typename coroutine_type::self self_type;
@@ -325,7 +281,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
           // return value to other side of the fence
           this->bind_result(&this->m_result_last);
-#endif
         }
         catch (exit_exception const&) {
           status = super_type::ctx_exited_exit;
@@ -375,73 +330,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     };
 
   public:
-
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-    //GCC workaround as per enable_if docs
-    template <int> struct dummy { dummy(int) {} };
-
-    /*
-     * Implementation for operator()
-     * This is for void result types.
-     * Can throw if m_fun throws. At least it can throw exit_exception.
-     */
-    template <typename ResultType>
-    typename boost::enable_if<boost::is_void<ResultType> >::type
-    do_call(dummy<0> = 0)
-    {
-      HPX_ASSERT(this->count() > 0);
-
-      typedef typename coroutine_type::self self_type;
-
-      // In this particular case result_slot_type is guaranteed to be
-      // default constructible.
-      typedef typename coroutine_type::result_slot_type result_slot_type;
-
-      {
-          self_type* old_self = super_type::get_self();
-          self_type self(this, old_self);
-          reset_self_on_exit on_exit(&self, old_self);
-          detail::unpack(m_fun, *this->args(),
-              detail::trait_tag<typename coroutine_type::arg_slot_traits>());
-      }
-
-      this->m_result_last = result_slot_type();
-      this->bind_result(&*this->m_result_last);
-    }
-
-    // Same as above, but for non void result types.
-    template <typename ResultType>
-    typename boost::disable_if<boost::is_void<ResultType> >::type
-    do_call(dummy<1> = 1)
-    {
-      HPX_ASSERT(this->count() > 0);
-
-      typedef typename coroutine_type::self self_type;
-      typedef typename coroutine_type::arg_slot_traits traits;
-      typedef typename coroutine_type::result_slot_type result_slot_type;
-
-      {
-          self_type* old_self = super_type::get_self();
-          self_type self(this, old_self);
-          reset_self_on_exit on_exit(&self, old_self);
-          this->m_result_last = boost::in_place(result_slot_type(
-                  detail::unpack(m_fun, *this->args(), detail::trait_tag<traits>())
-              ));
-
-          // if this thread returned 'terminated' we need to reset the functor
-          // and the bound arguments
-          //
-          // Note: threads::terminated == 5
-          //
-          if (this->m_result_last && boost::get<0>(this->m_result_last.get()) == 5)
-              this->reset();
-      }
-
-      // return value to other side of the fence
-      this->bind_result(&*this->m_result_last);
-    }
-#endif
-
     static inline void destroy(type* p);
     static inline void reset(type* p);
 
@@ -486,14 +374,18 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         // default macro sizes
         if (stacksize > HPX_MEDIUM_STACK_SIZE) {
             if (stacksize > HPX_LARGE_STACK_SIZE)
-                return get_heap<HPX_COROUTINE_NUM_HEAPS/4, heap_tag_huge>(i % (HPX_COROUTINE_NUM_HEAPS/4)); //-V112
+                return get_heap<HPX_COROUTINE_NUM_HEAPS/4,
+                heap_tag_huge>(i % (HPX_COROUTINE_NUM_HEAPS/4)); //-V112
 
-            return get_heap<HPX_COROUTINE_NUM_HEAPS/4, heap_tag_large>(i % (HPX_COROUTINE_NUM_HEAPS/4)); //-V112
+            return get_heap<HPX_COROUTINE_NUM_HEAPS/4,
+                heap_tag_large>(i % (HPX_COROUTINE_NUM_HEAPS/4)); //-V112
         }
         if (stacksize > HPX_SMALL_STACK_SIZE)
-            return get_heap<HPX_COROUTINE_NUM_HEAPS/2, heap_tag_medium>(i % (HPX_COROUTINE_NUM_HEAPS/2));
+            return get_heap<HPX_COROUTINE_NUM_HEAPS/2,
+            heap_tag_medium>(i % (HPX_COROUTINE_NUM_HEAPS/2));
 
-        return get_heap<HPX_COROUTINE_NUM_HEAPS, heap_tag_small>(i % HPX_COROUTINE_NUM_HEAPS);
+        return get_heap<HPX_COROUTINE_NUM_HEAPS,
+            heap_tag_small>(i % HPX_COROUTINE_NUM_HEAPS);
     }
 
   public:
@@ -583,7 +475,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
       wrapper_type* wrapper = static_cast<wrapper_type*>(p);
 
-      wrapper->rebind(boost::forward<Functor>(f), boost::move(target), id);
+      wrapper->rebind(boost::forward<Functor>(f), std::move(target), id);
   }
 
   template<typename Functor, typename CoroutineType, typename ContextImpl,

@@ -7,11 +7,11 @@
 #define HPX_BINARY_FILTER_FACTORY_BASE_MAR_24_2013_0339PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
-#include <hpx/util/binary_filter.hpp>
 
 #include <boost/mpl/list.hpp>
 
@@ -29,8 +29,8 @@ namespace hpx { namespace plugins
         ///
         /// return Returns the newly created instance of the binary filter
         ///        supported by this factory
-        virtual util::binary_filter* create(bool compress,
-            util::binary_filter* next_filter = 0) = 0;
+        virtual serialization::binary_filter* create(bool compress,
+            serialization::binary_filter* next_filter = 0) = 0;
     };
 }}
 

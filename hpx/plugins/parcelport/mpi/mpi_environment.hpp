@@ -38,6 +38,7 @@ namespace hpx { namespace util
         {
             scoped_lock();
             ~scoped_lock();
+            void unlock();
             HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_lock);
         };
 
@@ -45,6 +46,7 @@ namespace hpx { namespace util
         {
             scoped_try_lock();
             ~scoped_try_lock();
+            void unlock();
             bool locked;
             HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_try_lock);
         };

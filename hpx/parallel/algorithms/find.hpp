@@ -10,9 +10,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -39,17 +39,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename T>
             static InIter
-            sequential(ExPolicy const&, InIter first, InIter last, const T& val)
+            sequential(ExPolicy, InIter first, InIter last, const T& val)
             {
                 return std::find(first, last, val);
             }
 
             template <typename ExPolicy, typename T>
-            static typename detail::algorithm_result<ExPolicy, InIter>::type
-            parallel(ExPolicy const& policy, InIter first, InIter last,
+            static typename util::detail::algorithm_result<
+                ExPolicy, InIter
+            >::type
+            parallel(ExPolicy policy, InIter first, InIter last,
                 T const& val)
             {
-                typedef detail::algorithm_result<ExPolicy, InIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, InIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
                 typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
@@ -137,7 +139,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, InIter>::type
+        typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find(ExPolicy && policy, InIter first, InIter last, T const& val)
     {
@@ -174,16 +176,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename F>
             static InIter
-            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 return std::find_if(first, last, f);
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
                 typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
@@ -285,7 +289,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, InIter>::type
+        typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_if(ExPolicy && policy, InIter first, InIter last, F && f)
     {
@@ -322,7 +326,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename F>
             static InIter
-            sequential(ExPolicy const&, InIter first, InIter last, F && f)
+            sequential(ExPolicy, InIter first, InIter last, F && f)
             {
                 for (; first != last; ++first) {
                     if (!f(*first)) {
@@ -333,10 +337,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename F>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last, F && f)
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last, F && f)
             {
-                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<InIter>::value_type type;
                 typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
@@ -439,7 +445,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, InIter>::type
+        typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_if_not(ExPolicy && policy, InIter first, InIter last, F && f)
     {
@@ -476,18 +482,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first1, FwdIter last1,
+            sequential(ExPolicy, FwdIter first1, FwdIter last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
                 return std::find_end(first1, last1, first2, last2, op);
             }
 
             template <typename ExPolicy, typename FwdIter2, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy const& policy, FwdIter first1, FwdIter last1,
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
+            parallel(ExPolicy policy, FwdIter first1, FwdIter last1,
                 FwdIter2 first2, FwdIter2 last2, Pred && op)
             {
-                typedef detail::algorithm_result<ExPolicy, FwdIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
                 typedef typename std::iterator_traits<FwdIter>::reference reference;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
@@ -507,7 +515,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return util::partitioner<ExPolicy, FwdIter, void>::
                     call_with_index(
                         policy, first1, count-(diff-1),
-                        [=](std::size_t base_idx, FwdIter it, std::size_t part_size) mutable
+                        [=](std::size_t base_idx, FwdIter it,
+                            std::size_t part_size) mutable
                         {
                             FwdIter curr = it;
 
@@ -606,7 +615,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter1>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
     >::type
     find_end(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2)
@@ -711,7 +720,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter1>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
     >::type
     find_end(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2, F && f)
@@ -755,7 +764,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename Pred>
             static InIter
-            sequential(ExPolicy const&, InIter first, InIter last, FwdIter s_first,
+            sequential(ExPolicy, InIter first, InIter last, FwdIter s_first,
                 FwdIter s_last, Pred && op)
             {
                 if(first == last)
@@ -770,11 +779,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename FwdIter, typename Pred>
-            static typename detail::algorithm_result<ExPolicy,InIter>::type
-            parallel(ExPolicy const& policy, InIter first, InIter last,
+            static typename util::detail::algorithm_result<
+                ExPolicy, InIter
+            >::type
+            parallel(ExPolicy policy, InIter first, InIter last,
                 FwdIter s_first, FwdIter s_last, Pred && op)
             {
-                typedef detail::algorithm_result<ExPolicy, InIter> result;
+                typedef util::detail::algorithm_result<ExPolicy, InIter> result;
                 typedef typename std::iterator_traits<InIter>::reference reference;
                 typedef typename std::iterator_traits<InIter>::difference_type
                     difference_type;
@@ -799,7 +810,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         {
                             util::loop_idx_n(
                                 base_idx, it, part_size, tok,
-                                [&tok, &s_first, &s_last, &op](reference v, std::size_t i)
+                                [&tok, &s_first, &s_last, &op]
+                                (reference v, std::size_t i)
                                 {
                                     for(FwdIter iter = s_first; iter != s_last; ++iter) {
                                         if(op(v,*iter))
@@ -870,15 +882,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the first element
     ///           in the range [first, last) that is equal to an element from the range
-    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is
-    ///           greater than the length of the range [first, last), \a last is returned.
+    ///           [s_first, s_last).
+    ///           If the length of the subsequence [s_first, s_last) is
+    ///           greater than the length of the range [first, last),
+    ///           \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
     ///
     template <typename ExPolicy, typename InIter, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, InIter>::type
+        typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_first_of(ExPolicy && policy, InIter first, InIter last,
         FwdIter s_first, FwdIter s_last)
@@ -974,17 +988,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///           returns \a InIter otherwise.
     ///           The \a find_first_of algorithm returns an iterator to the first element
     ///           in the range [first, last) that is equal to an element from the range
-    ///           [s_first, s_last). If the length of the subsequence [s_first, s_last) is
-    ///           greater than the length of the range [first, last), \a last is returned.
+    ///           [s_first, s_last).
+    ///           If the length of the subsequence [s_first, s_last) is
+    ///           greater than the length of the range [first, last),
+    ///           \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
-    ///           This overload of \a find_end is available if the user decides to provide the
+    ///           This overload of \a find_end is available if
+    ///           the user decides to provide the
     ///           algorithm their own predicate \a f.
     ///
     template <typename ExPolicy, typename InIter, typename FwdIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, InIter>::type
+        typename util::detail::algorithm_result<ExPolicy, InIter>::type
     >::type
     find_first_of(ExPolicy && policy, InIter first, InIter last,
         FwdIter s_first, FwdIter s_last, Pred && op)

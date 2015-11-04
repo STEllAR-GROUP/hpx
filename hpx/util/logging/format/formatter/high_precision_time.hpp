@@ -36,13 +36,15 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
 
 
 /**
-@brief Prefixes the message with a high-precision time (. You pass the format string at construction.
+@brief Prefixes the message with a high-precision time (.
+You pass the format string at construction.
 
 @code
 #include <hpx/util/logging/format/formatter/high_precision_time.hpp>
 @endcode
 
-Internally, it uses hpx::util::date_time::microsec_time_clock. So, our precision matches this class.
+Internally, it uses hpx::util::date_time::microsec_time_clock.
+So, our precision matches this class.
 
 The format can contain escape sequences:
 $dd - day, 2 digits
@@ -63,20 +65,26 @@ Example:
 high_precision_time("$mm:$ss:$micro");
 @endcode
 
-@param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
+@param convert [optional] In case there needs to be a conversion between
+std::(w)string and the string that holds your logged message. See convert_format.
+For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
+"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::prepend> struct high_precision_time_t : is_generic, non_const_context<hpx::util::logging::detail::time_format_holder> {
+template<class convert = do_convert_format::prepend> struct high_precision_time_t
+    : is_generic, non_const_context<hpx::util::logging::detail::time_format_holder> {
     typedef convert convert_type;
-    typedef non_const_context<hpx::util::logging::detail::time_format_holder> non_const_context_base;
+    typedef non_const_context<hpx::util::logging::detail::time_format_holder>
+        non_const_context_base;
 
     /**
         constructs a high_precision_time object
     */
-    high_precision_time_t(const hold_string_type & format) : non_const_context_base(format) {}
+    high_precision_time_t(const hold_string_type & format)
+        : non_const_context_base(format) {}
 
-    template<class msg_type> 
-    void write_high_precision_time(msg_type & msg, ::boost::posix_time::ptime val) const {
+    template<class msg_type>
+    void write_high_precision_time(msg_type & msg, ::boost::posix_time::ptime val)
+        const {
         char_type buffer[64];
 
         int nanosecs = static_cast<int>(val.time_of_day().fractional_seconds()); //-V807
@@ -115,11 +123,13 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
     }
 
     template<class msg_type> void operator()(msg_type & msg) const {
-        write_high_precision_time(msg, ::boost::posix_time::microsec_clock::local_time() );
+        write_high_precision_time(msg,
+            ::boost::posix_time::microsec_clock::local_time() );
     }
 
     bool operator==(const high_precision_time_t & other) const {
-        return non_const_context_base::context() == other.non_const_context_base::context() ;
+        return non_const_context_base::context() ==
+            other.non_const_context_base::context() ;
     }
 
     /** @brief configure through script

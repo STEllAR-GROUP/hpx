@@ -9,7 +9,7 @@
 namespace startup_shutdown { namespace server
 {
     class HPX_COMPONENT_EXPORT startup_shutdown_component
-      : public hpx::components::simple_component_base<startup_shutdown_component>
+      : public hpx::components::component_base<startup_shutdown_component>
     {
     public:
         // constructor: initialize accumulator value

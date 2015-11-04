@@ -1,0 +1,61 @@
+#  Copyright (c) 2015  Martin Stumpf
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+machine:
+    services:
+        - docker
+    environment:
+        IMAGE_NAME: stellargroup/build_env:debian_clang
+        TARGET_IMAGE_NAME: stellargroup/hpx:dev
+
+general:
+    branches:
+        ignore:
+            - gh-pages
+
+dependencies:
+    pre:
+        - docker pull ${IMAGE_NAME}
+        - mkdir build
+    override:
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} cmake .. -DCMAKE_BUILD_TYPE=Debug -DHPX_WITH_MALLOC=system -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} -DHPX_WITH_TOOLS=On -DCMAKE_CXX_FLAGS="-fcolor-diagnostics"
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 core
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k components
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k examples
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.headers
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tools.inspect
+        # TODO replace this line with "docker build" once docker managed to
+        # introduce temporal file copies that don't show in the resulting image
+        # size.
+        # The problem is the "ADD/COPY" and "RUN rm" in Dockerfile. Those count
+        # as seperate steps and keep the temporal files stored as part of the
+        # image, expanding it by about 500 MB.
+        # docker-compile.pl is a dirty workaround, and shall be removed ASAP.
+        - cp tools/docker/Dockerfile tools/docker/.dockerignore .
+        - ./tools/docker/docker-compile.pl ${TARGET_IMAGE_NAME}:
+            timeout: 1200   # increase timeout to avoid failure
+
+test:
+    override:
+        - docker run -v $PWD:/hpx -w /hpx ${IMAGE_NAME} ./build/bin/inspect --all --output=./build/hpx_inspect_report.html /hpx
+        - cp $PWD/build/hpx_inspect_report.html ${CIRCLE_ARTIFACTS}/
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ./bin/hello_world --hpx:bind=none
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.unit --output-on-failure
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} ctest -D ExperimentalTest -R tests.regressions --output-on-failure
+        - sudo rm -rf build && mkdir build
+        - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hello_world --hpx:bind=none
+        - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hpxcxx --exe=hello_world_test_build ../examples/quickstart/hello_world.cpp -g -lhpx_iostreamsd
+        - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} ./hello_world_test_build --hpx:bind=none
+        - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hpxrun.py -l 2 -t 2 ./hello_world_test_build -- --hpx:bind=none
+
+deployment:
+    hub:
+        branch: master
+        commands:
+            - docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
+            - docker push ${TARGET_IMAGE_NAME}

@@ -36,7 +36,7 @@
 #include <hpx/util/coroutine/detail/signature.hpp>
 #include <hpx/util/coroutine/detail/yield_result_type.hpp>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
   template <typename T>
   struct as_tuple {
@@ -56,7 +56,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef typename boost::mpl::eval_if<
         is_tuple_traits<signature_result_type>,
         as_tuple<signature_result_type>,
-        boost::mpl::identity<signature_result_type> 
+        boost::mpl::identity<signature_result_type>
     >::type result_type;
 
     typedef typename boost::mpl::eval_if<
@@ -65,8 +65,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         boost::mpl::if_<
             boost::is_same<signature_result_type, void>,
             tuple_traits<>,
-            tuple_traits<signature_result_type> 
-        > 
+            tuple_traits<signature_result_type>
+        >
     >::type result_slot_traits;
 
     typedef typename result_slot_traits::as_tuple result_slot_type;

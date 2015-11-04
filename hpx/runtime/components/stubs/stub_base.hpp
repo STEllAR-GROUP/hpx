@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,13 +7,28 @@
 #if !defined(HPX_COMPONENTS_STUB_STUB_BASE_CLIENT_OCT_31_2008_0441PM)
 #define HPX_COMPONENTS_STUB_STUB_BASE_CLIENT_OCT_31_2008_0441PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/lcos/async_fwd.hpp>
+#include <hpx/lcos/detail/async_implementations_fwd.hpp>
+#include <hpx/lcos/detail/async_colocated_fwd.hpp>
+#include <hpx/lcos/future.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
+    namespace server
+    {
+        template <typename Component, typename ...Ts>
+        struct create_component_action;
+
+        template <typename Component, typename ...Ts>
+        struct bulk_create_component_action;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename ServerComponent>
     struct stub_base
@@ -33,9 +48,19 @@ namespace hpx { namespace components
         static lcos::future<naming::id_type>
         create_async(naming::id_type const& gid, Ts&&... vs)
         {
-            using stubs::runtime_support;
-            return runtime_support::create_component_async<ServerComponent>(
-                gid, std::forward<Ts>(vs)...);
+            if (!naming::is_locality(gid))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "stubs::runtime_support::create_component_async",
+                    "The id passed as the first argument is not representing"
+                        " a locality");
+                return lcos::make_ready_future(naming::invalid_id);
+            }
+
+            typedef server::create_component_action<
+                ServerComponent, typename hpx::util::decay<Ts>::type...
+            > action_type;
+            return hpx::async<action_type>(gid, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
@@ -43,46 +68,74 @@ namespace hpx { namespace components
         bulk_create_async(naming::id_type const& gid, std::size_t count,
             Ts&&... vs)
         {
-            using stubs::runtime_support;
-            return runtime_support::bulk_create_component_async<
-                    ServerComponent
-                >(gid, count, std::forward<Ts>(vs)...);
+            if (!naming::is_locality(gid))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "stubs::runtime_support::bulk_create_component_async",
+                    "The id passed as the first argument is not representing"
+                        " a locality");
+                return lcos::make_ready_future(std::vector<naming::id_type>());
+            }
+
+            typedef server::bulk_create_component_action<
+                ServerComponent, typename hpx::util::decay<Ts>::type...
+            > action_type;
+            return hpx::async<action_type>(gid, count,
+                std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         static naming::id_type create(
             naming::id_type const& gid, Ts&&... vs)
         {
-            using stubs::runtime_support;
-            return runtime_support::create_component<ServerComponent>(
-                gid, std::forward<Ts>(vs)...);
+            return create_async(gid, std::forward<Ts>(vs)...).get();
         }
 
         template <typename ...Ts>
         static std::vector<naming::id_type> bulk_create(
             naming::id_type const& gid, std::size_t count, Ts&&... vs)
         {
-            using stubs::runtime_support;
-            return runtime_support::bulk_create_component<ServerComponent>(
-                gid, count, std::forward<Ts>(vs)...);
+            return bulk_create_async(gid, count, std::forward<Ts>(vs)...).get();
         }
 
         template <typename ...Ts>
         static lcos::future<naming::id_type>
         create_colocated_async(naming::id_type const& gid, Ts&&... vs)
         {
-            using stubs::runtime_support;
-            return runtime_support::create_component_colocated_async<
-                ServerComponent>(gid, std::forward<Ts>(vs)...);
+            typedef server::create_component_action<
+                ServerComponent, typename hpx::util::decay<Ts>::type...
+            > action_type;
+            return hpx::detail::async_colocated<action_type>(
+                gid, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         static naming::id_type create_colocated(
             naming::id_type const& gid, Ts&&... vs)
         {
-            using stubs::runtime_support;
-            return runtime_support::create_component_colocated<
-                ServerComponent>(gid, std::forward<Ts>(vs)...);
+            return create_colocated_async(gid, std::forward<Ts>(vs)...).get();
+        }
+
+        template <typename ...Ts>
+        static lcos::future<std::vector<naming::id_type> >
+        bulk_create_colocated_async(naming::id_type const& gid,
+            std::size_t count, Ts&&... vs)
+        {
+            typedef server::bulk_create_component_action<
+                ServerComponent, typename hpx::util::decay<Ts>::type...
+            > action_type;
+
+            return hpx::detail::async_colocated<action_type>(gid, count,
+                std::forward<Ts>(vs)...);
+        }
+
+        template <typename ...Ts>
+        static std::vector<naming::id_type>
+        bulk_create_colocated(naming::id_type const& id, std::size_t count,
+            Ts&&... vs)
+        {
+            return bulk_create_colocated_async(id, count,
+                std::forward<Ts>(vs)...).get();
         }
 
         /// Delete an existing component

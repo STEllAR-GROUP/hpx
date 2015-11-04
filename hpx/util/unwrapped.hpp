@@ -8,6 +8,7 @@
 #define HPX_UTIL_UNWRAPPED_HPP
 
 #include <hpx/lcos/future.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
@@ -78,7 +79,7 @@ namespace hpx { namespace util
             static type call(Range& range, /*is_void=*/boost::mpl::false_)
             {
                 type result;
-                BOOST_FOREACH(typename Range::value_type & f, range)
+                for (typename Range::value_type& f : range)
                 {
                     result.push_back(unwrap_impl<future_type>::call(f));
                 }
@@ -89,7 +90,7 @@ namespace hpx { namespace util
             template <typename Range>
             static type call(Range& range, /*is_void=*/boost::mpl::true_)
             {
-                BOOST_FOREACH(typename Range::value_type & f, range)
+                for (typename Range::value_type& f : range)
                 {
                     unwrap_impl<future_type>::call(f);
                 }
@@ -228,7 +229,7 @@ namespace hpx { namespace util
         struct unwrapped_impl_result<
             F, T, TD,
             typename boost::enable_if<traits::is_future<TD> >::type
-        > : util::invoke_fused_result_of<
+        > : util::detail::fused_result_of<
                 F(typename unwrap_impl<util::tuple<TD> >::type)
             >
         {};
@@ -237,16 +238,22 @@ namespace hpx { namespace util
         struct unwrapped_impl_result<
             F, T, TD,
             typename boost::enable_if<traits::is_future_range<TD> >::type
-        > : util::invoke_fused_result_of<
-                F(util::tuple<typename unwrap_impl<TD>::type>)
-            >
+        > : boost::mpl::if_<
+                typename unwrap_impl<TD>::is_void
+              , util::detail::fused_result_of<
+                    F(util::tuple<>)
+                >
+              , util::detail::fused_result_of<
+                    F(util::tuple<typename unwrap_impl<TD>::type>)
+                >
+            >::type
         {};
 
         template <typename F, typename T, typename TD>
         struct unwrapped_impl_result<
             F, T, TD,
             typename boost::enable_if<traits::is_future_tuple<TD> >::type
-        > : util::invoke_fused_result_of<
+        > : util::detail::fused_result_of<
                 F(typename unwrap_impl<TD>::type)
             >
         {};
@@ -262,21 +269,43 @@ namespace hpx { namespace util
               : f_(std::move(f))
             {}
 
+            unwrapped_impl(unwrapped_impl && other)
+              : f_(std::move(other.f_))
+            {}
+
+            unwrapped_impl(unwrapped_impl const & other)
+              : f_(other.f_)
+            {}
+
+            unwrapped_impl &operator=(unwrapped_impl && other)
+            {
+                f_ = std::move(other.f_);
+                return *this;
+            }
+
+            unwrapped_impl &operator=(unwrapped_impl const & other)
+            {
+                f_ = other.f_;
+                return *this;
+            }
+
             template <typename Sig>
             struct result;
 
             template <typename This>
             struct result<This()>
-              : util::detail::result_of_or<F(), hpx::util::unused_type>
+              : boost::mpl::eval_if_c<
+                    traits::is_callable<F()>::value
+                  , util::result_of<F()>
+                  , boost::mpl::identity<util::unused_type>
+                >
             {};
 
             BOOST_FORCEINLINE
             typename result<unwrapped_impl()>::type
             operator()()
             {
-                typedef typename result<unwrapped_impl()>::type result_type;
-
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     util::make_tuple());
             }
 
@@ -299,12 +328,11 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
-                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<util::tuple<typename decay<T0>::type> >
                     unwrap_impl_t;
 
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     unwrap_impl_t::call(util::forward_as_tuple(t0)));
             }
 
@@ -317,12 +345,11 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
-                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
 
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     util::forward_as_tuple(unwrap_impl_t::call(t0)));
             }
 
@@ -334,13 +361,12 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
-                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
 
                 unwrap_impl_t::call(t0);
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     util::forward_as_tuple());
             }
 
@@ -352,12 +378,11 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
-                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
 
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     unwrap_impl_t::call(t0));
             }
 
@@ -367,14 +392,11 @@ namespace hpx { namespace util
             operator()(Ts&&... vs)
             {
                 typedef
-                    typename result<unwrapped_impl(Ts...)>::type
-                    result_type;
-                typedef
                     unwrap_impl<util::tuple<
                         typename util::decay<Ts>::type...> >
                     unwrap_impl_t;
 
-                return util::invoke_fused_r<result_type>(f_,
+                return util::invoke_fused(f_,
                     unwrap_impl_t::call(util::forward_as_tuple(
                         std::forward<Ts>(vs)...)));
             }
@@ -410,7 +432,7 @@ namespace hpx { namespace util
         detail::unwrapped_impl<typename util::decay<F>::type >
             res(std::forward<F>(f));
 
-        return std::move(res);
+        return res;
     }
 
     template <typename ...Ts>

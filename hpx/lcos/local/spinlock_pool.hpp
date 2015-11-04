@@ -13,7 +13,8 @@
 #ifndef HPX_LCOS_LOCAL_SPINLOCK_POOL_HPP
 #define HPX_LCOS_LOCAL_SPINLOCK_POOL_HPP
 
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/config/emulate_deleted.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,7 +53,7 @@ namespace hpx { namespace lcos { namespace local
         private:
             hpx::lcos::local::spinlock & sp_;
 
-            HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_lock);
+            HPX_NON_COPYABLE(scoped_lock);
 
         public:
             explicit scoped_lock(void const * pv)
@@ -113,8 +114,9 @@ namespace hpx { namespace lcos { namespace local
     }
 
     template <typename Tag>
-    lcos::local::itt_spinlock_init<Tag>
-        lcos::local::spinlock_pool<Tag>::init_ = lcos::local::itt_spinlock_init<Tag>();
+    lcos::local::detail::itt_spinlock_init<Tag>
+        lcos::local::spinlock_pool<Tag>::init_ =
+            lcos::local::detail::itt_spinlock_init<Tag>();
 #endif
 }}}
 

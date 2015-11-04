@@ -9,19 +9,14 @@
 #define HPX_UTIL_DETAIL_UNIQUE_FUNCTION_TEMPLATE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_callable.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/tracking.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -76,12 +71,12 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         unique_function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
           : unique_function_vtable_ptr<Sig, void, void>(boost::mpl::identity<T>())
-          , name(get_function_name<std::pair<unique_function_vtable_ptr, T> >())
+          , name(get_function_name<util::tuple<unique_function_vtable_ptr, T> >())
           , save_object(&serializable_vtable<IAr, OAr>::template save_object<T>)
           , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
         {
             init_registration<
-                std::pair<unique_function_vtable_ptr, T>
+                util::tuple<unique_function_vtable_ptr, T>
             >::g.register_function();
         }
     };
@@ -90,40 +85,31 @@ namespace hpx { namespace util { namespace detail
     // registration code for serialization
     template <typename Sig, typename IAr, typename OAr, typename T>
     struct init_registration<
-        std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
     >
     {
-        typedef std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T> vtable_ptr;
+        typedef util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T> vtable_ptr;
 
         static automatic_function_registration<vtable_ptr> g;
     };
 
     template <typename Sig, typename IAr, typename OAr, typename T>
     automatic_function_registration<
-        std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
     > init_registration<
-        std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
     >::g =  automatic_function_registration<
-                std::pair<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
+                util::tuple<unique_function_vtable_ptr<Sig, IAr, OAr>, T>
             >();
 }}}
-
-namespace boost { namespace serialization
-{
-    template <typename Sig, typename IArchive, typename OArchive>
-    struct tracking_level< ::hpx::util::detail::unique_function_vtable_ptr<
-        Sig, IArchive, OArchive
-    > > : boost::mpl::int_<boost::serialization::track_never>
-    {};
-}}
 
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Sig
-      , typename IArchive = portable_binary_iarchive
-      , typename OArchive = portable_binary_oarchive
+      , typename IArchive = serialization::input_archive
+      , typename OArchive = serialization::output_archive
     >
     class unique_function
       : public detail::basic_function<
@@ -134,20 +120,7 @@ namespace hpx { namespace util
         typedef detail::unique_function_vtable_ptr<Sig, IArchive, OArchive> vtable_ptr;
         typedef detail::basic_function<vtable_ptr, Sig> base_type;
 
-#if defined(HPX_INTEL14_WORKAROUND)
-    private:
-        unique_function& operator=(unique_function const&);
-
-    public:
-        // The Intel Compiler sometimes erroneously instantiates this ctor. In order
-        // to avoid compile errors, we provide the definition here
-        unique_function(unique_function const & other) BOOST_NOEXCEPT
-        {
-            HPX_ASSERT(false);
-        }
-#else
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function);
-#endif
 
     public:
         typedef typename base_type::result_type result_type;
@@ -191,18 +164,18 @@ namespace hpx { namespace util
         using base_type::target;
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         void load(IArchive& ar, const unsigned version)
         {
             reset();
 
             bool is_empty = false;
-            ar.load(is_empty);
+            ar >> is_empty;
             if (!is_empty)
             {
                 std::string name;
-                ar.load(name);
+                ar >> name;
 
                 this->vptr = detail::get_table_ptr<vtable_ptr>(name);
                 this->vptr->load_object(&this->object, ar, version);
@@ -212,17 +185,17 @@ namespace hpx { namespace util
         void save(OArchive& ar, const unsigned version) const
         {
             bool is_empty = empty();
-            ar.save(is_empty);
+            ar << is_empty;
             if (!is_empty)
             {
                 std::string function_name = this->vptr->name;
-                ar.save(function_name);
+                ar << function_name;
 
                 this->vptr->save_object(&this->object, ar, version);
             }
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
     };
 
     template <typename Sig>
@@ -235,20 +208,7 @@ namespace hpx { namespace util
         typedef detail::unique_function_vtable_ptr<Sig, void, void> vtable_ptr;
         typedef detail::basic_function<vtable_ptr, Sig> base_type;
 
-#if defined(HPX_INTEL14_WORKAROUND)
-    private:
-        unique_function& operator=(unique_function const&);
-
-    public:
-        // The Intel Compiler sometimes erroneously instantiates this ctor. In order
-        // to avoid compile errors, we provide the definition here
-        unique_function(unique_function const & other) BOOST_NOEXCEPT
-        {
-            HPX_ASSERT(false);
-        }
-#else
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function);
-#endif
 
     public:
         typedef typename base_type::result_type result_type;
@@ -293,13 +253,14 @@ namespace hpx { namespace util
     };
 
     template <typename Sig, typename IArchive, typename OArchive>
-    static bool is_empty_function(unique_function<Sig, IArchive, OArchive> const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(unique_function<Sig, IArchive,
+        OArchive> const& f) BOOST_NOEXCEPT
     {
         return f.empty();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#   ifndef BOOST_NO_CXX11_TEMPLATE_ALIASES
+#   ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
 
     template <typename Sig>
     using unique_function_nonser = unique_function<Sig, void, void>;
@@ -312,20 +273,7 @@ namespace hpx { namespace util
     {
         typedef unique_function<Sig, void, void> base_type;
 
-#if defined(HPX_INTEL14_WORKAROUND)
-    private:
-        unique_function_nonser& operator=(unique_function_nonser const&);
-
-    public:
-        // The Intel Compiler sometimes erroneously instantiates this ctor. In order
-        // to avoid compile errors, we provide the definition here
-        unique_function_nonser(unique_function_nonser const & other) BOOST_NOEXCEPT
-        {
-            HPX_ASSERT(false);
-        }
-#else
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function_nonser);
-#endif
 
     public:
         unique_function_nonser() BOOST_NOEXCEPT
@@ -364,7 +312,7 @@ namespace hpx { namespace util
         return f.empty();
     }
 
-#   endif /*BOOST_NO_CXX11_TEMPLATE_ALIASES*/
+#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 #endif

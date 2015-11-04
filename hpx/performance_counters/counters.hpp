@@ -9,13 +9,13 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/base_object.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
@@ -189,7 +189,7 @@ namespace hpx { namespace performance_counters
 
     protected:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
@@ -203,7 +203,8 @@ namespace hpx { namespace performance_counters
     /// instance. Generally, a full name of a counter instance has the
     /// structure:
     ///
-    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}/countername#parameters
+    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}
+    ///      /countername#parameters
     ///
     /// i.e.
     ///    /queue{localityprefix/thread#2}/length
@@ -232,18 +233,21 @@ namespace hpx { namespace performance_counters
         std::string instancename_;        ///< the name of the object instance
         boost::int64_t parentinstanceindex_;    ///< the parent instance index
         boost::int64_t instanceindex_;    ///< the instance index
-        bool parentinstance_is_basename_; ///< the parentinstancename_ member holds a base counter name
+        bool parentinstance_is_basename_; ///< the parentinstancename_
+                                          ///member holds a base counter name
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
             typedef counter_type_path_elements base_type;
-            ar & boost::serialization::base_object<base_type>(*this);
-            ar & parentinstancename_ & instancename_ &
+            hpx::serialization::base_object_type<
+              counter_path_elements, base_type> base =
+                hpx::serialization::base_object<base_type>(*this);
+            ar & base & parentinstancename_ & instancename_ &
                  parentinstanceindex_ & instanceindex_ &
                  parentinstance_is_basename_;
         }
@@ -334,7 +338,7 @@ namespace hpx { namespace performance_counters
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
@@ -371,7 +375,7 @@ namespace hpx { namespace performance_counters
     ///        HPX whenever it needs to discover all performance counter
     ///        instances of a particular type.
     typedef hpx::util::function_nonser<
-        bool(counter_info const&, discover_counter_func const&, 
+        bool(counter_info const&, discover_counter_func const&,
             discover_counters_mode, error_code&)>
         discover_counters_func;
 
@@ -435,7 +439,7 @@ namespace hpx { namespace performance_counters
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
@@ -609,12 +613,13 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::vector<boost::int64_t> const& parameters, error_code& ec = throws);
+            std::vector<boost::int64_t> const& parameters,
+            error_code& ec = throws);
 
         // \brief Create a new arithmetics performance counter instance based on
         //        the given base counter names
-        naming::gid_type create_arithmetics_counter(
-            counter_info const& info, std::vector<std::string> const& base_counter_names,
+        naming::gid_type create_arithmetics_counter(counter_info const& info,
+            std::vector<std::string> const& base_counter_names,
             error_code& ec = throws);
 
         // \brief Create a new performance counter instance based on given

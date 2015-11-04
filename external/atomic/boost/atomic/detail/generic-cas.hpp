@@ -21,7 +21,8 @@ each operation) */
 #if defined(__GNUC__)
     namespace boost { namespace detail { namespace atomic {
     static inline int32_t
-    fenced_compare_exchange_strong_32(volatile int32_t *ptr, int32_t expected, int32_t desired)
+    fenced_compare_exchange_strong_32(volatile int32_t *ptr,
+        int32_t expected, int32_t desired)
     {
         return __sync_val_compare_and_swap_4(ptr, expected, desired);
     }
@@ -48,7 +49,8 @@ each operation) */
     static inline int32_t
     fenced_compare_exchange_strong(int32_t *ptr, int32_t expected, int32_t desired)
     {
-        return _InterlockedCompareExchange(reinterpret_cast<volatile long*>(ptr), desired, expected);
+        return _InterlockedCompareExchange(reinterpret_cast<volatile long*>(ptr),
+            desired, expected);
     }
     #define BOOST_ATOMIC_HAVE_CAS32 1
     #if defined(_WIN64)
@@ -120,7 +122,8 @@ public:
     T load(memory_order order=memory_order_seq_cst) const volatile
     {
         T expected=(T)i;
-        do { } while(!const_cast<this_type *>(this)->compare_exchange_weak(expected, expected, order, memory_order_relaxed));
+        do { } while(!const_cast<this_type *>(this)->compare_exchange_weak(expected,
+            expected, order, memory_order_relaxed));
         return expected;
     }
     void store(T v, memory_order order=memory_order_seq_cst) volatile
@@ -134,7 +137,8 @@ public:
         memory_order failure_order) volatile
     {
         T found;
-        found=(T)fenced_compare_exchange_strong_32(&i, (int32_t)expected, (int32_t)desired);
+        found=(T)fenced_compare_exchange_strong_32(&i, (int32_t)expected,
+            (int32_t)desired);
         bool success=(found==expected);
         expected=found;
         return success;
@@ -161,7 +165,8 @@ private:
 };
 
 template<typename T>
-class platform_atomic_integral<T, 4> : public build_atomic_from_exchange<atomic_generic_cas32<T> > {
+class platform_atomic_integral<T, 4>
+    : public build_atomic_from_exchange<atomic_generic_cas32<T> > {
 public:
     typedef build_atomic_from_exchange<atomic_generic_cas32<T> > super;
     explicit platform_atomic_integral(T v) : super(v) {}
@@ -169,7 +174,8 @@ public:
 };
 
 template<typename T>
-class platform_atomic_integral<T, 1>: public build_atomic_from_larger_type<atomic_generic_cas32<int32_t>, T> {
+class platform_atomic_integral<T, 1>
+    : public build_atomic_from_larger_type<atomic_generic_cas32<int32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_generic_cas32<int32_t>, T> super;
 
@@ -178,7 +184,8 @@ public:
 };
 
 template<typename T>
-class platform_atomic_integral<T, 2>: public build_atomic_from_larger_type<atomic_generic_cas32<int32_t>, T> {
+class platform_atomic_integral<T, 2>
+    : public build_atomic_from_larger_type<atomic_generic_cas32<int32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_generic_cas32<int32_t>, T> super;
 

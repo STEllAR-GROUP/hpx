@@ -17,6 +17,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <hpx/include/parallel_algorithm.hpp>
+#include <boost/range/irange.hpp>
+
 #include "print_time_results.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,76 +42,16 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Use a special allocator for the partition data to remove a major contention
-// point - the constant allocation and deallocation of the data arrays.
-template <typename T>
-struct partition_allocator
-{
-private:
-    typedef hpx::lcos::local::spinlock mutex_type;
-
-public:
-    partition_allocator(std::size_t max_size = std::size_t(-1))
-      : max_size_(max_size)
-    {
-    }
-
-    ~partition_allocator()
-    {
-        mutex_type::scoped_lock l(mtx_);
-        while (!heap_.empty())
-        {
-            T* p = heap_.top();
-            heap_.pop();
-            delete [] p;
-        }
-    }
-
-    T* allocate(std::size_t n)
-    {
-        mutex_type::scoped_lock l(mtx_);
-        if (heap_.empty())
-            return new T[n];
-
-        T* next = heap_.top();
-        heap_.pop();
-        return next;
-    }
-
-    void deallocate(T* p)
-    {
-        mutex_type::scoped_lock l(mtx_);
-        if (max_size_ == static_cast<std::size_t>(-1) || heap_.size() < max_size_)
-            heap_.push(p);
-        else
-            delete [] p;
-    }
-
-private:
-    mutex_type mtx_;
-    std::size_t max_size_;
-    std::stack<T*> heap_;
-};
-
-///////////////////////////////////////////////////////////////////////////////
 // Our partition data type
 struct partition_data
 {
-private:
-    static partition_allocator<double> alloc_;
-
-    static void deallocate(double* p)
-    {
-        alloc_.deallocate(p);
-    }
-
 public:
     partition_data(std::size_t size)
-      : data_(alloc_.allocate(size), &partition_data::deallocate), size_(size)
+      : data_(new double[size]), size_(size)
     {}
 
     partition_data(std::size_t size, double initial_value)
-      : data_(alloc_.allocate(size), &partition_data::deallocate),
+      : data_(new double[size]),
         size_(size)
     {
         double base_value = double(initial_value * size);
@@ -116,17 +59,22 @@ public:
             data_[i] = base_value + double(i);
     }
 
+    partition_data(partition_data && other)
+      : data_(std::move(other.data_))
+      , size_(other.size_)
+    {}
+
     double& operator[](std::size_t idx) { return data_[idx]; }
     double operator[](std::size_t idx) const { return data_[idx]; }
 
     std::size_t size() const { return size_; }
 
 private:
-    boost::shared_array<double> data_;
+    std::unique_ptr<double[]> data_;
     std::size_t size_;
-};
 
-partition_allocator<double> partition_data::alloc_;
+    HPX_MOVABLE_BUT_NOT_COPYABLE(partition_data);
+};
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
 {
@@ -151,7 +99,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all
@@ -164,8 +112,10 @@ struct stepper
 
         next[0] = heat(left[size-1], middle[0], middle[1]);
 
-        for (std::size_t i = 1; i != size-1; ++i)
+        for(std::size_t i = 1; i != size-1; ++i)
+        {
             next[i] = heat(middle[i-1], middle[i], middle[i+1]);
+        }
 
         next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
 
@@ -185,8 +135,15 @@ struct stepper
             s.resize(np);
 
         // Initial conditions: f(0, i) = i
-        for (std::size_t i = 0; i != np; ++i)
-            U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
+        std::size_t b = 0;
+        auto range = boost::irange(b, np);
+        using hpx::parallel::par;
+        hpx::parallel::for_each(par, boost::begin(range), boost::end(range),
+            [&U, nx](std::size_t i)
+            {
+                U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
+            }
+        );
 
         auto Op = unwrapped(&stepper::heat_part);
 

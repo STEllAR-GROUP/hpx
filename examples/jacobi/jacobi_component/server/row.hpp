@@ -18,25 +18,13 @@ namespace jacobi {
     {
 
         struct HPX_COMPONENT_EXPORT row
-            : hpx::components::managed_component_base<
-                row
-              , hpx::components::detail::this_type
-              , hpx::traits::construct_with_back_ptr
-            >
+            : hpx::components::component_base<row>
         {
             typedef
-                hpx::components::managed_component_base<
-                    row
-                  , hpx::components::detail::this_type
-                  , hpx::traits::construct_with_back_ptr
-                >
+                hpx::components::component_base<row>
                 base_type;
 
-            typedef hpx::components::managed_component<row> component_type;
-
-            row(component_type * back_ptr)
-                : base_type(back_ptr)
-            {}
+            typedef hpx::components::component<row> component_type;
 
             void init(std::size_t nx, double value);
 
@@ -46,7 +34,7 @@ namespace jacobi {
 
             row_range get(std::size_t begin, std::size_t end)
             {
-                //std::cout << this->get_gid() << "row::get ...\n";
+                //std::cout << this->get_id() << "row::get ...\n";
                 HPX_ASSERT(values);
                 return row_range(values, begin, end);
             }

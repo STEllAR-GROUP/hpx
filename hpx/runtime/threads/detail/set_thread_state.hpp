@@ -6,6 +6,7 @@
 #if !defined(HPX_RUNTIME_THREADS_DETAIL_SET_THREAD_STATE_JAN_13_2013_0518PM)
 #define HPX_RUNTIME_THREADS_DETAIL_SET_THREAD_STATE_JAN_13_2013_0518PM
 
+#include <hpx/config/asio.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -59,7 +60,8 @@ namespace hpx { namespace threads { namespace detail
 
         // just retry, set_state will create new thread if target is still active
         error_code ec(lightweight);      // do not throw
-        detail::set_thread_state(thrd, newstate, newstate_ex, priority, std::size_t(-1), ec);
+        detail::set_thread_state(thrd, newstate, newstate_ex, priority,
+            std::size_t(-1), ec);
         return terminated;
     }
 
@@ -88,7 +90,8 @@ namespace hpx { namespace threads { namespace detail
         if (!thrd) {
             if (&ec != &throws)
                 ec = make_success_code();
-            return thread_state(terminated);     // this thread has already been terminated
+            return thread_state(terminated);
+            // this thread has already been terminated
         }
 
         thread_state previous_state;
@@ -211,7 +214,8 @@ namespace hpx { namespace threads { namespace detail
         if (new_state == pending) {
             // REVIEW: Passing a specific target thread may interfere with the
             // round robin queuing.
-            thrd->get_scheduler_base()->schedule_thread(thrd.get(), thread_num, priority);
+            thrd->get_scheduler_base()->schedule_thread(thrd.get(),
+                thread_num, priority);
             thrd->get_scheduler_base()->do_some_work(thread_num);
         }
 
@@ -251,10 +255,9 @@ namespace hpx { namespace threads { namespace detail
         }
 
         // then re-activate the thread holding the deadline_timer
-        // REVIEW: Why do we ignore errors here?
         error_code ec(lightweight);    // do not throw
         detail::set_thread_state(timer_id, pending, wait_timeout,
-            thread_priority_normal, std::size_t(-1), ec);
+            thread_priority_boost, std::size_t(-1), ec);
         return terminated;
     }
 
@@ -307,14 +310,19 @@ namespace hpx { namespace threads { namespace detail
         // this waits for the thread to be reactivated when the timer fired
         // if it returns signaled the timer has been canceled, otherwise
         // the timer fired and the wake_timer_thread above has been executed
-        bool oldvalue = false;
         thread_state_ex_enum statex = get_self().yield(suspended);
 
-        if (wait_timeout != statex &&
-            triggered->compare_exchange_strong(oldvalue, true)) //-V601
+        if (wait_timeout != statex) //-V601
         {
+            triggered->store(true);
+
             // wake_timer_thread has not been executed yet, cancel timer
             t.cancel();
+
+            // cancel wake_timer_thread
+            error_code ec(lightweight);    // do not throw
+            detail::set_thread_state(wake_id, pending, wait_abort,
+                priority, std::size_t(-1), ec);
         }
 
         return terminated;
@@ -374,7 +382,7 @@ namespace hpx { namespace threads { namespace detail
         util::steady_duration const& rel_time, thread_id_type const& thrd,
         error_code& ec)
     {
-        return set_thread_state_timed(scheduler, rel_time.from_now(), thrd, 
+        return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
             pending, wait_timeout, thread_priority_normal, std::size_t(-1), ec);
     }
 }}}

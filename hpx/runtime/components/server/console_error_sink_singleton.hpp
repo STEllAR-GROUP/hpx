@@ -16,6 +16,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/signals2.hpp>
 #include <boost/thread.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -32,13 +33,13 @@ namespace hpx { namespace components { namespace server
         template <typename F, typename Connection>
         bool register_error_sink(F sink, Connection& conn)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return (conn = dispatcher_.connect(sink)).connected();
         }
 
         void operator()(std::string const& msg)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             dispatcher_(msg);
         }
 

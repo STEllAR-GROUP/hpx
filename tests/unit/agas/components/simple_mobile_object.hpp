@@ -39,7 +39,7 @@ struct simple_mobile_object
     boost::uint64_t get_lva()
     {
         typedef server_type::get_lva_action action_type;
-        return hpx::async<action_type>(this->get_gid()).get();
+        return hpx::async<action_type>(this->get_id()).get();
     }
 };
 

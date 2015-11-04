@@ -15,7 +15,8 @@ C++ Standards.
 
 At this point, __hpx__ implements several of the C++ Standardization working papers,
 most notably __cpp11_n4104__ (Working Draft, Technical Specification for C++
-Extensions for Parallelism) and __cpp11_n4088__ (Task Regions).
+Extensions for Parallelism), __cpp11_n4088__ (Task Blocks), and __cpp11_n4406__
+(Parallel Algorithms Need Executors).
 
 
 [section:parallel_algorithms Using Parallel Algorithms]
@@ -73,7 +74,6 @@ of type __sequential_task_execution_policy__ or __parallel_task_execution_policy
 the execution is semantically equivalent to the case of passing a
 __sequential_execution_policy__ or __parallel_execution_policy__ contained in the
 __execution_policy__ object respectively.
-
 
 [heading Parallel Exceptions]
 
@@ -133,6 +133,9 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_all_any_none.hpp>`]]
     [[ [algoref for_each] ]
      [Applies a function to a range of elements.]
+     [`<hpx/include/parallel_for_each.hpp>`]]
+    [[ [algoref for_each_n] ]
+     [Applies a function to a number of elements.]
      [`<hpx/include/parallel_for_each.hpp>`]]
     [[ [algoref count] ]
      [Returns the number of elements equal to a given value.]
@@ -251,6 +254,25 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_swap_ranges.hpp>`]]
 ]
 
+[table Set operations on sorted sequences(In Header: <hpx/include/parallel_algortithm.hpp>)
+    [[Name]     [Description]   [In Header]]
+    [[ [algoref includes] ]
+     [Returns true if one set is a subset of another.]
+     [`<hpx/include/parallel_set_operations.hpp>`]]
+    [[ [algoref set_difference] ]
+     [Computes the difference between two sets.]
+     [`<hpx/include/parallel_set_operations.hpp>`]]
+    [[ [algoref set_intersection] ]
+     [Computes the intersection of two sets.]
+     [`<hpx/include/parallel_set_operations.hpp>`]]
+    [[ [algoref set_symmetric_difference] ]
+     [Computes the symmetric difference between two sets.]
+     [`<hpx/include/parallel_set_operations.hpp>`]]
+    [[ [algoref set_union] ]
+     [Computes the union of two sets.]
+     [`<hpx/include/parallel_set_operations.hpp>`]]
+]
+
 [table Minimum/maximum operations (In Header: <hpx/include/parallel_algortithm.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref max_element] ]
@@ -264,7 +286,7 @@ __hpx__ provides implementations of the following parallel algorithms:
      [`<hpx/include/parallel_minmax.hpp>`]]
 ]
 
-[table Is Sorted opererations (In Header: <hpx/include/parallel_algorithm.hpp>)
+[table Operations checking various sorting criteria (In Header: <hpx/include/parallel_algorithm.hpp>)
     [[Name]     [Description]   [In Header]]
     [[ [algoref is_sorted] ]
      [Returns `true` if each element in a range is sorted]
@@ -279,6 +301,12 @@ __hpx__ provides implementations of the following parallel algorithms:
 
 [table Numeric Parallel Algorithms (In Header: <hpx/include/parallel_numeric.hpp>)
     [[Name]     [Description]   [In Header]]
+    [[ [algoref adjacent_difference] ]
+     [Calculates the difference between each element in an input range and the preceeding elemnt.]
+     [`<hpx/include/parallel_adjacent_difference.hpp>`]]
+    [[ [algoref inner_product] ]
+     [Accumulates the inner products of two input ranges.]
+     [`<hpx/include/parallel_inner_product.hpp>`]]
     [[ [algoref reduce] ]
      [Sums up a range of elements.]
      [`<hpx/include/parallel_reduce.hpp>`]]
@@ -313,10 +341,191 @@ __hpx__ provides implementations of the following parallel algorithms:
 
 [endsect]
 
-[section:task_region Using Task Regions]
+[//////////////////////////////////////////////////////////////////////////////]
+[section:executors Executors and Executor Traits]
 
-The `task_region`, `run` and the `wait` functions implemented based on
-__cpp11_n4088__ are based on the task_group concept that is a part of the
+The existing Version 1 of the Parallelism TS (__cpp11_n4104__) exposes parallel
+execution to the programmer in the form of standard algorithms that accept
+execution policies. A companion executor facility both provides a suitable
+substrate for implementing these algorithms in a standard way and provide a
+mechanism for exercising programmatic control over where parallel work should
+be executed.
+
+The algorithms and execution policies specified by the Parallelism TS are
+designed to permit implementation on the broadest range of platforms. In
+addition to preemptive thread pools common on some platforms, implementations
+of these algorithms may want to take advantage of a number of mechanisms for
+parallel execution, including cooperative fibers, GPU threads, and SIMD vector
+units, among others. This diversity of possible execution resources strongly
+suggests that a suitable abstraction encapsulating the details of how
+work is created across diverse platforms would be of significant value to
+parallel algorithm implementations. Suitably defined executors provide just
+such a facility.
+
+An executor is an object responsible for creating execution agents on which
+work is performed, thus abstracting the (potentially platform-specific)
+mechanisms for launching work. To accommodate the goals of the Parallelism TS,
+whose algorithms aim to support the broadest range of possible platforms, the
+requirements that all executors are expected to fulfill are small. They are
+also be consistent with a broad range of execution semantics, including
+preemptive threads, cooperative fibers, GPU threads, and SIMD vector
+units, among others.
+
+The executors implemented by __hpx__ are aligned with the interfaces proposed
+by __cpp11_n4406__ (Parallel Algorithms Need Executors).
+
+Executors are modular components for requisitioning execution agents. During
+parallel algorithm execution, execution policies generate execution agents by
+requesting their creation from an associated executor. Rather than focusing on
+asynchronous task queueing, our complementary treatment of executors casts
+them as modular components for invoking functions over the points of an index
+space. We believe that executors may be conceived of as allocators for
+execution agents and our interface's design reflects this analogy. The process
+of requesting agents from an executor is mediated via the
+[classref hpx::parallel::v3::executor_traits `hpx::parallel::executor_traits`]
+API, which is analogous to the interaction between containers and
+allocator_traits.
+
+With `executor_traits`, clients manipulate all types of executors uniformly:
+
+    executor_traits<my_executor_t>::execute(my_executor,
+        [](size_t i){ // perform task i },
+        range(0, n));
+
+This call synchronously creates a group of invocations of the given function,
+where each individual invocation within the group is identified by a unique
+integer i in `[0, n)`. Other functions in the interface exist to create groups of
+invocations asynchronously and support the special case of creating a singleton
+group, resulting in four different combinations.
+
+Though this interface appears to require executor authors to implement four
+different basic operations, there is really only one requirement:
+`async_execute()`. In practice, the other operations may be defined in terms of
+this single basic primitive. However, some executors will naturally specialize
+all four operations for maximum efficiency.
+
+For maximum implementation flexibility, `executor_traits` does not require
+executors to implement a particular exception reporting mechanism. Executors
+may choose whether or not to report exceptions, and if so, in what manner they
+are communicated back to the caller. However, all executors in __hpx__
+report exceptions in a manner consistent with the behavior of execution policies
+described by the Parallelism TS, where multiple exceptions are collected into
+an __exception_list__. This list is reported through `async_execute()'s`
+returned future, or thrown directly by execute().
+
+In __hpx__ we have implemented the following executor types:
+
+* [classref hpx::parallel::v3::sequential_executor `hpx::parallel::sequential_executor`]:
+  creates groups of sequential execution agents which execute in the calling
+  thread. The sequential order is given by the lexicographical order of indices
+  in the index space.
+* [classref hpx::parallel::v3::parallel_executor `hpx::parallel::parallel_executor`]:
+  creates groups of parallel execution agents which execute in threads
+  implicitly created by the executor. This executor uses a given launch policy.
+* [classref hpx::parallel::v3::service_executor `hpx::parallel::service_executor`]:
+  creates groups of parallel execution agents which execute in one of the
+  kernel threads associated with a given pool category (I/O, parcel, or timer
+  pool, or on the main thread of the application).
+* [classref hpx::parallel::v3::local_priority_queue_executor `hpx::parallel::local_priority_queue_executor`],
+  [classref hpx::parallel::v3::local_queue_executor `hpx::parallel::local_queue_executor`]
+  [classref hpx::parallel::v3::static_priority_queue_executor `hpx::parallel::static_priority_queue_executor`]
+  create executors on top of the corresponding __hpx__ schedulers.
+* [classref hpx::parallel::v3::distribution_policy_executor `hpx::parallel::distribution_policy_executor`]
+  creates executors using any of the existing distribution policies (like
+  [classref hpx::components::colocating_distribution_policy `hpx::components::colocating_distribution_policy]
+  et.al.).
+
+[endsect]
+
+[//////////////////////////////////////////////////////////////////////////////]
+[section:executor_parameters Executor Parameters and Executor Parameter Traits]
+
+Executors as described in the previous section add a powerful customization
+capability to any facility which exposes management of parallel execution.
+However, sometimes it is necessary to be able to customize certain parameters
+of the execution as well. In __hpx__ we introduce the notion of execution
+parameters and execution parameter traits. At this point, the only parameter
+which can be customized is the size of the chunks of work executed on a single
+__hpx__-thread (such as the number of loop iterations combined to run as a
+single task).
+
+An executor parameter object is responsible for exposing the calculation of the
+size of the chunks scheduled. It abstracts the (potentiall platform-specific)
+algorithms of determining those chunks sizes.
+
+The way executor parameters are implemented is aligned with the way executors
+are implemented. All functionalities of concrete executior parameter types are
+exposed and accessible through a corresponding
+[classref hpx::parallel::v3::executor_parameter_traits `hpx::parallel::executor_parameter_traits`]
+type.
+
+With `executor_parameter_traits,` clients access all types of executor
+parameters uniformly:
+
+    std::size_t chunk_size =
+        executor_parameter_traits<my_parameter_t>::get_chunk_size(my_parameter,
+            my_executor, [](){ return 0; }, num_tasks);
+
+This call synchronously retrieves the size of a single chunk of loop iterations
+(or similar) to combine for execution on a single __hpx__-thread if the overall
+number of tasks to schedule is given by `num_tasks`. The lambda
+function exposes a means of test-probing the execution of a single iteration
+for performance measurment purposes (the execution parameter type might
+dynamically determine the execution time of one or more tasks in order to
+calculate the chunk size, see
+[classref hpx::parallel::v3::auto_chunk_size `hpx::parallel::auto_chunk_size`]
+for an example of such a executor parameter type).
+
+Other functions in the interface exist to discover whether a executor parameter
+type should be invoked once (i.e. returns a static chunk size, see
+[classref hpx::parallel::v3::static_chunk_size `hpx::parallel::static_chunk_size`])
+or whether it should be invoked for each scheduled chunk of work (i.e. it
+returns a variable chunk size, for an example, see
+[classref hpx::parallel::v3::guided_chunk_size `hpx::parallel::guided_chunk_size`]).
+
+Though this interface appears to require executor parameter type authors to
+implement all different basic operations, there is really none required. In
+practice, all operations have sensible defaults. However, some executor
+parameter types will naturally specialize all operations for maximum efficiency.
+
+In __hpx__ we have implemented the following executor parameter types:
+
+* [classref hpx::parallel::v3::auto_chunk_size `hpx::parallel::auto_chunk_size`]:
+  Loop iterations are divided into pieces and then assigned to threads. The
+  number of loop iterations combined is determined based on measurements of how
+  long the execution of 1% of the overall number of iterations takes.
+  This executor parameters type makes sure that as many loop iterations
+  are combined as necessary to run for the amount of time specified.
+* [classref hpx::parallel::v3::static_chunk_size `hpx::parallel::static_chunk_size`]:
+  Loop iterations are divided into pieces of a given size and then assigned to
+  threads. If the size is not specified, the iterations are evenly (if
+  possible) divided contiguously among the threads. This executor parameters
+  type is equivalent to OpenMP's STATIC scheduling directive.
+* [classref hpx::parallel::v3::dynamic_chunk_size `hpx::parallel::dynamic_chunk_size`]:
+  Loop iterations are divided into pieces of a given size and then dynamically
+  scheduled among the cores; when an core finishes one chunk, it is dynamically
+  assigned another If the size is not specified, the default chunk size is 1.
+  This executor parameters type is equivalent to OpenMP's DYNAMIC scheduling
+  directive.
+* [classref hpx::parallel::v3::guided_chunk_size `hpx::parallel::guided_chunk_size`]:
+  Iterations are dynamically assigned to cores in blocks as cores request them
+  until no blocks remain to be assigned. Similar to `dynamic_chunk_size` except
+  that the block size decreases each time a number of loop iterations is given
+  to a thread. The size of the initial block is proportional to
+  `number_of_iterations / number_of_cores`.
+  Subsequent blocks are proportional to
+  `number_of_iterations_remaining / number_of_cores`. The optional chunk size
+  parameter defines the minimum block size. The default minimal chunk size is 1.
+  This executor parameters type is equivalent to OpenMP's GUIDED scheduling
+  directive.
+
+[endsect]
+
+[//////////////////////////////////////////////////////////////////////////////]
+[section:task_block Using Task Blocks]
+
+The `define_task_block`, `run` and the `wait` functions implemented based on
+__cpp11_n4088__ are based on the task_block concept that is a part of the
 common subset of the __ppl__ and the __tbb__ libraries.
 
 This implementations adopts a simpler syntax than exposed by those libraries -
@@ -338,8 +547,8 @@ results:
     int traverse(node& n, Func && compute)
     {
         int left = 0, right = 0;
-        task_region(
-            [&](task_region_handle& tr) {
+        define_task_block(
+            [&](task_block<>& tr) {
                 if (n.left)
                     tr.run([&] { left = traverse(*n.left, compute); });
                 if (n.right)
@@ -350,45 +559,111 @@ results:
     }
 
 The example above demonstrates the use of two of the functions,
-[funcref hpx::parallel::v2::task_region task_region] and the
-[memberref hpx::parallel::v2::task_region_handle::run run] member
-function of a [classref hpx::parallel::v2::task_region_handle task_region_handle].
+[funcref hpx::parallel::v2::define_task_block define_task_block] and the
+[memberref hpx::parallel::v2::task_block::run run] member
+function of a [classref hpx::parallel::v2::task_block task_block].
 
-The `task_region` function delineates a region in a program code potentially
+The `task_block` function delineates a region in a program code potentially
 containing invocations of threads spawned by the `run` member function of the
-`task_region_handle` class.
+`task_block` class.
 The `run` function spawns an __hpx__ thread, a unit of work that is allowed to
 execute in parallel with respect to the caller. Any parallel tasks spawned by
-`run` within the `task_region` are joined back to a single thread of execution
-at the end of the `task_region`.
+`run` within the task block are joined back to a single thread of execution
+at the end of the `define_task_block`.
 `run` takes a user-provided function object `f` and starts it asynchronously -
 i.e. it may return before the execution of `f` completes. The __hpx__
 scheduler may choose to run `f` immediately or delay running `f` until compute
 resources become available.
 
-A `task_region_handle` can be constructed only by `task_region` because it has
+A `task_block` can be constructed only by `define_task_block` because it has
 no public constructors.
 Thus, `run` can be invoked (directly or indirectly) only from a user-provided
-function passed to task_region:
+function passed to `define_task_block`:
 
     void g();
 
-    void f(task_region_handle& tr)
+    void f(task_block<>& tr)
     {
-        tr.run(g);              // OK, invoked from within task_region in h
+        tr.run(g);          // OK, invoked from within task_block in h
     }
 
     void h()
     {
-        task_region(f);
+        define_task_block(f);
     }
 
     int main()
     {
-        task_region_handle tr;  // Error: no public constructor
-        tr.run(g);              // No way to call run outside of a task_region
+        task_block<> tr;      // Error: no public constructor
+        tr.run(g);          // No way to call run outside of a define_task_block
         return 0;
     }
+
+[heading Using Execution Policies with Task Blocks]
+
+An execution policy is an object that expresses the requirements on the
+ordering of functions invoked as a consequence of the invocation of a
+task block. Enabling passing an execution policy to `define_task_block`
+gives the user control over the amount of parallelism employed by the
+created `task_block`. In the following example the use of an explicit
+`par` execution policy makes the user's intent explicit:
+
+    template <typename Func>
+    int traverse(node *n, Func&& compute)
+    {
+        int left = 0, right = 0;
+
+        define_task_block(
+            par,                // parallel_execution_policy
+            [&](task_block<>& tb) {
+                if (n->left)
+                    tb.run([&] { left = traverse(n->left, compute); });
+                if (n->right)
+                    tb.run([&] { right = traverse(n->right, compute); });
+            });
+
+        return compute(n) + left + right;
+    }
+
+
+[endsect]
+
+[section:task_block Extensions for Task Blocks]
+
+In __hpx__ we implemented some extensions for `task_block` beyond the actual
+standards porposal __cpp11_n4088__. The main addition is that a `task_block`
+can be invoked with a execution policy as its first argument, very similar to
+the parallel algorithms.
+
+    template <typename Func>
+    int traverse(node& n, Func && compute)
+    {
+        int left = 0, right = 0;
+        define_task_block(
+            par,                        // specify an execution policy
+            [&](task_block<>& tr) {
+                if (n.left)
+                    tr.run([&] { left = traverse(*n.left, compute); });
+                if (n.right)
+                    tr.run([&] { right = traverse(*n.right, compute); });
+            });
+
+        return compute(n) + left + right;
+    }
+
+This also causes the [classref hpx::parallel::v2::task_block `hpx::parallel::task_block`]
+object to be a template in our implementation.
+The template argment is the type of the execution policy used to create the
+task block. The template argment defaults to
+[classref hpx::parallel::v1::parallel_execution_policy `hpx::parallel::parallel_execution_policy`].
+
+__hpx__ still supports calling
+[funcref hpx::parallel::v2::define_task_block `hpx::parallel::define_task_block`]
+without an explicit execution policy. In this case the task block will run using
+the [classref hpx::parallel::v1::parallel_execution_policy `hpx::parallel::parallel_execution_policy`].
+
+__hpx__ also adds the ability to access the execution policy which was used to
+create a given `task_block`.
 
 [endsect]
 

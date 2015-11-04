@@ -13,14 +13,13 @@
 #include <algorithm>
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 namespace hpx { namespace threads { namespace policies { namespace detail
 {
     inline std::size_t count_initialized(std::vector<mask_type> const& masks)
     {
         std::size_t count = 0;
-        BOOST_FOREACH(mask_cref_type m, masks)
+        for (mask_cref_type m : masks)
         {
             if(any(m))
                 ++count;
@@ -43,7 +42,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
     affinity_data::affinity_data(std::size_t num_threads)
       : num_threads_(num_threads), pu_offset_(0), pu_step_(1),
-        affinity_domain_("pu"), affinity_masks_(), pu_nums_()
+        affinity_domain_("pu"), affinity_masks_(), pu_nums_(),
+        no_affinity_()
     {}
 
     std::size_t affinity_data::init(init_affinity_data const& data,
@@ -68,7 +68,14 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                 get_runtime().get_config().get_entry("hpx.cores", used_cores),
                 used_cores);
 
-        if (!data.affinity_desc_.empty())
+        if (data.affinity_desc_ == "none")
+        {
+            // don't use any affinity for any of the os-threads
+            threads::resize(no_affinity_, num_threads_);
+            for (std::size_t i = 0; i != num_threads_; ++i)
+                threads::set(no_affinity_, i);
+        }
+        else if (!data.affinity_desc_.empty())
         {
             affinity_masks_.clear();
             affinity_masks_.resize(num_threads_);
@@ -113,7 +120,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::vector<std::size_t>::iterator it =
             std::unique(cores.begin(), cores.end());
 
-        return std::distance(cores.begin(), it);
+        std::size_t num_unique_cores = std::distance(cores.begin(), it);
+        return (std::max)(num_unique_cores, max_cores);
     }
 
     // means of adding a processing unit after initialization
@@ -144,9 +152,23 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         init_cached_pu_nums(num_system_pus, t);
     }
 
+    static mask_type get_empty_machine_mask()
+    {
+        threads::mask_type m = threads::mask_type();
+        threads::resize(m, hardware_concurrency());
+        return m;
+    }
+
     mask_cref_type affinity_data::get_pu_mask(topology const& topology,
         std::size_t num_thread, bool numa_sensitive) const
     {
+        // --hpx:bind=none disables all affinity
+        if (threads::test(no_affinity_, num_thread))
+        {
+            static mask_type m = get_empty_machine_mask();
+            return m;
+        }
+
         // if we have individual, predefined affinity masks, return those
         if (!affinity_masks_.empty())
             return affinity_masks_[num_thread];

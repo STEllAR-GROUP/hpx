@@ -18,7 +18,7 @@ add_hpx_executable(cancelable_action_client
     FOLDER "Examples/CancelableAction")
 
 # add a custom target for this example
-add_hpx_pseudo_target(examples.cancelable_action.cancelable_action)
+#add_hpx_pseudo_target(examples.cancelable_action.cancelable_action)
 
 # make pseudo-targets depend on master pseudo-target
 add_hpx_pseudo_dependencies(examples examples.cancelable_action)

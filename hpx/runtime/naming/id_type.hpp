@@ -8,12 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/warnings_prefix.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/safe_bool.hpp>
 
-#include <boost/serialization/split_member.hpp>
 #include <boost/intrusive_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +55,7 @@ namespace hpx { namespace naming
 
         id_type(id_type const & o) : gid_(o.gid_) {}
         id_type(id_type && o)
-          : gid_(o.gid_)
+          : gid_(std::move(o.gid_))
         {
             o.gid_.reset();
         }
@@ -116,12 +114,15 @@ namespace hpx { namespace naming
 
         friend std::ostream& operator<< (std::ostream& os, id_type const& id);
 
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
-        void save(util::portable_binary_oarchive& ar, const unsigned int version) const;
-        void load(util::portable_binary_iarchive& ar, const unsigned int version);
+        template <class T>
+        void save(T& ar, const unsigned int version) const;
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        template <class T>
+        void load(T& ar, const unsigned int version);
+
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
         boost::intrusive_ptr<detail::id_type_impl> gid_;
     };

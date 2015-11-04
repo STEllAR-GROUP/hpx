@@ -104,7 +104,8 @@ namespace any_tests // test definitions
 
         HPX_TEST_MSG(value.empty(), "empty");
         HPX_TEST_EQ_MSG((void*)0, any_cast<int>(&value), "any_cast<int>");
-        HPX_TEST_EQ_MSG(value.type(), BOOST_SP_TYPEID(hpx::util::detail::any::empty), "type");
+        HPX_TEST_EQ_MSG(value.type(), BOOST_SP_TYPEID(hpx::util::detail::any::empty),
+            "type");
     }
 
     void test_converting_ctor()
@@ -115,7 +116,8 @@ namespace any_tests // test definitions
         HPX_TEST_EQ_MSG(false, value.empty(), "empty");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
         HPX_TEST_EQ_MSG((void*)0, any_cast<int>(&value), "any_cast<int>");
-        HPX_TEST_NEQ_MSG((void*)0, any_cast<std::string>(&value), "any_cast<std::string>");
+        HPX_TEST_NEQ_MSG((void*)0, any_cast<std::string>(&value),
+            "any_cast<std::string>");
         HPX_TEST_EQ_MSG(
             any_cast<std::string>(value), text,
             "comparing cast copy against original text");
@@ -173,7 +175,8 @@ namespace any_tests // test definitions
         HPX_TEST_EQ_MSG(false, value.empty(), "type");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
         HPX_TEST_EQ_MSG((void*)0, any_cast<int>(&value), "any_cast<int>");
-        HPX_TEST_NEQ_MSG((void*)0, any_cast<std::string>(&value), "any_cast<std::string>");
+        HPX_TEST_NEQ_MSG((void*)0, any_cast<std::string>(&value),
+            "any_cast<std::string>");
         HPX_TEST_EQ_MSG(
             any_cast<std::string>(value), text,
             "comparing cast copy against original text");
@@ -233,7 +236,8 @@ namespace any_tests // test definitions
         any copy2 = any(copy_counter());
         int count = copy_counter::get_count();
         swap(copy1, copy2);
-        HPX_TEST_EQ_MSG(count, copy_counter::get_count(), "checking that free swap doesn't make any copies.");
+        HPX_TEST_EQ_MSG(count, copy_counter::get_count(),
+            "checking that free swap doesn't make any copies.");
     }
 
     void test_swap_big()
@@ -265,7 +269,8 @@ namespace any_tests // test definitions
         any copy2 = any(copy_counter());
         int count = copy_counter::get_count();
         swap(copy1, copy2);
-        HPX_TEST_EQ_MSG(count, copy_counter::get_count(), "checking that free swap doesn't make any copies.");
+        HPX_TEST_EQ_MSG(count, copy_counter::get_count(),
+            "checking that free swap doesn't make any copies.");
     }
 
     void test_null_copying()

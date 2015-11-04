@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_start.hpp>
 
-// Our main HPX thread does nothing except for signalling to the runtime to 
+// Our main HPX thread does nothing except for signalling to the runtime to
 // finalize.
 int hpx_main(int argc, char ** argv)
 {

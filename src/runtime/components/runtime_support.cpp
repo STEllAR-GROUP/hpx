@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,20 +8,3 @@
 
 HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, factory)
 HPX_REGISTER_REGISTRY_MODULE()
-
-namespace hpx { namespace components
-{
-    ///////////////////////////////////////////////////////////////////////////
-    int runtime_support::get_factory_properties(components::component_type type)
-    {
-        return this->base_type::get_factory_properties(gid_, type);
-    }
-
-    lcos::future<int>
-    runtime_support::get_factory_properties_async(components::component_type type)
-    {
-        return this->base_type::get_factory_properties_async(gid_, type);
-    }
-}}
-
-

@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
-set(root "${hpx_SOURCE_DIR}/hpx/components/containers/unordered")
+set(root "${PROJECT_SOURCE_DIR}/hpx/components/containers/unordered")
 
 add_hpx_component(unordered
   FOLDER "Core/Components/Containers"

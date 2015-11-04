@@ -17,7 +17,7 @@ namespace examples { namespace server
 {
 
 struct HPX_COMPONENT_EXPORT hello_world
-  : hpx::components::managed_component_base<hello_world>
+  : hpx::components::component_base<hello_world>
 {
     void invoke();
     HPX_DEFINE_COMPONENT_ACTION(hello_world, invoke);
@@ -50,7 +50,7 @@ struct hello_world
 
     void invoke()
     {
-        this->base_type::invoke(this->get_gid());
+        this->base_type::invoke(this->get_id());
     }
 };
 
@@ -59,6 +59,6 @@ struct hello_world
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::hello_world::invoke_action, hello_world_invoke_action);
 
-#endif // HELLO_WORLD_COMPONENT_HPP 
+#endif // HELLO_WORLD_COMPONENT_HPP
 //]
 

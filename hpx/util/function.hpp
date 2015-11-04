@@ -7,12 +7,13 @@
 #ifndef HPX_UTIL_FUNCTION_HPP
 #define HPX_UTIL_FUNCTION_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/error.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/function_template.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/tuple.hpp>
+#include <hpx/traits/needs_automatic_registration.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 
@@ -21,10 +22,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_CONTINUATION_REGISTER_FUNCTION_FACTORY(VTable, Name)              \
     static ::hpx::util::detail::function_registration<                        \
-        VTable::first_type, VTable::second_type                               \
+        ::hpx::util::tuple_element<0, VTable>::type                           \
+      , ::hpx::util::tuple_element<1, VTable>::type                           \
     > const BOOST_PP_CAT(Name, _function_factory_registration) =              \
             ::hpx::util::detail::function_registration<                       \
-                VTable::first_type, VTable::second_type                       \
+                ::hpx::util::tuple_element<0, VTable>::type                   \
+              , ::hpx::util::tuple_element<1, VTable>::type                   \
             >();                                                              \
 /**/
 
@@ -38,10 +41,11 @@
 #define HPX_UTIL_REGISTER_FUNCTION_DECLARATION(Sig, Functor, Name)            \
     namespace hpx { namespace util { namespace detail {                       \
         typedef                                                               \
-            std::pair<                                                        \
+            hpx::util::tuple<                                                 \
                 function_vtable_ptr<                                          \
                     Sig                                                       \
-                  , portable_binary_iarchive, portable_binary_oarchive        \
+                  , ::hpx::serialization::input_archive                       \
+                  , ::hpx::serialization::output_archive                      \
                 >                                                             \
               , util::decay<HPX_UTIL_STRIP(Functor)>::type                    \
             >                                                                 \
@@ -93,7 +97,7 @@ namespace hpx { namespace util { namespace detail
         std::pair<
             hpx::util::detail::function_vtable_ptr<
                 Sig
-              , hpx::util::portable_binary_iarchive, hpx::util::portable_binary_oarchive
+              , hpx::serialization::input_archive, hpx::serialization::output_archive
             >
           , hpx::util::detail::empty_function<Sig>
         >
@@ -109,13 +113,15 @@ namespace hpx { namespace util { namespace detail
     };
 }}}
 
-namespace hpx { namespace traits {
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Sig>
     struct needs_automatic_registration<
         std::pair<
             hpx::util::detail::function_vtable_ptr<
                 Sig
-              , hpx::util::portable_binary_iarchive, hpx::util::portable_binary_oarchive
+              , hpx::serialization::input_archive, hpx::serialization::output_archive
             >
           , hpx::util::detail::empty_function<Sig>
         >

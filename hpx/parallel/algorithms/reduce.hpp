@@ -14,18 +14,19 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+
+#include <boost/range/functions.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/type_traits/is_base_of.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
 #include <numeric>
 #include <iterator>
-
-#include <boost/static_assert.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -44,7 +45,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter, typename T_,
                 typename Reduce>
             static T
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 T_ && init, Reduce && r)
             {
                 return std::accumulate(first, last, std::forward<T_>(init),
@@ -53,13 +54,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename T_,
                 typename Reduce>
-            static typename detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<ExPolicy, T>::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 T_ && init, Reduce && r)
             {
                 if (first == last)
                 {
-                    return detail::algorithm_result<ExPolicy, T>::get(
+                    return util::detail::algorithm_result<ExPolicy, T>::get(
                         std::forward<T_>(init));
                 }
 
@@ -154,7 +155,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename T, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, T>::type
+        typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     reduce(ExPolicy&& policy, InIter first, InIter last, T init, F && f)
     {
@@ -231,7 +232,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, T>::type
+        typename util::detail::algorithm_result<ExPolicy, T>::type
     >::type
     reduce(ExPolicy&& policy, InIter first, InIter last, T init)
     {
@@ -309,7 +310,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy,
+        typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::value_type>::type
     >::type
     reduce(ExPolicy&& policy, InIter first, InIter last)

@@ -46,7 +46,7 @@ struct simple_refcnt_monitor
       : locality_(naming::get_locality_from_gid(locality)
                 , naming::id_type::unmanaged)
     {
-        gid_ = stub_type::create_async(locality_, flag_.get_gid());
+        gid_ = stub_type::create_async(locality_, flag_.get_id());
     }
 
     /// Create a new component on the target locality.
@@ -55,21 +55,21 @@ struct simple_refcnt_monitor
         )
       : locality_(naming::get_locality_from_id(locality))
     {
-        gid_ = stub_type::create_async(locality_, flag_.get_gid());
+        gid_ = stub_type::create_async(locality_, flag_.get_id());
     }
 
     lcos::future<void> take_reference_async(
         naming::id_type const& gid
         )
     {
-        return this->base_type::take_reference_async(get_gid(), gid);
+        return this->base_type::take_reference_async(get_id(), gid);
     }
 
     void take_reference(
         naming::id_type const& gid
         )
     {
-        return this->base_type::take_reference(get_gid(), gid);
+        return this->base_type::take_reference(get_id(), gid);
     }
 
     bool is_ready()

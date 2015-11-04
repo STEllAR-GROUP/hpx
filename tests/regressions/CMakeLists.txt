@@ -22,17 +22,20 @@ if(HPX_HAVE_CXX11_LAMBDAS)
 endif()
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.regressions.${subdir})
+  add_hpx_pseudo_target(tests.regressions.${subdir}_dir)
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.regressions tests.regressions.${subdir})
+  add_hpx_pseudo_dependencies(tests.regressions tests.regressions.${subdir}_dir)
 endforeach()
 
 set(tests
+    commandline_options_1437
+    dynamic_counters_loaded_1508
     id_type_ref_counting_1032
     multiple_init
     unhandled_exception_582
    )
 
+set(commandline_options_1437_PARAMETERS THREADS_PER_LOCALITY 2)
 set(id_type_ref_counting_1032_PARAMETERS THREADS_PER_LOCALITY 1)
 set(unhandled_exception_582_PARAMETERS THREADS_PER_LOCALITY 1)
 

@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <boost/serialization/serialization.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace sheneos
@@ -25,7 +25,7 @@ namespace sheneos
         dimension() : offset_(0), count_(0), size_(0) {}
         dimension(std::size_t size) : offset_(0), count_(0), size_(size) {}
 
-        std::size_t offset_;    ///< Dimension offset. 
+        std::size_t offset_;    ///< Dimension offset.
         std::size_t count_;     ///< Dimension count.
         std::size_t size_;      ///< Overall size of this dimension.
     };
@@ -33,14 +33,14 @@ namespace sheneos
 
 ///////////////////////////////////////////////////////////////////////////////
 // Non-intrusive serialization support.
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_iarchive& ar, sheneos::dimension& dim,
+    serialize(input_archive& ar, sheneos::dimension& dim,
         unsigned int const);
 
     HPX_COMPONENT_EXPORT void
-    serialize(hpx::util::portable_binary_oarchive& ar, sheneos::dimension& dim,
+    serialize(output_archive& ar, sheneos::dimension& dim,
         unsigned int const);
 }}
 

@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
@@ -36,13 +37,13 @@ namespace hpx { namespace util
                 f = other.f;
                 return *this;
             }
-            
+
             template <typename>
             struct result;
 
             template <typename This, typename ...Ts>
             struct result<This(Ts...)>
-              : util::invoke_result_of<MemPtr(Ts...)>
+              : util::result_of<MemPtr(Ts...)>
             {};
 
             template <typename T, typename ...Ts>

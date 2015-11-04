@@ -7,9 +7,6 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
 #include <hpx/util/assert.hpp>
 
 #include "partition.hpp"
@@ -73,6 +70,6 @@ HPX_REGISTER_ACTION(partition_type::init_action,
 HPX_REGISTER_ACTION(partition_type::interpolate_action,
     partition_interpolate_action);
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<partition_type>,
+HPX_REGISTER_COMPONENT(
+    hpx::components::component<partition_type>,
     interpolate1d_partition_type);

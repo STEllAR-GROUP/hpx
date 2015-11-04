@@ -72,17 +72,17 @@ void hpx_test_main(
         Client monitor_remote(remote_localities[0]);
         Client monitor_local(find_here());
 
-        cout << "id_remote: " << monitor_remote.get_gid() << " "
+        cout << "id_remote: " << monitor_remote.get_id() << " "
              << get_management_type_name
-                    (monitor_remote.get_gid().get_management_type()) << "\n"
-             << "id_local:  " << monitor_local.get_gid() << " "
+                    (monitor_remote.get_id().get_management_type()) << "\n"
+             << "id_local:  " << monitor_local.get_id() << " "
              << get_management_type_name
-                    (monitor_local.get_gid().get_management_type()) << "\n"
+                    (monitor_local.get_id().get_management_type()) << "\n"
              << flush;
 
         {
             // Have the remote object store a reference to the local object.
-            monitor_remote.take_reference(monitor_local.get_gid());
+            monitor_remote.take_reference(monitor_local.get_id());
 
             // Detach the references.
             id_type id1 = monitor_remote.detach().get();

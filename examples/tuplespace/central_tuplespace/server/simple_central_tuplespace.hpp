@@ -7,12 +7,14 @@
 #define HPX_SERVER_SIMPLE_CENTRAL_TUPLESPACE_MAR_29_2013_0237PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/storage/tuple.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/local_lcos.hpp>
+
+#include <boost/thread/locks.hpp>
 
 #include "tuples_warehouse.hpp"
 
@@ -26,14 +28,13 @@ namespace examples { namespace server
     /// This class is a simple central tuplespace (SCTS) as an HPX component. An HPX
     /// component is a class that:
     ///
-    ///     * Inherits from a component base class (either
-    ///       \a hpx::components::managed_component_base or
-    ///       \a hpx::components::simple_component_base).
+    ///     * Inherits from a component base class:
+    ///       \a hpx::components::component_base
     ///     * Exposes methods that can be called asynchronously and/or remotely.
     ///       These constructs are known as HPX actions.
     ///
-    /// By deriving this component from \a locking_hook the runtime system 
-    /// ensures that all action invocations are serialized. That means that 
+    /// By deriving this component from \a locking_hook the runtime system
+    /// ensures that all action invocations are serialized. That means that
     /// the system ensures that no two actions are invoked at the same time on
     /// a given component instance. This makes the component thread safe and no
     /// additional locking has to be implemented by the user.
@@ -47,16 +48,16 @@ namespace examples { namespace server
     /// (from JavaSpace)
     /// write,
     /// read,
-    /// take 
+    /// take
     ///
     /// each has the last argument as a timeout value, pre-defined WAIT_FOREVER, NO_WAIT
     /// users can also provide its own timeout values.
-    /// 
+    ///
     /// uses mutex, will hurt performance.
     ///
     //[simple_central_tuplespace_server_inherit
     class simple_central_tuplespace
-      : public hpx::components::simple_component_base<simple_central_tuplespace> 
+      : public hpx::components::component_base<simple_central_tuplespace>
     //]
     {
         public:
@@ -64,7 +65,7 @@ namespace examples { namespace server
             typedef hpx::util::storage::tuple tuple_type;
             typedef hpx::util::storage::tuple::elem_type elem_type;
             typedef hpx::lcos::local::spinlock mutex_type;
-            
+
             typedef examples::server::tuples_warehouse tuples_type;
 
             // pre-defined timeout values
@@ -92,7 +93,7 @@ namespace examples { namespace server
                 }
 
                 {
-                    mutex_type::scoped_lock l(mtx_); 
+                    boost::lock_guard<mutex_type> l(mtx_);
 
                     tuples_.insert(tp);
                 }
@@ -111,11 +112,11 @@ namespace examples { namespace server
                 {
                     if(tuples_.empty())
                     {
-                        continue; 
+                        continue;
                     }
 
                     {
-                        mutex_type::scoped_lock l(mtx_); 
+                        boost::lock_guard<mutex_type> l(mtx_);
 
                         result = tuples_.match(tp);
                     }
@@ -127,7 +128,7 @@ namespace examples { namespace server
                     }
                 } while((timeout < 0) || (timeout > t.elapsed()));
 
-                return result; 
+                return result;
             }
 
             // take from tuplespace
@@ -142,11 +143,11 @@ namespace examples { namespace server
 
                     if(tuples_.empty())
                     {
-                        continue; 
+                        continue;
                     }
 
                     {
-                        mutex_type::scoped_lock l(mtx_); 
+                        boost::lock_guard<mutex_type> l(mtx_);
 
                         result = tuples_.match_and_erase(tp);
                     }
@@ -158,7 +159,7 @@ namespace examples { namespace server
                     }
                 } while((timeout < 0) || (timeout > t.elapsed()));
 
-                return result; 
+                return result;
             }
 
             //]

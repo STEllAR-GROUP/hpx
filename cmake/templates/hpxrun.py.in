@@ -77,7 +77,7 @@ def run_mpi(cmd, localities, verbose):
 # Run with srun
 # This is executing srun with the '-n' option set to the number of localities
 def run_srun(cmd, localities, verbose):
-    exec_cmd = ['srun', '-K', '-n', str(localities), '-N', str(localities)] + cmd
+    exec_cmd = ['srun', '-K', '-n', str(localities)] + cmd
     if verbose:
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
@@ -107,7 +107,11 @@ def build_cmd(options, args):
         cmd += select_parcelport(options.parcelport)
 
     # set number of threads
-    cmd += ['--hpx:threads=' + str(options.threads)]
+    if options.threads == -1:
+        cmd += ['--hpx:threads=all']
+    else:
+        cmd += ['--hpx:threads=' + str(options.threads)]
+
     # set number of localities
     cmd += ['--hpx:localities=' + str(options.localities)]
 
@@ -131,7 +135,7 @@ def check_options(parser, options, args):
         print('Can not start less than one locality', sys.stderr)
         sys.exit(1)
 
-    if options.threads < 1:
+    if options.threads < 1 and options.threads != -1:
         print('Can not start less than one thread per locality', sys.stderr)
         sys.exit(1)
 
@@ -267,7 +271,9 @@ if __name__ == '__main__':
                 msg += ')'
                 print(msg)
                 while procs:
-                    term(procs.pop(0))
+                    nextproc = procs.pop(0)
+                    if nextproc != proc:
+                        term(nextproc)
         except:
             pass
         finally: procs_lock.release()

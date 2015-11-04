@@ -7,10 +7,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
-
-#include <stdexcept>
-
+#include <hpx/config/asio.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
@@ -18,6 +15,9 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <stdexcept>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -43,10 +43,8 @@ namespace hpx { namespace util
         // will not exit until they are explicitly stopped.
         for (std::size_t i = 0; i < pool_size; ++i)
         {
-            io_service_ptr io_service(new boost::asio::io_service);
-            work_ptr work(new boost::asio::io_service::work(*io_service));
-            io_services_.push_back(io_service);
-            work_.push_back(work);
+            io_services_.emplace_back(new boost::asio::io_service);
+            work_.emplace_back(initialize_work(*io_services_[i]));
         }
     }
 
@@ -61,16 +59,14 @@ namespace hpx { namespace util
     {
         for (std::size_t i = 0; i < pool_size_; ++i)
         {
-            io_service_ptr io_service(new boost::asio::io_service);
-            work_ptr work(new boost::asio::io_service::work(*io_service));
-            io_services_.push_back(io_service);
-            work_.push_back(work);
+            io_services_.emplace_back(new boost::asio::io_service);
+            work_.emplace_back(initialize_work(*io_services_[i]));
         }
     }
 
     io_service_pool::~io_service_pool()
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
         stop_locked();
         join_locked();
         clear_locked();
@@ -90,7 +86,7 @@ namespace hpx { namespace util
 
     bool io_service_pool::run(bool join_threads)
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
 
         // Create a pool of threads to run all of the io_services.
         if (!threads_.empty())   // should be called only once
@@ -114,18 +110,16 @@ namespace hpx { namespace util
         {
             for (std::size_t i = 0; i < pool_size_; ++i)
             {
-                io_service_ptr io_service(new boost::asio::io_service);
-                work_ptr work(new boost::asio::io_service::work(*io_service));
-                io_services_.push_back(io_service);
-                work_.push_back(work);
+                io_services_.emplace_back(new boost::asio::io_service);
+                work_.emplace_back(initialize_work(*io_services_[i]));
             }
         }
 
         for (std::size_t i = 0; i < pool_size_; ++i)
         {
-            boost::shared_ptr<boost::thread> thread(new boost::thread(
-                boost::bind(&io_service_pool::thread_run, this, i)));
-            threads_.push_back(thread);
+            boost::thread thread(boost::bind(
+                        &io_service_pool::thread_run, this, i));
+            threads_.emplace_back(std::move(thread));
         }
 
         next_io_service_ = 0;
@@ -143,7 +137,7 @@ namespace hpx { namespace util
 
     void io_service_pool::join()
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
         join_locked();
     }
 
@@ -151,13 +145,13 @@ namespace hpx { namespace util
     {
         // Wait for all threads in the pool to exit.
         for (std::size_t i = 0; i < threads_.size(); ++i)
-            threads_[i]->join();
+            threads_[i].join();
         threads_.clear();
     }
 
     void io_service_pool::stop()
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
         stop_locked();
     }
 
@@ -165,8 +159,6 @@ namespace hpx { namespace util
     {
         if (!stopped_) {
             // Explicitly inform all work to exit.
-            for (std::size_t i = 0; i < work_.size(); ++i)
-                work_[i].reset();
             work_.clear();
 
             // Explicitly stop all io_services.
@@ -179,7 +171,7 @@ namespace hpx { namespace util
 
     void io_service_pool::clear()
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
         clear_locked();
     }
 
@@ -195,14 +187,14 @@ namespace hpx { namespace util
 
     bool io_service_pool::stopped()
     {
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
         return stopped_;
     }
 
     boost::asio::io_service& io_service_pool::get_io_service(int index)
     {
         // use this function for single group io_service pools only
-        boost::mutex::scoped_lock l(mtx_);
+        boost::lock_guard<boost::mutex> l(mtx_);
 
         if (index == -1) {
             if (++next_io_service_ == pool_size_)

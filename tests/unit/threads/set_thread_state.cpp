@@ -27,7 +27,7 @@ using hpx::lcos::future;
 using hpx::async;
 
 using hpx::threads::thread_id_type;
-using hpx::threads::thread_data_base;
+using hpx::threads::thread_data;
 using hpx::this_thread::suspend;
 using hpx::threads::set_thread_state;
 using hpx::threads::thread_state_ex_enum;
@@ -88,7 +88,7 @@ void change_thread_state(
     )
 {
 //    std::cout << "waking up thread (wait_signaled)\n";
-    thread_id_type id(reinterpret_cast<thread_data_base*>(thread));
+    thread_id_type id(reinterpret_cast<thread_data*>(thread));
     set_thread_state(id, pending, wait_signaled);
 
 //    std::cout << "suspending thread (wait_timeout)\n";

@@ -10,6 +10,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -24,7 +25,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     /// Create arrays of components using their default constructor
     template <typename Component>
-    naming::gid_type create(std::size_t count = 1, error_code& ec = throws)
+    naming::gid_type create(std::size_t count)
     {
         Component* c = static_cast<Component*>(Component::create(count));
 
@@ -32,8 +33,6 @@ namespace hpx { namespace components { namespace server
         if (gid)
         {
             // everything is ok, return the new id
-            if (&ec != &throws)
-                ec = make_success_code();
             return gid;
         }
 
@@ -42,7 +41,7 @@ namespace hpx { namespace components { namespace server
         std::ostringstream strm;
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
-        HPX_THROWS_IF(ec, hpx::duplicate_component_address,
+        HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
             "create<Component>",
             strm.str());
 
@@ -50,8 +49,7 @@ namespace hpx { namespace components { namespace server
     }
 
     template <typename Component>
-    naming::gid_type create(util::function_nonser<void(void*)> const& ctor,
-        error_code& ec = throws)
+    naming::gid_type create(util::function_nonser<void(void*)> const& ctor)
     {
         Component* c = (Component*)Component::heap_type::alloc(1);
         ctor(c);
@@ -60,8 +58,6 @@ namespace hpx { namespace components { namespace server
         if (gid)
         {
             // everything is ok, return the new id
-            if (&ec != &throws)
-                ec = make_success_code();
             return gid;
         }
 
@@ -70,7 +66,7 @@ namespace hpx { namespace components { namespace server
         std::ostringstream strm;
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
-        HPX_THROWS_IF(ec, hpx::duplicate_component_address,
+        HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
             "create<Component>(ctor)",
             strm.str());
 
@@ -79,8 +75,7 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component>
     naming::gid_type create(naming::gid_type const& gid,
-        util::function_nonser<void(void*)> const& ctor,
-        error_code& ec = throws)
+        util::function_nonser<void(void*)> const& ctor)
     {
         Component* c = (Component*)Component::heap_type::alloc(1);
         ctor(c);
@@ -89,8 +84,6 @@ namespace hpx { namespace components { namespace server
         if (assigned_gid && assigned_gid == gid)
         {
             // everything is ok, return the new id
-            if (&ec != &throws)
-                ec = make_success_code();
             return gid;
         }
 
@@ -99,7 +92,7 @@ namespace hpx { namespace components { namespace server
         std::ostringstream strm;
         strm << "global id " << assigned_gid <<
             " is already bound to a different component instance";
-        HPX_THROWS_IF(ec, hpx::duplicate_component_address,
+        HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
             "create<Component>(naming::gid_type, ctor)",
             strm.str());
 

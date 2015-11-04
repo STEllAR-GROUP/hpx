@@ -66,7 +66,7 @@ by section basis below.
     medium_size = ${HPX_MEDIUM_STACK_SIZE:<hpx_medium_stack_size>}
     large_size = ${HPX_LARGE_STACK_SIZE:<hpx_large_stack_size>}
     huge_size = ${HPX_HUGE_STACK_SIZE:<hpx_huge_stack_size>}
-    use_guard_pages = ${HPX_USE_GUARD_PAGES:1}
+    use_guard_pages = ${HPX_THREAD_GUARD_PAGE:1}
 ``
 [c++]
 
@@ -102,18 +102,18 @@ by section basis below.
       application instance.]]
     [[`hpx.lock_detection`]
      [This setting verifies that no locks are being held while a __hpx__ thread
-      is suspended. This setting is applicable only if `HPX_VERIFY_LOCKS` is set
+      is suspended. This setting is applicable only if `HPX_WITH_VERIFY_LOCKS` is set
       during configuration in CMake.]]
     [[`hpx.throw_on_held_lock`]
      [This setting causes an exception if during lock detection at least one lock
       is being held while a __hpx__ thread is suspended. This setting is applicable
-      only if `HPX_VERIFY_LOCKS` is set during configuration in CMake. This setting
+      only if `HPX_WITH_VERIFY_LOCKS` is set during configuration in CMake. This setting
       has no effect if `hpx.lock_detection=0`]]
     [[`hpx.minimal_deadlock_detection`]
      [This setting enables support for minimal deadlock detection for __hpx__-threads.
       By default this is set to `1` (for Debug builds) or to `0` (for Release,
       RelWithDebInfo, RelMinSize builds), this setting is effective only if
-      `HPX_THREAD_MINIMAL_DEADLOCK_DETECTION` is set during configuration in
+      `HPX_WITH_THREAD_DEADLOCK_DETECTION` is set during configuration in
       CMake.]]
     [[`hpx.stacks.small_size`]
      [This is initialized to the small stack size to be used by __hpx__-threads.
@@ -135,7 +135,7 @@ by section basis below.
      [This entry controls whether the coroutine library will generate stack guard
       pages or not. This entry is applicable on Linux only and only if the
       `HPX_USE_GENERIC_COROUTINE_CONTEXT` option is not enabled and the
-      `HPX_THREAD_GUARD_PAGE` is set to 1 while configuring
+      `HPX_WITH_THREAD_GUARD_PAGE` is set to 1 while configuring
       the build system. It is set by default to `1`.]]
 ]
 
@@ -199,7 +199,7 @@ of the components will contain at least the following properties:
     [[`hpx.components.<component_instance_name>.name`]
      [This is the name of a component, usually the same as the second argument
       to the macro used while registering the component with
-      [macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`].
+      [macroref HPX_REGISTER_COMPONENT `HPX_REGISTER_COMPONENT`].
       Set by the component factory.]]
     [[`hpx.components.<component_instance_name>.path`]
      [This is either the full path file name of the component module or the
@@ -235,6 +235,7 @@ sections, one for each component.
     zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
     async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}
     enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}
+    message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:0}
 ``
 [c++]
 
@@ -288,6 +289,9 @@ sections, one for each component.
     [[`hpx.parcel.enable_security`]
      [This property defines whether this locality is encrypting parcels. The
       default is `0`.]]
+    [[`hpx.parcel.message_handlers`]
+     [This property defines whether message handlers are loaded. The
+      default is `0`.]]
 ]
 
 The following settings relate to the TCP/IP parcelport.
@@ -295,7 +299,7 @@ The following settings relate to the TCP/IP parcelport.
 [teletype]
 ``
     [hpx.parcel.tcp]
-    enable = ${HPX_PARCELPORT_TCP:1}
+    enable = ${HPX_HAVE_PARCELPORT_TCP:1}
     array_optimization = ${HPX_PARCEL_TCP_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
     zero_copy_optimization = ${HPX_PARCEL_TCP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
     async_serialization = ${HPX_PARCEL_TCP_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
@@ -356,13 +360,13 @@ The following settings relate to the TCP/IP parcelport.
 
 The following settings relate to the shared memory parcelport (which is usable
 for communication between two localities on the same node). These settings take
-effect only if the compile time constant `HPX_PARCELPORT_IPC` is set
-(the equivalent cmake variable is `HPX_PARCELPORT_IPC`, and has to be set to `ON`).
+effect only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` is set
+(the equivalent cmake variable is `HPX_WITH_PARCELPORT_IPC`, and has to be set to `ON`).
 
 [teletype]
 ``
     [hpx.parcel.ipc]
-    enable = ${HPX_PARCELPORT_IPC:0}
+    enable = ${HPX_HAVE_PARCELPORT_IPC:0}
     data_buffer_cache_size=${HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE:512}
     array_optimization = ${HPX_PARCEL_IPC_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
     async_serialization = ${HPX_PARCEL_IPC_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
@@ -493,28 +497,28 @@ set to `ON`).
 ]
 
 The following settings relate to the MPI parcelport. These settings take
-effect only if the compile time constant `HPX_PARCELPORT_MPI` is set
-(the equivalent cmake variable is `HPX_PARCELPORT_MPI`, and has to be set
+effect only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` is set
+(the equivalent cmake variable is `HPX_WITH_PARCELPORT_MPI`, and has to be set
 to `ON`).
 
 [teletype]
 ``
     [hpx.parcel.mpi]
-    enable = ${HPX_PARCELPORT_MPI:1}
-    env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}
-    multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}
+    enable = ${HPX_HAVE_PARCELPORT_MPI:1}
+    env = ${HPX_HAVE_PARCELPORT_MPI_ENV:MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE}
+    multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}
     rank = <MPI_rank>
     processor_name = <MPI_processor_name>
-    array_optimization = ${HPX_PARCEL_MPI_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
-    zero_copy_optimization = ${HPX_PARCEL_MPI_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
-    use_io_pool = ${HPX_PARCEL_MPI_USE_IO_POOL:$1}
-    async_serialization = ${HPX_PARCEL_MPI_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
-    enable_security = ${HPX_PARCEL_MPI_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
-    parcel_pool_size = ${HPX_PARCEL_MPI_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
-    max_connections =  ${HPX_PARCEL_MPI_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
-    max_connections_per_locality = ${HPX_PARCEL_MPI_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
-    max_message_size =  ${HPX_PARCEL_MPI_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
-    max_outbound_message_size =  ${HPX_PARCEL_MPI_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
+    array_optimization = ${HPX_HAVE_PARCEL_MPI_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+    zero_copy_optimization = ${HPX_HAVE_PARCEL_MPI_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
+    use_io_pool = ${HPX_HAVE_PARCEL_MPI_USE_IO_POOL:$1}
+    async_serialization = ${HPX_HAVE_PARCEL_MPI_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
+    enable_security = ${HPX_HAVE_PARCEL_MPI_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
+    parcel_pool_size = ${HPX_HAVE_PARCEL_MPI_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
+    max_connections =  ${HPX_HAVE_PARCEL_MPI_MAX_CONNECTIONS:$[hpx.parcel.max_connections]}
+    max_connections_per_locality = ${HPX_HAVE_PARCEL_MPI_MAX_CONNECTIONS_PER_LOCALITY:$[hpx.parcel.max_connections_per_locality]}
+    max_message_size =  ${HPX_HAVE_PARCEL_MPI_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
+    max_outbound_message_size =  ${HPX_HAVE_PARCEL_MPI_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
 ``
 [c++]
 

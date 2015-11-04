@@ -13,6 +13,7 @@
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/lcos/local/event.hpp>
+#include <hpx/lcos/local/latch.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/shared_mutex.hpp>
 #include <hpx/lcos/local/recursive_mutex.hpp>

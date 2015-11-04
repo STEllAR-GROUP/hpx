@@ -7,6 +7,7 @@
 import sys
 import os
 import re
+import subprocess
 
 app = None
 application = False
@@ -139,4 +140,9 @@ else:
 cmd = ' '.join(args)
 print pkg+'='+pkgconf
 print cmd
-os.system(cmd)
+sys.stdout.flush()
+
+p = subprocess.Popen(cmd, shell=True)
+p.communicate()
+sys.exit(p.returncode)
+

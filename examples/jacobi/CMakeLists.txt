@@ -5,8 +5,6 @@
 
 if(HPX_WITH_CXX11_LAMBDAS)
 
-  add_definitions(-DHPX_LIMIT=8)
-
   add_subdirectory(jacobi_component)
 
   set(jacobi_sources
@@ -14,7 +12,7 @@ if(HPX_WITH_CXX11_LAMBDAS)
 
   set(jacobi_FLAGS
       COMPONENT_DEPENDENCIES
-      iostreams jacobi_component distributing_factory)
+      iostreams jacobi_component)
 
   # add jacobi executable
   add_hpx_executable(jacobi
@@ -24,14 +22,14 @@ if(HPX_WITH_CXX11_LAMBDAS)
     FOLDER "Examples/Jacobi")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(examples.jacobi.jacobi)
+  add_hpx_pseudo_target(examples.jacobi.jacobi_simple)
 
   # make pseudo-targets depend on master pseudo-target
   add_hpx_pseudo_dependencies(examples.jacobi
-                              examples.jacobi.jacobi)
+                              examples.jacobi.jacobi_simple)
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.jacobi.jacobi
+  add_hpx_pseudo_dependencies(examples.jacobi.jacobi_simple
                               jacobi_exe)
 
 endif()

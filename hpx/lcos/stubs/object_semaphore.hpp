@@ -53,7 +53,7 @@ struct object_semaphore : components::stub_base<
     {
         typedef typename server_type::get_action action_type;
         lcos::promise<ValueType> lco;
-        hpx::apply<action_type>(gid, lco.get_gid());
+        hpx::apply<action_type>(gid, lco.get_id());
         return lco.get_future();
     }
 

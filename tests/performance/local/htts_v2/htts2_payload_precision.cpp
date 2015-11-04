@@ -8,18 +8,18 @@
 
 #include "htts2.hpp"
 
-#if defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
-#define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
-    private:                                                                  \
-        TYPE(TYPE const &);                                                   \
-        TYPE& operator=(TYPE const &);                                        \
-/**/
-#else
+#if defined(HPX_HAVE_CXX11_DELETED_FUNCTIONS)
 #define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
     public:                                                                   \
         TYPE(TYPE const &) = delete;                                          \
         TYPE& operator=(TYPE const &) = delete;                               \
     private:                                                                  \
+/**/
+#else
+#define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
+    private:                                                                  \
+        TYPE(TYPE const &);                                                   \
+        TYPE& operator=(TYPE const &);                                        \
 /**/
 #endif
 
@@ -45,7 +45,7 @@ struct payload_precision_tracker : htts2::clocksource<BaseClock>
     // Returns: the uncertainty of the mean lost payload.
     double precision_uncertainty() const
     {
-        return std::max(this->clock_uncertainty()
+        return (std::max)(this->clock_uncertainty()
                       , precision_stat_uncertainty());
     }
 

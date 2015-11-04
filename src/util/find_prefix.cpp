@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/find_prefix.hpp>
 
 #if defined(BOOST_WINDOWS)
 #  include <windows.h>
@@ -50,7 +51,7 @@ namespace hpx { namespace util
 
     std::string find_prefix(std::string const& library)
     {
-#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__) && !defined(__MIC)
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__MIC)
         try {
             error_code ec(hpx::throwmode::lightweight);
             hpx::util::plugin::dll dll(HPX_MAKE_DLL_STRING(library));

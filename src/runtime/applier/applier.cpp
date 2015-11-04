@@ -23,6 +23,8 @@
 #include <hpx/components/security/signed_type.hpp>
 #endif
 
+#include <memory>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
 {
@@ -105,31 +107,6 @@ namespace hpx { namespace applier
             util::bind(util::one_shot(&thread_function), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
-
-        threads::thread_id_type id = threads::invalid_thread_id;
-        app->get_thread_manager().register_thread(data, id, state, run_now, ec);
-        return id;
-    }
-
-    threads::thread_id_type register_non_suspendable_thread(
-        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
-        char const* desc, threads::thread_state_enum state, bool run_now,
-        threads::thread_priority priority, std::size_t os_thread,
-        error_code& ec)
-    {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::applier::register_thread",
-                "global applier object is not accessible");
-            return threads::invalid_thread_id;
-        }
-
-        threads::thread_init_data data(
-            util::bind(util::one_shot(&thread_function), std::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread,
-            threads::get_stack_size(threads::thread_stacksize_nostack));
 
         threads::thread_id_type id = threads::invalid_thread_id;
         app->get_thread_manager().register_thread(data, id, state, run_now, ec);
@@ -220,28 +197,6 @@ namespace hpx { namespace applier
             util::bind(util::one_shot(&thread_function), std::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
-        app->get_thread_manager().register_work(data, state, ec);
-    }
-
-    void register_non_suspendable_work(
-        util::unique_function_nonser<void(threads::thread_state_ex_enum)> && func,
-        char const* desc, threads::thread_state_enum state,
-        threads::thread_priority priority, std::size_t os_thread,
-        error_code& ec)
-    {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::applier::register_work",
-                "global applier object is not accessible");
-            return;
-        }
-
-        threads::thread_init_data data(
-            util::bind(util::one_shot(&thread_function), std::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread,
-            threads::get_stack_size(threads::thread_stacksize_nostack));
         app->get_thread_manager().register_work(data, state, ec);
     }
 
@@ -363,7 +318,7 @@ namespace hpx { namespace applier
         if (!parcel_handler_.get_raw_remote_localities(raw_prefixes, type, ec))
             return false;
 
-        BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
+        for (naming::gid_type& gid : raw_prefixes)
             prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
 
         return true;
@@ -379,10 +334,11 @@ namespace hpx { namespace applier
         error_code& ec) const
     {
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_localities(raw_prefixes, components::component_invalid, ec))
+        if (!parcel_handler_.get_raw_localities(raw_prefixes,
+            components::component_invalid, ec))
             return false;
 
-        BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
+        for (naming::gid_type& gid : raw_prefixes)
             prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
 
         return true;
@@ -395,7 +351,7 @@ namespace hpx { namespace applier
         if (!parcel_handler_.get_raw_localities(raw_prefixes, type, ec))
             return false;
 
-        BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
+        for (naming::gid_type& gid : raw_prefixes)
             prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
 
         return true;
@@ -431,7 +387,7 @@ namespace hpx { namespace applier
     }
 
     // schedule threads based on given parcel
-    void applier::schedule_action(parcelset::parcel const& p)
+    void applier::schedule_action(parcelset::parcel p, std::size_t num_thread)
     {
         // fetch the set of destinations
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
@@ -439,21 +395,24 @@ namespace hpx { namespace applier
 #else
         std::size_t const size = p.size();
 #endif
-        naming::id_type const* ids = p.get_destinations();
-        naming::address const* addrs = p.get_destination_addrs();
+        naming::id_type const* ids = p.destinations();
+        naming::address const* addrs = p.addrs();
 
         // make sure the target has not been migrated away
         naming::resolver_client& client = hpx::naming::get_agas_client();
         if (client.was_object_migrated(ids, size))
         {
-            client.route(p, util::bind(&detail::parcel_sent_handler,
-                std::ref(parcel_handler_), util::placeholders::_1, p));
+            using hpx::util::placeholders::_1;
+            using hpx::util::placeholders::_2;
+            client.route(std::move(p),
+                util::bind(&detail::parcel_sent_handler,
+                    std::ref(parcel_handler_), _1, _2));
             return;
         }
 
         // decode the action-type in the parcel
-        actions::continuation_type cont = p.get_continuation();
-        actions::action_type act = p.get_action();
+        std::unique_ptr<actions::continuation> cont = p.get_continuation();
+        actions::base_action * act = p.get_action();
 
 #if defined(HPX_HAVE_SECURITY)
         // we look up the certificate of the originating locality, no matter
@@ -478,7 +437,7 @@ namespace hpx { namespace applier
             caps_sender = cert.get_type().get_capability();
 #endif
         int comptype = act->get_component_type();
-        naming::gid_type dest = p.get_destination_locality();
+        naming::gid_type dest = p.destination_locality();
 
         // if the parcel carries a continuation it should be directed to a
         // single destination
@@ -499,7 +458,26 @@ namespace hpx { namespace applier
             // support component
             if (0 == lva)
             {
-                lva = get_runtime_support_raw_gid().get_lsb();
+                switch(comptype)
+                {
+                case components::component_runtime_support:
+                    lva = get_runtime_support_raw_gid().get_lsb();
+                    break;
+
+                case components::component_agas_primary_namespace:
+                    lva = get_agas_client().get_primary_ns_lva();
+                    break;
+
+                case components::component_agas_symbol_namespace:
+                    lva = get_agas_client().get_symbol_ns_lva();
+                    break;
+
+                case components::component_plain_function:
+                    break;
+
+                default:
+                    HPX_ASSERT(false);
+                }
             }
             else if (comptype == components::component_memory)
             {
@@ -532,7 +510,7 @@ namespace hpx { namespace applier
                       << addr.type_ << ") action_type(" << comptype
                       << ") parcel ("  << p << ")";
                 HPX_THROW_EXCEPTION(bad_component_type,
-                    "action_manager::fetch_parcel",
+                    "applier::schedule_action",
                     strm.str());
             }
 
@@ -541,21 +519,23 @@ namespace hpx { namespace applier
             if (!cont) {
                 // No continuation is to be executed, register the plain
                 // action and the local-virtual address.
-                act->schedule_thread(ids[i], lva, threads::pending);
+                act->schedule_thread(ids[i], lva, threads::pending, num_thread);
             }
             else {
                 // This parcel carries a continuation, register a wrapper
                 // which first executes the original thread function as
                 // required by the action and triggers the continuations
                 // afterwards.
-                act->schedule_thread(cont, ids[i], lva, threads::pending);
+                act->schedule_thread(std::move(cont), ids[i], lva,
+                    threads::pending, num_thread);
             }
         }
     }
 
     applier& get_applier()
     {
-        HPX_ASSERT(NULL != applier::applier_.get());   // should have been initialized
+        // should have been initialized
+        HPX_ASSERT(NULL != applier::applier_.get());
         return **applier::applier_;
     }
 

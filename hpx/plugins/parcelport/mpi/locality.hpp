@@ -9,6 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/util/safe_bool.hpp>
 
@@ -42,14 +43,14 @@ namespace hpx { namespace parcelset
                 return util::safe_bool<locality>()(rank_ != -1);
             }
 
-            void save(util::portable_binary_oarchive & ar) const
+            void save(serialization::output_archive & ar) const
             {
-                ar.save(rank_);
+                ar << rank_;
             }
 
-            void load(util::portable_binary_iarchive & ar)
+            void load(serialization::input_archive & ar)
             {
-                ar.load(rank_);
+                ar >> rank_;
             }
 
         private:

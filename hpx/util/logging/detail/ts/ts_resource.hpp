@@ -30,7 +30,8 @@ namespace hpx { namespace util { namespace logging {
 
 
 /**
-    @brief Contains implementations of locker objects. Such a locker can lock data for read or write.
+    @brief Contains implementations of locker objects.
+    Such a locker can lock data for read or write.
 
     Assume you have
     @code
@@ -65,7 +66,8 @@ namespace locker {
 
         @sa locker
     */
-    template<class type, class mutex = hpx::util::logging::threading::mutex > struct ts_resource {
+    template<class type, class mutex = hpx::util::logging::threading::mutex >
+    struct ts_resource {
         typedef ts_resource<type,mutex> self_type;
 
         ts_resource(const type& val = type() ) : m_val(val) {}
@@ -138,16 +140,20 @@ namespace locker {
     };
 
 
-#ifndef HPX_LOG_NO_TSS
+#ifndef HPX_HAVE_LOG_NO_TSS
 
     /**
-        Locks a resource, and uses TSS (Thread-specific storage). This holds the value, and each thread caches it.
-        Once at a given period (like, every 5 seconds), when used, the latest object is copied.
+        Locks a resource, and uses TSS (Thread-specific storage).
+        This holds the value, and each thread caches it.
+        Once at a given period (like, every 5 seconds), when used,
+        the latest object is copied.
 
         @sa locker
         @sa default_cache_millis how many secs to cache the data. By default, 5
     */
-    template<class type, int default_cache_secs = 5, class mutex = hpx::util::logging::threading::mutex > struct tss_resource_with_cache {
+    template<class type, int default_cache_secs = 5,
+    class mutex = hpx::util::logging::threading::mutex >
+    struct tss_resource_with_cache {
         typedef tss_resource_with_cache<type, default_cache_secs, mutex> self_type;
 
     private:
@@ -161,7 +167,9 @@ namespace locker {
         };
 
     public:
-        tss_resource_with_cache(const type& val = type() , int cache_secs = default_cache_secs ) : m_val(val), m_cache_secs(cache_secs) {}
+        tss_resource_with_cache(const type& val = type() ,
+            int cache_secs = default_cache_secs ) : m_val(val),
+            m_cache_secs(cache_secs) {}
 
         struct read;
         struct write;
@@ -224,14 +232,16 @@ namespace locker {
         Locks a resource, and uses TSS.
 
         The resource can be initialized once, at any time, no matter how many threads.
-        Once the resource is initialized (basically, someone used resource::write), that is <b>the final value</b>
+        Once the resource is initialized (basically, someone used resource::write),
+        that is <b>the final value</b>
 
         All other threads will use and cached the initialized value.
 
         @sa locker
         @sa default_cache_millis how many secs to cache the data. By default, 5
     */
-    template<class type, class mutex = hpx::util::logging::threading::mutex > struct tss_resource_once_init {
+    template<class type, class mutex = hpx::util::logging::threading::mutex >
+    struct tss_resource_once_init {
         typedef tss_resource_once_init<type, mutex> self_type;
 
     private:
@@ -242,7 +252,8 @@ namespace locker {
         };
 
     public:
-        tss_resource_once_init(const type& val = type() ) : m_val(val), m_initialized(false) {}
+        tss_resource_once_init(const type& val = type() )
+            : m_val(val), m_initialized(false) {}
 
         struct read;
         struct write;

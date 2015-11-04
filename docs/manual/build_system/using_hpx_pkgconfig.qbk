@@ -30,7 +30,8 @@ used while building __hpx__):
 
 ``
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -liostreams -DHPX_APPLICATION_NAME=hello_world
+    c++ -o hello_world hello_world.cpp \
+        `pkg-config --cflags --libs hpx_application` -lhpx_iostreams -DHPX_APPLICATION_NAME=hello_world
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
@@ -42,8 +43,8 @@ used while building __hpx__):
       suffix for the pkg-config name. That means instead of `hpx_application` or
       `hpx_component` you will have to use `hpx_application_debug` or
       `hpx_component_debug`. Moreover, all referenced __hpx__ components need to
-      have a appended 'd' suffix, e.g. instead of `-liostreams` you will need
-      to specify `-liostreamsd`.]
+      have a appended 'd' suffix, e.g. instead of `-lhpx_iostreams` you will need
+      to specify `-lhpx_iostreamsd`.]
 
 [important If the __hpx__ libraries are in a path that is not found by the dynamic
            linker. You need to add the path $HPX_LOCATION/lib to your linker search
@@ -97,7 +98,9 @@ build the component library. (where [^$HPX_LOCATION] is the build directory or
 
 ``
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    c++ -o libhello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
+    c++ -o libhpx_hello_world.so hello_world_component.cpp \
+        `pkg-config --cflags --libs hpx_component` \
+        -DHPX_COMPONENT_NAME=hpx_hello_world
 ``
 
 Now pick a directory in which to install your __hpx__ component libraries. For
@@ -113,15 +116,16 @@ this example, we'll choose a directory named ''my_hpx_libs''.
       suffix for the pkg-config name. That means instead of `hpx_application` or
       `hpx_component` you will have to use `hpx_application_debug` or
       `hpx_component_debug`. Moreover, all referenced __hpx__ components need to
-      have a appended 'd' suffix, e.g. instead of `-liostreams` you will need
-      to specify `-liostreamsd`.]
+      have a appended 'd' suffix, e.g. instead of `-lhpx_iostreams` you will need
+      to specify `-lhpx_iostreamsd`.]
 
 [important If the __hpx__ libraries are in a path that is not found by the dynamic
            linker. You need to add the path $HPX_LOCATION/lib to your linker search
            path (for example LD_LIBRARY_PATH on Linux)]
 
-In the ~/my_hpx_libs directory you need to create an ini file inside that directory which matches
-the name of the component (as supplied by -DHPX_COMPONENT_NAME above).
+In the ~/my_hpx_libs directory you need to create an ini file inside that
+directory which matches the name of the component (as supplied by
+`-DHPX_COMPONENT_NAME` above).
 
 [*hello_world.ini]
 ``
@@ -146,7 +150,9 @@ we do:
 
 ``
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -liostreams -L${HOME}/my_hpx_libs -lhello_world
+    c++ -o hello_world_client hello_world_client.cpp \
+        `pkg-config --cflags --libs hpx_application` \
+        -lhpx_iostreams -L${HOME}/my_hpx_libs -lhello_world
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after

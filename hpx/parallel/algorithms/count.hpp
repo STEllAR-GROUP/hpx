@@ -14,18 +14,19 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+
+#include <boost/range/functions.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/type_traits/is_base_of.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
-
-#include <boost/static_assert.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -46,18 +47,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename T>
             static difference_type
-            sequential(ExPolicy const&, Iter first, Iter last, T const& value)
+            sequential(ExPolicy, Iter first, Iter last, T const& value)
             {
                 return std::count(first, last, value);
             }
 
             template <typename ExPolicy, typename Iter, typename T>
-            static typename detail::algorithm_result<ExPolicy, difference_type>::type
-            parallel(ExPolicy const& policy, Iter first, Iter last,
+            static typename util::detail::algorithm_result<
+                ExPolicy, difference_type
+            >::type
+            parallel(ExPolicy policy, Iter first, Iter last,
                 T const& value)
             {
                 if (first == last)
-                    return detail::algorithm_result<ExPolicy, difference_type>::get(0);
+                {
+                    return util::detail::algorithm_result<
+                            ExPolicy, difference_type
+                        >::get(0);
+                }
 
                 return util::partitioner<ExPolicy, difference_type>::call(
                     policy, first, std::distance(first, last),
@@ -83,7 +90,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         template <typename ExPolicy, typename InIter, typename T>
-        inline typename detail::algorithm_result<
+        inline typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_(ExPolicy && policy, InIter first, InIter last, T const& value,
@@ -106,7 +113,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename T>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_(ExPolicy&& policy, InIter first, InIter last, T const& value,
@@ -161,7 +168,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename T>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy,
+        typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type
         >::type
     >::type
@@ -199,17 +206,23 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter, typename Pred>
             static difference_type
-            sequential(ExPolicy const&, Iter first, Iter last, Pred && op)
+            sequential(ExPolicy, Iter first, Iter last, Pred && op)
             {
                 return std::count_if(first, last, std::forward<Pred>(op));
             }
 
             template <typename ExPolicy, typename Iter, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, difference_type>::type
-            parallel(ExPolicy const& policy, Iter first, Iter last, Pred && op)
+            static typename util::detail::algorithm_result<
+                ExPolicy, difference_type
+            >::type
+            parallel(ExPolicy policy, Iter first, Iter last, Pred && op)
             {
                 if (first == last)
-                    return detail::algorithm_result<ExPolicy, difference_type>::get(0);
+                {
+                    return util::detail::algorithm_result<
+                            ExPolicy, difference_type
+                        >::get(0);
+                }
 
                 return util::partitioner<ExPolicy, difference_type>::call(
                     policy, first, std::distance(first, last),
@@ -235,7 +248,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         };
 
         template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
@@ -259,7 +272,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename InIter, typename F>
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, typename std::iterator_traits<InIter>::difference_type
         >::type
         count_if_(ExPolicy && policy, InIter first, InIter last, F && f,
@@ -330,7 +343,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy,
+        typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<InIter>::difference_type
         >::type
     >::type

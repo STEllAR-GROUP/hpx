@@ -14,27 +14,27 @@ namespace jacobi_smp {
         typedef typename values_type::reference reference;
         typedef typename values_type::const_reference const_reference;
         typedef std::vector<std::size_t> indices_type;
-        
+
         std::size_t row_begin(std::size_t i) const
         {
             return rows[i];
         }
-        
+
         std::size_t row_end(std::size_t i) const
         {
             return rows[i+1];
         }
-        
+
         std::size_t col(std::size_t j)
         {
             return indices[j];
         }
-        
+
         T & operator[](std::size_t j)
         {
             return values[j];
         }
-        
+
         T const & operator[](std::size_t j) const
         {
             return values[j];

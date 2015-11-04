@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,14 +12,6 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
-
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -72,10 +64,14 @@ namespace hpx { namespace lcos
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the base LCO actions
-HPX_REGISTER_ACTION(hpx::lcos::base_lco::set_event_action, base_set_event_action)
-HPX_REGISTER_ACTION(hpx::lcos::base_lco::set_exception_action, base_set_exception_action)
-HPX_REGISTER_ACTION(hpx::lcos::base_lco::connect_action, base_connect_action)
-HPX_REGISTER_ACTION(hpx::lcos::base_lco::disconnect_action, base_disconnect_action)
+HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::set_event_action,
+    base_set_event_action, hpx::actions::base_set_event_action_id)
+HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::set_exception_action,
+    base_set_exception_action, hpx::actions::base_set_exception_action_id)
+HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::connect_action,
+    base_connect_action, hpx::actions::base_connect_action_id)
+HPX_REGISTER_ACTION_ID(hpx::lcos::base_lco::disconnect_action,
+    base_disconnect_action, hpx::actions::base_disconnect_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(

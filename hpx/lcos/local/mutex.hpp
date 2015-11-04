@@ -8,6 +8,7 @@
 #define HPX_LCOS_MUTEX_JUN_23_2008_0530PM
 
 #include <hpx/config.hpp>
+#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -15,16 +16,15 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/intrusive/slist.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
-    class mutex : boost::noncopyable
+    class mutex
     {
     private:
         typedef lcos::local::spinlock mutex_type;
@@ -41,6 +41,8 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_RENAME(this, "lcos::local::mutex");
         }
 
+        HPX_NON_COPYABLE(mutex);
+
         ~mutex()
         {
             HPX_ITT_SYNC_DESTROY(this);
@@ -51,7 +53,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_PREPARE(this);
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if(owner_id_ == self_id)
@@ -84,7 +86,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_PREPARE(this);
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             if (owner_id_ != threads::invalid_thread_id_repr)
             {
@@ -110,7 +112,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_PREPARE(this);
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if (owner_id_ != threads::invalid_thread_id_repr)
@@ -119,7 +121,7 @@ namespace hpx { namespace lcos { namespace local
                     cond_.wait_until(l, abs_time, ec);
                 if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
 
-                if (reason == threads::wait_signaled) //-V110
+                if (reason == threads::wait_timeout) //-V110
                 {
                     HPX_ITT_SYNC_CANCEL(this);
                     return false;
@@ -161,7 +163,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(threads::get_self_ptr() != 0);
 
             HPX_ITT_SYNC_RELEASING(this);
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
 
             threads::thread_id_repr_type self_id = threads::get_self_id().get();
             if (HPX_UNLIKELY(owner_id_ != self_id))
@@ -177,7 +179,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_RELEASED(this);
             owner_id_ = threads::invalid_thread_id_repr;
 
-            cond_.notify_one(l, ec);
+            cond_.notify_one(std::move(l), ec);
         }
 
     private:

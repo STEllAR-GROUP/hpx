@@ -18,6 +18,9 @@
 # This software is distributed WITHOUT ANY WARRANTY; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the License for more information.
+#
+# Make the HPX inspect tool happy: hpxinspect:nolicense
+#
 #=============================================================================
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)

@@ -10,16 +10,17 @@
 #define HPX_UTIL_IO_SERVICE_POOL_MAR_26_2008_1218PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/config/asio.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <vector>
+#include <memory>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -35,9 +36,11 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 2,
-            util::function_nonser<void(std::size_t, char const*)> const& on_start_thread =
-                util::function_nonser<void(std::size_t, char const*)>(),
-            util::function_nonser<void()> const& on_stop_thread = util::function_nonser<void()>(),
+            util::function_nonser<void(std::size_t, char const*)>
+                 const& on_start_thread = util::function_nonser<void(std::size_t,
+                        char const*)>(),
+            util::function_nonser<void()> const& on_stop_thread =
+                 util::function_nonser<void()>(),
             char const* pool_name = "", char const* name_postfix = "");
 
         /// \brief Construct the io_service pool.
@@ -45,7 +48,8 @@ namespace hpx { namespace util
         ///                 [in]
         explicit io_service_pool(
             util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
-            util::function_nonser<void()> const& on_stop_thread = util::function_nonser<void()>(),
+            util::function_nonser<void()> const& on_stop_thread =
+                                  util::function_nonser<void()>(),
             char const* pool_name = "", char const* name_postfix = "");
 
         ~io_service_pool();
@@ -89,17 +93,34 @@ namespace hpx { namespace util
         void clear_locked();
 
     private:
-        typedef boost::shared_ptr<boost::asio::io_service> io_service_ptr;
-        typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;
+        typedef std::unique_ptr<boost::asio::io_service> io_service_ptr;
+// FIXME: Intel compilers don't like this
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+        typedef std::unique_ptr<boost::asio::io_service::work> work_type;
+#else
+        typedef boost::asio::io_service::work work_type;
+#endif
+
+        BOOST_FORCEINLINE work_type initialize_work(boost::asio::io_service& io_service)
+        {
+            return work_type(
+// FIXME: Intel compilers don't like this
+#if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700) || defined(HPX_NATIVE_MIC)
+                    new boost::asio::io_service::work(io_service)
+#else
+                    io_service
+#endif
+            );
+        }
 
         boost::mutex mtx_;
 
         /// The pool of io_services.
         std::vector<io_service_ptr> io_services_;
-        std::vector<boost::shared_ptr<boost::thread> > threads_;
+        std::vector<boost::thread> threads_;
 
         /// The work that keeps the io_services running.
-        std::vector<work_ptr> work_;
+        std::vector<work_type> work_;
 
         /// The next io_service to use for a connection.
         std::size_t next_io_service_;

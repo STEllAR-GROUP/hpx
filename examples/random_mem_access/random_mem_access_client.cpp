@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2011 Matt Anderson
 //  Copyright (c) 2011 Bryce Lelbach
 //
@@ -7,23 +7,12 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
 #include <boost/foreach.hpp>
 #include <time.h>
 
 #include "random_mem_access/random_mem_access.hpp"
-
-inline void
-init(hpx::components::server::distributing_factory::iterator_range_type r,
-    std::vector<hpx::components::random_mem_access>& accu)
-{
-    BOOST_FOREACH(hpx::naming::id_type const& id, r)
-    {
-        accu.push_back(hpx::components::random_mem_access(id));
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
@@ -38,24 +27,10 @@ int hpx_main(boost::program_options::variables_map& vm)
         iterations = vm["iterations"].as<std::size_t>();
 
     {
-        // get list of all known localities
-        //std::vector<hpx::naming::id_type> prefixes;
-        //hpx::applier::applier& appl = hpx::applier::get_applier();
-        //hpx::naming::id_type prefix;
-
-        // create a distributing factory locally
-        hpx::components::distributing_factory factory =
-            hpx::components::distributing_factory::create(hpx::find_here());
-
-        hpx::components::component_type mem_block_type =
-            hpx::components::get_component_type<
-                hpx::components::random_mem_access::server_component_type>();
-
-        hpx::components::distributing_factory::result_type mem_blocks =
-            factory.create_components(mem_block_type, array_size);
-
-        std::vector<hpx::components::random_mem_access> accu;
-        ::init(hpx::util::locality_results(mem_blocks), accu);
+        std::vector<hpx::components::random_mem_access> accu =
+            hpx::new_<hpx::components::random_mem_access[]>(
+                hpx::default_layout(hpx::find_all_localities()),
+                    array_size).get();
 
         // initialize the array
         for (std::size_t i=0;i<array_size;i++) {

@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_PAPI)
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -17,6 +21,7 @@
 
 #include <boost/version.hpp>
 #include <boost/format.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace papi_ns = hpx::performance_counters::papi;
@@ -68,7 +73,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     thread_counters::~thread_counters()
     {
         {
-            mutex_type::scoped_lock m(mtx_);
+            boost::lock_guard<mutex_type> m(mtx_);
             finalize();
         }
         // callback cancellation moved outside the mutex to avoid potential deadlock
@@ -122,7 +127,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     bool thread_counters::read_value(papi_counter *cnt, bool reset)
     {
         {
-            papi_counter_base::mutex_type::scoped_lock lk(cnt->get_global_mtx());
+            boost::lock_guard<papi_counter_base::mutex_type> lk(cnt->get_global_mtx());
 
             if (PAPI_read(evset_, &counts_[0]) != PAPI_OK) return false;
         }
@@ -133,7 +138,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
     bool thread_counters::terminate(boost::uint32_t tix)
     {
-        mutex_type::scoped_lock m(mtx_);
+        boost::lock_guard<mutex_type> m(mtx_);
         return finalize();
     }
 
@@ -184,7 +189,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     ///////////////////////////////////////////////////////////////////////////
     thread_counters *papi_counter_base::get_thread_counters(boost::uint32_t tix)
     {
-        mutex_type::scoped_lock m(base_mtx_);
+        boost::lock_guard<mutex_type> m(base_mtx_);
 
         // create entry for the thread associated with the counter if it doesn't exist
         ttable_type::iterator it = thread_state_.find(tix);
@@ -206,14 +211,14 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         get_counter_path_elements(info.fullname_, cpe);
         // convert event name to code and check availability
         {
-            papi_counter_base::mutex_type::scoped_lock lk(this->get_global_mtx());
+            boost::lock_guard<papi_counter_base::mutex_type> lk(this->get_global_mtx());
 
             papi_call(PAPI_event_name_to_code(
                 const_cast<char *>(cpe.countername_.c_str()),
                 const_cast<int *>(&event_)),
                 cpe.countername_+" does not seem to be a valid event name",
                 locstr);
-            papi_call(  
+            papi_call(
                 PAPI_query_event(event_),
                 "event "+cpe.countername_+" is not available on this platform",
                 locstr);
@@ -238,7 +243,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
     hpx::performance_counters::counter_value papi_counter::get_counter_value(bool reset)
     {
-        thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
+        boost::lock_guard<thread_counters::mutex_type> m(counters_->get_lock());
 
         if (status_ == PAPI_COUNTER_ACTIVE)
             counters_->read_value(this, reset);
@@ -258,7 +263,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
     bool papi_counter::start()
     {
-        papi_counter_base::mutex_type::scoped_lock lk(get_global_mtx());
+        boost::lock_guard<papi_counter_base::mutex_type> lk(get_global_mtx());
 
         if (status_ == PAPI_COUNTER_ACTIVE) return true;
         if (counters_->add_event(this))
@@ -272,21 +277,21 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
     bool papi_counter::stop()
     {
-        thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
+        boost::lock_guard<thread_counters::mutex_type> m(counters_->get_lock());
 
         return stop_counter();
     }
 
     void papi_counter::reset()
     {
-        thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
+        boost::lock_guard<thread_counters::mutex_type> m(counters_->get_lock());
 
         reset_counter();
     }
 
     void papi_counter::finalize()
     {
-        thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
+        boost::lock_guard<thread_counters::mutex_type> m(counters_->get_lock());
 
         stop_counter();
         base_type_holder::finalize();
@@ -294,3 +299,5 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     }
 
 }}}}
+
+#endif

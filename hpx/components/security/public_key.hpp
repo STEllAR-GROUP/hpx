@@ -6,12 +6,17 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_PUBLIC_KEY_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_PUBLIC_KEY_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/array.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
 
 #include <boost/array.hpp>
 #include <boost/io/ios_state.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/is_bitwise_serializable.hpp>
+#include <boost/mpl/bool.hpp>
 
 #include <sodium.h>
 
@@ -60,7 +65,7 @@ namespace hpx { namespace components { namespace security
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int)
@@ -80,13 +85,15 @@ namespace hpx { namespace components { namespace security
 #endif
 }}}
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits
 {
     template <>
     struct is_bitwise_serializable<
             hpx::components::security::public_key>
-       : mpl::true_
+       : boost::mpl::true_
     {};
 }}
+
+#endif
 
 #endif

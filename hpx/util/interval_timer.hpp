@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,11 +6,21 @@
 #if !defined(HPX_UTIL_INTERVAL_TIMER_SEP_27_2011_0434PM)
 #define HPX_UTIL_INTERVAL_TIMER_SEP_27_2011_0434PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+
+#include <boost/thread/locks.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
@@ -19,50 +29,48 @@
 
 namespace hpx { namespace util
 {
+    class interval_timer;
+}}
+
+namespace hpx { namespace util { namespace detail
+{
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT interval_timer
+      : public boost::enable_shared_from_this<interval_timer>
     {
     private:
+        friend class util::interval_timer;
+
         typedef lcos::local::spinlock mutex_type;
 
     public:
         interval_timer();
         interval_timer(util::function_nonser<bool()> const& f,
             boost::int64_t microsecs, std::string const& description,
-            bool pre_shutdown = false);
+            bool pre_shutdown);
         interval_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term, boost::int64_t microsecs,
-                std::string const& description, bool pre_shutdown = false);
+            util::function_nonser<void()> const& on_term,
+            boost::int64_t microsecs, std::string const& description,
+            bool pre_shutdown);
+
         ~interval_timer();
 
-        bool start(bool evaluate_ = true);
+        bool start(bool evaluate);
         bool stop();
 
-        bool restart(bool evaluate_ = true);
+        bool restart(bool evaluate);
 
         bool is_started() const { return is_started_; }
         bool is_terminated() const { return is_terminated_; }
 
-        boost::int64_t get_interval() const
-        {
-            mutex_type::scoped_lock l(mtx_);
-            return microsecs_;
-        }
+        boost::int64_t get_interval() const;
 
-        void slow_down(boost::int64_t max_interval)
-        {
-            mutex_type::scoped_lock l(mtx_);
-            microsecs_ = (std::min)((110 * microsecs_) / 100, max_interval);
-        }
-        void speed_up(boost::int64_t min_interval)
-        {
-            mutex_type::scoped_lock l(mtx_);
-            microsecs_ = (std::max)((90 * microsecs_) / 100, min_interval);
-        }
+        void slow_down(boost::int64_t max_interval);
+        void speed_up(boost::int64_t min_interval);
 
     protected:
         // schedule a high priority task after a given time interval
-        void schedule_thread(mutex_type::scoped_lock & l);
+        void schedule_thread(boost::unique_lock<mutex_type> & l);
 
         threads::thread_state_enum
             evaluate(threads::thread_state_ex_enum statex);
@@ -80,9 +88,72 @@ namespace hpx { namespace util
 
         bool pre_shutdown_;           ///< execute termination during pre-shutdown
         bool is_started_;             ///< timer has been started (is running)
-        bool first_start_;            ///< flag to distinguish first invocation of start()
+        bool first_start_;
+        ///^ flag to distinguish first invocation of start()
         bool is_terminated_;          ///< The timer has been terminated
         bool is_stopped_;
+    };
+}}}
+
+namespace hpx { namespace util
+{
+    class HPX_EXPORT interval_timer
+    {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(interval_timer);
+
+    public:
+        interval_timer();
+        interval_timer(util::function_nonser<bool()> const& f,
+            boost::int64_t microsecs, std::string const& description = "",
+            bool pre_shutdown = false);
+        interval_timer(util::function_nonser<bool()> const& f,
+            util::function_nonser<void()> const& on_term,
+            boost::int64_t microsecs, std::string const& description = "",
+            bool pre_shutdown = false);
+
+        interval_timer(util::function_nonser<bool()> const& f,
+            util::steady_duration const& rel_time,
+            char const*  description = "", bool pre_shutdown = false);
+        interval_timer(util::function_nonser<bool()> const& f,
+            util::function_nonser<void()> const& on_term,
+            util::steady_duration const& rel_time,
+            char const*  description = "", bool pre_shutdown = false);
+
+        ~interval_timer();
+
+        bool start(bool evaluate = true)
+        {
+            return timer_->start(evaluate);
+        }
+        bool stop()
+        {
+            return timer_->stop();
+        }
+
+        bool restart(bool evaluate = true)
+        {
+            return timer_->restart(evaluate);
+        }
+
+        bool is_started() const
+        {
+            return timer_->is_started();
+        }
+        bool is_terminated() const
+        {
+            return timer_->is_terminated();
+        }
+
+        boost::int64_t get_interval() const;
+
+        void slow_down(boost::int64_t max_interval);
+        void speed_up(boost::int64_t min_interval);
+
+        void slow_down(util::steady_duration const& max_interval);
+        void speed_up(util::steady_duration const& min_interval);
+
+    private:
+        boost::shared_ptr<detail::interval_timer> timer_;
     };
 }}
 

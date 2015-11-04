@@ -7,7 +7,7 @@
 #define HPX_SERVER_TUPLES_WAREHOUSE_MAY_04_2013_0801PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/storage/tuple.hpp>
@@ -34,7 +34,7 @@ namespace examples { namespace server
             typedef hpx::lcos::local::mutex mutex_type;
             typedef uint64_t index_type;
             typedef std::set<index_type> matched_indices_type;
-            
+
             tuples_warehouse() : index_(1) {}
 
             bool empty() const
@@ -65,14 +65,15 @@ namespace examples { namespace server
                 return 0;
             }
 
-                
+
             tuple_type match(const tuple_type& tp) const
             {
                 tuple_type result;
 
                 if(tp.empty())
                 {
-                    return read_random_tuple(); // return random results for an empty tuple
+                    return read_random_tuple();
+                    // return random results for an empty tuple
                 }
 
                 matched_indices_type matched_indices;
@@ -94,7 +95,8 @@ namespace examples { namespace server
 
                 if(tp.empty())
                 {
-                    return take_random_tuple(); // return random results for an empty tuple
+                    return take_random_tuple();
+                    // return random results for an empty tuple
                 }
 
                 matched_indices_type matched_indices;
@@ -126,15 +128,19 @@ namespace examples { namespace server
                         continue; // will match any record
                     }
 
-                    typedef std::pair<tuple_field_container::field_index_map_const_iterator_type, 
-                        tuple_field_container::field_index_map_const_iterator_type> equal_range_type;
+                    typedef std::pair<tuple_field_container
+                        ::field_index_map_const_iterator_type,
+                        tuple_field_container::field_index_map_const_iterator_type>
+                        equal_range_type;
                     typedef const std::pair<elem_type, index_type> pair_type;
 
-                    equal_range_type found_range = tuple_fields_[pos].field_index_map_.equal_range(*it);
+                    equal_range_type found_range =
+                        tuple_fields_[pos].field_index_map_.equal_range(*it);
 
-                    if(found_range.first == tuple_fields_[pos].field_index_map_.end()) // no match
+                    if(found_range.first == tuple_fields_[pos].field_index_map_.end())
+                    // no match
                     {
-                        return empty_set; // empty 
+                        return empty_set; // empty
                     }
 
                     // update index set
@@ -153,7 +159,7 @@ namespace examples { namespace server
                         std::for_each(found_range.first,
                             found_range.second,
                             [&new_matched_indices, &matched_indices](pair_type& p)
-                        { if(matched_indices.find(p.second) !=  
+                        { if(matched_indices.find(p.second) !=
                         matched_indices.end()) // found
                         { new_matched_indices.insert(p.second); }
                         }
@@ -211,7 +217,7 @@ namespace examples { namespace server
                 return result;
             }
 
-            tuple_type take_random_tuple() 
+            tuple_type take_random_tuple()
             {
                 tuple_type result;
 
@@ -221,7 +227,7 @@ namespace examples { namespace server
                 return take_tuple_at(tuple_fields_[0].random_index());
             }
 
-            tuple_type take_tuple_at(const index_type& id) 
+            tuple_type take_tuple_at(const index_type& id)
             {
                 tuple_type result;
 
@@ -231,7 +237,7 @@ namespace examples { namespace server
                 for(unsigned int pos = 0; pos < tuple_fields_.size(); ++pos)
                 {
                     tuple_field_container& tf = tuple_fields_[pos];
-                    tuple_field_container::index_field_map_iterator_type it = 
+                    tuple_field_container::index_field_map_iterator_type it =
                         tf.index_field_map_.find(id);
 
                     if( it == tf.index_field_map_.end() ) // not found
@@ -258,17 +264,23 @@ namespace examples { namespace server
             struct tuple_field_container
             {
 
-                typedef examples::server::tuples_warehouse::hash_elem_functor hash_elem_functor;
+                typedef examples::server
+                    ::tuples_warehouse::hash_elem_functor hash_elem_functor;
                 typedef examples::server::tuples_warehouse::elem_type elem_type;
                 typedef examples::server::tuples_warehouse::index_type index_type;
 
-                typedef boost::unordered_multimap<elem_type, index_type, hash_elem_functor> field_index_map_type;
-                typedef field_index_map_type::iterator field_index_map_iterator_type;
-                typedef field_index_map_type::const_iterator field_index_map_const_iterator_type;
+                typedef boost::unordered_multimap<elem_type,
+                    index_type, hash_elem_functor> field_index_map_type;
+                typedef field_index_map_type::iterator
+                    field_index_map_iterator_type;
+                typedef field_index_map_type::const_iterator
+                    field_index_map_const_iterator_type;
 
-                typedef std::map<index_type, field_index_map_iterator_type> index_field_map_type;
+                typedef std::map<index_type,
+                    field_index_map_iterator_type> index_field_map_type;
                 typedef index_field_map_type::iterator index_field_map_iterator_type;
-                typedef index_field_map_type::const_iterator index_field_map_const_iterator_type;
+                typedef index_field_map_type::const_iterator
+                    index_field_map_const_iterator_type;
 
                 field_index_map_type field_index_map_;
                 index_field_map_type index_field_map_;
@@ -276,12 +288,12 @@ namespace examples { namespace server
                 bool empty() const
                 {
                     return field_index_map_.empty();
-                } 
+                }
 
                 int insert(const index_type& id, const elem_type& elem)
                 {
                     field_index_map_iterator_type it;
-                    
+
                     it = field_index_map_.insert(std::make_pair(elem,id));
                     index_field_map_.insert(std::make_pair(id, it));
 

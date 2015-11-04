@@ -9,11 +9,9 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/serialization.hpp>
 
 #include <vector>
-
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/vector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 const std::size_t vsize_default = 1024*1024;
@@ -35,7 +33,7 @@ void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
     std::vector<double> data(in);
 
     on_recv_action act;
-    act(to, hpx::find_here(), boost::move(data), counter);
+    act(to, hpx::find_here(), std::move(data), counter);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -93,9 +91,11 @@ int hpx_main(boost::program_options::variables_map &b_arg)
         if (verbose) {
             std::cout << "[hpx_pingpong]" << std::endl
                     << "total_time(secs)=" << time << std::endl
-                    << "vsize=" << vsize << " = " << vsize * sizeof(double) << " Bytes" << std::endl
+                    << "vsize=" << vsize << " = " << vsize * sizeof(double)
+                    << " Bytes" << std::endl
                     << "bandwidth(MiB/s)="
-                    << (((vsize * sizeof(double) * numiter) / time) / 1024) / 1024 << std::endl
+                    << (((vsize * sizeof(double) * numiter) / time) / 1024) / 1024
+                    << std::endl
                     << "localities=" << localities.size() << std::endl
                     << "numiter=" << numiter << std::endl;
         }
@@ -128,7 +128,8 @@ int hpx_main(boost::program_options::variables_map &b_arg)
         std::cout << "[hpx_pingpong]"
                   << ":total_time(secs)=" << time
                   << ":vsize=" << vsize
-                  << ":bandwidth(GB/s)=" << (vsize * sizeof(double) * numiter) / (time * 1024 * 1024)
+                  << ":bandwidth(GB/s)=" << (vsize * sizeof(double) * numiter)
+                    / (time * 1024 * 1024)
                   << ":localities=" << localities.size()
                   << ":numiter=" << numiter << std::endl;
     }

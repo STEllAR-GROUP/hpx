@@ -7,13 +7,18 @@
 #if !defined(HPX_F5D19D10_9D74_4DB9_9ABB_ECCF2FA54497)
 #define HPX_F5D19D10_9D74_4DB9_9ABB_ECCF2FA54497
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
+
+#include <boost/mpl/bool.hpp>
+#include <boost/type_traits/is_base_and_derived.hpp>
 
 #include <sstream>
 
@@ -25,7 +30,7 @@ class fixed_component;
 
 ///////////////////////////////////////////////////////////////////////////
 template <typename Component>
-class fixed_component_base : public detail::fixed_component_tag
+class fixed_component_base : public traits::detail::fixed_component_tag
 {
 private:
     typedef typename boost::mpl::if_<
@@ -71,9 +76,20 @@ public:
         components::set_component_type<this_component_type>(type);
     }
 
-    /// \brief Return the component's fixed GID.
-    ///
-    /// \returns The fixed global id (GID) for this component
+private:
+    // declare friends which are allowed to access get_base_gid()
+    template <typename Component_>
+    friend naming::gid_type server::create(std::size_t count);
+
+    template <typename Component_>
+    friend naming::gid_type server::create(
+        util::function_nonser<void(void*)> const& ctor);
+
+    template <typename Component_>
+    friend naming::gid_type server::create(naming::gid_type const& gid,
+        util::function_nonser<void(void*)> const& ctor);
+
+    // Return the component's fixed GID.
     naming::gid_type get_base_gid(
         naming::gid_type const& assign_gid = naming::invalid_gid) const
     {
@@ -107,22 +123,28 @@ public:
         return gid_;
     }
 
-    naming::id_type get_gid() const
+public:
+    naming::id_type get_id() const
+    {
+        // fixed_address components are created without any credits
+        naming::gid_type gid = get_base_gid();
+        HPX_ASSERT(!naming::detail::has_credits(gid));
+
+        naming::detail::replenish_credits(gid);
+        return naming::id_type(gid, naming::id_type::managed);
+    }
+
+    naming::id_type get_unmanaged_id() const
     {
         return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
     }
 
-    /// \brief  The function \a get_factory_properties is used to
-    ///         determine, whether instances of the derived component can
-    ///         be created in blocks (i.e. more than one instance at once).
-    ///         This function is used by the \a distributing_factory to
-    ///         determine a correct allocation strategy
-    static factory_property get_factory_properties()
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+    naming::id_type get_gid() const
     {
-        // components derived from this template have to be allocated one
-        // at a time
-        return factory_none;
+        return get_unmanaged_id();
     }
+#endif
 
     void set_locality_id(boost::uint32_t locality_id, error_code& ec = throws)
     {

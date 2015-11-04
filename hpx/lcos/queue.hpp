@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,7 +8,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/include/client.hpp>
-#include <hpx/lcos/stubs/queue.hpp>
+#include <hpx/lcos/server/queue.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -16,11 +16,14 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename ValueType, typename RemoteType = ValueType>
     class queue
-      : public components::client_base<queue<ValueType, RemoteType>,
-            lcos::stubs::queue<ValueType, RemoteType> >
+      : public components::client_base<
+            queue<ValueType, RemoteType>,
+            lcos::server::queue<ValueType, RemoteType>
+        >
     {
         typedef components::client_base<
-            queue, lcos::stubs::queue<ValueType, RemoteType> > base_type;
+                queue, lcos::server::queue<ValueType, RemoteType>
+            > base_type;
 
     public:
         queue()
@@ -28,80 +31,73 @@ namespace hpx { namespace lcos
 
         /// Create a client side representation for the existing
         /// \a server#queue instance with the given global id \a gid.
-        queue(naming::id_type gid)
-          : base_type(gid)
+        queue(future<id_type> && gid)
+          : base_type(std::move(gid))
         {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
-
-        lcos::future<ValueType>
-        get_value_async()
+        future<ValueType> get_value()
         {
+            typedef typename
+                lcos::base_lco_with_value<ValueType, RemoteType>::get_value_action
+            action_type;
+
             HPX_ASSERT(this->get_gid());
-            return this->base_type::get_value_async(this->get_gid());
+            return hpx::async<action_type>(this->get_gid());
         }
 
-        lcos::future<void>
-        set_value_async(RemoteType const& val)
+        future<void> set_value(RemoteType && val)
         {
+            typedef typename
+                lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action
+            action_type;
+
             HPX_ASSERT(this->get_gid());
-            RemoteType tmp(val);
-            return this->base_type::set_value_async(this->get_gid(), std::move(tmp));
+            return hpx::async<action_type>(this->get_gid(), std::move(val));
         }
 
-        lcos::future<void>
-        abort_pending_async(boost::exception_ptr const& e)
+        future<void> set_value(RemoteType val)
         {
+            typedef typename
+                lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action
+            action_type;
+
             HPX_ASSERT(this->get_gid());
-            return this->base_type::abort_pending_async(this->get_gid(), e);
+            return hpx::async<action_type>(this->get_gid(), std::move(val));
+        }
+
+        future<void> abort_pending()
+        {
+            typedef lcos::base_lco::set_exception_action action_type;
+
+            HPX_ASSERT(this->get_gid());
+            boost::exception_ptr exception =
+                hpx::detail::get_exception(
+                    hpx::exception(hpx::no_success), "queue::abort_pending",
+                    __FILE__, __LINE__);
+            return hpx::async<action_type>(this->get_gid(), exception);
         }
 
         ///////////////////////////////////////////////////////////////////////
         ValueType get_value_sync()
         {
-            HPX_ASSERT(this->get_gid());
-            return this->base_type::get_value_sync(this->get_gid());
+            return get_value().get();
         }
 
         void set_value_sync(RemoteType const& val)
         {
-            HPX_ASSERT(this->get_gid());
-            RemoteType tmp(val);
-            this->base_type::set_value_sync(this->get_gid(), std::move(tmp));
+            set_value(val).get();
         }
 
         void set_value_sync(RemoteType && val) //-V659
         {
-            HPX_ASSERT(this->get_gid());
-            this->base_type::set_value_sync(this->get_gid(), val);
+            set_value(std::move(val)).get();
         }
 
-        void abort_pending_sync(boost::exception_ptr const& e)
+        void abort_pending_sync()
         {
-            this->base_type::abort_pending_sync(this->get_gid(), e);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        void set_value(RemoteType const& val)
-        {
-            RemoteType tmp(val);
-            this->base_type::set_value(this->get_gid(), std::move(tmp));
-        }
-        void set_value(RemoteType && val) //-V659
-        {
-            this->base_type::set_value(this->get_gid(), val);
-        }
-
-        void abort_pending()
-        {
-            try {
-                HPX_THROW_EXCEPTION(no_success, "queue::set_exception",
-                    "interrupt all pending requests");
-            }
-            catch (...) {
-                this->base_type::abort_pending(this->get_gid(), boost::current_exception());
-            }
+            abort_pending().get();
         }
     };
 }}

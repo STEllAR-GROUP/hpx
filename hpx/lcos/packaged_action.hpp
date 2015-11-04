@@ -7,7 +7,7 @@
 #if !defined(HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM)
 #define HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/promise.hpp>
@@ -16,7 +16,10 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/protect.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 
 #include <boost/mpl/bool.hpp>
@@ -83,6 +86,24 @@ namespace hpx { namespace lcos
             }
         }
 
+        template <typename Callback>
+        static void parcel_write_handler_cb(Callback const& cb,
+            boost::intrusive_ptr<typename base_type::wrapping_type> impl,
+            boost::system::error_code const& ec, parcelset::parcel const& p)
+        {
+            // any error in the parcel layer will be stored in the future object
+            if (ec) {
+                boost::exception_ptr exception =
+                    hpx::detail::get_exception(hpx::exception(ec),
+                        "packaged_action::parcel_write_handler",
+                        __FILE__, __LINE__, parcelset::dump_parcel(p));
+                (*impl)->set_exception(exception);
+            }
+
+            // invoke user supplied callback
+            cb(ec, p);
+        }
+
     public:
         /// Construct a (non-functional) instance of an \a packaged_action. To use
         /// this instance its member function \a apply needs to be directly
@@ -106,7 +127,10 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_cb<action_type>(this->get_gid(), gid,
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_cb<action_type>(cont_id, gid,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
@@ -118,9 +142,50 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_cb<action_type>(this->get_gid(), std::move(addr), gid,
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_cb<action_type>(cont_id, std::move(addr), gid,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
+                std::forward<Ts>(vs)...);
+        }
+
+        template <typename Callback, typename ...Ts>
+        void apply_cb(BOOST_SCOPED_ENUM(launch) policy,
+            naming::id_type const& gid, Callback && cb, Ts&&... vs)
+        {
+            util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
+            typedef typename util::decay<Callback>::type callback_type;
+
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_cb<action_type>(cont_id, gid,
+                util::bind(
+                    &packaged_action::parcel_write_handler_cb<callback_type>,
+                    util::protect(std::forward<Callback>(cb)), this->impl_,
+                    util::placeholders::_1, util::placeholders::_2),
+                std::forward<Ts>(vs)...);
+        }
+
+        template <typename Callback, typename ...Ts>
+        void apply_cb(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
+            naming::id_type const& gid, Callback && cb, Ts&&... vs)
+        {
+            util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
+            typedef typename util::decay<Callback>::type callback_type;
+
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_cb<action_type>(cont_id, std::move(addr), gid,
+                util::bind(
+                    &packaged_action::parcel_write_handler_cb<callback_type>,
+                    util::protect(std::forward<Callback>(cb)), this->impl_,
+                    util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
         }
 
@@ -130,7 +195,10 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_p_cb<action_type>(cont_id, gid, priority,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
@@ -143,10 +211,53 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_p_cb<action_type>(this->get_gid(), std::move(addr),
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_p_cb<action_type>(cont_id, std::move(addr),
                 gid, priority,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
+                std::forward<Ts>(vs)...);
+        }
+
+        template <typename Callback, typename ...Ts>
+        void apply_p_cb(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+            threads::thread_priority priority, Callback && cb, Ts&&... vs)
+        {
+            util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
+            typedef typename util::decay<Callback>::type callback_type;
+
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_p_cb<action_type>(cont_id, gid, priority,
+                util::bind(
+                    &packaged_action::parcel_write_handler_cb<callback_type>,
+                    util::protect(std::forward<Callback>(cb)), this->impl_,
+                    util::placeholders::_1, util::placeholders::_2),
+                std::forward<Ts>(vs)...);
+        }
+
+        template <typename Callback, typename ...Ts>
+        void apply_p_cb(BOOST_SCOPED_ENUM(launch) policy, naming::address&& addr,
+            naming::id_type const& gid, threads::thread_priority priority,
+            Callback && cb, Ts&&... vs)
+        {
+            util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
+            typedef typename util::decay<Callback>::type callback_type;
+
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_p_cb<action_type>(cont_id, std::move(addr),
+                gid, priority,
+                util::bind(
+                    &packaged_action::parcel_write_handler_cb<callback_type>,
+                    util::protect(std::forward<Callback>(cb)), this->impl_,
+                    util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
         }
 
@@ -169,7 +280,7 @@ namespace hpx { namespace lcos
         packaged_action(naming::id_type const& gid, Ts&&... vs)
           : apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_action::packaged_action("
+            LLCO_(info) << "packaged_action::packaged_action(" //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
@@ -182,7 +293,7 @@ namespace hpx { namespace lcos
                 threads::thread_priority priority, Ts&&... vs)
           : apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_action::packaged_action("
+            LLCO_(info) << "packaged_action::packaged_action(" //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
@@ -220,6 +331,24 @@ namespace hpx { namespace lcos
             }
         }
 
+        template <typename Callback>
+        static void parcel_write_handler_cb(Callback const& cb,
+            boost::intrusive_ptr<typename base_type::wrapping_type> impl,
+            boost::system::error_code const& ec, parcelset::parcel const& p)
+        {
+            // any error in the parcel layer will be stored in the future object
+            if (ec) {
+                boost::exception_ptr exception =
+                    hpx::detail::get_exception(hpx::exception(ec),
+                        "packaged_action::parcel_write_handler",
+                        __FILE__, __LINE__, parcelset::dump_parcel(p));
+                (*impl)->set_exception(exception);
+            }
+
+            // invoke user supplied callback
+            cb(ec, p);
+        }
+
     public:
         /// Construct a (non-functional) instance of an \a packaged_action. To use
         /// this instance its member function \a apply needs to be directly
@@ -254,8 +383,11 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
+                naming::id_type cont_id(this->get_id());
+                naming::detail::set_dont_store_in_cache(cont_id);
+
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    std::move(addr), this->get_gid(), gid,
+                    std::move(addr), cont_id, gid,
                     util::bind(&packaged_action::parcel_write_handler,
                         this->impl_, util::placeholders::_1, util::placeholders::_2),
                     std::forward<Ts>(vs)...);
@@ -278,10 +410,82 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
+                naming::id_type cont_id(this->get_id());
+                naming::detail::set_dont_store_in_cache(cont_id);
+
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    std::move(addr), this->get_gid(), gid,
+                    std::move(addr), cont_id, gid,
                     util::bind(&packaged_action::parcel_write_handler,
                         this->impl_, util::placeholders::_1, util::placeholders::_2),
+                    std::forward<Ts>(vs)...);
+            }
+        }
+
+        template <typename Callback, typename ...Ts>
+        void apply_cb(BOOST_SCOPED_ENUM(launch) /*policy*/,
+            naming::id_type const& gid, Callback && cb, Ts&&... vs)
+        {
+            util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
+            naming::address addr;
+            if (agas::is_local_address_cached(gid, addr)) {
+                // local, direct execution
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
+
+                (*this->impl_)->set_data(action_type::execute_function(
+                    addr.address_, std::forward<Ts>(vs)...));
+
+                // invoke callback
+                cb(boost::system::error_code(), parcelset::parcel());
+            }
+            else {
+                // remote execution
+                typedef typename util::decay<Callback>::type callback_type;
+
+                naming::id_type cont_id(this->get_id());
+                naming::detail::set_dont_store_in_cache(cont_id);
+
+                hpx::applier::detail::apply_c_cb<action_type>(
+                    std::move(addr), cont_id, gid,
+                    util::bind(
+                        &packaged_action::parcel_write_handler_cb<callback_type>,
+                        util::protect(std::forward<Callback>(cb)), this->impl_,
+                        util::placeholders::_1, util::placeholders::_2),
+                    std::forward<Ts>(vs)...);
+            }
+        }
+
+        template <typename Callback, typename ...Ts>
+        void apply_cb(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::address&& addr,
+            naming::id_type const& gid, Callback && cb, Ts&&... vs)
+        {
+            util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
+            if (addr.locality_ == hpx::get_locality()) {
+                // local, direct execution
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
+
+                (*this->impl_)->set_data(action_type::execute_function(
+                    addr.address_, std::forward<Ts>(vs)...));
+
+                // invoke callback
+                cb(boost::system::error_code(), parcelset::parcel());
+            }
+            else {
+                // remote execution
+                typedef typename util::decay<Callback>::type callback_type;
+
+                naming::id_type cont_id(this->get_id());
+                naming::detail::set_dont_store_in_cache(cont_id);
+
+                hpx::applier::detail::apply_c_cb<action_type>(
+                    std::move(addr), cont_id, gid,
+                    util::bind(
+                        &packaged_action::parcel_write_handler_cb<callback_type>,
+                        util::protect(std::forward<Callback>(cb)), this->impl_,
+                        util::placeholders::_1, util::placeholders::_2),
                     std::forward<Ts>(vs)...);
             }
         }
@@ -305,7 +509,7 @@ namespace hpx { namespace lcos
         packaged_action(naming::id_type const& gid, Ts&&... vs)
           : apply_logger_("packaged_action_direct::apply")
         {
-            LLCO_(info) << "packaged_action::packaged_action("
+            LLCO_(info) << "packaged_action::packaged_action(" //-V128
                         << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid

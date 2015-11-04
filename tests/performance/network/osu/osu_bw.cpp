@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,14 +6,13 @@
 
 // Unidirectional network bandwidth test
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/serialize_buffer.hpp>
-#include <hpx/parallel/algorithm.hpp>
+#include <hpx/include/serialization.hpp>
+#include <hpx/include/parallel_for_each.hpp>
+#include <hpx/include/util.hpp>
 
-#include <boost/assert.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/scoped_array.hpp>
 #include <boost/range/irange.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,7 +21,7 @@ char* align_buffer (char* ptr, unsigned long align_size)
     return (char*)(((std::size_t)ptr + (align_size - 1)) / align_size * align_size);
 }
 
-#if defined(BOOST_MSVC)
+#if defined(BOOST_WINDOWS)
 unsigned long getpagesize()
 {
     SYSTEM_INFO si;
@@ -32,7 +31,6 @@ unsigned long getpagesize()
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-
 #define LOOP_SMALL_MULTIPLIER 5
 #define SKIP  2
 
@@ -43,11 +41,11 @@ unsigned long getpagesize()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-void isend(hpx::util::serialize_buffer<char> const& receive_buffer) {}
+void isend(hpx::serialization::serialize_buffer<char> const& receive_buffer) {}
 HPX_PLAIN_ACTION(isend);
 
 ///////////////////////////////////////////////////////////////////////////////
-double ireceive(hpx::naming::id_type dest, std::size_t loop, 
+double ireceive(hpx::naming::id_type dest, std::size_t loop,
                 std::size_t size, std::size_t window_size)
 {
     std::size_t skip = SKIP;
@@ -56,16 +54,16 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop,
         loop *= LOOP_SMALL_MULTIPLIER;
         skip *= LOOP_SMALL_MULTIPLIER;
     }
-    
-    typedef hpx::util::serialize_buffer<char> buffer_type;
+
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
     (void)align_size;
-    BOOST_ASSERT(align_size <= MAX_ALIGNMENT);
+    HPX_ASSERT(align_size <= MAX_ALIGNMENT);
 
-    char *send_buffer = new char[size];
-    std::memset(send_buffer, 'a', size);
+    boost::scoped_array<char> send_buffer(new char[size]);
+    std::memset(send_buffer.get(), 'a', size);
 
     hpx::util::high_resolution_timer t;
 
@@ -80,30 +78,26 @@ double ireceive(hpx::naming::id_type dest, std::size_t loop,
 
         std::size_t const start = 0;
 
-        // Fill the original matrix, set transpose to known garbage value.
         auto range = boost::irange(start, window_size);
         for_each(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t j)
             {
-                send(dest,
-                    buffer_type(send_buffer, size, buffer_type::reference));
+                send(dest, buffer_type(
+                    send_buffer.get(), size, buffer_type::reference));
             }
         );
     }
 
     double elapsed = t.elapsed();
-
-    delete[] send_buffer;
-
     return (size / 1e6 * loop * window_size) / elapsed;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_header ()
+void print_header()
 {
     hpx::cout << "# OSU HPX Bandwidth Test\n"
-              << "# Size    Bandwidth (MB/s)\n"
-              << hpx::flush;
+              << "# Size    Bandwidth (MB/s)"
+              << std::endl;
 }
 
 void run_benchmark(boost::program_options::variables_map & vm)

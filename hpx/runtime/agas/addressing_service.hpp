@@ -11,16 +11,6 @@
 
 #include <hpx/config.hpp>
 
-#include <vector>
-
-#include <boost/make_shared.hpp>
-#include <boost/cache/entries/lfu_entry.hpp>
-#include <boost/cache/local_cache.hpp>
-#include <boost/cache/statistics/local_full_statistics.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/dynamic_bitset.hpp>
-
 #include <hpx/exception.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
@@ -29,8 +19,19 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/function.hpp>
+
+#include <boost/make_shared.hpp>
+#include <boost/cache/entries/lfu_entry.hpp>
+#include <boost/cache/local_cache.hpp>
+#include <boost/cache/statistics/local_full_statistics.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/dynamic_bitset.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <map>
+#include <vector>
 
 // TODO: split into a base class and two implementations (one for bootstrap,
 // one for hosted).
@@ -146,7 +147,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     state get_status() const
     {
         if (!hosted && !bootstrap)
-            return stopping;
+            return state_stopping;
         return state_.load();
     }
 
@@ -215,9 +216,25 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
       , boost::int64_t compensated_credit
         );
 
+    naming::address::address_type get_primary_ns_lva() const
+    {
+        return reinterpret_cast<naming::address::address_type>(
+            is_bootstrap() ?
+                get_bootstrap_primary_ns_ptr() :
+                get_hosted_primary_ns_ptr());
+    }
+
+    naming::address::address_type get_symbol_ns_lva() const
+    {
+        return reinterpret_cast<naming::address::address_type>(
+            is_bootstrap() ?
+                get_bootstrap_symbol_ns_ptr() :
+                get_hosted_symbol_ns_ptr());
+    }
+
 protected:
     void launch_bootstrap(
-        boost::shared_ptr<parcelset::parcelport> pp
+        boost::shared_ptr<parcelset::parcelport> const& pp
       , parcelset::endpoints_type const & endpoints
       , util::runtime_configuration const& ini_
         );
@@ -242,43 +259,43 @@ protected:
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , error_code& ec = throws
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests_non_blocking(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , error_code& ec
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     std::vector<hpx::future<std::vector<response> > >
     send_refcnt_requests_async(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests_sync(
-        mutex_type::scoped_lock& l
+        boost::unique_lock<mutex_type>& l
       , error_code& ec
         );
 
     // Helper functions to access the current cache statistics
-    std::size_t get_cache_hits(bool);
-    std::size_t get_cache_misses(bool);
-    std::size_t get_cache_evictions(bool);
-    std::size_t get_cache_insertions(bool);
+    boost::uint64_t get_cache_hits(bool);
+    boost::uint64_t get_cache_misses(bool);
+    boost::uint64_t get_cache_evictions(bool);
+    boost::uint64_t get_cache_insertions(bool);
 
-    std::size_t get_cache_get_entry_count(bool reset);
-    std::size_t get_cache_insert_entry_count(bool reset);
-    std::size_t get_cache_update_entry_count(bool reset);
-    std::size_t get_cache_erase_entry_count(bool reset);
+    boost::uint64_t get_cache_get_entry_count(bool reset);
+    boost::uint64_t get_cache_insert_entry_count(bool reset);
+    boost::uint64_t get_cache_update_entry_count(bool reset);
+    boost::uint64_t get_cache_erase_entry_count(bool reset);
 
-    std::size_t get_cache_get_entry_time(bool reset);
-    std::size_t get_cache_insert_entry_time(bool reset);
-    std::size_t get_cache_update_entry_time(bool reset);
-    std::size_t get_cache_erase_entry_time(bool reset);
+    boost::uint64_t get_cache_get_entry_time(bool reset);
+    boost::uint64_t get_cache_insert_entry_time(bool reset);
+    boost::uint64_t get_cache_update_entry_time(bool reset);
+    boost::uint64_t get_cache_erase_entry_time(bool reset);
 
 public:
     response service(
@@ -307,11 +324,18 @@ public:
       , error_code& ec = throws
         );
 
+    bool has_resolved_locality(
+        naming::gid_type const & gid
+        );
+
     /// \brief Remove a locality from the runtime.
     bool unregister_locality(
         naming::gid_type const & gid
       , error_code& ec = throws
         );
+
+    /// \brief remove given locality from locality cache
+    void remove_resolved_locality(naming::gid_type const& gid);
 
     /// \brief Get locality locality_id of the console locality.
     ///
@@ -1122,9 +1146,9 @@ public:
     ///                   before the parcel has been delivered to its
     ///                   destination.
     void route(
-        parcelset::parcel const& p
+        parcelset::parcel p
       , util::function_nonser<void(boost::system::error_code const&,
-            parcelset::parcel const&)> const&
+            parcelset::parcel const&)> &&
         );
 
     /// \brief Increment the global reference count for the given id

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +16,6 @@
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/util/unused.hpp>
-#include <hpx/util/void_cast.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
@@ -33,7 +32,7 @@ namespace hpx { namespace actions
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    //  Specialized generic non-conts component action types allowing to hold
+    //  Specialized generic non-const component action types allowing to hold
     //  a different number of arguments
     ///////////////////////////////////////////////////////////////////////////
     template <
@@ -47,9 +46,11 @@ namespace hpx { namespace actions
         static std::string get_action_name(naming::address::address_type lva)
         {
             std::stringstream name;
-            name << "component action(" << detail::get_action_name<Derived>() <<
-                ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
+            name << "component action("
+                 << detail::get_action_name<Derived>()
+                 << ") lva("
+                 << reinterpret_cast<void const*>(get_lva<Component>::call(lva))
+                 << ")";
             return name.str();
         }
 
@@ -62,6 +63,8 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static R invoke(naming::address::address_type lva, Ts&&... vs)
         {
+            basic_action<Component, R(Ps...), Derived>::
+                increment_invocation_count();
             return (get_lva<Component>::call(lva)->*F)
                 (std::forward<Ts>(vs)...);
         }
@@ -82,9 +85,11 @@ namespace hpx { namespace actions
         static std::string get_action_name(naming::address::address_type lva)
         {
             std::stringstream name;
-            name << "component action(" << detail::get_action_name<Derived>() <<
-                ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
+            name << "component action("
+                 << detail::get_action_name<Derived>()
+                 << ") lva("
+                 << reinterpret_cast<void const*>(get_lva<Component>::call(lva))
+                 << ")";
             return name.str();
         }
 
@@ -97,6 +102,8 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static R invoke(naming::address::address_type lva, Ts&&... vs)
         {
+            basic_action<Component const, R(Ps...), Derived>::
+                increment_invocation_count();
             return (get_lva<Component const>::call(lva)->*F)
                 (std::forward<Ts>(vs)...);
         }
@@ -123,18 +130,19 @@ namespace hpx { namespace actions
 /// \code
 ///       namespace app
 ///       {
-///           // Define a simple component exposing one action 'print_greating'
+///           // Define a simple component exposing one action 'print_greeting'
 ///           class HPX_COMPONENT_EXPORT server
 ///             : public hpx::components::simple_component_base<server>
 ///           {
-///               void print_greating() const
+///               void print_greeting() const
 ///               {
 ///                   hpx::cout << "Hey, how are you?\n" << hpx::flush;
 ///               }
 ///
 ///               // Component actions need to be declared, this also defines the
-///               // type 'print_greating_action' representing the action.
-///               HPX_DEFINE_COMPONENT_ACTION(server, print_greating, print_greating_action);
+///               // type 'print_greeting_action' representing the action.
+///               HPX_DEFINE_COMPONENT_ACTION(server, print_greeting,
+///                   print_greeting_action);
 ///           };
 ///       }
 /// \endcode
@@ -191,7 +199,7 @@ namespace hpx { namespace actions
     struct name : hpx::actions::make_direct_action<                           \
         decltype(&component::func), &component::func, name>::type {}          \
     /**/
-    /**/
+
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                 \
     HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(component, func,                     \
         BOOST_PP_CAT(func, _action))                                          \

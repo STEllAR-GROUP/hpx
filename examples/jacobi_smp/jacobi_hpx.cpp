@@ -13,7 +13,8 @@
 
 namespace jacobi_smp {
 
-    void jacobi_kernel_wrap(range const & y_range, std::size_t n, std::vector<double> & dst, std::vector<double> const & src)
+    void jacobi_kernel_wrap(range const & y_range, std::size_t n,
+        std::vector<double> & dst, std::vector<double> const & src)
     {
         for(std::size_t y = y_range.begin(); y < y_range.end(); ++y)
         {
@@ -41,7 +42,7 @@ namespace jacobi_smp {
 
         std::size_t n_block = static_cast<std::size_t>(std::ceil(double(n)/block_size));
 
-        
+
         boost::shared_ptr<deps_vector> deps_new(
             new deps_vector(n_block, hpx::make_ready_future()));
         boost::shared_ptr<deps_vector> deps_old(
@@ -74,8 +75,8 @@ namespace jacobi_smp {
                       , trigger
                     );
                 */
-                
-                (*deps_new)[j] = hpx::when_all(boost::move(trigger)).then(
+
+                (*deps_new)[j] = hpx::when_all(std::move(trigger)).then(
                     hpx::launch::async,
                     hpx::util::bind(
                         jacobi_kernel_wrap

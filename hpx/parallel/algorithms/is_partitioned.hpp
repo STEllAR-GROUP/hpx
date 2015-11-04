@@ -10,9 +10,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/execution_policy.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template<typename ExPolicy, typename Pred>
             static bool
-            sequential(ExPolicy const&, Iter first, Iter last,
+            sequential(ExPolicy, Iter first, Iter last,
                 Pred && pred)
             {
                 return std::is_partitioned(first,
@@ -72,15 +72,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             }
 
             template <typename ExPolicy, typename Pred>
-            static typename detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy const& policy, Iter first, Iter last,
+            static typename util::detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy policy, Iter first, Iter last,
                 Pred && pred)
             {
                 typedef typename std::iterator_traits<Iter>::reference
                     reference;
                 typedef typename std::iterator_traits<Iter>::difference_type
                     difference_type;
-                typedef typename detail::algorithm_result<ExPolicy, bool>
+                typedef typename util::detail::algorithm_result<ExPolicy, bool>
                     result;
 
                 difference_type count = std::distance(first, last);
@@ -139,7 +139,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \param pred         Refers to the binary predicate which returns a bool.
     ///                     The signature of the function should be equivalent
     ///                     to
-    ///                     \code bool pred(const Type1 &a, const Type2 &b); \endcode
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a InIter1 and \a InIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
     ///
     /// The predicate operations in the parallel \a is_partitioned algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy
@@ -163,7 +171,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename Pred>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, bool>::type
+        typename util::detail::algorithm_result<ExPolicy, bool>::type
     >::type
     is_partitioned(ExPolicy && policy, InIter first, InIter last, Pred && pred)
     {

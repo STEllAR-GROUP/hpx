@@ -39,7 +39,7 @@ namespace hpx { namespace threads { namespace detail
             }
         }
 
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -50,7 +50,7 @@ namespace hpx { namespace threads { namespace detail
 
         thread_self* self = get_self_ptr();
 
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         if (0 == data.parent_id) {
             if (self)
             {
@@ -73,19 +73,19 @@ namespace hpx { namespace threads { namespace detail
         }
 
         // create the new thread
-        scheduler->create_thread(data, &id, initial_state, run_now, ec,
-            data.num_os_thread);
+        std::size_t num_thread = data.num_os_thread;
+        scheduler->create_thread(data, &id, initial_state, run_now, ec, num_thread);
 
         LTM_(info) << "register_thread(" << id << "): initial_state("
                    << get_thread_state_name(initial_state) << "), "
                    << "run_now(" << (run_now ? "true" : "false")
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
                    << "), description(" << data.description
 #endif
                    << ")";
 
         // potentially wake up waiting thread
-        scheduler->do_some_work(data.num_os_thread);
+        scheduler->do_some_work(num_thread);
     }
 }}}
 

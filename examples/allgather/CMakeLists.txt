@@ -17,7 +17,6 @@ foreach(subdir ${subdirs})
   source_group("Source Files" FILES ${sources})
 
   set(dependencies
-      distributing_factory_component
       iostreams_component)
 
   # add example executable

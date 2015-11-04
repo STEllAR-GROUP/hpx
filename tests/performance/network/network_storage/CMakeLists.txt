@@ -13,19 +13,19 @@ add_hpx_executable(network_storage
 
 # add pseudo-target dependencies
 add_hpx_pseudo_target(
-  tests.performance.network.network_storage.network_storage)
+  tests.performance.network.network_storage.network_storage_dir)
 
 add_hpx_pseudo_dependencies(
   tests.performance.network.network_storage
-  tests.performance.network.network_storage.network_storage)
+  tests.performance.network.network_storage.network_storage_dir)
 
 add_hpx_pseudo_dependencies(
-  tests.performance.network.network_storage.network_storage
+  tests.performance.network.network_storage.network_storage_dir
   network_storage_exe)
 
-hpx_option(HPX_BENCHMARK_SCRIPTS_PATH PATH
+hpx_option(HPX_WITH_BENCHMARK_SCRIPTS_PATH PATH
   "Directory to place batch scripts in"
-  "${hpx_BINARY_DIR}/scripts"
+  "${PROJECT_BINARY_DIR}/scripts"
   ADVANCED)
 
 # our windows batch script needs to know the lib path for boost/hpx
@@ -39,7 +39,7 @@ if (WIN32)
 
   # generate a simple batch file for convenience
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/network_storage.bat.in"
-    "${HPX_BENCHMARK_SCRIPTS_PATH}/network_storage.bat"
+    "${HPX_WITH_BENCHMARK_SCRIPTS_PATH}/network_storage.bat"
     @ONLY)
 else()
 #-------------------------------------------------------
@@ -64,7 +64,7 @@ else()
   #set(LD_LIBRARY_PATH "${HPX_LIBRARY_OUTPUT_DIRECTORY_${CMAKE_CFG_INTDIR}}" CACHE PATH "Path to set when generating script tests")
 
 # Make sure scripts dir exists
-  execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${HPX_BENCHMARK_SCRIPTS_PATH}")
+  execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${HPX_WITH_BENCHMARK_SCRIPTS_PATH}")
 
 #--------------------------------------------------
 # Slurm script generator for
@@ -79,16 +79,16 @@ else()
                   -DMPIEXEC="${MPIEXEC}"
                   -DSCRIPT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
                   -DSCRIPT_NAME=${script}
-                  -DSCRIPT_DEST_DIR="${HPX_BENCHMARK_SCRIPTS_PATH}"
+                  -DSCRIPT_DEST_DIR="${HPX_WITH_BENCHMARK_SCRIPTS_PATH}"
                   -DLIB_PATH="${LD_LIBRARY_PATH}"
                   -DJOB_OPTIONS1="${SLURM_JOB_OPTIONS1}"
                   -P "${CMAKE_CURRENT_SOURCE_DIR}/copy_script.cmake"
-        OUTPUT    "${HPX_BENCHMARK_SCRIPTS_PATH}/${script}.sh"
+        OUTPUT    "${HPX_WITH_BENCHMARK_SCRIPTS_PATH}/${script}.sh"
         VERBATIM
     )
 
     add_custom_target(script-${script}
-        DEPENDS "${HPX_BENCHMARK_SCRIPTS_PATH}/${script}.sh"
+        DEPENDS "${HPX_WITH_BENCHMARK_SCRIPTS_PATH}/${script}.sh"
     )
   endforeach(script)
 endif()

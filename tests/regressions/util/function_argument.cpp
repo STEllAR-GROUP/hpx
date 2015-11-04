@@ -11,8 +11,6 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/foreach.hpp>
-
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
@@ -61,7 +59,7 @@ int hpx_main(variables_map &)
         hpx::util::function<bool()> f = g();
         std::vector<id_type> prefixes = hpx::find_all_localities();
 
-        BOOST_FOREACH(id_type const & prefix, prefixes)
+        for (id_type const& prefix : prefixes)
         {
             invoked_f = false;
             HPX_TEST(async<f_action>(prefix, f).get());

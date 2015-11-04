@@ -7,6 +7,10 @@
 #define HPX_RUNTIME_THREADS_THREAD_EXECUTOR_JAN_11_2013_0700PM
 
 #include <hpx/config.hpp>
+#include <hpx/runtime/get_os_thread_count.hpp>
+#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/safe_bool.hpp>
@@ -16,6 +20,17 @@
 #include <boost/cstdint.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    namespace threads
+    {
+        class HPX_EXPORT executor;
+    }
+
+    HPX_EXPORT std::size_t get_os_thread_count(threads::executor const&);
+}
 
 namespace hpx { namespace threads
 {
@@ -73,7 +88,7 @@ namespace hpx { namespace threads
         void intrusive_ptr_add_ref(executor_base* p);
         void intrusive_ptr_release(executor_base* p);
 
-        class executor_base
+        class HPX_EXPORT executor_base
         {
         public:
             typedef util::unique_function_nonser<void()> closure_type;
@@ -91,11 +106,23 @@ namespace hpx { namespace threads
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
             // Return an estimate of the number of waiting closures.
-            virtual std::size_t num_pending_closures(error_code& ec) const = 0;
+            virtual boost::uint64_t num_pending_closures(error_code& ec) const = 0;
+
+            // Reset internal (round robin) thread distribution scheme
+            virtual void reset_thread_distribution() {}
 
             // Return the requested policy element
             virtual std::size_t get_policy_element(
                 threads::detail::executor_parameter p, error_code& ec) const = 0;
+
+            /// Return the mask for processing units the given thread is allowed
+            /// to run on.
+            virtual mask_cref_type get_pu_mask(topology const& topology,
+                std::size_t num_thread) const;
+
+            /// Set the new scheduler mode
+            virtual void set_scheduler_mode(
+                threads::policies::scheduler_mode mode) {}
 
         private:
             // reference counting
@@ -165,9 +192,9 @@ namespace hpx { namespace threads
     //        virtual size_t num_pending_closures() const = 0;
     //    };
     //
-    class HPX_EXPORT executor
+    class executor
     {
-        friend std::size_t hpx::get_os_thread_count(threads::executor const& exec);
+        friend std::size_t hpx::get_os_thread_count(threads::executor const&);
 
     protected:
         // generic executors can't be created directly
@@ -190,13 +217,34 @@ namespace hpx { namespace threads
             threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
-            executor_data_->add(std::move(f), desc, initial_state, run_now, stacksize, ec);
+            executor_data_->add(std::move(f), desc, initial_state, run_now,
+                stacksize, ec);
         }
 
         /// Return an estimate of the number of waiting closures.
-        std::size_t num_pending_closures(error_code& ec = throws) const
+        boost::uint64_t num_pending_closures(error_code& ec = throws) const
         {
             return executor_data_->num_pending_closures(ec);
+        }
+
+        /// Return an estimate of the number of waiting closures.
+        void reset_thread_distribution() const
+        {
+            executor_data_->reset_thread_distribution();
+        }
+
+        /// Return the mask for processing units the given thread is allowed
+        /// to run on.
+        mask_cref_type get_pu_mask(topology const& topology,
+                std::size_t num_thread) const
+        {
+            return executor_data_->get_pu_mask(topology, num_thread);
+        }
+
+        /// Set the new scheduler mode
+        void set_scheduler_mode(threads::policies::scheduler_mode mode)
+        {
+            return executor_data_->set_scheduler_mode(mode);
         }
 
         operator util::safe_bool<executor>::result_type() const
@@ -241,7 +289,7 @@ namespace hpx { namespace threads
         /// execution by the executor at some point in the future no sooner
         /// than the time represented by abs_time.
         /// Synchronization: completion of closure on a particular thread
-        /// happens before destruction of that thread’s thread-duration
+        /// happens before destruction of that thread's thread-duration
         /// variables.
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
@@ -256,8 +304,9 @@ namespace hpx { namespace threads
         }
 
         void add_at(util::steady_time_point const& abs_time,
-            closure_type && f, char const* desc,
-            threads::thread_stacksize stacksize, error_code& ec)
+            closure_type f, char const* desc = "",
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            error_code& ec = throws)
         {
             return add_at(abs_time.value(), std::move(f), desc,
                 stacksize, ec);
@@ -267,7 +316,7 @@ namespace hpx { namespace threads
         /// execution by the executor at some point in the future no sooner
         /// than time rel_time from now.
         /// Synchronization: completion of closure on a particular thread
-        /// happens before destruction of that thread’s thread-duration
+        /// happens before destruction of that thread's thread-duration
         /// variables.
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
@@ -282,8 +331,9 @@ namespace hpx { namespace threads
         }
 
         void add_after(util::steady_duration const& rel_time,
-            closure_type && f, char const* desc,
-            threads::thread_stacksize stacksize, error_code& ec)
+            closure_type f, char const* desc = "",
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            error_code& ec = throws)
         {
             return add_after(rel_time.value(), std::move(f), desc,
                 stacksize, ec);
@@ -295,7 +345,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     /// Returns: the default executor defined by the
-    /// active process. If set_default_executor hasn’t been called then the
+    /// active process. If set_default_executor hasn't been called then the
     /// return value is a pointer to an executor of unspecified type.
     HPX_EXPORT scheduled_executor default_executor();
 

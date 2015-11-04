@@ -29,8 +29,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
         boost::uint64_t addr;
         boost::uint64_t size;
 
-        static const std::size_t data_size = sizeof(boost::uint32_t)*2 + sizeof(boost::uint64_t)*2;
-        static const std::size_t payload_size = HPX_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD - data_size;
+        static const std::size_t data_size =
+            sizeof(boost::uint32_t)*2 + sizeof(boost::uint64_t)*2;
+        static const std::size_t payload_size =
+            HPX_WITH_PARCELPORT_IBVERBS_MESSAGE_PAYLOAD - data_size;
 
         char payload[payload_size];
     };

@@ -6,7 +6,7 @@
 ###############################################################################
 if(HPX_WITH_SECURITY)
 
-  set(root "${hpx_SOURCE_DIR}/hpx/components/security")
+  set(root "${PROJECT_SOURCE_DIR}/hpx/components/security")
 
   add_hpx_component(security
     FOLDER "Core/Components"

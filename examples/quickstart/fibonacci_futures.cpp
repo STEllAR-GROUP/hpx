@@ -65,7 +65,7 @@ struct fibonacci_future_one_continuation
 
     result_type operator()(hpx::future<boost::uint64_t> res) const
     {
-        return add(fibonacci_future_one(n_ - 2), boost::move(res));
+        return add(fibonacci_future_one(n_ - 2), std::move(res));
     }
 
     boost::uint64_t n_;
@@ -140,7 +140,7 @@ hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
         hpx::async(&fibonacci_future, n-1);
     hpx::future<boost::uint64_t> r = fibonacci_future(n-2);
 
-    return hpx::async(&add, boost::move(f), boost::move(r));
+    return hpx::async(&add, std::move(f), std::move(r));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,7 +158,7 @@ hpx::future<boost::uint64_t> fibonacci_future_fork(boost::uint64_t n)
         hpx::async(hpx::launch::fork, &fibonacci_future_fork, n-1);
     hpx::future<boost::uint64_t> r = fibonacci_future_fork(n-2);
 
-    return hpx::async(&add, boost::move(f), boost::move(r));
+    return hpx::async(&add, std::move(f), std::move(r));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -209,7 +209,7 @@ hpx::future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
     hpx::future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
 
     // create a future representing the successful calculation of both sub-terms
-    return hpx::async(&add, boost::move(f1), boost::move(f2));
+    return hpx::async(&add, std::move(f1), std::move(f2));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -387,7 +387,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
         boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
-        char const* fmt = "fibonacci_future_when_all(%1%) == %2%,elapsed time:,%3%,[s]\n";
+        char const* fmt =
+            "fibonacci_future_when_all(%1%) == %2%,elapsed time:,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs));
 
         executed_one = true;
@@ -406,7 +407,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
         boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
-        char const* fmt = "fibonacci_future_unwrapped_when_all(%1%) == %2%,elapsed time:,%3%,[s]\n";
+        char const* fmt =
+            "fibonacci_future_unwrapped_when_all(%1%) == %2%,elapsed time:,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs));
 
         executed_one = true;
@@ -425,7 +427,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
         boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
-        char const* fmt = "fibonacci_future_all(%1%) == %2%,elapsed time,%3%,[s]\n";
+        char const* fmt =
+            "fibonacci_future_all(%1%) == %2%,elapsed time,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs));
 
         executed_one = true;
@@ -444,7 +447,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
         boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
-        char const* fmt = "fibonacci_future_all_when_all(%1%) == %2%,elapsed time:,%3%,[s]\n";
+        char const* fmt =
+            "fibonacci_future_all_when_all(%1%) == %2%,elapsed time:,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs));
 
         executed_one = true;

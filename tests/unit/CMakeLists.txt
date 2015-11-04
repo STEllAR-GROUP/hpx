@@ -8,11 +8,12 @@ set(subdirs
     actions
     agas
     build
-    components
+    component
     diagnostics
     lcos
     parcelset
-    performance_counters
+    performance_counter
+    serialization
     threads
     traits
     util
@@ -20,6 +21,10 @@ set(subdirs
 
 if(HPX_WITH_SECURITY)
   set(subdirs ${subdirs} security)
+endif()
+
+if(HPX_WITH_APEX)
+  set(subdirs ${subdirs} apex)
 endif()
 
 if(HPX_WITH_CXX11_LAMBDAS)

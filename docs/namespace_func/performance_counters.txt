@@ -1,54 +1,102 @@
+# Copyright (c) 2015 Hartmut Kaiser
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 Namespace: hpx::performance_counters
 
-API Component:                                  File:                                                           Comments:
+Format:
+API Component:
+    File:
+    Comments:
 
 * functions
-default_counter_discoverer                      hpx/performance_counters/counter_creators.hpp
-locality_counter_discoverer                     hpx/performance_counters/counter_creators.hpp
-locality_thread_counter_discoverer              hpx/performance_counters/counter_creators.hpp
-locality_raw_counter_creator                    hpx/performance_counters/counter_creators.hpp
-ensure_counter_prefix                           hpx/performance_counters/counters.hpp
-status_is_valid                                 hpx/performance_counters/counters.hpp
-get_counter_type_name                           hpx/performance_counters/counters.hpp
-get_full_counter_type_name                      hpx/performance_counters/counters.hpp
-get_counter_name                                hpx/performance_counters/counters.hpp
-get_counter_type_path_elements                  hpx/performance_counters/counters.hpp
-get_counter_counter_path_elements               hpx/performance_counters/counters.hpp
-complement_counter_info                         hpx/performance_counters/counters.hpp
-add_counter_type                                hpx/performance_counters/counters.hpp
-discover_counter_types                          hpx/performance_counters/counters.hpp
-remove_counter_type                             hpx/performance_counters/counters.hpp
-get_counter_type                                hpx/performance_counters/counters.hpp
-get_counter                                     hpx/performance_counters/counters.hpp
-get_counter_infos                               hpx/performance_counters/counters.hpp
-install_counter                                 hpx/performance_counters/manage_counter.hpp
-install_counter_type                            hpx/performance_counters/manage_counter_type.hpp
+default_counter_discoverer
+    hpx/performance_counters/counter_creators.hpp
+locality_counter_discoverer
+    hpx/performance_counters/counter_creators.hpp
+locality_thread_counter_discoverer
+    hpx/performance_counters/counter_creators.hpp
+locality_raw_counter_creator
+    hpx/performance_counters/counter_creators.hpp
+ensure_counter_prefix
+    hpx/performance_counters/counters.hpp
+status_is_valid
+    hpx/performance_counters/counters.hpp
+get_counter_type_name
+    hpx/performance_counters/counters.hpp
+get_full_counter_type_name
+    hpx/performance_counters/counters.hpp
+get_counter_name
+    hpx/performance_counters/counters.hpp
+get_counter_type_path_elements
+    hpx/performance_counters/counters.hpp
+get_counter_counter_path_elements
+    hpx/performance_counters/counters.hpp
+complement_counter_info
+    hpx/performance_counters/counters.hpp
+add_counter_type
+    hpx/performance_counters/counters.hpp
+discover_counter_types
+    hpx/performance_counters/counters.hpp
+remove_counter_type
+    hpx/performance_counters/counters.hpp
+get_counter_type
+    hpx/performance_counters/counters.hpp
+get_counter
+    hpx/performance_counters/counters.hpp
+get_counter_infos
+    hpx/performance_counters/counters.hpp
+install_counter
+    hpx/performance_counters/manage_counter.hpp
+install_counter_type
+    hpx/performance_counters/manage_counter_type.hpp
 
 * classes
-counter_type_path_elements                      hpx/performance_counters/counters.hpp
-counter_path_elements                           hpx/performance_counters/counters.hpp
-counter_info                                    hpx/performance_counters/counters.hpp
-counter_value                                   hpx/performance_counters/counters.hpp
-high_resolution_clock                           hpx/performance_counters/high_resolution_clock.hpp
-manage_counter                                  hpx/performance_counters/manage_counter.hpp
-manage_counter_type                             hpx/performance_counters/manage_counter_type.hpp
-generic_counter_type_data                       hpx/performance_counters/manage_counter_type.hpp
-registry                                        hpx/performance_counters/registry.hpp
+counter_type_path_elements
+    hpx/performance_counters/counters.hpp
+counter_path_elements
+    hpx/performance_counters/counters.hpp
+counter_info
+    hpx/performance_counters/counters.hpp
+counter_value
+    hpx/performance_counters/counters.hpp
+high_resolution_clock
+    hpx/performance_counters/high_resolution_clock.hpp
+manage_counter
+    hpx/performance_counters/manage_counter.hpp
+manage_counter_type
+    hpx/performance_counters/manage_counter_type.hpp
+generic_counter_type_data
+    hpx/performance_counters/manage_counter_type.hpp
+registry
+    hpx/performance_counters/registry.hpp
 
-server::aggregating_counter                     hpx/performance_counters/server/aggregating_counter.hpp
-server::base_performance_counter                hpx/performance_counters/server/base_performance_counter.hpp
-server::elapsed_time_counter                    hpx/performance_counters/server/elapsed_time_counter.hpp
-server::raw_counter                             hpx/performance_counters/server/raw_counter.hpp
+server::aggregating_counter
+    hpx/performance_counters/server/aggregating_counter.hpp
+server::base_performance_counter
+    hpx/performance_counters/server/base_performance_counter.hpp
+server::elapsed_time_counter
+    hpx/performance_counters/server/elapsed_time_counter.hpp
+server::raw_counter
+    hpx/performance_counters/server/raw_counter.hpp
 
-stubs::performance_counter                      hpx/performance_counters/stubs/performance_counter.hpp
+stubs::performance_counter
+    hpx/performance_counters/stubs/performance_counter.hpp
 
-parcels::count_and_time_data_point              hpx/performance_counters/parcels/count_and_time_data_point.hpp
-parcels::count_time_stats                       hpx/performance_counters/parcels/count_time_stats.hpp
-parcels::data_point                             hpx/performance_counters/parcels/data_point.hpp
-parcels::gatherer                               hpx/performance_counters/parcels/gatherer.hpp
+parcels::count_and_time_data_point
+    hpx/performance_counters/parcels/count_and_time_data_point.hpp
+parcels::count_time_stats
+    hpx/performance_counters/parcels/count_time_stats.hpp
+parcels::data_point
+    hpx/performance_counters/parcels/data_point.hpp
+parcels::gatherer
+    hpx/performance_counters/parcels/gatherer.hpp
 
 * macros
 
 * enums
-counter_type                                    hpx/performance_counters/counters.hpp
-counter_status                                  hpx/performance_counters/counters.hpp
+counter_type
+    hpx/performance_counters/counters.hpp
+counter_status
+    hpx/performance_counters/counters.hpp

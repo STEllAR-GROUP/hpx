@@ -6,11 +6,13 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_STORE_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_STORE_HPP
 
-#include <boost/optional.hpp>
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
-#include <boost/format.hpp>
+#include <hpx/config.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/exception.hpp>
+
+#include <boost/optional.hpp>
+#include <boost/format.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "certificate.hpp"
@@ -114,8 +116,8 @@ namespace hpx { namespace components { namespace security
                     hpx::security_error
                   , "certificate_store::insert"
                   , boost::str(boost::format(
-                        "The issuer can't delegated the requested capabilities: %1% %2%") %
-                        issuer_capability % certificate.get_capability())
+                      "The issuer can't delegated the requested capabilities: %1% %2%") %
+                      issuer_capability % certificate.get_capability())
                 )
             }
 
@@ -184,5 +186,7 @@ namespace hpx { namespace components { namespace security
         store_type store_;
     };
 }}}
+
+#endif
 
 #endif

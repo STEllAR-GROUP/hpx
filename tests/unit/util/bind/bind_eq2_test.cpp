@@ -42,7 +42,7 @@ template< class F > void test_self_equal( F f )
 
     HPX_TEST( function_equal( f, f ) );
 }
- 
+
 int main()
 {
     test_self_equal( hpx::util::bind( f, placeholders::_1 ) );

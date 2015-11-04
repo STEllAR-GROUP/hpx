@@ -70,12 +70,14 @@ void print_data(double elapsed, std::size_t size, std::size_t iterations)
 }
 
 inline std::pair<std::size_t, std::vector<hpx::util::remote_locality_result> >
-distribute_component(std::vector<hpx::id_type> localities, hpx::components::component_type type);
+distribute_component(std::vector<hpx::id_type> localities,
+    hpx::components::component_type type);
 
 HPX_PLAIN_ACTION(distribute_component);
 
 inline std::pair<std::size_t, std::vector<hpx::util::remote_locality_result> >
-distribute_component(std::vector<hpx::id_type> localities, hpx::components::component_type type)
+distribute_component(std::vector<hpx::id_type> localities,
+    hpx::components::component_type type)
 {
     typedef hpx::util::remote_locality_result value_type;
     typedef std::pair<std::size_t, std::vector<value_type> > result_type;
@@ -106,15 +108,17 @@ distribute_component(std::vector<hpx::id_type> localities, hpx::components::comp
     if(localities.size() > 1)
     {
         std::size_t half = (localities.size() / 2) + 1;
-        std::vector<hpx::id_type> locs_first(localities.begin() + 1, localities.begin() + half);
-        std::vector<hpx::id_type> locs_second(localities.begin() + half, localities.end());
+        std::vector<hpx::id_type> locs_first(localities.begin()
+            + 1, localities.begin() + half);
+        std::vector<hpx::id_type> locs_second(localities.begin() + half,
+            localities.end());
 
 
         if(locs_first.size() > 0)
         {
             hpx::lcos::packaged_action<distribute_component_action, result_type > p;
             hpx::id_type id = locs_first[0];
-            p.apply(hpx::launch::async, id, boost::move(locs_first), type);
+            p.apply(hpx::launch::async, id, std::move(locs_first), type);
             components_futures.push_back(
                 p.get_future()
             );
@@ -124,7 +128,7 @@ distribute_component(std::vector<hpx::id_type> localities, hpx::components::comp
         {
             hpx::lcos::packaged_action<distribute_component_action, result_type > p;
             hpx::id_type id = locs_second[0];
-            p.apply(hpx::launch::async, id, boost::move(locs_second), type);
+            p.apply(hpx::launch::async, id, std::move(locs_second), type);
             components_futures.push_back(
                 p.get_future()
             );
@@ -143,7 +147,7 @@ distribute_component(std::vector<hpx::id_type> localities, hpx::components::comp
 
         std::size_t ct = 0, pos = 0;
 
-        BOOST_FOREACH(hpx::future<result_type> & f, components_futures)
+        for (hpx::future<result_type>& f : components_futures)
         {
             if(f.is_ready())
             {
@@ -173,7 +177,7 @@ inline std::vector<hpx::id_type> create_components(params const & p)
     hpx::id_type id = localities[0];
     hpx::future<std::pair<std::size_t, std::vector<hpx::util::remote_locality_result> > >
         async_result = hpx::async<distribute_component_action>(
-            id, boost::move(localities), type);
+            id, std::move(localities), type);
 
     std::vector<hpx::id_type> components;
 
@@ -185,12 +189,12 @@ inline std::vector<hpx::id_type> create_components(params const & p)
 
     std::vector<hpx::util::locality_result> res;
     res.reserve(result.second.size());
-    BOOST_FOREACH(hpx::util::remote_locality_result const & rl, result.second)
+    for (hpx::util::remote_locality_result const& rl : result.second)
     {
         res.push_back(rl);
     }
 
-    BOOST_FOREACH(hpx::id_type id, hpx::util::locality_results(res))
+    for (hpx::id_type const& id : hpx::util::locality_results(res))
     {
         //hpx::apply<typename Component::run_action>(id, p);
         components.push_back(id);

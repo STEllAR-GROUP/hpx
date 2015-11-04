@@ -60,12 +60,12 @@ function(hpx_setup_target target)
   endif()
 
   set(nohpxinit FALSE)
-  if(target_NOHPXINIT)
+  if(target_NOHPX_INIT)
     set(nohpxinit TRUE)
   endif()
 
   set(target_STATIC_LINKING OFF)
-  if(HPX_STATIC_LINKING)
+  if(HPX_WITH_STATIC_LINKING)
     set(target_STATIC_LINKING ON)
   else()
     if(POLICY CMP0045)
@@ -119,6 +119,7 @@ function(hpx_setup_target target)
         VERSION ${HPX_LIBRARY_VERSION}
         SOVERSION ${HPX_SOVERSION})
     endif()
+    hpx_set_lib_name(${target} ${name})
     set_target_properties(${target}
       PROPERTIES
       # create *nix style library versions + symbolic links
@@ -145,6 +146,7 @@ function(hpx_setup_target target)
         VERSION ${HPX_LIBRARY_VERSION}
         SOVERSION ${HPX_SOVERSION})
     endif()
+    hpx_set_lib_name(${target} ${name})
     set_target_properties(${target}
       PROPERTIES
       # create *nix style library versions + symbolic links
@@ -155,8 +157,8 @@ function(hpx_setup_target target)
 
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
-                 "HPX_COMPONENT_NAME=${name}"
-                 "HPX_COMPONENT_STRING=\"${name}\""
+                 "HPX_COMPONENT_NAME=hpx_${name}"
+                 "HPX_COMPONENT_STRING=\"hpx_${name}\""
                  "HPX_COMPONENT_EXPORTS")
   endif()
 
@@ -191,9 +193,9 @@ function(hpx_setup_target target)
   if(NOT target_NOLIBS)
     set(hpx_libs hpx)
     if(NOT target_STATIC_LINKING)
-      set(hpx_libs ${hpx_libs} hpx_serialization)
+      set(hpx_libs ${hpx_libs})
       if(NOT nohpxinit)
-        set(hpx_libs ${hpx_libs} hpx_init)
+        set(hpx_libs hpx_init ${hpx_libs})
       endif()
     endif()
     hpx_handle_component_dependencies(target_COMPONENT_DEPENDENCIES)

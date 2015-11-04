@@ -6,6 +6,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
+
 #include <iostream>
 #include <boost/format.hpp>
 
@@ -112,7 +114,7 @@ struct timer : clocksource<BaseClock>
 struct driver
 {
     // Parses the command line.
-    driver(int argc, char** argv);
+    driver(int argc, char** argv, bool allow_unregistered = false);
 
     virtual ~driver() {}
 
@@ -122,6 +124,11 @@ struct driver
     boost::uint64_t tasks_;
     boost::uint64_t payload_duration_;
     io_type         io_;
+
+    // hold on to command line
+    int argc_;
+    char** argv_;
+    bool allow_unregistered_;
 };
 
 }

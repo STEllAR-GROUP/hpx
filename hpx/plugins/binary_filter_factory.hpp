@@ -67,8 +67,8 @@ namespace hpx { namespace plugins
         ///
         /// return Returns the newly created instance of the message handler
         ///        supported by this factory
-        util::binary_filter* create(bool compress,
-            util::binary_filter* next_filter = 0)
+        serialization::binary_filter* create(bool compress,
+            serialization::binary_filter* next_filter = 0)
         {
             if (isenabled_)
                 return new BinaryFilter(compress, next_filter);

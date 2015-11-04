@@ -6,23 +6,30 @@
 #if !defined(HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM)
 #define HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM
 
-#include <hpx/hpx_fwd.hpp>
-
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_client.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/future_access.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
 #include <utility>
+#include <vector>
+
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/has_xxx.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -36,11 +43,6 @@ namespace hpx { namespace components
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
-    struct is_client
-      : boost::mpl::false_
-    {};
-
     template <typename Derived>
     struct is_client<Derived,
         typename util::always_void<typename Derived::stub_argument_type>::type
@@ -54,14 +56,14 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct is_future<Derived,
-        typename boost::enable_if<is_client<Derived> >::type>
+        typename boost::enable_if_c<is_client<Derived>::value>::type>
       : boost::mpl::true_
     {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct future_traits<Derived,
-        typename boost::enable_if<is_client<Derived> >::type>
+        typename boost::enable_if_c<is_client<Derived>::value>::type>
     {
         typedef naming::id_type type;
     };
@@ -69,10 +71,10 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct future_access<Derived,
-        typename boost::enable_if<is_client<Derived> >::type>
+        typename boost::enable_if_c<is_client<Derived>::value>::type>
     {
         BOOST_FORCEINLINE static
-        typename lcos::detail::shared_state_ptr<naming::id_type>::type const&
+        typename traits::detail::shared_state_ptr<naming::id_type>::type const&
         get_shared_state(Derived const& client)
         {
             return client.share().shared_state_;
@@ -82,7 +84,7 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
     struct acquire_future_impl<Derived,
-        typename boost::enable_if<is_client<Derived> >::type>
+        typename boost::enable_if_c<is_client<Derived>::value>::type>
     {
         typedef Derived type;
 
@@ -176,7 +178,8 @@ namespace hpx { namespace components
           : gid_(rhs.gid_)
         {}
         explicit client_base(client_base && rhs)
-          : gid_(std::move(rhs.gid_))
+          : registered_name_(std::move(rhs.registered_name_)),
+            gid_(std::move(rhs.gid_))
         {}
 
         // A future to a client_base can be unwrapped to represent the
@@ -185,6 +188,15 @@ namespace hpx { namespace components
         client_base(future<Derived> && d)
           : gid_(d.then(detail::client_unwrapper<Derived>()))
         {}
+
+        ~client_base()
+        {
+            if (!registered_name_.empty())
+            {
+                error_code ec;      // ignore all exceptions
+                agas::unregister_name_sync(registered_name_, ec);
+            }
+        }
 
         // copy assignment and move assignment
         client_base& operator=(naming::id_type const & gid)
@@ -217,11 +229,13 @@ namespace hpx { namespace components
         client_base& operator=(client_base const & rhs)
         {
             gid_ = rhs.gid_;
+            registered_name_.clear();
             return *this;
         }
         client_base& operator=(client_base && rhs)
         {
             gid_ = std::move(rhs.gid_);
+            registered_name_ = std::move(rhs.registered_name_);
             return *this;
         }
 
@@ -259,7 +273,14 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
         naming::id_type const & get_gid() const
+        {
+            return gid_.get();
+        }
+
+#endif
+        naming::id_type const & get_id() const
         {
             return gid_.get();
         }
@@ -304,71 +325,64 @@ namespace hpx { namespace components
             return gid_.is_ready();
         }
 
+        void wait() const
+        {
+            return gid_.wait();
+        }
+
         ///////////////////////////////////////////////////////////////////////
     protected:
-        static void register_as_helper(shared_future<naming::id_type> f,
+        static void register_as_helper(shared_future<naming::id_type> && f,
             std::string const& symbolic_name)
         {
             hpx::agas::register_name(symbolic_name, f.get());
+        }
+
+        void reset_registered_name()
+        {
+            registered_name_.clear();
         }
 
     public:
         // Register our id with AGAS using the given name
         future<void> register_as(std::string const& symbolic_name)
         {
-            using util::placeholders::_1;
-            return gid_.then(util::bind(
-                &client_base::register_as_helper, _1, symbolic_name));
+            HPX_ASSERT(registered_name_.empty());   // call only once
+            registered_name_ = symbolic_name;
+
+            return gid_.then(util::bind(&client_base::register_as_helper,
+                util::placeholders::_1, symbolic_name));
         }
 
         // Retrieve the id associated with the given name and use it to
         // initialize this client_base instance.
-        //
-        // F is expected to reset the underlying client_base, it is passed the
-        // future<id_type> returned from on_symbol_namespace_event()
-        template <typename F>
-        future<void> connect_to(std::string const& symbolic_name, F && f)
+        void connect_to(std::string const& symbolic_name)
         {
-            return agas::on_symbol_namespace_event(
-                symbolic_name, agas::symbol_ns_bind, true)
-                    .then(std::forward<F>(f));
+            gid_ = agas::on_symbol_namespace_event(symbolic_name,
+                agas::symbol_ns_bind, true).share();
         }
 
     protected:
-        void connect_to_helper(future<naming::id_type> f)
+        template <typename F>
+        static typename lcos::detail::future_then_result<client_base, F>::cont_result
+        on_ready(future_type && fut, F f)
         {
-            gid_ = f.share();
+            return f(client_base(std::move(fut)));
         }
 
     public:
-        future<void> connect_to(std::string const& symbolic_name)
+        template <typename F>
+        typename lcos::detail::future_then_result<client_base, F>::type
+        then(F && f)
         {
-            using util::placeholders::_1;
-            return connect_to(symbolic_name,
-                util::bind(&client_base::connect_to_helper, this, _1));
+            typedef typename util::decay<F>::type func_type;
+            return gid_.then(util::bind(
+                util::one_shot(&client_base::template on_ready<func_type>),
+                util::placeholders::_1, std::forward<F>(f)));
         }
 
-//     protected:
-//         template <typename F>
-//         static typename lcos::detail::future_then_result<client_base, F>::cont_result
-//         on_ready(future_type fut, F && f)
-//         {
-//             return f(Derived(fut));
-//         }
-//
-//     public:
-//         template <typename F>
-//         typename lcos::detail::future_then_result<client_base, F>::type
-//         then(F && f)
-//         {
-//             typedef typename util::decay<F>::type func_type;
-//             return gid_.then(util::bind(
-//                 util::one_shot(&client_base::on_ready<func_type>),
-//                 std::forward<F>(f)));
-//         }
-
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
@@ -377,8 +391,84 @@ namespace hpx { namespace components
         }
 
     protected:
+        // will be set for created (non-attached) objects
+        std::string registered_name_;
         future_type gid_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, Client
+    >::type
+    make_client(hpx::id_type const& id)
+    {
+        return Client(id);
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, Client
+    >::type
+    make_client(hpx::future<hpx::id_type> const& id)
+    {
+        return Client(id);
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, Client
+    >::type
+    make_client(hpx::future<hpx::id_type> && id)
+    {
+        return Client(std::move(id));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_client(std::vector<hpx::id_type> const& ids)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::id_type const& id: ids)
+        {
+            result.push_back(Client(id));
+        }
+        return result;
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_client(std::vector<hpx::future<hpx::id_type> > const& ids)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::future<hpx::id_type> const& id: ids)
+        {
+            result.push_back(Client(id));
+        }
+        return result;
+    }
+
+    template <typename Client>
+    inline typename boost::enable_if_c<
+        traits::is_client<Client>::value, std::vector<Client>
+    >::type
+    make_client(std::vector<hpx::future<hpx::id_type> > && ids)
+    {
+        std::vector<Client> result;
+        result.reserve(ids.size());
+        for (hpx::future<hpx::id_type>& id: ids)
+        {
+            result.push_back(Client(std::move(id)));
+        }
+        return result;
+    }
 }}
 
 #endif

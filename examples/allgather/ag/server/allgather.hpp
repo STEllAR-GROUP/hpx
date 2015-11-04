@@ -9,16 +9,16 @@
 #include <vector>
 #include <queue>
 
-#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace ag { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT allgather
-      : public hpx::components::managed_component_base<allgather>
+      : public hpx::components::component_base<allgather>
     {
     public:
         allgather()

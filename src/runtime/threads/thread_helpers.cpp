@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,13 +6,14 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
+#include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/util/register_locks.hpp>
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#include <hpx/util/thread_specific_ptr.hpp>
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
 
@@ -25,20 +26,11 @@ namespace hpx { namespace threads
     thread_state set_thread_state(thread_id_type const& id, thread_state_enum state,
         thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::threads::set_thread_state",
-                "global applier object is not accessible");
-            return thread_state(unknown);
-        }
-
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().set_state(id, state, stateex,
-            priority, ec);
+        return  detail::set_thread_state(id, state, stateex,
+            priority, std::size_t(-1), ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -46,334 +38,290 @@ namespace hpx { namespace threads
         util::steady_time_point const& abs_time, thread_state_enum state,
         thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::threads::set_thread_state",
-                "global applier object is not accessible");
-            return invalid_thread_id;
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return app->get_thread_manager().set_state(abs_time, id,
-            state, stateex, priority, ec);
+        return detail::set_thread_state_timed(*id->get_scheduler_base(), abs_time, id,
+            state, stateex, priority, std::size_t(-1), ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     thread_state get_thread_state(thread_id_type const& id, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::threads::get_thread_state",
-                "global applier object is not accessible");
-            return thread_state(unknown);
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return app->get_thread_manager().get_state(id);
+        return id ? id->get_state() : thread_state(terminated);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     std::size_t get_thread_phase(thread_id_type const& id, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::threads::get_thread_phase",
-                "global applier object is not accessible");
-            return std::size_t(~0);
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return app->get_thread_manager().get_phase(id);
+        return id ? id->get_thread_phase() : std::size_t(~0);;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threads::thread_priority get_thread_priority(thread_id_type const& id, error_code& ec)
+    threads::thread_priority get_thread_priority(thread_id_type const& id,
+        error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::threads::get_thread_priority",
-                "global applier object is not accessible");
-            return threads::thread_priority_unknown;
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return app->get_thread_manager().get_priority(id);
+        return id ? id->get_priority() : thread_priority_unknown;
     }
 
+    /// The get_stack_size function is part of the thread related API. It
     std::ptrdiff_t get_stack_size(thread_id_type const& id, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::threads::get_stack_size",
-                "global applier object is not accessible");
-            return threads::thread_priority_unknown;
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return app->get_thread_manager().get_stack_size(id);
+        return id ? id->get_stack_size() :
+            static_cast<std::ptrdiff_t>(thread_stacksize_unknown);
     }
 
     void interrupt_thread(thread_id_type const& id, bool flag, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::interrupt_thread",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return;
         }
-        app->get_thread_manager().interrupt(id, flag, ec);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        id->interrupt(flag);      // notify thread
+
+        // set thread state to pending, if the thread is currently active,
+        // this will be rescheduled until it calls an interruption point
+        set_thread_state(id, pending, wait_abort,
+            thread_priority_normal, ec);
     }
 
     void interruption_point(thread_id_type const& id, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::interruption_point",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return;
         }
-        app->get_thread_manager().interruption_point(id, ec);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        id->interruption_point();      // notify thread
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool get_thread_interruption_enabled(thread_id_type const& id,
         error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
                 "hpx::threads::get_thread_interruption_enabled",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return false;
         }
-        return app->get_thread_manager().get_interruption_enabled(id, ec);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return id->interruption_enabled();
     }
 
     bool set_thread_interruption_enabled(thread_id_type const& id, bool enable,
         error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
                 "hpx::threads::get_thread_interruption_enabled",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return false;
         }
-        return app->get_thread_manager().set_interruption_enabled(id, enable, ec);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return id->set_interruption_enabled(enable);
     }
 
     bool get_thread_interruption_requested(thread_id_type const& id,
         error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_thread_interruption_requested",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return false;
         }
-        return app->get_thread_manager().get_interruption_requested(id, ec);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return id->interruption_requested();
     }
 
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
     ///////////////////////////////////////////////////////////////////////////
     std::size_t get_thread_data(thread_id_type const& id, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_thread_data",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return 0;
         }
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return app->get_thread_manager().get_thread_data(id, ec);
+        return id->get_thread_data();
     }
 
-    std::size_t set_thread_data(thread_id_type const& id, std::size_t d,
+    std::size_t set_thread_data(thread_id_type const& id, std::size_t data,
         error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::set_thread_data",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return 0;
         }
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return app->get_thread_manager().set_thread_data(id, d, ec);
+        return id->set_thread_data(data);
     }
 #endif
+
+    ////////////////////////////////////////////////////////////////////////////
+    struct continuation_recursion_count_tag {};
+    static util::thread_specific_ptr<
+            std::size_t, continuation_recursion_count_tag
+        > continuation_recursion_count;
+
+    std::size_t& get_continuation_recursion_count()
+    {
+        thread_self* self_ptr = get_self_ptr();
+        if (self_ptr)
+            return self_ptr->get_continuation_recursion_count();
+
+        if (0 == continuation_recursion_count.get())
+            continuation_recursion_count.reset(new std::size_t(0));
+
+        return *continuation_recursion_count.get();
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     void run_thread_exit_callbacks(thread_id_type const& id, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::run_thread_exit_callbacks",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return;
         }
-        app->get_thread_manager().run_thread_exit_callbacks(id, ec);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        id->run_thread_exit_callbacks();
     }
 
     bool add_thread_exit_callback(thread_id_type const& id,
         util::function_nonser<void()> const& f, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::add_thread_exit_callback",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return false;
         }
-        return app->get_thread_manager().add_thread_exit_callback(id, f, ec);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return id->add_thread_exit_callback(f);
     }
 
     void free_thread_exit_callbacks(thread_id_type const& id, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::add_thread_exit_callback",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return;
         }
-        app->get_thread_manager().free_thread_exit_callbacks(id, ec);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        id->free_thread_exit_callbacks();
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// The get_thread_description function is part of the thread related API and
+    /// allows to query the description of one of the thread id
     char const* get_thread_description(thread_id_type const& id, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "hpx::threads::get_thread_description",
-                "global applier object is not accessible");
-            return NULL;
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return app->get_thread_manager().get_description(id);
+        return id ? id->get_description() : "<unknown>";
     }
+
     char const* set_thread_description(thread_id_type const& id,
         char const* desc, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::set_thread_description",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return NULL;
         }
-
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().set_description(id, desc);
+        return id->set_description(desc);
     }
 
     char const* get_thread_lco_description(thread_id_type const& id,
         error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_thread_lco_description",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return NULL;
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().get_lco_description(id);
+        return id ? id->get_lco_description() : "<unknown>";
     }
     char const* set_thread_lco_description(thread_id_type const& id,
         char const* desc, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::set_thread_lco_description",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return NULL;
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().set_lco_description(id, desc);
+        if (id)
+            return id->set_lco_description(desc);
+        return NULL;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
     char const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
 #else
     util::backtrace const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
 #endif
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_thread_backtrace",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return NULL;
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().get_backtrace(id);
+        return id ? id->get_backtrace() : 0;
     }
 
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
     char const* set_thread_backtrace(thread_id_type const& id,
         char const* bt, error_code& ec)
 #else
@@ -381,33 +329,33 @@ namespace hpx { namespace threads
         util::backtrace const* bt, error_code& ec)
 #endif
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::set_thread_backtrace",
-                "global applier object is not accessible");
+                "NULL thread id encountered");
             return NULL;
         }
 
         if (&ec != &throws)
             ec = make_success_code();
 
-        return app->get_thread_manager().set_backtrace(id, bt);
+        return id ? id->set_backtrace(bt) : 0;
     }
 
-    threads::executor get_executor(thread_id_type const& id, error_code& ec)
+    threads::executors::current_executor
+        get_executor(thread_id_type const& id, error_code& ec)
     {
-        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
-        if (NULL == app)
-        {
-            HPX_THROWS_IF(ec, invalid_status,
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
                 "hpx::threads::get_executor",
-                "global applier object is not accessible");
-            return default_executor();
+                "NULL thread id encountered");
+            return executors::current_executor(0);
         }
 
-        return app->get_thread_manager().get_executor(id, ec);
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return executors::current_executor(id->get_scheduler_base());
     }
 }}
 
@@ -435,18 +383,18 @@ namespace hpx { namespace this_thread
             error_code& ec_;
         };
 
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
         struct reset_backtrace
         {
             reset_backtrace(threads::thread_id_type const& id, error_code& ec)
               : id_(id),
                 backtrace_(new hpx::util::backtrace()),
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
                 full_backtrace_(backtrace_->trace()),
 #endif
                 ec_(ec)
             {
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
                 threads::set_thread_backtrace(id_, full_backtrace_.c_str(), ec_);
 #else
                 threads::set_thread_backtrace(id_, backtrace_.get(), ec_);
@@ -459,7 +407,7 @@ namespace hpx { namespace this_thread
 
             threads::thread_id_type id_;
             boost::scoped_ptr<hpx::util::backtrace> backtrace_;
-#ifdef HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
             std::string full_backtrace_;
 #endif
             error_code& ec_;
@@ -491,10 +439,10 @@ namespace hpx { namespace this_thread
 #ifdef HPX_HAVE_VERIFY_LOCKS
             util::verify_no_locks();
 #endif
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
             detail::reset_lco_description desc(id, description, ec);
 #endif
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             detail::reset_backtrace bt(id, ec);
 #endif
 
@@ -542,19 +490,27 @@ namespace hpx { namespace this_thread
             // verify that there are no more registered locks for this OS-thread
             util::verify_no_locks();
 #endif
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
             detail::reset_lco_description desc(id, description, ec);
 #endif
-#ifdef HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             detail::reset_backtrace bt(id, ec);
 #endif
-            threads::set_thread_state(id,
-                abs_time, threads::pending, threads::wait_signaled,
+            threads::thread_id_type timer_id = threads::set_thread_state(id,
+                abs_time, threads::pending, threads::wait_timeout,
                 threads::thread_priority_boost, ec);
             if (ec) return threads::wait_unknown;
 
             // suspend the HPX-thread
             statex = self.yield(threads::suspended);
+
+            if (statex != threads::wait_timeout)
+            {
+                error_code ec(lightweight);    // do not throw
+                threads::set_thread_state(timer_id,
+                    threads::pending, threads::wait_abort,
+                    threads::thread_priority_boost, ec);
+            }
         }
 
         // handle interruption, if needed
@@ -575,6 +531,13 @@ namespace hpx { namespace this_thread
             ec = make_success_code();
 
         return statex;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threads::executors::current_executor
+        get_executor(error_code& ec)
+    {
+        return threads::get_executor(threads::get_self_id(), ec);
     }
 }}
 

@@ -25,8 +25,8 @@ namespace jacobi
             HPX_ASSERT(top.id);
             HPX_ASSERT(bottom.id);
             HPX_ASSERT(top.id != bottom.id);
-            HPX_ASSERT(this->get_gid() != top.id);
-            HPX_ASSERT(this->get_gid() != bottom.id);
+            HPX_ASSERT(this->get_unmanaged_id() != top.id);
+            HPX_ASSERT(this->get_unmanaged_id() != bottom.id);
 
             std::vector<hpx::lcos::future<void> > fs;
             for(std::size_t x = 1; x < nx-1; x += line_block)
@@ -101,11 +101,11 @@ namespace jacobi
     }
 }
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     jacobi::server::stencil_iterator
 > stencil_iterator_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(stencil_iterator_type, stencil_iterator);
+HPX_REGISTER_COMPONENT(stencil_iterator_type, stencil_iterator);
 
 
 HPX_REGISTER_ACTION(

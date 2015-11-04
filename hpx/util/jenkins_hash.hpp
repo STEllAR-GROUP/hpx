@@ -10,11 +10,13 @@
 #include <boost/cstdint.hpp>
 
 #if defined(JENKINS_HASH_HAS_SERIALIZATION_SUPPORT)
-#include <boost/serialization/serialization.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #endif
 
+#include <string>
+
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -215,12 +217,12 @@ namespace hpx { namespace util
 
 #if defined(JENKINS_HASH_HAS_SERIALIZATION_SUPPORT)
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version)
         {
-            ar & boost::serialization::make_nvp("seed", seed_);
+            ar & seed_;
         }
 #endif
     };

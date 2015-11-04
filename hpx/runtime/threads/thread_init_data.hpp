@@ -7,7 +7,7 @@
 #if !defined(HPX_THREAD_INIT_DATA_SEP_22_2009_1034AM)
 #define HPX_THREAD_INIT_DATA_SEP_22_2009_1034AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/move.hpp>
@@ -22,13 +22,13 @@ namespace hpx { namespace threads
     {
         thread_init_data()
           : func(),
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
             lva(0),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description(0),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id(0), parent_id(0), parent_phase(0),
 #endif
             priority(thread_priority_normal),
@@ -39,13 +39,13 @@ namespace hpx { namespace threads
 
         thread_init_data(thread_init_data && rhs)
           : func(std::move(rhs.func)),
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
             lva(rhs.lva),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description(rhs.description),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id(rhs.parent_locality_id), parent_id(rhs.parent_id),
             parent_phase(rhs.parent_phase),
 #endif
@@ -65,13 +65,13 @@ namespace hpx { namespace threads
                 naming::id_type const& target_ = naming::invalid_id,
                 policies::scheduler_base* scheduler_base_ = 0)
           : func(std::forward<F>(f)),
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
             lva(lva_),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description(desc),
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id(0), parent_id(0), parent_phase(0),
 #endif
             priority(priority_), num_os_thread(os_thread),
@@ -83,13 +83,13 @@ namespace hpx { namespace threads
 
         threads::thread_function_type func;
 
-#if defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
         naming::address::address_type lva;
 #endif
-#if defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
         char const* description;
 #endif
-#if defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         boost::uint32_t parent_locality_id;
         threads::thread_id_repr_type parent_id;
         std::size_t parent_phase;

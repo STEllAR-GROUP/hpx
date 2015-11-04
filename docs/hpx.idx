@@ -19,11 +19,11 @@ find_all_localities                   "" "hpx\.find_all_localities.*"
 find_remote_localities                "" "hpx\.find_remote_localities.*"
 find_locality                         "" "hpx\.find_locality.*"
 
-find_all_ids_from_basename            "" "hpx\.find_all_ids_from_basename.*"
-find_ids_from_basename                "" "hpx\.find_ids_from_basename.*"
-find_id_from_basename                 "" "hpx\.find_id_from_basename.*"
-register_id_with_basename             "" "hpx\.register_id_with_basename.*"
-unregister_id_with_basename           "" "hpx\.unregister_id_with_basename.*"
+# hpx/runtime/basename_registration.hpp
+find_all_from_basename                "" "hpx\.find_all_from_basename.*"
+find_from_basename                    "" "hpx\.find_from_basenam_id.*"
+register_with_basename                "" "hpx\.register_with_bas_id.*"
+unregister_with_basename              "" "hpx\.unregister_with_basename.*"
 
 get_num_localities_sync               "" "hpx\.get_num_localitie_id.*"
 get_num_localities                    "" "hpx\.get_num_localitie_id.*"
@@ -45,13 +45,16 @@ is_stopped_or_shutting_down           "" "hpx\.is_stopped_or_shutting_down.*"
 
 get_worker_thread_num                 "" "hpx\.get_worker_thread_num.*"
 get_thread_name                       "" "hpx\.get_thread_name.*"
-get_locality_name                     "" "hpx\.get_locality_name.*"
 get_num_worker_threads                "" "hpx\.get_num_worker_threads.*"
+
+# hpx/runtime/get_locality_name.hpp
+get_locality_name                     "" "hpx\.get_locality_name.*"
 
 get_system_uptime                     "" "hpx\.get_system_uptime.*"
 get_colocation_id                     "" "hpx\.get_colocation_id.*"
 get_colocation_id_sync                "" "hpx\.get_colocation_id_sync.*"
 
+# hpx/runtime/trigger_lco.hpp
 trigger_lco_event                     "" "hpx\.trigger_lco_event.*"
 set_lco_event                         "" "hpx\.set_lco_event.*"
 set_lco_value                         "" "hpx\.set_lco_value.*"
@@ -62,6 +65,7 @@ reset_active_counters                 "" "hpx\.reset_active_counters.*"
 stop_active_counters                  "" "hpx\.stop_active_counters.*"
 evaluate_active_counters              "" "hpx\.evaluate_active_counters.*"
 
+# hpx/runtime/set_parcel_write_handler.hpp
 set_parcel_write_handler              "" "hpx\.set_parcel_write_.*"
 parcel_write_handler_type             "" "hpx\.parcel_write_hand.*"
 
@@ -74,14 +78,68 @@ migrate_to_storage                    "" "hpx\.components\.migrate_to_s.*"
 # hpx/parallel/execution_policy.hpp
 parallel::execution_policy                 "execution_policy"               "hpx\.parallel\.v1\.execution_policy.*"
 parallel::parallel_execution_policy        "parallel_execution_policy"      "hpx\.parallel\.v1\.parallel_exec.*"
-parallel::parallel_task_execution_policy   "parallel_task_execution_policy" "hpx\.parallel\.v1\.parallel_task_exec.*"
+parallel::parallel_execution_policy_shim   "parallel_execution_policy_shim" "hpx\.parallel\.v1\.parallel_exec.*"
+parallel::parallel_task_execution_policy   "parallel_task_execution_policy" "hpx\.parallel\.v1\.parallel_task_exe_.*"
+parallel::parallel_task_execution_policy_shim "parallel_task_execution_policy_shim" "hpx\.parallel\.v1\.parallel_task_exe_.*"
 parallel::sequential_execution_policy      "sequential_execution_policy"    "hpx\.parallel\.v1\.sequential_exec.*"
-parallel::sequential_task_execution_policy "sequential_task_execution_policy" "hpx\.parallel\.v1\.sequential_task_exec.*"
-parallel::vector_execution_policy          "vector_execution_policy"        "hpx\.parallel\.v1\.vector_exec.*"
-parallel::is_execution_policy              "is_execution_policy"            "hpx\.parallel\.v1\.is_execution_policy.*"
-parallel::is_parallel_execution_policy     "is_parallel_execution_policy"   "hpx\.parallel\.v1\.is_parallel_execution_policy.*"
-parallel::is_sequential_execution_policy   "is_sequential_execution_policy" "hpx\.parallel\.v1\.is_sequential_execution_policy.*"
+parallel::sequential_execution_policy_shim "sequential_execution_policy_shim" "hpx\.parallel\.v1\.sequential_exec.*"
+parallel::sequential_task_execution_policy "sequential_task_execution_policy" "hpx\.parallel\.v1\.sequential_task_e.*"
+parallel::sequential_task_execution_policy_shim "sequential_task_execution_policy_shim" "hpx\.parallel\.v1\.sequential_task_e.*"
+parallel::parallel_vector_execution_policy "parallel_vector_execution_policy"        "hpx\.parallel\.v1\.parallel_vector_e.*"
 
+parallel::is_execution_policy              "is_execution_policy"            "hpx\.parallel\.v1\.is_execution_policy.*"
+parallel::is_parallel_execution_policy     "is_parallel_execution_policy"   "hpx\.parallel\.v1\.is_parallel_execu_.*"
+parallel::is_sequential_execution_policy   "is_sequential_execution_policy" "hpx\.parallel\.v1\.is_sequential_exe_.*"
+parallel::is_async_execution_policy        "is_async_execution_policy"            "hpx\.parallel\.v1\.is_async_execution_policy.*"
+
+# hpx/parallel/executors/execution_traits.hpp
+parallel::executor_traits                  "executor_traits"               "hpx\.parallel\.v3\.executor_traits.*"
+parallel::is_executor                      "is_executor"                   "hpx\.parallel\.v3\.is_executor.*"
+parallel::sequential_execution_tag         "sequential_execution_tag"      "hpx\.parallel\.v3\.sequential_execution_tag.*"
+parallel::parallel_execution_tag           "parallel_execution_tag"        "hpx\.parallel\.v3\.parallel_execution_tag.*"
+parallel::vector_execution_tag             "vector_execution_tag"          "hpx\.parallel\.v3\.vector_execution_tag.*"
+
+# hpx/parallel/executors/sequential_executor.hpp
+parallel::sequential_executor              "sequential_executor"           "hpx\.parallel\.v3\.sequential_executor.*"
+
+# hpx/parallel/executors/parallel_executor.hpp
+parallel::parallel_executor                "parallel_executor"             "hpx\.parallel\.v3\.parallel_executor.*"
+
+# hpx/parallel/executors/service_executors.hpp
+parallel::service_executor                 "service_executor"              "hpx\.parallel\.v3\.service_executor.*"
+
+# hpx/parallel/executors/this_thread_executors.hpp
+parallel::this_thread_static_queue_executor          "this_thread_static_queue_executor"    "hpx\.parallel\.v3\.this_thread_static_queue_executor.*"
+parallel::this_thread_static_priority_queue_executor "this_thread_static_priority_queue_executor"  "hpx\.parallel\.v3\.this_thread_static_priority_queue_executor.*"
+
+# hpx/parallel/executors/thread_pool_executors.hpp
+parallel::local_queue_executor              "local_queue_executor"             "hpx\.parallel\.v3\.local_queue_executor.*"
+parallel::local_priority_queue_executor     "local_priority_queue_executor"    "hpx\.parallel\.v3\.local_priority_qu_.*"
+parallel::static_priority_queue_executor    "static_priority_queue_executor"   "hpx\.parallel\.v3\.static_priority_q_.*"
+
+# hpx/parallel/executors/timed_execution_traits.hpp
+parallel::timed_execution_traits            "timed_execution_traits"        "hpx\.parallel\.v3\.timed_execution_traits.*"
+parallel::is_timed_executor                 "is_timed_executor"             "hpx\.parallel\.v3\.is_timed_executor.*"
+
+# hpx/parallel/executors/executor_parameter_traits.hpp
+parallel::executor_parameter_traits      "executor_parameter_traits"        "hpx\.parallel\.v3\.executor_parameter_traits.*"
+parallel::is_executor_parameters         "is_executor_parameters"           "hpx\.parallel\.v3\.is_executor_parameters.*"
+
+# hpx/parallel/executors/static_chunk_size.hpp
+parallel::static_chunk_size                 "static_chunk_size"             "hpx\.parallel\.v3\.static_chunk_size.*"
+
+# hpx/parallel/executors/dynamic_chunk_size.hpp
+parallel::dynamic_chunk_size                "dynamic_chunk_size"            "hpx\.parallel\.v3\.dynamic_chunk_size.*"
+
+# hpx/parallel/executors/guided_chunk_size.hpp
+parallel::guided_chunk_size                 "guided_chunk_size"             "hpx\.parallel\.v3\.guided_chunk_size.*"
+
+# hpx/parallel/executors/auto_chunk_size.hpp
+parallel::auto_chunk_size                   "auto_chunk_size"               "hpx\.parallel\.v3\.auto_chunk_size.*"
+
+
+# hpx/parallel/algorithms/adjacent_difference.hpp
+parallel::adjacent_difference         "adjacent_difference" "hpx\.parallel\.v1\.adjacent_difference.*"
 
 # hpx/parallel/algorithms/adjacent_find.hpp
 parallel::adjacent_find               "adjacent_find" "hpx\.parallel\.v1\.adjacent_find.*"
@@ -125,8 +183,14 @@ parallel::for_each_n                  "for_each_n" "hpx\.parallel\.v1\.for_each_
 parallel::generate                    "generate" "hpx\.parallel\.v1\.generate$"
 parallel::generate_n                  "generate_n" "hpx\.parallel\.v1\.generate_n.*"
 
+# hpx/parallel/algorithms/includes.hpp
+parallel::includes                    "includes" "hpx\.parallel\.v1\.includes.*"
+
 # hpx/parallel/algorithms/inclusive_scan.hpp
 parallel::inclusive_scan              "inclusive_scan" "hpx\.parallel\.v1\.inclusive_scan.*"
+
+# hpx/parallel/algorithms/inner_product.hpp
+parallel::inner_product               "inner_product" "hpx\.parallel\.v1\.inner_product.*"
 
 # hpx/parallel/algorithms/is_partitioned.hpp
 parallel::is_partitioned              "is_partitioned" "hpx\.parallel\.v1\.is_partitioned.*"
@@ -174,13 +238,25 @@ parallel::rotate_copy                 "rotate_copy" "hpx\.parallel\.v1\.rotate_c
 parallel::search                      "search" "hpx\.parallel\.v1\.search_id.*"
 parallel::search_n                    "search_n" "hpx\.parallel\.v1\.search_n.*"
 
+# hpx/parallel/algorithms/set_difference.hpp
+parallel::set_difference              "set_difference" "hpx\.parallel\.v1\.set_difference.*"
+
+# hpx/parallel/algorithms/set_intersection.hpp
+parallel::set_intersection            "set_intersection" "hpx\.parallel\.v1\.set_intersection.*"
+
+# hpx/parallel/algorithms/set_symmetric_difference.hpp
+parallel::set_symmetric_difference    "set_symmetric_difference" "hpx\.parallel\.v1\.set_symmetric_dif.*"
+
+# hpx/parallel/algorithms/set_union.hpp
+parallel::set_union                   "set_union" "hpx\.parallel\.v1\.set_union.*"
+
 # hpx/parallel/algorithms/swap_ranges.hpp
 parallel::swap_ranges                 "swap_ranges" "hpx\.parallel\.v1\.swap_ranges.*"
 
 # hpx/parallel/task_region.hpp
-parallel::task_region                 "task_region" "hpx\.parallel\.v2\.task_region_id.*"
-parallel::task_region_final           "task_region_final" "hpx\.parallel\.v2\.task_region_final.*"
-parallel::task_region_handle          "task_region_handle" "hpx\.parallel\.v2\.task_region_handle.*"
+parallel::define_task_block           "define_task_block" "hpx\.parallel\.v2\.define_task_block.*"
+parallel::define_task_block_restore_thread "define_task_block_restore_thread" "hpx\.parallel\.v2\.define_task_block_.*"
+parallel::task_block                  "task_block" "hpx\.parallel\.v2\.task_block.*"
 parallel::task_canceled_exception     "task_canceled_exception" "hpx\.parallel\.v2\.task_canceled_exception.*"
 
 # hpx/parallel/algorithms/transform.hpp
@@ -196,17 +272,27 @@ parallel::transform_inclusive_scan    "transform_inclusive_scan" "hpx\.parallel\
 parallel::transform_reduce            "transform_reduce" "hpx\.parallel\.v1\.transform_reduce.*"
 
 # hpx/parallel/algorithms/uninitialized_copy.hpp
-parallel::uninitialized_copy            "uninitialized_copy" "hpx\.parallel\.v1\.uninitialized_copy$"
-parallel::uninitialized_copy_n          "uninitialized_copy_n" "hpx\.parallel\.v1\.uninitialized_copy_n.*"
+parallel::uninitialized_copy          "uninitialized_copy" "hpx\.parallel\.v1\.uninitialized_copy$"
+parallel::uninitialized_copy_n        "uninitialized_copy_n" "hpx\.parallel\.v1\.uninitialized_copy_n.*"
 
 # hpx/parallel/algorithms/uninitialized_fill.hpp
-parallel::uninitialized_fill            "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
-parallel::uninitialized_fill_n          "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
+parallel::uninitialized_fill          "uninitialized_fill" "hpx\.parallel\.v1\.uninitialized_fill$"
+parallel::uninitialized_fill_n        "uninitialized_fill_n" "hpx\.parallel\.v1\.uninitialized_fill_n.*"
 
+# hpx/runtime/components/colocating_distribution_policy.hpp
+colocating_distribution_policy        "" "hpx\.components\.colocating_distri_id.*"
+colocated                             "" "hpx\.components\.colocated.*"
+
+# hpx/runtime/components/default_distribution_policy.hpp
+default_distribution_policy           "" "hpx\.components\.default_distribut_id.*"
+default_layout                        "" "hpx\.components\.default_layout.*"
+
+# hpx/runtime/components/binpacking_distribution_policy.hpp
+binpacking_distribution_policy        "" "hpx\.components\.binpacking_distri_id.*"
+binpacked                             '' "hpx\.components\.binpacked.*"
 
 # hpx/runtime/components/new.hpp
-new_                                  "" "hpx\.components\.new_.*"
-new_colocated                         "" "hpx\.components\.new_colocated.*"
+new_                                  "" "hpx\.new_id.*"
 
 # hpx/runtime/components/copy_component.hpp
 copy                                  "" "hpx\.components\.copy.*"
@@ -310,7 +396,7 @@ task_region_not_active                "" "hpx\.error"
 unmanaged                             "" "header\.hpx\.runtime\.naming\.unmanaged.*"
 
 # hpx/runtime/get_ptr.hpp
-get_ptr                               "" "hpx\.get_ptr.*"
+get_ptr                               "" "hpx\.runtime\.get_ptr.*"
 
 # hpx/lcos/broadcast.hpp
 broadcast                             "" "header\.hpx\.lcos\.broadcast.*"
@@ -378,14 +464,15 @@ install_counter_type                  "" "hpx\.performance_counters\.install_cou
 
 # hpx/runtime/actions/action_support.hpp
 HPX_REGISTER_ACTION_DECLARATION           "" "HPX_REGISTER_ACTION_DECLARATION"
-HPX_REGISTER_ACTION_DECLARATION_TEMPLATE  "" "HPX_REGISTER_ACTION_DECLARATION_TEMPLATE"
 HPX_REGISTER_ACTION                       "" "HPX_REGISTER_ACTION"
+HPX_REGISTER_ACTION_ID                    "" "HPX_REGISTER_ACTION_ID"
 
 # hpx/runtime/actions/component_action.hpp
 HPX_DEFINE_COMPONENT_ACTION               "" "HPX_DEFINE_COMPONENT_ACTION"
-HPX_DEFINE_COMPONENT_CONST_ACTION         "" "HPX_DEFINE_COMPONENT_CONST_ACTION"
 
 # hpx/runtime/actions/plain_action.hpp
-HPX_REGISTER_PLAIN_ACTION                 "" "HPX_REGISTER_PLAIN_ACTION"
-HPX_DEFINE_PLAIN_ACTION                   "" "HPX_DEFINE_PLAIN_ACTION"
 HPX_PLAIN_ACTION                          "" "HPX_PLAIN_ACTION"
+HPX_PLAIN_ACTION_ID                       "" "HPX_PLAIN_ACTION_ID"
+
+# hpx/runtime/components/component_factory.hpp
+HPX_REGISTER_COMPONENT                    "" "HPX_REGISTER_COMPONENT"

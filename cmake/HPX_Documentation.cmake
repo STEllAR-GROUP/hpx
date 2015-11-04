@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_BUILD_DOCUMENTATION)
+if(HPX_WITH_DOCUMENTATION)
   find_package(DocBook)
   find_package(BoostQuickBook)
   find_package(Doxygen)
@@ -16,27 +16,27 @@ if(HPX_BUILD_DOCUMENTATION)
   # issue a meaningful warning if part of the documentation toolchain is not available
   if(NOT DOCBOOK_FOUND)
     hpx_error("DocBook DTD or XSL is unavailable, documentation generation disabled. Set DOCBOOK_ROOT to your DocBook installation directory.")
-    set(HPX_BUILD_DOCUMENTATION OFF)
+    set(HPX_WITH_DOCUMENTATION OFF)
   elseif(NOT BOOSTQUICKBOOK_FOUND)
     hpx_error("Boost QuickBook tool is unavailable, documentation generation disabled. Set BOOSTQUICKBOOK_ROOT or BOOST_ROOT to your Boost QuickBook installation directory.")
-    set(HPX_BUILD_DOCUMENTATION OFF)
+    set(HPX_WITH_DOCUMENTATION OFF)
   elseif(NOT XSLTPROC_FOUND)
     hpx_error("xsltproc tool is unavailable, documentation generation disabled. Add the xsltproc executable to your path or set XSLTPROC_ROOT.")
-    set(HPX_BUILD_DOCUMENTATION OFF)
+    set(HPX_WITH_DOCUMENTATION OFF)
   elseif(NOT DOXYGEN_FOUND)
     hpx_error("Doxygen tool is unavailable, API reference will be unavailable. Add the doxygen executable to your path or set the DOXYGEN_EXECUTABLE variable manually.")
-    set(HPX_BUILD_DOCUMENTATION OFF)
+    set(HPX_WITH_DOCUMENTATION OFF)
   elseif(NOT BOOSTAUTOINDEX_FOUND)
     hpx_error("Boost auto_index tool is unavailable, index generation will be disabled. Set BOOSTAUTOINDEX_ROOT to your Boost auto_index installation directory.")
-    set(HPX_BUILD_DOCUMENTATION OFF)
+    set(HPX_WITH_DOCUMENTATION OFF)
   elseif(NOT FOP_FOUND)
     hpx_warn("FOP is unavailable, PDF generation will be disabled. Set FOP_ROOT to your FOP installation directory.")
   endif()
 endif()
 
 
-set(BOOSTBOOK_DTD_PATH "${hpx_SOURCE_DIR}/external/boostbook/dtd/")
-set(BOOSTBOOK_XSL_PATH "${hpx_SOURCE_DIR}/external/boostbook/xsl/")
+set(BOOSTBOOK_DTD_PATH "${PROJECT_SOURCE_DIR}/external/boostbook/dtd/")
+set(BOOSTBOOK_XSL_PATH "${PROJECT_SOURCE_DIR}/external/boostbook/xsl/")
 
 # Generate catalog file for XSLT processing
 macro(hpx_write_boostbook_catalog file)
@@ -70,11 +70,11 @@ macro(hpx_write_boostbook_catalog file)
     #"  />\n"
     "   <rewriteURI\n"
     "    uriStartString=\"http://www.boost.org/tools/boostbook/dtd/\"\n"
-    "    rewritePrefix=\"file:///${hpx_SOURCE_DIR}/external/boostbook/dtd/\"\n"
+    "    rewritePrefix=\"file:///${PROJECT_SOURCE_DIR}/external/boostbook/dtd/\"\n"
     "  />\n"
     "  <rewriteURI\n"
     "    uriStartString=\"http://www.boost.org/tools/boostbook/xsl/\"\n"
-    "    rewritePrefix=\"file:///${hpx_SOURCE_DIR}/external/boostbook/xsl/\"\n"
+    "    rewritePrefix=\"file:///${PROJECT_SOURCE_DIR}/external/boostbook/xsl/\"\n"
     "  />\n"
     "</catalog>\n"
   )
@@ -97,8 +97,8 @@ macro(hpx_quickbook_to_boostbook name)
   endif()
 
   set(git_commit_option "")
-  if(HPX_GIT_COMMIT AND NOT ${HPX_GIT_COMMIT} STREQUAL "")
-    set(git_commit_option "-D__hpx_git_commit__=${HPX_GIT_COMMIT}")
+  if(HPX_WITH_GIT_COMMIT AND NOT ${HPX_WITH_GIT_COMMIT} STREQUAL "")
+    set(git_commit_option "-D__hpx_git_commit__=${HPX_WITH_GIT_COMMIT}")
   endif()
 
   set(doxygen_option "")
@@ -173,10 +173,10 @@ macro(hpx_docbook_to_xslfo name)
     PARAMETERS
       paper.type=USLetter
       admon.graphics.extension=.png
-      img.src.path=${hpx_SOURCE_DIR}/docs/html/
-      boost.graphics.root=${hpx_SOURCE_DIR}/docs/html/images/
-      admon.graphics.path=${hpx_SOURCE_DIR}/docs/html/images/
-      callout.graphics.path=${hpx_SOURCE_DIR}/docs/html/images/
+      img.src.path=${PROJECT_SOURCE_DIR}/docs/html/
+      boost.graphics.root=${PROJECT_SOURCE_DIR}/docs/html/images/
+      admon.graphics.path=${PROJECT_SOURCE_DIR}/docs/html/images/
+      callout.graphics.path=${PROJECT_SOURCE_DIR}/docs/html/images/
       ${${name}_XSLTPROC_ARGS}
     CATALOG ${${name}_CATALOG}
     DEPENDS ${${name}_DEPENDENCIES}

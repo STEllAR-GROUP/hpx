@@ -3,13 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/spinlock.hpp>
 
-#include <boost/foreach.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace util
 {
@@ -30,14 +29,14 @@ namespace hpx { namespace util
         void register_functions(construct_type const& construct,
             destruct_type const& destruct)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             funcs_.push_back(value_type(construct, destruct));
         }
 
         void construct_all()
         {
-            mutex_type::scoped_lock l(mtx_);
-            BOOST_FOREACH(value_type const& val, funcs_)
+            boost::lock_guard<mutex_type> l(mtx_);
+            for (value_type const& val : funcs_)
             {
                 val.first();
             }
@@ -45,8 +44,8 @@ namespace hpx { namespace util
 
         void destruct_all()
         {
-            mutex_type::scoped_lock l(mtx_);
-            BOOST_FOREACH(value_type const& val, funcs_)
+            boost::lock_guard<mutex_type> l(mtx_);
+            for (value_type const& val : funcs_)
             {
                 val.second();
             }

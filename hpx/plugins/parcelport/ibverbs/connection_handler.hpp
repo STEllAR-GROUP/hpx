@@ -39,7 +39,7 @@ namespace hpx { namespace parcelset {
 
         static const char * pool_name()
         {
-            return "parcel_pool_ibverbs";
+            return "parcel-pool-ibverbs";
         }
 
         static const char * pool_name_postfix()
@@ -62,7 +62,8 @@ namespace hpx { namespace parcelset {
             static std::size_t max_memory_chunks(util::runtime_configuration const& ini);
 
             connection_handler(util::runtime_configuration const& ini,
-                util::function_nonser<void(std::size_t, char const*)> const& on_start_thread,
+                util::function_nonser<void(std::size_t, char const*)>
+                    const& on_start_thread,
                 util::function_nonser<void()> const& on_stop_thread);
 
             ~connection_handler();
@@ -78,7 +79,8 @@ namespace hpx { namespace parcelset {
             boost::shared_ptr<sender> create_connection(
                 parcelset::locality const& l, error_code& ec);
 
-            parcelset::locality agas_locality(util::runtime_configuration const & ini) const;
+            parcelset::locality agas_locality(util::runtime_configuration const & ini)
+                const;
 
             parcelset::locality create_locality() const;
 
@@ -86,7 +88,8 @@ namespace hpx { namespace parcelset {
 
             ibv_pd *get_pd(ibv_context *context, boost::system::error_code & ec);
 
-            ibverbs_mr register_buffer(ibv_pd * pd, char * buffer, std::size_t size, int access);
+            ibverbs_mr register_buffer(ibv_pd * pd, char * buffer, std::size_t size,
+                int access);
 
         private:
             // helper functions for receiving parcels
@@ -105,7 +108,8 @@ namespace hpx { namespace parcelset {
 
             typedef std::pair<char *, util::memory_chunk_pool::size_type> chunk_pair;
             typedef boost::cache::entries::lru_entry<ibverbs_mr> mr_cache_entry_type;
-            typedef boost::cache::local_cache<chunk_pair, mr_cache_entry_type> mr_cache_type;
+            typedef boost::cache::local_cache<chunk_pair, mr_cache_entry_type>
+                mr_cache_type;
             /*
             typedef
                 std::map<chunk_pair, ibverbs_mr>

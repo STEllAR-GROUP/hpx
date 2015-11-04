@@ -13,6 +13,4 @@ int main()
 
     seconds s(1);
     nanoseconds ns = duration_cast<seconds>(s);
-
-    return 0;
 }

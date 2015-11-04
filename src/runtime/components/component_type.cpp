@@ -16,22 +16,25 @@ namespace hpx { namespace components
         char const* const names[] =
         {
             "component_runtime_support",                        /*  0 */
-            "component_memory",                                 /*  1 */
-            "component_memory_block",                           /*  2 */
-            "component_base_lco",                               /*  3 */
-            "component_base_lco_with_value",                    /*  4 */
-            "component_barrier",                                /*  5 */
-            "component_promise",                                /*  6 */
+            "component_plain_function",                         /*  1 */
+            "component_memory",                                 /*  2 */
+            "component_memory_block",                           /*  3 */
+            "component_base_lco",                               /*  4 */
+            "component_base_lco_with_value",                    /*  5 */
+            "component_latch",                                  /*  6 (0x60005) */
+            "component_barrier",                                /*  7 (0x70004) */
+            "component_flex_barrier",                           /*  8 (0x80004) */
+            "component_promise",                                /*  9 (0x90005) */
 
-            "component_agas_locality_namespace",                /*  7 */
-            "component_agas_primary_namespace",                 /*  8 */
-            "component_agas_component_namespace",               /*  9 */
-            "component_agas_symbol_namespace",                  /* 10 */
+            "component_agas_locality_namespace",                /* 10 */
+            "component_agas_primary_namespace",                 /* 11 */
+            "component_agas_component_namespace",               /* 12 */
+            "component_agas_symbol_namespace",                  /* 13 */
 
 #if defined(HPX_HAVE_SODIUM)
-            "signed_certificate_promise",                       /* 11 */
-            "component_root_certificate_authority",             /* 12 */
-            "component_subordinate_certificate_authority",      /* 13 */
+            "signed_certificate_promise",                       /* 14 (0xe0005) */
+            "component_root_certificate_authority",             /* 15 */
+            "component_subordinate_certificate_authority",      /* 16 */
 #endif
         };
     }
@@ -45,7 +48,8 @@ namespace hpx { namespace components
             result = "component_invalid";
         else if ((type < component_last) && (get_derived_type(type) == 0))
             result = components::detail::names[type];
-        else if (get_derived_type(type) < component_last && (get_derived_type(type) != 0))
+        else if (get_derived_type(type) <
+            component_last && (get_derived_type(type) != 0))
             result = components::detail::names[get_derived_type(type)];
         else
             result = "component";

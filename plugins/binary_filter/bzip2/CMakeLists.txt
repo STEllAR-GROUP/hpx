@@ -26,8 +26,8 @@ macro(add_bzip2_module)
 
     add_hpx_library(compress_bzip2
       PLUGIN
-      SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"
-      HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
+      SOURCES "${PROJECT_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"
+      HEADERS "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${BZIP2_LIBRARIES})
 

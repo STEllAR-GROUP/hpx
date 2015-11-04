@@ -28,13 +28,15 @@
 namespace hpx { namespace util {
 
 /**
-    @brief Root namespace. All the logging lib is contained in this namespace, or sub-namespaces of this one.
+    @brief Root namespace. All the logging lib is contained in this namespace,
+    or sub-namespaces of this one.
 */
 namespace logging {
 
 
 /**
-    @brief Contains filter implementations. A filter tells the logger if it's enabled or not.
+    @brief Contains filter implementations. A filter tells the logger if
+    it's enabled or not.
 
 
     The %filter namespace contains a few implementations of %filter classes.
@@ -53,7 +55,8 @@ namespace logging {
     };
     @endcode
 
-    In your logger, you can use any filter class that's already here, or implement your own. Implementing a filter is usually as easy as it gets:
+    In your logger, you can use any filter class that's already here,
+    or implement your own. Implementing a filter is usually as easy as it gets:
 
     @code
     struct filter_no_ts {
@@ -158,7 +161,7 @@ private:
 
 
 
-#ifndef HPX_LOG_NO_TSS
+#ifndef HPX_HAVE_LOG_NO_TSS
 
 /**
     @brief Uses TSS (Thread Specific Storage) to find out if a filter is enabled or not.
@@ -168,13 +171,15 @@ private:
 
     @remarks
 
-    Another implementation can be done, which could be faster - where you retrieve the "is_enabled" each X calls on a given thread
+    Another implementation can be done, which could be faster
+    - where you retrieve the "is_enabled" each X calls on a given thread
     (like, every 20 calls on a given thread)
 */
 template<int default_cache_secs = 5> struct use_tss_with_cache {
     typedef locker::tss_resource_with_cache<bool,default_cache_secs> data;
 
-    use_tss_with_cache(int cache_secs = default_cache_secs) : m_enabled(true, cache_secs) {}
+    use_tss_with_cache(int cache_secs = default_cache_secs)
+        : m_enabled(true, cache_secs) {}
     bool is_enabled() const {
         typename data::read enabled(m_enabled);
         return enabled.use();
@@ -188,7 +193,9 @@ private:
 };
 
 /**
-    @brief Uses TSS (Thread Specific Storage) to find out if a filter is enabled or not. Once the filter is initialized to a value, that value will always be used.
+    @brief Uses TSS (Thread Specific Storage) to find out if a filter is
+    enabled or not. Once the filter is initialized to a value,
+    that value will always be used.
 
 */
 struct use_tss_once_init {
@@ -208,7 +215,7 @@ private:
 };
 
 
-#endif // #ifndef HPX_LOG_NO_TSS
+#endif // #ifndef HPX_HAVE_LOG_NO_TSS
 
 
 } // namespace filter

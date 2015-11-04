@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,31 +12,28 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the memory_block actions
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::detail::memory_block::get_action,
-    memory_block_get_action)
-HPX_REGISTER_ACTION(
+    memory_block_get_action,
+    hpx::actions::memory_block_get_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::detail::memory_block::get_config_action,
-    memory_block_get_config_action)
-HPX_REGISTER_ACTION(
+    memory_block_get_config_action,
+    hpx::actions::memory_block_get_config_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::detail::memory_block::checkout_action,
-    memory_block_checkout_action)
-HPX_REGISTER_ACTION(
+    memory_block_checkout_action,
+    hpx::actions::memory_block_checkout_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::detail::memory_block::checkin_action,
-    memory_block_checkin_action)
-HPX_REGISTER_ACTION(
+    memory_block_checkin_action,
+    hpx::actions::memory_block_checkin_action_id)
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::detail::memory_block::clone_action,
-    memory_block_clone_action)
+    memory_block_clone_action,
+    hpx::actions::memory_block_clone_action_id)
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::detail::memory_block_header,
@@ -48,13 +45,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::memory_block,
     hpx::components::component_memory_block)
 
-HPX_REGISTER_BASE_LCO_WITH_VALUE(
-    hpx::components::memory_block_data,
-    memory_data_type)
-
-HPX_REGISTER_MANAGE_OBJECT_ACTION(
-    hpx::actions::manage_object_action<boost::uint8_t>,
-    manage_object_action_uint8_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    hpx::components::memory_block_data, hpx_memory_data_type,
+    hpx::actions::base_lco_with_value_hpx_memory_data_get,
+    hpx::actions::base_lco_with_value_hpx_memory_data_set)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail

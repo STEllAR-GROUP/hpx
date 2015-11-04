@@ -21,7 +21,7 @@
 # pragma once
 #endif
 
-#if !defined(HPX_LOG_NO_TSS)
+#if !defined(HPX_HAVE_LOG_NO_TSS)
 
 #include <hpx/util/logging/detail/fwd.hpp>
 
@@ -44,7 +44,8 @@
 namespace hpx { namespace util { namespace logging {
 
 
-template<class type, template<typename> class thread_specific_ptr_type HPX_LOG_TSS_DEFAULT_CLASS > struct tss_value {
+template<class type, template<typename>
+class thread_specific_ptr_type HPX_LOG_TSS_DEFAULT_CLASS > struct tss_value {
     tss_value() {}
 
     type * get() const {
@@ -69,7 +70,9 @@ private:
 
 
 
-template<class type, template<typename> class thread_specific_ptr_type HPX_LOG_TSS_DEFAULT_CLASS > struct tss_value_with_default {
+template<class type, template<typename>
+class thread_specific_ptr_type HPX_LOG_TSS_DEFAULT_CLASS >
+struct tss_value_with_default {
     tss_value_with_default(const type & default_ ) : m_default( default_) {}
 
     type * get() const {
@@ -95,7 +98,7 @@ private:
 
 }}}
 
-#endif // !HPX_LOG_NO_TSS
+#endif // !HPX_HAVE_LOG_NO_TSS
 
 #endif
 

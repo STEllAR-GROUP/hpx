@@ -5,6 +5,8 @@
 
 #include <hpx/util/bind_action.hpp>
 
+#include <boost/thread/locks.hpp>
+
 #define HPX_DEFINE_COMPONENT_BROADCAST(NAME, TYPE)                              \
     void BOOST_PP_CAT(NAME, _)(TYPE const & value)                              \
     {                                                                           \
@@ -59,7 +61,7 @@ namespace hpx { namespace lcos
             {
                 std::vector<hpx::id_type> bcast_ids;
                 bcast_ids.reserve(ids.size()-1);
-                BOOST_FOREACH(hpx::id_type const & id, ids)
+                for (hpx::id_type const& id : ids)
                 {
                     if(id == this_id) continue;
                     bcast_ids.push_back(id);
@@ -67,7 +69,8 @@ namespace hpx { namespace lcos
 
                 if(bcast_ids.size() > 0)
                 {
-                    hpx::id_type locality = hpx::naming::get_locality_from_id(bcast_ids[0]);
+                    hpx::id_type locality =
+                        hpx::naming::get_locality_from_id(bcast_ids[0]);
                     Action act;
 
                     bcast_future =
@@ -83,14 +86,15 @@ namespace hpx { namespace lcos
             else
             {
                 {
-                    mutex_type::scoped_lock lk(mtx);
+                    boost::lock_guard<mutex_type> lk(mtx);
                     bcast_future = bcast_gate.get_future(1);
 
                     ready_promise.set_value();
                     ready_promise = hpx::lcos::local::promise<void>();
                 }
 
-                return bcast_future.then(hpx::util::bind(&broadcast::when_dst<A0>, this));
+                return bcast_future.then(hpx::util::bind(&broadcast::when_dst<A0>,
+                    this));
             }
         }
 
@@ -98,7 +102,7 @@ namespace hpx { namespace lcos
         {
             hpx::wait_all(ready_future);
             {
-                mutex_type::scoped_lock lk(mtx);
+                boost::lock_guard<mutex_type> lk(mtx);
                 recv_value = v;
                 bcast_gate.set(0);
                 ready_future = ready_promise.get_future();
@@ -142,7 +146,7 @@ namespace hpx { namespace lcos
                 {
                     std::size_t next_dist = (ids.size() - fan_out)/fan_out + 1;
                     iterator end
-                        = ((i == fan_out-1) || ((std::distance(ids.cbegin() + 
+                        = ((i == fan_out-1) || ((std::distance(ids.cbegin() +
                             fan_out, begin) + next_dist) >= ids.size()))
                         ? ids.cend()
                         : begin + next_dist;
@@ -153,10 +157,12 @@ namespace hpx { namespace lcos
                         hpx::id_type dst = hpx::naming::get_locality_from_id(next[0]);
 
                         broadcast_futures.push_back(
-                            hpx::async<broadcast_impl_action>(dst, boost::move(next), fun, fan_out)
+                            hpx::async<broadcast_impl_action>(dst, std::move(next),
+                                fun, fan_out)
                         );
                         /*
-                        hpx::apply<broadcast_impl_action>(dst, boost::move(next), fun, fan_out);
+                        hpx::apply<broadcast_impl_action>(dst, std::move(next),
+                        fun, fan_out);
                         */
                     }
 

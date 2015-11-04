@@ -168,9 +168,10 @@ namespace hpx { namespace lcos
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/lcos/async_colocated.hpp>
+#include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/tuple.hpp>
@@ -178,7 +179,6 @@ namespace hpx { namespace lcos
 #include <hpx/util/detail/pack.hpp>
 
 #include <boost/preprocessor/cat.hpp>
-#include <boost/serialization/vector.hpp>
 
 #include <vector>
 
@@ -416,7 +416,7 @@ namespace hpx { namespace lcos
                 if(!ids.empty())
                 {
                     fold_futures.push_back(
-                        hpx::async_colocated<fold_impl_action>(
+                        hpx::detail::async_colocated<fold_impl_action>(
                             ids_next.front()
                           , act
                           , std::move(ids_next)
@@ -477,7 +477,7 @@ namespace hpx { namespace lcos
             fold_impl_action;
 
         return
-            hpx::async_colocated<fold_impl_action>(
+            hpx::detail::async_colocated<fold_impl_action>(
                 ids[0]
               , Action()
               , ids
@@ -602,7 +602,7 @@ namespace hpx { namespace lcos
         }
 
         return
-            hpx::async_colocated<fold_impl_action>(
+            hpx::detail::async_colocated<fold_impl_action>(
                 inverted_ids[0]
               , Action()
               , inverted_ids
@@ -719,14 +719,14 @@ namespace hpx { namespace lcos
 /**/
 
 #define HPX_REGISTER_FOLD_ACTION_2(Action, FoldOp)                            \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_fold_action<Action>::                       \
             fold_invoker<FoldOp>::type                                        \
       , BOOST_PP_CAT(BOOST_PP_CAT(fold_, Action), FoldOp)                     \
     )                                                                         \
 /**/
 #define HPX_REGISTER_FOLD_ACTION_3(Action, FoldOp, Name)                      \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_fold_action<Action>::                       \
             fold_invoker<FoldOp>::type                                        \
       , BOOST_PP_CAT(fold_, Name)                                             \
@@ -772,7 +772,7 @@ namespace hpx { namespace lcos
 /**/
 
 #define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_2(Action, FoldOp)                 \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_fold_action<                                \
             ::hpx::lcos::detail::fold_with_index<Action>                      \
         >::fold_invoker<FoldOp>::type                                         \
@@ -780,7 +780,7 @@ namespace hpx { namespace lcos
     )                                                                         \
 /**/
 #define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_3(Action, FoldOp, Name)           \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
+    HPX_REGISTER_ACTION(                                                      \
         ::hpx::lcos::detail::make_fold_action<                                \
             ::hpx::lcos::detail::fold_with_index<Action>                      \
         >::fold_invoker<FoldOp>::type                                         \

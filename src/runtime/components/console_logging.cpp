@@ -10,16 +10,15 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -47,6 +46,10 @@ namespace hpx { namespace components
 
             case destination_agas:
                 LAGAS_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
+                break;
+
+            case destination_parcel:
+                LPT_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
                 break;
 
             case destination_app:
@@ -91,7 +94,7 @@ namespace hpx { namespace components
 
     bool pending_logs::is_active()
     {
-        return threads::threadmanager_is(running) && threads::get_self_ptr() &&
+        return threads::threadmanager_is(state_running) && threads::get_self_ptr() &&
             activated_.load();
     }
 
@@ -105,7 +108,7 @@ namespace hpx { namespace components
             // queue up the new message and log it with the rest of it
             messages_type msgs;
             {
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 queue_.push_back(msg);
                 queue_.swap(msgs);
             }
@@ -121,7 +124,7 @@ namespace hpx { namespace components
             std::size_t size = 0;
 
             {
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 queue_.push_back(msg);
                 size = queue_.size();
             }
@@ -140,7 +143,7 @@ namespace hpx { namespace components
             if (!naming::get_agas_client().is_console())
             {
                 // queue it for delivery to the console
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 queue_.push_back(msg);
             }
             else
@@ -155,7 +158,7 @@ namespace hpx { namespace components
 
     void pending_logs::cleanup()
     {
-        if (threads::threadmanager_is(running) && threads::get_self_ptr())
+        if (threads::threadmanager_is(state_running) && threads::get_self_ptr())
         {
             send();
         }
@@ -163,7 +166,7 @@ namespace hpx { namespace components
         {
             messages_type msgs;
             {
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 if (queue_.empty())
                     return;         // some other thread did the deed
                 queue_.swap(msgs);
@@ -178,13 +181,13 @@ namespace hpx { namespace components
         // Resolve the console prefix if it's still invalid.
         if (HPX_UNLIKELY(naming::invalid_id == prefix_))
         {
-            prefix_mutex_type::scoped_try_lock l(prefix_mtx_);
+            boost::unique_lock<prefix_mutex_type> l(prefix_mtx_, boost::try_to_lock);
 
             if (l.owns_lock() && (naming::invalid_id == prefix_))
             {
                 naming::gid_type raw_prefix;
                 {
-                    util::scoped_unlock<prefix_mutex_type::scoped_try_lock> ul(l);
+                    util::unlock_guard<boost::unique_lock<prefix_mutex_type> > ul(l);
                     naming::get_agas_client().get_console_locality(raw_prefix);
                 }
 
@@ -216,7 +219,7 @@ namespace hpx { namespace components
 
         try {
             {
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 if (queue_.empty())
                     return;         // some other thread did the deed
             }
@@ -226,7 +229,7 @@ namespace hpx { namespace components
 
             messages_type msgs;
             {
-                queue_mutex_type::scoped_lock l(queue_mtx_);
+                boost::lock_guard<queue_mutex_type> l(queue_mtx_);
                 if (queue_.empty())
                     return;         // some other thread did the deed
                 queue_.swap(msgs);

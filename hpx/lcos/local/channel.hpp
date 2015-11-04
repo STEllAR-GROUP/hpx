@@ -12,6 +12,8 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 
+#include <boost/thread/locks.hpp>
+
 namespace hpx { namespace lcos { namespace detail
 {
 
@@ -29,7 +31,7 @@ struct channel_future_data : future_data<Result>
         // yields control if needed
         data_type d;
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
+            boost::unique_lock<mutex_type> l(this->mtx_);
             // moves the data from the store
             this->data_.read_and_empty(d, l, ec);
             if (ec) return result_type();
@@ -67,8 +69,6 @@ struct channel
     typedef hpx::lcos::detail::channel_future_data<T> future_data;
 
     boost::intrusive_ptr<future_data> data_;
-
-    (channel<T>);
 
   public:
     typedef typename future_data::completed_callback_type
@@ -142,14 +142,14 @@ struct channel
     {
         HPX_ASSERT(data_);
         T tmp = data_->get_data(ec);
-        return std::move(tmp);
+        return tmp;
     }
 
     T move(hpx::error_code& ec = hpx::throws) const
     {
         HPX_ASSERT(data_);
         T tmp = data_->move_data(ec);
-        return std::move(tmp);
+        return tmp;
     }
 
     void post(T && result)

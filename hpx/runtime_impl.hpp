@@ -18,7 +18,6 @@
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -26,7 +25,6 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/init_logging.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
@@ -39,7 +37,7 @@ namespace hpx
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized.
-    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename SchedulingPolicy>
     class HPX_EXPORT runtime_impl : public runtime
     {
     private:
@@ -59,7 +57,7 @@ namespace hpx
 
     public:
         typedef SchedulingPolicy scheduling_policy_type;
-        typedef NotificationPolicy notification_policy_type;
+        typedef threads::policies::callback_notifier notification_policy_type;
 
         typedef typename scheduling_policy_type::init_parameter_type
             init_scheduler_type;
@@ -244,13 +242,6 @@ namespace hpx
             return applier_;
         }
 
-        /// \brief Allow access to the action manager instance used by the HPX
-        ///        runtime.
-        actions::action_manager& get_action_manager()
-        {
-            return action_manager_;
-        }
-
         /// \brief Allow access to the locality endpoints this runtime instance is
         /// associated with.
         ///
@@ -275,7 +266,7 @@ namespace hpx
         ///            thread the number of executed HPX threads should be
         ///            returned for. If this is std::size_t(-1) the function
         ///            will return the overall number of executed HPX threads.
-#ifdef HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
+#ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
         boost::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const
         {
             return thread_manager_->get_executed_threads(num);
@@ -363,6 +354,10 @@ namespace hpx
         /// Unregister an external OS-thread with HPX
         bool unregister_thread();
 
+        /// Generate a new notification policy instance for the given thread
+        /// name prefix
+        notification_policy_type get_notification_policy(char const* prefix);
+
     private:
         void init_tss(char const* context, std::size_t num, char const* postfix,
             bool service_thread);
@@ -383,7 +378,6 @@ namespace hpx
         naming::resolver_client agas_client_;
         util::detail::init_logging init_logging_;
         applier::applier applier_;
-        actions::action_manager action_manager_;
         boost::signals2::scoped_connection default_error_sink_;
 
         boost::mutex mtx_;

@@ -3,7 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -17,7 +16,6 @@
 #include <vector>
 
 #include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
 #include <boost/scoped_array.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -291,7 +289,7 @@ namespace hpx { namespace util
                 std::vector<std::string> const &cfg_files =
                     vm["hpx:options-file"].as<std::vector<std::string> >();
 
-                BOOST_FOREACH(std::string const& cfg_file, cfg_files)
+                for (std::string const& cfg_file : cfg_files)
                 {
                     // parse a single config file and store the results
                     read_config_file_options(cfg_file, desc_cfgfile, vm, ini,
@@ -343,7 +341,8 @@ namespace hpx { namespace util
                 hpx_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
-                    ("hpx:connect", "run this instance in worker mode, but connecting late")
+                    ("hpx:connect", "run this instance in worker mode,\
+                         but connecting late")
                 ;
                 break;
 
@@ -356,7 +355,8 @@ namespace hpx { namespace util
                 hidden_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
-                    ("hpx:connect", "run this instance in worker mode, but connecting late")
+                    ("hpx:connect", "run this instance in worker mode,\
+                        but connecting late")
                 ;
                 break;
 
@@ -404,29 +404,37 @@ namespace hpx { namespace util
                 ("hpx:node", value<std::size_t>(),
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
+                ("hpx:ignore-batch-env", "ignore batch environment variables")
+                ("hpx:expect-connecting-localities",
+                  "this locality expects other localities to dynamically connect "
+                  "(implied if the number of initial localities is larger than 1)")
 #if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
                   "run on (default: 0), valid for "
                   "--hpx:queuing=local, --hpx:queuing=abp-priority, "
-                  "--hpx:queuing=static and --hpx:queuing=local-priority only")
+                  "--hpx:queuing=static, --hpx:queuing=static-priority, "
+                  "and --hpx:queuing=local-priority only")
                 ("hpx:pu-step", value<std::size_t>(),
                   "the step between used processing unit numbers for this "
                   "instance of HPX (default: 1), valid for "
                   "--hpx:queuing=local, --hpx:queuing=abp-priority, "
-                  "--hpx:queuing=static and --hpx:queuing=local-priority only")
+                  "--hpx:queuing=static, --hpx:queuing=static-priority "
+                  "and --hpx:queuing=local-priority only")
 #endif
 #if defined(HPX_HAVE_HWLOC)
                 ("hpx:affinity", value<std::string>(),
                   "the affinity domain the OS threads will be confined to, "
                   "possible values: pu, core, numa, machine (default: pu), valid for "
                   "--hpx:queuing=local, --hpx:queuing=abp-priority, "
-                  "--hpx:queuing=static and --hpx:queuing=local-priority only")
+                  "--hpx:queuing=static, --hpx:queuing=static-priority "
+                  " and --hpx:queuing=local-priority only")
                 ("hpx:bind", value<std::vector<std::string> >()->composing(),
                   "the detailed affinity description for the OS threads, see "
                   "the documentation for a detailed description of possible "
                   "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
-                  "--hpx:affinity options. Implies --hpx:numa-sensitive.")
+                  "--hpx:affinity options. Implies --hpx:numa-sensitive=1"
+                  "(--hpx:bind=none disables defining thread affinities).")
                 ("hpx:print-bind",
                   "print to the console the bit masks calculated from the "
                   "arguments specified to all --hpx:bind options.")
@@ -435,15 +443,15 @@ namespace hpx { namespace util
                  "the number of operating system threads to spawn for this HPX "
                  "locality (default: 1, using 'all' will spawn one thread for "
                  "each processing unit")
-                ("hpx:cores", value<std::string>()->default_value("all"),
+                ("hpx:cores", value<std::string>(),
                  "the number of cores to utilize for this HPX "
                  "locality (default: 'all', i.e. the number of cores is based on "
                  "the number of total cores in the system)")
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are "
                   "'local', 'local-priority', 'abp-priority', "
-                  "'hierarchy', 'static', and 'periodic-priority' "
-                  "(default: 'local-priority'; "
+                  "'hierarchy', 'static', 'static-priority', and "
+                  "'periodic-priority' (default: 'local-priority'; "
                   "all option values can be abbreviated)")
                 ("hpx:hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
@@ -451,9 +459,13 @@ namespace hpx { namespace util
                 ("hpx:high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
-                  "--hpx:queuing=local-priority and --hpx:queuing=abp-priority only)")
-                ("hpx:numa-sensitive",
-                  "makes the local-priority scheduler NUMA sensitive")
+                  "--hpx:queuing=local-priority,--hpx:queuing=static-priority, "
+                  " and --hpx:queuing=abp-priority only)")
+                ("hpx:numa-sensitive", value<std::size_t>()->implicit_value(0),
+                  "makes the local-priority scheduler NUMA sensitive ("
+                  "allowed values: 0 - no NUMA sensitivity, 1 - allow only for "
+                  "boundary cores to steal across NUMA domains, 2 - "
+                  "no cross boundary stealing is allowed (default value: 0)")
             ;
 
             options_description config_options("HPX configuration options");
@@ -482,6 +494,9 @@ namespace hpx { namespace util
                 ("hpx:debug-agas-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the AGAS log channel and send all "
                   "AGAS logs to the target destination")
+                ("hpx:debug-parcel-log", value<std::string>()->implicit_value("cout"),
+                  "enable all messages on the parcel transport log channel and send all "
+                  "parcel transport logs to the target destination")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
 #if defined(_POSIX_VERSION) || defined(BOOST_WINDOWS)
@@ -498,7 +513,8 @@ namespace hpx { namespace util
             counter_options.add_options()
                 ("hpx:print-counter", value<std::vector<std::string> >()->composing(),
                   "print the specified performance counter either repeatedly or "
-                  "before shutting down the system (see option --hpx:print-counter-interval)")
+                  "before shutting down the system \
+                     (see option --hpx:print-counter-interval)")
                 ("hpx:print-counter-interval", value<std::size_t>(),
                   "print the performance counter(s) specified with --hpx:print-counter "
                   "repeatedly after the time interval (specified in milliseconds) "
@@ -511,11 +527,31 @@ namespace hpx { namespace util
                   "possible values:\n"
                   "   'minimal' (prints counter name skeletons)\n"
                   "   'full' (prints all available counter names)")
-                ("hpx:list-counter-infos", value<std::string>()->implicit_value("minimal"),
+                ("hpx:list-counter-infos",
+                    value<std::string>()->implicit_value("minimal"),
                   "list the description of all registered performance counters, "
                   "possible values:\n"
                   "   'minimal' (prints infos for counter name skeletons)\n"
                   "   'full' (prints all available counter infos)")
+                ("hpx:print-counter-format", value<std::string>(),
+                  "print the performance counter(s) specified with --hpx:print-counter "
+                  "in a given format (default: normal)")
+                ("hpx:csv-header",
+                  "print the performance counter(s) specified with --hpx:print-counter "
+                  "with header when format specified with --hpx:print-counter-format"
+                  "is csv or csv-short")
+                ("hpx:no-csv-header",
+                  "print the performance counter(s) specified with --hpx:print-counter "
+                  "without header when format specified with --hpx:print-counter-format"
+                  "is csv or csv-short")
+                ("hpx:print-counter-at",
+                    value<std::vector<std::string> >()->composing(),
+                  "print the performance counter(s) specified with "
+                  "--hpx:print-counter at the given point in time, possible "
+                  "argument values: 'startup', 'shutdown' (default), 'noshutdown'")
+                ("hpx:reset-counters",
+                  "reset the performance counter(s) specified with --hpx:print-counter "
+                  "after they have been evaluated")
             ;
 
             hidden_options.add_options()
@@ -670,7 +706,8 @@ namespace hpx { namespace util
         if (cfg.has_entry("hpx.cmd_line"))
             cmdline = cfg.get_entry("hpx.cmd_line");
         if (cfg.has_entry("hpx.locality"))
-            node = hpx::util::safe_lexical_cast<std::size_t>(cfg.get_entry("hpx.locality"));
+            node = hpx::util::safe_lexical_cast<std::size_t>
+                (cfg.get_entry("hpx.locality"));
 
         return parse_commandline(cfg, app_options, cmdline, vm, node,
             allow_unregistered);
@@ -714,7 +751,7 @@ namespace hpx { namespace util
             value_type;
 
         std::string command_line;
-        BOOST_FOREACH(value_type const& v, vm)
+        for (value_type const& v : vm)
         {
             boost::any const& value = v.second.value();
             if (boost::any_cast<std::string>(&value)) {
@@ -738,7 +775,7 @@ namespace hpx { namespace util
             else if (boost::any_cast<std::vector<std::string> >(&value)) {
                 std::vector<std::string> const& vec =
                     v.second.as<std::vector<std::string> >();
-                BOOST_FOREACH(std::string const& e, vec)
+                for (std::string const& e : vec)
                 {
                     add_as_option(command_line, v.first, embed_in_quotes(e));
                     if (!command_line.empty())

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2011      Dylan Stark
 #
@@ -7,7 +7,7 @@
 
 set(subdirs
     1d_hydro
-    accumulator
+    accumulators
     allgather
     async_io
     balancing
@@ -19,6 +19,7 @@ set(subdirs
     jacobi_smp
     nqueen
     performance_counters
+    queue
     quickstart
     qt
     random_mem_access
@@ -29,13 +30,19 @@ set(subdirs
     throttle
    )
 
- if(HPX_WITH_CXX11_LAMBDAS)
+if(HPX_WITH_CXX11_LAMBDAS)
   set(subdirs ${subdirs}
-     1d_stencil
-     diskperf
-     tuplespace
-     transpose
-      )
+      1d_stencil
+      diskperf
+      tuplespace
+      transpose
+     )
+endif()
+
+if(HPX_WITH_APEX)
+  set(subdirs ${subdirs}
+      apex
+     )
 endif()
 
 foreach(subdir ${subdirs})

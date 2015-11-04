@@ -10,8 +10,6 @@
 #include <hpx/runtime.hpp>
 #include <hpx/util/static.hpp>
 
-#include <boost/foreach.hpp>
-
 #if defined(__ANDROID__) && defined(ANDROID)
 #include <cpu-features.h>
 #endif
@@ -29,7 +27,8 @@
 
 namespace hpx { namespace threads
 {
-    mask_type noop_topology::empty_mask = mask_type(noop_topology::hardware_concurrency());
+    mask_type noop_topology::empty_mask =
+        mask_type(noop_topology::hardware_concurrency());
 }}
 
 #else

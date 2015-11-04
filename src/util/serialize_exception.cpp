@@ -3,17 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/serialize_exception.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/version.hpp>
 #include <boost/config.hpp>
 #include <boost/exception_ptr.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/split_free.hpp>
 
 #include <stdexcept>
 #ifndef BOOST_NO_TYPEID
@@ -21,7 +17,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
@@ -384,11 +380,11 @@ namespace boost { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
     template HPX_EXPORT void
-    save(hpx::util::portable_binary_oarchive&, boost::exception_ptr const&,
+    save(hpx::serialization::output_archive&, boost::exception_ptr const&,
         unsigned int);
 
     template HPX_EXPORT void
-    load(hpx::util::portable_binary_iarchive&, boost::exception_ptr&,
+    load(hpx::serialization::input_archive&, boost::exception_ptr&,
         unsigned int);
 }}
 

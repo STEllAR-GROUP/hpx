@@ -6,10 +6,16 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_HASH_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_HASH_HPP
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/array.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
+
 #include <boost/array.hpp>
 #include <boost/io/ios_state.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/is_bitwise_serializable.hpp>
 
 #include <sodium.h>
 
@@ -70,7 +76,7 @@ namespace hpx { namespace components { namespace security
         }
 
     private:
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int)
@@ -87,5 +93,7 @@ namespace hpx { namespace components { namespace security
 #  pragma pack(pop)
 #endif
 }}}
+
+#endif
 
 #endif

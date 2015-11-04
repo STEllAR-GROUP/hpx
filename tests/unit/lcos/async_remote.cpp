@@ -35,7 +35,7 @@ struct decrement_server
 };
 
 typedef hpx::components::managed_component<decrement_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, decrement_server);
+HPX_REGISTER_COMPONENT(server_type, decrement_server);
 
 typedef decrement_server::call_action call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action);
@@ -156,7 +156,7 @@ void test_remote_async(hpx::id_type const& target)
 int hpx_main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    BOOST_FOREACH(hpx::id_type const& id, localities)
+    for (hpx::id_type const& id : localities)
     {
         test_remote_async(id);
     }

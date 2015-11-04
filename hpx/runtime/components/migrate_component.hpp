@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/server/migrate_component.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/async_colocated.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/traits/is_component.hpp>
 
 #include <boost/utility/enable_if.hpp>
@@ -75,7 +75,7 @@ namespace hpx { namespace components
     {
         typedef typename client_base<Derived, Stub>::server_component_type
             component_type;
-        return Derived(migrate<component_type>(to_migrate.get_gid(),
+        return Derived(migrate<component_type>(to_migrate.get_id(),
             target_storage));
     }
 }}

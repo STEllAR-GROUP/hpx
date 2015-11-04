@@ -11,7 +11,6 @@
 #include <iomanip>
 #include <iostream>
 
-#include <boost/foreach.hpp>
 #include <boost/program_options.hpp>
 
 #include <hpx/util/hardware/cpuid.hpp>
@@ -135,7 +134,7 @@ int main(int argc, char* argv[])
         {
             if (!vm.count("quiet"))
             {
-                BOOST_FOREACH(std::string const& e, features)
+                for (std::string const& e : features)
                 { std::cerr << "error: unknown feature '" << e << "'!\n"; }
 
                 std::cerr << "\n" << visible << "\n";

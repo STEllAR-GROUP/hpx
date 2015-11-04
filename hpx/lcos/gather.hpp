@@ -23,13 +23,18 @@ namespace hpx { namespace lcos
 }}
 #else
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/runtime/components/new.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
+#include <hpx/lcos/local/and_gate.hpp>
 #include <hpx/util/unwrapped.hpp>
+
+#include <boost/preprocessor/cat.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <vector>
 
@@ -63,7 +68,7 @@ namespace hpx { namespace lcos
 
             hpx::future<std::vector<T> > get_result(std::size_t which, T && t)
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::unique_lock<mutex_type> l(mtx_);
 
                 using util::placeholders::_1;
                 hpx::future<std::vector<T> > f = gate_.get_future().then(
@@ -76,7 +81,7 @@ namespace hpx { namespace lcos
 
             void set_result(std::size_t which, T && t)
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                boost::unique_lock<mutex_type> l(mtx_);
                 set_result_locked(which, std::move(t), l);
             }
 
@@ -106,7 +111,7 @@ namespace hpx { namespace lcos
             char const* basename, std::size_t site)
         {
             hpx::id_type target = id.get();
-            hpx::register_id_with_basename(basename, target, site);
+            hpx::register_with_basename(basename, target, site);
             return target;
         }
 
@@ -213,7 +218,7 @@ namespace hpx { namespace lcos
             this_site = hpx::get_locality_id();
 
         return gather_there(
-            hpx::find_id_from_basename(basename, root_site),
+            hpx::find_from_basename(basename, root_site),
             std::move(result), this_site);
     }
 }}
@@ -237,7 +242,7 @@ namespace hpx { namespace lcos
     typedef hpx::components::simple_component<                                \
         hpx::lcos::detail::gather_server<type>                                \
     > BOOST_PP_CAT(gather_, name);                                            \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(BOOST_PP_CAT(gather_, name))       \
+    HPX_REGISTER_COMPONENT(BOOST_PP_CAT(gather_, name))                       \
     /**/
 
 #endif // DOXYGEN

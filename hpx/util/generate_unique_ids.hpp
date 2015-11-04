@@ -7,14 +7,12 @@
 #if !defined(HPX_UTIL_GENERATE_UNIQUE_IDS_MAR_24_2008_1014AM)
 #define HPX_UTIL_GENERATE_UNIQUE_IDS_MAR_24_2008_1014AM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/util/assert.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/spinlock.hpp>
 
-#include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/thread/locks.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
@@ -43,12 +41,11 @@ namespace hpx { namespace util
         /// Generate next unique component id
         naming::gid_type get_id(std::size_t count = 1);
 
-        /// Not thread-safe
         void set_range(
             naming::gid_type const& lower
           , naming::gid_type const& upper)
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             lower_ = lower;
             upper_ = upper;
         }

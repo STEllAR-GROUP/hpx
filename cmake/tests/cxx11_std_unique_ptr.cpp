@@ -11,36 +11,32 @@
 template <typename T>
 struct ptr
 {
-  private:
-   T* p;
+private:
+    T* p;
 
-  public:
-   ptr(std::unique_ptr<T>& r)
-   {
-      p = r.release();
-   }
+public:
+    ptr(std::unique_ptr<T>& r)
+    {
+        p = r.release();
+    }
 
-   ptr& operator=(std::unique_ptr<T>& r)
-   {
-      delete p;
-      p = r.release();
-      return *this;
-   }
+    ptr& operator=(std::unique_ptr<T>& r)
+    {
+        delete p;
+        p = r.release();
+        return *this;
+    }
 
-   ~ptr()
-   {
-      delete p;
-   }
+    ~ptr()
+    {
+        delete p;
+    }
 };
-
 
 int main()
 {
-   std::unique_ptr<int> up1(new int);
-   ptr<int> mp(up1);
-   std::unique_ptr<int> up2(new int);
-   mp = up2;
-
-   return 0;
+    std::unique_ptr<int> up1(new int);
+    ptr<int> mp(up1);
+    std::unique_ptr<int> up2(new int);
+    mp = up2;
 }
-

@@ -69,7 +69,7 @@ namespace hpx { namespace util
     bool mpi_environment::enabled_ = false;
     bool mpi_environment::has_called_init_ = false;
     int mpi_environment::provided_threading_flag_ = MPI_THREAD_SINGLE;
-    MPI_Comm mpi_environment::communicator_;
+    MPI_Comm mpi_environment::communicator_ = MPI_COMM_NULL;
 
     void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
@@ -92,7 +92,7 @@ namespace hpx { namespace util
         // The bottom line is that we use the MPI parcelport either when the
         // application was executed using mpirun or if the tcp/ip parcelport
         // was disabled.
-        if (!detail::detect_mpi_environment(cfg.rtcfg_, HPX_PARCELPORT_MPI_ENV) &&
+        if (!detail::detect_mpi_environment(cfg.rtcfg_, HPX_HAVE_PARCELPORT_MPI_ENV) &&
             detail::get_cfg_entry(cfg, "hpx.parcel.tcp.enable", 1))
         {
             cfg.ini_config_.push_back("hpx.parcel.mpi.enable = 0");
@@ -104,7 +104,7 @@ namespace hpx { namespace util
 
         cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
 
-#if defined(PARCELPORT_MPI_MULTITHREADED)
+#if defined(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
         int flag = (detail::get_cfg_entry(
             cfg, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
                 MPI_THREAD_MULTIPLE : MPI_THREAD_SINGLE;
@@ -251,16 +251,18 @@ namespace hpx { namespace util
             mtx_.unlock();
     }
 
+    void mpi_environment::scoped_lock::unlock()
+    {
+        if(!multi_threaded())
+            mtx_.unlock();
+    }
+
     mpi_environment::scoped_try_lock::scoped_try_lock()
-      : locked(false)
+      : locked(true)
     {
         if(!multi_threaded())
         {
             locked = mtx_.try_lock();
-        }
-        else
-        {
-            locked = true;
         }
     }
 
@@ -268,6 +270,15 @@ namespace hpx { namespace util
     {
         if(!multi_threaded() && locked)
             mtx_.unlock();
+    }
+
+    void mpi_environment::scoped_try_lock::unlock()
+    {
+        if(!multi_threaded() && locked)
+        {
+            locked = false;
+            mtx_.unlock();
+        }
     }
 }}
 

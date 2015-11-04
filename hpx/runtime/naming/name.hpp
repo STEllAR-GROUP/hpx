@@ -11,23 +11,21 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
-#include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/util/register_locks_globally.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
 
-#include <boost/foreach.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/serialization.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <ios>
 #include <iomanip>
 #include <iostream>
+#include <list>
 #include <sstream>
 #include <cstddef>
 
@@ -70,21 +68,26 @@ namespace hpx { namespace naming
         typedef gid_type size_type;
         typedef gid_type difference_type;
 
-        static boost::uint64_t const credit_base_mask = 0x1ful;
+        static boost::uint64_t const credit_base_mask = 0x1full;
         static boost::uint16_t const credit_shift = 24;
 
         static boost::uint64_t const credit_mask = credit_base_mask << credit_shift;
-        static boost::uint64_t const was_split_mask = 0x80000000ul; //-V112
-        static boost::uint64_t const has_credits_mask = 0x40000000ul; //-V112
-        static boost::uint64_t const is_locked_mask = 0x20000000ul; //-V112
+        static boost::uint64_t const was_split_mask = 0x80000000ull; //-V112
+        static boost::uint64_t const has_credits_mask = 0x40000000ull; //-V112
+        static boost::uint64_t const is_locked_mask = 0x20000000ull; //-V112
 
         static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
-        static boost::uint64_t const virtual_memory_mask = 0xffffffull;
+        static boost::uint16_t const locality_id_shift = 32;
+
+        static boost::uint64_t const virtual_memory_mask = 0x7fffffull;
+
+        // don't cache this id in the AGAS caches
+        static boost::uint64_t const dont_cache_mask = 0x800000ull; //-V112
 
         static boost::uint64_t const credit_bits_mask =
             credit_mask | was_split_mask | has_credits_mask;
         static boost::uint64_t const internal_bits_mask =
-            credit_bits_mask | is_locked_mask;
+            credit_bits_mask | is_locked_mask | dont_cache_mask;
         static boost::uint64_t const special_bits_mask =
             locality_id_mask | internal_bits_mask;
 
@@ -338,12 +341,15 @@ namespace hpx { namespace naming
     private:
         friend std::ostream& operator<< (std::ostream& os, gid_type const& id);
 
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
-        void save(util::portable_binary_oarchive& ar, const unsigned int version) const;
-        void load(util::portable_binary_iarchive& ar, const unsigned int version);
+        template <class T>
+        void save(T& ar, const unsigned int version) const;
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        template <class T>
+        void load(T& ar, const unsigned int version);
+
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
         // lock implementation
         typedef lcos::local::spinlock_pool<tag> internal_mutex_type;
@@ -384,7 +390,7 @@ namespace hpx { namespace naming
     };
 }}
 
-namespace boost { namespace serialization
+namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // we know that we can serialize a gid as a byte sequence
@@ -403,14 +409,16 @@ namespace hpx { namespace naming
 
     inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id)
     {
-        return gid_type(boost::uint64_t(locality_id+1) << 32, 0); //-V112
+        return gid_type(
+            boost::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            0);
     }
 
     inline boost::uint32_t get_locality_id_from_gid(boost::uint64_t msb) HPX_PURE;
 
     inline boost::uint32_t get_locality_id_from_gid(boost::uint64_t msb)
     {
-        return boost::uint32_t(msb >> 32)-1; //-V112
+        return boost::uint32_t(msb >> gid_type::locality_id_shift) - 1;
     }
 
     inline boost::uint32_t get_locality_id_from_gid(gid_type const& id) HPX_PURE;
@@ -497,6 +505,17 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
+        inline bool store_in_cache(gid_type const& id)
+        {
+            return (id.get_msb() & gid_type::dont_cache_mask) ? false : true;
+        }
+
+        inline void set_dont_store_in_cache(id_type& id)
+        {
+            id.set_msb(id.get_msb() | gid_type::dont_cache_mask);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         inline boost::int64_t get_credit_from_gid(gid_type const& id) HPX_PURE;
 
         inline boost::int16_t get_log2credit_from_gid(gid_type const& id)
@@ -580,7 +599,8 @@ namespace hpx { namespace naming
             HPX_ASSERT(0 == (log2credits & ~gid_type::credit_base_mask));
 
             id.set_msb((id.get_msb() & ~gid_type::credit_mask) |
-                ((boost::int32_t(log2credits) << gid_type::credit_shift) & gid_type::credit_mask) |
+                ((boost::int32_t(log2credits) << gid_type::credit_shift)
+                    & gid_type::credit_mask) |
                 gid_type::has_credits_mask);
         }
 
@@ -635,9 +655,9 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT gid_type split_gid_if_needed(gid_type& id);
-        HPX_EXPORT gid_type split_gid_if_needed_locked(gid_type::mutex_type::scoped_try_lock &l, gid_type& gid);
-        HPX_EXPORT gid_type replenish_new_gid_if_needed(gid_type const& id);
+        HPX_EXPORT hpx::future<gid_type> split_gid_if_needed(gid_type& id);
+        HPX_EXPORT hpx::future<gid_type> split_gid_if_needed_locked(
+            gid_type::mutex_type::scoped_lock &l, gid_type& gid);
 
         HPX_EXPORT gid_type move_gid(gid_type& id);
         HPX_EXPORT gid_type move_gid_locked(gid_type& gid);
@@ -700,8 +720,10 @@ namespace hpx { namespace naming
 //             detail::strip_internal_bits_and_locality_from_gid(lhs.id_msb_) -
 //             detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
 //
-//         boost::uint32_t lhs_locality_id = naming::get_locality_id_from_gid(lhs.id_msb_);
-//         boost::uint32_t rhs_locality_id = naming::get_locality_id_from_gid(rhs.id_msb_);
+//         boost::uint32_t lhs_locality_id =
+//             naming::get_locality_id_from_gid(lhs.id_msb_);
+//         boost::uint32_t rhs_locality_id =
+//             naming::get_locality_id_from_gid(rhs.id_msb_);
 //         if (rhs_locality_id != naming::invalid_locality_id)
 //         {
 //             HPX_ASSERT(lhs_locality_id == rhs_locality_id);
@@ -768,6 +790,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
         {
+            HPX_MOVABLE_BUT_NOT_COPYABLE(id_type_impl);
         private:
             typedef void (*deleter_type)(detail::id_type_impl*);
             static deleter_type get_deleter(id_type_management t);
@@ -800,13 +823,13 @@ namespace hpx { namespace naming
             }
 
             // serialization
-            void save(util::portable_binary_oarchive& ar) const;
-            void load(util::portable_binary_iarchive& ar);
+            void save(serialization::output_archive& ar) const;
+            void load(serialization::input_archive& ar);
 
         private:
             // credit management (called during serialization), this function
             // has to be 'const' as save() above has to be 'const'.
-            naming::gid_type preprocess_gid(boost::uint32_t dest_locality_id) const;
+            void preprocess_gid(serialization::output_archive& ar) const;
 
             // reference counting
             friend HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
@@ -848,14 +871,16 @@ namespace hpx { namespace naming
 
     inline id_type get_id_from_locality_id(boost::uint32_t locality_id)
     {
-        return id_type(boost::uint64_t(locality_id+1) << 32, 0, id_type::unmanaged); //-V112
+        return id_type(
+            boost::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            0, id_type::unmanaged);
     }
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id)
     {
-        return boost::uint32_t(id.get_msb() >> 32) - 1; //-V112
+        return boost::uint32_t(id.get_msb() >> gid_type::locality_id_shift) - 1;
     }
 
     inline id_type get_locality_from_id(id_type const& id)
@@ -904,7 +929,7 @@ namespace hpx { namespace traits
         {
             std::vector<naming::id_type> result;
             result.reserve(rhs.size());
-            BOOST_FOREACH(naming::gid_type const& r, rhs)
+            for (naming::gid_type const& r : rhs)
             {
                 bool has_credits = naming::detail::has_credits(r);
                 result.push_back(naming::id_type(r,
@@ -947,27 +972,6 @@ namespace std
         }
     };
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// this is the current version of the id_type serialization format
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-
-BOOST_CLASS_VERSION(hpx::naming::gid_type, HPX_GIDTYPE_VERSION)
-BOOST_CLASS_TRACKING(hpx::naming::gid_type, boost::serialization::track_never)
-BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
-BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
-BOOST_SERIALIZATION_INTRUSIVE_PTR(hpx::naming::detail::id_type_impl)
-
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

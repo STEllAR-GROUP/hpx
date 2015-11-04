@@ -30,16 +30,13 @@
 #define HPX_COROUTINE_TUPLE_TRAITS_HPP_20060613
 
 #include <boost/tuple/tuple.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-#include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/bool.hpp>
-#include <hpx/util/coroutine/detail/arg_max.hpp>
 
-namespace hpx { namespace util { namespace coroutines 
+namespace hpx { namespace util { namespace coroutines
 {
   namespace detail {
     /*
@@ -61,24 +58,13 @@ namespace hpx { namespace util { namespace coroutines
     /*
      * A boost::tuple<> is not constructible from an arbitrary
      * number of null_types (while non nullary tuples are).
-     * This class takes care of this assimmetry.
+     * This class takes care of this asymmetry.
      */
-    struct tuple_workaround : boost::tuple<> {
-#     define HPX_COROUTINE_arg_null_typecr(z, n, unused)\
-        const boost::tuples::null_type&                   \
-      /**/
-
-      tuple_workaround
-      (BOOST_PP_ENUM
-       (HPX_COROUTINE_ARG_MAX,
-        HPX_COROUTINE_arg_null_typecr,
-        ~)){}
-
+    struct tuple_workaround : boost::tuple<>
+    {
+      tuple_workaround(const boost::tuples::null_type&) {}
       tuple_workaround(const tuple_workaround&) {}
-#if HPX_COROUTINE_ARG_MAX > 0
       tuple_workaround() {}
-#endif
-#     undef HPX_COROUTINE_arg_null_typecr
     };
   } /* detail */
 
@@ -109,9 +95,9 @@ namespace hpx { namespace util { namespace coroutines
     : boost::mpl::if_<is_nullary<T>, detail::tuple_workaround, T>
   {};
 
-  // Used to implement the next metafunction,
-  // Splitted in two parts to satisfy the compiler.
-  template<typename T>
+  // Used to implement the next meta-function,
+  // Split in two parts to satisfy the compiler.
+  template <typename T>
   struct step_2
     : boost::mpl::eval_if<
         is_singular<T>,
@@ -126,7 +112,7 @@ namespace hpx { namespace util { namespace coroutines
   // - If the tuple is nullary returns 'void'.
   // - If it singular returns the first type
   // - Else return the tuple itself.
-  template<typename T>
+  template <typename T>
   struct make_result_type
     : boost::mpl::eval_if<
         is_nullary<T>,
@@ -135,8 +121,7 @@ namespace hpx { namespace util { namespace coroutines
       >
   {};
 
-  template<BOOST_PP_ENUM_BINARY_PARAMS(HPX_COROUTINE_ARG_MAX,
-      typename T, = boost::tuples::null_type BOOST_PP_INTERCEPT)>
+  template <typename T0 = boost::tuples::null_type>
   struct tuple_traits
     : tuple_traits_tag
   {
@@ -145,9 +130,7 @@ namespace hpx { namespace util { namespace coroutines
     // This is the straightforward boost::tuple trait
     // derived from the argument list. It is not
     // directly used in all cases.
-    typedef
-        boost::tuple<BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, T)>
-    internal_tuple_type;
+    typedef boost::tuple<T0> internal_tuple_type;
 
     // FIXME: Currently coroutine code does not use this typedef in all cases
     // and expect it to be equal to boost::tuples::null_type
@@ -160,11 +143,13 @@ namespace hpx { namespace util { namespace coroutines
     template<int Index>
     struct at
       : boost::mpl::eval_if_c<
-          Index<
-              boost::tuples::length<typename tuple_traits::internal_tuple_type>::value,
-              boost::tuples::element<Index, typename tuple_traits::internal_tuple_type>,
-              boost::mpl::identity<typename tuple_traits::null_type>
-          >
+            Index < boost::tuples::length<
+                        typename tuple_traits::internal_tuple_type
+                    >::value,
+                boost::tuples::element<
+                    Index, typename tuple_traits::internal_tuple_type>,
+                boost::mpl::identity<typename tuple_traits::null_type>
+            >
       {};
 
     typedef typename make_as_tuple<internal_tuple_type>::type as_tuple;

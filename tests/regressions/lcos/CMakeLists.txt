@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,56 +6,67 @@
 
 set(tests
     after_588
-    async_unwrap_1037
-    dataflow_launch_775
+    async_action_1813
+    async_callback_with_bound_callback
     async_callback_non_deduced_context
+    async_unwrap_1037
+    call_promise_get_gid_more_than_once
+    dataflow_791
+    dataflow_future_swap
+    dataflow_launch_775
     future_790
     future_hang_on_get_629
     future_hang_on_then_629
     future_timed_wait_1025
     future_unwrap_878
     future_unwrap_1182
+    ignore_while_locked_1485
     lifetime_588
     lifetime_588_1
     promise_leak_996
+    promise_1620
+    receive_buffer_1733
+    safely_destroy_promise_1481
     set_hpx_limit_798
+    shared_mutex_1702
     shared_stated_leaked_1211
+    wait_for_1751
+    when_all_vectors_1623
    )
 
-
+set(promise_1620_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
-set(dataflow_future_swap2_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
-set(tests ${tests}
-    dataflow_future_swap
-    dataflow_791
-   )
- if(HPX_WITH_CXX11_LAMBDAS)
-  set(tests ${tests}
-      dataflow_const_functor_773
-      dataflow_future_swap2
-      dataflow_using_774
-     )
-endif()
-
 set(after_588_PARAMETERS LOCALITIES 2)
-
+set(async_action_1813_PARAMETERS LOCALITIES 2)
+set(async_callback_with_bound_callback_PARAMETERS LOCALITIES 2)
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
-
+set(ignore_while_locked_1485_PARAMETERS THREADS_PER_LOCALITY 2)
 set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
-
-set(set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
+set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
+set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
+set(shared_mutex_1702_PARAMETERS THREADS_PER_LOCALITY 4)
+set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 
 if(HPX_WITH_CXX11_LAMBDAS)
+  set(tests ${tests}
+      dataflow_const_functor_773
+      dataflow_future_swap2
+      dataflow_recursion_1613
+      dataflow_using_774
+      exception_from_continuation_1613
+      future_hang_on_wait_with_callback_629
+     )
+  set(dataflow_future_swap2_FLAGS DEPENDENCIES iostreams_component)
+  set(dataflow_recursion_1613_PARAMETERS THREADS_PER_LOCALITY 2)
+  set(exception_from_continuation_1613_PARAMETERS THREADS_PER_LOCALITY 2)
   set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
-  set(tests
-    ${tests}
-    future_hang_on_wait_with_callback_629)
 endif()
 
+# Create test cases
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -73,14 +84,14 @@ foreach(test ${tests})
   add_hpx_regression_test("lcos" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.lcos.${test})
+  add_hpx_pseudo_target(tests.regressions.lcos_dir.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.lcos
-                              tests.regressions.lcos.${test})
+  add_hpx_pseudo_dependencies(tests.regressions.lcos_dir
+                              tests.regressions.lcos_dir.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.lcos.${test}
+  add_hpx_pseudo_dependencies(tests.regressions.lcos_dir.${test}
                               ${test}_test_exe)
 endforeach()
 

@@ -147,6 +147,7 @@ namespace hpx
 #else
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
@@ -189,33 +190,59 @@ namespace hpx { namespace lcos
             {}
 
             template <typename SharedState>
-            void operator()(SharedState& shared_state) const
+            void operator()(SharedState& shared_state,
+                typename boost::enable_if_c<
+                    traits::is_shared_state<SharedState>::value
+                >::type* = 0) const
             {
-                std::size_t counter = wait_.count_.load(boost::memory_order_seq_cst);
-                if (counter < wait_.needed_count_ && !shared_state->is_ready()) {
+                std::size_t counter =
+                    wait_.count_.load(boost::memory_order_seq_cst);
+                if (counter < wait_.needed_count_ && !shared_state->is_ready())
+                {
                     // handle future only if not enough futures are ready yet
                     // also, do not touch any futures which are already ready
 
-                    shared_state->set_on_completed(Callback(callback_));
-                }
-                else {
-                    if (wait_.count_.fetch_add(1) + 1 == wait_.needed_count_)
+                    shared_state->execute_deferred();
+
+                    // execute_deferred might have made the future ready
+                    if (!shared_state->is_ready())
                     {
-                        wait_.goal_reached_on_calling_thread_ = true;
+                        shared_state->set_on_completed(Callback(callback_));
+                        return;
                     }
+                }
+                if (wait_.count_.fetch_add(1) + 1 == wait_.needed_count_)
+                {
+                    wait_.goal_reached_on_calling_thread_ = true;
                 }
             }
 
             template <typename Sequence_>
-            void apply(Sequence_& sequence, typename boost::enable_if<
-                boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
+            BOOST_FORCEINLINE
+            void operator()(Sequence_& sequence,
+                typename boost::disable_if_c<
+                    traits::is_shared_state<Sequence_>::value
+                >::type* = 0) const
+            {
+                apply(sequence);
+            }
+
+            template <typename Sequence_>
+            BOOST_FORCEINLINE
+            void apply(Sequence_& sequence,
+                typename boost::enable_if_c<
+                    boost::fusion::traits::is_sequence<Sequence_>::value
+                >::type* = 0) const
             {
                 boost::fusion::for_each(sequence, *this);
             }
 
             template <typename Sequence_>
-            void apply(Sequence_& sequence, typename boost::disable_if<
-                boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
+            BOOST_FORCEINLINE
+            void apply(Sequence_& sequence,
+                typename boost::disable_if_c<
+                    boost::fusion::traits::is_sequence<Sequence_>::value
+                >::type* = 0) const
             {
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
@@ -298,13 +325,13 @@ namespace hpx { namespace lcos
         struct wait_get_shared_state
         {
             typedef
-                typename lcos::detail::shared_state_ptr_for<Future>::type const&
+                typename traits::detail::shared_state_ptr_for<Future>::type const&
                 result_type;
 
             BOOST_FORCEINLINE result_type
             operator()(Future const& f) const
             {
-                return lcos::detail::get_shared_state(f);
+                return traits::detail::get_shared_state(f);
             }
         };
     }
@@ -319,7 +346,7 @@ namespace hpx { namespace lcos
             traits::is_future<Future>::value, "invalid use of wait_some");
 
         typedef
-            typename lcos::detail::shared_state_ptr_for<Future>::type
+            typename traits::detail::shared_state_ptr_for<Future>::type
             shared_state_ptr;
         typedef std::vector<shared_state_ptr> result_type;
 
@@ -369,14 +396,15 @@ namespace hpx { namespace lcos
     template <typename Iterator>
     typename util::always_void<
         typename lcos::detail::future_iterator_traits<Iterator>::type
-    >::type wait_some(std::size_t n, Iterator begin, Iterator end,
+    >::type
+    wait_some(std::size_t n, Iterator begin, Iterator end,
         error_code& ec = throws)
     {
         typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;
         typedef
-            typename lcos::detail::shared_state_ptr_for<future_type>::type
+            typename traits::detail::shared_state_ptr_for<future_type>::type
             shared_state_ptr;
         typedef std::vector<shared_state_ptr> result_type;
 
@@ -399,7 +427,7 @@ namespace hpx { namespace lcos
             typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;
         typedef
-            typename lcos::detail::shared_state_ptr_for<future_type>::type
+            typename traits::detail::shared_state_ptr_for<future_type>::type
             shared_state_ptr;
         typedef std::vector<shared_state_ptr> result_type;
 
@@ -464,11 +492,11 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, error_code& ec, Ts&&...ts)
     {
         typedef hpx::util::tuple<
-                typename lcos::detail::shared_state_ptr_for<Ts>::type...
+                typename traits::detail::shared_state_ptr_for<Ts>::type...
             > result_type;
 
         result_type lazy_values_ =
-            result_type(lcos::detail::get_shared_state(ts)...);
+            result_type(traits::detail::get_shared_state(ts)...);
 
         if (n == 0)
         {
@@ -494,11 +522,11 @@ namespace hpx { namespace lcos
     void wait_some(std::size_t n, Ts&&...ts)
     {
         typedef hpx::util::tuple<
-                typename lcos::detail::shared_state_ptr_for<Ts>::type...
+                typename traits::detail::shared_state_ptr_for<Ts>::type...
             > result_type;
 
         result_type lazy_values_ =
-            result_type(lcos::detail::get_shared_state(ts)...);
+            result_type(traits::detail::get_shared_state(ts)...);
 
         if (n == 0)
         {

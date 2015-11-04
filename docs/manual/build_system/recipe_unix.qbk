@@ -69,6 +69,6 @@
 
 For more detailed information about using __cmake__ please refer its documentation
 and also the section __cmake_hpx__. Please pay special attention to the section about
-HPX_MALLOC as this is crucial for getting decent performance.
+HPX_WITH_MALLOC as this is crucial for getting decent performance.
 
 [endsect] [/ How to Install __hpx__ on Unix Variants]

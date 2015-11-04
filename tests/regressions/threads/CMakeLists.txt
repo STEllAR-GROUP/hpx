@@ -11,16 +11,16 @@ set(tests
     thread_rescheduling
     thread_suspend_pending
     thread_suspend_duration
+    threads_all_1422
    )
 
-if(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+if(HPX_HAVE_THREAD_LOCAL_STORAGE)
   set(tests ${tests} thread_data_1111)
 endif()
 
-if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
+if(HPX_HAVE_LOCAL_SCHEDULER OR HPX_HAVE_ALL_SCHEDULERS)
   set(tests ${tests}
     thread_pool_executor_1114
-#    thread_pool_executor_1127
     )
 endif()
 
@@ -29,6 +29,7 @@ set(thread_pool_executor_1112_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_suspend_pending_PARAMETERS THREADS_PER_LOCALITY 1)
 set(thread_suspend_duration_PARAMETERS THREADS_PER_LOCALITY 1)
+set(threads_all_1422_PARAMETERS THREADS_PER_LOCALITY -1)        # -1 means 'all'
 
 foreach(test ${tests})
   set(sources
@@ -47,14 +48,14 @@ foreach(test ${tests})
   add_hpx_regression_test("threads" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.threads.${test})
+  add_hpx_pseudo_target(tests.regressions.threads_dir.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.threads
-                              tests.regressions.threads.${test})
+  add_hpx_pseudo_dependencies(tests.regressions.threads_dir
+                              tests.regressions.threads_dir.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.threads.${test}
+  add_hpx_pseudo_dependencies(tests.regressions.threads_dir.${test}
                               ${test}_test_exe)
 endforeach()
 

@@ -56,26 +56,32 @@ Note: If you are using commandline git to change branches use:
     branch in the next step.
 
 #.  Delete the old release branch, and create a new one by branching a stable
-    point from master. 
-
+    point from master.
+    
+    *   ``git push origin --delete [branch name]``
+    *   ``git branch -D [branch name]``
+    *   ``git branch [new branch name]``
+    *   ``git push origin [new branch name]``
+    
 #.  Checkout the main branch, and bump the HPX version to the next release
     target. The following files contain version info:
 
-    *   ``hpx/version.hpp``
+    *   ``hpx/config/version.hpp``
     *   ``docs/hpx.qbk``
     *   ``CMakeLists.txt``
+    *   Grep for old version number
 
-#.  Create new logos for documentation. Update the logo used on line 143 
+#.  Create new logos for documentation. Update the logo used on line 170 
     (add '_draft') and change the size accordingly in ``docs/cmakelist.txt`` 
-    lines 234/235.
+    lines 262/263.
 
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
-    ``hpx/version.hpp`` (replace it with ``-rc1`` for the release candidate
+    ``hpx/config/version.hpp`` (replace it with ``-rc1`` for the release
     and later with an empty string for the actual release).
     
 #.  Change logo for release documentation by removing '_draft' suffix 
-    in ``docs/cmakelist.txt`` on line 143. Update logo size accordingly on
-    lines 234/235.
+    in ``docs/cmakelist.txt`` on line 170. Update logo size accordingly on
+    lines 262/263.
 
 #.  Remove the examples and benchmarks that will not go into the release from
     the release branch.
@@ -89,6 +95,11 @@ Note: If you are using commandline git to change branches use:
     availability of the release candidate. Ask users to test the candidate by 
     checking out the release candidate tag.
 
+#.  Switch Buildbot over to test the release branch
+
+    *   https://github.com/STEllAR-GROUP/hermione-buildbot/blob/master/master/master.cfg
+    *   Line 117
+    
 #.  Allow at least a week for testing of the release candidate. Pull in changes
     as needed from master to resolve bug fixes, etc.
 
@@ -96,6 +107,7 @@ Note: If you are using commandline git to change branches use:
         when needed.
 
 #.  Update ``$HPX_SOURCE/README.rst`` 
+
     *   Update version
     *   Update links to documentation
      
@@ -118,6 +130,10 @@ Note: If you are using commandline git to change branches use:
         http://stellar.cct.lsu.edu/downloads/hpx-v#-#-#-release-notes
 
 #.  Write a new blog post announcing the release.
+
+#.  Create a DOI number using Zenodo
+   
+    *   https://zenodo.org/
 
 #.  Announce the release on hpx-users@stellar.cct.lsu.edu, 
     stellar@cct.lsu.edu, allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,

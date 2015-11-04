@@ -17,6 +17,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/asio/placeholders.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
@@ -48,9 +49,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             >
             postprocess_function_type;
 
-        sender(connection_handler & handler, util::memory_chunk_pool & pool, parcelset::locality const& there,
+        sender(connection_handler & handler, util::memory_chunk_pool & pool,
+            parcelset::locality const& there,
             performance_counters::parcels::gatherer& parcels_sent)
-          : context_(), parcelport_(handler), there_(there), parcels_sent_(parcels_sent), memory_pool_(pool)
+          : context_(), parcelport_(handler), there_(there),
+            parcels_sent_(parcels_sent), memory_pool_(pool)
         {
         }
 
@@ -75,7 +78,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             return there_;
         }
 
-        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p, std::size_t arg_size)
+        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p,
+            std::size_t arg_size)
         {
             if(!buffer_)
             {
@@ -110,7 +114,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         {
             next_function_type f = 0;
             {
-                hpx::lcos::local::spinlock::scoped_lock l(mtx_);
+                boost::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
                 f = next_;
             }
             if(f != 0)
@@ -227,7 +231,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         bool next(next_function_type f)
         {
-            hpx::lcos::local::spinlock::scoped_lock l(mtx_);
+            boost::lock_guard<hpx::lcos::local::spinlock> l(mtx_);
             next_ = f;
             return false;
         }

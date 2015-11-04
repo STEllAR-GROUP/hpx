@@ -13,9 +13,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -42,12 +42,29 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         OutIter sequential_transform_exclusive_scan(InIter first, InIter last,
             OutIter dest, Conv && conv, T init, Op && op)
         {
-            for (/**/; first != last; (void) ++first, ++dest)
+            T temp = init;
+            for (/* */; first != last; (void) ++first, ++dest)
             {
-                *dest = init;
                 init = op(init, conv(*first));
+                *dest = temp;
+                temp = init;
             }
             return dest;
+        }
+
+        template <typename InIter, typename OutIter, typename Conv, typename T,
+            typename Op>
+        T sequential_transform_exclusive_scan_n(InIter first, std::size_t count,
+            OutIter dest, Conv && conv, T init, Op && op)
+        {
+            T temp = init;
+            for (/* */; count-- != 0; (void) ++first, ++dest)
+            {
+                init  = op(init, conv(*first));
+                *dest = temp;
+                temp  = init;
+            }
+            return init;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -62,7 +79,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter, typename Conv,
                 typename T, typename Op>
             static OutIter
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 OutIter dest, Conv && conv, T && init, Op && op)
             {
                 return sequential_transform_exclusive_scan(first, last, dest,
@@ -72,64 +89,66 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter, typename Conv,
                 typename T, typename Op>
-            static typename detail::algorithm_result<ExPolicy, OutIter>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            static typename util::detail::algorithm_result<
+                ExPolicy, OutIter
+            >::type
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                  OutIter dest, Conv && conv, T && init, Op && op)
             {
-                typedef detail::algorithm_result<ExPolicy, OutIter> result;
-                typedef hpx::util::zip_iterator<FwdIter, T*> zip_iterator;
+                typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
+                typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
+                typedef typename std::iterator_traits<FwdIter>::difference_type
+                    difference_type;
 
                 if (first == last)
                     return result::get(std::move(dest));
 
-                typedef typename std::iterator_traits<FwdIter>::difference_type
-                    difference_type;
-                difference_type count = std::distance(first, last) - 1;
+                difference_type count = std::distance(first, last);
 
-                *dest++ = init;
-                if (count == 0)
-                    return result::get(std::move(dest));
-
-                boost::shared_array<T> data(new T[count]);
+                OutIter final_dest = dest;
+                std::advance(final_dest, count);
 
                 // The overall scan algorithm is performed by executing 2
                 // subsequent parallel steps. The first calculates the scan
                 // results for each partition and the second produces the
                 // overall result
 
+                using hpx::util::get;
                 using hpx::util::make_zip_iterator;
-                return
-                    util::scan_partitioner<ExPolicy, OutIter, T>::call(
-                        policy, make_zip_iterator(first, data.get()), count, init,
-                        // step 1 performs first part of scan algorithm
-                        [=](zip_iterator part_begin, std::size_t part_size) -> T
-                        {
-                            using hpx::util::get;
-                            T part_init = conv(get<0>(*part_begin));
-                            get<1>(*part_begin++) = part_init;
-                            return sequential_transform_inclusive_scan_n(
-                                get<0>(part_begin.get_iterator_tuple()), part_size-1,
-                                get<1>(part_begin.get_iterator_tuple()), conv,
-                                part_init, op);
-                        },
-                        // step 2 propagates the partition results from left
-                        // to right
-                        hpx::util::unwrapped(
-                            [=](T const& prev, T const& curr) -> T
+                return util::scan_partitioner<ExPolicy, OutIter, T>::call(
+                    policy, make_zip_iterator(first, dest), count, init,
+                    // step 1 performs first part of scan algorithm
+                    [op, conv](zip_iterator part_begin, std::size_t part_size) -> T
+                    {
+                        T part_init = conv(get<0>(*part_begin++));
+                        return sequential_transform_exclusive_scan_n(
+                            get<0>(part_begin.get_iterator_tuple()),
+                            part_size - 1,
+                            get<1>(part_begin.get_iterator_tuple()),
+                            conv, part_init, op);
+                    },
+                    // step 2 propagates the partition results from left
+                    // to right
+                    hpx::util::unwrapped(op),
+                    // step 3 runs final_accumulation on each partition
+                    [op](zip_iterator part_begin, std::size_t part_size,
+                        hpx::shared_future<T> f_accu)
+                    {
+                        T val = f_accu.get();
+                        OutIter dst = get<1>(part_begin.get_iterator_tuple());
+                        *dst++ = val;
+                        util::loop_n(dst, part_size - 1,
+                            [&op, &val](OutIter it)
                             {
-                                return op(prev, curr);
-                            }),
-                        // step 3 runs the remaining operation
-                        [=](std::vector<hpx::shared_future<T> >&& r,
-                            std::vector<std::size_t> const& chunk_sizes)
-                                -> typename result::type
-                        {
-                            // run the final copy step and produce the required
-                            // result
-                            return scan_copy_helper(policy, std::move(r),
-                                data, count, dest, op, chunk_sizes);
-                        }
-                    );
+                                *it = op(*it, val);
+                            });
+                    },
+                    // use this return value
+                    [final_dest](std::vector<hpx::shared_future<T> > &&,
+                        std::vector<hpx::future<void> > &&)
+                    {
+                        return final_dest;
+                    });
             }
         };
         /// \endcond
@@ -138,7 +157,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
     /// the value of
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, conv(*first), ..., conv(*(first + (i - result) - 1))).
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, conv(*first), ...,
+    /// conv(*(first + (i - result) - 1))).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicates \a op and \a conv.
@@ -221,7 +241,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK), GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
+    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK),
+    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
     /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
@@ -234,7 +255,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typename Conv, typename T, typename Op>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, OutIter>::type
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     transform_exclusive_scan(ExPolicy&& policy, InIter first, InIter last,
         OutIter dest, Conv && conv, T init, Op && op)

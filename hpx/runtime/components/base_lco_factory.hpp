@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -74,18 +74,8 @@ namespace hpx { namespace components
         ///         error.
         std::string get_component_name() const
         {
-            return std::string("base_lco_factory for ") + 
+            return std::string("base_lco_factory for ") +
                 get_component_type_name(type_);
-        }
-
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        factory_property get_factory_properties() const
-        {
-            return factory_none;
         }
 
         /// \brief Create one or more new component instances.
@@ -151,7 +141,7 @@ namespace hpx { namespace components
         /// \param addr   [in] The resolved address of the first component
         ///               instance to destroy.
         void destroy(naming::gid_type const& gid,
-            naming::address const& addr)    
+            naming::address const& addr)
         {
             server::destroy_base_lco(gid, addr, heap_.get(), type_);
         }

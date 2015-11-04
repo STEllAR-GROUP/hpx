@@ -36,14 +36,14 @@ set(CMAKE_CROSSCOMPILING ON)
 set(HPX_PLATFORM "XeonPhi")
 
 # Always disable the ibverbs parcelport as it is nonfunctional on the BGQ.
-set(HPX_PARCELPORT_IBVERBS OFF CACHE BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature")
+set(HPX_WITH_PARCELPORT_IBVERBS OFF CACHE BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature")
 
 # We have a bunch of cores on the MIC ... increase the default
-set(HPX_MAX_CPU_COUNT "256" CACHE STRING "")
+set(HPX_WITH_MAX_CPU_COUNT "256" CACHE STRING "")
 
 # We default to tbbmalloc as our allocator on the MIC
-if(NOT DEFINED HPX_MALLOC)
-  set(HPX_MALLOC "tbbmalloc" CACHE STRING "")
+if(NOT DEFINED HPX_WITH_MALLOC)
+  set(HPX_WITH_MALLOC "tbbmalloc" CACHE STRING "")
 endif()
 
 # Set the TBBMALLOC_PLATFORM correctly so that find_package(TBBMalloc) sets the
@@ -51,3 +51,7 @@ endif()
 set(TBBMALLOC_PLATFORM "mic" CACHE STRING "")
 
 set(HPX_HIDDEN_VISIBILITY OFF CACHE BOOL "Use -fvisibility=hidden for builds on platforms which support it")
+
+# RDTSC is available on Xeon/Phis
+set(HPX_WITH_RDTSC ON CACHE BOOL "")
+

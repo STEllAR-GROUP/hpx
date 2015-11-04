@@ -1,5 +1,4 @@
-
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,16 +13,23 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
-
-HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::int64_t, int64_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::uint64_t, uint64_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE(bool, bool)
-HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::util::section, section)
-HPX_REGISTER_BASE_LCO_WITH_VALUE(std::string, std_string)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    boost::int64_t, int64_t,
+    hpx::actions::base_lco_with_value_int64_get,
+    hpx::actions::base_lco_with_value_int64_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    boost::uint64_t, uint64_t,
+    hpx::actions::base_lco_with_value_uint64_get,
+    hpx::actions::base_lco_with_value_uint64_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    bool, bool,
+    hpx::actions::base_lco_with_value_bool_get,
+    hpx::actions::base_lco_with_value_bool_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    hpx::util::section, hpx_section,
+    hpx::actions::base_lco_with_value_hpx_section_get,
+    hpx::actions::base_lco_with_value_hpx_section_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std::string, std_string,
+    hpx::actions::base_lco_with_value_std_string_get,
+    hpx::actions::base_lco_with_value_std_string_set)

@@ -25,7 +25,7 @@
 
 #include <hpx/util/logging/detail/ts/ts_none.hpp>
 
-#ifndef HPX_LOG_NO_TS
+#ifndef HPX_HAVE_LOG_NO_TS
 
     #ifdef HPX_LOG_USE_BOOST_THREADS
         #include <hpx/util/logging/detail/ts/ts_boost.hpp>
@@ -44,7 +44,7 @@
 
 namespace hpx { namespace util { namespace logging { namespace threading {
 
-#ifndef HPX_LOG_NO_TS
+#ifndef HPX_HAVE_LOG_NO_TS
 
     #ifdef HPX_LOG_USE_BOOST_THREADS
         typedef mutex_boost mutex;

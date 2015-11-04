@@ -12,12 +12,8 @@
 
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
-#include <hpx/util/binary_filter.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
+#include <hpx/runtime/serialization/binary_filter.hpp>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 
 #include <memory>
@@ -66,24 +62,21 @@ namespace hpx { namespace plugins { namespace compression
         };
     }
 
-    struct HPX_LIBRARY_EXPORT bzip2_serialization_filter : public util::binary_filter
+    struct HPX_LIBRARY_EXPORT bzip2_serialization_filter
+        : public serialization::binary_filter
     {
         bzip2_serialization_filter()
           : current_(0)
         {}
 
         bzip2_serialization_filter(bool compress,
-                util::binary_filter* next_filter = 0)
+                serialization::binary_filter* next_filter = 0)
           : compdecomp_(compress), current_(0)
         {}
-        ~bzip2_serialization_filter();
 
         void load(void* dst, std::size_t dst_count);
         void save(void const* src, std::size_t src_count);
         bool flush(void* dst, std::size_t dst_count, std::size_t& written);
-
-        /// serialization support
-        static void register_base();
 
         void set_max_length(std::size_t size);
         std::size_t init_data(char const* buffer,
@@ -95,10 +88,12 @@ namespace hpx { namespace plugins { namespace compression
 
     private:
         // serialization support
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
+
+        HPX_SERIALIZATION_POLYMORPHIC(bzip2_serialization_filter);
 
         detail::bzip2_compdecomp compdecomp_;
         std::vector<char> buffer_;
@@ -107,9 +102,6 @@ namespace hpx { namespace plugins { namespace compression
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>
-
-HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
-    hpx::plugins::compression::bzip2_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_USES_BZIP2_COMPRESSION(action)                             \
@@ -120,7 +112,8 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
         {                                                                     \
             /* Note that the caller is responsible for deleting the filter */ \
             /* instance returned from this function */                        \
-            static util::binary_filter* call(parcelset::parcel const& p)      \
+            static serialization::binary_filter* call(                        \
+                    parcelset::parcel const& p)                               \
             {                                                                 \
                 return hpx::create_binary_filter(                             \
                     "bzip2_serialization_filter", true);                      \

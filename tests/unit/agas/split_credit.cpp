@@ -76,18 +76,18 @@ void hpx_test_main(
     {
         Client object(find_here());
 
-        id_type g0 = split_credits(object.get_gid());
+        id_type g0 = split_credits(object.get_id());
 
-        HPX_TEST_EQ(get_credit(object.get_gid()), hpx_globalcredit_initial/2);
+        HPX_TEST_EQ(get_credit(object.get_id()), hpx_globalcredit_initial/2);
         HPX_TEST_EQ(get_credit(g0), hpx_globalcredit_initial/2);
 
-        id_type g1 = split_credits(object.get_gid());
+        id_type g1 = split_credits(object.get_id());
 
-        HPX_TEST_EQ(get_credit(object.get_gid()), hpx_globalcredit_initial/4);
+        HPX_TEST_EQ(get_credit(object.get_id()), hpx_globalcredit_initial/4);
         HPX_TEST_EQ(get_credit(g1), hpx_globalcredit_initial/4);
 
-        cout << "  " << object.get_gid() << " : "
-                     << get_credit(object.get_gid()) << "\n"
+        cout << "  " << object.get_id() << " : "
+                     << get_credit(object.get_id()) << "\n"
              << "  " << g0 << " : "
                      << get_credit(g0) << "\n"
              << "  " << g1 << " : "

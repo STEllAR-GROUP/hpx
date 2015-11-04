@@ -37,7 +37,7 @@ int hpx_main(
         simple_mobile_object a(hpx::find_here());
         simple_mobile_object b(hpx::find_here());
 
-        id_type a_id = a.get_gid();
+        id_type a_id = a.get_id();
         gid_type a_gid = get_stripped_gid(a_id.get_gid());
         boost::uint64_t b_lva = b.get_lva();
 
@@ -49,7 +49,7 @@ int hpx_main(
         HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_, a.get_lva());
 
         ///////////////////////////////////////////////////////////////////////
-        // Change a's GID to point to b. 
+        // Change a's GID to point to b.
 
         // Rebind the GID.
         boost::uint64_t a_lva = addr.address_;
@@ -64,7 +64,7 @@ int hpx_main(
         HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_, a.get_lva());
 
         ///////////////////////////////////////////////////////////////////////
-        // Now we restore the original bindings to prevent a double free. 
+        // Now we restore the original bindings to prevent a double free.
 
         // Rebind the GID.
         addr.address_ = a_lva;

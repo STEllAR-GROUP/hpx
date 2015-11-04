@@ -18,6 +18,11 @@ namespace hpx { namespace traits
         typedef std::false_type is_segmented_iterator;
     };
 
+    template <typename Iterator, typename Enable>
+    struct is_segmented_iterator
+      : segmented_iterator_traits<Iterator>::is_segmented_iterator
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     // traits allowing to distinguish iterators which have a purely local
     // representation
@@ -49,6 +54,13 @@ namespace hpx { namespace traits
         {
             return std::move(it);
         }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable>
+    struct projected_iterator
+    {
+        typedef typename hpx::util::decay<T>::type type;
     };
 }}
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,14 +10,13 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/capability.hpp>
 #endif
-
-#include <boost/mpl/list.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -50,13 +49,6 @@ namespace hpx { namespace components
         ///         instance is responsible for. This function throws on any
         ///         error.
         virtual std::string get_component_name() const = 0;
-
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        virtual factory_property get_factory_properties() const = 0;
 
         /// \brief Create one or more new component instances.
         ///
@@ -137,7 +129,7 @@ namespace hpx { namespace components
 namespace hpx { namespace util { namespace plugin
 {
     ///////////////////////////////////////////////////////////////////////////
-    // The following specialization of the virtual_constructors template
+    // The following specialization of the virtual_constructor template
     // defines the argument list for the constructor of the concrete component
     // factory (derived from the component_factory_base above). This magic is needed
     // because we use hpx::plugin for the creation of instances of derived
@@ -155,13 +147,12 @@ namespace hpx { namespace util { namespace plugin
     //     };
     //
     template <>
-    struct virtual_constructors<hpx::components::component_factory_base>
+    struct virtual_constructor<hpx::components::component_factory_base>
     {
-        typedef boost::mpl::list<
-            boost::mpl::list<
+        typedef
+            hpx::util::detail::pack<
                 hpx::util::section const*, hpx::util::section const*, bool
-            >
-        > type;
+            > type;
     };
 }}}
 
@@ -183,7 +174,7 @@ namespace hpx { namespace util { namespace plugin
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_APPLICATION_NAME) && !defined(HPX_STATIC_LINKING)
+#if !defined(HPX_APPLICATION_NAME) && !defined(HPX_HAVE_STATIC_LINKING)
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.
 #define HPX_REGISTER_COMPONENT_MODULE()                                       \
@@ -197,7 +188,7 @@ namespace hpx { namespace util { namespace plugin
 #else
 // in executables (when HPX_APPLICATION_NAME is defined) this needs to expand
 // to nothing
-#if defined(HPX_STATIC_LINKING)
+#if defined(HPX_HAVE_STATIC_LINKING)
 #define HPX_REGISTER_COMPONENT_MODULE()                                       \
     HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, factory)              \
     HPX_REGISTER_REGISTRY_MODULE()                                            \

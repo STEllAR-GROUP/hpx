@@ -14,7 +14,7 @@
 #include <boost/version.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::elapsed_time_counter
 > elapsed_time_counter_type;
 
@@ -38,8 +38,15 @@ namespace hpx { namespace performance_counters { namespace server
     }
 
     hpx::performance_counters::counter_value
-        elapsed_time_counter::get_counter_value(bool)
+        elapsed_time_counter::get_counter_value(bool reset)
     {
+        if (reset)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "elapsed_time_counter::get_counter_value",
+                "counter /runtime/uptime does no support reset");
+        }
+
         // gather the current value
         boost::int64_t now = static_cast<boost::int64_t>(hpx::get_system_uptime());
         hpx::performance_counters::counter_value value;
@@ -50,6 +57,13 @@ namespace hpx { namespace performance_counters { namespace server
         value.time_ = now;
         value.count_ = ++invocation_count_;
         return value;
+    }
+
+    void elapsed_time_counter::reset_counter_value()
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "elapsed_time_counter::reset_counter_value",
+            "counter /runtime/uptime does no support reset");
     }
 }}}
 

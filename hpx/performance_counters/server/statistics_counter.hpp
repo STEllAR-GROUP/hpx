@@ -7,6 +7,7 @@
 #define HPX_PERFORMANCE_COUNTERS_SERVER_AVERAGE_COUNT_COUNTER_SEP_30_2011_1045AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -181,10 +182,10 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Statistic>
     class statistics_counter
       : public base_performance_counter,
-        public components::managed_component_base<
+        public components::component_base<
             statistics_counter<Statistic> >
     {
-        typedef components::managed_component_base<
+        typedef components::component_base<
             statistics_counter<Statistic> > base_type;
 
         // avoid warnings about using this in member initializer list

@@ -4,17 +4,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/asio_util.hpp>
 
+#include <boost/cstdint.hpp>
+#include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/asio/ip/address_v4.hpp>
+#include <boost/asio/ip/address_v6.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <ctime>
+#include <string>
 #include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,6 +96,37 @@ namespace hpx { namespace util
         return tcp::endpoint();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // return the public IP address of the local node
+    std::string
+    resolve_public_ip_address()
+    {
+        using boost::asio::ip::tcp;
+
+        // collect errors here
+        exception_list errors;
+
+        try {
+            boost::asio::io_service io_service;
+            tcp::resolver resolver(io_service);
+            tcp::resolver::query query(boost::asio::ip::host_name(), "");
+            tcp::resolver::iterator it = resolver.resolve(query);
+            tcp::endpoint endpoint = *it;
+            return endpoint.address().to_string();
+        }
+        catch (boost::system::system_error const&) {
+            errors.add(boost::current_exception());
+        }
+
+        // report errors
+        std::ostringstream strm;
+        strm << errors.get_message()
+                << " (while trying to resolve public ip address)";
+        HPX_THROW_EXCEPTION(network_error, "util::resolve_public_ip_address",
+            strm.str());
+        return "";
+    }
+
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
     bool split_ip_address(std::string const& v, std::string& host,
@@ -125,7 +160,8 @@ namespace hpx { namespace util
     }
 
 
-    endpoint_iterator_type connect_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type connect_begin(std::string const & address,
+        boost::uint16_t port,
         boost::asio::io_service& io_service)
     {
         using boost::asio::ip::tcp;
@@ -175,7 +211,8 @@ namespace hpx { namespace util
         return endpoint_iterator_type();
     }
 
-    endpoint_iterator_type accept_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type accept_begin(std::string const & address,
+        boost::uint16_t port,
         boost::asio::io_service& io_service)
     {
         using boost::asio::ip::tcp;

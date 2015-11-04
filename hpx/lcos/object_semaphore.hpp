@@ -35,16 +35,16 @@ struct object_semaphore
         ValueType const& val
       , boost::uint64_t count = 1)
     {
-        HPX_ASSERT(this->get_gid());
-        return this->base_type::signal_async(this->get_gid(), val, count);
+        HPX_ASSERT(this->get_id());
+        return this->base_type::signal_async(this->get_id(), val, count);
     }
 
     void signal_sync(
         ValueType const& val
       , boost::uint64_t count = 1)
     {
-        HPX_ASSERT(this->get_gid());
-        return this->base_type::signal_sync(this->get_gid(), val, count);
+        HPX_ASSERT(this->get_id());
+        return this->base_type::signal_sync(this->get_id(), val, count);
     }
 
     void signal(
@@ -57,14 +57,14 @@ struct object_semaphore
     ///////////////////////////////////////////////////////////////////////////
     lcos::future<ValueType> get_async()
     {
-        HPX_ASSERT(this->get_gid());
-        return this->base_type::get_async(this->get_gid());
+        HPX_ASSERT(this->get_id());
+        return this->base_type::get_async(this->get_id());
     }
 
     ValueType get_sync()
     {
-        HPX_ASSERT(this->get_gid());
-        return this->base_type::get_sync(this->get_gid());
+        HPX_ASSERT(this->get_id());
+        return this->base_type::get_sync(this->get_id());
     }
 
     ValueType get()
@@ -73,14 +73,14 @@ struct object_semaphore
     ///////////////////////////////////////////////////////////////////////////
     void abort_pending_async(error ec = no_success)
     {
-        HPX_ASSERT(this->get_gid());
-        this->base_type::abort_pending_sync(this->get_gid(), ec);
+        HPX_ASSERT(this->get_id());
+        this->base_type::abort_pending_sync(this->get_id(), ec);
     }
 
     void abort_pending_sync(error ec = no_success)
     {
-        HPX_ASSERT(this->get_gid());
-        this->base_type::abort_pending_sync(this->get_gid(), ec);
+        HPX_ASSERT(this->get_id());
+        this->base_type::abort_pending_sync(this->get_id(), ec);
     }
 
     void abort_pending(error ec = no_success)
@@ -89,14 +89,14 @@ struct object_semaphore
     ///////////////////////////////////////////////////////////////////////////
     void wait_async()
     {
-        HPX_ASSERT(this->get_gid());
-        this->base_type::wait_sync(this->get_gid());
+        HPX_ASSERT(this->get_id());
+        this->base_type::wait_sync(this->get_id());
     }
 
     void wait_sync()
     {
-        HPX_ASSERT(this->get_gid());
-        this->base_type::wait_sync(this->get_gid());
+        HPX_ASSERT(this->get_id());
+        this->base_type::wait_sync(this->get_id());
     }
 
     void wait()

@@ -5,37 +5,39 @@
 
 hpx_write_boostbook_catalog("${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml")
 
-file(GLOB base_files "${hpx_SOURCE_DIR}/docs/*.qbk")
-file(GLOB_RECURSE manual_files "${hpx_SOURCE_DIR}/docs/manual/*.qbk")
-file(GLOB_RECURSE tutorial_files "${hpx_SOURCE_DIR}/docs/tutorial/*.qbk")
-file(GLOB_RECURSE index_files "${hpx_SOURCE_DIR}/docs/*.idx")
+file(GLOB base_files "${PROJECT_SOURCE_DIR}/docs/*.qbk")
+file(GLOB manual_files "${PROJECT_SOURCE_DIR}/docs/manual/*.qbk")
+file(GLOB build_system_files "${PROJECT_SOURCE_DIR}/docs/manual/build_system/*.qbk")
+file(GLOB_RECURSE tutorial_files "${PROJECT_SOURCE_DIR}/docs/tutorial/*.qbk")
+file(GLOB_RECURSE index_files "${PROJECT_SOURCE_DIR}/docs/*.idx")
 
 set(documentation_files
-    ${manual_files} ${tutorial_files} ${base_files} ${index_files})
+    ${manual_files} ${build_system_files} ${tutorial_files}
+    ${base_files} ${index_files})
 
 set(documentation_dependencies
-    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_1.cpp"
-    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_2.cpp"
-    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_3.cpp"
-    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_4.cpp"
-    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_5.cpp"
-    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_6.cpp"
-    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_7.cpp"
-    "${hpx_SOURCE_DIR}/examples/1d_stencil/1d_stencil_8.cpp"
-    "${hpx_SOURCE_DIR}/examples/quickstart/hello_world.cpp"
-    "${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp"
-    "${hpx_SOURCE_DIR}/examples/quickstart/error_handling.cpp"
-    "${hpx_SOURCE_DIR}/examples/accumulator/accumulators/server/managed_accumulator.hpp"
-    "${hpx_SOURCE_DIR}/examples/accumulator/accumulators/stubs/managed_accumulator.hpp"
-    "${hpx_SOURCE_DIR}/examples/accumulator/accumulators/managed_accumulator.hpp"
-    "${hpx_SOURCE_DIR}/examples/accumulator/accumulators/managed_accumulator.cpp"
-    "${hpx_SOURCE_DIR}/examples/accumulator/managed_accumulator_client.cpp"
-    "${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp"
-    "${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp"
-    "${hpx_SOURCE_DIR}/examples/performance_counters/simplest_performance_counter.cpp"
-    "${hpx_SOURCE_DIR}/examples/performance_counters/sine/server/sine.hpp"
-    "${hpx_SOURCE_DIR}/hpx/performance_counters/performance_counter.hpp"
-    "${hpx_SOURCE_DIR}/hpx/performance_counters/base_performance_counter.hpp")
+    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_1.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_2.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_3.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_4.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_5.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_6.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_7.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/1d_stencil/1d_stencil_8.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/quickstart/hello_world.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/quickstart/error_handling.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/server/accumulator.hpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/stubs/accumulator.hpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.hpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator_client.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp"
+    "${PROJECT_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/performance_counters/simplest_performance_counter.cpp"
+    "${PROJECT_SOURCE_DIR}/examples/performance_counters/sine/server/sine.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/performance_counter.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/base_performance_counter.hpp")
 
 set(all_documentation_dependencies
     ${documentation_files}
@@ -43,70 +45,106 @@ set(all_documentation_dependencies
 
 # Add all files here which should be passed to doxygen
 set(doxygen_dependencies
-    "${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp"
-    "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp"
-    "${hpx_SOURCE_DIR}/hpx/hpx_start.hpp"
-    "${hpx_SOURCE_DIR}/hpx/hpx_finalize.hpp"
-    "${hpx_SOURCE_DIR}/hpx/error.hpp"
-    "${hpx_SOURCE_DIR}/hpx/exception.hpp"
-    "${hpx_SOURCE_DIR}/hpx/exception_list.hpp"
-    "${hpx_SOURCE_DIR}/hpx/components/component_storage/migrate_from_storage.hpp"
-    "${hpx_SOURCE_DIR}/hpx/components/component_storage/migrate_to_storage.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithm.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/task_region.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/adjacent_find.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/all_any_none.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/copy.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/count.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/equal.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/exclusive_scan.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/fill.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/find.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/for_each.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/is_partitioned.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/is_sorted.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/lexicographical_compare.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/minmax.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/mismatch.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/move.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/reduce.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/remove_copy.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/replace.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/reverse.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/rotate.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/search.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/swap_ranges.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform_exclusive_scan.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform_inclusive_scan.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/transform_reduce.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_copy.hpp"
-    "${hpx_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/actions/basic_action.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/components/new.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/components/copy_component.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
-    "${hpx_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/fold.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/reduce.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/wait_all.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/when_all.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/wait_any.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/when_any.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/wait_some.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/when_some.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
-    "${hpx_SOURCE_DIR}/hpx/lcos/when_each.hpp"
-    "${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
+    "${PROJECT_SOURCE_DIR}/hpx/hpx_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/hpx_init.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/error.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/exception.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/exception_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/exception_list.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/components/component_storage/migrate_from_storage.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/components/component_storage/migrate_to_storage.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithm.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/task_block.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/adjacent_difference.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/adjacent_find.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/all_any_none.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/copy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/count.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/equal.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/exclusive_scan.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/fill.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/find.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/for_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/generate.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/includes.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/inclusive_scan.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/inner_product.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_partitioned.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/is_sorted.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/lexicographical_compare.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/minmax.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/mismatch.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/move.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/reduce.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/remove_copy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/replace.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/reverse.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/rotate.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/search.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_difference.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_intersection.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_symmetric_difference.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_union.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/swap_ranges.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_exclusive_scan.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_inclusive_scan.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_reduce.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_copy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/uninitialized_fill.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/auto_chunk_size.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/dynamic_chunk_size.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/executor_traits.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/executor_parameter_traits.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/guided_chunk_size.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/sequential_executor.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/service_executors.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/static_chunk_size.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/thread_pool_executors.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_executor_traits.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/get_ptr.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/get_locality_name.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/get_locality_id.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/get_os_thread_count.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/get_worker_thread_num.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/find_here.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/launch_policy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/parcelset_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/runtime_mode.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/trigger_lco.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/actions/basic_action.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/binpacking_distribution_policy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/colocating_distribution_policy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/component_factory.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/copy_component.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/default_distribution_policy.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/components/new.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_enums.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/broadcast.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/fold.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/reduce.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_all.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/when_all.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_any.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/when_any.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_some.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/when_some.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/when_each.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
 
 
 foreach(doxygen_input ${doxygen_dependencies})
@@ -121,10 +159,12 @@ set(doxygen_definition_list
     "DOXYGEN:=1"
     "BOOST_SCOPED_ENUM_START(x):=enum x"
     "BOOST_SCOPED_ENUM_END="
+    "BOOST_SCOPED_ENUM(x):=x"
     "BOOST_SYSTEM_NOEXCEPT="
     "HPX_EXCEPTION_EXPORT="
     "HPX_EXPORT="
     "HPX_API_EXPORT="
+    "HPX_ALWAYS_EXPORT="
     "HPX_STD_FUNCTION=std::function"
     "extern="
     "BOOST_NOEXCEPT="
@@ -144,7 +184,7 @@ foreach(doxygen_input ${doxygen_dependencies})
 endforeach()
 
 hpx_info("Creating Doxyfile: ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy")
-configure_file("${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in"
+configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/autodoc.doxy.in"
                 "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy"
                 @ONLY)
 
@@ -173,19 +213,22 @@ set(image
 set(HPX_CMAKE_OPTIONS "")
 foreach(_cat ${HPX_OPTION_CATEGORIES})
   string(REPLACE " " "_" _cat_link "${_cat}")
-  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_cat_link} ${_cat} Options]\n")
+  set(HPX_CMAKE_OPTIONS
+    "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_cat_link} ${_cat} Options]\n")
 endforeach()
 set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}\n")
 
 get_cmake_property(_variableNames CACHE_VARIABLES)
 foreach(_cat ${HPX_OPTION_CATEGORIES})
   string(REPLACE " " "_" _cat_anchor "${_cat}")
-  set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}[#build_system.cmake_variables.${_cat_anchor}][h3 ${_cat} Options]\n")
+  set(HPX_CMAKE_OPTIONS
+    "${HPX_CMAKE_OPTIONS}[#build_system.cmake_variables.${_cat_anchor}][h3 ${_cat} Options]\n")
   foreach (_variableName ${_variableNames})
     if(${_variableName}Category)
       if(_cat STREQUAL ${_variableName}Category)
         string(REPLACE " " "_" _variableName_anchor "${_variableName}")
-        set(HPX_CMAKE_OPTIONS "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_variableName_anchor} ${_variableName}]\n")
+        set(HPX_CMAKE_OPTIONS
+          "${HPX_CMAKE_OPTIONS}* [link build_system.cmake_variables.${_variableName_anchor} ${_variableName}]\n")
       endif()
     endif()
   endforeach()
@@ -214,12 +257,12 @@ foreach(_cat ${HPX_OPTION_CATEGORIES})
 endforeach()
 
 configure_file(
-  "${hpx_SOURCE_DIR}/cmake/templates/cmake_variables.qbk.in"
-  "${hpx_SOURCE_DIR}/docs/manual/build_system/cmake_variables.qbk"
+  "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_variables.qbk.in"
+  "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_variables.qbk"
   @ONLY
 )
 
-set(toolchains_base_dir ${hpx_SOURCE_DIR}/cmake/toolchains/)
+set(toolchains_base_dir ${PROJECT_SOURCE_DIR}/cmake/toolchains/)
 file(GLOB _toolchain_files ${toolchains_base_dir} ${toolchains_base_dir}*.cmake)
 
 set(HPX_CMAKE_TOOLCHAINS_LIST "")
@@ -227,8 +270,10 @@ set(HPX_CMAKE_TOOLCHAINS "")
 foreach(_toolchain ${_toolchain_files})
   get_filename_component(_toolchain_name ${_toolchain} NAME_WE)
   string(REGEX REPLACE "[ -]" "_" _toolchain_anchor "${_toolchain_name}")
-  set(HPX_CMAKE_TOOLCHAINS_LIST "${HPX_CMAKE_TOOLCHAINS_LIST}* [link hpx.manual.build_system.building_hpx.cmake_toolchains.${_toolchain_anchor} ${_toolchain_name}]\n")
-  set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}[heading:${_toolchain_anchor} ${_toolchain_name}]\n")
+  set(HPX_CMAKE_TOOLCHAINS_LIST
+   "${HPX_CMAKE_TOOLCHAINS_LIST}* [link hpx.manual.build_system.building_hpx.cmake_toolchains.${_toolchain_anchor} ${_toolchain_name}]\n")
+  set(HPX_CMAKE_TOOLCHAINS
+    "${HPX_CMAKE_TOOLCHAINS}[heading:${_toolchain_anchor} ${_toolchain_name}]\n")
   set(HPX_CMAKE_TOOLCHAINS "${HPX_CMAKE_TOOLCHAINS}\n``\n")
   file(STRINGS ${_toolchain} _toolchain_content)
   foreach(_line ${_toolchain_content})
@@ -240,8 +285,8 @@ endforeach()
 
 
 configure_file(
-  "${hpx_SOURCE_DIR}/cmake/templates/cmake_toolchains.qbk.in"
-  "${hpx_SOURCE_DIR}/docs/manual/build_system/cmake_toolchains.qbk"
+  "${PROJECT_SOURCE_DIR}/cmake/templates/cmake_toolchains.qbk.in"
+  "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_toolchains.qbk"
   @ONLY
 )
 
@@ -250,8 +295,8 @@ hpx_quickbook_to_html(hpx
   INDEX hpx.idx
   DEPENDENCIES
     ${all_documentation_dependencies}
-    "${hpx_SOURCE_DIR}/docs/manual/build_system/cmake_variables.qbk"
-    "${hpx_SOURCE_DIR}/docs/manual/build_system/cmake_toolchains.qbk"
+    "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_variables.qbk"
+    "${PROJECT_SOURCE_DIR}/docs/manual/build_system/cmake_toolchains.qbk"
   CATALOG "${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml"
   XSLTPROC_ARGS chunk.section.depth=4
                 chunk.first.sections=1
@@ -259,13 +304,13 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=481
-                boost.image.h=125
+                boost.image.w=466
+                boost.image.h=120
                 boost.image.alt="HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
   AUTOINDEX_ARGS --internal-index
-  SINGLEPAGE ${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
+  SINGLEPAGE ${HPX_WITH_DOCUMENTATION_SINGLEPAGE})
 
 if(FOP_FOUND)
   # This assumes that Quickbook -> BoostBook succeeded above.
@@ -294,7 +339,7 @@ else()
     SOURCES ${documentation_files})
 endif()
 
-if(HPX_BUILD_DOCUMENTATION_SINGLEPAGE)
+if(HPX_WITH_DOCUMENTATION_SINGLEPAGE)
   add_custom_target(singlepage_docs
     DEPENDS hpx_singlepage_HTML.manifest
     SOURCES ${documentation_files})
@@ -305,20 +350,21 @@ set(DOCS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}" )
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${DOCS_OUTPUT_DIR}/code" )
 execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/docs/html/src" "${DOCS_OUTPUT_DIR}/src")
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/docs/html/src" "${DOCS_OUTPUT_DIR}/src")
 execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/docs/html/images" "${DOCS_OUTPUT_DIR}/images")
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/docs/html/images" "${DOCS_OUTPUT_DIR}/images")
 execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/hpx" "${DOCS_OUTPUT_DIR}/code/hpx")
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/hpx" "${DOCS_OUTPUT_DIR}/code/hpx")
 execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/src" "${DOCS_OUTPUT_DIR}/code/src")
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/src" "${DOCS_OUTPUT_DIR}/code/src")
 execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/examples" "${DOCS_OUTPUT_DIR}/code/examples")
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/examples" "${DOCS_OUTPUT_DIR}/code/examples")
 execute_process(
-  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${hpx_SOURCE_DIR}/tests" "${DOCS_OUTPUT_DIR}/code/tests")
+  COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/tests" "${DOCS_OUTPUT_DIR}/code/tests")
 
 source_group(Documentation FILES ${base_files})
 source_group("Documentation\\Manual" FILES ${manual_files})
+source_group("Documentation\\Manual\\BuildSystem" FILES ${build_system_files})
 source_group("Documentation\\Tutorial" FILES ${tutorial_files})
 if(BOOSTAUTOINDEX_FOUND)
   source_group("Documentation\\Index" FILES ${index_files})
@@ -338,6 +384,6 @@ add_custom_target(git_docs
 #  VERBATIM)
 
 add_dependencies(git_docs docs)
-if(HPX_BUILD_DOCUMENTATION_SINGLEPAGE)
+if(HPX_WITH_DOCUMENTATION_SINGLEPAGE)
   add_dependencies(git_docs singlepage_docs)
 endif()

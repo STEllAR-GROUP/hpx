@@ -17,7 +17,7 @@ endif
 
 APP_CFLAGS = $(CXX_FLAGS)
 APP_CFLAGS += $(shell PKG_CONFIG_PATH=$(HPX_DIR) $(PKG_CONFIG) --cflags --libs $(hpx_application))
-APP_CFLAGS += -liostreams$(debug_suffix)
+APP_CFLAGS += -lhpx_iostreams$(debug_suffix)
 APP_CFLAGS += -DHPX_APPLICATION_NAME=test
 
 COMP_CFLAGS = $(CXX_FLAGS)

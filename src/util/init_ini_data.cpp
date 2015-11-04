@@ -4,9 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/config/defaults.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
@@ -24,7 +23,6 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/tokenizer.hpp>
 #include <hpx/util/plugin.hpp>
-#include <boost/foreach.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/range/iterator_range.hpp>
 
@@ -36,7 +34,8 @@ namespace hpx { namespace util
     {
         try {
             namespace fs = boost::filesystem;
-            if (!fs::exists(loc))
+            boost::system::error_code ec;
+            if (!fs::exists(loc, ec) || ec)
                 return false;       // avoid exception on missing file
             ini.read (loc);
         }
@@ -92,7 +91,8 @@ namespace hpx { namespace util
         bool result = false;
         for (tokenizer_type::iterator it = tok_paths.begin (); it != end_paths; ++it) {
             std::string path = *it;
-            for (tokenizer_type::iterator jt = tok_suffixes.begin (); jt != end_suffixes; ++jt) {
+            for (tokenizer_type::iterator jt = tok_suffixes.begin ();
+                jt != end_suffixes; ++jt) {
                 path += *jt;
                 bool result2 = handle_ini_file (ini, path + "/hpx.ini");
                 if (result2) {
@@ -131,7 +131,8 @@ namespace hpx { namespace util
 
         if (!hpx_ini_file.empty()) {
             namespace fs = boost::filesystem;
-            if (!fs::exists(hpx_ini_file)) {
+            boost::system::error_code ec;
+            if (!fs::exists(hpx_ini_file, ec) || ec) {
                 std::cerr << "hpx::init: command line warning: file specified using "
                              "--hpx::config does not exist ("
                     << hpx_ini_file << ")." << std::endl;
@@ -177,7 +178,8 @@ namespace hpx { namespace util
                 fs::directory_iterator nodir;
                 fs::path this_path (hpx::util::create_path(*it));
 
-                if (!fs::exists(this_path))
+                boost::system::error_code ec;
+                if (!fs::exists(this_path, ec) || ec)
                     continue;
 
                 for (fs::directory_iterator dir(this_path); dir != nodir; ++dir)
@@ -239,7 +241,7 @@ namespace hpx { namespace util
         }
         else {
             // ask all registries
-            BOOST_FOREACH(std::string const& s, names)
+            for (std::string const& s : names)
             {
                 // create the component registry object
                 boost::shared_ptr<components::component_registry_base>
@@ -285,7 +287,7 @@ namespace hpx { namespace util
         }
         else {
             // ask all registries
-            BOOST_FOREACH(std::string const& s, names)
+            for (std::string const& s : names)
             {
                 // create the component registry object
                 boost::shared_ptr<components::component_registry_base>
@@ -321,7 +323,7 @@ namespace hpx { namespace util
         std::vector<std::string> ini_data;
         if (!names.empty()) {
             // ask all registries
-            BOOST_FOREACH(std::string const& s, names)
+            for (std::string const& s : names)
             {
                 // create the plugin registry object
                 boost::shared_ptr<plugins::plugin_registry_base>
@@ -378,7 +380,8 @@ namespace hpx { namespace util
             fs::directory_iterator nodir;
             fs::path libs_path (hpx::util::create_path(libs));
 
-            if (!fs::exists(libs_path))
+            boost::system::error_code ec;
+            if (!fs::exists(libs_path, ec) || ec)
                 return plugin_registries;     // given directory doesn't exist
 
             // retrieve/create section [hpx.components]
@@ -405,6 +408,12 @@ namespace hpx { namespace util
 #if !defined(BOOST_WINDOWS)
                 if (0 == name.find("lib"))
                     name = name.substr(3);
+#endif
+#if defined(__APPLE__) // shared library version is added berfore extension
+                const std::string version = hpx::full_version_as_string();
+                std::string::size_type i = name.find(version);
+                if (i != std::string::npos)
+                    name.erase(i - 1, version.length() + 1); // - 1 for one more dot
 #endif
                 // ensure base directory, remove symlinks, etc.
                 boost::system::error_code fsec;
@@ -441,7 +450,7 @@ namespace hpx { namespace util
         std::random_shuffle(libdata.begin(), libdata.end());
 
         typedef std::pair<fs::path, std::string> libdata_type;
-        BOOST_FOREACH(libdata_type const& p,
+        for (libdata_type const& p :
             boost::iterator_range<iterator_type>(libdata.begin(), libdata.end()))
         {
             // get the handle of the library

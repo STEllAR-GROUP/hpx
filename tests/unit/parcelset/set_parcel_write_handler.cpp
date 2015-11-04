@@ -21,10 +21,9 @@ boost::atomic<std::size_t> write_handler_called(0);
 
 bool is_test_action(hpx::parcelset::parcel const& p)
 {
-    hpx::actions::action_type act = p.get_action();
     return dynamic_cast<
             hpx::actions::transfer_action<test_action>*
-        >(act.get()) != 0;
+        >(p.get_action()) != 0;
 }
 
 void write_handler(boost::system::error_code const&,
@@ -50,7 +49,7 @@ int main()
         for (hpx::id_type const& id: localities)
         {
             hpx::lcos::promise<void> p;
-            hpx::apply<test_action>(id, p.get_gid());
+            hpx::apply<test_action>(id, p.get_id());
             wait_for.push_back(p.get_future());
         }
 
@@ -67,7 +66,7 @@ int main()
         for (hpx::id_type const& id: localities)
         {
             hpx::lcos::promise<void> p;
-            hpx::apply<test_action>(id, p.get_gid());
+            hpx::apply<test_action>(id, p.get_id());
             wait_for.push_back(p.get_future());
         }
 

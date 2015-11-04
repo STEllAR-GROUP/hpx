@@ -6,12 +6,13 @@
 #if !defined(HPX_COMPONENTS_MEMORY_JUN_25_2008_0122PM)
 #define HPX_COMPONENTS_MEMORY_JUN_25_2008_0122PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/util/numerics/uint128.hpp>
+#include <hpx/util/integer/uint128.hpp>
 
 #include <utility>
 
@@ -32,7 +33,7 @@ namespace hpx { namespace components { namespace server
             components::set_component_type<memory>(t);
         }
 
-        typedef util::numerics::uint128 uint128_t;
+        typedef util::integer::uint128 uint128_t;
 
         // constructor
         memory()
@@ -146,9 +147,19 @@ namespace hpx { namespace components { namespace server
     HPX_DEFINE_PLAIN_ACTION(allocate, allocate_action);
 }}}
 
+namespace hpx { namespace traits
+{
+    // memory is a (hand-rolled) component
+    template <>
+    struct is_component<components::server::memory>
+      : boost::mpl::true_
+    {};
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the runtime_support actions
-HPX_REGISTER_PLAIN_ACTION_DECLARATION(hpx::components::server::allocate_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::allocate_action, allocate_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::memory::store8_action, store8_action)
@@ -173,8 +184,7 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::memory::load128_action, load128_action)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::components::server::memory::uint128_t
-  , hpx_components_memory_uint128_t
-)
+    hpx::components::server::memory::uint128_t, hpx_components_memory_uint128_t)
+
 #endif
 

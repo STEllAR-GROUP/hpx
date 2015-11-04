@@ -10,6 +10,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include <boost/shared_array.hpp>
 
@@ -43,7 +44,7 @@ inline std::size_t locidx(std::size_t i, std::size_t np, std::size_t nl)
 struct partition_data
 {
 private:
-    typedef hpx::util::serialize_buffer<double> buffer_type;
+    typedef hpx::serialization::serialize_buffer<double> buffer_type;
 
 public:
     partition_data()
@@ -95,7 +96,7 @@ private:
     // Serialization support: even if all of the code below runs on one
     // locality only, we need to provide an (empty) implementation for the
     // serialization as all arguments passed to actions have to support this.
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int version)
@@ -127,7 +128,7 @@ std::ostream& operator<<(std::ostream& os, partition_data const& c)
 // component which allows for it to be created and accessed remotely through
 // a global address (hpx::id_type).
 struct partition_server
-  : hpx::components::simple_component_base<partition_server>
+  : hpx::components::component_base<partition_server>
 {
     enum partition_type
     {
@@ -182,10 +183,10 @@ private:
 // The macros below are necessary to generate the code required for exposing
 // our partition type remotely.
 //
-// HPX_REGISTER_MINIMAL_COMPONENT_FACTORY() exposes the component creation
+// HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
-typedef hpx::components::simple_component<partition_server> partition_server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(partition_server_type, partition_server);
+typedef hpx::components::component<partition_server> partition_server_type;
+HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
@@ -209,7 +210,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
     // Create a new component on the locality co-located to the id 'where'. The
     // new instance will be initialized from the given partition_data.
     partition(hpx::id_type where, partition_data const& data)
-      : base_type(hpx::new_colocated<partition_server>(where, data))
+      : base_type(hpx::new_<partition_server>(hpx::colocated(where), data))
     {}
 
     // Attach a future representing a (possibly remote) partition.
@@ -229,7 +230,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
     hpx::future<partition_data> get_data(partition_server::partition_type t) const
     {
         partition_server::get_data_action act;
-        return hpx::async(act, get_gid(), t);
+        return hpx::async(act, get_id(), t);
     }
 };
 
@@ -242,7 +243,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all elements
@@ -277,7 +278,7 @@ struct stepper
                 {
                     // The new partition_data will be allocated on the same locality
                     // as 'middle'.
-                    return partition(middle.get_gid(), heat_part_data(l, m, r));
+                    return partition(middle.get_id(), heat_part_data(l, m, r));
                 }
             ),
             left.get_data(partition_server::left_partition),

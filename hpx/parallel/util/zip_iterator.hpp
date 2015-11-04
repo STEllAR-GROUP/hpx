@@ -29,8 +29,28 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
         >::type result_type;
 
         return zipiter.then(
-            [](hpx::future<ZipIter>&& f) -> result_type {
-             return hpx::util::get<N>(f.get().get_iterator_tuple());
+            [](hpx::future<ZipIter>&& f) -> result_type
+            {
+                return hpx::util::get<N>(f.get().get_iterator_tuple());
+            });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename R, typename ZipIter>
+    R get_iter_tuple(ZipIter&& zipiter)
+    {
+        return zipiter.get_iterator_tuple();
+    }
+
+    template <typename R, typename ZipIter>
+    R get_iter_tuple(hpx::future<ZipIter>&& zipiter)
+    {
+        typedef typename ZipIter::iterator_tuple_type result_type;
+
+        return zipiter.then(
+            [](hpx::future<ZipIter>&& f) -> result_type
+            {
+                return f.get().get_iterator_tuple();
             });
     }
 }}}}

@@ -54,7 +54,7 @@ namespace sheneos
         init_async(std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
-            return stubs::partition3d::init_async(this->get_gid(), datafilename,
+            return stubs::partition3d::init_async(this->get_id(), datafilename,
                 dimx, dimy, dimz);
         }
 
@@ -62,7 +62,7 @@ namespace sheneos
         void init(std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
-            stubs::partition3d::init(this->get_gid(), datafilename, dimx, dimy, dimz);
+            stubs::partition3d::init(this->get_id(), datafilename, dimx, dimy, dimz);
         }
 
         /// Asynchronously perform an interpolation on this partition.
@@ -76,7 +76,7 @@ namespace sheneos
         interpolate_async(double ye, double temp, double rho,
             boost::uint32_t eosvalues)
         {
-            return stubs::partition3d::interpolate_async(this->get_gid(),
+            return stubs::partition3d::interpolate_async(this->get_id(),
                 ye, temp, rho, eosvalues);
         }
 
@@ -90,7 +90,7 @@ namespace sheneos
         std::vector<double> interpolate(double ye, double temp, double rho,
             boost::uint32_t eosvalues)
         {
-            return stubs::partition3d::interpolate(this->get_gid(),
+            return stubs::partition3d::interpolate(this->get_id(),
                 ye, temp, rho, eosvalues);
         }
 
@@ -106,7 +106,7 @@ namespace sheneos
         interpolate_one_async(double ye, double temp, double rho,
             boost::uint32_t eosvalue)
         {
-            return stubs::partition3d::interpolate_one_async(this->get_gid(),
+            return stubs::partition3d::interpolate_one_async(this->get_id(),
                 ye, temp, rho, eosvalue);
         }
 
@@ -121,7 +121,7 @@ namespace sheneos
         double interpolate_one(double ye, double temp, double rho,
             boost::uint32_t eosvalue)
         {
-            return stubs::partition3d::interpolate_one(this->get_gid(),
+            return stubs::partition3d::interpolate_one(this->get_id(),
                 ye, temp, rho, eosvalue);
         }
 
@@ -136,7 +136,7 @@ namespace sheneos
         interpolate_one_bulk_async(std::vector<sheneos_coord> const& coords,
             boost::uint32_t eosvalue)
         {
-            return stubs::partition3d::interpolate_one_bulk_async(this->get_gid(),
+            return stubs::partition3d::interpolate_one_bulk_async(this->get_id(),
                 coords, eosvalue);
         }
 
@@ -150,7 +150,7 @@ namespace sheneos
         std::vector<double> interpolate_one_bulk(
             std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalue)
         {
-            return stubs::partition3d::interpolate_one_bulk(this->get_gid(),
+            return stubs::partition3d::interpolate_one_bulk(this->get_id(),
                 coords, eosvalue);
         }
 
@@ -166,7 +166,7 @@ namespace sheneos
         interpolate_bulk_async(std::vector<sheneos_coord> const& coords,
             boost::uint32_t eosvalue)
         {
-            return stubs::partition3d::interpolate_bulk_async(this->get_gid(),
+            return stubs::partition3d::interpolate_bulk_async(this->get_id(),
                 coords, eosvalue);
         }
 
@@ -181,7 +181,7 @@ namespace sheneos
         interpolate_bulk(std::vector<sheneos_coord> const& coords,
             boost::uint32_t eosvalue)
         {
-            return stubs::partition3d::interpolate_bulk(this->get_gid(),
+            return stubs::partition3d::interpolate_bulk(this->get_id(),
                 coords, eosvalue);
         }
     };

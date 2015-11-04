@@ -13,6 +13,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/register_locks.hpp>
 
+#include <boost/thread/locks.hpp>
+
 #if defined(__ANDROID__) || defined(ANDROID)
 #include <cpu-features.h>
 #endif
@@ -42,15 +44,15 @@ namespace hpx
     thread::thread(thread && rhs) BOOST_NOEXCEPT
       : id_(threads::invalid_thread_id)   // the rhs needs to end up with an invalid_id
     {
-        mutex_type::scoped_lock l(rhs.mtx_);
+        boost::lock_guard<mutex_type> l(rhs.mtx_);
         id_ = rhs.id_;
         rhs.id_ = threads::invalid_thread_id;
     }
 
     thread& thread::operator=(thread && rhs) BOOST_NOEXCEPT
     {
-        mutex_type::scoped_lock l(mtx_);
-        mutex_type::scoped_lock l2(rhs.mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
+        boost::lock_guard<mutex_type> l2(rhs.mtx_);
         // If our current thread is joinable, terminate
         if (joinable_locked())
         {
@@ -70,15 +72,15 @@ namespace hpx
         }
         threads::thread_id_type id = threads::invalid_thread_id;
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             std::swap(id_, id);
         }
     }
 
     void thread::swap(thread& rhs) BOOST_NOEXCEPT
     {
-        mutex_type::scoped_lock l(mtx_);
-        mutex_type::scoped_lock l2(rhs.mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
+        boost::lock_guard<mutex_type> l2(rhs.mtx_);
         std::swap(id_, rhs.id_);
     }
 
@@ -161,7 +163,7 @@ namespace hpx
 
     void thread::join()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
 
         if(!joinable_locked())
         {
@@ -183,7 +185,7 @@ namespace hpx
                 util::bind(&resume_thread, this_id)))
         {
             // wait for thread to be terminated
-            util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+            util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
             this_thread::suspend(threads::suspended, "thread::join");
         }
 
@@ -206,7 +208,7 @@ namespace hpx
         threads::interrupt_thread(id.id_, flag);
     }
 
-#ifdef HPX_THREAD_MAINTAIN_LOCAL_STORAGE
+#ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
     std::size_t thread::get_thread_data() const
     {
         return threads::get_thread_data(native_handle());
@@ -255,7 +257,7 @@ namespace hpx
 
             void cancel()
             {
-                mutex_type::scoped_lock l(this->mtx_);
+                boost::lock_guard<mutex_type> l(this->mtx_);
                 if (!this->is_ready()) {
                     threads::interrupt_thread(id_);
                     this->set_error(thread_cancelled,
@@ -269,7 +271,7 @@ namespace hpx
             void thread_exit_function()
             {
                 // might have been finished or canceled
-                mutex_type::scoped_lock l(this->mtx_);
+                boost::lock_guard<mutex_type> l(this->mtx_);
                 if (!this->is_ready())
                     this->set_data(result_type());
                 id_ = threads::invalid_thread_id;

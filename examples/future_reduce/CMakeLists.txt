@@ -6,11 +6,11 @@
 set(example_programs
    )
 
-if(HPX_WITH_CXX11_LAMBDAS)
+if(Boost_RANDOM_FOUND AND HPX_WITH_CXX11_LAMBDAS)
   set(example_programs
       ${example_programs}
-      future_reduce)
-  set(future_reduce_FLAGS DEPENDENCIES iostreams_component)
+      rnd_future_reduce)
+  set(rnd_future_reduce_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 foreach(example_program ${example_programs})

@@ -48,26 +48,26 @@ namespace sheneos
         init_async(std::string const& datafile,
             std::string const& symbolic_name, std::size_t num_instances)
         {
-            return stubs::configuration::init_async(this->get_gid(), datafile,
+            return stubs::configuration::init_async(this->get_id(), datafile,
                 symbolic_name, num_instances);
         }
 
         void init(std::string const& datafile, std::string const& symbolic_name,
             std::size_t num_instances)
         {
-            stubs::configuration::init(this->get_gid(), datafile, symbolic_name,
+            stubs::configuration::init(this->get_id(), datafile, symbolic_name,
                 num_instances);
         }
 
         ///////////////////////////////////////////////////////////////////////
         hpx::lcos::future<config_data> get_async() const
         {
-            return stubs::configuration::get_async(this->get_gid());
+            return stubs::configuration::get_async(this->get_id());
         }
 
         config_data get() const
         {
-            return stubs::configuration::get(this->get_gid());
+            return stubs::configuration::get(this->get_id());
         }
     };
 }

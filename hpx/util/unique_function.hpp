@@ -10,10 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/error.hpp>
-#include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/unique_function_template.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 
@@ -22,10 +22,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_CONTINUATION_REGISTER_UNIQUE_FUNCTION_FACTORY(VTable, Name)       \
     static ::hpx::util::detail::function_registration<                        \
-        VTable::first_type, VTable::second_type                               \
+        ::hpx::util::tuple_element<0, VTable>::type                           \
+      , ::hpx::util::tuple_element<1, VTable>::type                           \
     > const BOOST_PP_CAT(Name, _unique_function_factory_registration) =       \
             ::hpx::util::detail::function_registration<                       \
-                VTable::first_type, VTable::second_type                       \
+                ::hpx::util::tuple_element<0, VTable>::type                   \
+              , ::hpx::util::tuple_element<1, VTable>::type                   \
             >();                                                              \
 /**/
 
@@ -39,10 +41,11 @@
 #define HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(Sig, Functor, Name)     \
     namespace hpx { namespace util { namespace detail {                       \
         typedef                                                               \
-            std::pair<                                                        \
+            hpx::util::tuple<                                                 \
                 unique_function_vtable_ptr<                                   \
                     Sig                                                       \
-                  , portable_binary_iarchive, portable_binary_oarchive        \
+                  , serialization::input_archive                              \
+                  , serialization::output_archive                             \
                 >                                                             \
               , util::decay<HPX_UTIL_STRIP(Functor)>::type                    \
             >                                                                 \
@@ -76,11 +79,11 @@
 #define HPX_UTIL_REGISTER_UNIQUE_FUNCTION(Sig, Functor, Name)                 \
     HPX_CONTINUATION_REGISTER_UNIQUE_FUNCTION_FACTORY(                        \
         BOOST_PP_CAT(BOOST_PP_CAT(hpx::util::detail::__,                      \
-            BOOST_PP_CAT(hpx_function_serialization_, Name)), _type)          \
+            BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type)   \
       , Name)                                                                 \
     HPX_DEFINE_GET_UNIQUE_FUNCTION_NAME(                                      \
         BOOST_PP_CAT(BOOST_PP_CAT(hpx::util::detail::__,                      \
-            BOOST_PP_CAT(hpx_function_serialization_, Name)), _type)          \
+            BOOST_PP_CAT(hpx_unique_function_serialization_, Name)), _type)   \
       , Name)                                                                 \
 /**/
 

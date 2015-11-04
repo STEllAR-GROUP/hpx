@@ -73,12 +73,14 @@ long f_7(long a, long b, long c, long d, long e, long f, long g)
 
 long f_8(long a, long b, long c, long d, long e, long f, long g, long h)
 {
-    return a + 10 * b + 100 * c + 1000 * d + 10000 * e + 100000 * f + 1000000 * g + 10000000 * h;
+    return a + 10 * b + 100 * c + 1000 * d + 10000 * e
+        + 100000 * f + 1000000 * g + 10000000 * h;
 }
 
 long f_9(long a, long b, long c, long d, long e, long f, long g, long h, long i)
 {
-    return a + 10 * b + 100 * c + 1000 * d + 10000 * e + 100000 * f + 1000000 * g + 10000000 * h + 100000000 * i;
+    return a + 10 * b + 100 * c + 1000 * d + 10000 * e
+        + 100000 * f + 1000000 * g + 10000000 * h + 100000000 * i;
 }
 
 long global_result;
@@ -120,17 +122,20 @@ void fv_6(long a, long b, long c, long d, long e, long f)
 
 void fv_7(long a, long b, long c, long d, long e, long f, long g)
 {
-    global_result = a + 10 * b + 100 * c + 1000 * d + 10000 * e + 100000 * f + 1000000 * g;
+    global_result = a + 10 * b + 100 * c + 1000 * d + 10000 * e
+        + 100000 * f + 1000000 * g;
 }
 
 void fv_8(long a, long b, long c, long d, long e, long f, long g, long h)
 {
-    global_result = a + 10 * b + 100 * c + 1000 * d + 10000 * e + 100000 * f + 1000000 * g + 10000000 * h;
+    global_result = a + 10 * b + 100 * c + 1000 * d + 10000 * e
+        + 100000 * f + 1000000 * g + 10000000 * h;
 }
 
 void fv_9(long a, long b, long c, long d, long e, long f, long g, long h, long i)
 {
-    global_result = a + 10 * b + 100 * c + 1000 * d + 10000 * e + 100000 * f + 1000000 * g + 10000000 * h + 100000000 * i;
+    global_result = a + 10 * b + 100 * c + 1000 * d + 10000 * e
+        + 100000 * f + 1000000 * g + 10000000 * h + 100000000 * i;
 }
 
 void function_test()
@@ -143,23 +148,39 @@ void function_test()
     HPX_TEST( hpx::util::bind(f_1, placeholders::_1)(i) == 1L );
     HPX_TEST( hpx::util::bind(f_2, placeholders::_1, 2)(i) == 21L );
     HPX_TEST( hpx::util::bind(f_3, placeholders::_1, 2, 3)(i) == 321L );
-    HPX_TEST( hpx::util::bind(f_4, placeholders::_1, 2, 3, 4)(i) == 4321L );
-    HPX_TEST( hpx::util::bind(f_5, placeholders::_1, 2, 3, 4, 5)(i) == 54321L );
-    HPX_TEST( hpx::util::bind(f_6, placeholders::_1, 2, 3, 4, 5, 6)(i) == 654321L );
-    HPX_TEST( hpx::util::bind(f_7, placeholders::_1, 2, 3, 4, 5, 6, 7)(i) == 7654321L );
-    HPX_TEST( hpx::util::bind(f_8, placeholders::_1, 2, 3, 4, 5, 6, 7, 8)(i) == 87654321L );
-    HPX_TEST( hpx::util::bind(f_9, placeholders::_1, 2, 3, 4, 5, 6, 7, 8, 9)(i) == 987654321L );
+    HPX_TEST( hpx::util::bind(f_4,
+        placeholders::_1, 2, 3, 4)(i) == 4321L );
+    HPX_TEST( hpx::util::bind(f_5,
+        placeholders::_1, 2, 3, 4, 5)(i) == 54321L );
+    HPX_TEST( hpx::util::bind(f_6,
+        placeholders::_1, 2, 3, 4, 5, 6)(i) == 654321L );
+    HPX_TEST( hpx::util::bind(f_7,
+        placeholders::_1, 2, 3, 4, 5, 6, 7)(i) == 7654321L );
+    HPX_TEST( hpx::util::bind(f_8,
+        placeholders::_1, 2, 3, 4, 5, 6, 7, 8)(i) == 87654321L );
+    HPX_TEST( hpx::util::bind(f_9,
+        placeholders::_1, 2, 3, 4, 5, 6, 7, 8, 9)(i) == 987654321L );
 
     HPX_TEST( (hpx::util::bind(fv_0)(i), (global_result == 17041L)) );
-    HPX_TEST( (hpx::util::bind(fv_1, placeholders::_1)(i), (global_result == 1L)) );
-    HPX_TEST( (hpx::util::bind(fv_2, placeholders::_1, 2)(i), (global_result == 21L)) );
-    HPX_TEST( (hpx::util::bind(fv_3, placeholders::_1, 2, 3)(i), (global_result == 321L)) );
-    HPX_TEST( (hpx::util::bind(fv_4, placeholders::_1, 2, 3, 4)(i), (global_result == 4321L)) );
-    HPX_TEST( (hpx::util::bind(fv_5, placeholders::_1, 2, 3, 4, 5)(i), (global_result == 54321L)) );
-    HPX_TEST( (hpx::util::bind(fv_6, placeholders::_1, 2, 3, 4, 5, 6)(i), (global_result == 654321L)) );
-    HPX_TEST( (hpx::util::bind(fv_7, placeholders::_1, 2, 3, 4, 5, 6, 7)(i), (global_result == 7654321L)) );
-    HPX_TEST( (hpx::util::bind(fv_8, placeholders::_1, 2, 3, 4, 5, 6, 7, 8)(i), (global_result == 87654321L)) );
-    HPX_TEST( (hpx::util::bind(fv_9, placeholders::_1, 2, 3, 4, 5, 6, 7, 8, 9)(i), (global_result == 987654321L)) );
+    HPX_TEST( (hpx::util::bind(fv_1,
+        placeholders::_1)(i), (global_result == 1L)) );
+    HPX_TEST( (hpx::util::bind(fv_2,
+        placeholders::_1, 2)(i), (global_result == 21L)) );
+    HPX_TEST( (hpx::util::bind(fv_3,
+        placeholders::_1, 2, 3)(i), (global_result == 321L)) );
+    HPX_TEST( (hpx::util::bind(fv_4,
+        placeholders::_1, 2, 3, 4)(i), (global_result == 4321L)) );
+    HPX_TEST( (hpx::util::bind(fv_5,
+        placeholders::_1, 2, 3, 4, 5)(i), (global_result == 54321L)) );
+    HPX_TEST( (hpx::util::bind(fv_6,
+        placeholders::_1, 2, 3, 4, 5, 6)(i), (global_result == 654321L)) );
+    HPX_TEST( (hpx::util::bind(fv_7,
+        placeholders::_1, 2, 3, 4, 5, 6, 7)(i), (global_result == 7654321L)) );
+    HPX_TEST( (hpx::util::bind(fv_8,
+        placeholders::_1, 2, 3, 4, 5, 6, 7, 8)(i), (global_result == 87654321L)) );
+    HPX_TEST( (hpx::util::bind(fv_9,
+        placeholders::_1, 2, 3, 4, 5, 6, 7, 8, 9)(i),
+        (global_result == 987654321L)) );
 }
 
 //
@@ -169,7 +190,8 @@ struct Y
     short operator()(short & r) const { return ++r; }
     int operator()(int a, int b) const { return a + 10 * b; }
     long operator() (long a, long b, long c) const { return a + 10 * b + 100 * c; }
-    void operator() (long a, long b, long c, long d) const { global_result = a + 10 * b + 100 * c + 1000 * d; }
+    void operator() (long a, long b, long c, long d)
+        const { global_result = a + 10 * b + 100 * c + 1000 * d; }
 };
 
 void function_object_test()
@@ -185,7 +207,8 @@ void function_object_test()
     HPX_TEST( hpx::util::bind(Y(), i, placeholders::_1)(k) == 38 );
     HPX_TEST( hpx::util::bind(Y(), i, placeholders::_1, 9)(k) == 938 );
 
-#if !defined(__MWERKS__) || (__MWERKS__ > 0x2407)     // Fails for this version of the compiler.
+#if !defined(__MWERKS__) || (__MWERKS__ > 0x2407)
+    // Fails for this version of the compiler.
 
     global_result = 0;
     hpx::util::bind(Y(), i, placeholders::_1, 9, 4)(k);
@@ -214,7 +237,8 @@ void function_object_test2()
 
 //
 
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING)
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) \
+    && !defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING)
 
 struct Z
 {
@@ -246,23 +270,35 @@ struct X
     int f2(int a1, int a2) { f1(a1); f1(a2); return 0; }
     int g2(int a1, int a2) const { g1(a1); g1(a2); return 0; }
 
-    int f3(int a1, int a2, int a3) { f2(a1, a2); f1(a3); return 0; }
-    int g3(int a1, int a2, int a3) const { g2(a1, a2); g1(a3); return 0; }
+    int f3(int a1, int a2, int a3)
+        { f2(a1, a2); f1(a3); return 0; }
+    int g3(int a1, int a2, int a3)
+        const { g2(a1, a2); g1(a3); return 0; }
 
-    int f4(int a1, int a2, int a3, int a4) { f3(a1, a2, a3); f1(a4); return 0; }
-    int g4(int a1, int a2, int a3, int a4) const { g3(a1, a2, a3); g1(a4); return 0; }
+    int f4(int a1, int a2, int a3, int a4)
+        { f3(a1, a2, a3); f1(a4); return 0; }
+    int g4(int a1, int a2, int a3, int a4)
+        const { g3(a1, a2, a3); g1(a4); return 0; }
 
-    int f5(int a1, int a2, int a3, int a4, int a5) { f4(a1, a2, a3, a4); f1(a5); return 0; }
-    int g5(int a1, int a2, int a3, int a4, int a5) const { g4(a1, a2, a3, a4); g1(a5); return 0; }
+    int f5(int a1, int a2, int a3, int a4, int a5)
+        { f4(a1, a2, a3, a4); f1(a5); return 0; }
+    int g5(int a1, int a2, int a3, int a4, int a5)
+        const { g4(a1, a2, a3, a4); g1(a5); return 0; }
 
-    int f6(int a1, int a2, int a3, int a4, int a5, int a6) { f5(a1, a2, a3, a4, a5); f1(a6); return 0; }
-    int g6(int a1, int a2, int a3, int a4, int a5, int a6) const { g5(a1, a2, a3, a4, a5); g1(a6); return 0; }
+    int f6(int a1, int a2, int a3, int a4, int a5, int a6)
+        { f5(a1, a2, a3, a4, a5); f1(a6); return 0; }
+    int g6(int a1, int a2, int a3, int a4, int a5, int a6)
+        const { g5(a1, a2, a3, a4, a5); g1(a6); return 0; }
 
-    int f7(int a1, int a2, int a3, int a4, int a5, int a6, int a7) { f6(a1, a2, a3, a4, a5, a6); f1(a7); return 0; }
-    int g7(int a1, int a2, int a3, int a4, int a5, int a6, int a7) const { g6(a1, a2, a3, a4, a5, a6); g1(a7); return 0; }
+    int f7(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
+        { f6(a1, a2, a3, a4, a5, a6); f1(a7); return 0; }
+    int g7(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
+        const { g6(a1, a2, a3, a4, a5, a6); g1(a7); return 0; }
 
-    int f8(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8) { f7(a1, a2, a3, a4, a5, a6, a7); f1(a8); return 0; }
-    int g8(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8) const { g7(a1, a2, a3, a4, a5, a6, a7); g1(a8); return 0; }
+    int f8(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8)
+        { f7(a1, a2, a3, a4, a5, a6, a7); f1(a8); return 0; }
+    int g8(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8)
+        const { g7(a1, a2, a3, a4, a5, a6, a7); g1(a8); return 0; }
 };
 
 struct V
@@ -280,23 +316,35 @@ struct V
     void f2(int a1, int a2) { f1(a1); f1(a2); }
     void g2(int a1, int a2) const { g1(a1); g1(a2); }
 
-    void f3(int a1, int a2, int a3) { f2(a1, a2); f1(a3); }
-    void g3(int a1, int a2, int a3) const { g2(a1, a2); g1(a3); }
+    void f3(int a1, int a2, int a3)
+        { f2(a1, a2); f1(a3); }
+    void g3(int a1, int a2, int a3)
+        const { g2(a1, a2); g1(a3); }
 
-    void f4(int a1, int a2, int a3, int a4) { f3(a1, a2, a3); f1(a4); }
-    void g4(int a1, int a2, int a3, int a4) const { g3(a1, a2, a3); g1(a4); }
+    void f4(int a1, int a2, int a3, int a4)
+        { f3(a1, a2, a3); f1(a4); }
+    void g4(int a1, int a2, int a3, int a4)
+        const { g3(a1, a2, a3); g1(a4); }
 
-    void f5(int a1, int a2, int a3, int a4, int a5) { f4(a1, a2, a3, a4); f1(a5); }
-    void g5(int a1, int a2, int a3, int a4, int a5) const { g4(a1, a2, a3, a4); g1(a5); }
+    void f5(int a1, int a2, int a3, int a4, int a5)
+        { f4(a1, a2, a3, a4); f1(a5); }
+    void g5(int a1, int a2, int a3, int a4, int a5)
+        const { g4(a1, a2, a3, a4); g1(a5); }
 
-    void f6(int a1, int a2, int a3, int a4, int a5, int a6) { f5(a1, a2, a3, a4, a5); f1(a6); }
-    void g6(int a1, int a2, int a3, int a4, int a5, int a6) const { g5(a1, a2, a3, a4, a5); g1(a6); }
+    void f6(int a1, int a2, int a3, int a4, int a5,
+        int a6) { f5(a1, a2, a3, a4, a5); f1(a6); }
+    void g6(int a1, int a2, int a3, int a4, int a5,
+        int a6) const { g5(a1, a2, a3, a4, a5); g1(a6); }
 
-    void f7(int a1, int a2, int a3, int a4, int a5, int a6, int a7) { f6(a1, a2, a3, a4, a5, a6); f1(a7); }
-    void g7(int a1, int a2, int a3, int a4, int a5, int a6, int a7) const { g6(a1, a2, a3, a4, a5, a6); g1(a7); }
+    void f7(int a1, int a2, int a3, int a4, int a5,
+        int a6, int a7) { f6(a1, a2, a3, a4, a5, a6); f1(a7); }
+    void g7(int a1, int a2, int a3, int a4, int a5,
+        int a6, int a7) const { g6(a1, a2, a3, a4, a5, a6); g1(a7); }
 
-    void f8(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8) { f7(a1, a2, a3, a4, a5, a6, a7); f1(a8); }
-    void g8(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8) const { g7(a1, a2, a3, a4, a5, a6, a7); g1(a8); }
+    void f8(int a1, int a2, int a3, int a4, int a5,
+        int a6, int a7, int a8) { f7(a1, a2, a3, a4, a5, a6, a7); f1(a8); }
+    void g8(int a1, int a2, int a3, int a4, int a5,
+        int a6, int a7, int a8) const { g7(a1, a2, a3, a4, a5, a6, a7); g1(a8); }
 };
 
 void member_function_test()
@@ -486,17 +534,32 @@ void nested_bind_test()
     int const x = 1;
     int const y = 2;
 
-    HPX_TEST( hpx::util::bind(f_1, hpx::util::bind(f_1, placeholders::_1))(x) == 1L );
-    HPX_TEST( hpx::util::bind(f_1, hpx::util::bind(f_2, placeholders::_1, placeholders::_2))(x, y) == 21L );
-    HPX_TEST( hpx::util::bind(f_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_1))(x) == 11L );
-    HPX_TEST( hpx::util::bind(f_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_2))(x, y) == 21L );
-    HPX_TEST( hpx::util::bind(f_1, hpx::util::bind(f_0))() == 17041L );
+    HPX_TEST( hpx::util::bind(f_1,
+        hpx::util::bind(f_1, placeholders::_1))(x) == 1L );
+    HPX_TEST( hpx::util::bind(f_1,
+        hpx::util::bind(f_2, placeholders::_1, placeholders::_2))(x, y) == 21L );
+    HPX_TEST( hpx::util::bind(f_2,
+        hpx::util::bind(f_1, placeholders::_1),
+        hpx::util::bind(f_1, placeholders::_1))(x) == 11L );
+    HPX_TEST( hpx::util::bind(f_2,
+        hpx::util::bind(f_1, placeholders::_1),
+        hpx::util::bind(f_1, placeholders::_2))(x, y) == 21L );
+    HPX_TEST( hpx::util::bind(f_1,
+        hpx::util::bind(f_0))() == 17041L );
 
-    HPX_TEST( (hpx::util::bind(fv_1, hpx::util::bind(f_1, placeholders::_1))(x), (global_result == 1L)) );
-    HPX_TEST( (hpx::util::bind(fv_1, hpx::util::bind(f_2, placeholders::_1, placeholders::_2))(x, y), (global_result == 21L)) );
-    HPX_TEST( (hpx::util::bind(fv_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_1))(x), (global_result == 11L)) );
-    HPX_TEST( (hpx::util::bind(fv_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_2))(x, y), (global_result == 21L)) );
-    HPX_TEST( (hpx::util::bind(fv_1, hpx::util::bind(f_0))(), (global_result == 17041L)) );
+    HPX_TEST( (hpx::util::bind(fv_1,
+        hpx::util::bind(f_1, placeholders::_1))(x), (global_result == 1L)) );
+    HPX_TEST( (hpx::util::bind(fv_1,
+        hpx::util::bind(f_2, placeholders::_1, placeholders::_2))(x, y),
+        (global_result == 21L)) );
+    HPX_TEST( (hpx::util::bind(fv_2,
+        hpx::util::bind(f_1, placeholders::_1),
+        hpx::util::bind(f_1, placeholders::_1))(x), (global_result == 11L)) );
+    HPX_TEST( (hpx::util::bind(fv_2,
+        hpx::util::bind(f_1, placeholders::_1),
+        hpx::util::bind(f_1, placeholders::_2))(x, y), (global_result == 21L)) );
+    HPX_TEST( (hpx::util::bind(fv_1,
+        hpx::util::bind(f_0))(), (global_result == 17041L)) );
 }
 
 int main()

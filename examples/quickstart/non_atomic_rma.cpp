@@ -1,6 +1,9 @@
 // Copyright (c) 2011 Matt Anderson <matt@phys.lsu.edu>
 // Copyright (c) 2011 Pedro Diniz
 //
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
 // This is the non-atomic version of the random memory access.  The array length
 // is given by the variable array_length and N is the number of random accesses
 // to this array.
@@ -10,21 +13,18 @@
 //
 // Note that this is a *non-atomic* example.
 
-//HPX includes
+// HPX includes
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 //Boost includes
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
 
 #include <boost/thread/locks.hpp>
-#include <boost/foreach.hpp>
 #include <boost/ref.hpp>
 
 #include <algorithm>
@@ -49,7 +49,7 @@ struct data
 
 private:
     // serialization support
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
@@ -79,10 +79,8 @@ int hpx_main(po::variables_map &vm)
     int result = 0;
     double elapsed = 0.0;
 
-    components::component_type type =
-       components::get_component_type<components::server::plain_function<set_initialdata_action> >();
     std::vector<naming::id_type> localities =
-        hpx::find_remote_localities(type);
+        hpx::find_remote_localities();
 
     naming::id_type this_prefix = hpx::find_here();
 
@@ -125,14 +123,16 @@ int hpx_main(po::variables_map &vm)
         for (int i=0;i<array_length;i++) {
           components::access_memory_block<data>
                   result( components::stubs::memory_block::get(n[i].get()) );
-          std::cout << " Result index: " << i << " value : "  << result->val_ << std::endl;
+          std::cout << " Result index: " << i << " value : "
+                  << result->val_ << std::endl;
         }
 
         // What is the elapsed time?
         elapsed = t.elapsed();
 
         // Print out a completion message. The correct answer is 12 for this example.
-        std::cout << "Achieved result of " << result << " in " << elapsed << " seconds."<< std::endl;
+        std::cout << "Achieved result of " << result << " in "
+            << elapsed << " seconds."<< std::endl;
     }
 
     // Initiate shutdown of the runtime systems on all localities
@@ -142,9 +142,6 @@ int hpx_main(po::variables_map &vm)
 
 hpx::actions::manage_object_action<data> const manage_data =
         hpx::actions::manage_object_action<data>();
-
-HPX_REGISTER_MANAGE_OBJECT_ACTION(
-    hpx::actions::manage_object_action<data>, manage_object_action_data)
 
 naming::id_type set_initialdata (int i)
 {

@@ -8,6 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
+#include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -22,7 +23,6 @@
 #endif
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/atomic.hpp>
 
 #include <stdexcept>
@@ -41,7 +41,7 @@ extern char **environ;
 
 namespace hpx
 {
-    char const* get_runtime_state_name(runtime::state state);
+    char const* get_runtime_state_name(state st);
 
     ///////////////////////////////////////////////////////////////////////////
     // For testing purposes we sometime expect to see exceptions, allow those
@@ -87,7 +87,8 @@ namespace hpx { namespace detail
         std::size_t len = get_arraylen(_environ);
         env.reserve(len);
         std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
-#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__FreeBSD__) || defined(__AIX__)
+#elif defined(linux) || defined(__linux) || defined(__linux__) \
+                     || defined(__FreeBSD__) || defined(__AIX__)
         std::size_t len = get_arraylen(environ);
         env.reserve(len);
         std::copy(&environ[0], &environ[len], std::back_inserter(env));
@@ -102,7 +103,7 @@ namespace hpx { namespace detail
         std::sort(env.begin(), env.end());
 
         std::string retval = boost::str(boost::format("%d entries:\n") % env.size());
-        BOOST_FOREACH(std::string const& s, env)
+        for (std::string const& s : env)
         {
             retval += "  " + s + "\n";
         }
@@ -229,11 +230,11 @@ namespace hpx { namespace detail
         hpx::runtime* rt = get_runtime_ptr();
         if (rt)
         {
-            runtime::state rts_state = rt->get_state();
+            state rts_state = rt->get_state();
             state_name = get_runtime_state_name(rts_state);
 
-            if (rts_state >= runtime::state_initialized &&
-                rts_state < runtime::state_stopped)
+            if (rts_state >= state_initialized &&
+                rts_state < state_stopped)
             {
                 std::ostringstream strm;
                 strm << get_runtime().here();
@@ -253,8 +254,8 @@ namespace hpx { namespace detail
         threads::thread_self* self = threads::get_self_ptr();
         if (NULL != self)
         {
-            if (threads::threadmanager_is(running))
-                shepherd = threads::threadmanager_base::get_worker_thread_num();
+            if (threads::threadmanager_is(state_running))
+                shepherd = hpx::get_worker_thread_num();
 
             thread_id = threads::get_self_id();
             thread_name = threads::get_thread_description(thread_id);
@@ -265,7 +266,7 @@ namespace hpx { namespace detail
 
         return construct_exception(e, func, file, line, back_trace, node,
             hostname, pid, shepherd, reinterpret_cast<std::size_t>(thread_id.get()),
-            thread_name, env, config, state_name);
+            thread_name, env, config, state_name, auxinfo);
     }
 
     template <typename Exception>

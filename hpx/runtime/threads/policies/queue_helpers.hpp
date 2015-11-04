@@ -62,7 +62,7 @@ namespace detail
         typename Map::const_iterator end = tm.end();
         for (typename Map::const_iterator it = tm.begin(); it != end; ++it)
         {
-            threads::thread_data_base const* thrd = (*it).get();
+            threads::thread_data const* thrd = (*it).get();
             threads::thread_state state = thrd->get_state();
             threads::thread_state marked_state = thrd->get_marked_state();
 
@@ -92,7 +92,7 @@ namespace detail
                                 << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
                                 << ")"
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
                                 << " P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
 #endif
@@ -110,7 +110,7 @@ namespace detail
                                 << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
                                 << ")"
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
                                 << " P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
 #endif

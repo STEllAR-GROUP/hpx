@@ -9,7 +9,7 @@
 #if !defined(HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED)
 #define HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/export_definitions.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
@@ -17,13 +17,11 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
-#include <boost/serialization/split_member.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/tracking.hpp>
 
 #include <numeric>
 
@@ -206,19 +204,19 @@ struct HPX_EXPORT response
     }
 
   private:
-    friend class boost::serialization::access;
+    friend class hpx::serialization::access;
 
     void save(
-        hpx::util::portable_binary_oarchive& ar
+        serialization::output_archive&
       , const unsigned int
         ) const;
 
     void load(
-        hpx::util::portable_binary_iarchive& ar
+        serialization::input_archive&
       , const unsigned int
         );
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    HPX_SERIALIZATION_SPLIT_MEMBER()
 
     namespace_action_code mc; //-V707
     error status;
@@ -383,14 +381,16 @@ struct get_remote_result<std::pair<naming::id_type, naming::address>, agas::resp
         }
 
         HPX_THROW_EXCEPTION(bad_parameter,
-            "get_remote_result<std::pair<naming::id_type, naming::address>, agas::response>::call",
+            "get_remote_result<std::pair<naming::id_type, naming::address>,"
+            " agas::response>::call",
             "unexpected action code in result conversion");
         return std::pair<naming::id_type, naming::address>();
     }
 };
 
 template <>
-struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>, agas::response>
+struct get_remote_result<std::map<naming::gid_type, parcelset::endpoints_type>,
+    agas::response>
 {
     static std::map<naming::gid_type, parcelset::endpoints_type> call(
         agas::response const& rep
@@ -413,27 +413,11 @@ struct get_remote_result<parcelset::endpoints_type, agas::response>
 
 }}
 
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-BOOST_CLASS_VERSION(hpx::agas::response, HPX_AGAS_VERSION)
-BOOST_CLASS_TRACKING(hpx::agas::response, boost::serialization::track_never)
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::agas::response, hpx_agas_response_type)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::agas::response,
-    agas_response_type)
-
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    std::vector<hpx::agas::response>,
-    agas_response_vector_type)
+    std::vector<hpx::agas::response>, hpx_agas_response_vector_type)
 
 namespace hpx { namespace agas { namespace create_result_ns {
     typedef

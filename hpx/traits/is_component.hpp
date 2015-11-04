@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_IS_COMPONENT_OCT_10_2012_0221PM)
 #define HPX_TRAITS_IS_COMPONENT_OCT_10_2012_0221PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
 
 #include <boost/mpl/bool.hpp>
@@ -15,9 +15,17 @@
 
 namespace hpx { namespace traits
 {
+    namespace detail
+    {
+        struct fixed_component_tag {};
+        struct simple_component_tag {};
+        struct managed_component_tag {};
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable>
-    struct is_component : boost::mpl::false_
+    struct is_component
+      : boost::mpl::false_
     {};
 
     template <typename Component>
@@ -31,7 +39,7 @@ namespace hpx { namespace traits
     struct is_component<Component,
             typename boost::enable_if<
                 boost::is_base_and_derived<
-                    components::detail::simple_component_tag, Component
+                    detail::simple_component_tag, Component
                 > >::type>
       : boost::mpl::true_
     {};
@@ -41,7 +49,7 @@ namespace hpx { namespace traits
     struct is_component<Component,
             typename boost::enable_if<
                 boost::is_base_and_derived<
-                    components::detail::fixed_component_tag, Component
+                    detail::fixed_component_tag, Component
                 > >::type>
       : boost::mpl::true_
     {};
@@ -51,26 +59,25 @@ namespace hpx { namespace traits
     struct is_component<Component,
             typename boost::enable_if<
                 boost::is_base_and_derived<
-                    components::detail::managed_component_tag, Component
+                    detail::managed_component_tag, Component
                 > >::type>
       : boost::mpl::true_
     {};
 
     ///////////////////////////////////////////////////////////////////////////
-    // And, we have a couple of hand rolled components
-    template <>
-    struct is_component<components::server::runtime_support>
-      : boost::mpl::true_
+    template <typename T, typename Enable>
+    struct is_component_or_component_array
+      : is_component<T>
     {};
 
-    template <>
-    struct is_component<components::server::memory>
-      : boost::mpl::true_
+    template <typename T>
+    struct is_component_or_component_array<T[]>
+      : is_component<T>
     {};
 
-    template <>
-    struct is_component<components::server::memory_block>
-      : boost::mpl::true_
+    template <typename T, std::size_t N>
+    struct is_component_or_component_array<T[N]>
+      : is_component<T>
     {};
 }}
 

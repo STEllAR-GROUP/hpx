@@ -1,3 +1,8 @@
+# Copyright (c) 2015 Hartmut Kaiser
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 Namespce Naming
 
 API Component:		Comments:
@@ -43,7 +48,7 @@ hpx::naming::locality
     operators: ==, !=, <, >
     operator util::safe_bool<locality>::result_type() const
     std::string const& get_address() const
-    boost::uint16_t get_port() const 
+    boost::uint16_t get_port() const
 std::ostream& operator<< (std::ostream&, locality const&)
 
 hpx/runtime/naming/name.hpp
@@ -104,4 +109,4 @@ functions in hpx::naming
     boost::uint32_t get_locality_id_from_id(id_type const& id)
     id_type get_locality_from_id(id_type const& id)
     id_type const invalid_id
-    
+

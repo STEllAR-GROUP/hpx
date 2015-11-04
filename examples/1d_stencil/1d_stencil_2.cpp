@@ -54,7 +54,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
     }
 
     // do all the work on 'nx' data points for 'nt' time steps

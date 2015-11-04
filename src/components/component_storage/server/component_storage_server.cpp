@@ -8,7 +8,7 @@
 namespace hpx { namespace components { namespace server
 {
     component_storage::component_storage()
-      : data_(layout(find_all_localities()))
+      : data_(container_layout(find_all_localities()))
     {}
 
     ///////////////////////////////////////////////////////////////////////////

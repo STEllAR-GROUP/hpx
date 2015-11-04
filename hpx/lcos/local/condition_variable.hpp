@@ -10,10 +10,11 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 
 #include <boost/detail/scoped_enum_emulation.hpp>
+#include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
@@ -32,22 +33,23 @@ namespace hpx { namespace lcos { namespace local
     public:
         void notify_one(error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
-            cond_.notify_one(l, ec);
+            boost::unique_lock<mutex_type> l(mtx_);
+            cond_.notify_one(std::move(l), ec);
         }
 
         void notify_all(error_code& ec = throws)
         {
-            mutex_type::scoped_lock l(mtx_);
-            cond_.notify_all(l, ec);
+            util::ignore_all_while_checking ignore_lock;
+            boost::unique_lock<mutex_type> l(mtx_);
+            cond_.notify_all(std::move(l), ec);
         }
 
         template <class Lock>
         void wait(Lock& lock, error_code& ec = throws)
         {
-            util::ignore_while_checking<Lock> ignore_lock(&lock);
-            mutex_type::scoped_lock l(mtx_);
-            util::scoped_unlock<Lock> unlock(lock);
+            util::ignore_all_while_checking ignore_lock;
+            boost::unique_lock<mutex_type> l(mtx_);
+            util::unlock_guard<Lock> unlock(lock);
 
             cond_.wait(l, ec);
 
@@ -68,9 +70,9 @@ namespace hpx { namespace lcos { namespace local
         wait_until(Lock& lock, util::steady_time_point const& abs_time,
             error_code& ec = throws)
         {
-            util::ignore_while_checking<Lock> ignore_lock(&lock);
-            mutex_type::scoped_lock l(mtx_);
-            util::scoped_unlock<Lock> unlock(lock);
+            util::ignore_all_while_checking ignore_lock;
+            boost::unique_lock<mutex_type> l(mtx_);
+            util::unlock_guard<Lock> unlock(lock);
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_until(l, abs_time, ec);
@@ -79,7 +81,7 @@ namespace hpx { namespace lcos { namespace local
             if (ec) return cv_status::error;
 
             // if the timer has hit, the waiting period timed out
-            return (reason == threads::wait_signaled) ? //-V110
+            return (reason == threads::wait_timeout) ? //-V110
                 cv_status::timeout : cv_status::no_timeout;
         }
 

@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2014 Thomas Heller
+    Copyright (C) 2014-2015 Thomas Heller
     Copyright (C) 2007-2013 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,51 +8,9 @@
 
 [section:macos_installation How to Install __hpx__ on OS X (Mac)]
 
-This section describes how to build__hpx__ for OS X (Mac) (with recent versions
-of Clang, libc++, and Boost).
+This section describes how to build__hpx__ for OS X (Mac).
 
 [teletype]
-
-The standard system compiler on OS X is too old to build HPX. You will
-have to install a newer compiler manually, either Clang or GCC. Below
-we describe two possibilities:
-
-[heading Install a recent version of LLVM and Clang]
-
-    In order to build __hpx__ you will need a fairly recent version of Clang
-    (at least version 3.2 of Clang and LLVM). For more instructions please see
-    [link http://clang.llvm.org/get_started.html here].
-
-    If you're using Homebrew, `brew install llvm --with-clang` will do the trick
-    and install 3.2 into `/usr/local/bin`.
-
-    In the guide below, I assume you're either using Clang 3.2 as installed by
-    Homebrew into /usr/local/bin, or that the following symlinks are created and
-    visible in your $PATH:
-``
-        ln -s /path/to/build-llvm/Release/bin/clang++ clang++-3.3
-        ln -s /path/to/build-llvm/Release/bin/clang clang-3.3
-``
-    (Replace `/path/to` here with an absolute path of your liking.)
-
-[heading Visit http://libcxx.llvm.org/ to get the latest version of the "libc++" C++ standard library]
-
-    You need to use the trunk version; what's currently bundled with XCode or
-    OS X aren't quite there yet. You can follow the steps in
-    http://libcxx.llvm.org/ if you choose, but here's briefly how it can be built:
-``
-        cd /path/to
-        git clone http://llvm.org/git/libcxx.git
-        cd libcxx/lib
-        CXX=clang++-3.3 CC=clang-3.3 TRIPLE=-apple- ./buildit
-``
-    or alternatively:
-``
-        CXX=/usr/local/bin/clang++ CC=/usr/local/bin/clang TRIPLE=-apple- \
-            ./buildit
-``
-    The library is then found in `/path/to/libcxx/include` and
-    `/path/to/libcxx/lib`, respectively
 
 [heading Build (and install) a recent version of Boost, using Clang and libc++]
 
@@ -63,19 +21,10 @@ we describe two possibilities:
         # user-config.jam (put this file into your home directory)
         # ...
 
-        # Clang 3.2
         using clang
-            : 3.2
-            : "/usr/local/bin/clang++"
-            : <cxxflags>"-std=c++11 -stdlib=libc++ -fcolor-diagnostics -isystem /path/to/libcxx/include"
-              <linkflags>"-stdlib=libc++ -L/path/to/libcxx/lib"
-            ;
-
-        # Clang trunk ("3.3" for convenience)
-        using clang
-            : 3.3
-            : "clang++-3.3"
-            : <cxxflags>"-std=c++11 -stdlib=libc++ -fcolor-diagnostics -isystem /path/to/libcxx/include"
+            :
+            : "/usr/bin/clang++"
+            : <cxxflags>"-std=c++11 -fcolor-diagnostics"
               <linkflags>"-stdlib=libc++ -L/path/to/libcxx/lib"
             ;
 ``
@@ -83,11 +32,11 @@ we describe two possibilities:
 
     You can then use as build command either:
 ``
-        b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang-3.2 install -j4
+        b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang install -j4
 ``
     or
 ``
-        b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang-3.3 install -j4
+        b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang install -j4
 ``
     we verifed this using Boost V1.53. If you use a different
     version, just remember to replace `/usr/local/include/boost-1_53` with
@@ -102,31 +51,24 @@ we describe two possibilities:
     To build with Clang 3.2, execute:
 ``
         cmake ../hpx \
-            -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ \
-            -DCMAKE_C_COMPILER=/usr/local/bin/clang-3.3 \
+            -DCMAKE_CXX_COMPILER=clang++ \
             -DBOOST_INCLUDE_DIR=/usr/local/include/boost-1_53 \
             -DBOOST_LIBRARY_DIR=/usr/local/lib \
             -DBOOST_SUFFIX=-clang-darwin32-mt-1_53 \
-            -DCMAKE_CXX_FLAGS="-isystem /path/to/libcxx/include" \
-            -DLINK_FLAGS="-L /path/to/libcxx/lib"
         make
 ``
     To build with Clang 3.3 (trunk), execute:
 ``
         cmake ../hpx \
-            -DCMAKE_CXX_COMPILER=clang++-3.3 \
-            -DCMAKE_C_COMPILER=clang-3.3 \
+            -DCMAKE_CXX_COMPILER=clang++ \
             -DBOOST_INCLUDE_DIR=/usr/local/include/boost-1_53 \
             -DBOOST_LIBRARY_DIR=/usr/local/lib \
             -DBOOST_SUFFIX=-clang-darwin33-mt-1_53 \
-            -DCMAKE_CXX_FLAGS="-isystem /path/to/libcxx/include" \
-            -DLINK_FLAGS="-L /path/to/libcxx/lib"
         make
 ``
 
 For more detailed information about using __cmake__ please refer its documentation
-and to the section __cmake_hpx__ for. Please pay special attention to the section about
-HPX_MALLOC as this is crucial for getting decent performance.
+and to the section __cmake_hpx__ for.
 
 [heading Alternative Installation method of HPX on OS X (Mac)]
 
@@ -192,7 +134,7 @@ required libraries via MacPorts:
   with the following command:
 
 ``
-   cmake -DHPX_PARCELPORT_MPI=ON \
+   cmake -DHPX_WITH_PARCELPORT_MPI=ON \
         -DCMAKE_C_COMPILER=gcc \
         -DCMAKE_CXX_COMPILER=g++ \
         -DCMAKE_FORTRAN_COMPILER=gfortran \

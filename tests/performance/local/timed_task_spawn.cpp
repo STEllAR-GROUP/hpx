@@ -86,11 +86,19 @@ void print_results(
 
     if (ac)
         counter_values = ac->evaluate_counters_sync();
-    
+
     if (csv_header)
     {
         header = false;
-        cout << "Delay,Tasks,STasks,OS_Threads,Execution_Time,Warmup_Time\n";
+        cout << "Delay,Tasks,STasks,OS_Threads,Execution_Time_sec,Warmup_sec";
+
+        for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
+        {
+            cout << "," << counter_shortnames[i];
+        }
+        cout << "\n";
+
+
     }
 
     if (header)
@@ -99,7 +107,7 @@ void print_results(
                  << " (" << scaling << " scaling, "
                  << distribution << " distribution)\n";
 
-        cout << "# VERSION: " << HPX_GIT_COMMIT << " "
+        cout << "# VERSION: " << HPX_HAVE_GIT_COMMIT << " "
                  << format_build_date(__DATE__) << "\n"
              << "#\n";
 
@@ -131,7 +139,7 @@ void print_results(
         }
     }
 
-    cout << ( boost::format("%lu %lu %lu %lu %.14g %.14g")
+    cout << ( boost::format("%lu, %lu, %lu, %lu, %.14g, %.14g")
             % delay
             % tasks
             % suspended_tasks
@@ -143,7 +151,7 @@ void print_results(
     if (ac)
     {
         for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
-            cout << ( boost::format(" %.14g")
+            cout << ( boost::format(", %.14g")
                     % counter_values[i].get_value<double>());
     }
 
@@ -202,33 +210,6 @@ hpx::threads::thread_state_enum invoke_worker_timed_suspension(
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef void (*stage_worker_function)(boost::uint64_t, bool);
-
-void stage_worker_static_balanced_stackless(
-    boost::uint64_t target_thread
-  , bool suspend
-    )
-{
-    if (suspend)
-        hpx::threads::register_thread_plain(
-            &invoke_worker_timed_suspension
-          , "invoke_worker_timed_suspension"
-          , hpx::threads::pending
-          , false
-          , hpx::threads::thread_priority_normal
-          , target_thread
-          , hpx::threads::thread_stacksize_nostack
-            );
-    else
-        hpx::threads::register_thread_plain(
-            &invoke_worker_timed_no_suspension
-          , "invoke_worker_timed_no_suspension"
-          , hpx::threads::pending
-          , false
-          , hpx::threads::thread_priority_normal
-          , target_thread
-          , hpx::threads::thread_stacksize_nostack
-            );
-}
 
 void stage_worker_static_balanced_stackbased(
     boost::uint64_t target_thread
@@ -346,7 +327,7 @@ int hpx_main(
     {
         if (vm.count("no-header"))
             header = false;
-        
+
         if (vm.count("csv-header"))
             csv_header = true;
 
@@ -362,9 +343,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         stage_worker_function stage_worker;
 
-        if ("static-balanced-stackless" == distribution)
-            stage_worker = &stage_worker_static_balanced_stackless;
-        else if ("static-balanced-stackbased" == distribution)
+        if ("static-balanced-stackbased" == distribution)
             stage_worker = &stage_worker_static_balanced_stackbased;
         else if ("static-imbalanced" == distribution)
             stage_worker = &stage_worker_static_imbalanced;
@@ -524,7 +503,7 @@ int main(
           "\"weak\")")
 
         ( "distribution"
-        , value<std::string>(&distribution)->default_value("static-balanced-stackbased")
+        , value<std::string>(&distribution)->default_value("static-balanced")
         , "type of distribution to perform (valid options are "
           "\"static-balanced\", \"static-imbalanced\" or \"round-robin\")")
 
@@ -550,7 +529,7 @@ int main(
 
         ( "no-header"
         , "do not print out the header")
-        
+
         ( "csv-header"
         , "print out csv header")
         ;

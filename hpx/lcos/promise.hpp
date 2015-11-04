@@ -1,11 +1,11 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_PROMISE_FULL_EMPTY_FEB_03_2009_0841AM)
-#define HPX_LCOS_PROMISE_FULL_EMPTY_FEB_03_2009_0841AM
+#if !defined(HPX_LCOS_PROMISE_FEB_03_2009_0841AM)
+#define HPX_LCOS_PROMISE_FEB_03_2009_0841AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -23,6 +23,7 @@
 #include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/static_reinit.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/static_assert.hpp>
@@ -100,7 +101,8 @@ namespace hpx { namespace components
             static util::one_size_heap_list_base& get_heap()
             {
                 // ensure thread-safe initialization
-                // FIXME: The heap may be initialized during startup in a non-HPX thread
+                // FIXME: The heap may be initialized during startup in a
+                //        non-HPX thread
                 // Bootstrapping should happen in HPX threads ...
                 boost::call_once(constructed_,
                     &promise_heap_factory::create_heap);
@@ -149,43 +151,61 @@ namespace hpx { namespace lcos { namespace detail
     class promise_base
       : public lcos::base_lco_with_value<Result, RemoteResult>
     {
+        template <typename Result_, typename RemoteResult_>
+        friend class lcos::promise;
+
     public:
         virtual void add_ref() = 0;
         virtual void release() = 0;
         virtual long count() const = 0;
 
         // retrieve the gid of this promise
+        naming::id_type get_id() const
+        {
+            boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
+            return get_gid_locked(std::move(l));
+        }
+
+        naming::id_type get_unmanaged_id() const
+        {
+            boost::unique_lock<naming::gid_type> l(gid_.get_mutex());
+            return naming::id_type(gid_, id_type::unmanaged);
+        }
+
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
         naming::id_type get_gid() const
         {
-            naming::gid_type::mutex_type::scoped_lock l(gid_.get_mutex());
-            return get_gid_locked();
+            return get_id();
         }
+#endif
 
-        naming::id_type get_gid_locked() const
+    protected:
+        // The GID needs to be split in order to keep the shared state alive.
+        naming::id_type get_gid_locked(
+            boost::unique_lock<naming::gid_type> l) const
         {
-            // take all credits to avoid a self reference
-            naming::gid_type gid = gid_;
-            naming::detail::strip_credits_from_gid(
-                const_cast<naming::gid_type&>(gid_));
-
-            // we request the id of a future only once
-            HPX_ASSERT(naming::detail::has_credits(gid));
-            return naming::id_type(gid, naming::id_type::managed);
+            hpx::future<naming::gid_type> gid =
+                naming::detail::split_gid_if_needed_locked(l, gid_);
+            l.unlock();
+            return naming::id_type(gid.get(), naming::id_type::managed);
         }
 
+    protected:
         naming::gid_type get_base_gid() const
         {
             HPX_ASSERT(gid_ != naming::invalid_gid);
             return gid_;
         }
 
-    protected:
-        naming::gid_type gid_;
+        mutable naming::gid_type gid_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
     class promise;
+
+    template <typename Result, typename RemoteResult>
+    void intrusive_ptr_add_ref(promise<Result, RemoteResult>* p);
 
     template <typename Result, typename RemoteResult>
     void intrusive_ptr_release(promise<Result, RemoteResult>* p);
@@ -215,7 +235,6 @@ namespace hpx { namespace lcos { namespace detail
         // actual managed component object
         ~promise()
         {
-            // This lock is needed to not interfere with the intrusive pointer deletion
             this->finalize();
         }
 
@@ -244,11 +263,11 @@ namespace hpx { namespace lcos { namespace detail
 
         Result get_value(error_code& ec = throws)
         {
-            typedef typename future_data_type::data_type data_type;
-            data_type& data = this->get_result();
+            typedef typename future_data_type::result_type result_type;
+            result_type* result = this->get_result();
 
             // no error has been reported, return the result
-            return data.move_value();
+            return std::move(*result);
         }
 
         void add_ref()
@@ -269,32 +288,39 @@ namespace hpx { namespace lcos { namespace detail
     private:
         bool requires_delete()
         {
-            naming::gid_type::mutex_type::scoped_lock l(this->gid_.get_mutex());
+            boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
             long counter = --this->count_;
 
-            // if this promise was never asked for its id we need to take
             // special precautions for it to go out of scope
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
-                // this will trigger normal destruction
-                naming::id_type id = this->get_gid_locked();
+                // At this point, the remaining count has to be held by AGAS
+                // for this reason, we break the self-reference to allow for
+                // proper destruction
 
+                // move all credits to a temporary id_type
+                naming::gid_type gid = this->gid_;
+                naming::detail::strip_credits_from_gid(this->gid_);
+
+                naming::id_type id (gid, id_type::managed);
                 l.unlock();
+
                 return false;
             }
-            else if (0 == counter)
-            {
-                return true;
-            }
-            return false;
+
+            return 0 == counter;
+        }
+
+        // disambiguate reference counting
+        friend void intrusive_ptr_add_ref(promise* p)
+        {
+            ++p->count_;
         }
 
         friend void intrusive_ptr_release(promise* p)
         {
             if (p->requires_delete())
-            {
                 delete p;
-            }
         }
 
         template <typename>
@@ -331,7 +357,6 @@ namespace hpx { namespace lcos { namespace detail
         // actual managed component object
         ~promise()
         {
-            // This lock is needed to not interfere with the intrusive pointer deletion
             this->finalize();
         }
 
@@ -382,33 +407,39 @@ namespace hpx { namespace lcos { namespace detail
     private:
         bool requires_delete()
         {
-            naming::gid_type::mutex_type::scoped_lock l(this->gid_.get_mutex());
+            boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
             long counter = --this->count_;
 
-            // if this promise was never asked for its id we need to take
             // special precautions for it to go out of scope
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
-                // this will trigger normal destruction
-                naming::id_type id = this->get_gid_locked();
+                // At this point, the remaining count has to be held by AGAS
+                // for this reason, we break the self-reference to allow for
+                // proper destruction
 
+                // move all credits to a temporary id_type
+                naming::gid_type gid = this->gid_;
+                naming::detail::strip_credits_from_gid(this->gid_);
+
+                naming::id_type id (gid, id_type::managed);
                 l.unlock();
+
                 return false;
             }
-            else if (0 == counter)
-            {
-                //HPX_ASSERT(naming::detail::has_credits(this->gid_));
-                return true;
-            }
-            return false;
+
+            return 0 == counter;
+        }
+
+        // disambiguate reference counting
+        friend void intrusive_ptr_add_ref(promise* p)
+        {
+            ++p->count_;
         }
 
         friend void intrusive_ptr_release(promise* p)
         {
             if (p->requires_delete())
-            {
                 delete p;
-            }
         }
 
         template <typename>
@@ -488,7 +519,7 @@ namespace hpx { namespace lcos
     ///
     ///     // initiate the action supplying the promise as a
     ///     // continuation
-    ///     apply<some_action>(new continuation(f.get_gid()), ...);
+    ///     apply<some_action>(new continuation(f.get_id()), ...);
     ///
     ///     // Wait for the result to be returned, yielding control
     ///     // in the meantime.
@@ -510,6 +541,8 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class promise
     {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+
     public:
         typedef detail::promise<Result, RemoteResult> wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
@@ -523,15 +556,38 @@ namespace hpx { namespace lcos
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
         ///               \a base_lco#set_value action. Any error has to be
-        ///               reported using a \a base_lco::set_exception action. The
-        ///               target for either of these actions has to be this
+        ///               reported using a \a base_lco::set_exception action.
+        ///               The target for either of these actions has to be this
         ///               future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         promise()
           : impl_(new wrapping_type(new wrapped_type())),
             future_obtained_(false)
         {
-            LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
+            LLCO_(info)
+                << "promise::promise("
+                << impl_->get_unmanaged_id() << ")";
+        }
+
+        promise(promise && rhs)
+          : impl_(std::move(rhs.impl_)),
+            future_obtained_(rhs.future_obtained_)
+        {
+            rhs.future_obtained_ = false;
+        }
+
+        virtual ~promise()
+        {}
+
+        promise& operator=(promise && rhs)
+        {
+            if (this != &rhs)
+            {
+                impl_ = std::move(rhs.impl_);
+                future_obtained_ = rhs.future_obtained_;
+                rhs.future_obtained_ = false;
+            }
+            return *this;
         }
 
     protected:
@@ -550,17 +606,31 @@ namespace hpx { namespace lcos
         }
 
         /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid() const
+        naming::id_type get_id() const
         {
-            return (*impl_)->get_gid();
+            return (*impl_)->get_id();
         }
 
-        /// \brief Return the global id of this \a future instance
+        naming::id_type get_unmanaged_id() const
+        {
+            return (*impl_)->get_unmanaged_id();
+        }
+
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_id();
+        }
+#endif
+
+    private:
+        // Return the global id of this \a future instance
         naming::gid_type get_base_gid() const
         {
             return (*impl_)->get_base_gid();
         }
 
+    public:
         /// Return whether or not the data is available for this
         /// \a promise.
         bool is_ready() const
@@ -576,15 +646,12 @@ namespace hpx { namespace lcos
 
         typedef Result result_type;
 
-        virtual ~promise()
-        {}
-
         lcos::future<Result> get_future(error_code& ec = throws)
         {
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<Result>::get_future",
-                    "future already has been retrieved from this packaged_action");
+                    "future already has been retrieved from this promise");
                 return lcos::future<Result>();
             }
 
@@ -621,6 +688,8 @@ namespace hpx { namespace lcos
     template <>
     class promise<void, util::unused_type>
     {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+
     public:
         typedef detail::promise<void, util::unused_type> wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
@@ -633,15 +702,38 @@ namespace hpx { namespace lcos
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
         ///               \a base_lco#set_value action. Any error has to be
-        ///               reported using a \a base_lco::set_exception action. The
-        ///               target for either of these actions has to be this
+        ///               reported using a \a base_lco::set_exception action.
+        ///               The target for either of these actions has to be this
         ///               future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         promise()
           : impl_(new wrapping_type(new wrapped_type())),
             future_obtained_(false)
         {
-            LLCO_(info) << "promise<void>::promise(" << impl_->get_gid() << ")";
+            LLCO_(info)
+                << "promise<void>::promise("
+                << impl_->get_unmanaged_id() << ")";
+        }
+
+        promise(promise && rhs)
+          : impl_(std::move(rhs.impl_)),
+            future_obtained_(rhs.future_obtained_)
+        {
+            rhs.future_obtained_ = false;
+        }
+
+        virtual ~promise()
+        {}
+
+        promise& operator=(promise && rhs)
+        {
+            if (this != &rhs)
+            {
+                impl_ = std::move(rhs.impl_);
+                future_obtained_ = rhs.future_obtained_;
+                rhs.future_obtained_ = false;
+            }
+            return *this;
         }
 
     protected:
@@ -660,17 +752,31 @@ namespace hpx { namespace lcos
         }
 
         /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid() const
+        naming::id_type get_id() const
         {
-            return (*impl_)->get_gid();
+            return (*impl_)->get_id();
         }
 
+        naming::id_type get_unmanaged_id() const
+        {
+            return (*impl_)->get_unmanaged_id();
+        }
+
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_id();
+        }
+#endif
+
+    private:
         /// \brief Return the global id of this \a future instance
         naming::gid_type get_base_gid() const
         {
             return (*impl_)->get_base_gid();
         }
 
+    public:
         /// Return whether or not the data is available for this
         /// \a promise.
         bool is_ready() const
@@ -679,9 +785,6 @@ namespace hpx { namespace lcos
         }
 
         typedef util::unused_type result_type;
-
-        ~promise()
-        {}
 
         lcos::future<void> get_future(error_code& ec = throws)
         {

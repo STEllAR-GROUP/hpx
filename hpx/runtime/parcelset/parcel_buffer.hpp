@@ -8,21 +8,22 @@
 #define HPX_PARCELSET_PARCEL_BUFFER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/portable_binary_archive.hpp>
+#include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
+#include <hpx/util/integer/endian.hpp>
 
-#include <boost/integer/endian.hpp>
 #include <boost/atomic.hpp>
 
 #include <vector>
 
 namespace hpx { namespace parcelset
 {
-    template <typename BufferType, typename ChunkType = util::serialization_chunk>
+    template <typename BufferType,
+        typename ChunkType = serialization::serialization_chunk>
     struct parcel_buffer
     {
         typedef std::pair<
-            boost::integer::ulittle32_t, boost::integer::ulittle32_t
+            util::integer::ulittle32_t, util::integer::ulittle32_t
         > count_chunks_type;
 
         typedef typename BufferType::allocator_type allocator_type;
@@ -40,7 +41,8 @@ namespace hpx { namespace parcelset
           , size_(0), data_size_(0)
         {}
 
-        explicit parcel_buffer(BufferType && data, allocator_type allocator = allocator_type())
+        explicit parcel_buffer(BufferType && data,
+            allocator_type allocator = allocator_type())
           : data_(std::move(data), allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
@@ -84,15 +86,16 @@ namespace hpx { namespace parcelset
         BufferType data_;
         std::vector<ChunkType> chunks_;
 
-        typedef std::pair<boost::integer::ulittle64_t, boost::integer::ulittle64_t>
-            transmission_chunk_type;
+        typedef std::pair<
+            util::integer::ulittle64_t, util::integer::ulittle64_t
+        > transmission_chunk_type;
         std::vector<transmission_chunk_type> transmission_chunks_;
 
         // pair of (zero-copy, non-zero-copy) chunks
         count_chunks_type num_chunks_;
 
-        boost::integer::ulittle64_t size_;
-        boost::integer::ulittle64_t data_size_;
+        util::integer::ulittle64_t size_;
+        util::integer::ulittle64_t data_size_;
 
         /// Counters and their data containers.
         performance_counters::parcels::data_point data_point_;

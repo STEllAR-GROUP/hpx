@@ -13,15 +13,14 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/compression_snappy.hpp>
+
+#include <boost/ref.hpp>
+#include <boost/format.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <vector>
 #include <list>
 #include <set>
-
-#include <boost/ref.hpp>
-#include <boost/foreach.hpp>
-#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // The purpose of this example is to execute a HPX-thread printing "Hello world"
@@ -92,7 +91,7 @@ void hello_world_foreman()
         std::vector<hpx::lcos::future<std::size_t> > futures;
         futures.reserve(attendance.size());
 
-        BOOST_FOREACH(std::size_t worker, attendance)
+        for (std::size_t worker : attendance)
         {
             // Asynchronously start a new task. The task is encapsulated in a
             // future, which we can query to determine if the task has
@@ -112,7 +111,7 @@ void hello_world_foreman()
             hpx::util::unwrapped([&](std::size_t t) {
                 if (std::size_t(-1) != t)
                 {
-                    hpx::lcos::local::spinlock::scoped_lock lk(mtx);
+                    boost::lock_guard<hpx::lcos::local::spinlock> lk(mtx);
                     attendance.erase(t);
                 }
             }),
@@ -141,7 +140,7 @@ int main()
     std::vector<hpx::lcos::future<void> > futures;
     futures.reserve(localities.size());
 
-    BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+    for (hpx::naming::id_type const& node : localities)
     {
         // Asynchronously start a new task. The task is encapsulated in a
         // future, which we can query to determine if the task has

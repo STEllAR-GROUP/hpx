@@ -7,23 +7,20 @@
 #if !defined(HPX_041EF599_BA27_47ED_B1F0_2691B28966B3)
 #define HPX_041EF599_BA27_47ED_B1F0_2691B28966B3
 
-#include <list>
-#include <string>
-
-#include <boost/thread.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/atomic.hpp>
-#include <boost/format.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/type_traits/is_same.hpp>
-
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
+
+#include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/format.hpp>
+
+#include <list>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -123,7 +120,7 @@ namespace hpx { namespace util
                         bool allocated = false;
 
                         {
-                            util::scoped_unlock<unique_lock_type> ul(guard);
+                            util::unlock_guard<unique_lock_type> ul(guard);
                             allocated = heap->alloc(&p, count);
                         }
 
@@ -169,7 +166,7 @@ namespace hpx { namespace util
                 bool result = false;
 
                 {
-                    util::scoped_unlock<unique_lock_type> ul(guard);
+                    util::unlock_guard<unique_lock_type> ul(guard);
                     result = heap->alloc(&p, count);
                 }
 
@@ -257,7 +254,7 @@ namespace hpx { namespace util
         {
             unique_lock_type ul(mtx_);
 
-            if (NULL == p || !threads::threadmanager_is(running))
+            if (NULL == p || !threads::threadmanager_is(state_running))
                 return;
 
             // if this is called from outside a HPX thread we need to
@@ -272,7 +269,7 @@ namespace hpx { namespace util
                 bool did_allocate = false;
 
                 {
-                    util::scoped_unlock<unique_lock_type> ull(ul);
+                    util::unlock_guard<unique_lock_type> ull(ul);
                     did_allocate = heap->did_alloc(p);
                     if (did_allocate)
                         heap->free(p, count);
@@ -303,7 +300,7 @@ namespace hpx { namespace util
                 bool did_allocate = false;
 
                 {
-                    util::scoped_unlock<unique_lock_type> ull(ul);
+                    util::unlock_guard<unique_lock_type> ull(ul);
                     did_allocate = heap->did_alloc(p);
                 }
 

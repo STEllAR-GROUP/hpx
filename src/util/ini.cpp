@@ -22,8 +22,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/map.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -52,7 +52,8 @@ const char pattern_comment[] =  "^([^#]*)(#.*)$";
 const char pattern_section[] = "^\\[([^\\]]+)\\]$";
 
 // example uses ini line: sec.ssec.key = val
-const char pattern_qualified_entry[] = "^([^\\s=]+)\\.([^\\s=\\.]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
+const char pattern_qualified_entry[] =
+"^([^\\s=]+)\\.([^\\s=\\.]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
 
 // example uses ini line: key = val
 const char pattern_entry[] = "^([^\\s=]+)\\s*=\\s*(.*[^\\s]?)\\s*$";
@@ -210,8 +211,10 @@ void section::parse (std::string const& sourcename,
     int linenum = 0;
     section* current = this;
 
-    boost::regex regex_comment (pattern_comment, boost::regex::perl | boost::regex::icase);
-    boost::regex regex_section (pattern_section, boost::regex::perl | boost::regex::icase);
+    boost::regex regex_comment (pattern_comment, boost::regex::perl
+        | boost::regex::icase);
+    boost::regex regex_section (pattern_section, boost::regex::perl
+        | boost::regex::icase);
     boost::regex regex_qualified_entry
         (pattern_qualified_entry, boost::regex::perl | boost::regex::icase);
     boost::regex regex_entry (pattern_entry,   boost::regex::perl | boost::regex::icase);
@@ -662,7 +665,8 @@ void section::expand_bracket(std::string& value, std::string::size_type begin) c
         std::string to_expand = value.substr(begin+2, end-begin-2);
         std::string::size_type colon = find_next(":", to_expand);
         if (colon == std::string::npos) {
-            value.replace(begin, end-begin+1, root_->get_entry(to_expand, std::string("")));
+            value.replace(begin, end-begin+1, root_->get_entry(to_expand,
+                std::string("")));
         }
         else {
             value.replace(begin, end-begin+1,
@@ -775,23 +779,19 @@ std::string section::expand_only(std::string value,
 template <typename Archive>
 void section::save(Archive& ar, const unsigned int version) const
 {
-    using namespace boost::serialization;
-
-    ar << make_nvp("name", name_);
-    ar << make_nvp("parent_name", parent_name_);
-    ar << make_nvp("entries", entries_);
-    ar << make_nvp("sections", sections_);
+    ar << name_;
+    ar << parent_name_;
+    ar << entries_;
+    ar << sections_;
 }
 
 template <typename Archive>
 void section::load(Archive& ar, const unsigned int version)
 {
-    using namespace boost::serialization;
-
-    ar >> make_nvp("name", name_);
-    ar >> make_nvp("parent_name", parent_name_);
-    ar >> make_nvp("entries", entries_);
-    ar >> make_nvp("sections", sections_);
+    ar >> name_;
+    ar >> parent_name_;
+    ar >> entries_;
+    ar >> sections_;
 
     set_root(this, true);     // make this the current root
 }
@@ -799,10 +799,10 @@ void section::load(Archive& ar, const unsigned int version)
 ///////////////////////////////////////////////////////////////////////////////
 // explicit instantiation for the correct archive types
 template HPX_EXPORT void
-section::save(util::portable_binary_oarchive&, const unsigned int version) const;
+section::save(serialization::output_archive&, const unsigned int version) const;
 
 template HPX_EXPORT void
-section::load(util::portable_binary_iarchive&, const unsigned int version);
+section::load(serialization::input_archive&, const unsigned int version);
 
 }}  // namespace hpx::util
 

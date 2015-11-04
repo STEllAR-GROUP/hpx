@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@ macro(hpx_handle_component_dependencies components)
     if(TARGET ${component}_component)
       set(tmp ${tmp} ${component}_component)
     else()
-      set(tmp ${tmp} ${component})
+      set(tmp ${tmp} hpx_${component})
     endif()
     hpx_debug("hpx_handle_component_dependencies: ${tmp}")
   endforeach()

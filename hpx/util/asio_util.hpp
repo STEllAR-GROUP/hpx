@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,9 +8,10 @@
 #define HPX_UTIL_ASIOUTIL_MAY_16_2008_1212PM
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 
-#include <boost/fusion/include/vector.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/io_service.hpp>
 
 namespace hpx { namespace util
 {
@@ -27,14 +28,19 @@ namespace hpx { namespace util
     resolve_hostname(std::string const& hostname, boost::uint16_t port,
         boost::asio::io_service& io_service);
 
+    ///////////////////////////////////////////////////////////////////////////
+    // return the public IP address of the local node
+    HPX_API_EXPORT std::string resolve_public_ip_address();
+
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
-    HPX_API_EXPORT bool split_ip_address(std::string const& v, std::string& host,
-        boost::uint16_t& port);
+    HPX_API_EXPORT bool split_ip_address(std::string const& v,
+        std::string& host, boost::uint16_t& port);
 
     typedef boost::asio::ip::tcp::resolver::iterator endpoint_iterator_type;
 
-    endpoint_iterator_type HPX_EXPORT connect_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type HPX_EXPORT connect_begin(
+        std::string const & address, boost::uint16_t port,
         boost::asio::io_service& io_service);
 
     /// \brief Returns an iterator which when dereferenced will give an
@@ -52,7 +58,8 @@ namespace hpx { namespace util
         return endpoint_iterator_type();
     }
 
-    endpoint_iterator_type HPX_EXPORT accept_begin(std::string const & address, boost::uint16_t port,
+    endpoint_iterator_type HPX_EXPORT accept_begin(
+        std::string const & address, boost::uint16_t port,
         boost::asio::io_service& io_service);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -66,11 +73,10 @@ namespace hpx { namespace util
         return accept_begin(loc.address(), loc.port(), io_service);
     }
 
-    inline endpoint_iterator_type accept_end()
+    inline endpoint_iterator_type accept_end() //-V524
     {
         return endpoint_iterator_type();
     }
-
 }}
 
 #endif

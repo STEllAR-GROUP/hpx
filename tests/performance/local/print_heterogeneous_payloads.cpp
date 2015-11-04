@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
+
 #include <stdexcept>
 #include <iostream>
 
@@ -27,7 +29,7 @@ boost::uint64_t tasks = 500000;
 boost::uint64_t min_delay = 0;
 boost::uint64_t max_delay = 0;
 boost::uint64_t total_delay = 0;
-boost::uint64_t seed = 0; 
+boost::uint64_t seed = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t shuffler(
@@ -42,7 +44,7 @@ boost::uint64_t shuffler(
     boost::random::uniform_int_distribution<boost::uint64_t>
         dist(0, high - 1);
 
-    return dist(prng); 
+    return dist(prng);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,7 +53,7 @@ int app_main(
     )
 {
     ///////////////////////////////////////////////////////////////////////
-    // Initialize the PRNG seed. 
+    // Initialize the PRNG seed.
     if (!seed)
         seed = boost::uint64_t(std::time(0));
 
@@ -83,7 +85,7 @@ int app_main(
                                     "tasks\n");
 
     ///////////////////////////////////////////////////////////////////////
-    // Randomly generate a description of the heterogeneous workload. 
+    // Randomly generate a description of the heterogeneous workload.
     std::vector<boost::uint64_t> payloads;
     payloads.reserve(tasks);
 
@@ -120,10 +122,10 @@ int app_main(
         boost::uint64_t const payload = dist(prng);
 
         if (payload < min_delay)
-            throw std::logic_error("task delay is below minimum"); 
+            throw std::logic_error("task delay is below minimum");
 
         if (payload > max_delay)
-            throw std::logic_error("task delay is above maximum"); 
+            throw std::logic_error("task delay is above maximum");
 
         current_sum += payload;
         payloads.push_back(payload);
@@ -147,7 +149,7 @@ int app_main(
         throw std::logic_error("incorrect total delay generated");
 
     for (std::size_t i = 0; i < payloads.size(); ++i)
-        std::cout << payloads[i] << "\n"; 
+        std::cout << payloads[i] << "\n";
 
     return 0;
 }
@@ -183,7 +185,7 @@ int main(
         ( "total-delay"
         , value<boost::uint64_t>(&total_delay)->default_value(0)
         , "total number of delay iterations to be executed")
-        
+
         ( "seed"
         , value<boost::uint64_t>(&seed)->default_value(0)
         , "seed for the pseudo random number generator (if 0, a seed is "

@@ -55,18 +55,22 @@ This will output something similar to:
 @endcode
 
 
-@param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
+@param convert [optional] In case there needs to be a conversion between
+std::(w)string and the string that holds your logged message. See convert_format.
+For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
+"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::prepend> 
-struct idx_t : is_generic, formatter::non_const_context<boost::uint64_t>, hpx::util::logging::op_equal::always_equal  {
+template<class convert = do_convert_format::prepend>
+struct idx_t : is_generic, formatter::non_const_context<boost::uint64_t>,
+    hpx::util::logging::op_equal::always_equal  {
     typedef formatter::non_const_context<boost::uint64_t> non_const_context_base;
     typedef convert convert_type;
 
     idx_t() : non_const_context_base(0ull) {}
     template<class msg_type> void operator()(msg_type & str) const {
         std::basic_ostringstream<char_type> idx;
-        idx << std::hex << std::setw(sizeof(boost::uint64_t)*2) << std::setfill('0') << ++context();
+        idx << std::hex << std::setw(sizeof(boost::uint64_t)*2)
+            << std::setfill('0') << ++context();
 
         convert::write( idx.str(), str );
     }
@@ -76,10 +80,13 @@ struct idx_t : is_generic, formatter::non_const_context<boost::uint64_t>, hpx::u
 /**
 @brief Appends a new line
 
-@param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
+@param convert [optional] In case there needs to be a conversion between
+std::(w)string and the string that holds your logged message. See convert_format.
+For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
+"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::append> struct append_newline_t : is_generic, hpx::util::logging::op_equal::always_equal {
+template<class convert = do_convert_format::append> struct append_newline_t
+    : is_generic, hpx::util::logging::op_equal::always_equal {
     typedef convert convert_type;
     template<class msg_type> void operator()(msg_type & str) const {
         convert::write( HPX_LOG_STR("\n"), str );
@@ -90,10 +97,13 @@ template<class convert = do_convert_format::append> struct append_newline_t : is
 /**
 @brief Appends a new line, if not already there
 
-@param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
+@param convert [optional] In case there needs to be a conversion between
+std::(w)string and the string that holds your logged message. See convert_format.
+For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
+"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-template<class convert = do_convert_format::append> struct append_newline_if_needed_t : is_generic, hpx::util::logging::op_equal::always_equal {
+template<class convert = do_convert_format::append> struct append_newline_if_needed_t
+    : is_generic, hpx::util::logging::op_equal::always_equal {
     typedef convert convert_type;
 
     template<class msg_type> void operator()(msg_type & str) const {

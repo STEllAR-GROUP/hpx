@@ -1,3 +1,8 @@
+# Copyright (c) 2012 Matt Anderson
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 Code written/maintained by Matt Anderson (matt@phys.lsu.edu)
 
 This code implements random memory accesses in a large array.
@@ -12,4 +17,5 @@ Options:
 
    random_mem_access_client --array-size 64 --iterations 4000
 
-  would initialize an array of size 64 with integers and randomly access and update elements of this array 4000 times.
+  would initialize an array of size 64 with integers and randomly access and
+  update elements of this array 4000 times.

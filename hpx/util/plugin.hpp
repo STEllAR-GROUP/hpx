@@ -11,6 +11,6 @@
 #include <hpx/util/plugin/plugin_factory.hpp>
 #include <hpx/util/plugin/dll.hpp>
 
-#endif 
+#endif
 
 

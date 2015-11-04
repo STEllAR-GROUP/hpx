@@ -10,6 +10,7 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/iterator/counting_iterator.hpp>
+#include <boost/range/functions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

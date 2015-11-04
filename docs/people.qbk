@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2014 Hartmut Kaiser
+    Copyright (C) 2007-2015 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -64,7 +64,8 @@ our tables below.
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
   [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
   [[Agustin Berge]           [__cct__, __lsu__]   [[$./images/emails/aberge.png]]]
-  [[Martin Stumpf]           [__cct__, __lsu__]   []]
+  [[Anton Bikineev]          [__cct__, __lsu__]   [[$./images/emails/antbikineev.png]]]
+  [[Martin Stumpf]           [__inf3__, __fau__]  [[$./images/emails/martinhstumpf.png]]]
   [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]   [[$./images/emails/blelbach.png]]]
   [[Vinay C Amatya]          [__cct__, __lsu__]   [[$./images/emails/vamatya.png]]]
   [[Shuangyang Yang]         [__cct__, __lsu__]   [[$./images/emails/syang16.png]]]
@@ -96,8 +97,11 @@ our tables below.
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Eric Lemanissier contributed fixes to allow compilation using the MingW
+  toolchain.
+* Nidhi Makhijani who helped cleaning up some enum consistencies in __hpx__.
 * Daniel Bourgeois (__cct__) who contributed to __hpx__ the implementation of
-  several parallel algorithms.
+  several parallel algorithms (as proposed by __cpp11_n4107__).
 * Anuj Sharma and Christopher Bross (__inf3__), who worked on __hpx__ in the
   context of the __gsoc__ program 2014.
 * Martin Stumpf (__inf3__), who rebuilt our contiguous testing infrastructure
@@ -131,7 +135,9 @@ the project through discussions, pull requests, documentation patches, etc.
   meta-programming issues. He rewrote large parts of the API elements ensuring
   strict conformance with C++11/14.
 * Anton Bikineev for contributing changes to make using `boost::lexical_cast`
-  safer, he also contributed a thread safety fix to the iostreams module.
+  safer, he also contributed a thread safety fix to the iostreams module. He
+  also contributed a complete rewrite of the serialization infrastructure
+  replacing Boost.Serialization inside __hpx__.
 * Pyry Jahkola, who contributed the Mac OS build system and build documentation
   on how to build HPX using Clang and libc++.
 * Mario Mulansky, who created an __hpx__ backend for his Boost.Odeint library, and
@@ -144,7 +150,7 @@ the project through discussions, pull requests, documentation patches, etc.
 In addition to the people who worked directly with __hpx__ development we would
 like to acknowledge the NSF, DoE, DARPA, __cct__, and __inf3__ who fund and
 support our work. We would also like to thank the following organizations for
-granting us allocatons of thier compute resources:
+granting us allocations of thier compute resources:
 LSU HPC, LONI, XSEDE and the Gauss Center for Supercomputing.
 
 __hpx__ is currently funded by the following grants:

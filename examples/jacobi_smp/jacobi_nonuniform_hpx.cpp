@@ -15,7 +15,8 @@ namespace jacobi_smp {
     void jacobi_kernel_wrap(
         range const & r,
         crs_matrix<double> const & A,
-        std::vector<double> & x_dst, std::vector<double> const & x_src, std::vector<double> const & b)
+        std::vector<double> & x_dst,
+        std::vector<double> const & x_src, std::vector<double> const & b)
     {
         for(std::size_t row = r.begin(); row < r.end(); ++row)
         {
@@ -51,7 +52,7 @@ namespace jacobi_smp {
             {
                 std::size_t begin = A.row_begin(i);
                 std::size_t end = A.row_end(i);
-                
+
                 for(std::size_t ii = begin; ii < end; ++ii)
                 {
                     std::size_t idx = A.indices[ii];
@@ -59,7 +60,8 @@ namespace jacobi_smp {
                     {
                         if(block_ranges[j].begin() <= idx && idx < block_ranges[j].end())
                         {
-                            if(std::find(dependencies[b].begin(), dependencies[b].end(), j) == dependencies[b].end())
+                            if(std::find(dependencies[b].begin(),
+                                dependencies[b].end(), j) == dependencies[b].end())
                             {
                                 dependencies[b].push_back(j);
                             }
@@ -71,8 +73,10 @@ namespace jacobi_smp {
         }
 
         typedef std::vector<hpx::shared_future<void> > future_vector;
-        boost::shared_ptr<future_vector> deps_dst(new future_vector(dependencies.size(), hpx::make_ready_future()));
-        boost::shared_ptr<future_vector> deps_src(new future_vector(dependencies.size(), hpx::make_ready_future()));
+        boost::shared_ptr<future_vector> deps_dst
+            (new future_vector(dependencies.size(), hpx::make_ready_future()));
+        boost::shared_ptr<future_vector> deps_src
+            (new future_vector(dependencies.size(), hpx::make_ready_future()));
 
         hpx::util::high_resolution_timer t;
         for(std::size_t iter = 0; iter < iterations; ++iter)
@@ -82,13 +86,13 @@ namespace jacobi_smp {
                 std::vector<std::size_t> const & deps(dependencies[block]);
                 std::vector<hpx::shared_future<void> > trigger;
                 trigger.reserve(deps.size());
-                BOOST_FOREACH(std::size_t dep, deps)
+                for (std::size_t dep : deps)
                 {
                     trigger.push_back((*deps_src)[dep]);
-                }                                                                                                                           
-                
+                }
+
                 (*deps_dst)[block]
-                    = hpx::when_all(boost::move(trigger)).then(
+                    = hpx::when_all(std::move(trigger)).then(
                         hpx::launch::async,
                         hpx::util::bind(
                             jacobi_kernel_wrap
@@ -109,7 +113,7 @@ namespace jacobi_smp {
 
         double time_elapsed = t.elapsed();
         std::cout << dst->size() << " "
-            << ((double(dst->size() * iterations)/1e6)/time_elapsed) << " MLUPS/s\n" 
+            << ((double(dst->size() * iterations)/1e6)/time_elapsed) << " MLUPS/s\n"
             << std::flush;
     }
 }

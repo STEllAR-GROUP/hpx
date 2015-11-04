@@ -7,13 +7,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include "solver.hpp"
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     jacobi::server::solver
 > solver_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(solver_type, solver);
-
-
+HPX_REGISTER_COMPONENT(solver_type, solver);
 
 HPX_REGISTER_ACTION(
     jacobi::server::solver::run_action

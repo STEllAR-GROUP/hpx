@@ -6,9 +6,8 @@
 #if !defined(HPX_7B5783D6_FCA3_4E3D_BBCE_FBB0A6CF644B)
 #define HPX_7B5783D6_FCA3_4E3D_BBCE_FBB0A6CF644B
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/interval_timer.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/config/export_definitions.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/include/performance_counters.hpp>
 
 #include <string>
@@ -44,22 +43,22 @@ namespace hpx { namespace util
             sync_counter_values_type;
 
         async_counter_values_type
-        evaluate_counters_async(bool reset = false, error_code& ec = throws); 
+        evaluate_counters_async(bool reset = false, error_code& ec = throws);
 
         sync_counter_values_type
-        evaluate_counters_sync(bool reset = false, error_code& ec = throws); 
+        evaluate_counters_sync(bool reset = false, error_code& ec = throws);
 
-        std::string name(boost::uint64_t i) const
+        std::string name(std::size_t i) const
         {
             return names_[i];
         }
 
-        naming::id_type id(boost::uint64_t i) const
+        naming::id_type id(std::size_t i) const
         {
             return ids_[i];
         }
 
-        std::string unit_of_measure(boost::uint64_t i) const
+        std::string unit_of_measure(std::size_t i) const
         {
             return uoms_[i];
         }

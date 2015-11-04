@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This test case demonstrates the issue described in #773: local dataflow with 
+// This test case demonstrates the issue described in #773: local dataflow with
 // unwrapped: functor operators need to be const.
 
 #include <hpx/hpx.hpp>
@@ -14,11 +14,11 @@
 typedef hpx::lcos::shared_future< double > future_type;
 
 template< typename Value >
-struct mul 
+struct mul
 {
     const Value a;
 
-    mul( const Value alpha ) 
+    mul( const Value alpha )
       : a( alpha )
     {}
 

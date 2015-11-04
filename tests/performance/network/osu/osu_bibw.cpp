@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,10 +8,10 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/serialize_buffer.hpp>
+#include <hpx/include/serialization.hpp>
+#include <hpx/include/parallel_for_each.hpp>
 
-#include <boost/assert.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/range/irange.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define LOOP_SMALL  100
@@ -31,58 +31,69 @@
 char send_buffer[SEND_BUFSIZE];
 
 ///////////////////////////////////////////////////////////////////////////////
-void isend(hpx::util::serialize_buffer<char> const& receive_buffer) {}
+void isend(hpx::serialization::serialize_buffer<char> const& receive_buffer) {}
 HPX_PLAIN_ACTION(isend);
 
 ///////////////////////////////////////////////////////////////////////////////
-std::vector<hpx::future<void> >
+hpx::future<void>
 send_async(hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
 {
-    std::vector<hpx::future<void> > lazy_results;
-    lazy_results.reserve(window_size);
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
-    isend_action send;
-    for (std::size_t j = 0; j < window_size; ++j)
-    {
-        typedef hpx::util::serialize_buffer<char> buffer_type;
+    using hpx::parallel::for_each;
+    using hpx::parallel::par;
+    using hpx::parallel::task;
 
-        // Note: The original benchmark uses MPI_Isend which does not
-        //       create a copy of the passed buffer.
-        lazy_results.push_back(hpx::async(send, dest,
-            buffer_type(send_buffer, size, buffer_type::reference)));
-    }
-    return lazy_results;
+    std::size_t const start = 0;
+
+    auto range = boost::irange(start, window_size);
+    return for_each(
+        par(task), boost::begin(range), boost::end(range),
+        [=](boost::uint64_t j)
+        {
+            // Note: The original benchmark uses MPI_Isend which does not
+            //       create a copy of the passed buffer.
+            isend_action send;
+            send(dest, buffer_type(send_buffer, size, buffer_type::reference));
+        });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::serialize_buffer<char> irecv(std::size_t size)
+hpx::serialization::serialize_buffer<char> irecv(std::size_t size)
 {
-    typedef hpx::util::serialize_buffer<char> buffer_type;
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
     return buffer_type(send_buffer, size, buffer_type::reference);
 }
 HPX_PLAIN_ACTION(irecv);
 
 ///////////////////////////////////////////////////////////////////////////////
-std::vector<hpx::future<hpx::util::serialize_buffer<char> > >
+hpx::future<void>
 recv_async(hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
 {
-    typedef hpx::util::serialize_buffer<char> buffer_type;
-    std::vector<hpx::future<buffer_type> > lazy_results;
-    lazy_results.reserve(window_size);
-    irecv_action recv;
-    for (std::size_t j = 0; j < window_size; ++j)
-    {
-        lazy_results.push_back(hpx::async(recv, dest, size));
-    }
-    return lazy_results;
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
+
+    using hpx::parallel::for_each;
+    using hpx::parallel::par;
+    using hpx::parallel::task;
+
+    std::size_t const start = 0;
+
+    auto range = boost::irange(start, window_size);
+    return for_each(
+        par(task), boost::begin(range), boost::end(range),
+        [=](boost::uint64_t j)
+        {
+            irecv_action recv;
+            recv(dest, size);
+        });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_header ()
+void print_header()
 {
     hpx::cout << "# OSU HPX Bi-Directional Test\n"
-              << "# Size    Bandwidth (MB/s)\n"
-              << hpx::flush;
+              << "# Size    Bandwidth (MB/s)"
+              << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,26 +121,22 @@ void run_benchmark(boost::program_options::variables_map & vm)
         }
 
         hpx::util::high_resolution_timer t;
+
         for(std::size_t i = 0; i < loop + skip; ++i)
         {
-            if(i == skip) t.restart();
+            if (i == skip)      // don't measure during warm-up phase
+                t.restart();
 
-            typedef hpx::util::serialize_buffer<char> buffer_type;
-            hpx::future<std::vector<hpx::future<buffer_type> > >recv_futures
-                = hpx::async(&recv_async, there, size, window_size);
+            hpx::future<void> recv =
+                hpx::async(recv_async, there, size, window_size);
 
-            hpx::future<std::vector<hpx::future<void> > > send_futures
-                = hpx::async(&send_async, there, size, window_size);
+            send_async(there, size, window_size);
 
-            /*
-            std::vector<buffer_type> recv_results;
-            recv_results.reserve(window_size);
-            */
-            hpx::wait_all(recv_futures.get());//, recv_results);
-            hpx::wait_all(send_futures.get());
+            recv.wait();
         }
 
-        double bw = (size / 1e6 * loop * window_size * 2)/ t.elapsed();
-        hpx::cout << std::left << std::setw(10) << size << bw << hpx::endl << hpx::flush;
+        double bw = (size / 1e6 * loop * window_size * 2) / t.elapsed();
+
+        hpx::cout << std::left << std::setw(10) << size << bw << std::endl;
     }
 }

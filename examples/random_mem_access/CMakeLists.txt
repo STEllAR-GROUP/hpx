@@ -16,25 +16,22 @@ foreach(subdir ${subdirs})
 
   source_group("Source Files" FILES ${sources})
 
-  set(dependencies
-      distributing_factory_component)
-
   # add example executable
   add_hpx_executable(${subdir}_client
     MODULE random_mem_access
     SOURCES ${sources}
-    DEPENDENCIES ${subdir}_component ${dependencies}
+    DEPENDENCIES ${subdir}_component
     FOLDER "Examples/RandomMemoryAccess/random_mem_access")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(examples.random_mem_access.${subdir})
+  add_hpx_pseudo_target(examples.random_mem_access.${subdir}_dir)
 
   # make pseudo-targets depend on master pseudo-target
   add_hpx_pseudo_dependencies(examples.random_mem_access
-                              examples.random_mem_access.${subdir})
+                              examples.random_mem_access.${subdir}_dir)
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.random_mem_access.${subdir}
+  add_hpx_pseudo_dependencies(examples.random_mem_access.${subdir}_dir
                               ${subdir}_client_exe)
 endforeach()
 

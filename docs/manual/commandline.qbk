@@ -53,6 +53,11 @@ described in the table below:
                                  application startup (default: 1)]]
     [[`--hpx:node arg`]         [number of the node this locality is run on
                                  (must be unique)]]
+    [[`--hpx:ignore-batch-env`] [ignore batch environment variables]]
+    [[`--hpx:expect-connecting-localities`]
+                                [this locality expects other localities to
+                                 dynamically connect (this is implied if the
+                                 number of initial localities is larger than 1)]]
     [[`--hpx:pu-offset`]        [the first processing unit this instance of __hpx__ should be
                                  run on (default: 0), valid for
                                  `--hpx:queuing=local`, `--hpx:queuing=abp-priority`,
@@ -75,7 +80,8 @@ described in the table below:
                                  [link hpx.manual.init.commandline.details the additional documentation]
                                  for a detailed description of possible
                                  values. Do not use with `--hpx:pu-step`, `--hpx:pu-offset`, or
-                                 `--hpx:affinity` options. Implies `--hpx:numa-sensitive`.]]
+                                 `--hpx:affinity` options. Implies `--hpx:numa-sensitive`
+                                 (--hpx:bind=none disables defining thread affinities).]]
     [[`--hpx:print-bind`]       [print to the console the bit masks calculated from the
                                  arguments specified to all `--hpx:bind` options.]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
@@ -105,28 +111,52 @@ described in the table below:
     [[`--hpx:list-component-types`][list all dynamic component types after startup]]
     [[`--hpx:dump-config-initial`][print the initial runtime configuration]]
     [[`--hpx:dump-config`]      [print the final runtime configuration]]
-    [[`--hpx:debug-hpx-log`]    [enable all messages on the __hpx__ log channel and send all
-                                 __hpx__ logs to the target destination]]
-    [[`--hpx:debug-agas-log`]   [enable all messages on the AGAS log channel and send all
-                                 AGAS logs to the target destination]]
+    [[`--hpx:debug-hpx-log [arg]`]    [enable all messages on the __hpx__ log
+                                       channel and send all __hpx__ logs to the
+                                       target destination (default: cout)]]
+    [[`--hpx:debug-agas-log [arg]`]   [enable all messages on the AGAS log channel
+                                       and send all AGAS logs to the target
+                                       destination (default: cout)]]
+    [[`--hpx:debug-parcel-log [arg]`] [enable all messages on the parcel transport
+                                       log channel and send all parcel transport
+                                       logs to the target destination (default:
+                                       cout)]]
     [[`--hpx:debug-clp`]        [debug command line processing]]
     [[`--hpx:attach-debugger arg`] [wait for a debugger to be attached, possible arg values:
-                                    startup or exception (default: startup)]]
+                                    `startup` or `exception` (default: startup)]]
 
     [[[*__hpx__ options related to performance counters]]]
-    [[`--hpx:print-counter`]    [print the specified performance counter either repeatedly or
-                                 before shutting down the system (see option `--hpx:print-counter-interval`)]]
-    [[`--hpx:print-counter-interval`][print the performance counter(s) specified with `--hpx:print-counter`
-                                 repeatedly after the time interval (specified in milliseconds)
-                                 (default: 0, which means print once at shutdown)]]
-    [[`--hpx:print-counter-destination`][print the performance counter(s) specified with `--hpx:print-counter`
-                                 to the given file (default: console)]]
-    [[`--hpx:list-counters`]    [list the names of all registered performance counters, possible
-                                 values: 'minimal' (prints counter name skeletons),
-                                 'full' (prints all available counter names)]]
-    [[`--hpx:list-counter-infos`][list the description of all registered performance counters,
-                                   possible values: 'minimal' (prints info for counter name skeletons),
-                                  'full' (prints all available counter infos)]]
+    [[`--hpx:print-counter`]    [print the specified performance counter either
+        repeatedly and/or at the times specified by `--hpx:print-counter-at`
+        (see also option `--hpx:print-counter-interval`)]]
+    [[`--hpx:print-counter-interval`][print the performance counter(s)
+        specified with `--hpx:print-counter` repeatedly after the time interval
+        (specified in milliseconds), (default: 0, which means print once at
+        shutdown)]]
+    [[`--hpx:print-counter-destination`][print the performance counter(s)
+        specified with `--hpx:print-counter` to the given file (default:
+        `console`)]]
+    [[`--hpx:list-counters`]    [list the names of all registered performance
+        counters, possible values: `minimal` (prints counter name skeletons),
+        `full` (prints all available counter names)]]
+    [[`--hpx:list-counter-infos`][list the description of all registered
+        performance counters, possible values: `minimal` (prints info for
+        counter name skeletons), 'full' (prints all available counter infos)]]
+    [[`--hpx:print-counter-format`][print the performance counter(s) specified
+        with `--hpx:print-counter`, possible formats in csv format with  header
+        or without any header (see option `--hpx:no-csv-header`), possible
+        values: `csv` (prints counter values in CSV format with full names as
+        header), `csv-short` (prints counter values in CSV format with shortnames
+        provided with `--hpx:print-counter` as
+        `--hpx:print-counter shortname,full-countername`)]]
+    [[`--hpx:no-csv-header`][print the performance counter(s) specified with
+        `--hpx:print-counter` and `csv` or `csv-short` format specified with
+        `--hpx:print-counter-format` without header]]
+    [[`--hpx:printer-counter-at arg`][print the performance counter(s)
+        specified with `--hpx:print-counter` at the given point in time,
+        possible argument values: `startup`, `shutdown` (default), `noshutdown`]]
+    [[`--hpx:reset-counters`][reset the performance counter(s) specified with
+        `--hpx:print-counter` after they have been evaluated]]
 ]
 
 [heading Command Line Argument Shortcuts]
@@ -255,6 +285,10 @@ threads will run only on the processing units identified by the corresponding
 bind specification. The affinity settings are to be specified using
 `--hpx:bind=<BINDINGS>`, where `<BINDINGS>` have to be formatted as described
 below.
+
+In addition to the syntax described below one can use `--hpx:bind=none` to
+disable all binding of any threads to a particular core. This is mostly
+supported for debugging purposes.
 
 [note This command line option is only available if __hpx__ was built with
       support for HWLOC (__hwloc__) enabled. Please see __cmake_options__ for more

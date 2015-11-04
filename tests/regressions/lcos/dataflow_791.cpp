@@ -16,6 +16,8 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/assign.hpp>
+
 #include <cstdio>
 #include <cstdlib>
 
@@ -30,7 +32,8 @@ struct block {
     int size;
     int start;
     int height;
-    block(int size, int startAddress, int H) : size(size), start(startAddress), height(H){}
+    block(int size, int startAddress, int H) : size(size),
+        start(startAddress), height(H){}
     block() : size(0), start(0), height(0){}
 };
 void LU(int numBlocks);
@@ -128,27 +131,35 @@ void LU( int numBlocks)
     dfArray[0][0][0] = async( ProcessDiagonalBlock, blockList[0][0] );
     diag_block = &dfArray[0][0][0];
     for(int i = 1; i < numBlocks; i++) {
-        dfArray[0][0][i] = dataflow( unwrapped( &ProcessBlockOnRow ), hpx::make_ready_future( blockList[0][i] ), *diag_block);
+        dfArray[0][0][i] = dataflow( unwrapped( &ProcessBlockOnRow ),
+            hpx::make_ready_future( blockList[0][i] ), *diag_block);
     }
     for(int i = 1; i < numBlocks; i++) {
-        dfArray[0][i][0] = dataflow( unwrapped( &ProcessBlockOnColumn ), hpx::make_ready_future( blockList[i][0] ), *diag_block);
+        dfArray[0][i][0] = dataflow( unwrapped( &ProcessBlockOnColumn ),
+            hpx::make_ready_future( blockList[i][0] ), *diag_block);
         first_col = &dfArray[0][i][0];
         for(int j = 1; j < numBlocks; j++) {
-            dfArray[0][i][j] = dataflow( unwrapped( &ProcessInnerBlock ), hpx::make_ready_future( blockList[i][j]), dfArray[0][0][j], *first_col );
+            dfArray[0][i][j] = dataflow( unwrapped( &ProcessInnerBlock ),
+                hpx::make_ready_future( blockList[i][j]), dfArray[0][0][j], *first_col );
         }
     }
-    //all calculation after initialization. Each iteration, the number of tasks/blocks spawned is decreased.
+    //all calculation after initialization. Each iteration,
+    //the number of tasks/blocks spawned is decreased.
     for(int i = 1; i < numBlocks; i++) {
-        dfArray[i][i][i] = dataflow( unwrapped( &ProcessDiagonalBlock ), dfArray[i-1][i][i]);
+        dfArray[i][i][i] = dataflow( unwrapped( &ProcessDiagonalBlock ),
+            dfArray[i-1][i][i]);
         diag_block = &dfArray[i][i][i];
         for(int j = i + 1; j < numBlocks; j++){
-            dfArray[i][i][j] = dataflow( unwrapped(&ProcessBlockOnRow), dfArray[i-1][i][j], *diag_block);
+            dfArray[i][i][j] = dataflow( unwrapped(&ProcessBlockOnRow),
+                dfArray[i-1][i][j], *diag_block);
         }
         for(int j = i + 1; j < numBlocks; j++){
-            dfArray[i][j][i] = dataflow( unwrapped( &ProcessBlockOnColumn ), dfArray[i-1][j][i], *diag_block);
+            dfArray[i][j][i] = dataflow( unwrapped( &ProcessBlockOnColumn ),
+                dfArray[i-1][j][i], *diag_block);
             first_col = &dfArray[i][j][i];
             for(int k = i + 1; k < numBlocks; k++) {
-                dfArray[i][j][k] = dataflow( unwrapped( &ProcessInnerBlock ), dfArray[i-1][j][k], dfArray[i][i][k], *first_col );
+                dfArray[i][j][k] = dataflow( unwrapped( &ProcessInnerBlock ),
+                    dfArray[i-1][j][k], dfArray[i][i][k], *first_col );
             }
         }
     }
@@ -170,7 +181,8 @@ void getBlockList(vector<vector<block> > &blockList, int numBlocks)
             start = (size/numBlocks+1)*i;
         } else {
             blockSize = size/numBlocks;
-            start = (size/numBlocks+1)*(size%numBlocks) + (size/numBlocks)*(i-size%numBlocks);
+            start = (size/numBlocks+1)*(size%numBlocks)
+                + (size/numBlocks)*(i-size%numBlocks);
         }
         blockList[0].push_back( block( blockSize, start, height));
     }
@@ -248,7 +260,8 @@ void checkResult( vector<double> &originalA )
             temp2=0;
             for(int k=0;k<size;k++)
                 temp2+=L[i*size+k]*U[k*size+j];
-            if( (originalA[i*size+j]-temp2) / originalA[i*size+j] > 0.1 || (originalA[i*size+j]-temp2) / originalA[i*size+j] < -0.1 ){
+            if( (originalA[i*size+j]-temp2) / originalA[i*size+j] > 0.1
+                || (originalA[i*size+j]-temp2) / originalA[i*size+j] < -0.1 ){
                 printf("error:[%d][%d] ", i, j);
                 errors++;
             }

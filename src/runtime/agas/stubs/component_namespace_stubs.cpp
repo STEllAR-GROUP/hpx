@@ -6,11 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/runtime/agas/stubs/component_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
-
-#include <boost/serialization/vector.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 namespace hpx { namespace agas { namespace stubs
 {
@@ -35,7 +34,8 @@ template lcos::future<response> component_namespace::service_async<response>(
   , threads::thread_priority priority
     );
 
-template lcos::future<boost::uint32_t> component_namespace::service_async<boost::uint32_t>(
+template lcos::future<boost::uint32_t>
+component_namespace::service_async<boost::uint32_t>(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority

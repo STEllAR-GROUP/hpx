@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Hartmut Kaiser
+# Copyright (c) 2014-2015 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,9 +9,18 @@ set(example_programs
   transpose_serial_block
   transpose_smp
   transpose_smp_block
-  transpose
+  transpose_block
+  transpose_block_numa
   transpose_serial_vector
 )
+
+if(HPX_WITH_AWAIT)
+  set(example_programs
+    ${example_programs}
+    transpose_await)
+endif()
+
+set(transpose_serial_vector_FLAGS DEPENDENCIES partitioned_vector_component)
 
 foreach(example_program ${example_programs})
 

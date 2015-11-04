@@ -6,10 +6,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
-#include <boost/serialization/vector.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
 #include <hpx/util/assert.hpp>
 
 #include <cmath>
@@ -178,8 +174,10 @@ namespace sheneos { namespace server
         std::size_t idx_logrho = get_index(dimension::rho, logrho);
 
         double delta_ye = (ye - ye_values_[idx_ye]) / delta_[dimension::ye];
-        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp]) / delta_[dimension::temp];
-        double delta_logrho = (logrho - logrho_values_[idx_logrho]) / delta_[dimension::rho];
+        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp])
+            / delta_[dimension::temp];
+        double delta_logrho = (logrho - logrho_values_[idx_logrho])
+            / delta_[dimension::rho];
 
         std::vector<double> results;
         results.reserve(19);
@@ -259,8 +257,10 @@ namespace sheneos { namespace server
         std::size_t idx_logrho = get_index(dimension::rho, logrho);
 
         double delta_ye = (ye - ye_values_[idx_ye]) / delta_[dimension::ye];
-        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp]) / delta_[dimension::temp];
-        double delta_logrho = (logrho - logrho_values_[idx_logrho]) / delta_[dimension::rho];
+        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp])
+            / delta_[dimension::temp];
+        double delta_logrho = (logrho - logrho_values_[idx_logrho])
+            / delta_[dimension::rho];
 
         if (detail::more_than_one_value_requested(eosvalue)) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
@@ -371,7 +371,7 @@ namespace sheneos { namespace server
         for (std::vector<sheneos_coord>::const_iterator it = coords.begin();
             it != end; ++it)
         {
-            result.push_back(boost::move(interpolate(*it, eosvalues)));
+            result.push_back(std::move(interpolate(*it, eosvalues)));
         }
 
         return result;
@@ -379,17 +379,17 @@ namespace sheneos { namespace server
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace serialization
+namespace hpx { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
     // Implement the serialization functions.
-    void serialize(hpx::util::portable_binary_iarchive& ar,
+    void serialize(input_archive& ar,
         sheneos::sheneos_coord& coord, unsigned int const)
     {
         ar & coord.ye_ & coord.temp_ & coord.rho_;
     }
 
-    void serialize(hpx::util::portable_binary_oarchive& ar,
+    void serialize(output_archive& ar,
         sheneos::sheneos_coord& coord, unsigned int const)
     {
         ar & coord.ye_ & coord.temp_ & coord.rho_;
@@ -412,8 +412,8 @@ HPX_REGISTER_ACTION(partition3d_type::interpolate_bulk_action,
 HPX_REGISTER_ACTION(partition3d_type::interpolate_one_bulk_action,
     sheneos_partition3d_interpolate_one_bulk_action);
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<partition3d_type>,
+HPX_REGISTER_COMPONENT(
+    hpx::components::component<partition3d_type>,
     sheneos_partition_type);
 
 HPX_REGISTER_ACTION(

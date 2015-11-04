@@ -19,7 +19,7 @@
 
 # else // BOOST_WINDOWS
 
-#   if defined(HPX_PLUGIN_GCC_HAVE_VISIBILITY)
+#   if defined(HPX_HAVE_PLUGIN_GCC_HIDDEN_VISIBILITY)
 #     define HPX_PLUGIN_EXPORT_API    __attribute__((visibility ("default")))
 #   endif
 

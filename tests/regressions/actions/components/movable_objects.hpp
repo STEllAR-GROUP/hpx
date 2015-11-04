@@ -9,6 +9,8 @@
 #include <boost/move/move.hpp>
 #include <boost/ref.hpp>
 
+#include <hpx/runtime/serialization/access.hpp>
+
 namespace hpx { namespace test
 {
     // This base class is there to void the is_pod optimization
@@ -47,7 +49,7 @@ namespace hpx { namespace test
         void serialize(Archive& ar, const unsigned int);
 
     private:
-        
+
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -76,7 +78,7 @@ namespace hpx { namespace test
         template <typename Archive>
         void save(Archive& ar, const unsigned int) const;
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
     };
 }}
 

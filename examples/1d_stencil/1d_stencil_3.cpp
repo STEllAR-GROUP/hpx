@@ -84,7 +84,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/dx*dx) * (left - 2*middle + right);
+        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all
@@ -125,7 +125,8 @@ struct stepper
             space& next = U[(t + 1) % 2];
 
             for (std::size_t i = 0; i != np; ++i)
-                next[i] = heat_part(current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]);
+                next[i] =
+                heat_part(current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]);
         }
 
         // Return the solution at time-step 'nt'.

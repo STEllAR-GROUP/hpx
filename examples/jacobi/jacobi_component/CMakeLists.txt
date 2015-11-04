@@ -10,5 +10,5 @@ if(HPX_WITH_CXX11_LAMBDAS)
       HEADER_GLOB "*.h*"
       ${jacobi_component_FLAGS}
       FOLDER "Examples/Jacobi"
-      COMPONENT_DEPENDENCIES iostreams distributing_factory remote_object)
+      COMPONENT_DEPENDENCIES iostreams)
 endif()

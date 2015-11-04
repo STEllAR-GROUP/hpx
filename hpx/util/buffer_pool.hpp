@@ -6,8 +6,6 @@
 #if !defined(HPX_UTIL_BUFFER_POOL_HPP)
 #define HPX_UTIL_BUFFER_POOL_HPP
 
-#include <hpx/hpx_fwd.hpp>
-
 #include <vector>
 #include <list>
 #include <map>
@@ -55,7 +53,8 @@ namespace hpx { namespace util {
             typename buffer_map_type::iterator it = buffers_.find(capacity);
             if(it == buffers_.end())
             {
-                it = buffers_.insert(it, std::make_pair(capacity, std::list<shared_buffer_type>()));
+                it = buffers_.insert(it, std::make_pair(capacity,
+                    std::list<shared_buffer_type>()));
             }
             it->second.push_back(buffer);
         }

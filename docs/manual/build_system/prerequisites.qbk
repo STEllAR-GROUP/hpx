@@ -65,13 +65,18 @@ favorite compiler with __hpx__ visit __stellar_hpx_buildbot__.
     [[[*Required Libraries]]]
     [[__boost_libraries__        ][1.57.0 or newer    ][1.49.0          ]
         [See below for an important limitation when using Boost V1.54.0.]]
-    [[__hwloc__                  ][1.10                ][1.2             ]
+    [[__hwloc__                  ][1.10                ][1.2 (Xeon Phi: 1.6)]
         [Used for OS-thread pinning and NUMA awareness. This library is optional on Mac OSX.]]
 ]
 
 [important Because of a problem in Boost V1.54.0 this version can't be used
       for compiling __hpx__ if you use gcc V4.6.x. Please use either
       an earlier or a later version of Boost with this compiler.]
+
+[important When compiling with the Intel Compiler on Linux systems, we only support
+  C++ Standard Libraries provided by gcc 4.6 and upwards. If the 'g++' in your
+  path is older than 4.6, please specify the path of a newer g++ by setting
+  CMAKE_CXX_FLAGS='-gxx-name=/path/to/g++' via cmake.]
 
 [table Software Prerequisites for __hpx__ on Windows systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]

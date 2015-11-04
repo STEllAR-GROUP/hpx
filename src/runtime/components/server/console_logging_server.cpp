@@ -10,23 +10,15 @@
 #include <hpx/util/static.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/serialize_sequence.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/fusion/include/at_c.hpp>
-#include <boost/foreach.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
-
 #include <hpx/util/logging/format/named_write_fwd.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
+
+#include <boost/fusion/include/at_c.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <vector>
 #include <iostream>
@@ -36,9 +28,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // This must be in global namespace
-HPX_REGISTER_PLAIN_ACTION(
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::console_logging_action<>,
-    console_logging_action, hpx::components::factory_enabled)
+    console_logging_action,
+    hpx::actions::console_logging_action_id)
 
 namespace hpx { namespace util { namespace detail
 {
@@ -58,11 +51,11 @@ namespace hpx { namespace components { namespace server
     // implementation of console based logging
     void console_logging(messages_type const& msgs)
     {
-        util::spinlock::scoped_lock l(util::detail::get_log_lock());
+        boost::lock_guard<util::spinlock> l(util::detail::get_log_lock());
 
         using boost::fusion::at_c;
 
-        BOOST_FOREACH(message_type const& msg, msgs)
+        for (message_type const& msg : msgs)
         {
             const logging_destination dest = at_c<0>(msg);
             const std::size_t level = at_c<1>(msg);
@@ -79,6 +72,10 @@ namespace hpx { namespace components { namespace server
 
             case destination_agas:
                 LAGAS_CONSOLE_(level) << s;
+                break;
+
+            case destination_parcel:
+                LPT_CONSOLE_(level) << s;
                 break;
 
             case destination_app:

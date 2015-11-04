@@ -26,7 +26,8 @@
 
 #if defined(__clang__)
 
-#  define HPX_CLANG_VERSION (__clang_major__*10000 + __clang_minor__*100 + __clang_patchlevel__)
+#  define HPX_CLANG_VERSION \
+ (__clang_major__*10000 + __clang_minor__*100 + __clang_patchlevel__)
 
 #  undef HPX_INTEL_VERSION
 
@@ -44,10 +45,6 @@
 
 #  undef HPX_INTEL_VERSION
 
-#endif
-
-#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION == 1400
-#   define HPX_INTEL14_WORKAROUND
 #endif
 
 // Identify if we compile for the MIC

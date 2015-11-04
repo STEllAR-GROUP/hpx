@@ -64,8 +64,8 @@ int hpx_main()
         vector<future<int> > iteration;
         iteration.reserve(sizeX*sizeY);
 
-        hpx::cout << "Initial setup completed in " 
-                  << t.elapsed() 
+        hpx::cout << "Initial setup completed in "
+                  << t.elapsed()
                   << "s. Initializing and running futures...\n";
         t.restart();
 
@@ -84,8 +84,8 @@ int hpx_main()
         }
         wait_all(iteration);
 
-        hpx::cout << sizeX*sizeY << " calculations run in " 
-                  << t.elapsed() 
+        hpx::cout << sizeX*sizeY << " calculations run in "
+                  << t.elapsed()
                   << "s. Transferring from futures to general memory...\n";
         t.restart();
 
@@ -103,13 +103,13 @@ int hpx_main()
         }
     }
 
-    hpx::cout << "Transfer process completed in " 
+    hpx::cout << "Transfer process completed in "
               << t.elapsed() << "s. Writing to hard disk...\n";
     t.restart();
 
     SetImage.WriteToFile("out.bmp");
-    
-    hpx::cout << "Fractal image written to file \"out.bmp\" from memory in " 
+
+    hpx::cout << "Fractal image written to file \"out.bmp\" from memory in "
               << t.elapsed() << "s.\nInitializing shutdown process.\n";
 
     return hpx::finalize(); // Handles HPX shutdown

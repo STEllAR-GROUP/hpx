@@ -13,9 +13,9 @@
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
@@ -55,13 +55,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename FwdIter>
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
-        parallel_sequential_uninitialized_copy_n(ExPolicy const& policy,
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        parallel_sequential_uninitialized_copy_n(ExPolicy policy,
             Iter first, std::size_t count, FwdIter dest)
         {
             if (count == 0)
             {
-                return detail::algorithm_result<ExPolicy, FwdIter>::get(
+                return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
                     std::move(dest));
             }
 
@@ -116,14 +116,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter>
             static FwdIter
-            sequential(ExPolicy const&, Iter first, Iter last, FwdIter dest)
+            sequential(ExPolicy, Iter first, Iter last, FwdIter dest)
             {
                 return std::uninitialized_copy(first, last, dest);
             }
 
             template <typename ExPolicy, typename Iter>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy const& policy, Iter first, Iter last,
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
+            parallel(ExPolicy policy, Iter first, Iter last,
                 FwdIter dest)
             {
                 return parallel_sequential_uninitialized_copy_n(policy, first,
@@ -181,7 +183,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename FwdIter>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     uninitialized_copy(ExPolicy && policy, InIter first, InIter last,
         FwdIter dest)
@@ -226,15 +228,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Iter>
             static FwdIter
-            sequential(ExPolicy const&, Iter first, std::size_t count,
+            sequential(ExPolicy, Iter first, std::size_t count,
                 FwdIter dest)
             {
                 return std::uninitialized_copy_n(first, count, dest);
             }
 
             template <typename ExPolicy, typename Iter>
-            static typename detail::algorithm_result<ExPolicy, FwdIter>::type
-            parallel(ExPolicy const& policy, Iter first, std::size_t count,
+            static typename util::detail::algorithm_result<
+                ExPolicy, FwdIter
+            >::type
+            parallel(ExPolicy policy, Iter first, std::size_t count,
                 FwdIter dest)
             {
                 return parallel_sequential_uninitialized_copy_n(policy, first,
@@ -298,7 +302,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter, typename Size, typename FwdIter>
     typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     >::type
     uninitialized_copy_n(ExPolicy && policy, InIter first, Size count,
         FwdIter dest)
@@ -321,7 +325,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         // if count is representing a negative value, we do nothing
         if (detail::is_negative<Size>::call(count))
         {
-            return detail::algorithm_result<ExPolicy, FwdIter>::get(
+            return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
                 std::move(dest));
         }
 

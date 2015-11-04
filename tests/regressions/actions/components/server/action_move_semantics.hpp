@@ -39,15 +39,23 @@ namespace hpx { namespace test { namespace server
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_DEFINE_COMPONENT_ACTION(action_move_semantics, test_movable, test_movable_action);
-        HPX_DEFINE_COMPONENT_ACTION(action_move_semantics, test_non_movable, test_non_movable_action);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(action_move_semantics, test_movable, test_movable_direct_action);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(action_move_semantics, test_non_movable, test_non_movable_direct_action);
-        
-        HPX_DEFINE_COMPONENT_ACTION(action_move_semantics, return_test_movable, return_test_movable_action);
-        HPX_DEFINE_COMPONENT_ACTION(action_move_semantics, return_test_non_movable, return_test_non_movable_action);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(action_move_semantics, return_test_movable, return_test_movable_direct_action);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(action_move_semantics, return_test_non_movable, return_test_non_movable_direct_action);
+        HPX_DEFINE_COMPONENT_ACTION(action_move_semantics,
+            test_movable, test_movable_action);
+        HPX_DEFINE_COMPONENT_ACTION(action_move_semantics,
+            test_non_movable, test_non_movable_action);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(action_move_semantics,
+            test_movable, test_movable_direct_action);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(action_move_semantics,
+            test_non_movable, test_non_movable_direct_action);
+
+        HPX_DEFINE_COMPONENT_ACTION(action_move_semantics,
+            return_test_movable, return_test_movable_action);
+        HPX_DEFINE_COMPONENT_ACTION(action_move_semantics,
+            return_test_non_movable, return_test_non_movable_action);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(action_move_semantics,
+            return_test_movable, return_test_movable_direct_action);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(action_move_semantics,
+            return_test_non_movable, return_test_non_movable_direct_action);
     };
 }}}
 

@@ -10,6 +10,6 @@ HPX_REGISTER_COMPONENT_MODULE()
 bool test_server::called = false;
 
 typedef hpx::components::simple_component<test_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server);
 
 HPX_REGISTER_ACTION(call_action);

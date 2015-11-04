@@ -12,6 +12,7 @@
 #ifndef HPX_PARCELSET_POLICIES_TCP_RECEIVER_HPP
 #define HPX_PARCELSET_POLICIES_TCP_RECEIVER_HPP
 
+#include <hpx/config/asio.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
@@ -27,10 +28,10 @@
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/integer/endian.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/thread/locks.hpp>
 
 #include <sstream>
 #include <vector>
@@ -83,7 +84,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 sizeof(buffer_.num_chunks_)));
 
             {
-                mutex_type::scoped_lock lk(mtx_);
+                boost::unique_lock<mutex_type> lk(mtx_);
                 if(!socket_.is_open())
                 {
                     lk.unlock();
@@ -112,7 +113,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         void shutdown()
         {
-            mutex_type::scoped_lock lk(mtx_);
+            boost::lock_guard<mutex_type> lk(mtx_);
             // gracefully and portably shutdown the socket
             boost::system::error_code ec;
             if (socket_.is_open()) {
@@ -132,7 +133,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             std::size_t bytes_transferred, boost::tuple<Handler> handler)
         {
             if (e) {
-                if(e==boost::asio::error::not_connected) std::cout << "handle_read_header\n";
+                if(e==boost::asio::error::not_connected) std::cout <<
+                    "handle_read_header\n";
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
@@ -197,7 +199,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 }
 
                 {
-                    mutex_type::scoped_lock lk(mtx_);
+                    boost::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();
@@ -253,7 +255,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     = &receiver::handle_read_data<Handler>;
 
                 {
-                    mutex_type::scoped_lock lk(mtx_);
+                    boost::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();
@@ -296,12 +298,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     = &receiver::handle_write_ack<Handler>;
 
                 // decode the received parcels.
-                decode_parcels(parcelport_, std::move(buffer_));
+                decode_parcels(parcelport_, std::move(buffer_), -1);
                 buffer_ = parcel_buffer_type();
 
                 ack_ = true;
                 {
-                    mutex_type::scoped_lock lk(mtx_);
+                    boost::unique_lock<mutex_type> lk(mtx_);
                     if(!socket_.is_open())
                     {
                         lk.unlock();

@@ -7,29 +7,39 @@
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
-// We need to detect if user code include boost/config.hpp before including hpx/config.hpp
+// We need to detect if user code include boost/config.hpp before
+// including hpx/config.hpp
 // Everything else might lead to hard compile errors and possible very subtile bugs.
 #if defined(BOOST_CONFIG_HPP)
 #error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
 #endif
 
 #include <hpx/config/defines.hpp>
-#include <hpx/version.hpp>
+#include <hpx/config/version.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/constexpr.hpp>
-#include <hpx/config/cxx11_macros.hpp>
+
+#include <boost/version.hpp>
+
+#if BOOST_VERSION == 105400
+#include <cstdint> // Boost.Atomic has trouble finding [u]intptr_t
+#endif
 
 #if BOOST_VERSION < 105600
 #include <boost/exception/detail/attribute_noreturn.hpp>
 #endif
 
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/preprocessor/arithmetic/add.hpp>
-#include <boost/preprocessor/selection/min.hpp>
-#include <boost/preprocessor/facilities/expand.hpp>
+
+#if defined(_MSC_VER)
+// On Windows, make sure winsock.h is not included even if windows.h is
+// included before winsock2.h
+#define _WINSOCKAPI_
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure DEBUG macro is defined consistently across platforms
@@ -227,34 +237,34 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the parent thread information in debug builds
 /// only.
-#if !defined(HPX_THREAD_MAINTAIN_PARENT_REFERENCE)
+#if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#    define HPX_HAVE_THREAD_PARENT_REFERENCE
 #  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the thread phase in debug builds only.
-#if !defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if !defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_PHASE_INFORMATION
+#    define HPX_HAVE_THREAD_PHASE_INFORMATION
 #  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the thread description in debug builds only.
-#if !defined(HPX_THREAD_MAINTAIN_DESCRIPTION)
+#if !defined(HPX_HAVE_THREAD_DESCRIPTION)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_DESCRIPTION
+#    define HPX_HAVE_THREAD_DESCRIPTION
 #  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable storing the target address of the data the thread is
 /// accessing in debug builds only.
-#if !defined(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+#if !defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
 #  if defined(HPX_DEBUG)
-#    define HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+#    define HPX_HAVE_THREAD_TARGET_ADDRESS
 #  endif
 #endif
 
@@ -262,9 +272,9 @@
 /// By default we do not maintain stack back-traces on suspension. This is a
 /// pure debugging aid to be able to see in the debugger where a suspended
 /// thread got stuck.
-#if defined(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION) && \
+#if defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION) && \
   !defined(HPX_HAVE_STACKTRACES)
-#  error HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION reqires HPX_HAVE_STACKTRACES to be defined!
+#  error HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION reqires HPX_HAVE_STACKTRACES to be defined!
 #endif
 
 /// By default we capture only 5 levels of stack back trace on suspension
@@ -297,7 +307,7 @@
 #  define HPX_PATH_DELIMITERS               "/"
 #  ifdef __APPLE__    // apple
 #    define HPX_SHARED_LIB_EXTENSION        ".dylib"
-#  elif defined(HPX_STATIC_LINKING)
+#  elif defined(HPX_HAVE_STATIC_LINKING)
 #    define HPX_SHARED_LIB_EXTENSION        ".a"
 #  else  // linux & co
 #    define HPX_SHARED_LIB_EXTENSION        ".so"
@@ -363,7 +373,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(BOOST_WINDOWS)
+#if defined(BOOST_WINDOWS) && defined(_MSC_VER) && _MSC_VER < 1900
 #  define snprintf _snprintf
 #endif
 
@@ -437,11 +447,14 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Enable usage of std::unique_ptr instead of std::auto_ptr
-#if !defined(HPX_HAVE_CXX11_STD_UNIQUE_PTR)
-#  define HPX_STD_UNIQUE_PTR ::std::auto_ptr
+// This limits how deep the internal recursion of future continuations will go
+// before a new operation is re-spawned.
+#if !defined(HPX_CONTINUATION_MAX_RECURSION_DEPTH)
+#if defined(HPX_DEBUG)
+#define HPX_CONTINUATION_MAX_RECURSION_DEPTH 14
 #else
-#  define HPX_STD_UNIQUE_PTR ::std::unique_ptr
+#define HPX_CONTINUATION_MAX_RECURSION_DEPTH 20
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -455,7 +468,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Older Boost versions do not have BOOST_NOINLINE defined
 #if !defined(BOOST_NOINLINE)
-#  if defined(BOOST_MSVC)
+#  if defined(_MSC_VER)
 #    define BOOST_NOINLINE __declspec(noinline)
 #  else
 #    define BOOST_NOINLINE
@@ -473,20 +486,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// GCC has issues with forceinline and member function pointers
-#if defined(HPX_GCC_VERSION)
-#  define HPX_MAYBE_FORCEINLINE inline
-#else
-#  define HPX_MAYBE_FORCEINLINE BOOST_FORCEINLINE
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Make sure we have support for more than 64 threads for Xeon Phi
 #if defined(__MIC__) && !defined(HPX_WITH_MORE_THAN_64_THREADS)
 #  define HPX_WITH_MORE_THAN_64_THREADS
 #endif
-#if defined(__MIC__) && !defined(HPX_MAX_CPU_COUNT)
-#  define HPX_MAX_CPU_COUNT 256
+#if defined(__MIC__) && !defined(HPX_HAVE_MAX_CPU_COUNT)
+#  define HPX_HAVE_MAX_CPU_COUNT 256
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -506,13 +511,15 @@
 #if defined(HPX_HAVE_SODIUM)
 #  define HPX_ROOT_CERTIFICATE_AUTHORITY_MSB         0x0000000100000001ULL
 #  define HPX_ROOT_CERTIFICATE_AUTHORITY_LSB         0x0000000000000005ULL
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB  0x0000000000000001ULL      // this is made locality specific
+#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB  0x0000000000000001ULL
+// this is made locality specific
 #  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB  0x0000000000000006ULL
 #endif
 
 #if !defined(HPX_NO_DEPRECATED)
-#  define HPX_DEPRECATED_MSG "This function is deprecated and will be removed in the future."
-#  if defined(BOOST_MSVC)
+#  define HPX_DEPRECATED_MSG \
+   "This function is deprecated and will be removed in the future."
+#  if defined(_MSC_VER)
 #    define HPX_DEPRECATED(x) __declspec(deprecated(x))
 #  elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
 #    define HPX_DEPRECATED(x) __attribute__((__deprecated__(x)))
@@ -523,8 +530,5 @@
 #    define HPX_DEPRECATED(x)  /**/
 #  endif
 #endif
-
-///////////////////////////////////////////////////////////////////////////////
-#include <hpx/config/defaults.hpp>
 
 #endif

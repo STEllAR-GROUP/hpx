@@ -8,12 +8,10 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-
-#include <boost/serialization/vector.hpp>
 
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
@@ -73,8 +71,7 @@ namespace hpx { namespace agas
           , subtype_iterate_names_function  = 0x9
           , subtype_iterate_types_function  = 0xa
           , subtype_void                    = 0xb
-          , subtype_parcel                  = 0xc
-          , subtype_name_evt_id             = 0xd
+          , subtype_name_evt_id             = 0xc
           // update HPX_AGAS_REQUEST_SUBTYPES above if you add more entries
         };
 
@@ -166,11 +163,6 @@ namespace hpx { namespace agas
           , util::tuple<
             >
             // 0xc
-            // primary_ns_route
-          , util::tuple<
-                parcelset::parcel
-            >
-            // 0xd
             // symbol_ns_on_event
           , util::tuple<
                 std::string
@@ -299,7 +291,8 @@ namespace hpx { namespace agas
       , naming::gid_type prefix_
         )
       : mc(type_)
-      , data(new request_data(util::make_tuple(endpoints_, count_, num_threads_, prefix_)))
+      , data(new request_data(util::make_tuple(endpoints_,
+          count_, num_threads_, prefix_)))
     {
         // TODO: verification of namespace_action_code
     }
@@ -368,16 +361,6 @@ namespace hpx { namespace agas
 
     request::request(
         namespace_action_code type_
-      , parcelset::parcel const& p
-        )
-      : mc(type_)
-      , data(new request_data(util::make_tuple(p)))
-    {
-        // TODO: verification of namespace_action_code
-    }
-
-    request::request(
-        namespace_action_code type_
         )
       : mc(type_)
       , data(new request_data(util::make_tuple()))
@@ -393,7 +376,8 @@ namespace hpx { namespace agas
       , hpx::id_type result_lco
         )
       : mc(type_)
-      , data(new request_data(util::make_tuple(name, evt, call_for_past_events, result_lco)))
+      , data(new request_data(util::make_tuple(name,
+          evt, call_for_past_events, result_lco)))
     {
         HPX_ASSERT(type_ == symbol_ns_on_event);
     }
@@ -542,13 +526,6 @@ namespace hpx { namespace agas
         return data->get_data<request_data::subtype_iterate_types_function, 0>(ec);
     }
 
-    parcelset::parcel request::get_parcel(
-        error_code& ec
-        ) const
-    {
-        return data->get_data<request_data::subtype_parcel, 0>(ec);
-    }
-
     parcelset::endpoints_type request::get_endpoints(
         error_code& ec
         ) const
@@ -681,10 +658,10 @@ namespace hpx { namespace agas
     struct save_visitor : boost::static_visitor<void>
     {
       private:
-        hpx::util::portable_binary_oarchive& ar;
+        hpx::serialization::output_archive& ar;
 
       public:
-        save_visitor(hpx::util::portable_binary_oarchive& ar_)
+        save_visitor(hpx::serialization::output_archive& ar_)
           : ar(ar_)
         {}
 
@@ -694,11 +671,11 @@ namespace hpx { namespace agas
         void operator()(Sequence const& seq) const
         {
             // TODO: verification?
-            util::serialize_sequence(ar, seq);
+            ar << seq;
         }
     };
 
-    void request::save(hpx::util::portable_binary_oarchive& ar, const unsigned int) const
+    void request::save(serialization::output_archive& ar, const unsigned int) const
     { // {{{
         // TODO: versioning?
         int which = data->which();
@@ -714,13 +691,13 @@ namespace hpx { namespace agas
             boost::mpl::at_c<                                                 \
                 request_data::data_type::types, n                             \
             >::type d;                                                        \
-            util::serialize_sequence(ar, d);                                  \
+            ar >> d;                                                          \
             data->data = d;                                                   \
             return;                                                           \
         }                                                                     \
     /**/
 
-    void request::load(hpx::util::portable_binary_iarchive& ar, const unsigned int)
+    void request::load(serialization::input_archive& ar, const unsigned int)
     { // {{{
         // TODO: versioning
         int which = -1;

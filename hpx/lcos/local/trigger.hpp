@@ -11,6 +11,9 @@
 #include <hpx/lcos/local/conditional_trigger.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/assert_owns_lock.hpp>
+
+#include <boost/thread/locks.hpp>
 
 #include <utility>
 
@@ -45,7 +48,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (this != &rhs)
             {
-                typename mutex_type::scoped_lock l(rhs.mtx_);
+                boost::lock_guard<mutex_type> l(rhs.mtx_);
                 promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);
@@ -59,7 +62,7 @@ namespace hpx { namespace lcos { namespace local
         {
             bool triggered = false;
             error_code rc(lightweight);
-            BOOST_FOREACH(conditional_trigger* c, conditions_)
+            for (conditional_trigger* c : conditions_)
             {
                 triggered |= c->set(rc);
                 if (rc && (&ec != &throws))
@@ -73,7 +76,7 @@ namespace hpx { namespace lcos { namespace local
         future<void> get_future(std::size_t* generation_value = 0,
             error_code& ec = hpx::throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             HPX_ASSERT(generation_ != std::size_t(-1));
             ++generation_;
@@ -90,7 +93,7 @@ namespace hpx { namespace lcos { namespace local
         /// \brief Trigger this object.
         bool set(error_code& ec = throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -143,7 +146,7 @@ namespace hpx { namespace lcos { namespace local
             char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             synchronize(generation_value, l, function_name, ec);
         }
 
@@ -153,7 +156,7 @@ namespace hpx { namespace lcos { namespace local
             char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
-            HPX_ASSERT(l.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(l);
 
             if (generation_value < generation_)
             {
@@ -172,7 +175,7 @@ namespace hpx { namespace lcos { namespace local
                         &base_trigger::test_condition, this, generation_value));
 
                 {
-                    hpx::util::scoped_unlock<Lock> ul(l);
+                    hpx::util::unlock_guard<Lock> ul(l);
                     f.get();
                 }   // make sure lock gets re-acquired
             }
@@ -184,7 +187,7 @@ namespace hpx { namespace lcos { namespace local
     public:
         std::size_t next_generation()
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             HPX_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
@@ -195,7 +198,7 @@ namespace hpx { namespace lcos { namespace local
 
         std::size_t generation() const
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            boost::lock_guard<mutex_type> l(mtx_);
             return generation_;
         }
 

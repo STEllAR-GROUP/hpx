@@ -25,7 +25,7 @@
 
 namespace hpx { namespace util { namespace logging {
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////
     // specialize logger for format_write class
     //
     namespace tag {
@@ -54,29 +54,37 @@ namespace hpx { namespace util { namespace logging {
     }
 
     namespace detail {
-        template <class stream, class param> 
+        template <class stream, class param>
         struct find_gather {};
 
         template <class stream>
         struct find_gather< stream, std::basic_string<logging::char_type> >
         {
-            typedef gather::ostream_like::return_str< std::basic_string<char_type>, stream > type ;
+            typedef gather::ostream_like::return_str< std::basic_string<char_type>,
+                stream > type ;
         };
 
         template< class stream, class string_type>
-        struct find_gather< stream, hpx::util::logging::optimize::cache_string_one_str<string_type> > {
-            typedef gather::ostream_like::return_str< hpx::util::logging::optimize::cache_string_one_str<string_type>, stream > type;
+        struct find_gather< stream, hpx::util::logging::optimize
+            ::cache_string_one_str<string_type> > {
+            typedef gather::ostream_like::return_str< hpx::util::logging::optimize
+                ::cache_string_one_str<string_type>, stream > type;
         };
 
         template< class stream, class string_type>
-        struct find_gather< stream, hpx::util::logging::optimize::cache_string_several_str<string_type,void*> > {
-            typedef gather::ostream_like::return_str< hpx::util::logging::optimize::cache_string_several_str<string_type,void*>, stream > type;
+        struct find_gather< stream, hpx::util::logging::optimize
+            ::cache_string_several_str<string_type,void*> > {
+            typedef gather::ostream_like::return_str< hpx::util::logging::optimize
+                ::cache_string_several_str<string_type,void*>, stream > type;
         };
 
 
-        template<class stream, class string, class p1, class p2, class p3, class p4, class p5, class p6, class p7, class p8, class p9, class p10>
-        struct find_gather< stream, tag::holder<string,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> > {
-            typedef gather::ostream_like::return_tag_holder< tag::holder<string,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> , stream > type;
+        template<class stream, class string, class p1, class p2, class p3,
+        class p4, class p5, class p6, class p7, class p8, class p9, class p10>
+        struct find_gather< stream, tag::holder<string,p1,p2,p3,p4,
+            p5,p6,p7,p8,p9,p10> > {
+            typedef gather::ostream_like::return_tag_holder<
+                tag::holder<string,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> , stream > type;
         };
     }
 

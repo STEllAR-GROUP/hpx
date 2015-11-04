@@ -21,14 +21,9 @@
 
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
-#include <boost/foreach.hpp>
 
 #if defined(HPX_HAVE_HWLOC) && !defined(__APPLE__)
 #  include <hwloc.h>
-#endif
-
-#if defined(__linux__) && !defined(HPX_HAVE_PTHREAD_SETAFFINITY_NP)
-#  include <sys/syscall.h>      // make SYS_gettid available
 #endif
 
 std::size_t thread_affinity_worker(std::size_t desired)
@@ -43,13 +38,21 @@ std::size_t thread_affinity_worker(std::size_t desired)
 
         // extract the desired affinity mask
         hpx::threads::topology const& t = hpx::get_runtime().get_topology();
-        hpx::threads::mask_type desired_mask = t.get_thread_affinity_mask(current, numa_sensitive);
+        hpx::threads::mask_type desired_mask = t.get_thread_affinity_mask(current,
+            numa_sensitive);
 
-        std::size_t idx = hpx::threads::find_first(desired_mask);
+        std::size_t logical_idx = hpx::threads::find_first(desired_mask);
+
+        std::size_t idx = 0;
 
         hwloc_topology_t topo;
         hwloc_topology_init(&topo);
         hwloc_topology_load(topo);
+
+        int const pu_depth = hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
+        hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(topo, pu_depth, logical_idx);
+        idx = pu_obj->os_index;
+
 
         // retrieve the current affinity mask
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
@@ -64,7 +67,8 @@ std::size_t thread_affinity_worker(std::size_t desired)
         }
         else
         {
-            HPX_TEST(false && "hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD) failed!");
+            HPX_TEST(false && "hwloc_get_cpubind(topo, cpuset, \
+                        HWLOC_CPUBIND_THREAD) failed!");
         }
 
         hwloc_bitmap_free(cpuset);
@@ -113,7 +117,7 @@ void thread_affinity_foreman()
         std::vector<hpx::lcos::future<std::size_t> > futures;
         futures.reserve(attendance.size());
 
-        BOOST_FOREACH(std::size_t worker, attendance)
+        for (std::size_t worker : attendance)
         {
             // Asynchronously start a new task. The task is encapsulated in a
             // future, which we can query to determine if the task has
@@ -147,7 +151,7 @@ int hpx_main(boost::program_options::variables_map& /*vm*/)
         std::vector<hpx::lcos::future<void> > futures;
         futures.reserve(localities.size());
 
-        BOOST_FOREACH(hpx::naming::id_type const& node, localities)
+        for (hpx::naming::id_type const& node : localities)
         {
             // Asynchronously start a new task. The task is encapsulated in a
             // future, which we can query to determine if the task has

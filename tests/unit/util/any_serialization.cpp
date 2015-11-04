@@ -21,9 +21,8 @@ namespace std
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/any.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 
 #include "small_big_object.hpp"
 
@@ -43,21 +42,21 @@ using hpx::finalize;
 template <typename A>
 void out(std::vector<char> & out_buffer, A & a)
 {
-    hpx::util::portable_binary_oarchive archive(out_buffer);
+    hpx::serialization::output_archive archive(out_buffer);
     archive << a;
 }
 
 template <typename A>
 void in(std::vector<char> & in_buffer, A & a)
 {
-    hpx::util::portable_binary_iarchive archive(in_buffer, in_buffer.size());
+    hpx::serialization::input_archive archive(in_buffer, in_buffer.size());
     archive >> a;
 }
 
 int hpx_main(variables_map& vm)
 {
     typedef
-        basic_any<hpx::util::portable_binary_iarchive, hpx::util::portable_binary_oarchive>
+        basic_any<hpx::serialization::input_archive, hpx::serialization::output_archive>
         any_type;
 
     {

@@ -8,7 +8,6 @@
 #include <hpx/include/performance_counters.hpp>
 
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 #include "server/sine.hpp"
 
@@ -18,7 +17,7 @@
 HPX_REGISTER_COMPONENT_MODULE_DYNAMIC();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     ::performance_counters::sine::server::sine_counter
 > sine_counter_type;
 

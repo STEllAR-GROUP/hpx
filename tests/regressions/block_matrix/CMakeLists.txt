@@ -4,7 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_CXX11_AUTO AND HPX_WITH_CXX11_STD_INITIALIZER_LIST AND
-    HPX_WITH_CXX11_ALIAS_TEMPLATES AND HPX_WITH_CXX11_DEFAULTED_DELETED_FUNCTIONS)
+    HPX_WITH_CXX11_ALIAS_TEMPLATES AND HPX_WITH_CXX11_DEFAULTED_FUNCTIONS AND
+    HPX_WITH_CXX11_DELETED_FUNCTIONS)
 
   set(tests block_matrix)
 
@@ -24,12 +25,12 @@ if(HPX_WITH_CXX11_AUTO AND HPX_WITH_CXX11_STD_INITIALIZER_LIST AND
 
   add_hpx_regression_test("block_matrix" block_matrix ${block_matrix_PARAMETERS})
 
-  add_hpx_pseudo_target(tests.regressions.block_matrix.block_matrix)
+  add_hpx_pseudo_target(tests.regressions.block_matrix_dir.block_matrix)
 
-  add_hpx_pseudo_dependencies(tests.regressions.block_matrix
-                              tests.regressions.block_matrix.block_matrix)
+  add_hpx_pseudo_dependencies(tests.regressions.block_matrix_dir
+                              tests.regressions.block_matrix_dir.block_matrix)
 
-  add_hpx_pseudo_dependencies(tests.regressions.block_matrix.block_matrix
+  add_hpx_pseudo_dependencies(tests.regressions.block_matrix_dir.block_matrix
                               block_matrix_test_exe)
 
 endif()

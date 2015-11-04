@@ -38,7 +38,7 @@ namespace hpx { namespace threads { namespace detail
             }
         }
 
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
         if (0 == data.description)
         {
             HPX_THROWS_IF(ec, bad_parameter,
@@ -51,14 +51,14 @@ namespace hpx { namespace threads { namespace detail
             << "create_work: initial_state("
             << get_thread_state_name(initial_state) << "), thread_priority("
             << get_thread_priority_name(data.priority)
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
             << "), description(" << data.description
 #endif
             << ")";
 
         thread_self* self = get_self_ptr();
 
-#ifdef HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         if (0 == data.parent_id) {
 
             if (self)
@@ -86,11 +86,13 @@ namespace hpx { namespace threads { namespace detail
             thread_priority_boost == data.priority)
         {
             // For critical priority threads, create the thread immediately.
-            scheduler->create_thread(data, 0, initial_state, true, ec, data.num_os_thread);
+            scheduler->create_thread(data, 0, initial_state, true, ec,
+                data.num_os_thread);
         }
         else {
             // Create a task description for the new thread.
-            scheduler->create_thread(data, 0, initial_state, false, ec, data.num_os_thread);
+            scheduler->create_thread(data, 0, initial_state, false, ec,
+                data.num_os_thread);
         }
     }
 }}}

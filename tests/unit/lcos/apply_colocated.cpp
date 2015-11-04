@@ -9,6 +9,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/thread/locks.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 bool on_shutdown_executed = false;
 boost::uint32_t locality_id = boost::uint32_t(-1);
@@ -18,7 +20,7 @@ hpx::util::spinlock result_mutex;
 
 void receive_result(boost::int32_t i)
 {
-    hpx::util::spinlock::scoped_lock l(result_mutex);
+    boost::lock_guard<hpx::util::spinlock> l(result_mutex);
     if (i > final_result)
         final_result = i;
 }
@@ -50,7 +52,7 @@ struct increment_server
 };
 
 typedef hpx::components::managed_component<increment_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, increment_server);
+HPX_REGISTER_COMPONENT(server_type, increment_server);
 
 typedef increment_server::call_action call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action);
@@ -59,7 +61,7 @@ HPX_REGISTER_ACTION(call_action);
 ///////////////////////////////////////////////////////////////////////////////
 void on_shutdown()
 {
-    hpx::util::spinlock::scoped_lock l(result_mutex);
+    boost::lock_guard<hpx::util::spinlock> l(result_mutex);
     HPX_TEST_EQ(final_result, 3);
 
     on_shutdown_executed = true;
@@ -80,7 +82,7 @@ int hpx_main()
 
     {
         increment_action inc;
-        hpx::apply_colocated(inc, there, here, 1);
+        hpx::apply(inc, hpx::colocated(there), here, 1);
     }
 
     {
@@ -89,7 +91,7 @@ int hpx_main()
         hpx::id_type where = inc_f.get();
 
         increment_action inc;
-        hpx::apply_colocated(inc, where, here, 1);
+        hpx::apply(inc, hpx::colocated(where), here, 1);
     }
 
     {
@@ -97,7 +99,7 @@ int hpx_main()
             hpx::components::new_<increment_server>(there);
         hpx::id_type where = inc_f.get();
 
-        hpx::apply_colocated<increment_action>(where, here, 1);
+        hpx::apply<increment_action>(hpx::colocated(where), here, 1);
     }
 
     // register function which will verify final result

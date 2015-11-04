@@ -58,22 +58,34 @@ namespace hpx { namespace threads { namespace policies
             init_parameter()
               : num_queues_(1),
                 max_queue_thread_count_(max_thread_count),
-                numa_sensitive_(false)
+                numa_sensitive_(false),
+                description_("hierarchy_scheduler")
             {}
 
             init_parameter(std::size_t num_queues, std::size_t arity,
                     std::size_t max_queue_thread_count = max_thread_count,
-                    bool numa_sensitive = false)
+                    bool numa_sensitive = false,
+                    char const* description = "hierarchy_scheduler")
               : num_queues_(num_queues),
                 arity_(arity),
                 max_queue_thread_count_(max_queue_thread_count),
-                numa_sensitive_(numa_sensitive)
+                numa_sensitive_(numa_sensitive),
+                description_(description)
+            {}
+
+            init_parameter(std::size_t num_queues, char const* description)
+              : num_queues_(num_queues),
+                arity_(2),
+                max_queue_thread_count_(max_thread_count),
+                numa_sensitive_(false),
+                description_(description)
             {}
 
             std::size_t num_queues_;
             std::size_t arity_;
             std::size_t max_queue_thread_count_;
             bool numa_sensitive_;
+            char const* description_;
         };
         typedef init_parameter init_parameter_type;
 
@@ -86,7 +98,8 @@ namespace hpx { namespace threads { namespace policies
             boost::atomic<bool> v;
             flag_type() { v = false; }
             flag_type(flag_type const & f) { v.store(f.v.load()); }
-            flag_type & operator=(flag_type const & f) { v.store(f.v.load()); return *this; }
+            flag_type & operator=(flag_type const & f) { v.store(f.v.load());
+               return *this; }
             flag_type & operator=(bool b) { v.store(b); return *this;}
             bool operator==(bool b) { return v == b; }
             operator bool() { return v; }
@@ -157,7 +170,7 @@ namespace hpx { namespace threads { namespace policies
 
         hierarchy_scheduler(init_parameter_type const& init,
                 bool deferred_initialization = true)
-          : scheduler_base(init.num_queues_),
+          : scheduler_base(init.num_queues_, init.description_),
             d(init.arity_),
             numa_sensitive_(init.numa_sensitive_)
         {
@@ -178,6 +191,11 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const { return numa_sensitive_; }
+
+        static std::string get_scheduler_name()
+        {
+            return "hierarchy_scheduler";
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
@@ -245,7 +263,7 @@ namespace hpx { namespace threads { namespace policies
             return result;
         }
 
-#ifdef HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         ///////////////////////////////////////////////////////////////////////
         boost::int64_t get_average_thread_wait_time(
             std::size_t num_thread = std::size_t(-1)) const
@@ -320,7 +338,7 @@ namespace hpx { namespace threads { namespace policies
         }
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         boost::uint64_t get_creation_time(bool reset)
         {
             boost::uint64_t time = 0;
@@ -348,10 +366,10 @@ namespace hpx { namespace threads { namespace policies
         }
 #endif
 
-#ifdef HPX_THREAD_MAINTAIN_STEALING_COUNTS
-        std::size_t get_num_pending_misses(std::size_t num_thread, bool reset)
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+        boost::int64_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
-            std::size_t num_pending_misses = 0;
+            boost::int64_t num_pending_misses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -376,9 +394,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_misses;
         }
 
-        std::size_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_pending_accesses(std::size_t num_thread, bool reset)
         {
-            std::size_t num_pending_accesses = 0;
+            boost::int64_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -403,9 +421,9 @@ namespace hpx { namespace threads { namespace policies
             return num_pending_accesses;
         }
 
-        std::size_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -430,9 +448,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -457,9 +475,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -484,9 +502,9 @@ namespace hpx { namespace threads { namespace policies
             return num_stolen_threads;
         }
 
-        std::size_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
+        boost::int64_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
         {
-            std::size_t num_stolen_threads = 0;
+            boost::int64_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
                 for (size_type i = 0; i != tree.size(); ++i)
@@ -599,14 +617,14 @@ namespace hpx { namespace threads { namespace policies
             boost::int64_t count = tq->get_pending_queue_length()/d + 1;
             dest->move_work_items_from(tq, count);
 
-            tq->increment_num_stolen_from_pending(count);
-            dest->increment_num_stolen_to_pending(count);
+            tq->increment_num_stolen_from_pending(std::size_t(count));
+            dest->increment_num_stolen_to_pending(std::size_t(count));
         }
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        bool get_next_thread(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
+        bool get_next_thread(std::size_t num_thread,
+            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(num_thread < tree[0].size());
@@ -630,7 +648,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data_base* thrd, std::size_t num_thread,
+        void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority /*priority*/ = thread_priority_normal)
         {
             HPX_ASSERT(tree.size());
@@ -638,7 +656,8 @@ namespace hpx { namespace threads { namespace policies
             tree.back()[0]->schedule_thread(thrd);
         }
 
-        void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
+        void schedule_thread_last(threads::thread_data* thrd,
+            std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
             HPX_ASSERT(tree.size());
@@ -647,7 +666,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
+        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
         {
             for(size_type i = 0; i < tree.size(); ++i)
             {

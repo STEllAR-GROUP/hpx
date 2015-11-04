@@ -1,3 +1,8 @@
+#  Copyright (c) 2012 Bryce Lelbach
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 akemp = Andrew Kemp <akemp@cct.lsu.edu>
 aserio = Adrian Serio <aserio@cct.lsu.edu>
 atabbal = Alex Tabbal <atabbal@cct.lsu.edu>
@@ -23,4 +28,4 @@ syang16 = Shuangyang Yang <syang16@cct.lsu.edu>
 vamatya = Vinay Amatya <vamatya@cct.lsu.edu>
 zbyerly = Zachary Byerly <zbyerly@cct.lsu.edu>
 svn_jwest = John West <john.e.west@gmail.com>
-svn_kbwheel = Kyle Wheeler <kbwheel@gmail.com> 
+svn_kbwheel = Kyle Wheeler <kbwheel@gmail.com>

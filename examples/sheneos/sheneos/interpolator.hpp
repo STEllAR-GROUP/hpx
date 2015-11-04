@@ -63,7 +63,7 @@ namespace sheneos
             boost::uint32_t eosvalues = server::partition3d::small_api_values)  const
         {
             return stubs::partition3d::interpolate_async(
-                get_gid(ye, temp, rho), ye, temp, rho, eosvalues);
+                get_id(ye, temp, rho), ye, temp, rho, eosvalues);
         }
 
         /// Synchronously interpolate the function values for the given ye,
@@ -73,7 +73,7 @@ namespace sheneos
             boost::uint32_t eosvalues = server::partition3d::small_api_values)  const
         {
             return stubs::partition3d::interpolate(
-                get_gid(ye, temp, rho), ye, temp, rho, eosvalues);
+                get_id(ye, temp, rho), ye, temp, rho, eosvalues);
         }
 
         /// Asynchronously interpolate the function values for the given ye,
@@ -84,7 +84,7 @@ namespace sheneos
             boost::uint32_t eosvalue)  const
         {
             return stubs::partition3d::interpolate_one_async(
-                get_gid(ye, temp, rho), ye, temp, rho, eosvalue);
+                get_id(ye, temp, rho), ye, temp, rho, eosvalue);
         }
 
         /// Synchronously interpolate the function values for the given ye,
@@ -94,7 +94,7 @@ namespace sheneos
             boost::uint32_t eosvalue)  const
         {
             return stubs::partition3d::interpolate_one(
-                get_gid(ye, temp, rho), ye, temp, rho, eosvalue);
+                get_id(ye, temp, rho), ye, temp, rho, eosvalue);
         }
 
         /// Asynchronously interpolate one function value for all the given ye,
@@ -140,11 +140,11 @@ namespace sheneos
 
     private:
         /// Find the GID of the partition that contains the specified value.
-        hpx::naming::id_type const& get_gid(double ye, double temp, double rho) const;
+        hpx::naming::id_type const& get_id(double ye, double temp, double rho) const;
 
-        hpx::naming::id_type const& get_gid(sheneos_coord const& c) const
+        hpx::naming::id_type const& get_id(sheneos_coord const& c) const
         {
-            return get_gid(c.ye_, c.temp_, c.rho_);
+            return get_id(c.ye_, c.temp_, c.rho_);
         }
 
         typedef hpx::components::distributing_factory distributing_factory;

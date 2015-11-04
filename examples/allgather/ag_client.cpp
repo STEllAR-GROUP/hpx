@@ -1,12 +1,11 @@
 //  Copyright (c) 2012 Matthew Anderson
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
 #include "ag/server/allgather.hpp"
@@ -16,48 +15,27 @@
 #include <vector>
 #include <math.h>
 
-/// This function initializes a vector of \a ag::point clients,
-/// connecting them to components created with
-/// \a hpx::components::distributing_factory.
-inline void
-init(hpx::components::server::distributing_factory::iterator_range_type const& r,
-    std::vector<hpx::naming::id_type>& p)
-{
-    BOOST_FOREACH(hpx::naming::id_type const& id, r)
-    {
-        p.push_back(id);
-    }
-}
-
 ///////////////////////////////////////////////////////////////////////
 // Create a distributing factory locally. The distributing factory can
 // be used to create blocks of components that are distributed across
 // all localities that support that component type.
 void test_allgather(std::size_t np)
 {
-    hpx::components::distributing_factory factory =
-        hpx::components::distributing_factory::create(hpx::find_here());
-
     // Get the component type for our point component.
     hpx::components::component_type block_type =
         ag::server::allgather::get_component_type();
 
-    std::vector<hpx::naming::id_type> localities =
+    std::vector<hpx::id_type> localities =
         hpx::find_all_localities(block_type);
-    std::cout << " Number of localities: " << localities.size() << std::endl;
+    std::cout << " Number of localities: " << localities.size()
+              << std::endl;
 
-    // Create np allgather components with distributing factory.
-    // These components will be evenly distributed among all available
-    // localities supporting the component type.
-    hpx::components::distributing_factory::result_type blocks =
-        factory.create_components(block_type, np);
-
-    // This vector will hold client classes referring to all of the
-    // components we just created.
-    std::vector<hpx::naming::id_type> components;
-
-    // Populate the client vectors.
-    init(hpx::util::locality_results(blocks), components);
+    // Create np allgather components. These components will be evenly
+    // distributed among all available localities supporting the
+    // component type.
+    std::vector<hpx::id_type> components =
+        hpx::new_<ag::server::allgather[]>(
+            hpx::default_layout(localities), np).get();
 
     hpx::util::high_resolution_timer kernel1time;
     {
@@ -93,29 +71,21 @@ void test_allgather(std::size_t np)
 
 void test_allgather_and_gate(std::size_t np)
 {
-    hpx::components::distributing_factory factory =
-        hpx::components::distributing_factory::create(hpx::find_here());
-
     // Get the component type for our point component.
     hpx::components::component_type block_type =
         ag::server::allgather_and_gate::get_component_type();
 
     std::vector<hpx::naming::id_type> localities =
         hpx::find_all_localities(block_type);
-    std::cout << " Number of localities: " << localities.size() << std::endl;
+    std::cout << " Number of localities: " << localities.size()
+              << std::endl;
 
     // Create np allgather components with distributing factory.
     // These components will be evenly distributed among all available
     // localities supporting the component type.
-    hpx::components::distributing_factory::result_type blocks =
-        factory.create_components(block_type, np);
-
-    // This vector will hold client classes referring to all of the
-    // components we just created.
-    std::vector<hpx::naming::id_type> components;
-
-    // Populate the client vectors.
-    init(hpx::util::locality_results(blocks), components);
+    std::vector<hpx::id_type> components =
+        hpx::new_<ag::server::allgather_and_gate[]>(
+            hpx::default_layout(localities), np).get();
 
     hpx::util::high_resolution_timer inittimer;
     {

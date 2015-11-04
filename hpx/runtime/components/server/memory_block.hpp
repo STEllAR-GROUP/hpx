@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +6,8 @@
 #if !defined(HPX_COMPONENTS_MEMORY_BLOCK_OCT_21_2008_0159PM)
 #define HPX_COMPONENTS_MEMORY_BLOCK_OCT_21_2008_0159PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/traits/is_component.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
@@ -14,12 +15,11 @@
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/noncopyable.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/array.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -31,6 +31,7 @@
 namespace hpx { namespace components { namespace server
 {
     class memory_block;     // forward declaration only
+    class runtime_support;
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -124,8 +125,17 @@ namespace hpx { namespace components { namespace server { namespace detail
             components::set_component_type<memory_block_header>(t);
         }
 
-        naming::id_type get_gid() const;
+        naming::id_type get_id() const;
+        naming::id_type get_unmanaged_id() const;
 
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_unmanaged_id();
+        }
+#endif
+
+    protected:
         naming::gid_type get_base_gid() const;
 
     protected:
@@ -272,7 +282,7 @@ namespace hpx { namespace components
         /// \note Serializing memory_blocks is not platform independent as
         ///       such things as endianess, alignment, and data type sizes are
         ///       not considered.
-        friend class boost::serialization::access;
+        friend class hpx::serialization::access;
 
         ///////////////////////////////////////////////////////////////////////
         template <class Archive>
@@ -288,7 +298,7 @@ namespace hpx { namespace components
             HPX_ASSERT(act);
 
             ar << size; //-V128
-            ar << act;
+            ar << hpx::serialization::detail::raw_ptr(act);
 
             HPX_ASSERT(act->save());
             if (config) {
@@ -320,20 +330,20 @@ namespace hpx { namespace components
             actions::manage_object_action_base* act = 0;
 
             ar >> size; //-V128
-            ar >> act;
+            ar >> hpx::serialization::detail::raw_ptr(act);
 
             typedef server::detail::memory_block_header alloc_type;
             alloc_type* p =
                 new (server::detail::allocate_block<alloc_type>(size))
-                    alloc_type(size, act->get_instance());
+                    alloc_type(size, act->get_instance()); //-V522
 
-            HPX_ASSERT(act->load());
+            HPX_ASSERT(act->load()); //-V522
             if (config) {
-                act->load()(p->get_ptr(), size, ar, version,
+                act->load()(p->get_ptr(), size, ar, version, //-V522
                     config->get_ptr());
             }
             else {
-                act->load()(p->get_ptr(), size, ar, version, 0);
+                act->load()(p->get_ptr(), size, ar, version, 0); //-V522
             }
 
             delete act;
@@ -350,7 +360,7 @@ namespace hpx { namespace components
                 config_.reset(load_(ar, version));
             data_.reset(load_(ar, version, config_.get()));
         }
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER();
 
     private:
         boost::intrusive_ptr<server::detail::memory_block_header> data_;
@@ -647,26 +657,29 @@ namespace hpx { namespace components { namespace server
             get_heap().free(p);
         }
 
-        /// \brief  The function \a get_factory_properties is used to
-        ///         determine, whether instances of the derived component can
-        ///         be created in blocks (i.e. more than one instance at once).
-        ///         This function is used by the \a distributing_factory to
-        ///         determine a correct allocation strategy
-        static factory_property get_factory_properties()
-        {
-            // this component can be allocated one at a time only, but the
-            // meaning of the count parameter passed to create is different.
-            // In this case it specifies the number of bytes to allocate for a
-            // new memory block.
-            return factory_instance_count_is_size;
-        }
-
     public:
         /// \brief Return the global id of this \a future instance
+        naming::id_type get_id() const
+        {
+            return get_checked()->get_id();
+        }
+
+        naming::id_type get_unmanaged_id() const
+        {
+            return get_checked()->get_unmanaged_id();
+        }
+
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
         naming::id_type get_gid() const
         {
             return get_checked()->get_gid();
         }
+#endif
+
+    protected:
+        friend class server::detail::memory_block;
+        friend class server::detail::memory_block_header;
+        friend class server::runtime_support;
 
         naming::gid_type get_base_gid() const
         {
@@ -674,8 +687,6 @@ namespace hpx { namespace components { namespace server
         }
 
     private:
-        friend class detail::memory_block;
-
         /// \brief We use a intrusive pointer here to make sure the size of the
         ///        overall memory_block class is exactly equal to the size of
         ///        a single pointer
@@ -684,7 +695,12 @@ namespace hpx { namespace components { namespace server
 
     namespace detail
     {
-        inline naming::id_type memory_block_header::get_gid() const
+        inline naming::id_type memory_block_header::get_id() const
+        {
+            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        }
+
+        inline naming::id_type memory_block_header::get_unmanaged_id() const //-V524
         {
             return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
         }
@@ -696,6 +712,15 @@ namespace hpx { namespace components { namespace server
         }
     }
 }}}
+
+namespace hpx { namespace traits
+{
+    // memory_block is a (hand-rolled) component
+    template <>
+    struct is_component<components::server::memory_block>
+      : boost::mpl::true_
+    {};
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the memory_block actions
@@ -716,8 +741,7 @@ HPX_REGISTER_ACTION_DECLARATION(
     memory_block_clone_action)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::components::memory_block_data,
-    memory_data_type)
+    hpx::components::memory_block_data, hpx_memory_data_type)
 
 #include <hpx/config/warnings_suffix.hpp>
 

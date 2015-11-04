@@ -93,6 +93,11 @@ namespace hpx { namespace util { namespace batch_environments {
             {
                 num_localities_ = safe_lexical_cast<std::size_t>(total_num_tasks);
             }
+            else
+            {
+                num_localities_ = 1;
+            }
+
             std::size_t task_count = 0;
             if (tasks_per_node)
             {
@@ -152,6 +157,12 @@ namespace hpx { namespace util { namespace batch_environments {
                     }
                 }
             }
+            else
+            {
+                num_tasks_ = 1;
+                task_count = 1;
+            }
+
             if (task_count != num_localities_ && num_nodes)
             {
                 num_tasks_
@@ -190,14 +201,14 @@ namespace hpx { namespace util { namespace batch_environments {
 
                 std::vector<std::string> tmp_nodes;
 
-                BOOST_FOREACH(value_type const & value, p)
+                for (value_type const& value : p)
                 {
                     std::string const & prefix = boost::fusion::at_c<0>(value);
                     optional_type const & ranges = boost::fusion::at_c<1>(value);
                     bool push_now = tmp_nodes.empty();
                     if(ranges)
                     {
-                        BOOST_FOREACH(vector_type const & range, *ranges)
+                        for (vector_type const& range : *ranges)
                         {
                             if(range.size() == 1)
                             {
@@ -209,7 +220,7 @@ namespace hpx { namespace util { namespace batch_environments {
                                 }
                                 else
                                 {
-                                    BOOST_FOREACH(std::string & node, tmp_nodes)
+                                    for (std::string& node : tmp_nodes)
                                     {
                                         node += s;
                                     }
@@ -218,8 +229,10 @@ namespace hpx { namespace util { namespace batch_environments {
                             else
                             {
                                 using hpx::util::safe_lexical_cast;
-                                std::size_t begin = safe_lexical_cast<std::size_t>(range[0]);
-                                std::size_t end = safe_lexical_cast<std::size_t>(range[1]);
+                                std::size_t begin = safe_lexical_cast<std::size_t>
+                                    (range[0]);
+                                std::size_t end = safe_lexical_cast<std::size_t>
+                                    (range[1]);
                                 if(begin > end) std::swap(begin, end);
 
                                 std::vector<std::string> vs;
@@ -245,9 +258,9 @@ namespace hpx { namespace util { namespace batch_environments {
                                 {
                                     std::vector<std::string> tmp;
                                     std::swap(tmp, tmp_nodes);
-                                    BOOST_FOREACH(std::string s, tmp)
+                                    for (std::string s : tmp)
                                     {
-                                        BOOST_FOREACH(std::string const & s2, vs)
+                                        for (std::string const& s2 : vs)
                                         {
                                             s += s2;
                                             tmp_nodes.push_back(s);
@@ -265,7 +278,7 @@ namespace hpx { namespace util { namespace batch_environments {
                         }
                         else
                         {
-                            BOOST_FOREACH(std::string & node, tmp_nodes)
+                            for (std::string& node : tmp_nodes)
                             {
                                 node += prefix;
                             }
@@ -356,22 +369,24 @@ namespace hpx { namespace util { namespace batch_environments {
                     else
                         num_threads_ = num_pus / num_tasks_;
                 }
-
-                std::size_t num_cores = 0;
-                if(slurm_cpus_per_task)
-                {
-                    num_cores = safe_lexical_cast<std::size_t>(slurm_cpus_per_task);
-                }
                 else
                 {
-                    num_cores = slurm_num_cpus / num_tasks_;
-                }
-                HPX_ASSERT(num_cores <= top.get_number_of_cores());
+                    std::size_t num_cores = 0;
+                    if(slurm_cpus_per_task)
+                    {
+                        num_cores
+                            = safe_lexical_cast<std::size_t>(slurm_cpus_per_task);
+                    }
+                    else
+                    {
+                        num_cores = slurm_num_cpus / num_tasks_;
+                    }
+                    HPX_ASSERT(num_cores <= top.get_number_of_cores());
 
-                num_threads_ = 0;
-                for(std::size_t core = 0; core != num_cores; ++core)
-                {
-                    num_threads_ += top.get_number_of_core_pus(core);
+                    for(std::size_t core = 0; core != num_cores; ++core)
+                    {
+                        num_threads_ += top.get_number_of_core_pus(core);
+                    }
                 }
             }
         }

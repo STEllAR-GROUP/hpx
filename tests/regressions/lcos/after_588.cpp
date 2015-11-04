@@ -50,7 +50,7 @@ struct test
 };
 
 typedef hpx::components::managed_component<test> test_component;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(test_component);
+HPX_REGISTER_COMPONENT(test_component);
 
 HPX_REGISTER_ACTION(test::pong_action, test_pong_action);
 HPX_REGISTER_ACTION(test::ping_action, test_ping_action);
@@ -64,8 +64,10 @@ int hpx_main(boost::program_options::variables_map & vm)
         hpx::id_type id0 = hpx::components::new_<test>(localities[0]).get();
         hpx::id_type id1 = hpx::components::new_<test>(there).get();
 
-        hpx::future<void> f0 = hpx::async(test::ping_action(), id0, id1, vm["iterations"].as<std::size_t>());
-        hpx::future<void> f1 = hpx::async(test::ping_action(), id1, id0, vm["iterations"].as<std::size_t>());
+        hpx::future<void> f0 = hpx::async(test::ping_action(), id0, id1,
+            vm["iterations"].as<std::size_t>());
+        hpx::future<void> f1 = hpx::async(test::ping_action(), id1, id0,
+            vm["iterations"].as<std::size_t>());
         hpx::wait_all(f0, f1);
     }
     hpx::finalize();

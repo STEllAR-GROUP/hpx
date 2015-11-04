@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2010 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2013 Jeroen Habraken
 #
@@ -6,16 +6,19 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    binpacking_factory
     component_storage
     containers
-    distributing_factory
     iostreams
     memory
     papi_counters
-    remote_object
     security
    )
+
+if(HPX_WITH_IO_COUNTERS)
+  set(subdirs ${subdirs}
+      io_counters
+     )
+endif()
 
 add_hpx_pseudo_target(components)
 

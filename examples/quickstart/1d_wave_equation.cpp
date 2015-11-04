@@ -11,7 +11,8 @@
 //
 // D^2 U / Dt^2 = c^2  D^2 U / Dx^2
 //
-// The parameter alpha = c*dt/dx must be less than 1 to ensure the stability of the algorithm.
+// The parameter alpha = c*dt/dx must be less than 1 to ensure the stability
+//     of the algorithm.
 // Discretizing the equation and solving for U(t+dt,x) yields
 // alpha^2 * (U(t,x+dx)+U(t,x-dx))+2(1-alpha^2)*U(t,x) - U(t-dt,x)
 //
@@ -22,13 +23,13 @@
 // Include statements.
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/format.hpp>
 #include <boost/math/constants/constants.hpp>
+#include <boost/thread/locks.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -129,7 +130,7 @@ double calculate_u_tplus_x_1st(double u_t_xplus, double u_t_x,
 
 double wave(boost::uint64_t t, boost::uint64_t x)
 {
-  hpx::lcos::local::mutex::scoped_lock l(u[t][x].mtx);
+  boost::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
   //  cout << (boost::format("calling wave... t=%1% x=%2%\n") % t % x) << flush;
   if (u[t][x].computed)
     {
@@ -203,7 +204,8 @@ int hpx_main(variables_map& vm)
   // check that alpha_squared satisfies the stability condition
   if (0.25 < alpha_squared)
     {
-      cout << (("alpha^2 = (c*dt/dx)^2 should be less than 0.25 for stability!\n"))<< flush;
+      cout << (("alpha^2 = (c*dt/dx)^2 should be less than 0.25 for stability!\n"))
+          << flush;
     }
 
   u = std::vector<std::vector<data> >(nt, std::vector<data>(nx));

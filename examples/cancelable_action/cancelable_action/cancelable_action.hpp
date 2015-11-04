@@ -39,14 +39,14 @@ namespace examples
         ///////////////////////////////////////////////////////////////////////
         void do_it(hpx::error_code& ec = hpx::throws)
         {
-            HPX_ASSERT(this->get_gid());
-            this->base_type::do_it(this->get_gid(), ec);
+            HPX_ASSERT(this->get_id());
+            this->base_type::do_it(this->get_id(), ec);
         }
 
         void cancel_it()
         {
-            HPX_ASSERT(this->get_gid());
-            this->base_type::cancel_it(this->get_gid());
+            HPX_ASSERT(this->get_id());
+            this->base_type::cancel_it(this->get_id());
         }
     };
 }

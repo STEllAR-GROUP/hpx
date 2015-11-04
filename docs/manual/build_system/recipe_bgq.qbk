@@ -63,7 +63,7 @@ You can then use this as your build command:
             -DMPI_CXX_COMPILER=mpiclang++11 \
             -DHWLOC_ROOT=/path/to/hwloc/installation \
             -DBOOST_ROOT=/path/to/boost \
-            -DHPX_MALLOC=system \
+            -DHPX_WITH_MALLOC=system \
             /path/to/hpx
 ``
 

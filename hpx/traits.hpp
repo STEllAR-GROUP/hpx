@@ -24,10 +24,20 @@ namespace hpx { namespace traits
     struct is_component;
 
     template <typename Component, typename Enable = void>
+    struct is_component_or_component_array;
+
+    template <typename Component, typename Enable = void>
     struct component_type_database;
 
     template <typename Component, typename Enable = void>
     struct component_type_is_compatible;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable = void>
+    struct is_client;
+
+    template <typename T, typename Enable = void>
+    struct is_client_or_client_array;
 
     ///////////////////////////////////////////////////////////////////////////
     // control the way managed_components are constructed
@@ -53,11 +63,10 @@ namespace hpx { namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Enable = void>
-    struct needs_guid_initialization;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Enable = void>
     struct is_action;
+
+    template <typename Action, typename Enable = void>
+    struct is_continuation;
 
     // Customization point for action priority
     template <typename Action, typename Enable = void>
@@ -80,9 +89,6 @@ namespace hpx { namespace traits
 #endif
 
     template <typename Action, typename Enable = void>
-    struct action_may_require_id_splitting;
-
-    template <typename Action, typename Enable = void>
     struct action_is_target_valid;
 
     template <typename Action, typename Enable = void>
@@ -98,16 +104,24 @@ namespace hpx { namespace traits
     struct action_schedule_thread;
 
     ///////////////////////////////////////////////////////////////////////////
-    // Customization point for type_size
-    template <typename T, typename Enable = void>
-    struct type_size;
+    template <typename A, typename Enable = void>
+    struct is_chunk_allocator;
+
+    template <typename A, typename Enable = void>
+    struct default_chunk_size;
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Range, typename Enable = void>
+    struct is_range;
+
     template <typename Future, typename Enable = void>
     struct is_future;
 
     template <typename Future, typename Enable = void>
     struct future_traits;
+
+    template <typename Future, typename Enable = void>
+    struct future_access;
 
     template <typename Range, typename Enable = void>
     struct is_future_range;
@@ -119,10 +133,13 @@ namespace hpx { namespace traits
     struct is_future_tuple;
 
     template <typename Future, typename Enable = void>
-    struct serialize_as_future;
+    struct acquire_future;
 
     template <typename Future, typename Enable = void>
-    struct acquire_future;
+    struct acquire_shared_state;
+
+    template <typename T, typename Enable = void>
+    struct is_shared_state;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Plugin, typename Enable = void>
@@ -142,7 +159,26 @@ namespace hpx { namespace traits
     struct segmented_iterator_traits;
 
     template <typename Iterator, typename Enable = void>
+    struct is_segmented_iterator;
+
+    template <typename Iterator, typename Enable = void>
     struct segmented_local_iterator_traits;
+
+    template <typename T, typename Enable = void>
+    struct projected_iterator;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable = void>
+    struct is_distribution_policy;
+
+    template <typename T, typename Enable = void>
+    struct is_executor;
+
+    template <typename T, typename Enable = void>
+    struct is_timed_executor;
+
+    template <typename T, typename Enable = void>
+    struct is_executor_parameters;
 }}
 
 #endif

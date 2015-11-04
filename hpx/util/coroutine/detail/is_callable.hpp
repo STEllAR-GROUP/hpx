@@ -32,7 +32,7 @@
 #include <boost/type_traits.hpp>
 #include <boost/mpl/logical.hpp>
 #include <boost/mpl/has_xxx.hpp>
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
   template<typename T>
   struct is_function_pointer :

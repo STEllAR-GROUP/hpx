@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -10,7 +10,7 @@
 #if !defined(HPX_E43E0AF0_8A9D_4870_8CC7_E5AD53EF4798)
 #define HPX_E43E0AF0_8A9D_4870_8CC7_E5AD53EF4798
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
 #include <boost/thread.hpp>
@@ -21,14 +21,16 @@
 #include <vector>
 #include <iosfwd>
 #include <limits>
-#if defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT > 64)
+#if defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
+            && HPX_HAVE_MAX_CPU_COUNT > 64)
 #include <bitset>
 #endif
 
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
-#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
+#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || (defined(HPX_HAVE_MAX_CPU_COUNT) \
+             && HPX_HAVE_MAX_CPU_COUNT <= 64)
     typedef boost::uint64_t mask_type;
     typedef boost::uint64_t mask_cref_type;
 
@@ -93,9 +95,9 @@ namespace hpx { namespace threads
 #define HPX_CPU_MASK_PREFIX "0x"
 
 #else
-# if defined(HPX_MAX_CPU_COUNT)
-    typedef std::bitset<HPX_MAX_CPU_COUNT> mask_type;
-    typedef std::bitset<HPX_MAX_CPU_COUNT> const& mask_cref_type;
+# if defined(HPX_HAVE_MAX_CPU_COUNT)
+    typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> mask_type;
+    typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> const& mask_cref_type;
 # else
     typedef boost::dynamic_bitset<boost::uint64_t> mask_type;
     typedef boost::dynamic_bitset<boost::uint64_t> const& mask_cref_type;
@@ -128,7 +130,7 @@ namespace hpx { namespace threads
 
     inline void resize(mask_type& mask, std::size_t s)
     {
-# if defined(HPX_MAX_CPU_COUNT)
+# if defined(HPX_HAVE_MAX_CPU_COUNT)
         HPX_ASSERT(s <= mask.size());
 # else
         return mask.resize(s);
@@ -137,10 +139,10 @@ namespace hpx { namespace threads
 
     inline std::size_t find_first(mask_cref_type mask)
     {
-# if defined(HPX_MAX_CPU_COUNT)
+# if defined(HPX_HAVE_MAX_CPU_COUNT)
         if (mask.any())
         {
-            for (std::size_t i = 0; i != HPX_MAX_CPU_COUNT; ++i)
+            for (std::size_t i = 0; i != HPX_HAVE_MAX_CPU_COUNT; ++i)
             {
                 if (mask[i])
                     return i;
@@ -152,7 +154,7 @@ namespace hpx { namespace threads
 # endif
     }
 
-# if defined(HPX_MAX_CPU_COUNT)
+# if defined(HPX_HAVE_MAX_CPU_COUNT)
 #define HPX_CPU_MASK_PREFIX "0b"
 #else
 #define HPX_CPU_MASK_PREFIX "0x"
@@ -248,7 +250,7 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_thread_affinity_mask(std::size_t num_thread,
-            bool numa_sensitive, error_code& ec = throws) const = 0;
+            bool numa_sensitive = false, error_code& ec = throws) const = 0;
 
         /// \brief Use the given bit mask to set the affinity of the given
         ///        thread. Each set bit corresponds to a processing unit the
@@ -283,11 +285,12 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        virtual mask_cref_type get_thread_affinity_mask_from_lva(
+        virtual mask_type get_thread_affinity_mask_from_lva(
             naming::address::address_type, error_code& ec = throws) const = 0;
 
         /// \brief Prints the \param m to os in a human readable form
-        virtual void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const = 0;
+        virtual void print_affinity_mask(std::ostream& os,
+            std::size_t num_thread, mask_type const& m) const = 0;
 
         /// \brief Reduce thread priority of the current thread.
         ///
@@ -296,11 +299,26 @@ namespace hpx { namespace threads
         ///                   the function will throw on error instead.
         virtual bool reduce_thread_priority(error_code& ec = throws) const;
 
+        /// \brief Return the number of available NUMA domains
+        virtual std::size_t get_number_of_sockets() const = 0;
+
+        /// \brief Return the number of available NUMA domains
+        virtual std::size_t get_number_of_numa_nodes() const = 0;
+
         /// \brief Return the number of available cores
         virtual std::size_t get_number_of_cores() const = 0;
 
         /// \brief Return the number of available hardware processing units
         virtual std::size_t get_number_of_pus() const = 0;
+
+        /// \brief Return number of cores in given numa domain
+        virtual std::size_t get_number_of_numa_node_cores(std::size_t numa) const = 0;
+
+        /// \brief Return number of processing units in a given numa domain
+        virtual std::size_t get_number_of_numa_node_pus(std::size_t numa) const = 0;
+
+        /// \brief Return number of processing units in a given socket
+        virtual std::size_t get_number_of_socket_pus(std::size_t socket) const = 0;
 
         /// \brief Return number of processing units in given core
         virtual std::size_t get_number_of_core_pus(std::size_t core) const = 0;
@@ -309,9 +327,17 @@ namespace hpx { namespace threads
             error_code& ec = throws) const = 0;
 
         virtual mask_type get_cpubind_mask(error_code& ec = throws) const = 0;
-        virtual mask_type get_cpubind_mask(boost::thread & handle, error_code& ec = throws) const = 0;
+        virtual mask_type get_cpubind_mask(boost::thread & handle,
+            error_code& ec = throws) const = 0;
 
         virtual void write_to_log() const = 0;
+
+        /// This is equivalent to malloc(), except that it tries to allocate
+        /// page-aligned memory from the OS.
+        virtual void* allocate(std::size_t len) = 0;
+
+        /// Free memory that was previously allocated by allocate
+        virtual void deallocate(void* addr, std::size_t len) = 0;
     };
 
     HPX_API_EXPORT std::size_t hardware_concurrency();
@@ -361,7 +387,8 @@ namespace hpx { namespace threads
 
             bool operator==(spec_type const& rhs) const
             {
-                if (type_ != rhs.type_ || index_bounds_.size() != rhs.index_bounds_.size())
+                if (type_ != rhs.type_ || index_bounds_.size() !=
+                    rhs.index_bounds_.size())
                     return false;
 
                 for (std::size_t i = 0; i < index_bounds_.size(); ++i)

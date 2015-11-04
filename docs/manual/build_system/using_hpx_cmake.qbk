@@ -35,21 +35,36 @@ The basic structure to include __hpx__ into your CMakeLists.txt is shown here:
     find_package(HPX)
 ``
 
-In order to have CMake find HPX, it needs to be told. The easiest is to add
-the HPX_DIR cmake variable pointing to the directory containing the HPXConfig.cmake
-script which gets picked up by cmake and sets up all the necessary macros needed
-to use HPX in your project. Pass it on the command line while invoking cmake
-(where [^$HPX_LOCATION] is the build directory or [^CMAKE_INSTALL_PREFIX] you
-used while building __hpx__):
+In order to have CMake find __hpx__, it needs to be told where to look for the
+`HPXConfig.cmake` file that is generated when HPX is built or installed,
+it is used by `find_package(HPX)` to set up all the necessary macros needed to
+use __hpx__ in your project. The ways to achieve this are
 
+* set the `HPX_DIR` cmake variable to point to the directory containing the `HPXConfig.cmake`
+script on the command line when you invoke cmake,
 ``
-    cmake -DHPX_DIR=$HPX_LOCATION/lib/cmake/hpx ...
+    cmake -DHPX_DIR=$HPX_LOCATION/lib/cmake/HPX ...
 ``
+where [^$HPX_LOCATION] is the build directory or [^CMAKE_INSTALL_PREFIX] you used when
+building/configuring __hpx__
 
-Alternatively, if you wish to require __hpx__ for your project, replace the
+* set the `CMAKE_PREFIX_PATH` variable to the root directory of your __hpx__ build or install
+location on the command line when you invoke cmake,
+``
+    cmake -DCMAKE_PREFIX_PATH=$HPX_LOCATION ...
+``
+the difference between `CMAKE_PREFIX_PATH` and `HPX_DIR` is that cmake will add common postfixes
+such as `lib/cmake/<project>` to the `CMAKE_PREFIX_PATH` and search in these locations too.
+Note that if your project uses __hpx__ as well as other cmake managed projects, the paths to the
+locations of these multiple projects may be concatenated in the `CMAKE_PREFIX_PATH`.
+
+* The variables above may be set in the CMake GUI or curses ccmake interface
+instead of the command line.
+
+Additionally, if you wish to require __hpx__ for your project, replace the
 `find_package(HPX)` line with `find_package(HPX REQUIRED)`.
 
-You can check if HPX was succesfully found with the `HPX_FOUND` CMake variable.
+You can check if __hpx__ was successfully found with the `HPX_FOUND` CMake variable.
 
 The simplst way to add the __hpx__ component is to use the `add_hpx_component`
 macro and add it to the `CMakeLists.txt` file:
@@ -143,4 +158,3 @@ to the section on __pkg_config__.
       to link against have been added. Please also consult the CMake documentation [@http://www.cmake.org/Wiki/CMake_RPATH_handling `here`]]
 
 [endsect] [/ Using HPX with CMake based projects]
-

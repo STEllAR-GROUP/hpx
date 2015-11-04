@@ -9,8 +9,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
-#include <hpx/util/serialize_buffer.hpp>
 #include <hpx/util/any.hpp>
 
 #include <boost/assert.hpp>
@@ -19,7 +19,7 @@
 #include <benchmarks/network/osu_coll.hpp>
 #include <benchmarks/network/broadcast.hpp>
 
-HPX_REGISTER_PLAIN_ACTION(hpx::lcos::detail::broadcast_impl_action, broadcast_impl_action);
+HPX_PLAIN_ACTION(hpx::lcos::detail::broadcast_impl_action, broadcast_impl_action);
 
 
 struct broadcast_component
@@ -28,9 +28,10 @@ struct broadcast_component
     broadcast_component()
     {}
 
-    void init(std::vector<hpx::id_type> const & id, std::size_t max_msg_size, std::size_t fan_out)
+    void init(std::vector<hpx::id_type> const & id, std::size_t max_msg_size,
+        std::size_t fan_out)
     {
-        bcast.this_id = this->get_gid();
+        bcast.this_id = this->get_id();
         bcast.fan_out = fan_out;
         ids = id;
         send_buffer = std::vector<char>(max_msg_size);
@@ -38,7 +39,7 @@ struct broadcast_component
 
     HPX_DEFINE_COMPONENT_ACTION(broadcast_component, init);
 
-    typedef hpx::util::serialize_buffer<char> buffer_type;
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
     double run(std::size_t size, std::size_t iterations, std::size_t skip)
     {
@@ -47,7 +48,8 @@ struct broadcast_component
         {
             hpx::util::high_resolution_timer t;
 
-            recv_buffer = bcast(ids, 0, buffer_type(&send_buffer[0], size, buffer_type::reference)).get();
+            recv_buffer = bcast(ids, 0, buffer_type(&send_buffer[0], size,
+                buffer_type::reference)).get();
 
             double t_elapsed = t.elapsed();
             if(i >= skip)
@@ -69,7 +71,7 @@ struct broadcast_component
     buffer_type recv_buffer;
 };
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+HPX_REGISTER_COMPONENT(
     hpx::components::simple_component<broadcast_component>
   , osu_broadcast_component);
 
@@ -83,17 +85,19 @@ void run_benchmark(params const & p)
 
     if(ids.size() < 2)
     {
-        hpx::cout << "This benchmark must be run with at least 2 threads" << hpx::endl << hpx::flush;
+        hpx::cout << "This benchmark must be run with at least 2 threads"
+            << hpx::endl << hpx::flush;
         return;
     }
 
     {
         std::vector<hpx::future<void> > init_futures;
         init_futures.reserve(ids.size());
-        BOOST_FOREACH(hpx::id_type const & id, ids)
+        for (hpx::id_type const& id : ids)
         {
             init_futures.push_back(
-                hpx::async<broadcast_component::init_action>(id, ids, p.max_msg_size, p.fan_out)
+                hpx::async<broadcast_component::init_action>(id, ids,
+                    p.max_msg_size, p.fan_out)
             );
         }
         hpx::wait_all(init_futures);
@@ -109,7 +113,7 @@ void run_benchmark(params const & p)
 
         std::vector<hpx::future<double> > run_futures;
         run_futures.reserve(ids.size());
-        BOOST_FOREACH(hpx::id_type const & id, ids)
+        for (hpx::id_type const& id : ids)
         {
             run_futures.push_back(
                 hpx::async<broadcast_component::run_action>(id, size, iterations, skip)
@@ -119,12 +123,13 @@ void run_benchmark(params const & p)
 
         std::vector<double> times; times.reserve(ids.size());
         hpx::wait_all(run_futures);
-        BOOST_FOREACH(hpx::future<double> & f, run_futures)
+        for (hpx::future<double>& f : run_futures)
         {
             times.push_back(f.get());
         }
 
-        double avg_latency = std::accumulate(times.begin(), times.end(), 0.0) / ids.size();
+        double avg_latency = std::accumulate(times.begin(), times.end(), 0.0)
+            / ids.size();
 
         print_data(avg_latency, size, iterations);
     }

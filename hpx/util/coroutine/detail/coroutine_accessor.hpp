@@ -29,7 +29,7 @@
 #ifndef HPX_COROUTINE_DETAIL_COROUTINE_ACCESSOR_HPP_20060709
 #define HPX_COROUTINE_DETAIL_COROUTINE_ACCESSOR_HPP_20060709
 #include  <boost/utility/in_place_factory.hpp>
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
   /*
    * This is a private interface used for coroutine

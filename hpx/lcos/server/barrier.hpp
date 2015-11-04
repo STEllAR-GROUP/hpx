@@ -14,6 +14,8 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 
+#include <boost/thread/locks.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
 {
@@ -65,12 +67,12 @@ namespace hpx { namespace lcos { namespace server
         /// entered this function.
         void set_event()
         {
-            mutex_type::scoped_lock l(mtx_);
+            boost::unique_lock<mutex_type> l(mtx_);
             if (cond_.size(l) < number_of_threads_-1) {
                 cond_.wait(l, "barrier::set_event");
             }
             else {
-                cond_.notify_all(l);
+                cond_.notify_all(std::move(l));
             }
         }
 
@@ -84,8 +86,8 @@ namespace hpx { namespace lcos { namespace server
         void set_exception(boost::exception_ptr const& e)
         {
             try {
-                mutex_type::scoped_lock l(mtx_);
-                cond_.abort_all(l);
+                boost::unique_lock<mutex_type> l(mtx_);
+                cond_.abort_all(std::move(l));
 
                 boost::rethrow_exception(e);
             }

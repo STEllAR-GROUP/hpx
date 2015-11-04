@@ -71,17 +71,17 @@ void hpx_test_main(
         Client monitor0(remote_localities[0]);
         Client monitor1(remote_localities[0]);
 
-        cout << "id0: " << monitor0.get_gid() << " "
+        cout << "id0: " << monitor0.get_id() << " "
              << get_management_type_name
-                    (monitor0.get_gid().get_management_type()) << "\n"
-             << "id1: " << monitor1.get_gid() << " "
+                    (monitor0.get_id().get_management_type()) << "\n"
+             << "id1: " << monitor1.get_id() << " "
              << get_management_type_name
-                    (monitor1.get_gid().get_management_type()) << "\n"
+                    (monitor1.get_id().get_management_type()) << "\n"
              << flush;
 
         {
             // Have the second object store a reference to the first object.
-            monitor1.take_reference(monitor0.get_gid());
+            monitor1.take_reference(monitor0.get_id());
 
             // Detach the references.
             id_type id1 = monitor0.detach().get();

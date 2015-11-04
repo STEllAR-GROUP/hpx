@@ -28,9 +28,12 @@ int omp_thread_count() {
 
 extern "C" {void FNAME(read_nuc_table)(); }
 
-extern "C" {void FNAME(nuc_eos_short)(double *xrho,double *xtemp,double *xye,double *xenr,
-                                      double *xprs,double *xent,double *xcs2,double *xdedt,
-                    double *xdpderho,double *xdpdrhoe,double *xmunu,int *keytemp,int *keyerr,double *rfeps); }
+extern "C" {void FNAME(nuc_eos_short)(double *xrho,double *xtemp,double *xye,
+                                      double *xenr,
+                                      double *xprs,double *xent,double *xcs2,
+                                      double *xdedt,
+                                      double *xdpderho,double *xdpdrhoe,double *xmunu,
+                                      int *keytemp,int *keyerr,double *rfeps); }
 
 char const* const shen_symbolic_name = "/sheneos/interpolator_test";
 
@@ -91,7 +94,8 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     std::size_t nthreads = omp_thread_count();
     //std::size_t nthreads = omp_get_num_threads();
     std::cout << " Number of OMP threads " << nthreads << std::endl;
-    std::cout << " Problem Size: Ye " << sequence_ye.size() << " T " << sequence_temp.size() << " R " << sequence_rho.size()  << std::endl;
+    std::cout << " Problem Size: Ye " << sequence_ye.size() << " T "
+        << sequence_temp.size() << " R " << sequence_rho.size()  << std::endl;
 
     ///////////////////////////////////////////////////////////////////////////
     // We want to avoid invoking the same evaluation sequence on all localities
@@ -386,7 +390,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
         std::vector<hpx::lcos::future<void> > tests;
-        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
+        for (hpx::naming::id_type const& id : locality_ids)
         {
             using hpx::async;
             for (std::size_t i = 0; i < num_workers; ++i)
@@ -408,7 +412,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
         std::vector<hpx::lcos::future<void> > bulk_one_tests;
-        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
+        for (hpx::naming::id_type const& id : locality_ids)
         {
             using hpx::async;
             for (std::size_t i = 0; i < num_workers; ++i)
@@ -431,7 +435,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
         std::vector<hpx::lcos::future<void> > bulk_tests;
-        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
+        for (hpx::naming::id_type const& id : locality_ids)
         {
             using hpx::async;
             for (std::size_t i = 0; i < num_workers; ++i)

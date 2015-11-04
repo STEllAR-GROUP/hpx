@@ -81,37 +81,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef util::function_nonser<yield_result_type(arg0_type)>
         yield_decorator_type;
 
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-
-#define HPX_COROUTINE_PARAM_WITH_DEFAULT(z, n, type_prefix)                   \
-    typename boost::call_traits<                                              \
-        BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)>::param_type        \
-            BOOST_PP_CAT(arg, n) =                                            \
-                BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()           \
-/**/
-
-    yield_result_type yield(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX,
-        HPX_COROUTINE_PARAM_WITH_DEFAULT, typename yield_traits::arg))
-    {
-        return !yield_decorator_.empty() ? yield_decorator_(arg0)
-          : yield_impl(typename coroutine_type::result_slot_type(
-            BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
-    }
-
-    template <typename Target>
-    yield_result_type yield_to(Target& target
-        BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX,
-            HPX_COROUTINE_PARAM_WITH_DEFAULT, typename Target::arg))
-    {
-        typedef typename Target::arg_slot_type slot_type;
-        return yield_to_impl(target, slot_type(
-            BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
-    }
-
-#undef  HPX_COROUTINE_PARAM_WITH_DEFAULT
-
-#else
-
     yield_result_type yield(arg0_type arg0 = arg0_type())
     {
         return !yield_decorator_.empty() ? yield_decorator_(arg0) : yield_impl(arg0);
@@ -122,6 +91,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       HPX_ASSERT(m_pimpl);
 
       this->m_pimpl->bind_result(&arg0);
+
       {
         reset_self_on_exit on_exit(this);
         this->m_pimpl->yield();
@@ -129,21 +99,20 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
       return *m_pimpl->args();
     }
-#endif
 
     template <typename F>
     yield_decorator_type decorate_yield(F && f)
     {
         yield_decorator_type tmp(std::forward<F>(f));
         std::swap(tmp, yield_decorator_);
-        return std::move(tmp);
+        return tmp;
     }
 
     yield_decorator_type decorate_yield(yield_decorator_type const& f)
     {
         yield_decorator_type tmp(f);
         std::swap(tmp, yield_decorator_);
-        return std::move(tmp);
+        return tmp;
     }
 
     yield_decorator_type decorate_yield(yield_decorator_type && f)
@@ -156,7 +125,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     {
         yield_decorator_type tmp;
         std::swap(tmp, yield_decorator_);
-        return std::move(tmp);
+        return tmp;
     }
 
     HPX_ATTRIBUTE_NORETURN void exit() {
@@ -183,7 +152,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     std::size_t get_thread_phase() const
     {
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
       HPX_ASSERT(m_pimpl);
       return m_pimpl->get_thread_phase();
 #else
@@ -195,7 +164,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       : m_pimpl(pimpl), next_self_(next_self)
     {}
 
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
     std::size_t get_thread_data() const
     {
         HPX_ASSERT(m_pimpl);
@@ -220,47 +189,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 #endif
 
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-
-    yield_result_type yield_impl(
-        typename coroutine_type::result_slot_type result_)
+    std::size_t& get_continuation_recursion_count()
     {
-      HPX_ASSERT(m_pimpl);
-
-      this->m_pimpl->bind_result(&result_);
-      {
-        reset_self_on_exit on_exit(this);
-        this->m_pimpl->yield();
-      }
-
-      typedef typename coroutine_type::arg_slot_traits traits_type;
-      return detail::fix_result<traits_type>(*m_pimpl->args());
+        HPX_ASSERT(m_pimpl);
+        return m_pimpl->get_continuation_recursion_count();
     }
-
-  private:
-    coroutine_self(impl_type * pimpl, detail::init_from_impl_tag)
-      : m_pimpl(pimpl), next_self_(0)
-    {}
-
-    template <typename TargetCoroutine>
-    yield_result_type yield_to_impl(TargetCoroutine& target,
-        typename TargetCoroutine::arg_slot_type args)
-    {
-      HPX_ASSERT(m_pimpl);
-
-      coroutine_accessor::get_impl(target)->bind_args(&args);
-      coroutine_accessor::get_impl(target)->bind_result_pointer(m_pimpl->result_pointer());
-
-      {
-        reset_self_on_exit on_exit(this);
-        this->m_pimpl->yield_to(*coroutine_accessor::get_impl(target));
-      }
-
-      typedef typename coroutine_type::arg_slot_traits traits_type;
-      return detail::fix_result<traits_type>(*m_pimpl->args());
-    }
-
-#endif
 
   private:
     yield_decorator_type yield_decorator_;

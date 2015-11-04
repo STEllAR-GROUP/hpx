@@ -37,7 +37,7 @@ struct test_server : hpx::components::simple_component_base<test_server>
 bool test_server::destructor_called = false;
 
 typedef hpx::components::simple_component<test_server> test_server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(test_server_type, test_server);
+HPX_REGISTER_COMPONENT(test_server_type, test_server);
 
 typedef test_server::test_action test_action;
 HPX_REGISTER_ACTION(test_action);
@@ -52,7 +52,7 @@ struct test : hpx::components::client_base<test, test_server>
 
     hpx::future<int> call() const
     {
-        return hpx::async(test_action(), get_gid());
+        return hpx::async(test_action(), get_id());
     }
 };
 

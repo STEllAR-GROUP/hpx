@@ -7,19 +7,13 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
-
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/serialize_exception.hpp>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/export.hpp>
-
-#include <hpx/util/serialize_exception.hpp>
 
 #include <vector>
 #include <iostream>
@@ -38,7 +32,8 @@ namespace hpx { namespace components { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // This must be in global namespace
-HPX_REGISTER_PLAIN_ACTION(
+HPX_REGISTER_ACTION_ID(
     hpx::components::server::console_error_sink_action,
-    console_error_sink_action, hpx::components::factory_enabled)
+    console_error_sink_action,
+    hpx::actions::console_error_sink_action_id)
 

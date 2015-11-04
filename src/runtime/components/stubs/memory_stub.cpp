@@ -4,7 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/async.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/runtime/components/stubs/memory.hpp>
 
 namespace hpx { namespace components { namespace stubs

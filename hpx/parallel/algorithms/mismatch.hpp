@@ -10,9 +10,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/algorithm_result.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -53,7 +53,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static T
-            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, InIter2 last2, F && f)
             {
                 return sequential_mismatch_binary(first1, last1, first2, last2,
@@ -62,13 +62,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+            static typename util::detail::algorithm_result<ExPolicy, T>::type
+            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, FwdIter2 last2, F && f)
             {
                 if (first1 == last1 || first2 == last2)
                 {
-                    return detail::algorithm_result<ExPolicy, T>::get(
+                    return util::detail::algorithm_result<ExPolicy, T>::get(
                         std::make_pair(first1, first2));
                 }
 
@@ -88,7 +88,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 difference_type2 count2 = std::distance(first2, last2);
                 if (count1 != count2)
                 {
-                    return detail::algorithm_result<ExPolicy, T>::get(
+                    return util::detail::algorithm_result<ExPolicy, T>::get(
                         std::make_pair(first1, first2));
                 }
 
@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter1, InIter2>
         >::type
     >::type
@@ -300,7 +300,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter1, InIter2>
         >::type
     >::type
@@ -346,7 +346,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
             static T
-            sequential(ExPolicy const&, InIter1 first1, InIter1 last1,
+            sequential(ExPolicy, InIter1 first1, InIter1 last1,
                 InIter2 first2, F && f)
             {
                 return std::mismatch(first1, last1, first2, std::forward<F>(f));
@@ -354,13 +354,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static typename detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy const& policy, FwdIter1 first1, FwdIter1 last1,
+            static typename util::detail::algorithm_result<ExPolicy, T>::type
+            parallel(ExPolicy policy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, F && f)
             {
                 if (first1 == last1)
                 {
-                    return detail::algorithm_result<ExPolicy, T>::get(
+                    return util::detail::algorithm_result<ExPolicy, T>::get(
                         std::make_pair(first1, first2));
                 }
 
@@ -388,7 +388,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                                         tok.cancel(i);
                                 });
                         },
-                        [=](std::vector<hpx::future<void> > &&) mutable -> std::pair<FwdIter1, FwdIter2>
+                        [=](std::vector<hpx::future<void> > &&) mutable ->
+                            std::pair<FwdIter1, FwdIter2>
                         {
                             difference_type mismatched =
                                 static_cast<difference_type>(tok.get_data());
@@ -456,7 +457,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter1, InIter2>
         >::type
     >::type
@@ -555,7 +556,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
     inline typename boost::enable_if<
         is_execution_policy<ExPolicy>,
-        typename detail::algorithm_result<
+        typename util::detail::algorithm_result<
             ExPolicy, std::pair<InIter1, InIter2>
         >::type
     >::type

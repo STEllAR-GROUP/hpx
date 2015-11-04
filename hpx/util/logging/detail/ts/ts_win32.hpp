@@ -22,7 +22,7 @@
 # pragma once
 #endif
 
-#if !defined(HPX_LOG_NO_TS)
+#if !defined(HPX_HAVE_LOG_NO_TS)
 
 // many thanks to Terris Linerbach!
 #ifndef WIN32_LEAN_AND_MEAN

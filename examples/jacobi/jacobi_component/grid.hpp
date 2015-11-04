@@ -20,7 +20,7 @@ namespace jacobi
         grid() {}
         grid(std::size_t nx, std::size_t ny, double value);
 
-        typedef 
+        typedef
             std::vector<row>
             rows_type;
 

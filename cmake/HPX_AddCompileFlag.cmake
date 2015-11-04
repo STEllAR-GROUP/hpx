@@ -33,6 +33,35 @@ macro(hpx_add_compile_flag FLAG)
   endforeach()
 endmacro()
 
+macro(hpx_remove_compile_flag FLAG)
+  set(options)
+  set(one_value_args)
+  set(multi_value_args CONFIGURATIONS LANGUAGES)
+  cmake_parse_arguments(HPX_REMOVE_COMPILE_FLAG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  set(_languages "CXX")
+  if(HPX_REMOVE_COMPILE_FLAG_LANGUAGES)
+    set(_languages ${HPX_REMOVE_COMPILE_FLAG_LANGUAGES})
+  endif()
+
+  set(_configurations "none")
+  if(HPX_REMOVE_COMPILE_FLAG_CONFIGURATIONS)
+    set(_configurations "${HPX_REMOVE_COMPILE_FLAG_CONFIGURATIONS}")
+  endif()
+
+  foreach(_lang ${_languages})
+    foreach(_config ${_configurations})
+      set(_conf)
+      if(NOT _config STREQUAL "none")
+        string(TOUPPER "${_config}" _conf)
+        set(_conf "_${_conf}")
+      endif()
+      STRING (REGEX REPLACE "${FLAG}" "" CMAKE_${_lang}_FLAGS${_conf} "${CMAKE_${_lang}_FLAGS${_conf}}")
+    endforeach()
+  endforeach()
+endmacro()
+
+
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 

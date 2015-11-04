@@ -10,6 +10,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/include/util.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
@@ -91,8 +92,7 @@ namespace hpx { namespace components { namespace server
 
             {
                 std::vector<char> data = f.get();
-                util::portable_binary_iarchive archive(
-                    data, data.size(), boost::archive::no_header);
+                serialization::input_archive archive(data, data.size(), 0);
                 archive >> ptr;
             }
 
@@ -175,10 +175,6 @@ namespace hpx { namespace components { namespace server
           , trigger_migrate_from_storage_here_action<Component> >
     {};
 }}}
-
-HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
-    (template <typename Component>),
-    (hpx::components::server::trigger_migrate_from_storage_here_action<Component>))
 
 #endif
 

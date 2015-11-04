@@ -72,16 +72,18 @@ public:
         sorted = false;
     }
 
-    friend HPX_API_EXPORT void run_guarded(guard_set& guards,boost::function<void()> task);
+    friend HPX_API_EXPORT void run_guarded(guard_set& guards,
+        util::function_nonser<void()> task);
     boost::shared_ptr<guard> get(std::size_t i) { return guards[i]; }
 };
 
 /// Conceptually, a guard acts like a mutex on an asyncrhonous task. The
 /// mutex is locked before the task runs, and unlocked afterwards.
-HPX_API_EXPORT void run_guarded(guard& guard,boost::function<void()> task);
+HPX_API_EXPORT void run_guarded(guard& guard,util::function_nonser<void()> task);
 
-/// Conceptually, a guard_set acts like a set of mutexes on an asyncrhonous task. The
-/// mutexes are locked before the task runs, and unlocked afterwards.
-HPX_API_EXPORT void run_guarded(guard_set& guards,boost::function<void()> task);
+/// Conceptually, a guard_set acts like a set of mutexes on an asyncrhonous task.
+/// The mutexes are locked before the task runs, and unlocked afterwards.
+HPX_API_EXPORT void run_guarded(guard_set& guards,
+        util::function_nonser<void()> task);
 }}}
 #endif

@@ -12,7 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Define a base component which exposes the required interface
 struct hello_world_server
-  : hpx::components::managed_component_base<hello_world_server>
+  : hpx::components::component_base<hello_world_server>
 {
     hello_world_server()
       : sched_(hpx::get_num_worker_threads())   // run on all available cores
@@ -39,7 +39,7 @@ struct hello_world_server
         hpx::threads::thread_state_enum initial_state)
     {
         char const* desc = 0;
-#ifdef HPX_THREAD_MAINTAIN_DESCRIPTION
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
         desc = data.description;
 #endif
 
@@ -54,8 +54,8 @@ private:
     hpx::threads::executors::local_priority_queue_executor sched_;
 };
 
-typedef hpx::components::managed_component<hello_world_server> server_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server_type, hello_world_server);
+typedef hpx::components::component<hello_world_server> server_type;
+HPX_REGISTER_COMPONENT(server_type, hello_world_server);
 
 typedef hello_world_server::print_action print_action;
 HPX_REGISTER_ACTION_DECLARATION(print_action);
@@ -77,7 +77,7 @@ struct hello_world
 
     void print()
     {
-        hpx::async<print_action>(this->get_gid()).get();
+        hpx::async<print_action>(this->get_id()).get();
     }
 };
 

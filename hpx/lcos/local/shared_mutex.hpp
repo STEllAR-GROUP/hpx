@@ -8,8 +8,10 @@
 #define HPX_F0757EAC_E2A3_4F80_A1EC_8CC7EB55186F
 
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/lcos/local/detail/counting_semaphore.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
+
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {
@@ -31,17 +33,24 @@ namespace hpx { namespace lcos { namespace local
 
             state_data state;
             mutex_type state_change;
-            lcos::local::detail::counting_semaphore<no_mutex> shared_cond;
-            lcos::local::detail::counting_semaphore<no_mutex> exclusive_cond;
-            lcos::local::detail::counting_semaphore<no_mutex> upgrade_cond;
+            lcos::local::detail::counting_semaphore shared_cond;
+            lcos::local::detail::counting_semaphore exclusive_cond;
+            lcos::local::detail::counting_semaphore upgrade_cond;
 
             void release_waiters()
             {
-                exclusive_cond.signal(1);
-                shared_cond.signal_all();
+                no_mutex mtx;
+                {
+                    boost::unique_lock<no_mutex> l(mtx);
+                    exclusive_cond.signal(std::move(l), 1);
+                }
+                {
+                    boost::unique_lock<no_mutex> l(mtx);
+                    shared_cond.signal_all(std::move(l));
+                }
             }
 
-          public:
+        public:
             shared_mutex()
             {
                 state_data state_ = {0, 0, 0, 0};
@@ -50,11 +59,11 @@ namespace hpx { namespace lcos { namespace local
 
             void lock_shared()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
 
                 while (state.exclusive || state.exclusive_waiting_blocked)
                 {
-                    shared_cond.wait_locked(1, lk);
+                    shared_cond.wait(lk, 1);
                 }
 
                 ++state.shared_count;
@@ -62,7 +71,7 @@ namespace hpx { namespace lcos { namespace local
 
             bool try_lock_shared()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
 
                 if (state.exclusive || state.exclusive_waiting_blocked)
                     return false;
@@ -76,7 +85,7 @@ namespace hpx { namespace lcos { namespace local
 
             void unlock_shared()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
 
                 bool const last_reader = !--state.shared_count;
 
@@ -86,9 +95,11 @@ namespace hpx { namespace lcos { namespace local
                     {
                         state.upgrade = false;
                         state.exclusive = true;
-                        upgrade_cond.signal(1);
-                    }
 
+                        no_mutex mtx;
+                        boost::unique_lock<no_mutex> l(mtx);
+                        upgrade_cond.signal(std::move(l), 1);
+                    }
                     else
                     {
                         state.exclusive_waiting_blocked = false;
@@ -100,12 +111,12 @@ namespace hpx { namespace lcos { namespace local
 
             void lock()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
 
                 while (state.shared_count || state.exclusive)
                 {
                     state.exclusive_waiting_blocked = true;
-                    exclusive_cond.wait_locked(1, lk);
+                    exclusive_cond.wait(lk, 1);
                 }
 
                 state.exclusive = true;
@@ -113,7 +124,7 @@ namespace hpx { namespace lcos { namespace local
 
             bool try_lock()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
 
                 if (state.shared_count || state.exclusive)
                     return false;
@@ -127,7 +138,7 @@ namespace hpx { namespace lcos { namespace local
 
             void unlock()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
                 state.exclusive = false;
                 state.exclusive_waiting_blocked = false;
                 release_waiters();
@@ -135,11 +146,12 @@ namespace hpx { namespace lcos { namespace local
 
             void lock_upgrade()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
 
-                while (state.exclusive || state.exclusive_waiting_blocked || state.upgrade)
+                while (state.exclusive || state.exclusive_waiting_blocked
+                    || state.upgrade)
                 {
-                    shared_cond.wait_locked(1, lk);
+                    shared_cond.wait(lk, 1);
                 }
 
                 ++state.shared_count;
@@ -148,7 +160,7 @@ namespace hpx { namespace lcos { namespace local
 
             bool try_lock_upgrade()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
 
                 if (state.exclusive || state.exclusive_waiting_blocked || state.upgrade)
                     return false;
@@ -163,7 +175,7 @@ namespace hpx { namespace lcos { namespace local
 
             void unlock_upgrade()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
                 state.upgrade = false;
                 bool const last_reader = !--state.shared_count;
 
@@ -176,12 +188,12 @@ namespace hpx { namespace lcos { namespace local
 
             void unlock_upgrade_and_lock()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
                 --state.shared_count;
 
                 while (state.shared_count)
                 {
-                    upgrade_cond.wait_locked(1, lk);
+                    upgrade_cond.wait(lk, 1);
                 }
 
                 state.upgrade = false;
@@ -190,7 +202,7 @@ namespace hpx { namespace lcos { namespace local
 
             void unlock_and_lock_upgrade()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
                 state.exclusive = false;
                 state.upgrade = true;
                 ++state.shared_count;
@@ -200,7 +212,7 @@ namespace hpx { namespace lcos { namespace local
 
             void unlock_and_lock_shared()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
                 state.exclusive = false;
                 ++state.shared_count;
                 state.exclusive_waiting_blocked = false;
@@ -209,7 +221,7 @@ namespace hpx { namespace lcos { namespace local
 
             bool try_unlock_shared_and_lock()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
                 if(    !state.exclusive
                     && !state.exclusive_waiting_blocked
                     && !state.upgrade
@@ -224,7 +236,7 @@ namespace hpx { namespace lcos { namespace local
 
             void unlock_upgrade_and_lock_shared()
             {
-                typename mutex_type::scoped_lock lk(state_change);
+                boost::unique_lock<mutex_type> lk(state_change);
                 state.upgrade = false;
                 state.exclusive_waiting_blocked = false;
                 release_waiters();

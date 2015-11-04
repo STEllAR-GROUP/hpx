@@ -3,20 +3,22 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This test verifies that issue #1001 is resolved (Zero copy serialization raises assert).
+// This test verifies that issue #1001 is resolved
+// (Zero copy serialization raises assert).
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/util/serialize_buffer.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::serialize_buffer<int> test(hpx::util::serialize_buffer<int> const& b)
+hpx::serialization::serialize_buffer<int> test(hpx::serialization
+    ::serialize_buffer<int> const& b)
 {
     return b;
 }
@@ -41,7 +43,8 @@ int hpx_main()
 
     if (localities.empty())
     {
-        HPX_TEST_MSG(!localities.empty(), "This test must be run on more than one locality");
+        HPX_TEST_MSG(!localities.empty(),
+            "This test must be run on more than one locality");
     }
     else
     {
@@ -55,10 +58,11 @@ int hpx_main()
 
             std::generate(data.begin(), data.end(), inc());
 
-            hpx::util::serialize_buffer<int> buffer(data.data(), data.size(),
-                hpx::util::serialize_buffer<int>::reference);
+            hpx::serialization::serialize_buffer<int> buffer(data.data(), data.size(),
+                hpx::serialization::serialize_buffer<int>::reference);
 
-            hpx::util::serialize_buffer<int> result = act(localities[0], buffer);
+            hpx::serialization::serialize_buffer<int> result =
+                act(localities[0], buffer);
 
             HPX_TEST(std::equal(data.begin(), data.end(), result.data()));
         }

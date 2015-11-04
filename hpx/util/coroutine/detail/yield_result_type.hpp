@@ -32,7 +32,7 @@
 #include <hpx/util/coroutine/detail/make_tuple_traits.hpp>
 #include <boost/mpl/vector.hpp>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
     /**
      * Same as make_tuple_traits, but if

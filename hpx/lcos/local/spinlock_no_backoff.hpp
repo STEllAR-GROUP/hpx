@@ -10,6 +10,7 @@
 #if !defined(HPX_LCOS_LOCAL_SPINLOCK_NO_BACKOFF)
 #define HPX_LCOS_LOCAL_SPINLOCK_NO_BACKOFF
 
+#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
@@ -19,7 +20,7 @@
 #include <boost/config.hpp>
 
 #if defined(BOOST_WINDOWS)
-#  include <boost/smart_ptr/detail/spinlock_w32.hpp>
+#  include <boost/smart_ptr/detail/spinlock.hpp>
 #else
 #  include <boost/smart_ptr/detail/spinlock_sync.hpp>
 #  if defined( __ia64__ ) && defined( __INTEL_COMPILER )
@@ -36,38 +37,17 @@ namespace hpx { namespace lcos { namespace local
     private:
         boost::uint64_t v_;
 
-        HPX_MOVABLE_BUT_NOT_COPYABLE(spinlock_no_backoff)
-
     public:
         spinlock_no_backoff() : v_(0)
         {
             HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock_no_backoff", "");
         }
 
-        spinlock_no_backoff(spinlock_no_backoff && rhs)
-#if defined(BOOST_WINDOWS)
-          : v_(BOOST_INTERLOCKED_EXCHANGE(&rhs.v_, 0))
-#else
-          : v_(__sync_lock_test_and_set(&rhs.v_, 0))
-#endif
-        {}
+        HPX_NON_COPYABLE(spinlock_no_backoff);
 
         ~spinlock_no_backoff()
         {
             HPX_ITT_SYNC_DESTROY(this);
-        }
-
-        spinlock_no_backoff& operator=(spinlock_no_backoff && rhs)
-        {
-            if (this != &rhs) {
-                unlock();
-#if defined(BOOST_WINDOWS)
-                v_ = BOOST_INTERLOCKED_EXCHANGE(&rhs.v_, 0);
-#else
-                v_ = __sync_lock_test_and_set(&rhs.v_, 0);
-#endif
-            }
-            return *this;
         }
 
         void lock()
@@ -86,7 +66,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
             BOOST_COMPILER_FENCE
 #else
@@ -107,7 +87,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_RELEASING(this);
 
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             BOOST_COMPILER_FENCE
             *const_cast<boost::uint64_t volatile*>(&v_) = 0;
 #else

@@ -26,8 +26,8 @@ macro(add_zlib_module)
 
     add_hpx_library(compress_zlib
       PLUGIN
-      SOURCES "${hpx_SOURCE_DIR}/plugins/binary_filter/zlib/zlib_serialization_filter.cpp"
-      HEADERS "${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/zlib_serialization_filter.hpp"
+      SOURCES "${PROJECT_SOURCE_DIR}/plugins/binary_filter/zlib/zlib_serialization_filter.cpp"
+      HEADERS "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/zlib_serialization_filter.hpp"
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${ZLIB_LIBRARIES})
 

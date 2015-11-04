@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,28 +7,36 @@
 #if !defined(HPX_APPLIER_APPLY_NOV_27_2008_0957AM)
 #define HPX_APPLIER_APPLY_NOV_27_2008_0957AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 
-#include <hpx/lcos/local/detail/invoke_when_ready.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
+#include <hpx/runtime/applier/detail/apply_implementations.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
-#include <hpx/util/remove_local_destinations.hpp>
+#include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_continuation.hpp>
+#include <hpx/traits/is_distribution_policy.hpp>
 
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+#include <hpx/util/remove_local_destinations.hpp>
 #include <boost/dynamic_bitset.hpp>
+#endif
 #include <boost/format.hpp>
+#include <boost/make_shared.hpp>
 
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <type_traits>
+#include <memory>
 
 // FIXME: Error codes?
 
@@ -65,66 +73,136 @@ namespace hpx
             return addr;
         }
 
-        template <typename Action>
-        struct put_parcel
+        template <typename Action, typename ...Ts>
+        inline bool
+        put_parcel(naming::id_type const& id, naming::address&& addr,
+            threads::thread_priority priority, Ts&&... vs)
         {
-            typedef void result_type;
+            typedef
+                typename hpx::actions::extract_action<Action>::type
+                action_type;
+            action_type act;
 
-            explicit put_parcel(naming::id_type const& id,
-                    naming::address&& addr
-                  , threads::thread_priority priority
-                  , actions::continuation_type cont = actions::continuation_type()
-                  , parcelset::parcelhandler::write_handler_type const& cb =
-                        parcelset::parcelhandler::write_handler_type())
-              : id_(id)
-              , addr_(std::move(addr))
-              , priority_(priority)
-              , cont_(cont)
-              , cb_(cb)
-            {}
+            parcelset::parcelhandler& ph =
+                hpx::applier::get_applier().get_parcel_handler();
 
-            template <typename ...Ts>
-            result_type operator()(Ts&&... vs)
-            {
-                typedef
-                    typename hpx::actions::extract_action<Action>::type
-                    action_type;
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
+                act, priority, std::forward<Ts>(vs)...);
 
-                actions::base_action* action =
-                    new hpx::actions::transfer_action<action_type>(priority_,
-                        std::forward<Ts>(vs)...);
-                parcelset::parcelhandler& ph =
-                    hpx::applier::get_applier().get_parcel_handler();
+            ph.put_parcel(std::move(p));
 
-                if (!cont_)
-                {
-                    parcelset::parcel p(id_, complement_addr<action_type>(addr_),
-                        action);
+            return false;     // destinations are remote
+        }
 
-                    // Send the parcel through the parcel handler
-                    if (cb_.empty())
-                        ph.put_parcel(p);
-                    else
-                        ph.put_parcel(p, cb_);
-                }
-                else {
-                    parcelset::parcel p(id_, complement_addr<action_type>(addr_),
-                        action, cont_);
+        template <typename Action, typename Continuation, typename ...Ts>
+        inline bool
+        put_parcel_cont(naming::id_type const& id, naming::address&& addr,
+            threads::thread_priority priority,
+            Continuation && cont, Ts&&... vs)
+        {
+            typedef
+                typename hpx::actions::extract_action<Action>::type
+                action_type;
 
-                    // Send the parcel through the parcel handler
-                    if (cb_.empty())
-                        ph.put_parcel(p);
-                    else
-                        ph.put_parcel(p, cb_);
-                }
-            }
+            parcelset::parcelhandler& ph =
+                hpx::applier::get_applier().get_parcel_handler();
 
-            naming::id_type id_;
-            naming::address addr_;
-            threads::thread_priority priority_;
-            actions::continuation_type cont_;
-            parcelset::parcelhandler::write_handler_type cb_;
-        };
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
+                std::forward<Continuation>(cont),
+                action_type(), priority, std::forward<Ts>(vs)...);
+
+            ph.put_parcel(std::move(p));
+
+            return false;     // destinations are remote
+        }
+
+        template <typename Action, typename ...Ts>
+        inline bool
+        put_parcel_cb(naming::id_type const& id, naming::address&& addr,
+            threads::thread_priority priority,
+            parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
+        {
+            typedef
+                typename hpx::actions::extract_action<Action>::type
+                action_type;
+
+            parcelset::parcelhandler& ph =
+                hpx::applier::get_applier().get_parcel_handler();
+
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
+                action_type(), priority, std::forward<Ts>(vs)...);
+
+            ph.put_parcel(std::move(p), cb);
+
+            return false;     // destinations are remote
+        }
+
+        template <typename Action, typename ...Ts>
+        inline bool
+        put_parcel_cb(naming::id_type const& id, naming::address&& addr,
+            threads::thread_priority priority,
+            parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
+        {
+            typedef
+                typename hpx::actions::extract_action<Action>::type
+                action_type;
+
+            parcelset::parcelhandler& ph =
+                hpx::applier::get_applier().get_parcel_handler();
+
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
+                action_type(), priority, std::forward<Ts>(vs)...);
+
+            ph.put_parcel(std::move(p), std::move(cb));
+
+            return false;     // destinations are remote
+        }
+
+        template <typename Action, typename Continuation, typename ...Ts>
+        inline bool
+        put_parcel_cont_cb(naming::id_type const& id,
+            naming::address&& addr, threads::thread_priority priority,
+            Continuation && cont,
+            parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
+        {
+            typedef
+                typename hpx::actions::extract_action<Action>::type
+                action_type;
+
+            parcelset::parcelhandler& ph =
+                hpx::applier::get_applier().get_parcel_handler();
+
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
+                std::forward<Continuation>(cont),
+                action_type(), priority, std::forward<Ts>(vs)...);
+
+            ph.put_parcel(std::move(p), cb);
+
+            return false;     // destinations are remote
+        }
+
+        template <typename Action, typename Continuation, typename ...Ts>
+        inline bool
+        put_parcel_cont_cb(naming::id_type const& id,
+            naming::address&& addr, threads::thread_priority priority,
+            Continuation && cont,
+            parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
+        {
+            typedef
+                typename hpx::actions::extract_action<Action>::type
+                action_type;
+
+            parcelset::parcelhandler& ph =
+                hpx::applier::get_applier().get_parcel_handler();
+
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
+                std::forward<Continuation>(cont),
+                action_type(), priority, std::forward<Ts>(vs)...);
+
+            ph.put_parcel(std::move(p), std::move(cb));
+
+            return false;     // destinations are remote
+        }
 
         // We know it is remote.
         template <typename Action, typename ...Ts>
@@ -134,10 +212,8 @@ namespace hpx
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            lcos::local::detail::invoke_when_ready(
-                detail::put_parcel<Action>(id, std::move(addr), priority),
+            return detail::put_parcel<Action>(id, std::move(addr), priority,
                 std::forward<Ts>(vs)...);
-            return false;     // destinations are remote
         }
 
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
@@ -161,7 +237,7 @@ namespace hpx
                 parcelset::parcel p(e.second.gids_, e.second.addrs_, act_);
 
                 // Send the parcel through the parcel handler
-                ph_.put_parcel(p);
+                ph_.put_parcel(std::move(p));
             }
 
             parcelset::parcelhandler& ph_;
@@ -214,7 +290,7 @@ namespace hpx
         // We know it is local and has to be directly executed.
         template <typename Action, typename ...Ts>
         inline bool
-        apply_l_p(naming::id_type const& target, naming::address const& addr,
+        apply_l_p(naming::id_type const& target, naming::address&& addr,
             threads::thread_priority priority, Ts&&... vs)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -230,7 +306,7 @@ namespace hpx
         // same as above, but taking all arguments by value
         template <typename Action, typename ...Ts>
         inline bool
-        apply_l_p_val(naming::id_type const& target, naming::address const& addr,
+        apply_l_p_val(naming::id_type const& target, naming::address&& addr,
             threads::thread_priority priority, Ts... vs)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -245,61 +321,87 @@ namespace hpx
 
         template <typename Action, typename ...Ts>
         inline bool
-        apply_l (naming::id_type const& target, naming::address const& addr,
+        apply_l (naming::id_type const& target, naming::address && addr,
             Ts&&... vs)
         {
-            return apply_l_p<Action>(target, addr,
+            return apply_l_p<Action>(target, std::move(addr),
                 actions::action_priority<Action>(),
                 std::forward<Ts>(vs)...);
         }
     }}
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \note A call to applier's apply function would look like:
-    /// \code
-    ///    appl_.apply<add_action>(gid, ...);
-    /// \endcode
     template <typename Action, typename ...Ts>
     inline bool
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         Ts&&... vs)
     {
-        if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
-                boost::str(boost::format(
-                    "the target (destination) does not match the action type (%s)"
-                ) % hpx::actions::detail::get_action_name<Action>()));
-            return false;
-        }
+        return hpx::detail::apply_impl<Action>(gid, priority,
+            std::forward<Ts>(vs)...);
+    }
 
-        // Determine whether the gid is local or remote
-        naming::address addr;
-        if (agas::is_local_address_cached(gid, addr)) {
-            return applier::detail::apply_l_p<Action>(gid, std::move(addr),
-                priority, std::forward<Ts>(vs)...);
-        }
+    template <typename Action, typename DistPolicy, typename ...Ts>
+    inline typename boost::enable_if_c<
+        traits::is_distribution_policy<DistPolicy>::value, bool
+    >::type
+    apply_p(DistPolicy const& policy, threads::thread_priority priority,
+        Ts&&... vs)
+    {
+        return policy.template apply<Action>(priority, std::forward<Ts>(vs)...);
+    }
 
-        // apply remotely
-        return applier::detail::apply_r_p<Action>(std::move(addr), gid,
-            priority, std::forward<Ts>(vs)...);
+    namespace detail
+    {
+        // dispatch point used for apply implementations
+        template <typename Func, typename Enable = void>
+        struct apply_dispatch;
+
+        template <typename Action>
+        struct apply_dispatch<Action,
+            typename boost::enable_if_c<
+                traits::is_action<Action>::value
+            >::type>
+        {
+            template <typename Component, typename Signature, typename Derived,
+                typename ...Ts>
+            BOOST_FORCEINLINE static bool
+            call(hpx::actions::basic_action<Component, Signature, Derived>,
+                naming::id_type const& id, Ts&&... ts)
+            {
+                return apply_p<Derived>(id, actions::action_priority<Derived>(),
+                    std::forward<Ts>(ts)...);
+            }
+
+            template <typename Component, typename Signature, typename Derived,
+                typename DistPolicy, typename ...Ts>
+            BOOST_FORCEINLINE static typename boost::enable_if_c<
+                traits::is_distribution_policy<DistPolicy>::value, bool
+            >::type
+            call(hpx::actions::basic_action<Component, Signature, Derived>,
+                DistPolicy const& policy, Ts&&... ts)
+            {
+                return apply_p<Derived>(policy,
+                    actions::action_priority<Derived>(),
+                    std::forward<Ts>(ts)...);
+            }
+        };
     }
 
     template <typename Action, typename ...Ts>
     inline bool
-    apply (naming::id_type const& gid, Ts&&... vs)
+    apply(naming::id_type const& gid, Ts&&... vs)
     {
         return apply_p<Action>(gid, actions::action_priority<Action>(),
             std::forward<Ts>(vs)...);
     }
 
-    template <typename Component, typename Signature, typename Derived,
-        typename ...Ts>
-    inline bool
-    apply (
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Ts&&... vs)
+    template <typename Action, typename DistPolicy, typename ...Ts>
+    inline typename boost::enable_if_c<
+        traits::is_distribution_policy<DistPolicy>::value, bool
+    >::type
+    apply(DistPolicy const& policy, Ts&&... vs)
     {
-        return apply_p<Derived>(gid, actions::action_priority<Derived>(),
+        return apply_p<Action>(policy, actions::action_priority<Action>(),
             std::forward<Ts>(vs)...);
     }
 
@@ -370,27 +472,26 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
     {
-        template <typename Action, typename ...Ts>
+        template <typename Action, typename Continuation, typename ...Ts>
         inline bool
-        apply_r_p(naming::address&& addr, actions::continuation* c,
+        apply_r_p(naming::address&& addr, Continuation && c,
             naming::id_type const& id, threads::thread_priority priority,
             Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            lcos::local::detail::invoke_when_ready(
-                detail::put_parcel<Action>(id, std::move(addr), priority,
-                    actions::continuation_type(c)),
-                std::forward<Ts>(vs)...);
-            return false;     // destinations are remote
+            return detail::put_parcel_cont<Action>(id, std::move(addr),
+                priority, std::forward<Continuation>(c), std::forward<Ts>(vs)...);
         }
 
-        template <typename Action, typename ...Ts>
-        inline bool
-        apply_r (naming::address&& addr, actions::continuation* c,
+        template <typename Action, typename Continuation, typename ...Ts>
+        inline typename boost::enable_if_c<
+            traits::is_continuation<Continuation>::value, bool
+        >::type
+        apply_r (naming::address&& addr, Continuation && c,
             naming::id_type const& gid, Ts&&... vs)
         {
-            return apply_r_p<Action>(std::move(addr), c, gid,
+            return apply_r_p<Action>(std::move(addr), std::forward<Continuation>(c), gid,
                 actions::action_priority<Action>(),
                 std::forward<Ts>(vs)...);
         }
@@ -405,10 +506,11 @@ namespace hpx
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p(id, complement_addr<action_type_>(addr),
-                new hpx::actions::transfer_action<action_type_>(priority));
+                action_type_(), priority);
 
             // Send the parcel through the parcel handler
-            hpx::applier::get_applier().get_parcel_handler().sync_put_parcel(p);
+            hpx::applier::get_applier().get_parcel_handler()
+                .sync_put_parcel(std::move(p));
             return false;     // destination is remote
         }
 
@@ -421,79 +523,123 @@ namespace hpx
         }
 
         // We know it is local and has to be directly executed.
-        template <typename Action, typename ...Ts>
+        template <typename Action, typename Continuation, typename ...Ts>
         inline bool
-        apply_l_p(actions::continuation* c, naming::id_type const& target,
-            naming::address const& addr, threads::thread_priority priority,
-            Ts&&... vs)
+        apply_l_p(Continuation && cont,
+            naming::id_type const& target, naming::address&& addr,
+            threads::thread_priority priority, Ts&&... vs)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            typedef typename hpx::actions::extract_action<
+                    Action
+                >::type action_type;
 
             HPX_ASSERT(traits::component_type_is_compatible<
                 typename action_type::component_type>::call(addr));
 
-            actions::continuation_type cont(c);
-
             apply_helper<action_type>::call(
-                cont, target, addr.address_, priority,
+                std::forward<Continuation>(cont), target, addr.address_, priority,
                 std::forward<Ts>(vs)...);
             return true;     // no parcel has been sent (dest is local)
         }
 
-        template <typename Action, typename ...Ts>
-        inline bool
-        apply_l (actions::continuation* c, naming::id_type const& target,
-            naming::address const& addr, Ts&&... vs)
+        template <typename Action, typename Continuation, typename ...Ts>
+        inline typename boost::enable_if_c<
+            traits::is_continuation<Continuation>::value, bool
+        >::type
+        apply_l (Continuation && c, naming::id_type const& target,
+            naming::address& addr, Ts&&... vs)
         {
-            return apply_l_p<Action>(c, target, addr,
-                actions::action_priority<Action>(),
-                std::forward<Ts>(vs)...);
+            return apply_l_p<Action>(std::forward<Continuation>(c),
+                target, std::move(addr),
+                actions::action_priority<Action>(), std::forward<Ts>(vs)...);
         }
     }}
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename ...Ts>
-    inline bool
-    apply_p(actions::continuation* c, naming::id_type const& gid,
+    template <typename Action, typename Continuation, typename ...Ts>
+    inline typename boost::enable_if_c<
+        traits::is_continuation<Continuation>::value, bool
+    >::type
+    apply_p(Continuation && c, naming::id_type const& gid,
         threads::thread_priority priority, Ts&&... vs)
     {
-        if (!traits::action_is_target_valid<Action>::call(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
-                boost::str(boost::format(
-                    "the target (destination) does not match the action type (%s)"
-                ) % hpx::actions::detail::get_action_name<Action>()));
-            return false;
-        }
-
-        // Determine whether the gid is local or remote
-        naming::address addr;
-        if (agas::is_local_address_cached(gid, addr)) {
-            return applier::detail::apply_l_p<Action>(c, gid, std::move(addr),
-                priority, std::forward<Ts>(vs)...);
-        }
-
-        // apply remotely
-        return applier::detail::apply_r_p<Action>(std::move(addr), c, gid,
-            priority, std::forward<Ts>(vs)...);
+        return hpx::detail::apply_impl<Action>(
+            std::forward<Continuation>(c), gid, priority, std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename ...Ts>
-    inline bool
-    apply (actions::continuation* c, naming::id_type const& gid, Ts&&... vs)
-    {
-        return apply_p<Action>(c, gid, actions::action_priority<Action>(),
-            std::forward<Ts>(vs)...);
-    }
-
-    template <typename Component, typename Signature, typename Derived,
+    template <typename Action, typename Continuation, typename DistPolicy,
         typename ...Ts>
-    inline bool
-    apply (actions::continuation* c,
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Ts&&... vs)
+    inline typename boost::enable_if_c<
+        traits::is_continuation<Continuation>::value &&
+        traits::is_distribution_policy<DistPolicy>::value, bool
+    >::type
+    apply_p(Continuation && c, DistPolicy const& policy,
+        threads::thread_priority priority, Ts&&... vs)
     {
-        return apply_p<Derived>(c, gid, actions::action_priority<Derived>(),
+        return policy.template apply<Action>(
+            std::forward<Continuation>(c), priority, std::forward<Ts>(vs)...);
+    }
+
+    namespace detail
+    {
+        template <typename Continuation>
+        struct apply_dispatch<Continuation,
+            typename std::enable_if<
+                traits::is_continuation<Continuation>::value
+            >::type>
+        {
+            template <typename Component, typename Signature, typename Derived,
+                typename ...Ts>
+            BOOST_FORCEINLINE static bool
+            call(Continuation && c,
+                hpx::actions::basic_action<Component, Signature, Derived>,
+                naming::id_type const& id, Ts&&... ts)
+            {
+                return apply_p<Derived>(std::forward<Continuation>(c), id,
+                    actions::action_priority<Derived>(),
+                    std::forward<Ts>(ts)...);
+            }
+
+            template <typename Component, typename Signature, typename Derived,
+                typename DistPolicy, typename ...Ts>
+            BOOST_FORCEINLINE static typename boost::enable_if_c<
+                traits::is_distribution_policy<DistPolicy>::value, bool
+            >::type
+            call(Continuation && c,
+                hpx::actions::basic_action<Component, Signature, Derived>,
+                DistPolicy const& policy, Ts&&... ts)
+            {
+                return apply_p<Derived>(std::forward<Continuation>(c), policy,
+                    actions::action_priority<Derived>(),
+                    std::forward<Ts>(ts)...);
+            }
+        };
+    }
+
+    template <typename Action, typename Continuation, typename ...Ts>
+    inline typename boost::enable_if_c<
+        traits::is_continuation<Continuation>::value, bool
+    >::type
+    apply(Continuation && c, naming::id_type const& gid,
+        Ts&&... vs)
+    {
+        return apply_p<Action>(std::forward<Continuation>(c), gid,
+            actions::action_priority<Action>(),
             std::forward<Ts>(vs)...);
+    }
+
+    template <typename Action, typename Continuation, typename DistPolicy,
+        typename ...Ts>
+    inline typename boost::enable_if_c<
+        traits::is_distribution_policy<DistPolicy>::value
+     && traits::is_continuation<Continuation>::value
+      , bool
+    >::type
+    apply(Continuation && c, DistPolicy const& policy,
+        Ts&&... vs)
+    {
+        return apply_p<Action>(std::forward<Continuation>(c), policy,
+            actions::action_priority<Action>(), std::forward<Ts>(vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -510,7 +656,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p<Action>(std::move(addr),
-                new actions::typed_continuation<result_type>(contgid),
+                actions::typed_continuation<result_type>(contgid),
                 gid, priority, std::forward<Ts>(vs)...);
         }
 
@@ -524,7 +670,7 @@ namespace hpx
                 result_type;
 
             return apply_r_p<Action>(std::move(addr),
-                new actions::typed_continuation<result_type>(contgid),
+                actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 std::forward<Ts>(vs)...);
         }
@@ -541,7 +687,7 @@ namespace hpx
             result_type;
 
         return apply_p<Action>(
-            new actions::typed_continuation<result_type>(contgid),
+            actions::typed_continuation<result_type>(contgid),
             gid, priority, std::forward<Ts>(vs)...);
     }
 
@@ -555,7 +701,7 @@ namespace hpx
             result_type;
 
         return apply_p<Action>(
-            new actions::typed_continuation<result_type>(contgid),
+            actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
             std::forward<Ts>(vs)...);
     }
@@ -573,7 +719,7 @@ namespace hpx
             result_type;
 
         return apply_p<Derived>(
-            new actions::typed_continuation<result_type>(contgid),
+            actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Derived>(),
             std::forward<Ts>(vs)...);
     }

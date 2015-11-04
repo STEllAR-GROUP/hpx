@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2015 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,14 +6,12 @@
 
 // Bidirectional network bandwidth test
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/serialize_buffer.hpp>
-#include <hpx/parallel/algorithm.hpp>
+#include <hpx/include/serialization.hpp>
+#include <hpx/include/parallel_for_each.hpp>
 
-#include <boost/assert.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/scoped_array.hpp>
 #include <boost/range/irange.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,16 +23,13 @@
 #define LOOP_LARGE  100
 #define SKIP_LARGE  10
 
-
-char *send_buffer_orig;
-
 ///////////////////////////////////////////////////////////////////////////////
 char* align_buffer (char* ptr, unsigned long align_size)
 {
     return (char*)(((std::size_t)ptr + (align_size - 1)) / align_size * align_size);
 }
 
-#if defined(BOOST_MSVC)
+#if defined(BOOST_WINDOWS)
 unsigned long getpagesize()
 {
     SYSTEM_INFO si;
@@ -44,15 +39,17 @@ unsigned long getpagesize()
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::util::serialize_buffer<char>
-message(hpx::util::serialize_buffer<char> const& receive_buffer)
+hpx::serialization::serialize_buffer<char>
+message(hpx::serialization::serialize_buffer<char> const& receive_buffer)
 {
     return receive_buffer;
 }
 HPX_PLAIN_ACTION(message);
 
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::serialize_buffer<char>, serialization_buffer_char);
-HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::util::serialize_buffer<char>, serialization_buffer_char);
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::serialization::serialize_buffer<char>, serialization_buffer_char);
+HPX_REGISTER_BASE_LCO_WITH_VALUE(
+    hpx::serialization::serialize_buffer<char>, serialization_buffer_char);
 
 ///////////////////////////////////////////////////////////////////////////////
 double receive(
@@ -64,7 +61,7 @@ double receive(
 {
     std::size_t skip = SKIP_LARGE;
 
-    typedef hpx::util::serialize_buffer<char> buffer_type;
+    typedef hpx::serialization::serialize_buffer<char> buffer_type;
     buffer_type recv_buffer;
 
     hpx::util::high_resolution_timer t;
@@ -80,7 +77,6 @@ double receive(
 
         std::size_t const start = 0;
 
-        // Fill the original matrix, set transpose to known garbage value.
         auto range = boost::irange(start, window_size);
         for_each(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t j)
@@ -96,11 +92,11 @@ double receive(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_header ()
+void print_header()
 {
     hpx::cout << "# OSU HPX Latency Test\n"
-              << "# Size    Latency (microsec)\n"
-              << hpx::flush;
+              << "# Size    Latency (microsec)"
+              << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,19 +119,18 @@ void run_benchmark(boost::program_options::variables_map & vm)
 
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
-    //BOOST_ASSERT(align_size <= MAX_ALIGNMENT);
-    send_buffer_orig = new char[max_size + align_size];
-    char* send_buffer = align_buffer(send_buffer_orig, align_size);
+    boost::scoped_array<char> send_buffer_orig(new char[max_size + align_size]);
+    char* send_buffer = align_buffer(send_buffer_orig.get(), align_size);
 
-    hpx::util::high_resolution_timer timer;
     // perform actual measurements
+    hpx::util::high_resolution_timer timer;
+
     for (std::size_t size = min_size; size <= max_size; size *= 2)
     {
         double latency = receive(there, send_buffer, size, loop, window_size);
         hpx::cout << std::left << std::setw(10) << size
                   << latency << hpx::endl << hpx::flush;
     }
-    hpx::cout << "Total time: " << timer.elapsed_nanoseconds() << "\n" << hpx::flush;
-    delete[] send_buffer_orig;
 
+    hpx::cout << "Total time: " << timer.elapsed_nanoseconds() << std::endl;
 }

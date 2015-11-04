@@ -3,7 +3,7 @@
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //  Copyright (c) 2014 Agustin Berge
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
@@ -199,7 +199,7 @@ struct test_timedlock
     void operator()()
     {
         test_lock_times_out_if_other_thread_has_lock<mutex_type>()();
-        
+
         mutex_type mutex;
         hpx::lcos::local::condition_variable condition;
 
@@ -230,7 +230,7 @@ struct test_timedlock
         // time out.
         HPX_TEST(!condition.wait_until(lock, timeout, fake_predicate));
         HPX_TEST(lock ? true : false);
-        
+
         boost::chrono::system_clock::time_point const now =
             boost::chrono::system_clock::now();
         HPX_TEST_LTE(timeout - timeout_resolution, now);
@@ -242,7 +242,7 @@ struct test_timedlock
         HPX_TEST(lock ? true : false);
         lock.unlock();
         HPX_TEST(!lock);
-        
+
         boost::chrono::system_clock::time_point target =
             boost::chrono::system_clock::now()
           + boost::chrono::milliseconds(100);

@@ -46,10 +46,15 @@ namespace hpx { namespace threads { namespace policies
           : base_type(init, deferred_initialization)
         {}
 
+        static std::string get_scheduler_name()
+        {
+            return "static_priority_queue_scheduler";
+        }
+
         /// Return the next thread to be executed, return false if non is
         /// available
-        bool get_next_thread(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
+        bool get_next_thread(std::size_t num_thread,
+            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
         {
             std::size_t queues_size = this->queues_.size();
 
@@ -115,7 +120,9 @@ namespace hpx { namespace threads { namespace policies
             {
                 bool suspended_only = true;
 
-                for (std::size_t i = 0; suspended_only && i != this->queues_.size(); ++i) {
+                for (std::size_t i = 0;
+                     suspended_only && i != this->queues_.size(); ++i)
+                {
                     suspended_only = this->queues_[i]->dump_suspended_threads(
                         i, idle_loop_count, running);
                 }
@@ -127,8 +134,8 @@ namespace hpx { namespace threads { namespace policies
                             << "no new work available, are we deadlocked?";
                     }
                     else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] " //-V128
-                              << "queue(" << num_thread << "): "
+                        LHPX_CONSOLE_(hpx::util::logging::level::error) //-V128
+                              << "  [TM] queue(" << num_thread << "): "
                               << "no new work available, are we deadlocked?\n";
                     }
                 }

@@ -6,10 +6,15 @@
 #if !defined(HPX_PARALLEL_UTIL_DETAIL_AUTO_CHUNK_SIZE_OCT_03_2014_0159PM)
 #define HPX_PARALLEL_UTIL_DETAIL_AUTO_CHUNK_SIZE_OCT_03_2014_0159PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/util/tuple.hpp>
+
+#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/executors/executor_parameter_traits.hpp>
 
 #include <vector>
+#include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util { namespace detail
@@ -39,51 +44,83 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         workitems.push_back(hpx::make_ready_future());
     }
 
-    // estimate a chunk size based on number of cores used
-    template <typename Future, typename F1, typename FwdIter>
-        // requires traits::is_future<Future>
-    std::size_t auto_chunk_size(
-        std::vector<Future>& workitems,
-        F1 && f1, FwdIter& first, std::size_t& count)
-    {
-        std::size_t test_chunk_size = count / 100;
-        if (0 == test_chunk_size) return 0;
-
-        boost::uint64_t t = hpx::util::high_resolution_clock::now();
-        add_ready_future(workitems, f1, first, test_chunk_size);
-
-        t = (hpx::util::high_resolution_clock::now() - t) / test_chunk_size;
-
-        std::advance(first, test_chunk_size);
-        count -= test_chunk_size;
-
-        // return chunk size which will create 80 microseconds of work
-        return t == 0 ? 0 : (std::min)(count, (std::size_t)(80000 / t));
-    }
-
     template <typename ExPolicy, typename Future, typename F1,
         typename FwdIter>
         // requires traits::is_future<Future>
-    std::size_t get_static_chunk_size(ExPolicy const& policy,
-        std::vector<Future>& workitems,
-        F1 && f1, FwdIter& first, std::size_t& count,
-        std::size_t chunk_size)
+    std::vector<hpx::util::tuple<FwdIter, std::size_t> >
+    get_bulk_iteration_shape(
+        ExPolicy policy, std::vector<Future>& workitems, F1 && f1,
+        FwdIter& first, std::size_t& count, std::size_t chunk_size)
     {
-        threads::executor exec = policy.get_executor();
-        if (chunk_size == 0)
+        typedef typename ExPolicy::executor_parameters_type parameters_type;
+        typedef executor_parameter_traits<parameters_type> traits;
+        typedef hpx::util::tuple<FwdIter, std::size_t> tuple_type;
+
+        typedef typename ExPolicy::executor_type executor_type;
+        std::size_t const cores = executor_information_traits<executor_type>::
+            processing_units_count(policy.executor(), policy.parameters());
+
+        bool variable_chunk_sizes = traits::variable_chunk_size(
+            policy.parameters(), policy.executor());
+
+        std::vector<tuple_type> shape;
+
+        if (!variable_chunk_sizes || chunk_size != 0)
         {
-            chunk_size = policy.get_chunk_size();
             if (chunk_size == 0)
             {
-                std::size_t const cores = hpx::get_os_thread_count(exec);
-                if (count > 100*cores)
-                    chunk_size = auto_chunk_size(workitems, f1, first, count);
+                auto test_function =
+                    [&]() -> std::size_t
+                    {
+                        std::size_t test_chunk_size = count / 100;
+                        if (test_chunk_size == 0)
+                            return 0;
+
+                        add_ready_future(workitems, f1, first, test_chunk_size);
+
+                        std::advance(first, test_chunk_size);
+                        count -= test_chunk_size;
+
+                        return test_chunk_size;
+                    };
+
+                chunk_size = traits::get_chunk_size(policy.parameters(),
+                    policy.executor(), test_function, count);
+            }
+
+            if (chunk_size == 0)
+                chunk_size = (count + cores - 1) / cores;
+
+            shape.reserve(count / chunk_size + 1);
+            while (count != 0)
+            {
+                std::size_t chunk = (std::min)(chunk_size, count);
+
+                shape.push_back(hpx::util::make_tuple(first, chunk));
+                count -= chunk;
+                std::advance(first, chunk);
+            }
+        }
+        else
+        {
+            while (count != 0)
+            {
+                chunk_size = traits::get_chunk_size(
+                    policy.parameters(), policy.executor(),
+                    [](){ return 0; }, count);
 
                 if (chunk_size == 0)
                     chunk_size = (count + cores - 1) / cores;
+
+                std::size_t chunk = (std::min)(chunk_size, count);
+
+                shape.push_back(hpx::util::make_tuple(first, chunk));
+                count -= chunk;
+                std::advance(first, chunk);
             }
         }
-        return chunk_size;
+
+        return shape;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -112,54 +149,79 @@ namespace hpx { namespace parallel { namespace util { namespace detail
         workitems.push_back(hpx::make_ready_future());
     }
 
-    // estimate a chunk size based on number of cores used, take into
-    // account base index
-    template <typename Future, typename F1, typename FwdIter>
-        // requires traits::is_future<Future>
-    std::size_t auto_chunk_size_idx(
-        std::vector<Future>& workitems, F1 && f1,
-        std::size_t& base_idx, FwdIter& first, std::size_t& count)
-    {
-        std::size_t test_chunk_size = count / 100;
-        if (0 == test_chunk_size) return 0;
-
-        boost::uint64_t t = hpx::util::high_resolution_clock::now();
-        add_ready_future_idx(workitems, f1, base_idx, first, test_chunk_size);
-
-        t = (hpx::util::high_resolution_clock::now() - t) / test_chunk_size;
-
-        base_idx += test_chunk_size;
-        std::advance(first, test_chunk_size);
-        count -= test_chunk_size;
-
-        // return chunk size which will create 80 microseconds of work
-        return t == 0 ? 0 : (std::min)(count, (std::size_t)(80000 / t));
-    }
-
     template <typename ExPolicy, typename Future, typename F1,
         typename FwdIter>
         // requires traits::is_future<Future>
-    std::size_t get_static_chunk_size_idx(ExPolicy const& policy,
-        std::vector<Future>& workitems,
-        F1 && f1, std::size_t& base_idx, FwdIter& first,
-        std::size_t& count, std::size_t chunk_size)
+    std::vector<hpx::util::tuple<std::size_t, FwdIter, std::size_t > >
+    get_bulk_iteration_shape_idx(
+        ExPolicy policy, std::vector<Future>& workitems, F1 && f1,
+        std::size_t& base_idx, FwdIter& first, std::size_t& count,
+        std::size_t chunk_size)
     {
-        threads::executor exec = policy.get_executor();
-        if (chunk_size == 0)
+        typedef typename ExPolicy::executor_parameters_type parameters_type;
+        typedef executor_parameter_traits<parameters_type> traits;
+        typedef hpx::util::tuple<std::size_t, FwdIter, std::size_t> tuple_type;
+
+        bool variable_chunk_sizes = traits::variable_chunk_size(
+            policy.parameters(), policy.executor());
+
+        std::vector<tuple_type> shape;
+
+        if (!variable_chunk_sizes || chunk_size != 0)
         {
-            chunk_size = policy.get_chunk_size();
             if (chunk_size == 0)
             {
-                std::size_t const cores = hpx::get_os_thread_count(exec);
-                if (count > 100*cores)
-                    chunk_size = auto_chunk_size_idx(workitems, f1,
-                        base_idx, first, count);
+                auto test_function =
+                    [&]() -> std::size_t
+                    {
+                        std::size_t test_chunk_size = count / 100;
+                        if (test_chunk_size == 0)
+                            return 0;
 
-                if (chunk_size == 0)
-                    chunk_size = (count + cores - 1) / cores;
+                        add_ready_future_idx(workitems, f1, base_idx, first,
+                            test_chunk_size);
+
+                        base_idx += test_chunk_size;
+                        std::advance(first, test_chunk_size);
+                        count -= test_chunk_size;
+
+                        return test_chunk_size;
+                    };
+
+                chunk_size = traits::get_chunk_size(policy.parameters(),
+                    policy.executor(), test_function, count);
+            }
+
+            shape.reserve(count / (chunk_size + 1));
+            while (count != 0)
+            {
+                std::size_t chunk = (std::min)(chunk_size, count);
+
+                shape.push_back(hpx::util::make_tuple(base_idx, first, chunk));
+
+                count -= chunk;
+                std::advance(first, chunk);
+                base_idx += chunk;
             }
         }
-        return chunk_size;
+        else
+        {
+            while (count != 0)
+            {
+                chunk_size = traits::get_chunk_size(
+                    policy.parameters(), policy.executor(),
+                    [](){ return 0; }, count);
+
+                std::size_t chunk = (std::min)(chunk_size, count);
+
+                shape.push_back(hpx::util::make_tuple(base_idx, first, chunk));
+                count -= chunk;
+                std::advance(first, chunk);
+                base_idx += chunk;
+            }
+        }
+
+        return shape;
     }
 }}}}
 

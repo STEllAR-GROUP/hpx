@@ -42,11 +42,8 @@
 #include <boost/call_traits.hpp>
 #include <utility>
 
-#include <hpx/util/coroutine/detail/arg_max.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/util/coroutine/detail/is_callable.hpp>
-#include <hpx/util/coroutine/detail/argument_packer.hpp>
-#include <hpx/util/coroutine/detail/argument_unpacker.hpp>
 #include <hpx/util/coroutine/detail/signature.hpp>
 #include <hpx/util/coroutine/detail/index.hpp>
 #include <hpx/util/coroutine/detail/coroutine_traits.hpp>
@@ -142,7 +139,8 @@ namespace hpx { namespace util { namespace coroutines
 
     template <typename Functor>
     coroutine (Functor && f, naming::id_type && target,
-            thread_id_repr_type id = 0, std::ptrdiff_t stack_size = detail::default_stack_size)
+            thread_id_repr_type id = 0, std::ptrdiff_t stack_size =
+               detail::default_stack_size)
       : m_pimpl(impl_type::create(std::forward<Functor>(f),
             std::move(target), id, stack_size))
     {
@@ -181,14 +179,14 @@ namespace hpx { namespace util { namespace coroutines
         return m_pimpl->get_thread_id();
     }
 
-#if defined(HPX_THREAD_MAINTAIN_PHASE_INFORMATION)
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
     std::size_t get_thread_phase() const
     {
         return m_pimpl->get_thread_phase();
     }
 #endif
 
-#if defined(HPX_THREAD_MAINTAIN_LOCAL_STORAGE)
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
     std::size_t get_thread_data() const
     {
         return m_pimpl.get() ? m_pimpl->get_thread_data() : 0;
@@ -205,67 +203,24 @@ namespace hpx { namespace util { namespace coroutines
     {
         HPX_ASSERT(exited());
         impl_type::rebind(m_pimpl.get(), boost::forward<Functor>(f),
-            boost::move(target), id);
+            std::move(target), id);
     }
 
-    //void reset()
-    //{
-    //    HPX_ASSERT(exited());
-    //    m_pimpl->reset();
-    //}
+    typedef typename arg_slot_traits::template at<0>::type arg0_type;
+    static const int arity = 1;
 
-#define HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE(z, n, traits_type)             \
-    typedef typename traits_type::template at<n>::type                        \
-    BOOST_PP_CAT(BOOST_PP_CAT(arg, n), _type);                                \
-/**/
-
-    BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
-                    HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE,
-                    arg_slot_traits)
-
-    static const int arity = arg_slot_traits::length;
-
-    struct yield_traits {
-      BOOST_PP_REPEAT(HPX_COROUTINE_ARG_MAX,
-                      HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE,
-                      result_slot_traits)
-      static const int arity = result_slot_traits::length;
+    struct yield_traits
+    {
+        typedef typename result_slot_traits::template at<0>::type arg0_type;
+        static const int arity = 1;
     };
-
-#undef HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE
-
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-
-#define HPX_COROUTINE_PARAM_WITH_DEFAULT(z, n, type_prefix)                   \
-    typename boost::call_traits<                                              \
-        BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)>::param_type        \
-            BOOST_PP_CAT(arg, n) =                                            \
-                BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()           \
-/**/
-
-    BOOST_FORCEINLINE result_type operator()(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX,
-        HPX_COROUTINE_PARAM_WITH_DEFAULT, arg))
-    {
-      return call_impl(arg_slot_type(BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
-    }
-
-    BOOST_FORCEINLINE typename detail::optional_result_type<result_type>::type
-    operator()(const std::nothrow_t&
-        BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX, HPX_COROUTINE_PARAM_WITH_DEFAULT, arg))
-    {
-      return call_impl_nothrow(arg_slot_type(BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
-    }
-
-#undef HPX_COROUTINE_PARAM_WITH_DEFAULT
-
-#else
 
     BOOST_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type())
     {
       HPX_ASSERT(m_pimpl);
       HPX_ASSERT(m_pimpl->is_ready());
 
-      result_type* ptr;
+      result_type* ptr = 0;
       m_pimpl->bind_args(&arg0);
       m_pimpl->bind_result_pointer(&ptr);
 
@@ -274,12 +229,10 @@ namespace hpx { namespace util { namespace coroutines
       return *m_pimpl->result();
     }
 
-#endif
-
     typedef void(coroutine::*bool_type)();
     operator bool_type() const
     {
-      return good()? &coroutine::bool_type_f: 0;
+      return good() ? &coroutine::bool_type_f : 0;
     }
 
     bool operator==(const coroutine& rhs) const
@@ -336,39 +289,7 @@ namespace hpx { namespace util { namespace coroutines
       return !empty() && !exited() && !waiting();
     }
 
-#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-    result_type call_impl(arg_slot_type args) {
-      HPX_ASSERT(m_pimpl);
-      m_pimpl->bind_args(&args);
-      result_slot_type * ptr;
-      m_pimpl->bind_result_pointer(&ptr);
-      m_pimpl->invoke();
-
-      return detail::fix_result<result_slot_traits>(*m_pimpl->result());
-    }
-
-    typename detail::optional_result_type<result_type>::type
-    call_impl_nothrow(arg_slot_type args) {
-      HPX_ASSERT(m_pimpl);
-      m_pimpl->bind_args(&args);
-      result_slot_type * ptr;
-      m_pimpl->bind_result_pointer(&ptr);
-      if(!m_pimpl->wake_up())
-        return detail::optional_result<result_type>();
-
-      return detail::fix_result<result_slot_traits>(*m_pimpl->result());
-    }
-#endif
-
     impl_ptr m_pimpl;
-
-    //void acquire() {
-    //  m_pimpl->acquire();
-    //}
-
-    //void release() {
-    //  m_pimpl->release();
-    //}
 
     std::size_t count() const
     {

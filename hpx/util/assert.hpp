@@ -6,6 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//  Make HPX inspect tool happy: hpxinspect:noassert_macro
 //  Note: There are no include guards. This is intentional.
 
 #if defined(HPX_USE_BOOST_ASSERT)
@@ -82,7 +83,8 @@ namespace hpx
 
 #define HPX_ASSERT_MSG(expr, msg) (HPX_LIKELY(!!(expr)) \
     ? ((void)0) \
-    : ::hpx::assertion_failed_msg(#expr, msg, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
+    : ::hpx::assertion_failed_msg \
+    (#expr, msg, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
 
 #else
 
@@ -102,7 +104,8 @@ namespace hpx
 
 namespace hpx { namespace assertion { namespace detail
 {
-    // Note: The template is needed to make the function non-inline and avoid linking errors
+    // Note: The template is needed to make the function non-inline and
+    // avoid linking errors
     template< typename CharT >
     BOOST_NOINLINE void assertion_failed_msg(CharT const * expr,
         char const * msg, char const * function, char const * file, long line)
@@ -134,8 +137,9 @@ namespace hpx { namespace assertion { namespace detail
 
 #undef HPX_VERIFY
 
-#if defined(HPX_DISABLE_ASSERTS) || ( !defined(HPX_ENABLE_ASSERT_HANDLER) && defined(NDEBUG) ) \
- || defined(BOOST_DISABLE_ASSERTS) || ( !defined(BOOST_ENABLE_ASSERT_HANDLER) && defined(NDEBUG) )
+#if defined(HPX_DISABLE_ASSERTS) || ( !defined(HPX_ENABLE_ASSERT_HANDLER) \
+ && defined(NDEBUG) ) || defined(BOOST_DISABLE_ASSERTS) \
+ || ( !defined(BOOST_ENABLE_ASSERT_HANDLER) && defined(NDEBUG) )
 
 # define HPX_VERIFY(expr) ((void)(expr))
 

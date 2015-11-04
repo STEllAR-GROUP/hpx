@@ -7,16 +7,20 @@
 #if !defined(HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E)
 #define HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E
 
-#include <boost/intrusive/slist.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
 #include <hpx/lcos/base_lco.hpp>
+
+#include <boost/intrusive/slist.hpp>
+#include <boost/thread/locks.hpp>
+
+#include <memory>
 
 namespace hpx { namespace lcos { namespace server
 {
@@ -85,8 +89,10 @@ struct object_semaphore
 
   private:
     // assumes that this thread has acquired l
-    void resume(mutex_type::scoped_lock& l)
+    void resume(boost::unique_lock<mutex_type>& l)
     { // {{{
+        HPX_ASSERT(l.owns_lock());
+
         // resume as many waiting LCOs as possible
         while (!thread_queue_.empty() && !value_queue_.empty())
         {
@@ -108,7 +114,7 @@ struct object_semaphore
             thread_queue_.pop_front();
 
             {
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
 
                 // set the LCO's result
                 applier::trigger(id, std::move(value));
@@ -128,10 +134,10 @@ struct object_semaphore
     void signal(ValueType const& val, boost::uint64_t count)
     { // {{{
         // push back the new value onto the queue
-        HPX_STD_UNIQUE_PTR<queue_value_entry> node
+        std::unique_ptr<queue_value_entry> node
             (new queue_value_entry(val, count));
 
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
         value_queue_.push_back(*node);
 
         node.release();
@@ -142,9 +148,9 @@ struct object_semaphore
     void get(naming::id_type const& lco)
     { // {{{
         // push the LCO's GID onto the queue
-        HPX_STD_UNIQUE_PTR<queue_thread_entry> node(new queue_thread_entry(lco));
+        std::unique_ptr<queue_thread_entry> node(new queue_thread_entry(lco));
 
-        mutex_type::scoped_lock l(mtx_);
+        boost::unique_lock<mutex_type> l(mtx_);
 
         thread_queue_.push_back(*node);
 
@@ -155,7 +161,7 @@ struct object_semaphore
 
     void abort_pending(error ec)
     { // {{{
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         LLCO_(info)
             << "object_semaphore::abort_pending: thread_queue is not empty, "
@@ -191,7 +197,7 @@ struct object_semaphore
             lcos::template base_lco_with_value<ValueType>::get_value_action
         action_type;
 
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         typename thread_queue_type::const_iterator it = thread_queue_.begin()
                                                  , end = thread_queue_.end();

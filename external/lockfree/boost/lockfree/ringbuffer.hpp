@@ -39,7 +39,8 @@ class ringbuffer_base:
     typedef std::size_t size_t;
     static const int padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(size_t);
     atomic<size_t> write_index_;
-    char padding1[padding_size]; /* force read_index and write_index to different cache lines */
+    char padding1[padding_size];
+    /* force read_index and write_index to different cache lines */
     atomic<size_t> read_index_;
 
 protected:
@@ -55,7 +56,8 @@ protected:
         return ret;
     }
 
-    static size_t read_available(size_t write_index, size_t read_index, size_t max_size)
+    static size_t read_available(size_t write_index, size_t read_index,
+        size_t max_size)
     {
         if (write_index >= read_index)
             return write_index - read_index;
@@ -64,7 +66,8 @@ protected:
         return ret;
     }
 
-    static size_t write_available(size_t write_index, size_t read_index, size_t max_size)
+    static size_t write_available(size_t write_index, size_t read_index,
+        size_t max_size)
     {
         size_t ret = read_index - write_index - 1;
         if (write_index >= read_index)
@@ -74,7 +77,8 @@ protected:
 
     bool enqueue(T const & t, T * buffer, size_t max_size)
     {
-        size_t write_index = write_index_.load(memory_order_relaxed);  // only written from enqueue thread
+        size_t write_index = write_index_.load(memory_order_relaxed);
+        // only written from enqueue thread
         size_t next = next_index(write_index, max_size);
 
         if (next == read_index_.load(memory_order_acquire))
@@ -87,16 +91,18 @@ protected:
         return true;
     }
 
-    size_t enqueue(const T * input_buffer, size_t input_count, T * internal_buffer, size_t max_size)
+    size_t enqueue(const T * input_buffer, size_t input_count,
+        T * internal_buffer, size_t max_size)
     {
-        size_t write_index = write_index_.load(memory_order_relaxed);  // only written from enqueue thread
+        size_t write_index = write_index_.load(memory_order_relaxed);
+        // only written from enqueue thread
         const size_t read_index  = read_index_.load(memory_order_acquire);
         const size_t avail = write_available(write_index, read_index, max_size);
 
         if (avail == 0)
             return 0;
 
-        input_count = std::min(input_count, avail);
+        input_count = (std::min)(input_count, avail);
 
         size_t new_write_index = write_index + input_count;
 
@@ -104,11 +110,14 @@ protected:
             /* copy data in two sections */
             size_t count0 = max_size - write_index;
 
-            std::copy(input_buffer, input_buffer + count0, internal_buffer + write_index);
-            std::copy(input_buffer + count0, input_buffer + input_count, internal_buffer);
+            std::copy(input_buffer, input_buffer + count0,
+                internal_buffer + write_index);
+            std::copy(input_buffer + count0, input_buffer + input_count,
+                internal_buffer);
             new_write_index -= max_size;
         } else {
-            std::copy(input_buffer, input_buffer + input_count, internal_buffer + write_index);
+            std::copy(input_buffer, input_buffer + input_count,
+                internal_buffer + write_index);
 
             if (new_write_index == max_size)
                 new_write_index = 0;
@@ -119,11 +128,13 @@ protected:
     }
 
     template <typename ConstIterator>
-    ConstIterator enqueue(ConstIterator begin, ConstIterator end, T * internal_buffer, size_t max_size)
+    ConstIterator enqueue(ConstIterator begin, ConstIterator end,
+        T * internal_buffer, size_t max_size)
     {
         // FIXME: avoid std::distance and std::advance
 
-        size_t write_index = write_index_.load(memory_order_relaxed);  // only written from enqueue thread
+        size_t write_index = write_index_.load(memory_order_relaxed);
+        // only written from enqueue thread
         const size_t read_index  = read_index_.load(memory_order_acquire);
         const size_t avail = write_available(write_index, read_index, max_size);
 
@@ -131,7 +142,7 @@ protected:
             return begin;
 
         size_t input_count = std::distance(begin, end);
-        input_count = std::min(input_count, avail);
+        input_count = (std::min)(input_count, avail);
 
         size_t new_write_index = write_index + input_count;
 
@@ -161,7 +172,8 @@ protected:
     bool dequeue (T & ret, T * buffer, size_t max_size)
     {
         size_t write_index = write_index_.load(memory_order_acquire);
-        size_t read_index  = read_index_.load(memory_order_relaxed); // only written from dequeue thread
+        size_t read_index  = read_index_.load(memory_order_relaxed);
+        // only written from dequeue thread
         if (empty(write_index, read_index))
             return false;
 
@@ -171,17 +183,19 @@ protected:
         return true;
     }
 
-    size_t dequeue (T * output_buffer, size_t output_count, const T * internal_buffer, size_t max_size)
+    size_t dequeue (T * output_buffer, size_t output_count,
+        const T * internal_buffer, size_t max_size)
     {
         const size_t write_index = write_index_.load(memory_order_acquire);
-        size_t read_index = read_index_.load(memory_order_relaxed); // only written from dequeue thread
+        size_t read_index = read_index_.load(memory_order_relaxed);
+        // only written from dequeue thread
 
         const size_t avail = read_available(write_index, read_index, max_size);
 
         if (avail == 0)
             return 0;
 
-        output_count = std::min(output_count, avail);
+        output_count = (std::min)(output_count, avail);
 
         size_t new_read_index = read_index + output_count;
 
@@ -190,12 +204,14 @@ protected:
             size_t count0 = max_size - read_index;
             size_t count1 = output_count - count0;
 
-            std::copy(internal_buffer + read_index, internal_buffer + max_size, output_buffer);
+            std::copy(internal_buffer + read_index,
+                internal_buffer + max_size, output_buffer);
             std::copy(internal_buffer, internal_buffer + count1, output_buffer + count0);
 
             new_read_index -= max_size;
         } else {
-            std::copy(internal_buffer + read_index, internal_buffer + read_index + output_count, output_buffer);
+            std::copy(internal_buffer + read_index,
+                internal_buffer + read_index + output_count, output_buffer);
             if (new_read_index == max_size)
                 new_read_index = 0;
         }
@@ -208,7 +224,8 @@ protected:
     size_t dequeue (OutputIterator it, const T * internal_buffer, size_t max_size)
     {
         const size_t write_index = write_index_.load(memory_order_acquire);
-        size_t read_index = read_index_.load(memory_order_relaxed); // only written from dequeue thread
+        size_t read_index = read_index_.load(memory_order_relaxed);
+        // only written from dequeue thread
 
         const size_t avail = read_available(write_index, read_index, max_size);
         if (avail == 0)
@@ -226,7 +243,8 @@ protected:
 
             new_read_index -= max_size;
         } else {
-            std::copy(internal_buffer + read_index, internal_buffer + read_index + avail, it);
+            std::copy(internal_buffer + read_index,
+                internal_buffer + read_index + avail, it);
             if (new_read_index == max_size)
                 new_read_index = 0;
         }
@@ -254,7 +272,8 @@ public:
      * */
     bool empty(void)
     {
-        return empty(write_index_.load(memory_order_relaxed), read_index_.load(memory_order_relaxed));
+        return empty(write_index_.load(memory_order_relaxed),
+            read_index_.load(memory_order_relaxed));
     }
 
     //! \copydoc boost::lockfree::stack::is_lock_free
@@ -280,7 +299,8 @@ class ringbuffer:
     boost::array<T, max_size> array_;
 
 public:
-    /** Enqueues object t to the ringbuffer. Enqueueing may fail, if the ringbuffer is full.
+    /** Enqueues object t to the ringbuffer.
+     *  Enqueueing may fail, if the ringbuffer is full.
      *
      * \return true, if the enqueue operation is successful.
      *
@@ -293,9 +313,11 @@ public:
 
     /** Dequeue object from ringbuffer.
      *
-     * If dequeue operation is successful, object is written to memory location denoted by ret.
+     * If dequeue operation is successful,
+     * object is written to memory location denoted by ret.
      *
-     * \return true, if the dequeue operation is successful, false if ringbuffer was empty.
+     * \return true, if the dequeue operation is successful,
+     * false if ringbuffer was empty.
      *
      * \note Thread-safe and non-blocking
      */
@@ -342,12 +364,14 @@ public:
     template <typename ConstIterator>
     ConstIterator enqueue(ConstIterator begin, ConstIterator end)
     {
-        return detail::ringbuffer_base<T>::enqueue(begin, end, array_.c_array(), max_size);
+        return detail::ringbuffer_base<T>::enqueue(begin, end,
+            array_.c_array(), max_size);
     }
 
     /** Dequeue a maximum of size objects from ringbuffer.
      *
-     * If dequeue operation is successful, object is written to memory location denoted by ret.
+     * If dequeue operation is successful,
+     * object is written to memory location denoted by ret.
      *
      * \return number of dequeued items
      *
@@ -356,7 +380,8 @@ public:
     /* @{ */
     size_t dequeue(T * ret, size_t size)
     {
-        return detail::ringbuffer_base<T>::dequeue(ret, size, array_.c_array(), max_size);
+        return detail::ringbuffer_base<T>::dequeue(ret, size,
+            array_.c_array(), max_size);
     }
 
     /** Enqueues all objects from the array t to the ringbuffer.
@@ -400,7 +425,8 @@ public:
         max_size_(max_size), array_(new T[max_size])
     {}
 
-    /** Enqueues object t to the ringbuffer. Enqueueing may fail, if the ringbuffer is full.
+    /** Enqueues object t to the ringbuffer.
+     *  Enqueueing may fail, if the ringbuffer is full.
      *
      * \return true, if the enqueue operation is successful.
      *
@@ -413,9 +439,11 @@ public:
 
     /** Dequeue object from ringbuffer.
      *
-     * If dequeue operation is successful, object is written to memory location denoted by ret.
+     * If dequeue operation is successful,
+     * object is written to memory location denoted by ret.
      *
-     * \return true, if the dequeue operation is successful, false if ringbuffer was empty.
+     * \return true, if the dequeue operation is successful,
+     * false if ringbuffer was empty.
      *
      * \note Thread-safe and non-blocking
      */
@@ -467,7 +495,8 @@ public:
 
     /** Dequeue a maximum of size objects from ringbuffer.
      *
-     * If dequeue operation is successful, object is written to memory location denoted by ret.
+     * If dequeue operation is successful, object is written to memory
+     * location denoted by ret.
      *
      * \return number of dequeued items
      *
@@ -480,7 +509,8 @@ public:
 
     /** Dequeue objects from ringbuffer.
      *
-     * If dequeue operation is successful, object is written to memory location denoted by ret.
+     * If dequeue operation is successful,
+     object is written to memory location denoted by ret.
      *
      * \return number of dequeued items
      *

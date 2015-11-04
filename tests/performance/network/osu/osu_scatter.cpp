@@ -8,17 +8,19 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <benchmarks/network/osu_coll.hpp>
 
-void scatter(std::vector<hpx::id_type> const & localities, hpx::util::serialize_buffer<char> buffer, std::size_t chunk_size);
+void scatter(std::vector<hpx::id_type> const & localities,
+    hpx::serialization::serialize_buffer<char> buffer, std::size_t chunk_size);
 HPX_PLAIN_ACTION(scatter);
 
-void scatter(std::vector<hpx::id_type> const & localities, hpx::util::serialize_buffer<char> buffer, std::size_t chunk_size)
+void scatter(std::vector<hpx::id_type> const & localities,
+    hpx::serialization::serialize_buffer<char> buffer, std::size_t chunk_size)
 {
     std::vector<hpx::future<void> > scatter_futures;
     scatter_futures.reserve(localities.size() / chunk_size);
@@ -41,7 +43,7 @@ void scatter(std::vector<hpx::id_type> const & localities, hpx::util::serialize_
                 hpx::id_type dst = locs[0];
 
                 scatter_futures.push_back(
-                    hpx::async<scatter_action>(dst, boost::move(locs), buffer, chunk_size)
+                    hpx::async<scatter_action>(dst, std::move(locs), buffer, chunk_size)
                 );
             }
 
@@ -66,7 +68,8 @@ void run_benchmark(params const & p)
 
     if(localities.size() < 2)
     {
-        hpx::cout << "This benchmark must be run with at least 2 localities" << hpx::endl << hpx::flush;
+        hpx::cout << "This benchmark must be run with at least 2 localities"
+                  << hpx::endl << hpx::flush;
         return;
     }
 
@@ -85,9 +88,10 @@ void run_benchmark(params const & p)
         for(std::size_t i = 0; i < iterations + skip; ++i)
         {
             hpx::util::high_resolution_timer t;
-            typedef hpx::util::serialize_buffer<char> buffer_type;
+            typedef hpx::serialization::serialize_buffer<char> buffer_type;
             hpx::id_type dst = localities[0];
-            scatter_action()(dst, localities, buffer_type(&send_buffer[0], size, buffer_type::reference), p.chunk_size);
+            scatter_action()(dst, localities, buffer_type(&send_buffer[0],
+                size, buffer_type::reference), p.chunk_size);
             double t_elapsed = t.elapsed();
             if(i >= skip)
                 elapsed += t_elapsed;

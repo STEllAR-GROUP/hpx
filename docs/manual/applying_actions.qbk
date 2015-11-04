@@ -37,7 +37,7 @@ the action type. Here is an example demonstrating this:
 If the action type should be defined somewhere not in global namespace, the
 action type definition has to be split into two macro invocations
 ([macroref HPX_DEFINE_PLAIN_ACTION `HPX_DEFINE_PLAIN_ACTION`] and
-[macroref HPX_REGISTER_PLAIN_ACTION `HPX_REGISTER_PLAIN_ACTION`]) as shown in
+[macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`]) as shown in
 the next example:
 
     namespace app
@@ -61,7 +61,7 @@ the next example:
     // The following macro expands to a series of definitions of global objects
     // which are needed for proper serialization and initialization support
     // enabling the remote invocation of the function `some_global_function`.
-    ``[macroref HPX_REGISTER_PLAIN_ACTION `HPX_REGISTER_PLAIN_ACTION`]``(app::some_global_action, app_some_global_action);
+    ``[macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`]``(app::some_global_action, app_some_global_action);
 
 The shown code defines an action type `some_global_action` inside the namespace
 `app`.
@@ -70,7 +70,7 @@ The shown code defines an action type `some_global_action` inside the namespace
            above, the name of the action type to create has to be the same for
            both macro invocations (here `some_global_action`).]
 
-[important The second argument passed to [macroref HPX_REGISTER_PLAIN_ACTION `HPX_REGISTER_PLAIN_ACTION`]
+[important The second argument passed to [macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`]
            (`app_some_global_action`) has to comprise a globally unique C++
            identifier representing the action. This is used for serialization
            purposes.]
@@ -111,7 +111,7 @@ file) in the most simple case:
     typedef hpx::components::simple_component<app::some_component> component_type;
     typedef app::some_component some_component;
 
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(component_type, some_component);
+    HPX_REGISTER_COMPONENT(component_type, some_component);
 
     // The parameters for this macro have to be the same as used in the corresponding
     // HPX_REGISTER_ACTION_DECLARATION() macro invocation above

@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <string>
 
-// disable the code specific to gcc for now as this causes problems 
-// (see #811: simple_central_tuplespace_client run error) 
+// disable the code specific to gcc for now as this causes problems
+// (see #811: simple_central_tuplespace_client run error)
 #if 0 // defined(__GNUC__)
 #include <cxxabi.h>
 

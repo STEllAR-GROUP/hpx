@@ -3,13 +3,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// Make HPX inspect tool happy: hpxinspect:nounnamed
+
 #if !defined(HPX_COMPONENTS_STATIC_FACTORY_DATA_HPP)
 #define HPX_COMPONENTS_STATIC_FACTORY_DATA_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
-#include <hpx/util/plugin/virtual_constructors.hpp>
+#include <hpx/util/plugin/virtual_constructor.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
 

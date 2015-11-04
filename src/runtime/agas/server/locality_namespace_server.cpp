@@ -18,8 +18,8 @@
 
 #include <list>
 
-#include <boost/foreach.hpp>
 #include <boost/fusion/include/at_c.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace hpx { namespace agas
 {
@@ -184,7 +184,8 @@ void locality_namespace::register_counter_types(
           ++i)
     {
         // global counters are handled elsewhere
-        if (detail::locality_namespace_services[i].code_ == locality_ns_statistics_counter)
+        if (detail::locality_namespace_services[i].code_ ==
+            locality_ns_statistics_counter)
             continue;
 
         std::string name(detail::locality_namespace_services[i].name_);
@@ -192,7 +193,8 @@ void locality_namespace::register_counter_types(
         std::string::size_type p = name.find_last_of('/');
         HPX_ASSERT(p != std::string::npos);
 
-        if (detail::locality_namespace_services[i].target_ == detail::counter_target_count)
+        if (detail::locality_namespace_services[i].target_ ==
+            detail::counter_target_count)
             help = boost::str(help_count % name.substr(p+1));
         else
             help = boost::str(help_time % name.substr(p+1));
@@ -224,12 +226,15 @@ void locality_namespace::register_global_counter_types(
           ++i)
     {
         // local counters are handled elsewhere
-        if (detail::locality_namespace_services[i].code_ != locality_ns_statistics_counter)
+        if (detail::locality_namespace_services[i].code_ !=
+            locality_ns_statistics_counter)
             continue;
 
         std::string help;
-        if (detail::locality_namespace_services[i].target_ == detail::counter_target_count)
-            help = "returns the overall number of invocations of all locality AGAS services";
+        if (detail::locality_namespace_services[i].target_ ==
+            detail::counter_target_count)
+            help = "returns the overall number of invocations \
+                    of all locality AGAS services";
         else
             help = "returns the overall execution time of all locality AGAS services";
 
@@ -260,7 +265,7 @@ void locality_namespace::register_server_instance(
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name_sync(instance_name_, get_gid().get_gid(), ec);
+    agas::register_name_sync(instance_name_, get_unmanaged_id().get_gid(), ec);
 }
 
 void locality_namespace::unregister_server_instance(
@@ -289,7 +294,7 @@ std::vector<response> locality_namespace::bulk_service(
     std::vector<response> r;
     r.reserve(reqs.size());
 
-    BOOST_FOREACH(request const& req, reqs)
+    for (request const& req : reqs)
     {
         error_code ign;
         r.push_back(service(req, ign));
@@ -311,16 +316,16 @@ response locality_namespace::allocate(
     boost::uint32_t const num_threads = req.get_num_threads();
     naming::gid_type const suggested_prefix = req.get_suggested_prefix();
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
 #if defined(HPX_DEBUG)
-    BOOST_FOREACH(partition_table_type::value_type const & partition, partitions_)
+    for (partition_table_type::value_type const& partition : partitions_)
     {
         HPX_ASSERT(at_c<0>(partition.second) != endpoints);
     }
 #endif
     // Check for address space exhaustion.
-    if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size()))
+    if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size())) //-V104
     {
         l.unlock();
 
@@ -413,7 +418,7 @@ response locality_namespace::resolve_locality(
     using boost::fusion::at_c;
     boost::uint32_t prefix = naming::get_locality_id_from_gid(req.get_gid());
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
     partition_table_type::iterator it = partitions_.find(prefix);
 
     if(it != partitions_.end())
@@ -436,7 +441,7 @@ response locality_namespace::free(
     naming::gid_type locality = req.get_gid();
     boost::uint32_t prefix = naming::get_locality_id_from_gid(locality);
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::unique_lock<mutex_type> l(mutex_);
 
     partition_table_type::iterator pit = partitions_.find(prefix)
                                  , pend = partitions_.end();
@@ -458,9 +463,36 @@ response locality_namespace::free(
         if (primary_)
         {
             l.unlock();
-            request req(primary_ns_unbind_gid, locality, 0);
-            response resp = primary_->service(req, ec);
-            if (ec) return resp;
+
+            boost::uint32_t locality_id =
+                naming::get_locality_id_from_gid(locality);
+
+            // remove primary namespace
+            {
+                naming::gid_type service(HPX_AGAS_PRIMARY_NS_MSB,
+                    HPX_AGAS_PRIMARY_NS_LSB);
+                request req(primary_ns_unbind_gid,
+                    naming::replace_locality_id(service, locality_id), 1);
+                response resp = primary_->service(req, ec);
+                if (ec) return resp;
+            }
+
+            // remove symbol namespace
+            {
+                naming::gid_type service(HPX_AGAS_SYMBOL_NS_MSB,
+                    HPX_AGAS_SYMBOL_NS_LSB);
+                request req(primary_ns_unbind_gid,
+                    naming::replace_locality_id(service, locality_id), 1);
+                response resp = primary_->service(req, ec);
+                if (ec) return resp;
+            }
+
+            // remove locality itself
+            {
+                request req(primary_ns_unbind_gid, locality, 0);
+                response resp = primary_->service(req, ec);
+                if (ec) return resp;
+            }
         }
 
         /*
@@ -496,7 +528,7 @@ response locality_namespace::localities(
 { // {{{ localities implementation
     using boost::fusion::at_c;
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     std::vector<boost::uint32_t> p;
 
@@ -523,7 +555,7 @@ response locality_namespace::resolved_localities(
 { // {{{ localities implementation
     using boost::fusion::at_c;
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     std::map<naming::gid_type, parcelset::endpoints_type> localities;
 
@@ -555,7 +587,7 @@ response locality_namespace::get_num_localities(
   , error_code& ec
     )
 { // {{{ get_num_localities implementation
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     boost::uint32_t num_localities =
         static_cast<boost::uint32_t>(partitions_.size());
@@ -575,7 +607,7 @@ response locality_namespace::get_num_threads(
   , error_code& ec
     )
 { // {{{ get_num_threads implementation
-    mutex_type::scoped_lock l(mutex_);
+    boost::lock_guard<mutex_type> l(mutex_);
 
     std::vector<boost::uint32_t> num_threads;
 
@@ -647,27 +679,34 @@ response locality_namespace::statistics_counter(
     {
         switch (code) {
         case locality_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_allocate_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_resolve_locality:
-            get_data_func = boost::bind(&cd::get_resolve_locality_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolve_locality_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_free:
-            get_data_func = boost::bind(&cd::get_free_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_free_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_localities:
-            get_data_func = boost::bind(&cd::get_localities_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_localities_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_resolved_localities:
-            get_data_func = boost::bind(&cd::get_resolved_localities_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolved_localities_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_num_localities_count,
+                &counter_data_, ::_1);
             break;
         case locality_ns_num_threads:
-            get_data_func = boost::bind(&cd::get_num_threads_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_num_threads_count,
+                &counter_data_, ::_1);
             break;
-        case primary_ns_statistics_counter:
+        case locality_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
             break;
         default:
@@ -681,27 +720,32 @@ response locality_namespace::statistics_counter(
         HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case locality_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_allocate_time,
+                &counter_data_, ::_1);
             break;
         case locality_ns_resolve_locality:
-            get_data_func = boost::bind(&cd::get_resolve_locality_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolve_locality_time,
+                &counter_data_, ::_1);
             break;
         case locality_ns_free:
             get_data_func = boost::bind(&cd::get_free_time, &counter_data_, ::_1);
             break;
         case locality_ns_localities:
-            get_data_func = boost::bind(&cd::get_localities_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_localities_time,
+                &counter_data_, ::_1);
             break;
         case locality_ns_resolved_localities:
-            get_data_func = boost::bind(&cd::get_resolved_localities_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_resolved_localities_time,
+                &counter_data_, ::_1);
             break;
         case locality_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_num_localities_time,
+                &counter_data_, ::_1);
             break;
         case locality_ns_num_threads:
             get_data_func = boost::bind(&cd::get_num_threads_time, &counter_data_, ::_1);
             break;
-        case primary_ns_statistics_counter:
+        case locality_ns_statistics_counter:
             get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);
             break;
         default:
@@ -760,7 +804,8 @@ boost::int64_t locality_namespace::counter_data::get_num_threads_count(bool rese
     return util::get_and_reset_value(num_threads_.count_, reset);
 }
 
-boost::int64_t locality_namespace::counter_data::get_resolved_localities_count(bool reset)
+boost::int64_t locality_namespace::counter_data
+        ::get_resolved_localities_count(bool reset)
 {
     return util::get_and_reset_value(resolved_localities_.count_, reset);
 }

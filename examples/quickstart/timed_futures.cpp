@@ -29,7 +29,7 @@ void wake_up_after_2_seconds()
     // wait until the new future gets ready
     f.wait();
 
-    hpx::cout << "woke up after " << t.elapsed() 
+    hpx::cout << "woke up after " << t.elapsed()
               << " seconds\n" << hpx::flush;
 }
 
@@ -49,7 +49,7 @@ int return_int_at_time()
     // wait until the new future gets ready (should return 42)
     int retval = f.get();
 
-    hpx::cout << "woke up after " << t.elapsed() 
+    hpx::cout << "woke up after " << t.elapsed()
               << " seconds, returned: " << retval << "\n"
               << hpx::flush;
 

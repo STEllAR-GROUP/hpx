@@ -31,7 +31,7 @@ HPX_ACTION_HAS_NORMAL_PRIORITY(normal_priority_action);
 
 void high_priority()
 {
-    HPX_TEST_EQ(hpx::threads::thread_priority_critical, 
+    HPX_TEST_EQ(hpx::threads::thread_priority_critical,
         hpx::this_thread::get_priority());
     hpx::this_thread::yield();
     HPX_TEST_EQ(hpx::threads::thread_priority_critical,

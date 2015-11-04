@@ -332,7 +332,7 @@ void test_shared_future()
     hpx::lcos::local::packaged_task<int()> pt(make_int);
     hpx::lcos::shared_future<int> fi = pt.get_future();
 
-    hpx::lcos::shared_future<int> sf(boost::move(fi));
+    hpx::lcos::shared_future<int> sf(std::move(fi));
 
     pt();
 
@@ -349,7 +349,7 @@ void test_copies_of_shared_future_become_ready_together()
     hpx::lcos::local::packaged_task<int()> pt(make_int);
     hpx::lcos::shared_future<int> fi=pt.get_future();
 
-    hpx::lcos::shared_future<int> sf1(boost::move(fi));
+    hpx::lcos::shared_future<int> sf1(std::move(fi));
     hpx::lcos::shared_future<int> sf2(sf1);
     hpx::lcos::shared_future<int> sf3;
 
@@ -387,7 +387,7 @@ void test_shared_future_can_be_move_assigned_from_shared_future()
     hpx::lcos::shared_future<int> fi=pt.get_future();
 
     hpx::lcos::shared_future<int> sf;
-    sf = boost::move(fi);
+    sf = std::move(fi);
     HPX_TEST(!fi.valid());
 
     HPX_TEST(!sf.is_ready());
@@ -400,7 +400,7 @@ void test_shared_future_void()
     hpx::lcos::local::packaged_task<void()> pt(do_nothing);
     hpx::lcos::shared_future<void> fi = pt.get_future();
 
-    hpx::lcos::shared_future<void> sf(boost::move(fi));
+    hpx::lcos::shared_future<void> sf(std::move(fi));
     HPX_TEST(!fi.valid());
 
     pt();
@@ -529,7 +529,7 @@ void test_packaged_task_can_be_moved()
     hpx::lcos::shared_future<int> fi = pt.get_future();
     HPX_TEST(!fi.is_ready());
 
-    hpx::lcos::local::packaged_task<int()> pt2(boost::move(pt));
+    hpx::lcos::local::packaged_task<int()> pt2(std::move(pt));
     HPX_TEST(!fi.is_ready());
 
     try {
@@ -1235,7 +1235,7 @@ void test_wait_for_either_of_five_futures_5()
 //     hpx::lcos::shared_future<int> fi2 = pt2.get_future();
 //     pt1.set_wait_callback(wait_callback_for_task);
 //
-//     hpx::thread t(boost::move(pt));
+//     hpx::thread t(std::move(pt));
 //
 //     boost::wait_for_any(fi, fi2);
 //     HPX_TEST_EQ(callback_called, 1U);
@@ -1251,14 +1251,16 @@ void test_wait_for_either_of_five_futures_5()
 //         hpx::lcos::shared_future<int> futures[count];
 //         for(unsigned j = 0; j < count; ++j)
 //         {
-//             tasks[j] = boost::move(hpx::lcos::local::packaged_task<int()>(make_int_slowly));
+//             tasks[j] =
+//               std::move(hpx::lcos::local::packaged_task<int()>(make_int_slowly));
 //             futures[j] = tasks[j].get_future();
 //         }
-//         hpx::thread t(boost::move(tasks[i]));
+//         hpx::thread t(std::move(tasks[i]));
 //
 //         hpx::lcos::wait_any(futures, futures);
 //
-//         hpx::lcos::shared_future<int>* const future = boost::wait_for_any(futures, futures+count);
+//         hpx::lcos::shared_future<int>* const future =
+//              boost::wait_for_any(futures, futures+count);
 //
 //         HPX_TEST(future == (futures + i));
 //         for(unsigned j = 0; j < count; ++j)

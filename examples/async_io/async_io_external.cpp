@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // The purpose of this example is to demonstrate how it is possible to
-// schedule an IO task onto an external OS-thread in HPX and how to 
+// schedule an IO task onto an external OS-thread in HPX and how to
 // synchronize the result of this IO task with a waiting HPX thread.
 
 #include <hpx/hpx_init.hpp>

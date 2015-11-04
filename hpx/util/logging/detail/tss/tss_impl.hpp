@@ -55,7 +55,7 @@ private:
 
 namespace hpx { namespace util { namespace logging {
 
-template <typename T> 
+template <typename T>
 class thread_specific_ptr : private boost::noncopyable
 {
     detail::tss m_tss;

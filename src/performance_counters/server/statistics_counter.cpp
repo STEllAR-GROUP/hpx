@@ -15,6 +15,7 @@
 
 #include <boost/version.hpp>
 #include <boost/chrono/chrono.hpp>
+#include <boost/thread/locks.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
@@ -55,11 +56,12 @@ namespace hpx { namespace performance_counters { namespace server
     hpx::performance_counters::counter_value
         statistics_counter<Statistic>::get_counter_value(bool reset)
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         hpx::performance_counters::counter_value value;
 
-        prev_value_.value_ = detail::counter_type_from_statistic<Statistic>::call(*value_);
+        prev_value_.value_ =
+            detail::counter_type_from_statistic<Statistic>::call(*value_);
         prev_value_.status_ = status_new_data;
         prev_value_.time_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         prev_value_.count_ = ++invocation_count_;
@@ -69,7 +71,8 @@ namespace hpx { namespace performance_counters { namespace server
         {
             value_.reset(detail::counter_type_from_statistic<Statistic>::create(
                 parameter2_)); // reset accumulator
-            (*value_)(static_cast<double>(prev_value_.value_));  // start off with last base value
+            (*value_)(static_cast<double>(prev_value_.value_));
+            // start off with last base value
         }
 
         return value;
@@ -96,8 +99,9 @@ namespace hpx { namespace performance_counters { namespace server
             return false;
         }
         else {
-            mutex_type::scoped_lock l(mtx_);
-            (*value_)(static_cast<double>(base_value.value_));          // accumulate new value
+            boost::lock_guard<mutex_type> l(mtx_);
+            (*value_)(static_cast<double>(base_value.value_));
+            // accumulate new value
         }
         return true;
     }
@@ -107,7 +111,7 @@ namespace hpx { namespace performance_counters { namespace server
     {
         // lock here to avoid checking out multiple reference counted GIDs
         // from AGAS
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         if (!base_counter_id_) {
             // get or create the base counter
@@ -158,7 +162,7 @@ namespace hpx { namespace performance_counters { namespace server
                 counter_value base_value;
                 if (evaluate_base_counter(base_value))
                 {
-                    mutex_type::scoped_lock l(mtx_);
+                    boost::lock_guard<mutex_type> l(mtx_);
                     (*value_)(static_cast<double>(base_value.value_));
                     prev_value_ = base_value;
                 }
@@ -187,11 +191,12 @@ namespace hpx { namespace performance_counters { namespace server
     template <typename Statistic>
     void statistics_counter<Statistic>::reset_counter_value()
     {
-        mutex_type::scoped_lock l(mtx_);
+        boost::lock_guard<mutex_type> l(mtx_);
 
         value_.reset(detail::counter_type_from_statistic<Statistic>::create(
             parameter2_)); // reset accumulator
-        (*value_)(static_cast<double>(prev_value_.value_));  // start off with last base value
+        (*value_)(static_cast<double>(prev_value_.value_));
+        // start off with last base value
     }
 }}}
 
@@ -211,7 +216,7 @@ template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
 
 ///////////////////////////////////////////////////////////////////////////////
 // Average
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::mean>
 > average_count_counter_type;
@@ -223,7 +228,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Variance
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::variance>
 > variance_count_counter_type;
@@ -235,7 +240,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(variance_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Rooling average
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::rolling_mean>
 > rolling_mean_count_counter_type;
@@ -247,7 +252,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(rolling_mean_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Median
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::median>
 > median_count_counter_type;
@@ -259,7 +264,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(median_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Max
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::max>
 > max_count_counter_type;
@@ -271,7 +276,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(max_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Min
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::min>
 > min_count_counter_type;
@@ -316,7 +321,7 @@ namespace hpx { namespace performance_counters { namespace detail
                             qi::int_ % ',', parameters))
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
-                            "statistics_counter_creator", 
+                            "statistics_counter_creator",
                             "invalid parameter specification for counter: " +
                                 paths.parameters_);
                         return naming::invalid_gid;

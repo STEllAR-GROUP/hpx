@@ -9,7 +9,6 @@
 #define HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
 
 #include <hpx/error.hpp>
-#include <hpx/util/serialize_empty_type.hpp>
 
 namespace hpx { namespace util { namespace detail
 {

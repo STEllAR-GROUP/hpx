@@ -38,11 +38,12 @@ namespace hpx { namespace performance_counters { namespace parcels
                                       ///< start serialization timestamp after
                                       ///< processing holds elapsed serialization time
 #if defined(HPX_HAVE_SECURITY)
-        boost::int64_t security_time_;///< during processing this holds holds the start 
+        boost::int64_t security_time_;///< during processing this holds holds the start
                                       ///< security work timestamp after
                                       ///< processing holds elapsed security time
 #endif
-        std::size_t num_parcels_;     ///< The number of parcels processed by this message
+        std::size_t num_parcels_;
+        ///^ The number of parcels processed by this message
         std::size_t raw_bytes_;       ///< number of bytes processed for the action in
                                       ///< this parcel (uncompressed)
 

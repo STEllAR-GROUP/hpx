@@ -1,9 +1,16 @@
+//  Copyright (C) 2007, 2008 Tim Blechmann
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+
 #ifndef BOOST_LOCKFREE_DETAIL_ATOMIC_HPP
 #define BOOST_LOCKFREE_DETAIL_ATOMIC_HPP
 
 #if !defined(BOOST_NO_0X_HDR_ATOMIC)
 #ifdef __GNUC__
-# if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
+# if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)
+  || !defined(__GXX_EXPERIMENTAL_CXX0X__)
 #  define BOOST_NO_0X_HDR_ATOMIC
 # endif
 #else

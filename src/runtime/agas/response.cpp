@@ -8,11 +8,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/tracking.hpp>
-
 #include <vector>
 
 #include <hpx/hpx.hpp>
@@ -22,10 +17,8 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/serialize_sequence.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/value_at.hpp>
@@ -578,10 +571,10 @@ namespace hpx { namespace agas
     struct save_visitor : boost::static_visitor<void>
     {
       private:
-        hpx::util::portable_binary_oarchive& ar;
+        hpx::serialization::output_archive& ar;
 
       public:
-        save_visitor(hpx::util::portable_binary_oarchive& ar_)
+        save_visitor(hpx::serialization::output_archive& ar_)
           : ar(ar_)
         {}
 
@@ -591,11 +584,11 @@ namespace hpx { namespace agas
         void operator()(Sequence const& seq) const
         {
             // TODO: verification?
-            util::serialize_sequence(ar, seq);
+            ar << seq;
         }
     };
 
-    void response::save(hpx::util::portable_binary_oarchive& ar, const unsigned int) const
+    void response::save(serialization::output_archive& ar, const unsigned int) const
     { // {{{
         // TODO: versioning?
         int which = data->which();
@@ -612,13 +605,13 @@ namespace hpx { namespace agas
             boost::mpl::at_c<                                               \
                 response_data::data_type::types, n                          \
             >::type d;                                                      \
-            util::serialize_sequence(ar, d);                                \
+            ar >> d;                                                        \
             data->data = d;                                                 \
             return;                                                         \
         }                                                                   \
     /**/
 
-    void response::load(hpx::util::portable_binary_iarchive& ar, const unsigned int)
+    void response::load(serialization::input_archive& ar, const unsigned int)
     { // {{{
         // TODO: versioning
         int which = -1;
@@ -651,21 +644,24 @@ using hpx::agas::response;
 
 using hpx::naming::id_type;
 
-HPX_REGISTER_BASE_LCO_WITH_VALUE(
-    hpx::agas::response,
-    agas_response_type)
-
-HPX_REGISTER_BASE_LCO_WITH_VALUE(
-    std::vector<hpx::agas::response>,
-    agas_response_vector_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    hpx::agas::response, hpx_agas_response_type,
+    hpx::actions::base_lco_with_value_hpx_agas_response_get,
+    hpx::actions::base_lco_with_value_hpx_agas_response_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    std::vector<hpx::agas::response>, hpx_agas_response_vector_type,
+    hpx::actions::base_lco_with_value_hpx_agas_response_vector_get,
+    hpx::actions::base_lco_with_value_hpx_agas_response_vector_set)
 
 typedef base_lco_with_value<bool, response> base_lco_bool_response_type;
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     base_lco_bool_response_type::set_value_action,
-    set_value_action_agas_bool_response_type)
+    set_value_action_agas_bool_response_type,
+    hpx::actions::set_value_action_agas_bool_response_type_id)
 
 typedef base_lco_with_value<id_type, response> base_lco_id_type_response_type;
-HPX_REGISTER_ACTION(
+HPX_REGISTER_ACTION_ID(
     base_lco_id_type_response_type::set_value_action,
-    set_value_action_agas_id_type_response_type)
+    set_value_action_agas_id_type_response_type,
+    hpx::actions::set_value_action_agas_id_type_response_type_id)
 

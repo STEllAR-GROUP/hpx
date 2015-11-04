@@ -13,7 +13,7 @@
 #define HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
 
 #include <hpx/config.hpp>
-
+#include <hpx/config/emulate_deleted.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
@@ -22,7 +22,7 @@
 #include <boost/thread/locks.hpp>
 
 #if defined(BOOST_WINDOWS)
-#  include <boost/smart_ptr/detail/spinlock_w32.hpp>
+#  include <boost/smart_ptr/detail/spinlock.hpp>
 #else
 #  if !defined(__ANDROID__) && !defined(ANDROID)
 #    include <boost/smart_ptr/detail/spinlock_sync.hpp>
@@ -44,8 +44,6 @@ namespace hpx { namespace lcos { namespace local
 #else
         boost::uint64_t v_;
 #endif
-
-        HPX_MOVABLE_BUT_NOT_COPYABLE(spinlock)
 
     public:
         ///////////////////////////////////////////////////////////////////////
@@ -112,30 +110,11 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_CREATE(this, desc, "");
         }
 
-        spinlock(spinlock && rhs)
-#if defined(BOOST_WINDOWS)
-          : v_(BOOST_INTERLOCKED_EXCHANGE(&rhs.v_, 0))
-#else
-          : v_(__sync_lock_test_and_set(&rhs.v_, 0))
-#endif
-        {}
+        HPX_NON_COPYABLE(spinlock);
 
         ~spinlock()
         {
             HPX_ITT_SYNC_DESTROY(this);
-        }
-
-        spinlock& operator=(spinlock && rhs)
-        {
-            if (this != &rhs) {
-                unlock();
-#if defined(BOOST_WINDOWS)
-                v_ = BOOST_INTERLOCKED_EXCHANGE(&rhs.v_, 0);
-#else
-                v_ = __sync_lock_test_and_set(&rhs.v_, 0);
-#endif
-            }
-            return *this;
         }
 
         void lock()
@@ -181,7 +160,7 @@ namespace hpx { namespace lcos { namespace local
         // returns whether the mutex has been acquired
         bool acquire_lock()
         {
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
             BOOST_COMPILER_FENCE
 #else
@@ -192,7 +171,7 @@ namespace hpx { namespace lcos { namespace local
 
         void relinquish_lock()
         {
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             BOOST_COMPILER_FENCE
             *const_cast<boost::uint64_t volatile*>(&v_) = 0;
 #else

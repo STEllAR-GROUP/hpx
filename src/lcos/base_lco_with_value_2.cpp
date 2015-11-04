@@ -1,5 +1,4 @@
-
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,15 +13,19 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
-
-HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::int16_t, int16_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::uint16_t, uint16_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::int32_t, int32_t)
-HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::uint32_t, uint32_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    boost::int16_t, int16_t,
+    hpx::actions::base_lco_with_value_int16_get,
+    hpx::actions::base_lco_with_value_int16_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    boost::uint16_t, uint16_t,
+    hpx::actions::base_lco_with_value_uint16_get,
+    hpx::actions::base_lco_with_value_uint16_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    boost::int32_t, int32_t,
+    hpx::actions::base_lco_with_value_int32_get,
+    hpx::actions::base_lco_with_value_int32_set)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
+    boost::uint32_t, uint32_t,
+    hpx::actions::base_lco_with_value_uint32_get,
+    hpx::actions::base_lco_with_value_uint32_set)

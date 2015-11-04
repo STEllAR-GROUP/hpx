@@ -10,8 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/detail/get_table.hpp>
-#include <hpx/util/polymorphic_factory.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
+#include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/tuple.hpp>
 
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/bool.hpp>
@@ -24,7 +26,7 @@ namespace hpx { namespace util { namespace detail
     struct get_function_name_impl
     {
         static char const* call()
-#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
+#ifndef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
         ;
 #else
         {
@@ -69,18 +71,19 @@ namespace hpx { namespace util { namespace detail
     template <typename VTable, typename T>
     struct function_registration
     {
-        typedef boost::shared_ptr<function_registration_info_base> pointer_type;
+        typedef function_registration_info_base base_type;
 
-        static pointer_type create()
+        static void * create()
         {
-            return pointer_type(new function_registration_info<VTable, T>());
+            static function_registration_info<VTable, T> ri;
+            return &ri;
         }
 
         function_registration()
         {
-            util::polymorphic_factory<function_registration_info_base>::get_instance().
-                add_factory_function(
-                    detail::get_function_name<std::pair<VTable, T> >()
+            hpx::serialization::detail::polymorphic_intrusive_factory::instance().
+                register_class(
+                    detail::get_function_name<util::tuple<VTable, T> >()
                   , &function_registration::create
                 );
         }
@@ -89,10 +92,11 @@ namespace hpx { namespace util { namespace detail
     template <typename VTable>
     VTable const* get_table_ptr(std::string const& name)
     {
-        boost::shared_ptr<detail::function_registration_info_base> p(
-            util::polymorphic_factory<
-                detail::function_registration_info_base
-            >::create(name));
+        detail::function_registration_info_base *
+            p(
+                hpx::serialization::detail::polymorphic_intrusive_factory::instance().
+                    create<function_registration_info_base>(name)
+            );
 
         return static_cast<VTable const*>(p->get_table_ptr());
     }
@@ -107,8 +111,8 @@ namespace hpx { namespace util { namespace detail
         automatic_function_registration()
         {
             function_registration<
-                typename VTablePair::first_type
-              , typename VTablePair::second_type
+                typename util::tuple_element<0, VTablePair>::type
+              , typename util::tuple_element<1, VTablePair>::type
             > auto_register;
         }
 
