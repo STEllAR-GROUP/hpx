@@ -1,6 +1,7 @@
 [/=============================================================================
     Copyright (C) 2012 Adrian Serio
     Copyright (C) 2012 Vinay C Amatya
+    Copyright (C) 2015 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -405,20 +406,17 @@ walkthrough will cover the __hpx__ component library. The code for the client
 application can be found here:
 [hpx_link examples/accumulators/accumulator_client.cpp..accumulator_client.cpp].
 
-An __hpx__ component is represented by three C++ classes:
+An __hpx__ component is represented by two C++ classes:
 
 * [*A server class] - The implementation of the components functionality.
-* [*A stubs class] - A lower-level interface to instances of the component.
 * [*A client class] - A high-level interface that acts as a proxy for an
   instance of the component.
 
-Typically, these three classes all have the same name, but stubs and server
-classes usually live in different sub-namespaces (`server` and `stubs`
-respectively).  For example, the full names of the three classes in
-accumulator are:
+Typically, these two classes all have the same name, but the server
+class usually lives in different sub-namespaces (`server`).  For example, the
+full names of the two classes in accumulator are:
 
 * `examples::server::accumulator` (server class)
-* `examples::stubs::accumulator` (stubs class)
 * `examples::accumulator` (client class)
 
 [heading The Server Class]
@@ -477,46 +475,6 @@ The rest of the registration code is in
 
 [note The code above must be placed in the global namespace.]
 
-[heading The Stubs Class]
-
-The following code is from
-[hpx_link examples/accumulators/stubs/accumulator.hpp..stubs/accumulator.hpp].
-
-All stubs classes must inherit from the stubs base class, [classref hpx::components::stub_base]`<>`:
-
-[import ../../examples/accumulators/stubs/accumulator.hpp]
-[accumulator_stubs_inherit]
-
-The stubs class contains helper functions which invoke actions on component
-instances. There are a few different ways of invoking actions:
-
-* [*Non-blocking]: For actions which don't have return types, or when we do not
-  care about the result of an action, we can invoke the action using
-  fire-and-forget semantics. This means that once we have asked __hpx__ to compute
-  the action, we forget about it completely and continue with our computation.
-  We use [funcref hpx::applier::apply]`<>()` instead of
-  [funcref hpx::async]`<>()` to invoke an action in a non-blocking fashion.
-  Here's an example from the accumulator stubs class:
-
-[accumulator_stubs_reset_non_blocking]
-
-* [*Asynchronous]: Futures, as demonstrated in __fibonacci_example__ and the
-  __hello_world_example__, enable asynchronous action invocation. Here's an
-  example from the accumulator stubs class:
-
-[accumulator_stubs_query_async]
-
-* [*Synchronous]: To invoke an action in a fully synchronous manner, we can
-  simply call [classref hpx::async]`<>().get()` (e.g., create a future and
-  immediately wait on it to be ready). Here's an example from the
-  accumulator stubs class:
-
-[accumulator_stubs_add_sync]
-
-[classref hpx::naming::id_type] is a type which represents a global identifier
-in __hpx__. This is the type that is returned by [funcref hpx::find_here]`()`. This
-type specifies the target of an action.
-
 [heading The Client Class]
 
 The following code is from
@@ -526,8 +484,8 @@ The client class is the primary interface to a component instance. Client classe
 are used to create components:
 
 ``
-    examples::accumulator c;
-    c.create(hpx::find_here()); // Create a component on this machine.
+    // Create a component on this locality.
+    examples::accumulator c = hpx::new_<examples::accumulator>(hpx::find_here());
 ``
 
 and to invoke component actions:
@@ -536,7 +494,7 @@ and to invoke component actions:
     c.add_sync(4);
 ``
 
-Clients, like stubs and servers, need to inherit from a base class, this time,
+Clients, like servers, need to inherit from a base class, this time,
 [classref hpx::components::client_base]`<>`:
 
 [import ../../examples/accumulators/accumulator.hpp]
@@ -548,14 +506,39 @@ For readability, we typedef the base class like so:
 
 Here are examples of how to expose actions through a client class:
 
+There are a few different ways of invoking actions:
+
+* [*Non-blocking]: For actions which don't have return types, or when we do not
+  care about the result of an action, we can invoke the action using
+  fire-and-forget semantics. This means that once we have asked __hpx__ to compute
+  the action, we forget about it completely and continue with our computation.
+  We use [funcref hpx::apply]`<>()` instead of
+  [funcref hpx::async]`<>()` to invoke an action in a non-blocking fashion.
+
 [accumulator_client_reset_non_blocking]
+
+* [*Asynchronous]: Futures, as demonstrated in __fibonacci_example__ and the
+  __hello_world_example__, enable asynchronous action invocation. Here's an
+  example from the accumulator client class:
 
 [accumulator_client_query_async]
 
+* [*Synchronous]: To invoke an action in a fully synchronous manner, we can
+  simply call [classref hpx::async]`<>().get()` (e.g., create a future and
+  immediately wait on it to be ready). Here's an example from the
+  accumulator client class:
+
 [accumulator_client_add_sync]
 
-Note that `this->gid_` references a data member of the
-[classref hpx::components::client_base]`<>` base class.
+Note that `this->get_id()` references a data member of the
+[classref hpx::components::client_base]`<>` base class which identifies the
+server accumulator instance.
+
+[classref hpx::naming::id_type `hpx::id_type`] is a type which represents a
+global identifier in __hpx__. This type specifies the target of an action.
+This is the type that is returned by [funcref hpx::find_here]`()` in which case
+it represents the locality the code is running on.
+
 
 [endsect] [/Accumulator]
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2015 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,12 +13,14 @@ set(examples
 foreach(example ${examples})
   set(client_sources ${example}_client.cpp)
   set(component_sources ${example}.cpp)
+  set(component_headers ${example}.hpp server/${example}.hpp)
 
   source_group("Source Files" FILES ${client_sources} ${component_sources})
 
   # add example components
   add_hpx_component(${example}
     SOURCES ${component_sources}
+    HEADERS ${component_headers}
     FOLDER "Examples/Quickstart/Accumulators/${example}")
 
   # add example executable
