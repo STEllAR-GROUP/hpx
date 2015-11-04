@@ -113,7 +113,7 @@ namespace hpx { namespace threads { namespace policies
             steals_in_numa_domain_(),
             steals_outside_numa_domain_(),
 #endif
-#if !defined(HPX_WITH_MORE_THAN_64_THREADS) || defined(HPX_HAVE_MAX_CPU_COUNT)
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || defined(HPX_HAVE_MAX_CPU_COUNT)
             numa_domain_masks_(init.num_queues_),
             outside_numa_domain_masks_(init.num_queues_)
 #else
