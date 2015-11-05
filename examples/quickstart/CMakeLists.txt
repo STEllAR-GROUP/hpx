@@ -23,6 +23,7 @@ set(example_programs
     fibonacci_futures_distributed
     fractals
     fractals_struct
+    safe_object
     interest_calculator
     interval_timer
     latch_local
