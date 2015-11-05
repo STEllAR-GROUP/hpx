@@ -9,14 +9,16 @@
 //
 #include <random>
 #include <limits>
+#include <iomanip>
 //
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_sort.hpp>
 #include <hpx/util/lightweight_test.hpp>
-
+//
 #include <boost/range/functions.hpp>
-
+#include <boost/format.hpp>
+//
 #include "test_utils.hpp"
 
 // Fill a vector with random numbers in the range [lower, upper]
@@ -33,7 +35,7 @@ void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
 }
 
 template <class IA, typename Compare>
-int verify(const std::vector <IA> &A, Compare comp, bool print) {
+int verify(const std::vector <IA> &A, Compare comp, boost::uint64_t elapsed, bool print) {
     if (A.size()<2) {
         // skip checks as we must be sorted
     }
@@ -41,16 +43,20 @@ int verify(const std::vector <IA> &A, Compare comp, bool print) {
         IA temp = *(A.begin());
         for (typename std::vector<IA>::const_iterator it=A.begin(); it!=A.end(); ++it) {
             if (comp((*it),temp)) {
-                if (print) std::cout << "fail " << A.size() << std::endl;
+                if (print) std::cout << "fail "
+                  << boost::format("%8.6f") % (elapsed / 1e9)
+                  << A.size() << std::endl;
                 return 0;
             }
             temp = (*it);
         }
     }
-    if (print) std::cout << "OK " << A.size() << std::endl;
+    if (print) std::cout
+      << "OK "
+      << boost::format("%8.6f") % (elapsed / 1e9)
+      << A.size() << std::endl;
     return 1;
 }
-
 
 #define msg(a,b,c,d,e) \
         std::cout \
@@ -71,11 +77,13 @@ void test_sort1(ExPolicy && policy, T)
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
         (std::numeric_limits<T>::max)(), std::random_device{}());
 
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
     hpx::parallel::sort(std::forward<ExPolicy>(policy),
             c.begin(), c.end());
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, std::less<T>(), true) != 0);
+    bool is_sorted = (verify(c, std::less<T>(), elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
 
@@ -92,11 +100,13 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
         (std::numeric_limits<T>::max)(), std::random_device{}());
 
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
     hpx::parallel::sort(std::forward<ExPolicy>(policy),
             c.begin(), c.end(), comp);
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, comp, true)!=0);
+    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
 
@@ -112,12 +122,14 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
         (std::numeric_limits<T>::max)(), std::random_device{}());
 
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, non blocking
     hpx::future<void> f = hpx::parallel::sort(std::forward<ExPolicy>(policy),
             c.begin(), c.end(), comp);
-
     f.get();
-    bool is_sorted = (verify(c, comp, true)!=0);
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
+    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
 
@@ -133,11 +145,13 @@ void test_sort2(ExPolicy && policy, T)
     std::vector<T> c(5000000);
     std::iota(boost::begin(c), boost::end(c), 0);
 
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
     hpx::parallel::sort(std::forward<ExPolicy>(policy),
             c.begin(), c.end());
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, std::less<T>(), true) != 0);
+    bool is_sorted = (verify(c, std::less<T>(), elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
 
@@ -152,11 +166,13 @@ void test_sort2_comp(ExPolicy && policy, T, Compare comp = Compare())
     std::vector<T> c(5000000);
     std::iota(boost::begin(c), boost::end(c), 0);
 
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
     hpx::parallel::sort(std::forward<ExPolicy>(policy),
             c.begin(), c.end(), comp);
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify(c, comp, true)!=0);
+    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
 
@@ -171,12 +187,14 @@ void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
     std::vector<T> c(5000000);
     std::iota(boost::begin(c), boost::end(c), 0);
 
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, non blocking
     hpx::future<void> f = hpx::parallel::sort(std::forward<ExPolicy>(policy),
             c.begin(), c.end(), comp);
-
     f.get();
-    bool is_sorted = (verify(c, comp, true)!=0);
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
+    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
 
