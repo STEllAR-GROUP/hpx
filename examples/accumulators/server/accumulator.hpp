@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,18 +39,23 @@ namespace examples { namespace server
     /// a simple component is created.
     ///
     /// This component exposes 3 different actions: reset, add and query.
+    //[accumulator_server_inherit
     class accumulator
       : public hpx::components::locking_hook<
             hpx::components::component_base<accumulator> >
+    //]
     {
     public:
         typedef boost::int64_t argument_type;
 
+        //[accumulator_server_ctor
         accumulator() : value_(0) {}
+        //]
 
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
+        //[accumulator_methods
         /// Reset the components value to 0.
         void reset()
         {
@@ -71,21 +76,26 @@ namespace examples { namespace server
             // Get the value of value_.
             return value_;
         }
+        //]
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-
+        //[accumulator_action_types
         HPX_DEFINE_COMPONENT_ACTION(accumulator, reset);
         HPX_DEFINE_COMPONENT_ACTION(accumulator, add);
         HPX_DEFINE_COMPONENT_ACTION(accumulator, query);
+        //]
 
     private:
+        //[accumulator_server_data_member
         argument_type value_;
+        //]
     };
 }}
 
+//[accumulator_registration_declarations
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::accumulator::reset_action,
     accumulator_reset_action);
@@ -97,6 +107,7 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::accumulator::query_action,
     accumulator_query_action);
+//]
 
 #endif
 

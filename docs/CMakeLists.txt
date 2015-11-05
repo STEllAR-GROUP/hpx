@@ -28,7 +28,6 @@ set(documentation_dependencies
     "${PROJECT_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp"
     "${PROJECT_SOURCE_DIR}/examples/quickstart/error_handling.cpp"
     "${PROJECT_SOURCE_DIR}/examples/accumulators/server/accumulator.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulators/stubs/accumulator.hpp"
     "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.hpp"
     "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.cpp"
     "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator_client.cpp"

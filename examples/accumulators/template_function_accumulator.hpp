@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/components.hpp>
 
-#include "stubs/template_function_accumulator.hpp"
+#include "server/template_function_accumulator.hpp"
 
 namespace examples
 {
@@ -18,11 +18,13 @@ namespace examples
     /// Client for the \a server::managed_accumulator component.
     class template_function_accumulator
       : public hpx::components::client_base<
-            template_function_accumulator, stubs::managed_accumulator
+            template_function_accumulator,
+            server::template_function_accumulator
         >
     {
         typedef hpx::components::client_base<
-            template_function_accumulator, stubs::managed_accumulator
+            template_function_accumulator,
+            server::template_function_accumulator
         > base_type;
 
     public:
@@ -33,7 +35,7 @@ namespace examples
 
         /// Create a client side representation for the existing
         /// \a server::managed_accumulator instance with the given GID.
-        template_function_accumulator(hpx::future<hpx::naming::id_type> && gid)
+        template_function_accumulator(hpx::future<hpx::id_type> && gid)
           : base_type(std::move(gid))
         {}
 
@@ -46,7 +48,10 @@ namespace examples
         void reset_non_blocking()
         {
             HPX_ASSERT(this->get_id());
-            this->base_type::reset_non_blocking(this->get_id());
+
+            typedef server::template_function_accumulator::reset_action
+                action_type;
+            hpx::apply<action_type>(this->get_id());
         }
 
         /// Reset the accumulator's value to 0.
@@ -55,7 +60,10 @@ namespace examples
         void reset_sync()
         {
             HPX_ASSERT(this->get_id());
-            this->base_type::reset_sync(this->get_id());
+
+            typedef server::template_function_accumulator::reset_action
+                action_type;
+            hpx::async<action_type>(this->get_id()).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -68,7 +76,10 @@ namespace examples
         void add_non_blocking(T arg)
         {
             HPX_ASSERT(this->get_id());
-            this->base_type::add_non_blocking(this->get_id(), arg);
+
+            typedef server::template_function_accumulator::add_action<T>
+                action_type;
+            hpx::apply<action_type>(this->get_id(), arg);
         }
 
         /// Add \p arg to the accumulator's value.
@@ -78,7 +89,10 @@ namespace examples
         void add_sync(T arg)
         {
             HPX_ASSERT(this->get_id());
-            this->base_type::add_sync(this->get_id(), arg);
+
+            typedef typename server::template_function_accumulator::add_action<T>
+                 action_type;
+            hpx::async<action_type>(this->get_id(), arg).get();
         }
         //]
 
@@ -90,10 +104,13 @@ namespace examples
         ///          the future should be called. If the value is available,
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
-        hpx::lcos::future<double> query_async()
+        hpx::future<double> query_async()
         {
             HPX_ASSERT(this->get_id());
-            return this->base_type::query_async(this->get_id());
+
+            typedef server::template_function_accumulator::query_action
+                action_type;
+            return hpx::async<action_type>(this->get_id());
         }
 
         /// Query the current value of the accumulator.
@@ -102,7 +119,8 @@ namespace examples
         double query_sync()
         {
             HPX_ASSERT(this->get_id());
-            return this->base_type::query_sync(this->get_id());
+
+            return query_async().get();
         }
     };
 }
