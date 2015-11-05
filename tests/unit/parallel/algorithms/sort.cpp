@@ -29,9 +29,9 @@ void test_sort1()
     test_sort1_comp(par_vec, int(), std::less<std::size_t>());
 
     // user supplied comparison operator (std::greater)
-    test_sort1_comp(seq,     double(), std::greater<std::size_t>());
-    test_sort1_comp(par,     double(), std::greater<std::size_t>());
-    test_sort1_comp(par_vec, double(), std::greater<std::size_t>());
+    test_sort1_comp(seq,     double(), std::greater<double>());
+    test_sort1_comp(par,     double(), std::greater<double>());
+    test_sort1_comp(par_vec, double(), std::greater<double>());
 
     // Async execution, default comparison operator
     test_sort1_async(seq(task), int());
@@ -72,9 +72,9 @@ void test_sort2()
     test_sort2_comp(par_vec, int(), std::less<std::size_t>());
 
     // user supplied comparison operator (std::greater)
-    test_sort2_comp(seq,     double(), std::greater<std::size_t>());
-    test_sort2_comp(par,     double(), std::greater<std::size_t>());
-    test_sort2_comp(par_vec, double(), std::greater<std::size_t>());
+    test_sort2_comp(seq,     double(), std::greater<double>());
+    test_sort2_comp(par,     double(), std::greater<double>());
+    test_sort2_comp(par_vec, double(), std::greater<double>());
 
     // Async execution, default comparison operator
     test_sort2_async(seq(task), int());

@@ -21,12 +21,16 @@
 //
 #include "test_utils.hpp"
 
+#include  <boost/nondet_random.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+
 // Fill a vector with random numbers in the range [lower, upper]
 template <typename T>
 void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
 {
     // use the default random engine and an uniform distribution
-    std::default_random_engine eng(seed);
+    std::default_random_engine eng(static_cast<unsigned int>(seed));
     std::uniform_real_distribution<double> distr(lower, upper);
 
     for (auto &elem : V) {
@@ -35,14 +39,18 @@ void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
 }
 
 template <class IA, typename Compare>
-int verify(const std::vector <IA> &A, Compare comp, boost::uint64_t elapsed, bool print) {
+int verify(const std::vector <IA> &A, Compare comp, boost::uint64_t elapsed,
+    bool print)
+{
     if (A.size()<2) {
         // skip checks as we must be sorted
     }
     else {
         IA temp = *(A.begin());
-        for (typename std::vector<IA>::const_iterator it=A.begin(); it!=A.end(); ++it) {
-            if (comp((*it),temp)) {
+        for (typename std::vector<IA>::const_iterator it=A.begin();
+            it != A.end(); ++it)
+        {
+            if (comp((*it), temp)) {
                 if (print) std::cout << "fail "
                   << boost::format("%8.6f") % (elapsed / 1e9)
                   << A.size() << std::endl;
@@ -72,10 +80,13 @@ void test_sort1(ExPolicy && policy, T)
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
     msg(typeid(ExPolicy).name(), typeid(T).name(), "default", sync, random);
 
+    boost::random::random_device rseed;
+    boost::random::mt19937 gen(rseed());
+
     // Fill vector with random values
     std::vector<T> c(5000000);
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
-        (std::numeric_limits<T>::max)(), std::random_device{}());
+        (std::numeric_limits<T>::max)(), T(gen()));
 
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
@@ -95,10 +106,13 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
     msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync, random);
 
+    boost::random::random_device rseed;
+    boost::random::mt19937 gen(rseed());
+
     // Fill vector with random values
     std::vector<T> c(5000000);
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
-        (std::numeric_limits<T>::max)(), std::random_device{}());
+        (std::numeric_limits<T>::max)(), T(gen()));
 
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
@@ -117,10 +131,13 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
     msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), async, random);
 
+    boost::random::random_device rseed;
+    boost::random::mt19937 gen(rseed());
+
     // Fill vector with random values
     std::vector<T> c(5000000);
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
-        (std::numeric_limits<T>::max)(), std::random_device{}());
+        (std::numeric_limits<T>::max)(), T(gen()));
 
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, non blocking
@@ -185,7 +202,7 @@ void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
 
     // Fill vector with random values
     std::vector<T> c(5000000);
-    std::iota(boost::begin(c), boost::end(c), 0);
+    std::iota(boost::begin(c), boost::end(c), T(0));
 
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, non blocking
