@@ -21,6 +21,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 
@@ -94,8 +95,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 executor_traits;
 
             //------------------------- begin ----------------------
-            std::size_t N = last - first;
-            if (N <= sort_limit_per_task)
+            std::ptrdiff_t N = last - first;
+            if (std::size_t(N) <= sort_limit_per_task)
             {
                 return executor_traits::async_execute(
                     policy.executor(),
@@ -114,7 +115,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 return hpx::make_ready_future();
 
             //---------------------- pivot select ----------------------------
-            std::size_t nx = N >> 1;
+            std::size_t nx = std::size_t(N) >> 1;
 
             RandomIt it_a = first + 1;
             RandomIt it_b = first + nx;
@@ -185,28 +186,44 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         parallel_sort_async(ExPolicy policy, RandomIt first, RandomIt last,
             Compare comp)
         {
-            size_t N = last - first;
-            HPX_ASSERT(N >= 0);
+            hpx::future<void> result;
+            try {
+                std::ptrdiff_t N = last - first;
+                HPX_ASSERT(N >= 0);
 
-            if (N < sort_limit_per_task)
-            {
-                std::sort(first, last, comp);
-                return hpx::make_ready_future();
+                if (std::size_t(N) < sort_limit_per_task)
+                {
+                    std::sort(first, last, comp);
+                    return hpx::make_ready_future();
+                }
+
+                // check if already sorted
+                if (detail::is_sorted_sequential(first, last, comp))
+                    return hpx::make_ready_future();
+
+                typedef typename ExPolicy::executor_type executor_type;
+                typedef typename hpx::parallel::executor_traits<executor_type>
+                    executor_traits;
+
+                result = executor_traits::async_execute(
+                    policy.executor(),
+                    hpx::util::bind(
+                        &sort_thread<ExPolicy, RandomIt, Compare>,
+                        policy, first, last, comp
+                    ));
+            }
+            catch (...) {
+                return util::detail::handle_local_exception<ExPolicy>::call(
+                    boost::current_exception());
             }
 
-            // check if already sorted
-            if (detail::is_sorted_sequential(first, last, comp))
-                return hpx::make_ready_future();
+            if (result.has_exception())
+            {
+                return util::detail::handle_local_exception<ExPolicy>::call(
+                    result.get_exception_ptr());
+            }
 
-            typedef typename ExPolicy::executor_type executor_type;
-            typedef typename hpx::parallel::executor_traits<executor_type>
-                executor_traits;
-
-            return executor_traits::async_execute(policy.executor(),
-                hpx::util::bind(
-                    &sort_thread<ExPolicy, RandomIt, Compare>,
-                    policy, first, last, comp
-                ));
+            return result;
         }
 
         ///////////////////////////////////////////////////////////////////////
