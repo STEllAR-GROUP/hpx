@@ -272,12 +272,12 @@ hpx_option(HPX_WITH_MAX_CPU_COUNT STRING
   CATEGORY "Thread Manager" ADVANCED)
 hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
 
-if(NOT (${HPX_WITH_MAX_CPU_COUNT} LESS 65))
-  set(HPX_WITH_MORE_THAN_64_THREADS_DEFAULT OFF)
-  hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
-    "HPX applications will be able to run on more than 64 cores"
-    ${HPX_WITH_MORE_THAN_64_THREADS_DEFAULT}
-    CATEGORY "Thread Manager" ADVANCED)
+hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
+  "HPX applications will be able to run on more than 64 cores"
+  (NOT (${HPX_WITH_MAX_CPU_COUNT} LESS 65))
+  CATEGORY "Thread Manager" ADVANCED)
+if(HPX_WITH_MORE_THAN_64_THREADS)
+  hpx_add_config_define(HPX_HAVE_MORE_THAN_64_THREADS)
 endif()
 
 hpx_option(HPX_WITH_THREAD_STACK_MMAP BOOL
