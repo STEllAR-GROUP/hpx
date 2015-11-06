@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2015 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,17 +22,16 @@
 //
 #include "test_utils.hpp"
 
-#include  <boost/nondet_random.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 
 // Fill a vector with random numbers in the range [lower, upper]
 template <typename T>
 void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
 {
     // use the default random engine and an uniform distribution
-    std::default_random_engine eng(static_cast<unsigned int>(seed));
-    std::uniform_real_distribution<double> distr(lower, upper);
+    boost::random::mt19937 eng(static_cast<unsigned int>(seed));
+    boost::random::uniform_real_distribution<double> distr(lower, upper);
 
     for (auto &elem : V) {
         elem = static_cast<T>(distr(eng));
@@ -80,13 +80,10 @@ void test_sort1(ExPolicy && policy, T)
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
     msg(typeid(ExPolicy).name(), typeid(T).name(), "default", sync, random);
 
-    boost::random::random_device rseed;
-    boost::random::mt19937 gen(rseed());
-
     // Fill vector with random values
     std::vector<T> c(5000000);
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
-        (std::numeric_limits<T>::max)(), T(gen()));
+        (std::numeric_limits<T>::max)(), T(std::rand()));
 
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
@@ -104,15 +101,13 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
         void test_sort1_comp(ExPolicy && policy, T, Compare comp = Compare())
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
-    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync, random);
-
-    boost::random::random_device rseed;
-    boost::random::mt19937 gen(rseed());
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(),
+        sync, random);
 
     // Fill vector with random values
     std::vector<T> c(5000000);
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
-        (std::numeric_limits<T>::max)(), T(gen()));
+        (std::numeric_limits<T>::max)(), T(std::rand()));
 
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
@@ -129,15 +124,13 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
         void test_sort1_async(ExPolicy && policy, T, Compare comp = Compare())
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
-    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), async, random);
-
-    boost::random::random_device rseed;
-    boost::random::mt19937 gen(rseed());
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(),
+        async, random);
 
     // Fill vector with random values
     std::vector<T> c(5000000);
     rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
-        (std::numeric_limits<T>::max)(), T(gen()));
+        (std::numeric_limits<T>::max)(), T(std::rand()));
 
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, non blocking
@@ -177,7 +170,8 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T> >
 void test_sort2_comp(ExPolicy && policy, T, Compare comp = Compare())
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
-    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync, sorted);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(),
+        sync, sorted);
 
     // Fill vector with increasing values
     std::vector<T> c(5000000);
@@ -198,7 +192,8 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T> >
 void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
-    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), async, sorted);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(),
+        async, sorted);
 
     // Fill vector with random values
     std::vector<T> c(5000000);

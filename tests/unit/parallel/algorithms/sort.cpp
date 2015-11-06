@@ -99,6 +99,13 @@ void test_sort2()
 ////////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
+    unsigned int seed = (unsigned int)std::time(0);
+    if (vm.count("seed"))
+        seed = vm["seed"].as<unsigned int>();
+
+    std::cout << "using seed: " << seed << std::endl;
+    std::srand(seed);
+
     test_sort1();
     test_sort2();
     return hpx::finalize();
@@ -106,10 +113,17 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
+    // add command line option which controls the random number generator seed
     using namespace boost::program_options;
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
+    desc_commandline.add_options()
+        ("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run")
+        ;
+
+    // By default this test should run on all available cores
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=" +
         boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency()));
