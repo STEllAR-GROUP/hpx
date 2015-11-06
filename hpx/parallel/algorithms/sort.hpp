@@ -12,8 +12,11 @@
 #include <hpx/traits/concepts.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/lcos/when_all.hpp>
 
+#include <hpx/parallel/executors/executor_traits.hpp>
+#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -82,15 +85,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// \return
         /// \remarks
         //------------------------------------------------------------------------
-        template <typename RandomIt, typename Compare>
-        hpx::future<void>
-        sort_thread(RandomIt first, RandomIt last, Compare comp)
+        template <typename ExPolicy, typename RandomIt, typename Compare>
+        hpx::future<void> sort_thread(ExPolicy policy,
+            RandomIt first, RandomIt last, Compare comp)
         {
+            typedef typename ExPolicy::executor_type executor_type;
+            typedef typename hpx::parallel::executor_traits<executor_type>
+                executor_traits;
+
             //------------------------- begin ----------------------
             std::size_t N = last - first;
             if (N <= sort_limit_per_task)
             {
-                return hpx::async(
+                return executor_traits::async_execute(
+                    policy.executor(),
                     [first, last, comp]()
                     {
                         std::sort(first, last, comp);
@@ -144,10 +152,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             std::swap(*first, *c_last);
 
             // spawn tasks for each sub section
-            hpx::future<void> left = hpx::async(
-                &sort_thread<RandomIt, Compare>, first, c_last, comp);
-            hpx::future<void> right = hpx::async(
-                &sort_thread<RandomIt, Compare>, c_first, last, comp);
+            hpx::future<void> left =
+                executor_traits::async_execute(
+                    policy.executor(),
+                    hpx::util::bind(
+                        &sort_thread<ExPolicy, RandomIt, Compare>,
+                        policy, first, c_last, comp
+                    ));
+
+            hpx::future<void> right =
+                executor_traits::async_execute(
+                    policy.executor(),
+                    hpx::util::bind(
+                        &sort_thread<ExPolicy, RandomIt, Compare>,
+                        policy, c_first, last, comp
+                    ));
 
             return hpx::when_all(std::move(left), std::move(right));
         }
@@ -161,9 +180,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         /// @exception
         /// @return
         /// @remarks
-        template <typename RandomIt, typename Compare>
+        template <typename ExPolicy, typename RandomIt, typename Compare>
         hpx::future<void>
-        parallel_sort_async(RandomIt first, RandomIt last, Compare comp)
+        parallel_sort_async(ExPolicy policy, RandomIt first, RandomIt last,
+            Compare comp)
         {
             size_t N = last - first;
             HPX_ASSERT(N >= 0);
@@ -178,7 +198,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             if (detail::is_sorted_sequential(first, last, comp))
                 return hpx::make_ready_future();
 
-            return hpx::async(&sort_thread<RandomIt, Compare>, first, last, comp);
+            typedef typename ExPolicy::executor_type executor_type;
+            typedef typename hpx::parallel::executor_traits<executor_type>
+                executor_traits;
+
+            return executor_traits::async_execute(policy.executor(),
+                hpx::util::bind(
+                    &sort_thread<ExPolicy, RandomIt, Compare>,
+                    policy, first, last, comp
+                ));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -211,7 +239,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 // call the sort routine and return the right type,
                 // depending on execution policy
                 return util::detail::algorithm_result<ExPolicy>::get(
-                    parallel_sort_async(first, last,
+                    parallel_sort_async(policy, first, last,
                         compare_projected<Compare, Proj>(
                             std::forward<Compare>(comp),
                             std::forward<Proj>(proj)
