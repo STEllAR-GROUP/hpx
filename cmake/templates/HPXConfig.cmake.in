@@ -57,6 +57,10 @@ hpx_check_compiler_compatibility()
 hpx_check_boost_compatibility()
 hpx_setup_allocator()
 
+if(NOT DEFINED ${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+  set(${CMAKE_FIND_PACKAGE_NAME}_FOUND true)
+endif()
+
 if(${CMAKE_FIND_PACKAGE_NAME}_FOUND)
   set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "@CXX_FLAG@")
 endif()
