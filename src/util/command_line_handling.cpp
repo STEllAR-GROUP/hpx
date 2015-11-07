@@ -5,6 +5,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
+#include <hpx/version.hpp>
+#include <hpx/util/asio_util.hpp>
 #include <hpx/util/batch_environment.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/sed_transform.hpp>
@@ -17,7 +20,7 @@
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <boost/asio.hpp>
+#include <boost/asio/ip/host_name.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -182,6 +185,94 @@ namespace hpx { namespace util
             return num_localities;
         }
 
+        std::string handle_queueing(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm, std::string default_)
+        {
+            // command line options is used preferred
+            if (vm.count("hpx:queuing"))
+                return vm["hpx:queuing"].as<std::string>();
+
+            // use either cfgmap value or default
+            return cfgmap.get_value<std::string>("hpx.scheduler", default_);
+        }
+
+        std::string handle_affinity(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm, std::string default_)
+        {
+            // command line options is used preferred
+            if (vm.count("hpx:affinity"))
+                return vm["hpx:affinity"].as<std::string>();
+
+            // use either cfgmap value or default
+            return cfgmap.get_value<std::string>("hpx.affinity", default_);
+        }
+
+        std::string handle_affinity_bind(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm, std::string default_)
+        {
+            // command line options is used preferred
+            if (vm.count("hpx:bind"))
+            {
+                std::string affinity_desc;
+
+                std::vector<std::string> bind_affinity =
+                    vm["hpx:bind"].as<std::vector<std::string> >();
+                for (std::string const& s : bind_affinity)
+                {
+                    if (!affinity_desc.empty())
+                        affinity_desc += ";";
+                    affinity_desc += s;
+                }
+
+                return affinity_desc;
+            }
+
+            // use either cfgmap value or default
+            return cfgmap.get_value<std::string>("hpx.bind", default_);
+        }
+
+        std::size_t handle_pu_step(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm, std::size_t default_)
+        {
+            // command line options is used preferred
+            if (vm.count("hpx:pu-step"))
+                return vm["hpx:pu-step"].as<std::size_t>();
+
+            // use either cfgmap value or default
+            return cfgmap.get_value<std::size_t>("hpx.pu_step", default_);
+        }
+
+        std::size_t handle_pu_offset(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm, std::size_t default_)
+        {
+            // command line options is used preferred
+            if (vm.count("hpx:pu-offset"))
+                return vm["hpx:pu-offset"].as<std::size_t>();
+
+            // use either cfgmap value or default
+            return cfgmap.get_value<std::size_t>("hpx.pu_offset", default_);
+        }
+
+        std::size_t handle_numa_sensitive(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm, std::size_t default_)
+        {
+            if (vm.count("hpx:numa-sensitive") != 0)
+            {
+                std::size_t numa_sensitive =
+                    vm["hpx:numa-sensitive"].as<std::size_t>();
+                if (numa_sensitive > 2)
+                {
+                    throw hpx::detail::command_line_error("Invalid argument "
+                        "value for --hpx:numa-sensitive. Allowed values are "
+                        "0, 1, or 2");
+                }
+                return numa_sensitive;
+            }
+
+            // use either cfgmap value or default
+            return cfgmap.get_value<std::size_t>("hpx.numa_sensitive", default_);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         std::size_t handle_num_threads(util::manage_config& cfgmap,
             boost::program_options::variables_map& vm,
@@ -280,7 +371,8 @@ namespace hpx { namespace util
                     get_number_of_default_cores(env));
             }
 
-            std::size_t num_cores = cfgmap.get_value<std::size_t>("hpx.cores", num_threads);
+            std::size_t num_cores = cfgmap.get_value<std::size_t>("hpx.cores",
+                num_threads);
             if (vm.count("hpx:cores")) {
                 cores_str = vm["hpx:cores"].as<std::string>();
                 if ("all" == cores_str)
@@ -420,9 +512,25 @@ namespace hpx { namespace util
         std::string hpx_host =
             cfgmap.get_value<std::string>("hpx.parcel.address",
                 env.host_name(HPX_INITIAL_IP_ADDRESS));
+
+        // we expect dynamic connections if:
+        //  - --hpx:expect-connecting-localities or
+        //  - hpx.expect_connecting_localities=1 is given, or
+        //  - num_localities > 1
+        bool expect_connections =
+            cfgmap.get_value<int>("hpx.expect_connecting_localities",
+                num_localities_ > 1 ? 0 : 1) ? true : false;
+
+        if (vm.count("hpx:expect-connecting-localities"))
+            expect_connections = true;
+
+        ini_config += std::string("hpx.expect_connecting_localities=") +
+            (expect_connections ? "1" : "0");
+
         boost::uint16_t hpx_port =
             cfgmap.get_value<boost::uint16_t>("hpx.parcel.port",
-                num_localities_ == 1 ? 0 : HPX_INITIAL_IP_PORT);
+                (num_localities_ == 1 && !expect_connections) ?
+                    0 : HPX_INITIAL_IP_PORT);
 
         bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))
@@ -541,11 +649,29 @@ namespace hpx { namespace util
             hpx_host = hpx::util::resolve_public_ip_address();
         }
 
-        queuing_ = "local-priority";
-        if (vm.count("hpx:queuing"))
-            queuing_ = vm["hpx:queuing"].as<std::string>();
-
+        // handle setting related to schedulers
+        queuing_ = detail::handle_queueing(cfgmap, vm, "local-priority");
         ini_config += "hpx.scheduler=" + queuing_;
+
+        affinity_domain_ = detail::handle_affinity(cfgmap, vm, "pu");
+        ini_config += "hpx.affinity=" + affinity_domain_;
+
+        affinity_bind_ = detail::handle_affinity_bind(cfgmap, vm, "");
+        if (!affinity_bind_.empty())
+            ini_config += "hpx.bind!=" + affinity_bind_;
+
+        pu_step_ = detail::handle_pu_step(cfgmap, vm, 1);
+        ini_config += "hpx.pu_step=" +
+            hpx::util::safe_lexical_cast<std::string>(pu_step_);
+
+        pu_offset_ = detail::handle_pu_offset(cfgmap, vm, 0);
+        ini_config += "hpx.pu_offset=" +
+            hpx::util::safe_lexical_cast<std::string>(pu_offset_);
+
+        numa_sensitive_ = detail::handle_numa_sensitive(cfgmap, vm,
+            affinity_bind_.empty() ? 0 : 1);
+        ini_config += "hpx.numa_sensitive=" +
+            hpx::util::safe_lexical_cast<std::string>(numa_sensitive_);
 
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);
@@ -677,6 +803,46 @@ namespace hpx { namespace util
         //        scheduler, switch to the 'local' scheduler instead.
         ini_config += std::string("hpx.runtime_mode=") +
             get_runtime_mode_name(mode_);
+
+        bool noshutdown_evaluate = false;
+        if (vm.count("hpx:print-counter-at")) {
+            std::vector<std::string> print_counters_at =
+                vm["hpx:print-counter-at"].as<std::vector<std::string> >();
+
+            for (std::string const& s: print_counters_at)
+            {
+                if (0 == std::string("startup").find(s))
+                {
+                    ini_config += "hpx.print_counter.startup!=1";
+                    continue;
+                }
+                if (0 == std::string("shutdown").find(s))
+                {
+                    ini_config += "hpx.print_counter.shutdown!=1";
+                    continue;
+                }
+                if (0 == std::string("noshutdown").find(s))
+                {
+                    ini_config += "hpx.print_counter.shutdown!=0";
+                    noshutdown_evaluate = true;
+                    continue;
+                }
+
+                throw hpx::detail::command_line_error(boost::str(boost::format(
+                    "Invalid argument for option --hpx:print-counter-at: "
+                    "'%1%', allowed values: 'startup', 'shutdown' (default), "
+                    "'noshutdown'") % s));
+            }
+        }
+
+        // if any counters have to be evaluated, always print at the end
+        if (vm.count("hpx:print-counter"))
+        {
+            if (!noshutdown_evaluate)
+                ini_config += "hpx.print_counter.shutdown!=1";
+            if (vm.count("hpx:reset-counters"))
+                ini_config += "hpx.print_counter.reset!=1";
+        }
 
         if (debug_clp) {
             std::cerr << "Configuration before runtime start:\n";

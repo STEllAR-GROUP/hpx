@@ -12,8 +12,8 @@
 
 using hpx::components::stub_base;
 using hpx::components::client_base;
-using hpx::components::managed_component;
-using hpx::components::managed_component_base;
+using hpx::components::component;
+using hpx::components::component_base;
 
 using hpx::find_here;
 using hpx::async;
@@ -21,14 +21,14 @@ using hpx::async;
 using hpx::cout;
 using hpx::flush;
 
-struct hello_world_server : managed_component_base<hello_world_server>
+struct hello_world_server : component_base<hello_world_server>
 {
     void print() const { cout << "hello world\n" << flush; }
 
     HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action);
 };
 
-typedef managed_component<hello_world_server> server_type;
+typedef component<hello_world_server> server_type;
 HPX_REGISTER_COMPONENT(server_type, hello_world_server);
 
 typedef hello_world_server::print_action print_action;

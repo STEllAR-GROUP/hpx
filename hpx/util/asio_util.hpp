@@ -8,9 +8,10 @@
 #define HPX_UTIL_ASIOUTIL_MAY_16_2008_1212PM
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 
-#include <boost/fusion/include/vector.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/io_service.hpp>
 
 namespace hpx { namespace util
 {

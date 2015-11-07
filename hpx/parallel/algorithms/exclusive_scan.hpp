@@ -159,7 +159,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
     /// the value of
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, *first, ..., *(first + (i - result) - 1)).
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(binary_op, init, *first, ...,
+    /// *(first + (i - result) - 1)).
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicate \a op.
@@ -225,7 +226,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
-    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK), GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
+    ///         * op(GENERALIZED_NONCOMMUTATIVE_SUM(op, a1, ..., aK),
+    ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN))
     ///           where 1 < K+1 = M <= N.
     ///
     /// The difference between \a exclusive_scan and \a inclusive_scan is that
@@ -323,7 +325,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///
     /// \note   GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aN) is defined as:
     ///         * a1 when N is 1
-    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK) + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
+    ///         * GENERALIZED_NONCOMMUTATIVE_SUM(+, a1, ..., aK)
+    ///           + GENERALIZED_NONCOMMUTATIVE_SUM(+, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
     /// The difference between \a exclusive_scan and \a inclusive_scan is that

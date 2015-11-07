@@ -7,7 +7,7 @@
 #if !defined(HPX_UTIL_REINITIALIZABLE_STATIC_OCT_25_2012_1129AM)
 #define HPX_UTIL_REINITIALIZABLE_STATIC_OCT_25_2012_1129AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/static_reinit.hpp>
 
 #include <boost/noncopyable.hpp>

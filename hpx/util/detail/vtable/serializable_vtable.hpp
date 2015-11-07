@@ -9,7 +9,6 @@
 #define HPX_UTIL_DETAIL_VTABLE_SERIALIZABLE_VTABLE_HPP
 
 #include <hpx/config/forceinline.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
 namespace hpx { namespace util { namespace detail
@@ -31,21 +30,6 @@ namespace hpx { namespace util { namespace detail
             ar >> vtable::get<T>(v);
         }
         typedef void (*load_object_t)(void**, IArchive&, unsigned);
-
-        template <typename T>
-        static void wait_for_future(void** v)
-        {
-            traits::serialize_as_future<T>::call(vtable::get<T>(v));
-        }
-        typedef void (*wait_for_future_t)(void**);
-
-        template <typename T>
-        static bool has_to_wait_for_futures(void** v)
-        {
-            return traits::serialize_as_future<T>::value ||
-                traits::serialize_as_future<T>::call_if(vtable::get<T>(v));
-        }
-        typedef bool (*has_to_wait_for_futures_t)(void**);
     };
 }}}
 

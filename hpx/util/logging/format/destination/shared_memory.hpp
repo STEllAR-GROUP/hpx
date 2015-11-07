@@ -33,8 +33,10 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 namespace detail {
     struct shared_memory_context {
         shared_memory_context() : occupied_size(0), memory(0), mem_size(0) {
-            // note: we don't want to destroy this segment, since we want it to outlive our
-            // application. In the case of a problem, we need to have another program that will
+            // note: we don't want to destroy this segment, since we want
+            // it to outlive our
+            // application. In the case of a problem, we need to have
+            // another program that will
             // take a look at what we just logged.
         }
 
@@ -51,35 +53,44 @@ namespace detail {
 /**
     @brief Logs the information in shared memory
 */
-template<class convert_dest = do_convert_destination > struct shared_memory_t : non_const_context<detail::shared_memory_context> {
+template<class convert_dest = do_convert_destination >
+struct shared_memory_t : non_const_context<detail::shared_memory_context> {
 
     enum { just_in_case = 8192 };
-    shared_memory_t(const std::string & name, std::size_t mem_size = 2 * 1024 * 1024 * sizeof(char_type) ) : m_name(name), m_mem_size(mem_size) {
+    shared_memory_t(const std::string & name, std::size_t mem_size =
+        2 * 1024 * 1024 * sizeof(char_type) ) : m_name(name), m_mem_size(mem_size) {
         non_const_context_base::context().mem_size = mem_size;
 
         // this segment might have been previously created...
-        non_const_context_base::context().segment.open_or_create(name.c_str(), non_const_context_base::context().mem_size + just_in_case);
+        non_const_context_base::context().segment.open_or_create(name.c_str(),
+            non_const_context_base::context().mem_size + just_in_case);
 
         // the string
         { typedef std::pair<char_type*, std::size_t> pair;
-        pair res = non_const_context_base::context().segment.find<char_type>("shared_log_object");
+        pair res = non_const_context_base::context().segment.find<char_type>
+            ("shared_log_object");
         if ( !res.first)
             // we're creating it right now
-            non_const_context_base::context().segment.construct<char_type>("shared_log_object")[mem_size](0);
+            non_const_context_base::context().segment.construct<char_type>
+            ("shared_log_object")[mem_size](0);
 
-        res = non_const_context_base::context().segment.find<char_type>("shared_log_object");
+        res = non_const_context_base::context().segment.find<char_type>
+            ("shared_log_object");
         HPX_ASSERT( res.first); // should be created by now
         non_const_context_base::context().memory = res.first;
         }
 
         // the occupied size
         { typedef std::pair<long*, std::size_t> pair;
-        pair res = non_const_context_base::context().segment.find<long>("shared_occupied_size");
+        pair res = non_const_context_base::context().segment.find<long>
+            ("shared_occupied_size");
         if ( !res.first)
             // we're creating it right now
-            non_const_context_base::context().segment.construct<long>("shared_occupied_size")[1](0);
+            non_const_context_base::context().segment.construct<long>
+            ("shared_occupied_size")[1](0);
 
-        res = non_const_context_base::context().segment.find<long>("shared_occupied_size");
+        res = non_const_context_base::context().segment.find<long>
+            ("shared_occupied_size");
         HPX_ASSERT( res.first); // should be created by now
         non_const_context_base::context().occupied_size = res.first;
         }
@@ -88,9 +99,11 @@ template<class convert_dest = do_convert_destination > struct shared_memory_t : 
     template<class msg_type> void operator () (const msg_type& msg_arg) const {
         const string_type & msg = do_convert::do_convert(msg_arg, into<string_type>() );
 
-        bool can_fit = *(non_const_context_base::context().occupied_size) + msg.size() < non_const_context_base::context().mem_size;
+        bool can_fit = *(non_const_context_base::context().occupied_size)
+            + msg.size() < non_const_context_base::context().mem_size;
         if ( can_fit) {
-            std::copy(msg.begin(), msg.end(), non_const_context_base::context().memory + *non_const_context_base::context().occupied_size);
+            std::copy(msg.begin(), msg.end(), non_const_context_base::context().memory
+                + *non_const_context_base::context().occupied_size);
             *non_const_context_base::context().occupied_size += (long)msg.size();
         }
         else {
@@ -98,18 +111,26 @@ template<class convert_dest = do_convert_destination > struct shared_memory_t : 
             if ( msg.size() < non_const_context_base::context().mem_size) {
                 // move what was previously written, to the left, to make room
                 std::size_t keep = non_const_context_base::context().mem_size / 2;
-                if ( keep + msg.size() > non_const_context_base::context().mem_size) keep = non_const_context_base::context().mem_size - msg.size();
+                if ( keep + msg.size() > non_const_context_base::context().mem_size)
+                    keep = non_const_context_base::context().mem_size - msg.size();
                 std::copy_backward(
-                    non_const_context_base::context().memory + *non_const_context_base::context().occupied_size - keep,
-                    non_const_context_base::context().memory + *non_const_context_base::context().occupied_size,
+                    non_const_context_base::context().memory +
+                    *non_const_context_base::context().occupied_size - keep,
+                    non_const_context_base::context().memory +
+                    *non_const_context_base::context().occupied_size,
                     non_const_context_base::context().memory + keep);
-                std::copy( msg.begin(), msg.end(), non_const_context_base::context().memory + keep);
-                *non_const_context_base::context().occupied_size = (long)(keep + msg.size());
+                std::copy( msg.begin(), msg.end(),
+                    non_const_context_base::context().memory + keep);
+                *non_const_context_base::context().occupied_size =
+                    (long)(keep + msg.size());
             }
             else {
                 // message too big
-                std::copy(msg.begin(), msg.begin() + non_const_context_base::context().mem_size, non_const_context_base::context().memory);
-                *non_const_context_base::context().occupied_size = (long)non_const_context_base::context().mem_size;
+                std::copy(msg.begin(), msg.begin() +
+                    non_const_context_base::context().mem_size,
+                    non_const_context_base::context().memory);
+                *non_const_context_base::context().occupied_size =
+                    (long)non_const_context_base::context().mem_size;
             }
         }
     }

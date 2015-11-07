@@ -35,7 +35,8 @@ template<class gather_msg , class write_msg > struct logger ;
 
 namespace formatter {
     /**
-    @brief what is the default type of your string, in formatter_base ? See HPX_LOG_FORMAT_MSG
+    @brief what is the default type of your string,
+         in formatter_base ? See HPX_LOG_FORMAT_MSG
     */
     template<class T = override> struct msg_type {
         typedef hold_string_type type;
@@ -44,7 +45,8 @@ namespace formatter {
 
 namespace destination {
     /**
-    @brief what is the default type of your string, in destination_base ? See HPX_LOG_DESTINATION_MSG
+    @brief what is the default type of your string,
+    in destination_base ? See HPX_LOG_DESTINATION_MSG
     */
     template<class T = override> struct msg_type {
         // by default  - the default string
@@ -55,7 +57,9 @@ namespace destination {
 namespace gather {
     template<class T = override> struct find {
         template<class msg_type> struct from_msg_type {
-            typedef typename ::hpx::util::logging::detail::find_gather< std::basic_ostringstream<char_type>, msg_type >::type type;
+            typedef typename ::hpx::util::logging::detail
+                ::find_gather< std::basic_ostringstream<char_type>,
+                  msg_type >::type type;
         };
     };
 }

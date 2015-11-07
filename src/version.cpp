@@ -9,8 +9,12 @@
 #include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
+// Intel MPI does not like to be included after stdio.h. As such, we include mpi.h
+// as soon as possible.
 #include <mpi.h>
 #endif
+
+#include <hpx/version.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
@@ -86,7 +90,11 @@ namespace hpx
         strm << "Unknown MPI";
 #endif
         // add general MPI version
+#if defined(MPI_VERSION) && defined(MPI_SUBVERSION)
         strm << ", MPI V" << MPI_VERSION << "." << MPI_SUBVERSION;
+#else
+        strm << ", unknown MPI version";
+#endif
         return strm.str();
     }
 #endif
@@ -95,11 +103,13 @@ namespace hpx
     {
         char const* const copyright =
             "HPX - High Performance ParalleX\n"
-            "A general purpose parallel C++ runtime system for distributed applications\n"
+            "A general purpose parallel C++ runtime system for\
+             distributed applications\n"
             "of any scale.\n\n"
             "Copyright (c) 2007-2015, The STE||AR Group,\n"
             "http://stellar-group.org, email:hpx-users@stellar.cct.lsu.edu\n\n"
-            "Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
+            "Distributed under the Boost Software License, \
+             Version 1.0. (See accompanying\n"
             "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n";
         return copyright;
     }

@@ -50,7 +50,8 @@ namespace atomic {
 // instructions.  So, if we're compiling in "Thumb 1" mode, we need to wrap all of our
 // asm blocks with code to temporarily change to ARM mode.
 //
-// You can only change between ARM and Thumb modes when branching using the bx instruction.
+// You can only change between ARM and Thumb modes when
+//    branching using the bx instruction.
 // bx takes an address specified in a register.  The least significant bit of the address
 // indicates the mode, so 1 is added to indicate that the destination code is Thumb.
 // A temporary register is needed for the address and is passed as an argument to these
@@ -58,16 +59,20 @@ namespace atomic {
 // usng the "l" attribute in the asm statement.
 //
 // Architecture v7 introduces "Thumb 2", which does include (almost?) all of the ARM
-// instruction set.  So in v7 we don't need to change to ARM mode; we can write "universal
+// instruction set.  So in v7 we don't need to change to ARM mode;
+//    we can write "universal
 // assembler" which will assemble to Thumb 2 or ARM code as appropriate.  The only thing
-// we need to do to make this "universal" assembler mode work is to insert "IT" instructions
+// we need to do to make this "universal"
+//    assembler mode work is to insert "IT" instructions
 // to annotate the conditional instructions.  These are ignored in other modes (e.g. v6),
 // so they can always be present.
 
 #if defined(__thumb__) && !defined(__ARM_ARCH_7A__)
 // FIXME also other v7 variants.
-#define BOOST_ATOMIC_ARM_ASM_START(TMPREG) "adr " #TMPREG ", 1f\n" "bx " #TMPREG "\n" ".arm\n" ".align 4\n" "1: "
-#define BOOST_ATOMIC_ARM_ASM_END(TMPREG)   "adr " #TMPREG ", 1f + 1\n" "bx " #TMPREG "\n" ".thumb\n" ".align 2\n" "1: "
+#define BOOST_ATOMIC_ARM_ASM_START(TMPREG) \
+  "adr " #TMPREG ", 1f\n" "bx " #TMPREG "\n" ".arm\n" ".align 4\n" "1: "
+#define BOOST_ATOMIC_ARM_ASM_END(TMPREG) \
+  "adr " #TMPREG ", 1f + 1\n" "bx " #TMPREG "\n" ".thumb\n" ".align 2\n" "1: "
 
 #else
 // The tmpreg is wasted in this case, which is non-optimal.
@@ -83,7 +88,8 @@ namespace atomic {
 #define BOOST_ATOMIC_ARM_DMB "mcr\tp15, 0, r0, c7, c10, 5\n"
 #endif
 
-// There is also a "Data Synchronisation Barrier" DSB; this exists in v6 as another co-processor
+// There is also a "Data Synchronisation Barrier" DSB;
+//    this exists in v6 as another co-processor
 // instruction like the above.
 
 
@@ -259,7 +265,8 @@ private:
 
 
 template<typename T>
-class platform_atomic_integral<T, 4> : public build_atomic_from_typical<build_exchange<atomic_arm_4<T> > > {
+class platform_atomic_integral<T, 4>
+    : public build_atomic_from_typical<build_exchange<atomic_arm_4<T> > > {
 public:
     typedef build_atomic_from_typical<build_exchange<atomic_arm_4<T> > > super;
     explicit platform_atomic_integral(T v) : super(v) {}
@@ -267,7 +274,8 @@ public:
 };
 
 template<typename T>
-class platform_atomic_integral<T, 1>: public build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> {
+class platform_atomic_integral<T, 1>
+    : public build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> super;
 
@@ -276,7 +284,8 @@ public:
 };
 
 template<typename T>
-class platform_atomic_integral<T, 2>: public build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> {
+class platform_atomic_integral<T, 2>
+    : public build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> super;
 

@@ -8,15 +8,20 @@
 #if !defined(HPX_APPLIER_APPLIER_JUN_03_2008_0438PM)
 #define HPX_APPLIER_APPLIER_JUN_03_2008_0438PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/runtime/agas_fwd.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <boost/noncopyable.hpp>
+#include <boost/cstdint.hpp>
 
-#include <sstream>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -43,7 +48,7 @@ namespace hpx { namespace applier
         ///
         /// This function returns a reference to the resolver client this
         /// applier instance has been created with.
-        naming::resolver_client& get_agas_client();
+        agas::addressing_service& get_agas_client();
 
         /// \brief Access the \a parcelhandler instance associated with this
         ///        \a applier
@@ -154,7 +159,7 @@ namespace hpx { namespace applier
         }
 
         /// Schedule  threads based on the given parcel
-        void schedule_action(parcelset::parcel const& p);
+        void schedule_action(parcelset::parcel p, std::size_t num_thread = -1);
 
 #if defined(HPX_HAVE_SECURITY)
         void enable_verify_capabilities()

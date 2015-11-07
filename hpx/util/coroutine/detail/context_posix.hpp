@@ -45,11 +45,13 @@
 
 #include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/config.hpp>
 #include <boost/atomic.hpp>
 
-#if defined(__FreeBSD__) || (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) && _XOPEN_VERSION >= 500)
+#if defined(__FreeBSD__) || (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) \
+            && _XOPEN_VERSION >= 500)
 
 // OS X 10.4 -- despite passing the test above -- doesn't support
 // swapcontext() et al. Use GNU Pth workalike functions.
@@ -210,7 +212,8 @@ namespace hpx { namespace util { namespace coroutines {
          */
         template<typename Functor>
         explicit ucontext_context_impl(Functor & cb, std::ptrdiff_t stack_size)
-          : m_stack_size(stack_size == -1 ? (std::ptrdiff_t)default_stack_size : stack_size),
+          : m_stack_size(stack_size == -1 ? (std::ptrdiff_t)default_stack_size
+              : stack_size),
             m_stack(alloc_stack(m_stack_size)),
             cb_(&cb)
         {
@@ -248,7 +251,8 @@ namespace hpx { namespace util { namespace coroutines {
         void rebind_stack()
         {
           if (m_stack) {
-            // just reset the context stack pointer to its initial value at the stack start
+            // just reset the context stack pointer to its initial value at
+            // the stack start
             increment_stack_recycle_count();
             int error = HPX_COROUTINE_MAKE_CONTEXT(
                 &m_ctx, m_stack, m_stack_size, funp_, cb_, NULL);

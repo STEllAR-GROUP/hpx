@@ -162,6 +162,7 @@ void disabled_interruption_point_thread(hpx::lcos::local::spinlock* m,
     hpx::lcos::local::barrier* b, bool* failed)
 {
     hpx::this_thread::disable_interruption dc;
+    b->wait();
     try {
         boost::lock_guard<hpx::lcos::local::spinlock> lk(*m);
         hpx::this_thread::interruption_point();
@@ -178,23 +179,36 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 {
     hpx::lcos::local::spinlock m;
     hpx::lcos::local::barrier b(2);
+    bool caught = false;
     bool failed = true;
-    boost::unique_lock<hpx::lcos::local::spinlock> lk(m);
     hpx::thread thrd(&disabled_interruption_point_thread, &m, &b, &failed);
-    thrd.interrupt();
-    lk.unlock();
+    b.wait();       // Make sure the test thread has been started and marked itself
+                    // to disable interrupts.
+    try {
+        boost::unique_lock<hpx::lcos::local::spinlock> lk(m);
+        hpx::util::ignore_while_checking<
+            boost::unique_lock<hpx::lcos::local::spinlock> > il(&lk);
+        thrd.interrupt();
+    }
+    catch(hpx::exception& e) {
+        HPX_TEST(e.get_error() == hpx::thread_not_interruptable);
+        caught = true;
+    }
 
     b.wait();       // Make sure the test thread has been executed, as join is
                     // a interruption point which might get triggered.
 
     thrd.join();
     HPX_TEST(!failed);
+    HPX_TEST(caught);
 }
 
 void test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 {
-    set_description("test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point");
-    timed_test(&do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point, 1);
+    set_description("test_thread_no_interrupt_if_interrupts_disabled_at\
+                    _interruption_point");
+    timed_test
+        (&do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point,1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -31,3 +31,8 @@ HPX_REGISTER_ACTION_ID(
     primary_namespace::bulk_service_action,
     primary_namespace_bulk_service_action,
     hpx::actions::primary_namespace_bulk_service_action_id)
+
+HPX_REGISTER_ACTION_ID(
+    primary_namespace::route_action,
+    primary_namespace_route_action,
+    hpx::actions::primary_namespace_route_action_id)

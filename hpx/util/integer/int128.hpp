@@ -6,11 +6,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef INT128_HPP
-#define INT128_HPP
+#ifndef HPX_UTIL_INTEGER_INT128_HPP
+#define HPX_UTIL_INTEGER_INT128_HPP
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/config/export_definitions.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <exception>
 #include <cstdlib>

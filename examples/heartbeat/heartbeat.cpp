@@ -15,7 +15,8 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/state.hpp>
 
-#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
 
@@ -25,9 +26,9 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-void stop_monitor(hpx::promise<void> p)
+void stop_monitor(boost::shared_ptr<hpx::promise<void> > p)
 {
-    p.set_value();      // Kill the monitor.
+    p->set_value();      // Kill the monitor.
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,11 +57,14 @@ int monitor(double runfor, std::string const& name, boost::uint64_t pause)
         return 1;
     }
 
-    hpx::promise<void> stop_flag;
-    hpx::register_shutdown_function(boost::bind(&stop_monitor, stop_flag));
+    boost::shared_ptr<hpx::promise<void> > stop_flag =
+        boost::make_shared<hpx::promise<void> >();
+    hpx::future<void> f = stop_flag->get_future();
+
+    hpx::register_shutdown_function(
+        hpx::util::bind(&stop_monitor, stop_flag));
 
     boost::int64_t zero_time = 0;
-    hpx::future<void> f = stop_flag.get_future();
 
     hpx::util::high_resolution_timer t;
     while (runfor < 0 || t.elapsed() < runfor)
@@ -138,6 +142,7 @@ int main(int argc, char* argv[])
     cfg.push_back("hpx.run_hpx_main!=1");
 
     hpx::util::function_nonser<void()> const empty;
-    return hpx::init(desc_commandline, argc, argv, cfg, empty, empty, hpx::runtime_mode_connect);
+    return hpx::init(desc_commandline, argc, argv, cfg, empty,
+        empty, hpx::runtime_mode_connect);
 }
 

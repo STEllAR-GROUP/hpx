@@ -139,7 +139,8 @@ namespace hpx { namespace util { namespace coroutines
 
     template <typename Functor>
     coroutine (Functor && f, naming::id_type && target,
-            thread_id_repr_type id = 0, std::ptrdiff_t stack_size = detail::default_stack_size)
+            thread_id_repr_type id = 0, std::ptrdiff_t stack_size =
+               detail::default_stack_size)
       : m_pimpl(impl_type::create(std::forward<Functor>(f),
             std::move(target), id, stack_size))
     {

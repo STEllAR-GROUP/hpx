@@ -40,7 +40,8 @@ int main()
 
     // compile error even when using full namespace
     future_type f2 = dataflow( functor , f1 , f1 );
-    future_type f3 = hpx::lcos::local::dataflow( hpx::util::unwrapped(mul<double>( 2.0 )) , f1 , f1 );
+    future_type f3 = hpx::lcos::local::dataflow(
+        hpx::util::unwrapped(mul<double>( 2.0 )) , f1 , f1 );
 
     hpx::wait_all(f1, f2, f3);
 

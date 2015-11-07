@@ -20,12 +20,13 @@ dependencies:
         - docker pull ${IMAGE_NAME}
         - mkdir build
     override:
-        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} cmake .. -DCMAKE_BUILD_TYPE=Debug -DHPX_WITH_MALLOC=system -DHPX_WITH_TOOLS=On -DCMAKE_CXX_FLAGS="-fcolor-diagnostics"
+        - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} cmake .. -DCMAKE_BUILD_TYPE=Debug -DHPX_WITH_MALLOC=system -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} -DHPX_WITH_TOOLS=On -DCMAKE_CXX_FLAGS="-fcolor-diagnostics"
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 core
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k components
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k examples
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.unit
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.regressions
+        #- docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.headers
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tests.performance
         - docker run -v $PWD:/hpx -w /hpx/build ${IMAGE_NAME} make -j2 -k tools.inspect
         # TODO replace this line with "docker build" once docker managed to
@@ -50,6 +51,7 @@ test:
         - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hello_world --hpx:bind=none
         - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hpxcxx --exe=hello_world_test_build ../examples/quickstart/hello_world.cpp -g -lhpx_iostreamsd
         - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} ./hello_world_test_build --hpx:bind=none
+        - docker run -v $PWD:/hpx -w /hpx/build ${TARGET_IMAGE_NAME} hpxrun.py -l 2 -t 2 ./hello_world_test_build -- --hpx:bind=none
 
 deployment:
     hub:

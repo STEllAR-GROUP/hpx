@@ -6,15 +6,16 @@
 #ifndef HPX_SERIALIZATION_MAP_HPP
 #define HPX_SERIALIZATION_MAP_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/runtime/serialization/input_archive.hpp>
+#include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
+
 #include <map>
 
 #include <boost/mpl/and.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/add_reference.hpp>
-
-#include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
 
 namespace hpx
 {
@@ -33,7 +34,8 @@ namespace hpx
         namespace detail
         {
             template <class Key, class Value>
-            void load_pair_impl(input_archive& ar, std::pair<Key, Value>& t, boost::mpl::false_)
+            void load_pair_impl(input_archive& ar, std::pair<Key, Value>& t,
+                boost::mpl::false_)
             {
                 ar >> const_cast<
                     typename boost::add_reference<
@@ -43,25 +45,28 @@ namespace hpx
             }
 
             template <class Key, class Value>
-            void load_pair_impl(input_archive& ar, std::pair<Key, Value>& t, boost::mpl::true_)
+            void load_pair_impl(input_archive& ar, std::pair<Key, Value>& t,
+                boost::mpl::true_)
             {
-                if (!has_array_optimization(ar))
+                if (ar.disable_array_optimization())
                     load_pair_impl(ar, t, boost::mpl::false_());
                 else
                     load_binary(ar, &t, sizeof(std::pair<Key, Value>));
             }
 
             template <class Key, class Value>
-            void save_pair_impl(output_archive& ar, std::pair<Key, Value>& t, boost::mpl::false_)
+            void save_pair_impl(output_archive& ar, const std::pair<Key, Value>& t,
+                boost::mpl::false_)
             {
                 ar << t.first;
                 ar << t.second;
             }
 
             template <class Key, class Value>
-            void save_pair_impl(output_archive& ar, std::pair<Key, Value>& t, boost::mpl::true_)
+            void save_pair_impl(output_archive& ar, const std::pair<Key, Value>& t,
+                boost::mpl::true_)
             {
-                if (!has_array_optimization(ar))
+                if (ar.disable_array_optimization())
                     save_pair_impl(ar, t, boost::mpl::false_());
                 else
                     save_binary(ar, &t, sizeof(std::pair<Key, Value>));
@@ -79,7 +84,7 @@ namespace hpx
         }
 
         template <class Key, class Value>
-        void serialize(output_archive& ar, std::pair<Key, Value>& t, unsigned)
+        void serialize(output_archive& ar, const std::pair<Key, Value>& t, unsigned)
         {
             typedef std::pair<Key, Value> pair_type;
             typedef typename traits::is_bitwise_serializable<pair_type> optimized;
@@ -104,12 +109,13 @@ namespace hpx
         }
 
         template <class Key, class Value, class Comp, class Alloc>
-        void serialize(output_archive& ar, std::map<Key, Value, Comp, Alloc>& t, unsigned)
+        void serialize(output_archive& ar,
+            const std::map<Key, Value, Comp, Alloc>& t, unsigned)
         {
             typedef typename std::map<Key, Value, Comp, Alloc>::value_type value_type;
 
             ar << t.size(); //-V128
-            for(value_type& val : t)
+            for(const value_type& val : t)
             {
                 ar << val;
             }

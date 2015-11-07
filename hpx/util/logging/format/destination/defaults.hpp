@@ -33,7 +33,8 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 /**
     @brief Writes the string to console
 */
-template<class convert_dest = do_convert_destination > struct cout_t : is_generic, hpx::util::logging::op_equal::always_equal {
+template<class convert_dest = do_convert_destination > struct cout_t : is_generic,
+hpx::util::logging::op_equal::always_equal {
 
     template<class msg_type> void operator()(const msg_type & msg) const {
 #ifndef HPX_LOG_USE_WCHAR_T
@@ -48,7 +49,8 @@ template<class convert_dest = do_convert_destination > struct cout_t : is_generi
 /**
     @brief Writes the string to cerr
 */
-template<class convert_dest = do_convert_destination > struct cerr_t : is_generic, hpx::util::logging::op_equal::always_equal {
+template<class convert_dest = do_convert_destination > struct cerr_t : is_generic,
+hpx::util::logging::op_equal::always_equal {
 
     template<class msg_type> void operator()(const msg_type & msg) const {
 #ifndef HPX_LOG_USE_WCHAR_T
@@ -65,9 +67,11 @@ template<class convert_dest = do_convert_destination > struct cerr_t : is_generi
     @brief writes to stream.
 
     @note:
-    The stream must outlive this object! Or, clear() the stream, before the stream is deleted.
+    The stream must outlive this object! Or, clear() the stream,
+    before the stream is deleted.
 */
-template<class convert_dest = do_convert_destination > struct stream_t : is_generic, non_const_context< std::basic_ostream<hpx::util::logging::char_type> * > {
+template<class convert_dest = do_convert_destination > struct stream_t : is_generic,
+non_const_context< std::basic_ostream<hpx::util::logging::char_type> * > {
     typedef std::basic_ostream<char_type> stream_type;
     typedef non_const_context< stream_type* > non_const_context_base;
 
@@ -82,7 +86,8 @@ template<class convert_dest = do_convert_destination > struct stream_t : is_gene
     }
 
     bool operator==(const stream_t & other) const {
-        return non_const_context_base::context() != other.non_const_context_base::context();
+        return non_const_context_base::context() !=
+            other.non_const_context_base::context();
     }
 
     /**
@@ -104,7 +109,8 @@ template<class convert_dest = do_convert_destination > struct stream_t : is_gene
 
     For non-Windows systems, this is the console.
 */
-template<class convert_dest = do_convert_destination > struct dbg_window_t : is_generic, hpx::util::logging::op_equal::always_equal {
+template<class convert_dest = do_convert_destination > struct dbg_window_t : is_generic,
+hpx::util::logging::op_equal::always_equal {
 
     template<class msg_type> void operator()(const msg_type & msg) const {
 #ifdef BOOST_WINDOWS

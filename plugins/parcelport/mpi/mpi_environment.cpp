@@ -69,7 +69,7 @@ namespace hpx { namespace util
     bool mpi_environment::enabled_ = false;
     bool mpi_environment::has_called_init_ = false;
     int mpi_environment::provided_threading_flag_ = MPI_THREAD_SINGLE;
-    MPI_Comm mpi_environment::communicator_;
+    MPI_Comm mpi_environment::communicator_ = MPI_COMM_NULL;
 
     void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
@@ -258,7 +258,7 @@ namespace hpx { namespace util
     }
 
     mpi_environment::scoped_try_lock::scoped_try_lock()
-      : locked(false)
+      : locked(true)
     {
         if(!multi_threaded())
         {

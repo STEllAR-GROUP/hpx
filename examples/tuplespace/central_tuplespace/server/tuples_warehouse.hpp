@@ -7,7 +7,7 @@
 #define HPX_SERVER_TUPLES_WAREHOUSE_MAY_04_2013_0801PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/storage/tuple.hpp>
@@ -72,7 +72,8 @@ namespace examples { namespace server
 
                 if(tp.empty())
                 {
-                    return read_random_tuple(); // return random results for an empty tuple
+                    return read_random_tuple();
+                    // return random results for an empty tuple
                 }
 
                 matched_indices_type matched_indices;
@@ -94,7 +95,8 @@ namespace examples { namespace server
 
                 if(tp.empty())
                 {
-                    return take_random_tuple(); // return random results for an empty tuple
+                    return take_random_tuple();
+                    // return random results for an empty tuple
                 }
 
                 matched_indices_type matched_indices;
@@ -126,13 +128,17 @@ namespace examples { namespace server
                         continue; // will match any record
                     }
 
-                    typedef std::pair<tuple_field_container::field_index_map_const_iterator_type,
-                        tuple_field_container::field_index_map_const_iterator_type> equal_range_type;
+                    typedef std::pair<tuple_field_container
+                        ::field_index_map_const_iterator_type,
+                        tuple_field_container::field_index_map_const_iterator_type>
+                        equal_range_type;
                     typedef const std::pair<elem_type, index_type> pair_type;
 
-                    equal_range_type found_range = tuple_fields_[pos].field_index_map_.equal_range(*it);
+                    equal_range_type found_range =
+                        tuple_fields_[pos].field_index_map_.equal_range(*it);
 
-                    if(found_range.first == tuple_fields_[pos].field_index_map_.end()) // no match
+                    if(found_range.first == tuple_fields_[pos].field_index_map_.end())
+                    // no match
                     {
                         return empty_set; // empty
                     }
@@ -258,17 +264,23 @@ namespace examples { namespace server
             struct tuple_field_container
             {
 
-                typedef examples::server::tuples_warehouse::hash_elem_functor hash_elem_functor;
+                typedef examples::server
+                    ::tuples_warehouse::hash_elem_functor hash_elem_functor;
                 typedef examples::server::tuples_warehouse::elem_type elem_type;
                 typedef examples::server::tuples_warehouse::index_type index_type;
 
-                typedef boost::unordered_multimap<elem_type, index_type, hash_elem_functor> field_index_map_type;
-                typedef field_index_map_type::iterator field_index_map_iterator_type;
-                typedef field_index_map_type::const_iterator field_index_map_const_iterator_type;
+                typedef boost::unordered_multimap<elem_type,
+                    index_type, hash_elem_functor> field_index_map_type;
+                typedef field_index_map_type::iterator
+                    field_index_map_iterator_type;
+                typedef field_index_map_type::const_iterator
+                    field_index_map_const_iterator_type;
 
-                typedef std::map<index_type, field_index_map_iterator_type> index_field_map_type;
+                typedef std::map<index_type,
+                    field_index_map_iterator_type> index_field_map_type;
                 typedef index_field_map_type::iterator index_field_map_iterator_type;
-                typedef index_field_map_type::const_iterator index_field_map_const_iterator_type;
+                typedef index_field_map_type::const_iterator
+                    index_field_map_const_iterator_type;
 
                 field_index_map_type field_index_map_;
                 index_field_map_type index_field_map_;

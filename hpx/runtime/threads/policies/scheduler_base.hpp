@@ -11,8 +11,14 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/assert.hpp>
+#if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
+#include <hpx/util/coroutine/detail/tss.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+#endif
 
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
@@ -55,19 +61,25 @@ namespace hpx { namespace threads { namespace policies
     /// scheduler policies
     struct scheduler_base : boost::noncopyable
     {
-        scheduler_base(std::size_t num_threads)
+        scheduler_base(std::size_t num_threads,
+                char const* description = "",
+                scheduler_mode mode = nothing_special)
           : topology_(get_topology())
           , affinity_data_(num_threads)
+          , mode_(mode)
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
 #endif
+          , description_(description)
         {
             states_.resize(num_threads);
             for (std::size_t i = 0; i != num_threads; ++i)
                 states_[i].store(state_initialized);
         }
 
-        virtual ~scheduler_base() {}
+        virtual ~scheduler_base()
+        {
+        }
 
         threads::mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const
@@ -195,6 +207,17 @@ namespace hpx { namespace threads { namespace policies
             return result;
         }
 
+        // get/set scheduler mode
+        scheduler_mode get_scheduler_mode() const
+        {
+            return mode_.load(boost::memory_order_acquire);
+        }
+
+        void set_scheduler_mode(scheduler_mode mode)
+        {
+            mode_.store(mode);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         virtual bool numa_sensitive() const { return false; }
 
@@ -237,16 +260,16 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread) = 0;
 
         virtual bool get_next_thread(std::size_t num_thread,
-            boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd) = 0;
+            boost::int64_t& idle_loop_count, threads::thread_data*& thrd) = 0;
 
-        virtual void schedule_thread(threads::thread_data_base* thrd,
+        virtual void schedule_thread(threads::thread_data* thrd,
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal) = 0;
-        virtual void schedule_thread_last(threads::thread_data_base* thrd,
+        virtual void schedule_thread_last(threads::thread_data* thrd,
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal) = 0;
 
-        virtual bool destroy_thread(threads::thread_data_base* thrd,
+        virtual bool destroy_thread(threads::thread_data* thrd,
             boost::int64_t& busy_count) = 0;
 
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
@@ -268,9 +291,12 @@ namespace hpx { namespace threads { namespace policies
             boost::atomic<hpx::state>& global_state)
         {}
 
+        virtual void reset_thread_distribution() {}
+
     protected:
         topology const& topology_;
         detail::affinity_data affinity_data_;
+        boost::atomic<scheduler_mode> mode_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
@@ -280,6 +306,66 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
         boost::ptr_vector<boost::atomic<hpx::state> > states_;
+        char const* description_;
+
+#if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
+    public:
+        util::coroutines::detail::tss_data_node* find_tss_data(void const* key)
+        {
+            if (!thread_data_)
+                return 0;
+            return thread_data_->find(key);
+        }
+
+        void add_new_tss_node(void const* key,
+            boost::shared_ptr<util::coroutines::detail::tss_cleanup_function>
+                const& func, void* tss_data)
+        {
+            if (!thread_data_)
+            {
+                thread_data_ =
+                    boost::make_shared<util::coroutines::detail::tss_storage>();
+            }
+            thread_data_->insert(key, func, tss_data);
+        }
+
+        void erase_tss_node(void const* key, bool cleanup_existing)
+        {
+            if (thread_data_)
+                thread_data_->erase(key, cleanup_existing);
+        }
+
+        void* get_tss_data(void const* key)
+        {
+            if (util::coroutines::detail::tss_data_node* const current_node =
+                    find_tss_data(key))
+            {
+                return current_node->get_value();
+            }
+            return 0;
+        }
+
+        void set_tss_data(void const* key,
+            boost::shared_ptr<util::coroutines::detail::tss_cleanup_function>
+                const& func, void* tss_data, bool cleanup_existing)
+        {
+            if (util::coroutines::detail::tss_data_node* const current_node =
+                    find_tss_data(key))
+            {
+                if (func || (tss_data != 0))
+                    current_node->reinit(func, tss_data, cleanup_existing);
+                else
+                    erase_tss_node(key, cleanup_existing);
+            }
+            else if(func || (tss_data != 0))
+            {
+                add_new_tss_node(key, func, tss_data);
+            }
+        }
+
+    protected:
+        boost::shared_ptr<util::coroutines::detail::tss_storage> thread_data_;
+#endif
     };
 }}}
 

@@ -33,14 +33,17 @@ namespace hpx { namespace util { namespace logging {
     struct override {};
 
     struct default_ {};
-    template<class param, class default_type> struct use_default                    { typedef param type; };
-    template<class default_type> struct use_default<default_, default_type>         { typedef default_type type; };
+    template<class param, class default_type> struct use_default
+    { typedef param type; };
+    template<class default_type> struct use_default<default_, default_type>
+    { typedef default_type type; };
 
     struct void_ {};
 
 
     namespace detail {
-        /** this is just a simple way to always return override; however, in this case we postpone the instantiation
+        /** this is just a simple way to always return override; however,
+        in this case we postpone the instantiation
          until our template parameter is known
 
 
@@ -49,7 +52,8 @@ namespace hpx { namespace util { namespace logging {
         typedef typename formatter::msg_type<override>::type msg_type;
         @endcode
 
-        would compute msg_type right now; however, we want the compiler to wait, until the user has actually set the msg_type,
+        would compute msg_type right now; however, we want the compiler to wait,
+        until the user has actually set the msg_type,
         for example, using the HPX_LOG_FORMAT_MSG macro. Thus, we do:
 
         @code

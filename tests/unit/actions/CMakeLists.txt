@@ -59,33 +59,24 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
 
     source_group("Source Files" FILES ${sources})
 
-    if(MSVC)
-      # add dummy library for MSVC to generate a project in VS
-      add_hpx_library(${compile_test}_compile_test
-                      SOURCES ${sources}
-                      EXCLUDE_FROM_ALL
-                      FOLDER "Tests/Unit/Actions/CompileOnly")
+    add_hpx_unit_compile_test(
+      "actions"
+      ${compile_test}
+      SOURCES ${sources}
+      ${${compile_test}_FLAGS}
+      FOLDER "Tests/Unit/Actions/CompileOnly")
 
-      # add a custom target for this example
-      add_hpx_pseudo_target(tests.unit.actions.${compile_test})
+    # add a custom target for this example
+    add_hpx_pseudo_target(tests.unit.actions.${compile_test})
 
-      # make pseudo-targets depend on master pseudo-target
-      add_hpx_pseudo_dependencies(tests.unit.actions
-                                  tests.unit.actions.${compile_test})
+    # make pseudo-targets depend on master pseudo-target
+    add_hpx_pseudo_dependencies(tests.unit.actions
+                                tests.unit.actions.${compile_test})
 
-      # add dependencies to pseudo-target
-      add_hpx_pseudo_dependencies(tests.unit.actions.${compile_test}
-                                  ${compile_test}_compile_test_lib)
+    # add dependencies to pseudo-target
+    add_hpx_pseudo_dependencies(tests.unit.actions.${compile_test}
+                                "tests.unit.actions.${compile_test}")
 
-    else()
-      add_hpx_unit_compile_test(
-        "actions"
-        ${compile_test}
-        SOURCES ${sources}
-        ${${compile_test}_FLAGS}
-        FOLDER "Tests/Unit/Actions/CompileOnly")
-      # there is no way to make this test depend on one of our pseudo targets
-    endif()
   endforeach()
 endif()
 

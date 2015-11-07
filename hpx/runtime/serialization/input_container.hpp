@@ -7,6 +7,7 @@
 #ifndef HPX_SERIALIZATION_INPUT_CONTAINER_HPP
 #define HPX_SERIALIZATION_INPUT_CONTAINER_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/serialization/container.hpp>
@@ -106,7 +107,8 @@ namespace hpx { namespace serialization
                     current_chunk_size_ += count;
                     // make sure we switch to the next serialization_chunk if necessary
                     std::size_t current_chunk_size = get_chunk_size(current_chunk_);
-                    if (current_chunk_size != 0 && current_chunk_size_ >= current_chunk_size)
+                    if (current_chunk_size != 0 && current_chunk_size_ >=
+                        current_chunk_size)
                     {
                         // raise an error if we read past the serialization_chunk
                         if (current_chunk_size_ > current_chunk_size)
@@ -127,7 +129,8 @@ namespace hpx { namespace serialization
         {
             HPX_ASSERT((boost::int64_t)count >= 0);
 
-            if (filter_.get() || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
+            if (filter_.get() || chunks_ == 0 ||
+                count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
                 // fall back to serialization_chunk-less archive
                 this->input_container::load_binary(address, count);
             }
@@ -143,7 +146,8 @@ namespace hpx { namespace serialization
                     return;
                 }
 
-                // unfortunately we can't implement a zero copy policy on the receiving end
+                // unfortunately we can't implement a zero copy policy on
+                // the receiving end
                 // as the memory was already allocated by the serialization code
                 std::memcpy(address, get_chunk_data(current_chunk_).pos_, count);
                 ++current_chunk_;

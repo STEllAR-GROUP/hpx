@@ -26,6 +26,13 @@ namespace hpx { namespace detail
     bool apply_colocated_cb(naming::id_type const& gid, Callback&& cb,
         Ts&&... vs)
     {
+        // shortcut co-location code if target already is a locality
+        if (naming::is_locality(gid))
+        {
+            return apply_cb<Action>(gid, std::forward<Callback>(cb),
+                std::forward<Ts>(vs)...);
+        }
+
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
         agas::request req(agas::primary_ns_resolve_gid, gid.get_gid());
@@ -55,10 +62,18 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Callback, typename ...Ts>
-    bool apply_colocated_cb(hpx::actions::continuation_type const& cont,
+    template <typename Action, typename Continuation, typename Callback, typename ...Ts>
+    bool apply_colocated_cb(Continuation && cont,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
+        // shortcut co-location code if target already is a locality
+        if (naming::is_locality(gid))
+        {
+            return apply_p_cb<Action>(std::forward<Continuation>(cont), gid,
+                actions::action_priority<Action>(),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        }
+
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
         agas::request req(agas::primary_ns_resolve_gid, gid.get_gid());
@@ -74,18 +89,19 @@ namespace hpx { namespace detail
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Ts>(vs)...)
-              , cont),
+              , std::forward<Continuation>(cont)),
             service_target, std::forward<Callback>(cb), req);
     }
 
-    template <typename Component, typename Signature, typename Derived,
+    template <typename Continuation,
+        typename Component, typename Signature, typename Derived,
         typename Callback, typename ...Ts>
     bool apply_colocated_cb(
-        hpx::actions::continuation_type const& cont,
+        Continuation && cont,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
-        return apply_colocated_cb<Derived>(cont, gid,
+        return apply_colocated_cb<Derived>(std::forward<Continuation>(cont), gid,
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 }}

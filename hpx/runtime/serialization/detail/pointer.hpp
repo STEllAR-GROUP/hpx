@@ -8,6 +8,7 @@
 #define HPX_SERIALIZATION_DETAIL_POINTER_HPP
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/basic_archive.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -184,7 +185,8 @@ namespace hpx { namespace serialization
                     Pointer temp = detail::pointer_input_dispatcher<
                         Pointer>::type::call(ar);
                     register_pointer(ar, pos, ptr_helper_ptr(
-                            new detail::erase_ptr_helper<Pointer>(std::move(temp), ptr)));
+                            new detail::erase_ptr_helper<Pointer>
+                                (std::move(temp), ptr)));
                 }
                 else
                 {

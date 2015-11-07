@@ -9,6 +9,8 @@
 #include "boost/regex.hpp"
 #include "boost/lexical_cast.hpp"
 #include "unnamed_namespace_check.hpp"
+#include "function_hyper.hpp"
+#include <string>
 
 
 namespace
@@ -51,7 +53,7 @@ namespace boost
         const string::size_type
          ln = std::count( contents.begin(), (*cur)[0].first, '\n' ) + 1;
 
-        error( library_name, full_path, "Unnamed namespace", ln );
+        error( library_name, full_path, "Unnamed namespace" + linelink(full_path, std::to_string(ln)));
       }
 
 

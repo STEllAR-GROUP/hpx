@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2015 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
 //  Copyright (c) 2011 Bryce Lelbach
@@ -9,698 +10,454 @@
 #if !defined(HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM)
 #define HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#if defined(HPX_DEBUG)
 #include <hpx/runtime/components/component_type.hpp>
+#endif
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/parcelset/policies/message_handler.hpp>
-#include <hpx/runtime/serialization/binary_filter.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/input_archive.hpp>
+#include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/traits/is_bitwise_serializable.hpp>
+#include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
+#include <memory>
+
 #include <hpx/config/warnings_prefix.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-//  parcel serialization format version
-#define HPX_PARCEL_VERSION 0x80
+namespace hpx { namespace serialization
+{
+    struct binary_filter;
+}}
+namespace hpx { namespace parcelset { namespace policies
+{
+    struct message_handler;
+}}}
 
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    class HPX_EXPORT parcel;
-
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////////
-        class HPX_EXPORT parcel_data
-        {
-        public:
-            parcel_data()
-              : count_(0)
-            {}
-
-            parcel_data(actions::base_action* act)
-              : count_(0), action_(act)
-            {}
-
-            parcel_data(actions::action_type act)
-              : count_(0), action_(act)
-            {}
-
-            parcel_data(actions::base_action* act,
-                   actions::continuation* do_after)
-              : count_(0),
-                action_(act), continuation_(do_after)
-            {}
-
-            parcel_data(actions::base_action* act,
-                    actions::continuation_type do_after)
-              : count_(0),
-                action_(act), continuation_(do_after)
-            {}
-
-            virtual ~parcel_data() {}
-
-            virtual bool is_multi_destination() const = 0;
-            virtual std::size_t size() const = 0;
-
-            ///
-            virtual void set_start_time(double starttime) = 0;
-            virtual double get_start_time() const = 0;
-            virtual double get_creation_time() const = 0;
-
-            /// get and set the destination id
-            virtual naming::id_type* get_destinations() = 0;
-            virtual naming::id_type const* get_destinations() const = 0;
-            virtual void set_destination(naming::id_type const& dest) = 0;
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            virtual void set_destinations(std::vector<naming::id_type> const& dests) = 0;
-#endif
-            /// get and set the destination address
-            virtual naming::address* get_destination_addrs() = 0;
-            virtual naming::address const* get_destination_addrs() const = 0;
-            virtual void set_destination_addr(naming::address const& addr) = 0;
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            virtual void set_destination_addrs(std::vector<naming::address> const& addrs) = 0;
-#endif
-            virtual boost::uint32_t get_destination_locality_id() const = 0;
-            virtual naming::gid_type const& get_destination_locality() const = 0;
-
-            virtual naming::gid_type get_parcel_id() const = 0;
-            virtual void set_parcel_id(naming::gid_type const& id) = 0;
-
-            virtual bool does_termination_detection() const = 0;
-
-            virtual void wait_for_futures() = 0;
-
-            // default copy constructor is ok
-            // default assignment operator is ok
-
-            /// get and set the source locality/component id
-            naming::id_type& get_source()
-            {
-                return source_id_;
-            }
-            naming::id_type const& get_source() const
-            {
-                return source_id_;
-            }
-            void set_source(naming::id_type const& source_id)
-            {
-                source_id_ = source_id;
-            }
-
-            actions::action_type get_action() const
-            {
-                return action_;
-            }
-
-            actions::continuation_type get_continuation() const
-            {
-                return continuation_;
-            }
-
-            threads::thread_priority get_thread_priority() const
-            {
-                HPX_ASSERT(action_);
-                return action_->get_thread_priority();
-            }
-
-            serialization::binary_filter* get_serialization_filter(parcelset::parcel const& p) const
-            {
-                return action_->get_serialization_filter(p);
-            }
-
-            policies::message_handler* get_message_handler(
-                parcelset::parcelhandler* ph, locality const& loc,
-                parcelset::parcel const& p) const
-            {
-                return action_->get_message_handler(ph, loc, p);
-            }
-
-        protected:
-            void save(serialization::output_archive& ar, bool has_source_id, bool has_continuation) const;
-
-            void load(serialization::input_archive& ar, bool has_source_id, bool has_continuation);
-
-        private:
-            friend void intrusive_ptr_add_ref(parcel_data* p);
-            friend void intrusive_ptr_release(parcel_data* p);
-
-            boost::detail::atomic_count count_;
-
-        protected:
-            naming::id_type source_id_;
-            actions::action_type action_;
-            actions::continuation_type continuation_;
-        };
-
-        /// support functions for boost::intrusive_ptr
-        inline void intrusive_ptr_add_ref(parcel_data* p)
-        {
-            ++p->count_;
-        }
-
-        inline void intrusive_ptr_release(parcel_data* p)
-        {
-            if (0 == --p->count_)
-                delete p;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // part of the parcel data is stored in a contigious memory area, which
-        // helps improving serialization times
-
-        // single-destination buffer
-        class single_destination_parcel_data : public parcel_data
-        {
-        public:
-            single_destination_parcel_data()
-            {
-                data_.start_time_ = 0;
-                data_.creation_time_ = 0;
-                data_.has_source_id_ = 0;
-                data_.has_continuation_ = 0;
-            }
-
-            single_destination_parcel_data(naming::id_type const& apply_to,
-                    naming::address const& addr, actions::base_action* act)
-              : parcel_data(act)
-              , dest_(apply_to)
-              , addr_(addr)
-            {
-                data_.start_time_ = 0;
-                data_.creation_time_ = 0;
-                data_.has_source_id_ = 0;
-                data_.has_continuation_ = 0;
-
-                HPX_ASSERT(components::types_are_compatible(
-                    act->get_component_type(), addr.type_));
-            }
-
-            single_destination_parcel_data(naming::id_type const& apply_to,
-                    naming::address const& addr, actions::base_action* act,
-                   actions::continuation* do_after)
-              : parcel_data(act, do_after)
-              , dest_(apply_to)
-              , addr_(addr)
-            {
-                data_.start_time_ = 0;
-                data_.creation_time_ = 0;
-                data_.has_source_id_ = 0;
-                data_.has_continuation_ = do_after ? 1 : 0;
-
-                HPX_ASSERT(components::types_are_compatible(
-                    act->get_component_type(), addr.type_));
-            }
-
-            single_destination_parcel_data(naming::id_type const& apply_to,
-                    naming::address const& addr, actions::base_action* act,
-                    actions::continuation_type do_after)
-              : parcel_data(act, do_after)
-              , dest_(apply_to)
-              , addr_(addr)
-            {
-                data_.start_time_ = 0;
-                data_.creation_time_ = 0;
-                data_.has_source_id_ = 0;
-                data_.has_continuation_ = do_after ? 1 : 0;
-
-                HPX_ASSERT(components::types_are_compatible(
-                    act->get_component_type(), addr.type_));
-            }
-
-            bool is_multi_destination() const { return false; }
-            std::size_t size() const { return 1ul; }
-
-            ///
-            void set_start_time(double starttime)
-            {
-                data_.start_time_ = starttime;
-                if (std::abs(data_.creation_time_) < 1e-10)
-                    data_.creation_time_ = starttime;
-            }
-            double get_start_time() const
-            {
-                return data_.start_time_;
-            }
-            double get_creation_time() const
-            {
-                return data_.creation_time_;
-            }
-
-            /// get and set the destination id
-            naming::id_type* get_destinations()
-            {
-                return &dest_;
-            }
-            naming::id_type const* get_destinations() const
-            {
-                return &dest_;
-            }
-            void set_destination(naming::id_type const& dest)
-            {
-                dest_ = dest;
-            }
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            void set_destinations(std::vector<naming::id_type> const& dests)
-            {
-                HPX_ASSERT(false);
-            }
-#endif
-            /// get and set the destination address
-            naming::address* get_destination_addrs()
-            {
-                return &addr_;
-            }
-            naming::address const* get_destination_addrs() const
-            {
-                return &addr_;
-            }
-            void set_destination_addr(naming::address const& addr)
-            {
-                addr_ = addr;
-            }
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            void set_destination_addrs(std::vector<naming::address> const& addrs)
-            {
-                HPX_ASSERT(false);
-            }
-#endif
-            boost::uint32_t get_destination_locality_id() const
-            {
-                return naming::get_locality_id_from_id(dest_);
-            }
-
-            ///
-            naming::gid_type const& get_destination_locality() const
-            {
-                return addr_.locality_;
-            }
-
-            naming::gid_type get_parcel_id() const
-            {
-                return data_.parcel_id_;
-            }
-            void set_parcel_id(naming::gid_type const& id)
-            {
-                data_.parcel_id_ = id;
-            }
-
-            bool does_termination_detection() const
-            {
-                return this->get_action()->does_termination_detection();
-            }
-
-            void wait_for_futures()
-            {
-                actions::continuation_type const& cont = this->get_continuation();
-                if (cont)
-                    cont->wait_for_futures();
-                this->get_action()->wait_for_futures();
-            }
-
-            void save(serialization::output_archive& ar) const;
-
-            void load(serialization::input_archive& ar);
-
-        private:
-            friend std::ostream& operator<< (std::ostream& os,
-                single_destination_parcel_data const& req);
-
-            // the parcel data is wrapped into a separate struct to simplify
-            // serialization
-            struct parcel_buffer
-            {
-                // actual parcel data
-                naming::gid_type parcel_id_;
-                double start_time_;
-                double creation_time_;
-
-                // data needed just for serialization purposes
-                boost::uint64_t dest_size_;
-                mutable boost::uint8_t has_source_id_;
-                boost::uint8_t has_continuation_;
-
-                template <class Archive>
-                void serialize(Archive& ar, unsigned int)
-                {
-                  ar & parcel_id_ & start_time_ &
-                    creation_time_ & dest_size_ &
-                    has_source_id_ & has_continuation_;
-                }
-            };
-
-            parcel_buffer data_;
-
-            // other parcel data
-            naming::id_type dest_;
-            naming::address addr_;
-        };
-
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        ///////////////////////////////////////////////////////////////////////
-        // multi-destination parcel buffer
-        class multi_destination_parcel_data : public parcel_data
-        {
-        public:
-            multi_destination_parcel_data()
-            {
-                data_.start_time_ = 0;
-                data_.creation_time_ = 0;
-                data_.dest_size_ = 0;
-                data_.has_source_id_ = 0;
-                data_.has_continuation_ = 0;
-            }
-
-            multi_destination_parcel_data(
-                    std::vector<naming::id_type> const& apply_to,
-                    std::vector<naming::address> const& addrs,
-                    actions::action_type act)
-              : parcel_data(act)
-              , dests_(apply_to)
-              , addrs_(addrs)
-            {
-                data_.start_time_ = 0;
-                data_.creation_time_ = 0;
-                data_.dest_size_ = apply_to.size();
-                data_.has_source_id_ = 0;
-                data_.has_continuation_ = 0;
-
-#if defined(HPX_DEBUG)
-                HPX_ASSERT(dests_.size() == addrs_.size());
-                if (!dests_.empty() && addrs[0].locality_)
-                {
-                    // all destinations have to be on the same locality
-                    naming::gid_type dest = get_destination_locality();
-                    for (std::size_t i = 1; i != addrs.size(); ++i)
-                    {
-                        HPX_ASSERT(dest == addrs[i].locality_);
-                    }
-
-                    // all destination component types are properly matched
-                    int comptype = act->get_component_type();
-                    for (std::size_t i = 0; i != addrs.size(); ++i)
-                    {
-                        HPX_ASSERT(components::types_are_compatible(
-                            comptype, addrs[i].type_));
-                    }
-                    HPX_UNUSED(comptype);
-                }
-#endif
-            }
-
-            bool is_multi_destination() const { return true; }
-            std::size_t size() const { return data_.dest_size_; }
-
-            ///
-            void set_start_time(double starttime)
-            {
-                data_.start_time_ = starttime;
-                if (std::abs(data_.creation_time_) < 1e-10)
-                    data_.creation_time_ = starttime;
-            }
-            double get_start_time() const
-            {
-                return data_.start_time_;
-            }
-            double get_creation_time() const
-            {
-                return data_.creation_time_;
-            }
-
-            /// get and set the destination id
-            naming::id_type* get_destinations()
-            {
-                return dests_.data();
-            }
-            naming::id_type const* get_destinations() const
-            {
-                return dests_.data();
-            }
-            void set_destination(naming::id_type const& dest)
-            {
-                HPX_ASSERT(false);
-            }
-            void set_destinations(std::vector<naming::id_type> const& dests)
-            {
-                dests_ = dests;
-            }
-
-            /// get and set the destination address
-            naming::address* get_destination_addrs()
-            {
-                return addrs_.data();
-            }
-            naming::address const* get_destination_addrs() const
-            {
-                return addrs_.data();
-            }
-            void set_destination_addr(naming::address const& addr)
-            {
-                HPX_ASSERT(false);
-            }
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-            void set_destination_addrs(std::vector<naming::address> const& addrs)
-            {
-                addrs_ = addrs;
-            }
-#endif
-            boost::uint32_t get_destination_locality_id() const
-            {
-                return naming::get_locality_id_from_id(dests_[0]);
-            }
-
-            ///
-            naming::gid_type const& get_destination_locality() const
-            {
-                HPX_ASSERT(!addrs_.empty());
-                return addrs_[0].locality_;
-            }
-
-            naming::gid_type get_parcel_id() const
-            {
-                return data_.parcel_id_;
-            }
-            void set_parcel_id(naming::gid_type const& id)
-            {
-                data_.parcel_id_ = id;
-            }
-
-            void save(serialization::output_archive& ar) const;
-
-            void load(serialization::input_archive& ar);
-
-        private:
-            friend std::ostream& operator<< (std::ostream& os,
-                multi_destination_parcel_data const& req);
-
-            // the parcel data is wrapped into a separate struct to simplify
-            // serialization
-            struct parcel_buffer
-            {
-                // actual parcel data
-                naming::gid_type parcel_id_;
-                double start_time_;
-                double creation_time_;
-
-                // data needed just for serialization purposes
-                boost::uint64_t dest_size_;
-                mutable boost::uint8_t has_source_id_;
-                boost::uint8_t has_continuation_;
-
-                template <class Archive>
-                void serialize(Archive& ar, unsigned int)
-                {
-                  ar & parcel_id_ & start_time_ &
-                    creation_time_ & dest_size_ &
-                    has_source_id_ & has_continuation_;
-                }
-            };
-            parcel_buffer data_;
-
-            // more parcel data
-            std::vector<naming::id_type> dests_;
-            std::vector<naming::address> addrs_;
-        };
-#endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT parcel
     {
-    public:
-        parcel() {}
+    private:
+        HPX_MOVABLE_BUT_NOT_COPYABLE(parcel);
 
-        parcel(naming::id_type const& apply_to,
-                naming::address const& addrs, actions::base_action* act)
-          : data_(new detail::single_destination_parcel_data(apply_to, addrs, act))
-        {
-        }
-
+    private:
+#if defined(HPX_DEBUG)
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        parcel(std::vector<naming::id_type> const& apply_to,
-                std::vector<naming::address> const& addrs,
-                actions::action_type act)
-          : data_(new detail::multi_destination_parcel_data(apply_to, addrs, act))
+        bool is_valid() const
         {
+            // empty parcels are always valid
+            if (0 == data_.creation_time_)
+                return true;
+
+            if (data_.has_source_id_ && !source_id_)
+                return false;
+
+            if (dests_.size() != addrs_.size())
+                return false;
+
+            // verify target destinations
+            if (!dests_.empty() && addrs_[0].locality_)
+            {
+                // all destinations have to be on the same locality
+                naming::gid_type dest = destination_locality();
+                for (std::size_t i = 1; i != addrs_.size(); ++i)
+                {
+                    if (dest != addrs_[i].locality_)
+                        return false;
+                }
+
+                // if we have a destination we need an action as well
+                if (!action_)
+                    return false;
+            }
+
+            // verify that the action targets the correct type
+            if (action_ && addrs.type_ != components::component_invalid)
+            {
+                int type = action_->get_component_type();
+                for (std::size_t i = 0; i != addrs_.size(); ++i)
+                {
+                    if (!components::types_are_compatible(type, addrs[i].type_))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+#else
+        bool is_valid() const
+        {
+            // empty parcels are always valid
+            if (0 == data_.creation_time_)
+                return true;
+
+            if (data_.has_source_id_ && !source_id_)
+                return false;
+
+            // verify target destinations
+            if (dests_ && addrs_.locality_)
+            {
+                // if we have a destination we need an action as well
+                if (!action_)
+                    return false;
+            }
+
+            // verify that the action targets the correct type
+            if (action_ && addrs_.type_ != components::component_invalid)
+            {
+                int type = action_->get_component_type();
+                if (!components::types_are_compatible(type, addrs_.type_))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+#endif
+#else
+        // Only used in debug mode.
+        bool is_valid() const
+        {
+            return true;
         }
 #endif
 
-        parcel(naming::id_type const& apply_to,
-                naming::address const& addrs, actions::base_action* act,
-                actions::continuation* do_after)
-          : data_(new detail::single_destination_parcel_data(apply_to, addrs, act, do_after))
+    public:
+        struct data
         {
+        private:
+            HPX_MOVABLE_BUT_NOT_COPYABLE(data);
+
+        public:
+            data()
+              : start_time_(0),
+                creation_time_(util::high_resolution_timer::now()),
+                has_source_id_(false)
+            {}
+
+            data(data && rhs)
+              : parcel_id_(rhs.parcel_id_),
+                start_time_(rhs.start_time_),
+                creation_time_(rhs.creation_time_),
+                has_source_id_(rhs.has_source_id_)
+            {
+                rhs.parcel_id_ = naming::invalid_gid;
+                rhs.start_time_ = 0;
+                rhs.creation_time_ = 0;
+                rhs.has_source_id_ = false;
+            }
+
+            data& operator=(data && rhs)
+            {
+                parcel_id_ = rhs.parcel_id_;
+                start_time_ = rhs.start_time_;
+                creation_time_ = rhs.creation_time_;
+                has_source_id_ = rhs.has_source_id_;
+
+                rhs.parcel_id_ = naming::invalid_gid;
+                rhs.start_time_ = 0;
+                rhs.creation_time_ = 0;
+                rhs.has_source_id_ = false;
+                return *this;
+            }
+
+            template <typename Archive>
+            void serialize(Archive &ar, unsigned)
+            {
+                ar & parcel_id_;
+                ar & start_time_;
+                ar & creation_time_;
+                ar & has_source_id_;
+            }
+
+            naming::gid_type parcel_id_;
+            double start_time_;
+            double creation_time_;
+
+            bool has_source_id_;
+        };
+
+        parcel() {}
+
+        template <
+            typename Action
+          , typename...Args
+          , typename Enable =
+                typename std::enable_if<traits::is_action<Action>::value>::type
+          >
+        parcel(
+            naming::id_type const& dests,
+            naming::address const& addrs,
+            Action,
+            Args &&... args
+        )
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+          : dests_(1, dests),
+            addrs_(1, addrs),
+#else
+          : dests_(dests),
+            addrs_(addrs),
+#endif
+            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
+        {
+            HPX_ASSERT(is_valid());
         }
 
-        parcel(naming::id_type const& apply_to,
-                naming::address const& addrs, actions::base_action* act,
-                actions::continuation_type do_after)
-          : data_(new detail::single_destination_parcel_data(apply_to, addrs, act, do_after))
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+        template <
+            typename Action
+          , typename...Args
+          , typename Enable =
+                typename std::enable_if<traits::is_action<Action>::value>::type
+          >
+        parcel(
+            std::vector<naming::id_type> const& dests,
+            std::vector<naming::address> const& addrs,
+            Action,
+            Args &&... args
+        )
+          : dests_(dests),
+            addrs_(addrs),
+            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
         {
+            HPX_ASSERT(is_valid());
+        }
+#endif
+
+        template <
+            typename Continuation
+          , typename Action
+          , typename...Args
+          , typename Enable
+                = typename std::enable_if<
+                    traits::is_action<Action>::value
+                 && traits::is_continuation<Continuation>::value
+                 && !std::is_same<
+                        Continuation
+                      , std::unique_ptr<actions::continuation>
+                    >::value
+                >::type
+          >
+        parcel(
+            naming::id_type const& dests,
+            naming::address const& addrs,
+            Continuation && cont,
+            Action,
+            Args &&... args
+        )
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+          : dests_(1, dests),
+            addrs_(1, addrs),
+#else
+          : dests_(dests),
+            addrs_(addrs),
+#endif
+            cont_(
+                new typename util::decay<Continuation>
+                    ::type(std::forward<Continuation>(cont))
+            ),
+            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
+        {
+            HPX_ASSERT(is_valid());
         }
 
-        ~parcel() {}
-
-        // default copy constructor is ok
-        // default assignment operator is ok
-
-        actions::action_type get_action() const
+        template <
+            typename Action
+          , typename...Args
+          , typename Enable
+                = typename std::enable_if<
+                    traits::is_action<Action>::value
+                >::type
+          >
+        parcel(
+            naming::id_type const& dests,
+            naming::address const& addrs,
+            std::unique_ptr<actions::continuation> cont,
+            Action,
+            Args &&... args
+        )
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+          : dests_(1, dests),
+            addrs_(1, addrs),
+#else
+          : dests_(dests),
+            addrs_(addrs),
+#endif
+            cont_(std::move(cont)),
+            action_(new actions::transfer_action<Action>(std::forward<Args>(args)...))
         {
-            return data_->get_action();
+            HPX_ASSERT(is_valid());
         }
 
-        actions::continuation_type get_continuation() const
+        parcel(parcel && other)
+          : data_(std::move(other.data_)),
+            source_id_(std::move(other.source_id_)),
+            dests_(std::move(other.dests_)),
+            addrs_(std::move(other.addrs_)),
+            cont_(std::move(other.cont_)),
+            action_(std::move(other.action_))
         {
-            return data_->get_continuation();
+            HPX_ASSERT(is_valid());
         }
 
-        /// get and set the source locality/component id
-        naming::id_type& get_source()
+        parcel &operator=(parcel && other)
         {
-            return data_->get_source();
-        }
-        naming::id_type const& get_source() const
-        {
-            return data_->get_source();
+            data_ = std::move(other.data_);
+            source_id_ = std::move(other.source_id_);
+            dests_ = std::move(other.dests_);
+            addrs_ = std::move(other.addrs_);
+            cont_ = std::move(other.cont_);
+            action_ = std::move(other.action_);
+
+            other.reset();
+
+            HPX_ASSERT(is_valid());
+            return *this;
         }
 
-        void set_source(naming::id_type const& source_id)
+        void reset()
         {
-            data_->set_source(source_id);
+            data_ = data();
+            source_id_ = hpx::naming::invalid_id;
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+            dests_.clear();
+            addrs_.clear();
+#else
+            dests_ = hpx::naming::invalid_id;
+            addrs_ = hpx::naming::address();
+#endif
+            cont_.reset();
+            action_.reset();
+        }
+
+        actions::base_action *get_action() const
+        {
+            HPX_ASSERT(action_.get());
+            return action_.get();
+        }
+
+        std::unique_ptr<actions::continuation> get_continuation()
+        {
+            return std::move(cont_);
+        }
+
+        naming::id_type const& source_id() const
+        {
+            return source_id_;
+        }
+
+        void set_source_id(naming::id_type const & source_id)
+        {
+            if (source_id != naming::invalid_id)
+            {
+                source_id_ = source_id;
+                data_.has_source_id_ = true;
+            }
         }
 
         std::size_t size() const
         {
-            return data_->size();
-        }
-
-        /// get and set the destination id
-        naming::id_type* get_destinations()
-        {
-            return data_->get_destinations();
-        }
-        naming::id_type const* get_destinations() const
-        {
-            return data_->get_destinations();
-        }
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        void set_destinations(std::vector<naming::id_type> const& dests)
-        {
-            if (data_->is_multi_destination()) {
-                data_->set_destinations(dests);
-            }
-            else {
-                HPX_ASSERT(dests.size() == 1);
-                data_->set_destination(dests[0]);
-            }
-        }
+            return dests_.size();
+#else
+            return 1ul;
 #endif
-
-        boost::uint32_t get_destination_locality_id() const
-        {
-            return data_->get_destination_locality_id();
         }
 
-        naming::gid_type const& get_destination_locality() const
+        naming::id_type const* destinations() const
         {
-            return data_->get_destination_locality();
-        }
 
-        /// get and set the destination address
-        naming::address* get_destination_addrs()
-        {
-            return data_->get_destination_addrs();
-        }
-        naming::address const* get_destination_addrs() const
-        {
-            return data_->get_destination_addrs();
-        }
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        void set_destination_addrs(std::vector<naming::address> const& addrs)
-        {
-            if (data_->is_multi_destination()) {
-                data_->set_destination_addrs(addrs);
-            }
-            else {
-                HPX_ASSERT(addrs.size() == 1);
-                data_->set_destination_addr(addrs[0]);
-            }
-        }
+            return dests_.data();
+#else
+            return &dests_;
 #endif
-        void set_start_time(double starttime)
-        {
-            data_->set_start_time(starttime);
         }
-        double get_start_time() const
+
+        naming::address const* addrs() const
         {
-            return data_->get_start_time();
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+            return addrs_.data();
+#else
+            return &addrs_;
+#endif
         }
-        double get_creation_time() const
+
+        naming::address* addrs()
         {
-            return data_->get_creation_time();
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+            return addrs_.data();
+#else
+            return &addrs_;
+#endif
+        }
+
+        boost::uint32_t destination_locality_id() const
+        {
+            return naming::get_locality_id_from_id(destinations()[0]);
+        }
+
+        naming::gid_type const& destination_locality() const
+        {
+            return addrs()[0].locality_;
+        }
+
+        double const start_time() const
+        {
+            return data_.start_time_;
+        }
+
+        void set_start_time(double time)
+        {
+            data_.start_time_ = time;
+        }
+
+        double const creation_time() const
+        {
+            return data_.creation_time_;
         }
 
         threads::thread_priority get_thread_priority() const
         {
-            return data_->get_thread_priority();
+            return action_->get_thread_priority();
         }
 
-        naming::gid_type get_parcel_id() const
+        naming::gid_type const parcel_id() const
         {
-            return data_->get_parcel_id();
+            return data_.parcel_id_;
         }
-        void set_parcel_id(naming::gid_type const& id)
+
+        naming::gid_type & parcel_id()
         {
-            data_->set_parcel_id(id);
+            return data_.parcel_id_;
         }
 
         serialization::binary_filter* get_serialization_filter() const
         {
-            return data_->get_serialization_filter(*this);
+            return action_->get_serialization_filter(*this);
         }
 
         policies::message_handler* get_message_handler(
             parcelset::parcelhandler* ph, locality const& loc) const
         {
-            return data_->get_message_handler(ph, loc, *this);
+            return action_->get_message_handler(ph, loc, *this);
         }
 
         bool does_termination_detection() const
         {
-            return data_->does_termination_detection();
-        }
-
-        void wait_for_futures()
-        {
-            return data_->wait_for_futures();
+            return action_ ? action_->does_termination_detection() : false;
         }
 
         // generate unique parcel id
@@ -713,53 +470,33 @@ namespace hpx { namespace parcelset
         // serialization support
         friend class hpx::serialization::access;
 
-        void save(serialization::output_archive& ar, const unsigned int version) const;
+        void serialize(serialization::input_archive & ar, unsigned);
+        void serialize(serialization::output_archive & ar, unsigned);
 
-        void load(serialization::input_archive& ar, const unsigned int version);
+        data data_;
+        naming::id_type source_id_;
 
-        HPX_SERIALIZATION_SPLIT_MEMBER();
-
-    private:
-        boost::intrusive_ptr<detail::parcel_data> data_;
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+        std::vector<naming::id_type> dests_;
+        std::vector<naming::address> addrs_;
+#else
+        naming::id_type dests_;
+        naming::address addrs_;
+#endif
+        std::unique_ptr<actions::continuation> cont_;
+        std::unique_ptr<actions::base_action> action_;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT std::string dump_parcel(parcel const& p);
 }}
 
 namespace hpx { namespace traits
 {
     template <>
-    struct serialize_as_future<hpx::parcelset::parcel>
-      : boost::mpl::true_
-    {
-        static bool call_if(hpx::parcelset::parcel& r)
-        {
-            return true;
-        }
-
-        static void call(hpx::parcelset::parcel& p)
-        {
-            p.wait_for_futures();
-        }
-    };
-}}
-
-namespace hpx { namespace traits
-{
-    template <>
     struct is_bitwise_serializable<
-            hpx::parcelset::detail::single_destination_parcel_data::parcel_buffer>
+            hpx::parcelset::parcel::data>
        : boost::mpl::true_
     {};
-
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-    template <>
-    struct is_bitwise_serializable<
-            hpx::parcelset::detail::multi_destination_parcel_data::parcel_buffer>
-       : boost::mpl::true_
-    {};
-#endif
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

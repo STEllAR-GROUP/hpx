@@ -6,12 +6,19 @@
 #if !defined(HPX_UTIL_COMMAND_LINE_HANDLING_OCT_04_2012_0800AM)
 #define HPX_UTIL_COMMAND_LINE_HANDLING_OCT_04_2012_0800AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/defines.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/manage_config.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+#include <boost/cstdint.hpp>
 #include <boost/program_options.hpp>
+
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -20,19 +27,24 @@ namespace hpx { namespace util
     struct command_line_handling
     {
         command_line_handling(hpx::runtime_mode mode,
-                util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
-                std::vector<std::string> const& ini_config,
+                util::function_nonser<
+                    int(boost::program_options::variables_map& vm)
+                > const& f,
+                std::vector<std::string> && ini_config,
                 char const* argv0)
           : rtcfg_(argv0),
             mode_(mode),
-            ini_config_(ini_config),
+            ini_config_(std::move(ini_config)),
             hpx_main_f_(f),
             node_(std::size_t(-1)),
             num_threads_(1),
             num_cores_(1),
-            num_localities_(1)
+            num_localities_(1),
+            pu_step_(1),
+            pu_offset_(0),
+            numa_sensitive_(0)
         {
-            for (std::string const& e : ini_config)
+            for (std::string const& e : ini_config_)
                 rtcfg_.parse("<user supplied config>", e, true, false);
         }
 
@@ -44,13 +56,20 @@ namespace hpx { namespace util
 
         hpx::runtime_mode mode_;
         std::vector<std::string> ini_config_;
-        util::function_nonser<int(boost::program_options::variables_map& vm)> hpx_main_f_;
+        util::function_nonser<
+            int(boost::program_options::variables_map& vm)
+        > hpx_main_f_;
 
         std::size_t node_;
         std::size_t num_threads_;
         std::size_t num_cores_;
         std::size_t num_localities_;
+        std::size_t pu_step_;
+        std::size_t pu_offset_;
         std::string queuing_;
+        std::string affinity_domain_;
+        std::string affinity_bind_;
+        std::size_t numa_sensitive_;
 
     protected:
         bool handle_arguments(util::manage_config& cfgmap,

@@ -181,7 +181,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                 << std::left << "Average task execution time      : "
                              << std::right << std::setw(8) << task_time/1e9 << "\n"
                 << std::left << "Average sequential execution time: "
-                             << std::right << std::setw(8) << seq_time/1e9 << "\n" << hpx::flush;
+                             << std::right << std::setw(8) << seq_time/1e9 << "\n"
+                             << hpx::flush;
 
             hpx::cout << "---------Execution Time Difference---------\n"
                 << std::left << "Parallel Scale: " << std::right  << std::setw(27)

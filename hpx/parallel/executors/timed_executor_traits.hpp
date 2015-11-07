@@ -16,7 +16,6 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
-#include <hpx/util/date_time_chrono.hpp>
 
 #include <type_traits>
 #include <utility>

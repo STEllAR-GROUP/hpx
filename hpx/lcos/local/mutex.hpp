@@ -121,7 +121,7 @@ namespace hpx { namespace lcos { namespace local
                     cond_.wait_until(l, abs_time, ec);
                 if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
 
-                if (reason == threads::wait_signaled) //-V110
+                if (reason == threads::wait_timeout) //-V110
                 {
                     HPX_ITT_SYNC_CANCEL(this);
                     return false;

@@ -34,8 +34,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    this_thread_executor<Scheduler>::this_thread_executor()
-      : scheduler_(1, false), shutdown_sem_(0),
+    this_thread_executor<Scheduler>::this_thread_executor(char const* description)
+      : scheduler_(
+            typename Scheduler::init_parameter_type(1, description),
+            false
+        ),
+        shutdown_sem_(0),
         thread_num_(std::size_t(-1)),
         parent_thread_num_(std::size_t(-1)), orig_thread_num_(std::size_t(-1)),
         tasks_scheduled_(0), tasks_completed_(0), cookie_(0),
@@ -204,6 +208,20 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         return (scheduler_.get_state(0) < state_stopped) ? 1 : 0;
     }
 
+    // Reset internal (round robin) thread distribution scheme
+    template <typename Scheduler>
+    void this_thread_executor<Scheduler>::set_scheduler_mode(
+        threads::policies::scheduler_mode mode)
+    {
+        scheduler_.set_scheduler_mode(mode);
+    }
+
+    template <typename Scheduler>
+    void this_thread_executor<Scheduler>::reset_thread_distribution()
+    {
+        scheduler_.Scheduler::reset_thread_distribution();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     struct on_self_reset
     {
@@ -304,13 +322,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 executed_threads, executed_thread_phases,
                 overall_times, thread_times);
 
-
             threads::detail::scheduling_callbacks callbacks(
                 threads::detail::scheduling_callbacks::callback_type(),
                 util::bind( //-V107
                     &this_thread_executor::suspend_back_into_calling_context,
                     this));
 
+            scheduler_.set_scheduler_mode(policies::fast_idle_mode);
             threads::detail::scheduling_loop(0, scheduler_, counters, callbacks);
 
             // the scheduling_loop is allowed to exit only if no more HPX
@@ -400,7 +418,8 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     this_thread_static_queue_executor::this_thread_static_queue_executor()
       : scheduled_executor(new detail::this_thread_executor<
-            policies::static_queue_scheduler<> >())
+            policies::static_queue_scheduler<> >(
+                "this_thread_static_queue_executor"))
     {}
 #endif
 
@@ -409,7 +428,8 @@ namespace hpx { namespace threads { namespace executors
     this_thread_static_priority_queue_executor::
             this_thread_static_priority_queue_executor()
       : scheduled_executor(new detail::this_thread_executor<
-            policies::static_priority_queue_scheduler<> >())
+            policies::static_priority_queue_scheduler<> >(
+                "this_thread_static_priority_queue_executor"))
     {}
 #endif
 }}}

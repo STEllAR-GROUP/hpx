@@ -33,6 +33,13 @@ namespace hpx { namespace traits
     struct component_type_is_compatible;
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Enable = void>
+    struct is_client;
+
+    template <typename T, typename Enable = void>
+    struct is_client_or_client_array;
+
+    ///////////////////////////////////////////////////////////////////////////
     // control the way managed_components are constructed
     struct construct_with_back_ptr {};
     struct construct_without_back_ptr {};
@@ -57,6 +64,9 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Enable = void>
     struct is_action;
+
+    template <typename Action, typename Enable = void>
+    struct is_continuation;
 
     // Customization point for action priority
     template <typename Action, typename Enable = void>
@@ -101,6 +111,9 @@ namespace hpx { namespace traits
     struct default_chunk_size;
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Range, typename Enable = void>
+    struct is_range;
+
     template <typename Future, typename Enable = void>
     struct is_future;
 
@@ -118,9 +131,6 @@ namespace hpx { namespace traits
 
     template <typename Tuple, typename Enable = void>
     struct is_future_tuple;
-
-    template <typename Future, typename Enable = void>
-    struct serialize_as_future;
 
     template <typename Future, typename Enable = void>
     struct acquire_future;

@@ -19,19 +19,19 @@ hpx::thread::id test() { return hpx::this_thread::get_id(); }
 
 void test_sync()
 {
-    typedef hpx::parallel::parallel_fork_executor executor;
+    typedef hpx::parallel::parallel_executor executor;
     typedef hpx::parallel::executor_traits<executor> traits;
 
-    executor exec;
+    executor exec(hpx::launch::fork);
     HPX_TEST(traits::execute(exec, &test) != hpx::this_thread::get_id());
 }
 
 void test_async()
 {
-    typedef hpx::parallel::parallel_fork_executor executor;
+    typedef hpx::parallel::parallel_executor executor;
     typedef hpx::parallel::executor_traits<executor> traits;
 
-    executor exec;
+    executor exec(hpx::launch::fork);
     HPX_TEST(
         traits::async_execute(exec, &test).get() !=
         hpx::this_thread::get_id());
@@ -45,7 +45,7 @@ void bulk_test(hpx::thread::id tid, int value)
 
 void test_bulk_sync()
 {
-    typedef hpx::parallel::parallel_fork_executor executor;
+    typedef hpx::parallel::parallel_executor executor;
     typedef hpx::parallel::executor_traits<executor> traits;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
@@ -55,13 +55,13 @@ void test_bulk_sync()
 
     using hpx::util::placeholders::_1;
 
-    executor exec;
+    executor exec(hpx::launch::fork);
     traits::execute(exec, hpx::util::bind(&bulk_test, tid, _1), v);
 }
 
 void test_bulk_async()
 {
-    typedef hpx::parallel::parallel_fork_executor executor;
+    typedef hpx::parallel::parallel_executor executor;
     typedef hpx::parallel::executor_traits<executor> traits;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
@@ -71,7 +71,7 @@ void test_bulk_async()
 
     using hpx::util::placeholders::_1;
 
-    executor exec;
+    executor exec(hpx::launch::fork);
     hpx::when_all(traits::async_execute(
         exec, hpx::util::bind(&bulk_test, tid, _1), v)).get();
 }

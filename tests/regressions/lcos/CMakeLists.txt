@@ -6,6 +6,7 @@
 
 set(tests
     after_588
+    async_action_1813
     async_callback_with_bound_callback
     async_callback_non_deduced_context
     async_unwrap_1037
@@ -23,16 +24,21 @@ set(tests
     lifetime_588
     lifetime_588_1
     promise_leak_996
+    promise_1620
+    receive_buffer_1733
     safely_destroy_promise_1481
     set_hpx_limit_798
     shared_mutex_1702
     shared_stated_leaked_1211
+    wait_for_1751
     when_all_vectors_1623
    )
 
+set(promise_1620_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
 set(after_588_PARAMETERS LOCALITIES 2)
+set(async_action_1813_PARAMETERS LOCALITIES 2)
 set(async_callback_with_bound_callback_PARAMETERS LOCALITIES 2)
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
@@ -40,9 +46,10 @@ set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
 set(ignore_while_locked_1485_PARAMETERS THREADS_PER_LOCALITY 2)
 set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
-set(set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
+set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 set(shared_mutex_1702_PARAMETERS THREADS_PER_LOCALITY 4)
+set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 
 if(HPX_WITH_CXX11_LAMBDAS)
   set(tests ${tests}

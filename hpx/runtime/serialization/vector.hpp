@@ -6,6 +6,7 @@
 #ifndef HPX_SERIALIZATION_VECTOR_HPP
 #define HPX_SERIALIZATION_VECTOR_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
@@ -15,7 +16,8 @@ namespace hpx { namespace serialization
 {
     // load vector<T>
     template <typename T, typename Allocator>
-    void load_impl(input_archive & ar, std::vector<T, Allocator> & vs, boost::mpl::false_)
+    void load_impl(input_archive & ar, std::vector<T, Allocator> & vs,
+        boost::mpl::false_)
     {
         // normal load ...
         typedef typename std::vector<T, Allocator>::size_type size_type;
@@ -24,7 +26,6 @@ namespace hpx { namespace serialization
         if(size == 0) return;
 
         vs.resize(size);
-        typedef typename std::vector<T, Allocator>::value_type value_type;
         for(size_type i = 0; i != size; ++i)
         {
             ar >> vs[i];
@@ -34,7 +35,7 @@ namespace hpx { namespace serialization
     template <typename T, typename Allocator>
     void load_impl(input_archive & ar, std::vector<T, Allocator> & v, boost::mpl::true_)
     {
-        if(!has_array_optimization(ar))
+        if(ar.disable_array_optimization())
         {
             load_impl(ar, v, boost::mpl::false_());
         }
@@ -85,7 +86,8 @@ namespace hpx { namespace serialization
 
     // save vector<T>
     template <typename T, typename Allocator>
-    void save_impl(output_archive & ar, std::vector<T, Allocator> & vs, boost::mpl::false_)
+    void save_impl(output_archive & ar, const std::vector<T, Allocator> & vs,
+        boost::mpl::false_)
     {
         // normal save ...
         typedef typename std::vector<T, Allocator>::value_type value_type;
@@ -96,9 +98,10 @@ namespace hpx { namespace serialization
     }
 
     template <typename T, typename Allocator>
-    void save_impl(output_archive & ar, std::vector<T, Allocator> & v, boost::mpl::true_)
+    void save_impl(output_archive & ar, const std::vector<T, Allocator> & v,
+        boost::mpl::true_)
     {
-        if(!has_array_optimization(ar))
+        if(ar.disable_array_optimization())
         {
             save_impl(ar, v, boost::mpl::false_());
         }
@@ -111,7 +114,7 @@ namespace hpx { namespace serialization
     }
 
     template <typename Allocator>
-    void serialize(output_archive & ar, std::vector<bool, Allocator> & v, unsigned)
+    void serialize(output_archive & ar, const std::vector<bool, Allocator> & v, unsigned)
     {
         typedef typename std::vector<bool, Allocator>::size_type size_type;
         ar << v.size(); //-V128
@@ -125,7 +128,7 @@ namespace hpx { namespace serialization
     }
 
     template <typename T, typename Allocator>
-    void serialize(output_archive & ar, std::vector<T, Allocator> & v, unsigned)
+    void serialize(output_archive & ar, const std::vector<T, Allocator> & v, unsigned)
     {
         ar << v.size(); //-V128
         if(v.empty()) return;

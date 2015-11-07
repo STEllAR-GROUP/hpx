@@ -20,7 +20,7 @@
 #include <boost/config.hpp>
 
 #if defined(BOOST_WINDOWS)
-#  include <boost/smart_ptr/detail/spinlock_w32.hpp>
+#  include <boost/smart_ptr/detail/spinlock.hpp>
 #else
 #  include <boost/smart_ptr/detail/spinlock_sync.hpp>
 #  if defined( __ia64__ ) && defined( __INTEL_COMPILER )
@@ -66,7 +66,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
             BOOST_COMPILER_FENCE
 #else
@@ -87,7 +87,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_RELEASING(this);
 
-#if defined(BOOST_WINDOWS)
+#if !defined( BOOST_SP_HAS_SYNC )
             BOOST_COMPILER_FENCE
             *const_cast<boost::uint64_t volatile*>(&v_) = 0;
 #else

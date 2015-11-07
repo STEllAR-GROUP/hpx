@@ -81,7 +81,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         }
     }
 
-    bool connection_handler::can_connect(parcelset::locality const & dest, bool use_alternative)
+    bool connection_handler::can_connect(parcelset::locality const & dest,
+        bool use_alternative)
     {
         if(use_alternative)
         {
@@ -100,7 +101,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         exception_list errors;
         util::endpoint_iterator_type end = util::accept_end();
         for (util::endpoint_iterator_type it =
-                util::accept_begin(here_.get<locality>(), io_service_pool_.get_io_service(0));
+                util::accept_begin(here_.get<locality>(),
+                    io_service_pool_.get_io_service(0));
              it != end; ++it, ++tried)
         {
             try {

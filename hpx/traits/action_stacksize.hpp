@@ -6,8 +6,7 @@
 #if !defined(HPX_TRAITS_ACTION_STACKSIZE_SEP_03_2012_1136AM)
 #define HPX_TRAITS_ACTION_STACKSIZE_SEP_03_2012_1136AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 
 namespace hpx { namespace traits
 {
@@ -18,12 +17,6 @@ namespace hpx { namespace traits
     {
         enum { value = threads::thread_stacksize_default };
     };
-
-    template <typename Action>
-    struct action_stacksize<Action
-      , typename util::always_void<typename Action::type>::type>
-      : action_stacksize<typename Action::type>
-    {};
 }}
 
 #endif

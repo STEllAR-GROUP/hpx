@@ -6,8 +6,11 @@
 #if !defined(HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM)
 #define HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM
 
-#include <hpx/hpx_fwd.hpp>
-
+#include <hpx/config.hpp>
+#include <hpx/traits/is_client.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/future_access.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
@@ -19,7 +22,6 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/acquire_future.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
 #include <utility>
@@ -27,6 +29,7 @@
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/has_xxx.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,11 +43,6 @@ namespace hpx { namespace components
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
-    struct is_client
-      : boost::mpl::false_
-    {};
-
     template <typename Derived>
     struct is_client<Derived,
         typename util::always_void<typename Derived::stub_argument_type>::type
@@ -53,21 +51,6 @@ namespace hpx { namespace traits
                 Derived, typename Derived::stub_argument_type
             >,
             Derived>
-    {};
-
-    template <typename T, typename Enable = void>
-    struct is_client_or_client_array
-      : is_client<T>
-    {};
-
-    template <typename T>
-    struct is_client_or_client_array<T[]>
-      : is_client<T>
-    {};
-
-    template <typename T, std::size_t N>
-    struct is_client_or_client_array<T[N]>
-      : is_client<T>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -379,24 +362,26 @@ namespace hpx { namespace components
                 agas::symbol_ns_bind, true).share();
         }
 
-//     protected:
-//         template <typename F>
-//         static typename lcos::detail::future_then_result<client_base, F>::cont_result
-//         on_ready(future_type fut, F && f)
-//         {
-//             return f(Derived(fut));
-//         }
-//
-//     public:
-//         template <typename F>
-//         typename lcos::detail::future_then_result<client_base, F>::type
-//         then(F && f)
-//         {
-//             typedef typename util::decay<F>::type func_type;
-//             return gid_.then(util::bind(
-//                 util::one_shot(&client_base::on_ready<func_type>),
-//                 std::forward<F>(f)));
-//         }
+    protected:
+        template <typename F>
+        static typename lcos::detail::future_then_result<Derived, F>::cont_result
+        on_ready(future_type && fut, F f)
+        {
+            return f(Derived(std::move(fut)));
+        }
+
+    public:
+        template <typename F>
+        typename lcos::detail::future_then_result<
+            Derived, typename util::decay<F>::type
+        >::type
+        then(F && f)
+        {
+            typedef typename util::decay<F>::type func_type;
+            return gid_.then(util::bind(
+                util::one_shot(&client_base::template on_ready<func_type>),
+                util::placeholders::_1, std::forward<F>(f)));
+        }
 
     private:
         friend class hpx::serialization::access;
@@ -482,30 +467,10 @@ namespace hpx { namespace components
         result.reserve(ids.size());
         for (hpx::future<hpx::id_type>& id: ids)
         {
-            result.push_back(Client(id));
+            result.push_back(Client(std::move(id)));
         }
         return result;
     }
-}}
-
-namespace hpx { namespace traits
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived>
-    struct serialize_as_future<Derived,
-            typename boost::enable_if<is_client<Derived> >::type>
-      : boost::mpl::true_
-    {
-        static bool call_if(Derived& c)
-        {
-            return true;
-        }
-
-        static void call(Derived& c)
-        {
-            c.wait();
-        }
-    };
 }}
 
 #endif

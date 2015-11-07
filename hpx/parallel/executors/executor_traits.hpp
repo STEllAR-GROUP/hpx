@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/exception_list.hpp>
 #include <hpx/async.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/util/decay.hpp>
@@ -22,9 +23,15 @@
 
 #include <type_traits>
 #include <utility>
+#include <stdexcept>
 
 #include <boost/range/functions.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/throw_exception.hpp>
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40700
+#define HPX_ENABLE_WORKAROUND_FOR_GCC46
+#endif
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 {
@@ -127,14 +134,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         struct apply_helper
         {
             template <typename Executor, typename F>
-            static auto call(wrap_int, Executor& exec, F && f) -> void
+            static void call(wrap_int, Executor& exec, F && f)
             {
                 exec.async_execute(std::forward<F>(f));
             }
 
             template <typename Executor, typename F>
             static auto call(int, Executor& exec, F && f)
-                -> decltype(exec.apply_execute(std::forward<F>(f)))
+            ->  decltype(exec.apply_execute(std::forward<F>(f)))
             {
                 exec.apply_execute(std::forward<F>(f));
             }
@@ -143,34 +150,46 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         template <typename Executor, typename F>
         void call_apply_execute(Executor& exec, F && f)
         {
-            return apply_helper::call(0, exec, std::forward<F>(f));
+            apply_helper::call(0, exec, std::forward<F>(f));
         }
 
         ///////////////////////////////////////////////////////////////////////
         struct execute_helper
         {
             template <typename Executor, typename F>
-            static typename hpx::util::result_of<
-                    typename hpx::util::decay<F>::type()
-                >::type
-            call(wrap_int, Executor& exec, F && f)
+            static auto call(wrap_int, Executor& exec, F && f)
+            ->  decltype(exec.async_execute(std::forward<F>(f)).get())
             {
-                return exec.async_execute(std::forward<F>(f)).get();
+                try {
+                    return exec.async_execute(std::forward<F>(f)).get();
+                }
+                catch (std::bad_alloc const& ba) {
+                    boost::throw_exception(ba);
+                }
+                catch (...) {
+                    boost::throw_exception(
+                        exception_list(boost::current_exception())
+                    );
+                }
             }
 
             template <typename Executor, typename F>
             static auto call(int, Executor& exec, F && f)
-                -> decltype(exec.execute(std::forward<F>(f)))
+            ->  decltype(exec.execute(std::forward<F>(f)))
             {
                 return exec.execute(std::forward<F>(f));
             }
         };
 
         template <typename Executor, typename F>
-        typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type
-        call_execute(Executor& exec, F && f)
+        auto call_execute(Executor& exec, F && f)
+#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
+        ->  typename hpx::util::result_of<
+                typename hpx::util::decay<F>::type()
+            >::type
+#else
+        ->  decltype(execute_helper::call(0, exec, std::forward<F>(f)))
+#endif
         {
             return execute_helper::call(0, exec, std::forward<F>(f));
         }
@@ -190,18 +209,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 >::type type;
         };
 
+        ///////////////////////////////////////////////////////////////////////
         struct bulk_async_execute_helper
         {
             template <typename Executor, typename F, typename S>
-            static std::vector<typename future_type<
-                    Executor, typename bulk_async_execute_result<F, S>::type
-                >::type>
-            call(wrap_int, Executor& exec, F && f, S const& shape)
+            static auto call(wrap_int, Executor& exec, F && f, S const& shape)
+            ->  std::vector<decltype(
+                    exec.async_execute(
+                        hpx::util::deferred_call(f, *boost::begin(shape))
+                    )
+                )>
             {
                 std::vector<typename future_type<
                         Executor,
                         typename bulk_async_execute_result<F, S>::type
                     >::type> results;
+                results.reserve(boost::size(shape));
 
                 for (auto const& elem: shape)
                 {
@@ -215,17 +238,24 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
 
             template <typename Executor, typename F, typename S>
             static auto call(int, Executor& exec, F && f, S const& shape)
-                ->  decltype(exec.bulk_async_execute(std::forward<F>(f), shape))
+            ->  decltype(exec.bulk_async_execute(std::forward<F>(f), shape))
             {
                 return exec.bulk_async_execute(std::forward<F>(f), shape);
             }
         };
 
         template <typename Executor, typename F, typename S>
-        std::vector<typename future_type<
+        auto call_bulk_async_execute(Executor& exec, F && f, S const& shape)
+#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
+        ->  std::vector<typename future_type<
                 Executor, typename bulk_async_execute_result<F, S>::type
             >::type>
-        call_bulk_async_execute(Executor& exec, F && f, S const& shape)
+#else
+        ->  decltype(
+                bulk_async_execute_helper::call(0, exec, std::forward<F>(f),
+                    shape)
+            )
+#endif
         {
             return bulk_async_execute_helper::call(
                 0, exec, std::forward<F>(f), shape);
@@ -251,87 +281,72 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
             typedef void type;
         };
 
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct bulk_result_helper
+        {
+            typedef std::vector<T> type;
+        };
+
+        template <>
+        struct bulk_result_helper<void>
+        {
+            typedef void type;
+        };
+
         struct bulk_execute_helper
         {
             // returns void if F returns void
             template <typename Executor, typename F, typename S>
-            static typename detail::bulk_execute_result<F, S>::type
-            call(wrap_int, Executor& exec, F && f, S const& shape)
+            static auto call(wrap_int, Executor& exec, F && f, S const& shape)
+            ->  typename bulk_result_helper<decltype(
+                    exec.async_execute(
+                        hpx::util::deferred_call(f, *boost::begin(shape))
+                    ).get()
+                )>::type
             {
                 std::vector<typename future_type<
                         Executor,
                         typename bulk_async_execute_result<F, S>::type
                     >::type> results;
+                results.reserve(boost::size(shape));
 
-                for (auto const& elem: shape)
-                {
-                    results.push_back(exec.async_execute(
-                        hpx::util::deferred_call(f, elem)
-                    ));
+                try {
+                    for (auto const& elem: shape)
+                    {
+                        results.push_back(
+                            exec.async_execute(hpx::util::deferred_call(f, elem))
+                        );
+                    }
+                    return hpx::util::unwrapped(results);
                 }
-
-                return hpx::util::unwrapped(results);
+                catch (std::bad_alloc const& ba) {
+                    boost::throw_exception(ba);
+                }
+                catch (...) {
+                    boost::throw_exception(
+                        exception_list(boost::current_exception())
+                    );
+                }
             }
 
             template <typename Executor, typename F, typename S>
             static auto call(int, Executor& exec, F && f, S const& shape)
-                ->  decltype(exec.bulk_execute(std::forward<F>(f), shape))
+            ->  decltype(exec.bulk_execute(std::forward<F>(f), shape))
             {
                 return exec.bulk_execute(std::forward<F>(f), shape);
             }
         };
 
         template <typename Executor, typename F, typename S>
-        typename detail::bulk_execute_result<F, S>::type
-        call_bulk_execute(Executor& exec, F && f, S const& shape)
+        auto call_bulk_execute(Executor& exec, F && f, S const& shape)
+#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
+        ->  typename detail::bulk_execute_result<F, S>::type
+#else
+        ->  decltype(bulk_execute_helper::call(0, exec, std::forward<F>(f), shape))
+#endif
         {
             return bulk_execute_helper::call(0, exec, std::forward<F>(f), shape);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        struct os_thread_count_helper
-        {
-            template <typename Executor>
-            static auto call(wrap_int, Executor& exec) -> std::size_t
-            {
-                return hpx::get_os_thread_count();
-            }
-
-            template <typename Executor>
-            static auto call(int, Executor& exec)
-                ->  decltype(exec.os_thread_count())
-            {
-                return exec.os_thread_count();
-            }
-        };
-
-        template <typename Executor>
-        std::size_t call_os_thread_count(Executor& exec)
-        {
-            return os_thread_count_helper::call(0, exec);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        struct has_pending_closures_helper
-        {
-            template <typename Executor>
-            static auto call(wrap_int, Executor& exec) -> bool
-            {
-                return false;   // assume stateless scheduling
-            }
-
-            template <typename Executor>
-            static auto call(int, Executor& exec)
-                ->  decltype(exec.has_pending_closures())
-            {
-                return exec.has_pending_closures();
-            }
-        };
-
-        template <typename Executor>
-        bool call_has_pending_closures(Executor& exec)
-        {
-            return has_pending_closures_helper::call(0, exec);
         }
         /// \endcond
     }
@@ -421,12 +436,16 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         /// \returns f()'s result through a future
         ///
         template <typename F>
-        static typename future<
-            typename hpx::util::result_of<
-                typename hpx::util::decay<F>::type()
+        static auto async_execute(executor_type& exec, F && f)
+#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
+        ->  typename future<
+                typename hpx::util::result_of<
+                    typename hpx::util::decay<F>::type()
+                >::type
             >::type
-        >::type
-        async_execute(executor_type& exec, F && f)
+#else
+        ->  decltype(exec.async_execute(std::forward<F>(f)))
+#endif
         {
             return exec.async_execute(std::forward<F>(f));
         }
@@ -448,10 +467,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       otherwise hpx::async(f).get()
         ///
         template <typename F>
-        static typename hpx::util::result_of<
-            typename hpx::util::decay<F>::type()
-        >::type
-        execute(executor_type& exec, F && f)
+        static auto execute(executor_type& exec, F && f)
+#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
+        ->  typename hpx::util::result_of<
+                typename hpx::util::decay<F>::type()
+            >::type
+#else
+        ->  decltype(detail::call_execute(exec, std::forward<F>(f)))
+#endif
         {
             return detail::call_execute(exec, std::forward<F>(f));
         }
@@ -483,10 +506,17 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       otherwise it executes hpx::async(f, i) as often as needed.
         ///
         template <typename F, typename Shape>
-        static std::vector<typename future<
-            typename detail::bulk_async_execute_result<F, Shape>::type
-        >::type>
+        static auto
         async_execute(executor_type& exec, F && f, Shape const& shape)
+#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
+        ->  std::vector<typename future<
+                typename detail::bulk_async_execute_result<F, Shape>::type
+            >::type>
+#else
+        ->  decltype(
+                detail::call_bulk_async_execute(exec, std::forward<F>(f), shape)
+            )
+#endif
         {
             return detail::call_bulk_async_execute(
                 exec, std::forward<F>(f), shape);
@@ -520,37 +550,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         ///       otherwise it executes hpx::async(f, i) as often as needed.
         ///
         template <typename F, typename Shape>
-        static typename detail::bulk_execute_result<F, Shape>::type
-        execute(executor_type& exec, F && f, Shape const& shape)
+        static auto execute(executor_type& exec, F && f, Shape const& shape)
+#if defined(HPX_ENABLE_WORKAROUND_FOR_GCC46)
+        ->  typename detail::bulk_execute_result<F, Shape>::type
+#else
+        ->  decltype(detail::call_bulk_execute(exec, std::forward<F>(f), shape))
+#endif
         {
             return detail::call_bulk_execute(exec, std::forward<F>(f), shape);
-        }
-
-        /// Retrieve the number of (kernel-)threads used by the associated
-        /// executor.
-        ///
-        /// \param exec  [in] The executor object to use for scheduling of the
-        ///              function \a f.
-        ///
-        /// \note This calls exec.os_thread_count() if it exists;
-        ///       otherwise it executes hpx::get_os_thread_count().
-        ///
-        static std::size_t os_thread_count(executor_type const& exec)
-        {
-            return detail::call_os_thread_count(exec);
-        }
-
-        /// Retrieve whether this executor has operations pending or not.
-        ///
-        /// \param exec  [in] The executor object to use for scheduling of the
-        ///              function \a f.
-        ///
-        /// \note If the executor does not expose this information, this call
-        ///       will always return \a false
-        ///
-        static bool has_pending_closures(executor_type& exec)
-        {
-            return detail::call_has_pending_closures(exec);
         }
     };
 
@@ -568,5 +575,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     template <typename T>
     struct is_executor;         // defined in hpx/traits/is_executor.hpp
 }}}
+
+#undef HPX_ENABLE_WORKAROUND_FOR_GCC46
 
 #endif

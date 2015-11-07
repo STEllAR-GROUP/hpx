@@ -29,7 +29,7 @@ namespace hpx { namespace serialization {
 
     namespace detail
     {
-        class HPX_EXPORT id_registry : boost::noncopyable
+        class id_registry : boost::noncopyable
         {
         public:
             typedef void* (*ctor_t) ();
@@ -104,14 +104,10 @@ namespace hpx { namespace serialization {
                 return result;
             }
 
-            static id_registry& instance()
-            {
-                util::static_<id_registry> inst;
-                return inst.get();
-            }
+            HPX_EXPORT static id_registry& instance();
 
         private:
-            id_registry(): max_id(0u) {}
+            id_registry() : max_id(0u) {}
 
             friend struct ::hpx::util::static_<id_registry>;
             friend class polymorphic_id_factory;
@@ -129,7 +125,7 @@ namespace hpx { namespace serialization {
             cache_t cache;
         };
 
-        class HPX_EXPORT polymorphic_id_factory : boost::noncopyable
+        class polymorphic_id_factory : boost::noncopyable
         {
             typedef id_registry::ctor_t ctor_t;
             typedef id_registry::typename_to_ctor_t typename_to_ctor_t;
@@ -169,11 +165,7 @@ namespace hpx { namespace serialization {
         private:
             polymorphic_id_factory() {}
 
-            static polymorphic_id_factory& instance()
-            {
-                hpx::util::static_<polymorphic_id_factory> factory;
-                return factory.get();
-            }
+            HPX_EXPORT static polymorphic_id_factory& instance();
 
             friend struct hpx::util::static_<polymorphic_id_factory>;
         };

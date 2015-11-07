@@ -7,6 +7,7 @@
 #define HPX_RUNTIME_THREADS_DETAIL_PERIODIC_MAINTENANCE_JAN_11_2015_0626PM
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/bind.hpp>
@@ -53,7 +54,8 @@ namespace hpx { namespace threads { namespace detail
                 get_thread_pool("timer-thread")->get_io_service(),
                 boost::chrono::milliseconds(1000));
 
-            void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&, boost::mpl::true_) =
+            void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&,
+                boost::mpl::true_) =
                 &periodic_maintenance_handler<SchedulingPolicy>;
 
             t.async_wait(boost::bind(handler, boost::ref(scheduler),
@@ -83,7 +85,8 @@ namespace hpx { namespace threads { namespace detail
             get_thread_pool("io-thread")->get_io_service(),
             boost::chrono::milliseconds(1000));
 
-        void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&, boost::mpl::true_) =
+        void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&,
+            boost::mpl::true_) =
             &periodic_maintenance_handler<SchedulingPolicy>;
 
         t.async_wait(util::bind(handler, boost::ref(scheduler),

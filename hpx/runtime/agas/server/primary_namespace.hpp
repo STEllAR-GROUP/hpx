@@ -17,6 +17,7 @@
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
@@ -72,7 +73,10 @@ char const* const primary_namespace_service_name = "primary/";
 ///                  Bit 95 is a flag that is set if a GID's credit count is
 ///                  ever split (e.g. if the GID is ever passed to another
 ///                  locality).
-///     identifier - Bit 64 to bit 87 of the MSB, and the entire LSB. The
+///                - Bit 87 marks the gid such that it will not be stored in
+///                  any of the AGAS caches. This is used mainly for ids
+///                  which represent 'one-shot' objects (like promises).
+///     identifier - Bit 64 to bit 86 of the MSB, and the entire LSB. The
 ///                  content of these bits depends on the component type of
 ///                  the underlying object. For all user-defined components,
 ///                  these bits contain a unique 88-bit number which is
@@ -320,8 +324,7 @@ struct HPX_EXPORT primary_namespace
         );
 
     response route(
-        request const& req
-      , error_code& ec = throws
+        parcelset::parcel && p
         );
 
     response bind_gid(
@@ -361,7 +364,8 @@ struct HPX_EXPORT primary_namespace
 
   private:
     resolved_type resolve_gid_locked(
-        naming::gid_type const& gid
+        boost::unique_lock<mutex_type>& l
+      , naming::gid_type const& gid
       , error_code& ec
         );
 
@@ -430,7 +434,10 @@ struct HPX_EXPORT primary_namespace
     }; // }}}
 
     HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_service, service_action);
-    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service, bulk_service_action);
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, remote_bulk_service,
+        bulk_service_action);
+
+    HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route, route_action);
 
     static parcelset::policies::message_handler* get_message_handler(
         parcelset::parcelhandler* ph
@@ -453,11 +460,15 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::primary_namespace::bulk_service_action,
     primary_namespace_bulk_service_action)
 
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::agas::server::primary_namespace::route_action,
+    primary_namespace_route_action)
+
 namespace hpx { namespace traits
 {
     // Parcel routing forwards the message handler request to the routed action
     template <>
-    struct action_message_handler<agas::server::primary_namespace::service_action>
+    struct action_message_handler<agas::server::primary_namespace::route_action>
     {
         static parcelset::policies::message_handler* call(
             parcelset::parcelhandler* ph
@@ -473,7 +484,7 @@ namespace hpx { namespace traits
     // Parcel routing forwards the binary filter request to the routed action
     template <>
     struct action_serialization_filter<
-        agas::server::primary_namespace::service_action>
+        agas::server::primary_namespace::route_action>
     {
         static serialization::binary_filter* call(parcelset::parcel const& p)
         {

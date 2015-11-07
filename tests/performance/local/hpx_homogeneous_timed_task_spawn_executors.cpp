@@ -25,7 +25,6 @@ using hpx::finalize;
 using hpx::get_os_thread_count;
 
 using hpx::applier::register_work;
-using hpx::applier::register_non_suspendable_work;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
@@ -76,12 +75,14 @@ int hpx_main(
         throw std::invalid_argument("number of executors to use must be larger than 0");
 
     if (std::size_t(num_executors) > num_os_threads)
-        throw std::invalid_argument("number of executors to use must be smaller than number of OS threads");
+        throw std::invalid_argument("number of executors to use must be \
+                                        smaller than number of OS threads");
 
     std::size_t num_cores_per_executor = vm["cores"].as<int>();
 
     if ((num_executors - 1) * num_cores_per_executor > num_os_threads)
-        throw std::invalid_argument("number of cores per executor should not cause oversubscription");
+        throw std::invalid_argument("number of cores per executor should not \
+                                     cause oversubscription");
 
     if (0 == tasks)
         throw std::invalid_argument("count of 0 tasks specified\n");
@@ -108,21 +109,10 @@ int hpx_main(
 
         t.restart();
 
-        if (0 == vm.count("no-stack")) {
-            // schedule normal threads
-            for (boost::uint64_t i = 0; i < tasks; ++i)
-                executors[i % num_executors].add(
-                    hpx::util::bind(&worker_timed, delay * 1000));
-        }
-        else {
-            // schedule stackless threads
-            for (boost::uint64_t i = 0; i < tasks; ++i)
-                executors[i % num_executors].add(
-                    hpx::util::bind(&worker_timed, delay * 1000),
-                    "", hpx::threads::pending, true,
-                    hpx::threads::thread_stacksize_nostack);
-        }
-
+        // schedule normal threads
+        for (boost::uint64_t i = 0; i < tasks; ++i)
+            executors[i % num_executors].add(
+                hpx::util::bind(&worker_timed, delay * 1000));
     // destructors of executors will wait for all tasks to finish executing
     }
 
@@ -152,9 +142,6 @@ int main(
         ( "executors,e"
         , value<int>()->default_value(1)
         , "number of executor instances to use")
-
-        ( "no-stack"
-        , "use stackless threads")
 
         ( "cores"
         , value<int>()->default_value(1)

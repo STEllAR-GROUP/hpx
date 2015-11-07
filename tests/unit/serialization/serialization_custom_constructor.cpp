@@ -107,7 +107,8 @@ C<T> *c_factory(hpx::serialization::input_archive& ar, C<T> */*unused*/)
     return c;
 }
 
-HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE((template<typename T>), (C<T>), c_factory);
+HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE((template<typename T>),
+    (C<T>), c_factory);
 
 void test_delegate()
 {

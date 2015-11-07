@@ -13,6 +13,9 @@
 #include <utility>
 #include <memory>
 #include <string>
+#include <vector>
+#include <list>
+#include <deque>
 
 #include <boost/move/move.hpp>
 #include <boost/lexical_cast.hpp>
@@ -73,9 +76,10 @@ void test_wait_for_either_of_two_futures_2()
     HPX_TEST_EQ(hpx::util::get<1>(t).get(), 42);
 }
 
+template <class Container>
 void test_wait_for_either_of_two_futures_list_1()
 {
-    std::vector<hpx::lcos::future<int> > futures;
+    Container futures;
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
     futures.push_back(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
@@ -84,25 +88,24 @@ void test_wait_for_either_of_two_futures_list_1()
     pt1();
 
     hpx::lcos::future<hpx::when_any_result<
-        std::vector<hpx::lcos::future<int> > > > r =
-        hpx::when_any(futures);
-    hpx::when_any_result<
-        std::vector<hpx::lcos::future<int> > > raw = r.get();
+        Container> > r = hpx::when_any(futures);
+    hpx::when_any_result<Container> raw = r.get();
 
     HPX_TEST_EQ(raw.index, 0u);
 
-    std::vector<hpx::lcos::future<int> > t = std::move(raw.futures);
+    Container t = std::move(raw.futures);
 
-    HPX_TEST(!futures[0].valid());
-    HPX_TEST(!futures[1].valid());
+    HPX_TEST(!futures.front().valid());
+    HPX_TEST(!futures.back().valid());
 
-    HPX_TEST(t[0].is_ready());
-    HPX_TEST_EQ(t[0].get(), 42);
+    HPX_TEST(t.front().is_ready());
+    HPX_TEST_EQ(t.front().get(), 42);
 }
 
+template <class Container>
 void test_wait_for_either_of_two_futures_list_2()
 {
-    std::vector<hpx::lcos::future<int> > futures;
+    Container futures;
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
     futures.push_back(pt1.get_future());
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
@@ -111,20 +114,18 @@ void test_wait_for_either_of_two_futures_list_2()
     pt2();
 
     hpx::lcos::future<hpx::when_any_result<
-        std::vector<hpx::lcos::future<int> > > > r =
-        hpx::when_any(futures);
-    hpx::when_any_result<
-        std::vector<hpx::lcos::future<int> > > raw = r.get();
+        Container> > r = hpx::when_any(futures);
+    hpx::when_any_result<Container> raw = r.get();
 
     HPX_TEST_EQ(raw.index, 1u);
 
-    std::vector<hpx::lcos::future<int> > t = std::move(raw.futures);
+    Container t = std::move(raw.futures);
 
-    HPX_TEST(!futures[0].valid());
-    HPX_TEST(!futures[1].valid());
+    HPX_TEST(!futures.front().valid());
+    HPX_TEST(!futures.back().valid());
 
-    HPX_TEST(t[1].is_ready());
-    HPX_TEST_EQ(t[1].get(), 42);
+    HPX_TEST(t.back().is_ready());
+    HPX_TEST_EQ(t.back().get(), 42);
 }
 
 void test_wait_for_either_of_three_futures_1()
@@ -350,9 +351,10 @@ void test_wait_for_either_of_four_futures_4()
     HPX_TEST_EQ(hpx::util::get<3>(t).get(), 42);
 }
 
+template <class Container>
 void test_wait_for_either_of_five_futures_1_from_list()
 {
-    std::vector<hpx::lcos::future<int> > futures;
+    Container futures;
 
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
     hpx::lcos::future<int> f1(pt1.get_future());
@@ -373,14 +375,12 @@ void test_wait_for_either_of_five_futures_1_from_list()
     pt1();
 
     hpx::lcos::future<hpx::when_any_result<
-        std::vector<hpx::lcos::future<int> > > > r =
-        hpx::when_any(futures);
-    hpx::when_any_result<
-        std::vector<hpx::lcos::future<int> > > raw = r.get();
+        Container> > r = hpx::when_any(futures);
+    hpx::when_any_result<Container> raw = r.get();
 
     HPX_TEST_EQ(raw.index, 0u);
 
-    std::vector<hpx::lcos::future<int> > t = std::move(raw.futures);
+    Container t = std::move(raw.futures);
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
@@ -388,13 +388,16 @@ void test_wait_for_either_of_five_futures_1_from_list()
     HPX_TEST(!f4.valid());
     HPX_TEST(!f5.valid());
 
-    HPX_TEST(t[0].is_ready());
-    HPX_TEST_EQ(t[0].get(), 42);
+    HPX_TEST(t.front().is_ready());
+    HPX_TEST_EQ(t.front().get(), 42);
 }
 
+template <class Container>
 void test_wait_for_either_of_five_futures_1_from_list_iterators()
 {
-    std::vector<hpx::lcos::future<int> > futures;
+    typedef typename Container::iterator iterator;
+
+    Container futures;
 
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
     hpx::lcos::future<int> f1(pt1.get_future());
@@ -415,14 +418,13 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
     pt1();
 
     hpx::lcos::future<hpx::when_any_result<
-        std::vector<hpx::lcos::future<int> > > > r =
-        hpx::when_any(futures.begin(), futures.end());
-    hpx::when_any_result<
-        std::vector<hpx::lcos::future<int> > > raw = r.get();
+        Container> > r =
+        hpx::when_any<iterator, Container>(futures.begin(), futures.end());
+    hpx::when_any_result<Container> raw = r.get();
 
     HPX_TEST_EQ(raw.index, 0u);
 
-    std::vector<hpx::lcos::future<int> > t = std::move(raw.futures);
+    Container t = std::move(raw.futures);
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
@@ -430,8 +432,8 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
     HPX_TEST(!f4.valid());
     HPX_TEST(!f5.valid());
 
-    HPX_TEST(t[0].is_ready());
-    HPX_TEST_EQ(t[0].get(), 42);
+    HPX_TEST(t.front().is_ready());
+    HPX_TEST_EQ(t.front().get(), 42);
 }
 
 void test_wait_for_either_of_five_futures_1()
@@ -655,14 +657,16 @@ void test_wait_for_either_of_five_futures_5()
 //         hpx::lcos::future<int> futures[count];
 //         for(unsigned j = 0; j < count; ++j)
 //         {
-//             tasks[j] = std::move(hpx::lcos::local::packaged_task<int()>(make_int_slowly));
+//             tasks[j] =
+//               std::move(hpx::lcos::local::packaged_task<int()>(make_int_slowly));
 //             futures[j] = tasks[j].get_future();
 //         }
 //         hpx::thread t(std::move(tasks[i]));
 //
 //         hpx::lcos::wait_any(futures, futures);
 //
-//         hpx::lcos::future<int>* const future = boost::wait_for_any(futures, futures+count);
+//         hpx::lcos::future<int>* const future =
+//               boost::wait_for_any(futures, futures+count);
 //
 //         HPX_TEST(future == (futures + i));
 //         for(unsigned j = 0; j < count; ++j)
@@ -731,13 +735,19 @@ void test_wait_for_either_of_two_deferred_futures()
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
+using hpx::lcos::future;
+
 int hpx_main(variables_map&)
 {
     {
         test_wait_for_either_of_two_futures_1();
         test_wait_for_either_of_two_futures_2();
-        test_wait_for_either_of_two_futures_list_1();
-        test_wait_for_either_of_two_futures_list_2();
+        test_wait_for_either_of_two_futures_list_1<std::vector<future<int> > >();
+        test_wait_for_either_of_two_futures_list_1<std::list<future<int> > >();
+        test_wait_for_either_of_two_futures_list_1<std::deque<future<int> > >();
+        test_wait_for_either_of_two_futures_list_2<std::vector<future<int> > >();
+        test_wait_for_either_of_two_futures_list_2<std::list<future<int> > >();
+        test_wait_for_either_of_two_futures_list_2<std::deque<future<int> > >();
         test_wait_for_either_of_three_futures_1();
         test_wait_for_either_of_three_futures_2();
         test_wait_for_either_of_three_futures_3();
@@ -745,8 +755,15 @@ int hpx_main(variables_map&)
         test_wait_for_either_of_four_futures_2();
         test_wait_for_either_of_four_futures_3();
         test_wait_for_either_of_four_futures_4();
-        test_wait_for_either_of_five_futures_1_from_list();
-        test_wait_for_either_of_five_futures_1_from_list_iterators();
+        test_wait_for_either_of_five_futures_1_from_list<std::vector<future<int> > >();
+        test_wait_for_either_of_five_futures_1_from_list<std::list<future<int> > >();
+        test_wait_for_either_of_five_futures_1_from_list<std::deque<future<int> > >();
+        test_wait_for_either_of_five_futures_1_from_list_iterators<
+            std::vector<future<int> > >();
+        test_wait_for_either_of_five_futures_1_from_list_iterators<
+            std::list<future<int> > >();
+        test_wait_for_either_of_five_futures_1_from_list_iterators<
+            std::deque<future<int> > >();
         test_wait_for_either_of_five_futures_1();
         test_wait_for_either_of_five_futures_2();
         test_wait_for_either_of_five_futures_3();

@@ -96,7 +96,8 @@ namespace hpx { namespace components { namespace security { namespace server
                 hpx::security_error
               , "subordinate_certificate_authority::sign_certificate_signing_request"
               , boost::str(boost::format(
-                    "The certificate signing request its capabilities can't be delegated: %1% %2%") %
+                    "The certificate signing request its capabilities can't be\
+                     delegated: %1% %2%") %
                     issuer_capability % csr.get_capability())
             )
         }

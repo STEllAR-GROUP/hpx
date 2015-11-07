@@ -205,7 +205,7 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 // component which allows for it to be created and accessed remotely through
 // a global address (hpx::id_type).
 struct partition_server
-  : hpx::components::simple_component_base<partition_server>
+  : hpx::components::component_base<partition_server>
 {
     enum partition_type
     {
@@ -262,7 +262,7 @@ private:
 //
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
-typedef hpx::components::simple_component<partition_server> partition_server_type;
+typedef hpx::components::component<partition_server> partition_server_type;
 HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
@@ -313,7 +313,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Data for one time step on one locality
-struct stepper_server : hpx::components::simple_component_base<stepper_server>
+struct stepper_server : hpx::components::component_base<stepper_server>
 {
     // Our data for one time step
     typedef std::vector<partition> space;
@@ -321,8 +321,10 @@ struct stepper_server : hpx::components::simple_component_base<stepper_server>
     stepper_server() {}
 
     stepper_server(std::size_t nl)
-      : left_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id(), -1, nl))),
-        right_(hpx::find_id_from_basename(stepper_basename, idx(hpx::get_locality_id(), +1, nl))),
+      : left_(hpx::find_from_basename(
+            stepper_basename, idx(hpx::get_locality_id(), -1, nl))),
+        right_(hpx::find_from_basename(
+            stepper_basename, idx(hpx::get_locality_id(), +1, nl))),
         U_(2)
     {
     }
@@ -394,7 +396,7 @@ private:
 //
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
-typedef hpx::components::simple_component<stepper_server> stepper_server_type;
+typedef hpx::components::component<stepper_server> stepper_server_type;
 HPX_REGISTER_COMPONENT(stepper_server_type, stepper_server);
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
@@ -411,9 +413,11 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
 
     // construct new instances/wrap existing steppers from other localities
     stepper()
-      : base_type(hpx::new_<stepper_server>(hpx::find_here(), hpx::get_num_localities_sync()))
+      : base_type(hpx::new_<stepper_server>
+          (hpx::find_here(), hpx::get_num_localities_sync()))
     {
-        hpx::register_id_with_basename(stepper_basename, get_id(), hpx::get_locality_id());
+        hpx::register_with_basename(
+            stepper_basename, get_id(), hpx::get_locality_id());
     }
 
     stepper(hpx::future<hpx::id_type> && id)

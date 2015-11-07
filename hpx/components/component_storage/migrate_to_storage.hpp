@@ -13,6 +13,7 @@
 #include <hpx/include/traits.hpp>
 
 #include <hpx/components/component_storage/server/migrate_to_storage.hpp>
+#include <hpx/components/component_storage/component_storage.hpp>
 
 #include <type_traits>
 

@@ -60,7 +60,8 @@ namespace hpx { namespace performance_counters { namespace server
 
         hpx::performance_counters::counter_value value;
 
-        prev_value_.value_ = detail::counter_type_from_statistic<Statistic>::call(*value_);
+        prev_value_.value_ =
+            detail::counter_type_from_statistic<Statistic>::call(*value_);
         prev_value_.status_ = status_new_data;
         prev_value_.time_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         prev_value_.count_ = ++invocation_count_;
@@ -70,7 +71,8 @@ namespace hpx { namespace performance_counters { namespace server
         {
             value_.reset(detail::counter_type_from_statistic<Statistic>::create(
                 parameter2_)); // reset accumulator
-            (*value_)(static_cast<double>(prev_value_.value_));  // start off with last base value
+            (*value_)(static_cast<double>(prev_value_.value_));
+            // start off with last base value
         }
 
         return value;
@@ -98,7 +100,8 @@ namespace hpx { namespace performance_counters { namespace server
         }
         else {
             boost::lock_guard<mutex_type> l(mtx_);
-            (*value_)(static_cast<double>(base_value.value_));          // accumulate new value
+            (*value_)(static_cast<double>(base_value.value_));
+            // accumulate new value
         }
         return true;
     }
@@ -192,7 +195,8 @@ namespace hpx { namespace performance_counters { namespace server
 
         value_.reset(detail::counter_type_from_statistic<Statistic>::create(
             parameter2_)); // reset accumulator
-        (*value_)(static_cast<double>(prev_value_.value_));  // start off with last base value
+        (*value_)(static_cast<double>(prev_value_.value_));
+        // start off with last base value
     }
 }}}
 
@@ -212,7 +216,7 @@ template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
 
 ///////////////////////////////////////////////////////////////////////////////
 // Average
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::mean>
 > average_count_counter_type;
@@ -224,7 +228,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Variance
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::variance>
 > variance_count_counter_type;
@@ -236,7 +240,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(variance_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Rooling average
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::rolling_mean>
 > rolling_mean_count_counter_type;
@@ -248,7 +252,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(rolling_mean_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Median
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::median>
 > median_count_counter_type;
@@ -260,7 +264,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(median_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Max
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::max>
 > max_count_counter_type;
@@ -272,7 +276,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(max_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Min
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     hpx::performance_counters::server::statistics_counter<
         boost::accumulators::tag::min>
 > min_count_counter_type;

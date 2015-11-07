@@ -7,7 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include "solver.hpp"
 
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     jacobi::server::solver
 > solver_type;
 

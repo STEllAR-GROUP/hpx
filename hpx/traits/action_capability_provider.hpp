@@ -6,11 +6,11 @@
 #if !defined(HPX_TRAITS_ACTION_CAPABILITY_PROVIDER_JUN_09_2013_1257PM)
 #define HPX_TRAITS_ACTION_CAPABILITY_PROVIDER_JUN_09_2013_1257PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/capability.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/runtime/naming/address.hpp>
 
 namespace hpx { namespace traits
 {
@@ -28,12 +28,6 @@ namespace hpx { namespace traits
             return components::security::capability();
         }
     };
-
-    template <typename Action>
-    struct action_capability_provider<Action
-      , typename util::always_void<typename Action::type>::type>
-      : action_capability_provider<typename Action::type>
-    {};
 }}
 
 #endif

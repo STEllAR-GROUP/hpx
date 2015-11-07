@@ -23,6 +23,7 @@
 #include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/static_reinit.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/static_assert.hpp>
@@ -179,25 +180,14 @@ namespace hpx { namespace lcos { namespace detail
 #endif
 
     protected:
+        // The GID needs to be split in order to keep the shared state alive.
         naming::id_type get_gid_locked(
             boost::unique_lock<naming::gid_type> l) const
         {
-            naming::gid_type gid = gid_;
-            if (naming::detail::has_credits(gid))
-            {
-                // first invocation: take all credits to avoid a self reference
-                naming::detail::strip_credits_from_gid(
-                    const_cast<naming::gid_type&>(gid_));
-
-                l.unlock();
-                return naming::id_type(gid, naming::id_type::managed);
-            }
-
+            hpx::future<naming::gid_type> gid =
+                naming::detail::split_gid_if_needed_locked(l, gid_);
             l.unlock();
-
-            // any (subsequent) invocation causes the credits to be replenished
-            naming::detail::replenish_credits(gid);
-            return naming::id_type(gid, naming::id_type::managed);
+            return naming::id_type(gid.get(), naming::id_type::managed);
         }
 
     protected:
@@ -207,12 +197,15 @@ namespace hpx { namespace lcos { namespace detail
             return gid_;
         }
 
-        naming::gid_type gid_;
+        mutable naming::gid_type gid_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
     class promise;
+
+    template <typename Result, typename RemoteResult>
+    void intrusive_ptr_add_ref(promise<Result, RemoteResult>* p);
 
     template <typename Result, typename RemoteResult>
     void intrusive_ptr_release(promise<Result, RemoteResult>* p);
@@ -242,8 +235,6 @@ namespace hpx { namespace lcos { namespace detail
         // actual managed component object
         ~promise()
         {
-            // This lock is needed to not interfere with the intrusive pointer
-            // deletion
             this->finalize();
         }
 
@@ -300,27 +291,36 @@ namespace hpx { namespace lcos { namespace detail
             boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
             long counter = --this->count_;
 
-            // if this promise was never asked for its id we need to take
             // special precautions for it to go out of scope
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
-                // this will trigger normal destruction
-                naming::id_type id = this->get_gid_locked(std::move(l));
+                // At this point, the remaining count has to be held by AGAS
+                // for this reason, we break the self-reference to allow for
+                // proper destruction
+
+                // move all credits to a temporary id_type
+                naming::gid_type gid = this->gid_;
+                naming::detail::strip_credits_from_gid(this->gid_);
+
+                naming::id_type id (gid, id_type::managed);
+                l.unlock();
+
                 return false;
             }
-            else if (0 == counter)
-            {
-                return true;
-            }
-            return false;
+
+            return 0 == counter;
+        }
+
+        // disambiguate reference counting
+        friend void intrusive_ptr_add_ref(promise* p)
+        {
+            ++p->count_;
         }
 
         friend void intrusive_ptr_release(promise* p)
         {
             if (p->requires_delete())
-            {
                 delete p;
-            }
         }
 
         template <typename>
@@ -357,8 +357,6 @@ namespace hpx { namespace lcos { namespace detail
         // actual managed component object
         ~promise()
         {
-            // This lock is needed to not interfere with the intrusive pointer
-            // deletion
             this->finalize();
         }
 
@@ -412,27 +410,36 @@ namespace hpx { namespace lcos { namespace detail
             boost::unique_lock<naming::gid_type> l(this->gid_.get_mutex());
             long counter = --this->count_;
 
-            // if this promise was never asked for its id we need to take
             // special precautions for it to go out of scope
             if (1 == counter && naming::detail::has_credits(this->gid_))
             {
-                // this will trigger normal destruction
-                naming::id_type id = this->get_gid_locked(std::move(l));
+                // At this point, the remaining count has to be held by AGAS
+                // for this reason, we break the self-reference to allow for
+                // proper destruction
+
+                // move all credits to a temporary id_type
+                naming::gid_type gid = this->gid_;
+                naming::detail::strip_credits_from_gid(this->gid_);
+
+                naming::id_type id (gid, id_type::managed);
+                l.unlock();
+
                 return false;
             }
-            else if (0 == counter)
-            {
-                return true;
-            }
-            return false;
+
+            return 0 == counter;
+        }
+
+        // disambiguate reference counting
+        friend void intrusive_ptr_add_ref(promise* p)
+        {
+            ++p->count_;
         }
 
         friend void intrusive_ptr_release(promise* p)
         {
             if (p->requires_delete())
-            {
                 delete p;
-            }
         }
 
         template <typename>
@@ -534,6 +541,8 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class promise
     {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+
     public:
         typedef detail::promise<Result, RemoteResult> wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
@@ -558,6 +567,27 @@ namespace hpx { namespace lcos
             LLCO_(info)
                 << "promise::promise("
                 << impl_->get_unmanaged_id() << ")";
+        }
+
+        promise(promise && rhs)
+          : impl_(std::move(rhs.impl_)),
+            future_obtained_(rhs.future_obtained_)
+        {
+            rhs.future_obtained_ = false;
+        }
+
+        virtual ~promise()
+        {}
+
+        promise& operator=(promise && rhs)
+        {
+            if (this != &rhs)
+            {
+                impl_ = std::move(rhs.impl_);
+                future_obtained_ = rhs.future_obtained_;
+                rhs.future_obtained_ = false;
+            }
+            return *this;
         }
 
     protected:
@@ -586,6 +616,13 @@ namespace hpx { namespace lcos
             return (*impl_)->get_unmanaged_id();
         }
 
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_id();
+        }
+#endif
+
     private:
         // Return the global id of this \a future instance
         naming::gid_type get_base_gid() const
@@ -609,15 +646,12 @@ namespace hpx { namespace lcos
 
         typedef Result result_type;
 
-        virtual ~promise()
-        {}
-
         lcos::future<Result> get_future(error_code& ec = throws)
         {
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<Result>::get_future",
-                    "future already has been retrieved from this packaged_action");
+                    "future already has been retrieved from this promise");
                 return lcos::future<Result>();
             }
 
@@ -654,6 +688,8 @@ namespace hpx { namespace lcos
     template <>
     class promise<void, util::unused_type>
     {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise);
+
     public:
         typedef detail::promise<void, util::unused_type> wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
@@ -677,6 +713,27 @@ namespace hpx { namespace lcos
             LLCO_(info)
                 << "promise<void>::promise("
                 << impl_->get_unmanaged_id() << ")";
+        }
+
+        promise(promise && rhs)
+          : impl_(std::move(rhs.impl_)),
+            future_obtained_(rhs.future_obtained_)
+        {
+            rhs.future_obtained_ = false;
+        }
+
+        virtual ~promise()
+        {}
+
+        promise& operator=(promise && rhs)
+        {
+            if (this != &rhs)
+            {
+                impl_ = std::move(rhs.impl_);
+                future_obtained_ = rhs.future_obtained_;
+                rhs.future_obtained_ = false;
+            }
+            return *this;
         }
 
     protected:
@@ -705,6 +762,13 @@ namespace hpx { namespace lcos
             return (*impl_)->get_unmanaged_id();
         }
 
+#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
+        naming::id_type get_gid() const
+        {
+            return get_id();
+        }
+#endif
+
     private:
         /// \brief Return the global id of this \a future instance
         naming::gid_type get_base_gid() const
@@ -721,9 +785,6 @@ namespace hpx { namespace lcos
         }
 
         typedef util::unused_type result_type;
-
-        virtual ~promise()
-        {}
 
         lcos::future<void> get_future(error_code& ec = throws)
         {

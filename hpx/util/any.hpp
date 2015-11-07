@@ -18,7 +18,7 @@
 #pragma once
 #endif
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -85,7 +85,8 @@ namespace hpx { namespace util
             void (*copy)(void* const*, void**);
             bool (*equal_to)(void* const*, void* const*);
             std::basic_istream<Char>& (*stream_in)(std::basic_istream<Char>&, void**);
-            std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&, void* const*);
+            std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&,
+                void* const*);
 
             virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
             virtual void load_object(void **, IArchive & ar, unsigned) = 0;
@@ -110,7 +111,8 @@ namespace hpx { namespace util
             void (*copy)(void* const*, void**);
             bool (*equal_to)(void* const*, void* const*);
             std::basic_istream<Char>& (*stream_in)(std::basic_istream<Char>&, void**);
-            std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&, void* const*);
+            std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&,
+                void* const*);
         };
 
         template <typename T
@@ -962,7 +964,8 @@ namespace hpx { namespace util
     }
 
     template <typename T, typename IArchive, typename OArchive, typename Char>
-    inline T const* any_cast(basic_any<IArchive, OArchive, Char> const* operand) BOOST_NOEXCEPT
+    inline T const* any_cast(basic_any<IArchive, OArchive,
+        Char> const* operand) BOOST_NOEXCEPT
     {
         return any_cast<T>(const_cast<basic_any<IArchive, OArchive, Char>*>(operand));
     }
@@ -999,13 +1002,16 @@ namespace hpx { namespace util
         BOOST_STATIC_ASSERT(!is_reference<nonref>::value);
 #endif
 
-        return any_cast<nonref const&>(const_cast<basic_any<IArchive, OArchive, Char> &>(operand));
+        return any_cast<nonref const&>(const_cast<basic_any<IArchive, OArchive,
+            Char> &>(operand));
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    typedef basic_any<serialization::input_archive, serialization::output_archive, char> any;
-    typedef basic_any<serialization::input_archive, serialization::output_archive, wchar_t> wany;
+    typedef basic_any<serialization::input_archive, serialization::output_archive,
+        char> any;
+    typedef basic_any<serialization::input_archive, serialization::output_archive,
+        wchar_t> wany;
 
     typedef basic_any<void, void, char> any_nonser;
     typedef basic_any<void, void, wchar_t> wany_nonser;

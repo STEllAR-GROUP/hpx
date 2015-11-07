@@ -7,6 +7,7 @@
 
 #include "boost/regex.hpp"
 #include "license_check.hpp"
+#include "function_hyper.hpp"
 
 namespace
 {
@@ -39,7 +40,7 @@ namespace boost
       if ( !boost::regex_search( contents, license_regex ) )
       {
         ++m_files_with_errors;
-        error( library_name, full_path, name() );
+        error( library_name, full_path, loclink(full_path, name()) );
       }
     }
   } // namespace inspect

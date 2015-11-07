@@ -6,28 +6,36 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM)
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
+#include <hpx/runtime/actions/continuation_fwd.hpp>
+#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/input_archive.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/util/unique_function.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
+#include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
 
-#include <boost/enable_shared_from_this.hpp>
+#include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/utility/enable_if.hpp>
+
+#include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -63,7 +71,7 @@ namespace hpx
         >::set_value_action set_value_action;
         if (move_credits)
         {
-            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            naming::id_type target(id.get_gid(), naming::id_type::managed_move_credit);
             id.make_unmanaged();
 
             apply<set_value_action>(target, util::detail::make_temporary<T>(t));
@@ -83,7 +91,7 @@ namespace hpx
         >::set_value_action set_value_action;
         if (move_credits)
         {
-            naming::id_type target(id.get_gid(), id_type::managed_move_credit);
+            naming::id_type target(id.get_gid(), naming::id_type::managed_move_credit);
             id.make_unmanaged();
 
             apply_c<set_value_action>(cont, target,
@@ -96,15 +104,13 @@ namespace hpx
         }
     }
 
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
+    HPX_EXPORT void set_lco_error(naming::id_type const& id,
         boost::exception_ptr const& e, bool move_credits);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    class HPX_EXPORT continuation;
-
     namespace detail
     {
         template <typename Continuation>
@@ -131,36 +137,33 @@ namespace hpx { namespace actions
     // Parcel continuations are polymorphic objects encapsulating the
     // id_type of the destination where the result has to be sent.
     class HPX_EXPORT continuation
-      : public boost::enable_shared_from_this<continuation>
     {
     public:
+        typedef void continuation_tag;
+
         continuation() {}
 
         explicit continuation(naming::id_type const& gid)
           : gid_(gid)
         {
-            // continuations with invalid id do not make sense
-            HPX_ASSERT(gid_);
         }
 
         explicit continuation(naming::id_type && gid)
           : gid_(std::move(gid))
         {
-            // continuations with invalid id do not make sense
-            HPX_ASSERT(gid_);
         }
 
         virtual ~continuation() {}
 
         //
-        virtual void trigger() const;
+        virtual void trigger();
 
         template <typename Arg0>
-        inline void trigger(Arg0 && arg0) const;
+        inline void trigger(Arg0 && arg0);
 
         //
-        virtual void trigger_error(boost::exception_ptr const& e) const;
-        virtual void trigger_error(boost::exception_ptr && e) const;
+        virtual void trigger_error(boost::exception_ptr const& e);
+        virtual void trigger_error(boost::exception_ptr && e);
 
         virtual char const* get_continuation_name() const = 0;
 
@@ -184,9 +187,6 @@ namespace hpx { namespace actions
             return gid_;
         }
 
-        virtual bool has_to_wait_for_futures() = 0;
-        virtual void wait_for_futures() = 0;
-
     protected:
         naming::id_type gid_;
     };
@@ -197,9 +197,8 @@ namespace hpx { namespace actions
         boost::is_void<typename util::result_of<F(Ts...)>::type>::value
     >::type trigger(continuation& cont, F&& f, Ts&&... vs)
     {
-        typedef typename util::result_of<F(Ts...)>::type result_type;
         try {
-            cont.trigger(util::invoke_r<result_type>(std::forward<F>(f),
+            cont.trigger(util::invoke(std::forward<F>(f),
                 std::forward<Ts>(vs)...));
         }
         catch (...) {
@@ -214,7 +213,7 @@ namespace hpx { namespace actions
     >::type trigger(continuation& cont, F&& f, Ts&&... vs)
     {
         try {
-            util::invoke_r<void>(std::forward<F>(f), std::forward<Ts>(vs)...);
+            util::invoke(std::forward<F>(f), std::forward<Ts>(vs)...);
             cont.trigger();
         }
         catch (...) {
@@ -236,7 +235,7 @@ namespace hpx { namespace actions
         };
 
         template <typename T>
-        BOOST_FORCEINLINE T operator()(id_type const& lco, T && t) const
+        BOOST_FORCEINLINE T operator()(naming::id_type const& lco, T && t) const
         {
             hpx::set_lco_value(lco, std::forward<T>(t));
 
@@ -266,33 +265,23 @@ namespace hpx { namespace actions
         continuation_impl() {}
 
         template <typename Cont_>
-        continuation_impl(Cont_ && cont, hpx::id_type const& target)
+        continuation_impl(Cont_ && cont, hpx::naming::id_type const& target)
           : cont_(std::forward<Cont_>(cont)), target_(target)
         {}
 
         virtual ~continuation_impl() {}
 
         template <typename T>
-        typename result<continuation_impl(hpx::id_type, T)>::type
-        operator()(hpx::id_type const& lco, T && t) const
+        typename result<continuation_impl(hpx::naming::id_type, T)>::type
+        operator()(hpx::naming::id_type const& lco, T && t) const
         {
             hpx::apply_c(cont_, lco, target_, std::forward<T>(t));
 
             // Unfortunately we need to default construct the return value,
             // this possibly imposes an additional restriction of return types.
-            typedef typename result<continuation_impl(hpx::id_type, T)>::type
+            typedef typename result<continuation_impl(hpx::naming::id_type, T)>::type
                 result_type;
             return result_type();
-        }
-
-        virtual bool has_to_wait_for_futures()
-        {
-            return traits::serialize_as_future<cont_type>::call_if(cont_);
-        }
-
-        virtual void wait_for_futures()
-        {
-            traits::serialize_as_future<cont_type>::call(cont_);
         }
 
     private:
@@ -306,7 +295,7 @@ namespace hpx { namespace actions
         }
 
         cont_type cont_;
-        hpx::id_type target_;
+        hpx::naming::id_type target_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -328,14 +317,14 @@ namespace hpx { namespace actions
                     cont_type(T1, T2)
                 >::type result_type;
             typedef typename util::result_of<
-                    function_type(hpx::id_type, result_type)
+                    function_type(hpx::naming::id_type, result_type)
                 >::type type;
         };
 
         continuation2_impl() {}
 
         template <typename Cont_, typename F_>
-        continuation2_impl(Cont_ && cont, hpx::id_type const& target,
+        continuation2_impl(Cont_ && cont, hpx::naming::id_type const& target,
                 F_ && f)
           : cont_(std::forward<Cont_>(cont)),
             target_(target),
@@ -345,8 +334,8 @@ namespace hpx { namespace actions
         virtual ~continuation2_impl() {}
 
         template <typename T>
-        typename result<continuation2_impl(hpx::id_type, T)>::type
-        operator()(hpx::id_type const& lco, T && t) const
+        typename result<continuation2_impl(hpx::naming::id_type, T)>::type
+        operator()(hpx::naming::id_type const& lco, T && t) const
         {
             using hpx::util::placeholders::_2;
             hpx::apply_continue(cont_, hpx::util::bind(f_, lco, _2),
@@ -354,21 +343,9 @@ namespace hpx { namespace actions
 
             // Unfortunately we need to default construct the return value,
             // this possibly imposes an additional restriction of return types.
-            typedef typename result<continuation2_impl(hpx::id_type, T)>::type
+            typedef typename result<continuation2_impl(hpx::naming::id_type, T)>::type
                 result_type;
             return result_type();
-        }
-
-        virtual bool has_to_wait_for_futures()
-        {
-            return traits::serialize_as_future<cont_type>::call_if(cont_) ||
-                traits::serialize_as_future<function_type>::call_if(f_);
-        }
-
-        virtual void wait_for_futures()
-        {
-            traits::serialize_as_future<cont_type>::call(cont_);
-            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -382,8 +359,9 @@ namespace hpx { namespace actions
         }
 
         cont_type cont_;        // continuation type
-        hpx::id_type target_;
-        function_type f_;       // set_value action  (default: set_lco_value_continuation)
+        hpx::naming::id_type target_;
+        function_type f_;
+        // set_value action  (default: set_lco_value_continuation)
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -391,7 +369,7 @@ namespace hpx { namespace actions
     struct typed_continuation : continuation
     {
     private:
-        typedef util::function<void(naming::id_type, Result)> function_type;
+        typedef util::unique_function<void(naming::id_type, Result)> function_type;
 
     public:
         typed_continuation()
@@ -415,12 +393,25 @@ namespace hpx { namespace actions
           : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
-        template <typename F>
+        template <typename F,
+            typename Enable
+                = typename std::enable_if<
+                    !std::is_same<
+                        typename util::decay<F>::type, typed_continuation>::value
+                    >::type
+        >
         explicit typed_continuation(F && f)
           : f_(std::forward<F>(f))
         {}
 
-        virtual void trigger_value(Result && result) const
+        // This is needed for some gcc versions
+        // replace by typed_continuation(typed_continuation && o) = default;
+        // when all compiler support it
+        typed_continuation(typed_continuation && o)
+          : continuation(std::move(o.gid_)), f_(std::move(o.f_))
+        {}
+
+        virtual void trigger_value(Result && result)
         {
             LLCO_(info)
                 << "typed_continuation<Result>::trigger_value("
@@ -438,16 +429,6 @@ namespace hpx { namespace actions
             else {
                 f_(this->get_id(), std::move(result));
             }
-        }
-
-        virtual bool has_to_wait_for_futures()
-        {
-            return traits::serialize_as_future<function_type>::call_if(f_);
-        }
-
-        virtual void wait_for_futures()
-        {
-            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -500,7 +481,7 @@ namespace hpx { namespace actions
     struct typed_continuation<void> : continuation
     {
     private:
-        typedef util::function<void(naming::id_type)> function_type;
+        typedef util::unique_function<void(naming::id_type)> function_type;
 
     public:
         typed_continuation()
@@ -529,7 +510,7 @@ namespace hpx { namespace actions
           : f_(std::forward<F>(f))
         {}
 
-        void trigger() const
+        void trigger()
         {
             LLCO_(info)
                 << "typed_continuation<void>::trigger("
@@ -549,19 +530,9 @@ namespace hpx { namespace actions
             }
         }
 
-        virtual void trigger_value(util::unused_type &&) const
+        virtual void trigger_value(util::unused_type &&)
         {
             this->trigger();
-        }
-
-        virtual bool has_to_wait_for_futures()
-        {
-            return traits::serialize_as_future<function_type>::call_if(f_);
-        }
-
-        virtual void wait_for_futures()
-        {
-            traits::serialize_as_future<function_type>::call(f_);
         }
 
     private:
@@ -608,11 +579,11 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
-    void continuation::trigger(Arg0 && arg0) const
+    void continuation::trigger(Arg0 && arg0)
     {
         // The static_cast is safe as we know that Arg0 is the result type
         // of the executed action (see apply.hpp).
-        static_cast<typed_continuation<Arg0> const*>(this)->trigger_value(
+        static_cast<typed_continuation<Arg0> *>(this)->trigger_value(
             std::forward<Arg0>(arg0));
     }
 }}
@@ -641,7 +612,7 @@ namespace hpx
     inline hpx::actions::continuation_impl<
         typename util::decay<Cont>::type
     >
-    make_continuation(Cont && f, hpx::id_type const& target)
+    make_continuation(Cont && f, hpx::naming::id_type const& target)
     {
         typedef typename util::decay<Cont>::type cont_type;
         return hpx::actions::continuation_impl<cont_type>(
@@ -673,7 +644,7 @@ namespace hpx
         typename util::decay<Cont>::type,
         typename util::decay<F>::type
     >
-    make_continuation(Cont && cont, hpx::id_type const& target,
+    make_continuation(Cont && cont, hpx::naming::id_type const& target,
         F && f)
     {
         typedef typename util::decay<Cont>::type cont_type;
@@ -683,6 +654,13 @@ namespace hpx
             std::forward<Cont>(cont), target, std::forward<F>(f));
     }
 }
+
+namespace hpx { namespace traits {
+    template <>
+    struct is_continuation<std::unique_ptr<actions::continuation> >
+      : boost::mpl::true_
+    {};
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 

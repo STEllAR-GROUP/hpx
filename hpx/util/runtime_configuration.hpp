@@ -7,14 +7,18 @@
 #if !defined(HPX_UTIL_RUNTIME_CONFIGURATION_OCT_02_2008_0530PM)
 #define HPX_UTIL_RUNTIME_CONFIGURATION_OCT_02_2008_0530PM
 
-#include <vector>
-#include <string>
-
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
+
+#include <boost/cstdint.hpp>
+
+#include <vector>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

@@ -6,7 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_AUTHORITY_BASE_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_AUTHORITY_BASE_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_SECURITY)
+
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 
@@ -64,7 +67,8 @@ namespace hpx { namespace components { namespace security { namespace server
 }}}}
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::security::server::certificate_authority_base::sign_certificate_signing_request_action
+    hpx::components::security::server::certificate_authority_base
+       ::sign_certificate_signing_request_action
   , certificate_authority_base_sign_certificate_signing_request_action);
 
 HPX_REGISTER_ACTION_DECLARATION(
@@ -74,5 +78,7 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::security::server::certificate_authority_base::is_valid_action
   , certificate_authority_base_is_valid_action);
+
+#endif
 
 #endif

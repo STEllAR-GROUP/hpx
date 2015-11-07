@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_finalize.hpp>
+#include <hpx/hpx_user_main_config.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
@@ -487,7 +488,8 @@ namespace hpx
     inline bool start(std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-    /// \fn bool start(int (*f)(boost::program_options::variables_map& vm), std::string const& app_name, int argc, char** argv)
+    /// \fn bool start(int (*f)(boost::program_options::variables_map& vm),
+    ///  std::string const& app_name, int argc, char** argv)
     ///
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///

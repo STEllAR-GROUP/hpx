@@ -203,7 +203,8 @@ namespace hpx { namespace performance_counters
     /// instance. Generally, a full name of a counter instance has the
     /// structure:
     ///
-    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}/countername#parameters
+    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}
+    ///      /countername#parameters
     ///
     /// i.e.
     ///    /queue{localityprefix/thread#2}/length
@@ -232,7 +233,8 @@ namespace hpx { namespace performance_counters
         std::string instancename_;        ///< the name of the object instance
         boost::int64_t parentinstanceindex_;    ///< the parent instance index
         boost::int64_t instanceindex_;    ///< the instance index
-        bool parentinstance_is_basename_; ///< the parentinstancename_ member holds a base counter name
+        bool parentinstance_is_basename_; ///< the parentinstancename_
+                                          ///member holds a base counter name
 
     private:
         // serialization support
@@ -611,12 +613,13 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::vector<boost::int64_t> const& parameters, error_code& ec = throws);
+            std::vector<boost::int64_t> const& parameters,
+            error_code& ec = throws);
 
         // \brief Create a new arithmetics performance counter instance based on
         //        the given base counter names
-        naming::gid_type create_arithmetics_counter(
-            counter_info const& info, std::vector<std::string> const& base_counter_names,
+        naming::gid_type create_arithmetics_counter(counter_info const& info,
+            std::vector<std::string> const& base_counter_names,
             error_code& ec = throws);
 
         // \brief Create a new performance counter instance based on given

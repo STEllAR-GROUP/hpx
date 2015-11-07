@@ -96,7 +96,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     std::size_t arg_size = get_archive_size(outp, out_archive_flags,
         zero_copy ? &out_chunks : 0);
     std::vector<char> out_buffer;
-    boost::uint32_t dest_locality_id = outp.get_destination_locality_id();
+    boost::uint32_t dest_locality_id = outp.destination_locality_id();
 
     out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
@@ -124,13 +124,13 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     }
 
     // make sure the parcel has been de-serialized properly
-    HPX_TEST_EQ(outp.get_parcel_id(), inp.get_parcel_id());
-    HPX_TEST_EQ(outp.get_source(), inp.get_source());
-    HPX_TEST_EQ(outp.get_destination_locality(), inp.get_destination_locality());
-    HPX_TEST_EQ(outp.get_start_time(), inp.get_start_time());
+    HPX_TEST_EQ(outp.parcel_id(), inp.parcel_id());
+    HPX_TEST_EQ(outp.source_id(), inp.source_id());
+    HPX_TEST_EQ(outp.destination_locality(), inp.destination_locality());
+    HPX_TEST_EQ(outp.start_time(), inp.start_time());
 
-    hpx::actions::action_type outact = outp.get_action();
-    hpx::actions::action_type inact = inp.get_action();
+    hpx::actions::base_action *outact = outp.get_action();
+    hpx::actions::base_action *inact = inp.get_action();
 
     HPX_TEST_EQ(outact->get_component_type(), inact->get_component_type());
     HPX_TEST_EQ(outact->get_action_name(), inact->get_action_name());
@@ -142,8 +142,8 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     HPX_TEST_EQ(int(outact->get_thread_stacksize()), int(inact->get_thread_stacksize()));
     HPX_TEST_EQ(outact->get_parent_thread_phase(), inact->get_parent_thread_phase());
 
-    hpx::actions::continuation_type outcont = outp.get_continuation();
-    hpx::actions::continuation_type incont = inp.get_continuation();
+    std::unique_ptr<hpx::actions::continuation> outcont = outp.get_continuation();
+    std::unique_ptr<hpx::actions::continuation> incont = inp.get_continuation();
 
     HPX_TEST_EQ(outcont->get_continuation_name(), incont->get_continuation_name());
     HPX_TEST_EQ(outcont->get_id(), incont->get_id());
@@ -174,14 +174,13 @@ void test_normal_serialization(T& arg)
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp(here, addr,
-        new hpx::actions::transfer_action<Action>(
-            hpx::threads::thread_priority_normal, arg),
-        new hpx::actions::typed_continuation<int>(here));
+        hpx::actions::typed_continuation<int>(here),
+        Action(), hpx::threads::thread_priority_normal, arg);
 
-    outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here);
+    outp.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
+    outp.set_source_id(here);
 
-    test_parcel_serialization(outp, out_archive_flags, false);
+    test_parcel_serialization(std::move(outp), out_archive_flags, false);
 }
 
 template <typename T1, typename T2>
@@ -202,14 +201,13 @@ void test_normal_serialization(T1& arg1, T2& arg2)
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp(here, addr,
-        new hpx::actions::transfer_action<test_action2>(
-            hpx::threads::thread_priority_normal, arg1, arg2),
-        new hpx::actions::typed_continuation<int>(here));
+        hpx::actions::typed_continuation<int>(here),
+        test_action2(), hpx::threads::thread_priority_normal, arg1, arg2);
 
-    outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here);
+    outp.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
+    outp.set_source_id(here);
 
-    test_parcel_serialization(outp, out_archive_flags, false);
+    test_parcel_serialization(std::move(outp), out_archive_flags, false);
 }
 
 template <typename T1, typename T2>
@@ -231,14 +229,15 @@ void test_normal_serialization(double d, T1& arg1, std::string const& s,
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp(here, addr,
-        new hpx::actions::transfer_action<test_action3>(
-            hpx::threads::thread_priority_normal, d, arg1, s, i, arg2),
-        new hpx::actions::typed_continuation<int>(here));
+        hpx::actions::typed_continuation<int>(here),
+        test_action3(),
+        hpx::threads::thread_priority_normal, d, arg1, s, i, arg2
+        );
 
-    outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here);
+    outp.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
+    outp.set_source_id(here);
 
-    test_parcel_serialization(outp, out_archive_flags, false);
+    test_parcel_serialization(std::move(outp), out_archive_flags, false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -260,14 +259,13 @@ void test_zero_copy_serialization(T& arg)
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp(here, addr,
-        new hpx::actions::transfer_action<Action>(
-            hpx::threads::thread_priority_normal, arg),
-        new hpx::actions::typed_continuation<int>(here));
+        hpx::actions::typed_continuation<int>(here),
+        Action(), hpx::threads::thread_priority_normal, arg);
 
-    outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here);
+    outp.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
+    outp.set_source_id(here);
 
-    test_parcel_serialization(outp, out_archive_flags, true);
+    test_parcel_serialization(std::move(outp), out_archive_flags, true);
 }
 
 template <typename T1, typename T2>
@@ -288,14 +286,13 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp(here, addr,
-        new hpx::actions::transfer_action<test_action2>(
-            hpx::threads::thread_priority_normal, arg1, arg2),
-        new hpx::actions::typed_continuation<int>(here));
+        hpx::actions::typed_continuation<int>(here),
+        test_action2(), hpx::threads::thread_priority_normal, arg1, arg2);
 
-    outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here);
+    outp.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
+    outp.set_source_id(here);
 
-    test_parcel_serialization(outp, out_archive_flags, true);
+    test_parcel_serialization(std::move(outp), out_archive_flags, true);
 }
 
 template <typename T1, typename T2>
@@ -317,14 +314,13 @@ void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp(here, addr,
-        new hpx::actions::transfer_action<test_action3>(
-            hpx::threads::thread_priority_normal, d, arg1, s, i, arg2),
-        new hpx::actions::typed_continuation<int>(here));
+        hpx::actions::typed_continuation<int>(here),
+        test_action3(), hpx::threads::thread_priority_normal, d, arg1, s, i, arg2);
 
-    outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here);
+    outp.parcel_id() = hpx::parcelset::parcel::generate_unique_id();
+    outp.set_source_id(here);
 
-    test_parcel_serialization(outp, out_archive_flags, true);
+    test_parcel_serialization(std::move(outp), out_archive_flags, true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

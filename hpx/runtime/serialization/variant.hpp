@@ -114,7 +114,8 @@ namespace hpx { namespace serialization
         variant_impl<types>::load(ar, which, v);
     }
 
-    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template <BOOST_VARIANT_ENUM_PARAMS(class T)>),
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template
+        <BOOST_VARIANT_ENUM_PARAMS(class T)>),
             (boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>));
 
 } // namespace serialization

@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_BASE_LCO_WITH_VALUE_HPP)
 #define HPX_LCOS_BASE_LCO_WITH_VALUE_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/components/component_type.hpp>

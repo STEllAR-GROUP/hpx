@@ -15,7 +15,6 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/serialization/serialize_sequence.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/fusion/include/at_c.hpp>

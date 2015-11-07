@@ -77,7 +77,7 @@ def run_mpi(cmd, localities, verbose):
 # Run with srun
 # This is executing srun with the '-n' option set to the number of localities
 def run_srun(cmd, localities, verbose):
-    exec_cmd = ['srun', '-K', '-n', str(localities), '-N', str(localities)] + cmd
+    exec_cmd = ['srun', '-K', '-n', str(localities)] + cmd
     if verbose:
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
@@ -271,7 +271,9 @@ if __name__ == '__main__':
                 msg += ')'
                 print(msg)
                 while procs:
-                    term(procs.pop(0))
+                    nextproc = procs.pop(0)
+                    if nextproc != proc:
+                        term(nextproc)
         except:
             pass
         finally: procs_lock.release()

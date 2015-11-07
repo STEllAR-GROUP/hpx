@@ -7,6 +7,7 @@
 #define HPX_PERFORMANCE_COUNTERS_SERVER_RAW_COUNTER_MAR_03_2009_0743M
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/util/function.hpp>
 
@@ -15,9 +16,9 @@ namespace hpx { namespace performance_counters { namespace server
 {
     class HPX_EXPORT raw_counter
       : public base_performance_counter,
-        public components::managed_component_base<raw_counter>
+        public components::component_base<raw_counter>
     {
-        typedef components::managed_component_base<raw_counter> base_type;
+        typedef components::component_base<raw_counter> base_type;
 
     public:
         typedef raw_counter type_holder;

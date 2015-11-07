@@ -1251,14 +1251,16 @@ void test_wait_for_either_of_five_futures_5()
 //         hpx::lcos::shared_future<int> futures[count];
 //         for(unsigned j = 0; j < count; ++j)
 //         {
-//             tasks[j] = std::move(hpx::lcos::local::packaged_task<int()>(make_int_slowly));
+//             tasks[j] =
+//               std::move(hpx::lcos::local::packaged_task<int()>(make_int_slowly));
 //             futures[j] = tasks[j].get_future();
 //         }
 //         hpx::thread t(std::move(tasks[i]));
 //
 //         hpx::lcos::wait_any(futures, futures);
 //
-//         hpx::lcos::shared_future<int>* const future = boost::wait_for_any(futures, futures+count);
+//         hpx::lcos::shared_future<int>* const future =
+//              boost::wait_for_any(futures, futures+count);
 //
 //         HPX_TEST(future == (futures + i));
 //         for(unsigned j = 0; j < count; ++j)

@@ -212,7 +212,8 @@ void symbol_namespace::register_global_counter_types(
 
         std::string help;
         if (detail::symbol_namespace_services[i].target_ == detail::counter_target_count)
-            help = "returns the overall number of invocations of all symbol AGAS services";
+            help = "returns the overall number of invocations \
+                    of all symbol AGAS services";
         else
             help = "returns the overall execution time of all symbol AGAS services";
 
@@ -398,7 +399,7 @@ response symbol_namespace::bind(
                 // split the credit as the receiving end will expect to keep the
                 // object alive
                 naming::gid_type new_gid =
-                    naming::detail::split_gid_if_needed(*current_gid);
+                    naming::detail::split_gid_if_needed(*current_gid).get();
 
                 // trigger the lco
                 set_lco_value(id, new_gid);
@@ -452,7 +453,7 @@ response symbol_namespace::resolve(
     boost::shared_ptr<naming::gid_type> current_gid(it->second);
 
     l.unlock();
-    naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid);
+    naming::gid_type gid = naming::detail::split_gid_if_needed(*current_gid).get();
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::resolve, key(%1%), gid(%2%)")
@@ -566,7 +567,7 @@ response symbol_namespace::on_event(
             {
                 util::unlock_guard<boost::unique_lock<mutex_type> > ul(l);
                 naming::gid_type new_gid = naming::detail::split_gid_if_needed(
-                    *current_gid);
+                    *current_gid).get();
 
                 // trigger the lco
                 handled = true;
@@ -669,7 +670,8 @@ response symbol_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_count, &counter_data_, ::_1);
             break;
         case symbol_ns_iterate_names:
-            get_data_func = boost::bind(&cd::get_iterate_names_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_iterate_names_count,
+                &counter_data_, ::_1);
             break;
         case symbol_ns_on_event:
             get_data_func = boost::bind(&cd::get_on_event_count, &counter_data_, ::_1);
@@ -697,7 +699,8 @@ response symbol_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_time, &counter_data_, ::_1);
             break;
         case symbol_ns_iterate_names:
-            get_data_func = boost::bind(&cd::get_iterate_names_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_iterate_names_time,
+                &counter_data_, ::_1);
             break;
         case symbol_ns_on_event:
             get_data_func = boost::bind(&cd::get_on_event_time, &counter_data_, ::_1);

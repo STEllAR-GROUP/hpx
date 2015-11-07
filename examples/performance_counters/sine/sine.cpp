@@ -17,7 +17,7 @@
 HPX_REGISTER_COMPONENT_MODULE_DYNAMIC();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     ::performance_counters::sine::server::sine_counter
 > sine_counter_type;
 

@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
 #include "server/allgather.hpp"
@@ -15,7 +15,7 @@
 HPX_REGISTER_COMPONENT_MODULE();
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     ag::server::allgather
 > allgather_type;
 
@@ -39,7 +39,7 @@ HPX_REGISTER_ACTION(
     allgather_get_item_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::managed_component<
+typedef hpx::components::component<
     ag::server::allgather_and_gate
 > allgather_and_gate_type;
 

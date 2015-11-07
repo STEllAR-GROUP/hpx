@@ -6,15 +6,16 @@
 #if !defined(HPX_UTIL_QUERY_COUNTERS_SEP_27_2011_0255PM)
 #define HPX_UTIL_QUERY_COUNTERS_SEP_27_2011_0255PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/export_definitions.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/performance_counters.hpp>
 
+#include <boost/cstdint.hpp>
+
 #include <string>
 #include <vector>
-
-#include <boost/cstdint.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

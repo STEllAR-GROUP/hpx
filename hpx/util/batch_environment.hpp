@@ -7,8 +7,10 @@
 #define HPX_UTIL_PBS_ENVIRONMENT_AUG_26_2011_0901AM
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
+#include <hpx/util/spinlock.hpp>
 
-#include <hpx/util/asio_util.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 #include <map>
 #include <cstdlib>
@@ -26,8 +28,8 @@ namespace hpx { namespace util
     // Try to retrieve default values from a batch environment
     struct HPX_EXPORT batch_environment
     {
-        // the constructor tries to read initial values from a batch environment, filling our
-        // map of nodes and thread counts
+        // the constructor tries to read initial values from a batch environment,
+        // filling our map of nodes and thread counts
         batch_environment(std::vector<std::string> & nodelist,
             bool debug = false, bool enable = true);
 

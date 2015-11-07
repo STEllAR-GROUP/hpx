@@ -7,8 +7,14 @@
 #ifndef HPX_LCOS_LOCAL_DATAFLOW_HPP
 #define HPX_LCOS_LOCAL_DATAFLOW_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/is_future_range.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/is_executor.hpp>
+#include <hpx/traits/acquire_future.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/bind.hpp>
@@ -16,11 +22,6 @@
 #include <hpx/util/invoke_fused.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/deferred_call.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_future_range.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/acquire_future.hpp>
 
 #include <boost/fusion/include/begin.hpp>
 #include <boost/fusion/include/deref.hpp>
@@ -81,13 +82,13 @@ namespace hpx { namespace lcos { namespace local
         template <typename Policy, typename Func, typename Futures>
         struct dataflow_frame //-V690
           : hpx::lcos::detail::future_data<
-                typename hpx::util::invoke_fused_result_of<
+                typename hpx::util::detail::fused_result_of<
                     Func(Futures &&)
                 >::type
             >
         {
             typedef
-                typename hpx::util::invoke_fused_result_of<
+                typename hpx::util::detail::fused_result_of<
                     Func(Futures &&)
                 >::type
                 result_type;
@@ -130,7 +131,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 try {
                     result_type res =
-                        hpx::util::invoke_fused_r<result_type>(
+                        hpx::util::invoke_fused(
                             func_, std::move(futures_));
 
                     // reset futures
@@ -147,7 +148,7 @@ namespace hpx { namespace lcos { namespace local
             void execute(boost::mpl::true_)
             {
                 try {
-                    hpx::util::invoke_fused_r<result_type>(
+                    hpx::util::invoke_fused(
                         func_, std::move(futures_));
 
                     // reset futures

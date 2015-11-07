@@ -22,22 +22,14 @@ namespace jacobi
     namespace server
     {
         struct HPX_COMPONENT_EXPORT solver
-            : hpx::components::managed_component_base<
-                solver
-              , hpx::components::detail::this_type
-              , hpx::traits::construct_with_back_ptr
-            >
+            : hpx::components::component_base<solver>
         {
             typedef
-                hpx::components::managed_component_base<
-                    solver
-                  , hpx::components::detail::this_type
-                  , hpx::traits::construct_with_back_ptr
-                >
+                hpx::components::component_base<solver>
                 base_type;
-            typedef hpx::components::managed_component<solver> component_type;
+            typedef hpx::components::component<solver> component_type;
 
-            solver(component_type * back_ptr)
+            solver()
             {
                 HPX_ASSERT(false);
             }
@@ -51,9 +43,8 @@ namespace jacobi
                 }
             }
 
-            solver(component_type * back_ptr, grid const & g, std::size_t nx, std::size_t line_block)
-                : base_type(back_ptr)
-                , ny(g.rows.size())
+            solver(grid const & g, std::size_t nx, std::size_t line_block)
+                : ny(g.rows.size())
                 , nx(nx)
                 //, stencil_iterators(g.rows.size())
             {
@@ -134,7 +125,8 @@ namespace jacobi
 
                 double time_elapsed = t.elapsed();
                 hpx::cout << nx << "x" << ny << " "
-                     << ((double((nx-2)*(ny-2) * max_iterations)/1e6)/time_elapsed) << " MLUPS\n" << hpx::flush;
+                     << ((double((nx-2)*(ny-2) * max_iterations)/1e6)/time_elapsed)
+                     << " MLUPS\n" << hpx::flush;
             }
 
             HPX_DEFINE_COMPONENT_ACTION(solver, run, run_action);

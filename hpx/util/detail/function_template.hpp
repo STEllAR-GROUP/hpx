@@ -9,9 +9,8 @@
 #define HPX_UTIL_DETAIL_FUNCTION_TEMPLATE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
+#include <hpx/runtime/serialization/access.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/function_registration.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
@@ -73,10 +72,6 @@ namespace hpx { namespace util { namespace detail
         char const* name;
         typename serializable_vtable<IAr, OAr>::save_object_t save_object;
         typename serializable_vtable<IAr, OAr>::load_object_t load_object;
-        typename serializable_vtable<IAr, OAr>::wait_for_future_t
-            wait_for_future;
-        typename serializable_vtable<IAr, OAr>::has_to_wait_for_futures_t
-            has_to_wait_for_futures;
 
         template <typename T>
         function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
@@ -84,15 +79,11 @@ namespace hpx { namespace util { namespace detail
           , name("empty")
           , save_object(&serializable_vtable<IAr, OAr>::template save_object<T>)
           , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
-          , wait_for_future(
-                &serializable_vtable<IAr, OAr>::template wait_for_future<T>)
-          , has_to_wait_for_futures(
-                &serializable_vtable<IAr, OAr>::template has_to_wait_for_futures<T>)
         {
             if(!this->empty)
-                name = get_function_name<std::pair<function_vtable_ptr, T> >();
+                name = get_function_name<util::tuple<function_vtable_ptr, T> >();
             init_registration<
-                std::pair<function_vtable_ptr, T>
+                util::tuple<function_vtable_ptr, T>
             >::g.register_function();
         }
     };
@@ -101,21 +92,21 @@ namespace hpx { namespace util { namespace detail
     // registration code for serialization
     template <typename Sig, typename IAr, typename OAr, typename T>
     struct init_registration<
-        std::pair<function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<function_vtable_ptr<Sig, IAr, OAr>, T>
     >
     {
-        typedef std::pair<function_vtable_ptr<Sig, IAr, OAr>, T> vtable_ptr;
+        typedef util::tuple<function_vtable_ptr<Sig, IAr, OAr>, T> vtable_ptr;
 
         static automatic_function_registration<vtable_ptr> g;
     };
 
     template <typename Sig, typename IAr, typename OAr, typename T>
     automatic_function_registration<
-        std::pair<function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<function_vtable_ptr<Sig, IAr, OAr>, T>
     > init_registration<
-        std::pair<function_vtable_ptr<Sig, IAr, OAr>, T>
+        util::tuple<function_vtable_ptr<Sig, IAr, OAr>, T>
     >::g =  automatic_function_registration<
-                std::pair<function_vtable_ptr<Sig, IAr, OAr>, T>
+                util::tuple<function_vtable_ptr<Sig, IAr, OAr>, T>
             >();
 }}}
 
@@ -133,8 +124,6 @@ namespace hpx { namespace util
           , Sig
         >
     {
-        friend struct traits::serialize_as_future<function>;
-
         typedef detail::function_vtable_ptr<Sig, IArchive, OArchive> vtable_ptr;
         typedef detail::basic_function<vtable_ptr, Sig> base_type;
 
@@ -330,13 +319,14 @@ namespace hpx { namespace util
     };
 
     template <typename Sig, typename IArchive, typename OArchive>
-    static bool is_empty_function(function<Sig, IArchive, OArchive> const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(function<Sig, IArchive,
+        OArchive> const& f) BOOST_NOEXCEPT
     {
         return f.empty();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#   ifndef BOOST_NO_CXX11_TEMPLATE_ALIASES
+#   ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
 
     template <typename Sig>
     using function_nonser = function<Sig, void, void>;
@@ -399,7 +389,7 @@ namespace hpx { namespace util
         return f.empty();
     }
 
-#   endif /*BOOST_NO_CXX11_TEMPLATE_ALIASES*/
+#   endif /*HPX_HAVE_CXX11_ALIAS_TEMPLATES*/
 }}
 
 #endif

@@ -3,7 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/manage_config.hpp>
 
 namespace hpx { namespace util
@@ -32,7 +31,7 @@ namespace hpx { namespace util
     {
         for (std::string const& s : cfg)
         {
-            std::string::size_type p = s.find_last_of("=");
+            std::string::size_type p = s.find_first_of("=");
             std::string key(trim_whitespace(s.substr(0, p)));
             if (key[key.size()-1] == '!')
                 key.erase(key.size()-1);

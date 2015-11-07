@@ -39,6 +39,7 @@ namespace hpx { namespace lcos { namespace local
 
         void notify_all(error_code& ec = throws)
         {
+            util::ignore_all_while_checking ignore_lock;
             boost::unique_lock<mutex_type> l(mtx_);
             cond_.notify_all(std::move(l), ec);
         }
@@ -80,7 +81,7 @@ namespace hpx { namespace lcos { namespace local
             if (ec) return cv_status::error;
 
             // if the timer has hit, the waiting period timed out
-            return (reason == threads::wait_signaled) ? //-V110
+            return (reason == threads::wait_timeout) ? //-V110
                 cv_status::timeout : cv_status::no_timeout;
         }
 

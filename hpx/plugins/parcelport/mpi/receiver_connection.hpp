@@ -55,6 +55,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , header_(h)
           , allocator_(chunk_pool)
           , buffer_(allocator_)
+          , request_(MPI_REQUEST_NULL)
           , request_ptr_(0)
           , chunks_idx_(0)
           , pp_(pp)
@@ -69,18 +70,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             buffer_.num_chunks_ = header_.num_chunks();
         }
 
-        bool receive()
+        bool receive(std::size_t num_thread = -1)
         {
             switch (state_)
             {
                 case initialized:
-                    return receive_transmission_chunks();
+                    return receive_transmission_chunks(num_thread);
                 case rcvd_transmission_chunks:
-                    return receive_data();
+                    return receive_data(num_thread);
                 case rcvd_data:
-                    return receive_chunks();
+                    return receive_chunks(num_thread);
                 case rcvd_chunks:
-                    return send_release_tag();
+                    return send_release_tag(num_thread);
                 case sent_release_tag:
                     return done();
                 default:
@@ -89,7 +90,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return false;
         }
 
-        bool receive_transmission_chunks()
+        bool receive_transmission_chunks(std::size_t num_thread = -1)
         {
             // determine the size of the chunk buffer
             std::size_t num_zero_copy_chunks =
@@ -124,10 +125,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             state_ = rcvd_transmission_chunks;
 
-            return receive_data();
+            return receive_data(num_thread);
         }
 
-        bool receive_data()
+        bool receive_data(std::size_t num_thread = -1)
         {
             if(!request_done()) return false;
 
@@ -153,10 +154,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             state_ = rcvd_data;
 
-            return receive_chunks();
+            return receive_chunks(num_thread);
         }
 
-        bool receive_chunks()
+        bool receive_chunks(std::size_t num_thread = -1)
         {
             while(chunks_idx_ < buffer_.chunks_.size())
             {
@@ -184,10 +185,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             state_ = rcvd_chunks;
 
-            return send_release_tag();
+            return send_release_tag(num_thread);
         }
 
-        bool send_release_tag()
+        bool send_release_tag(std::size_t num_thread = -1)
         {
             if(!request_done()) return false;
 
@@ -208,7 +209,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 request_ptr_ = &request_;
             }
 
-            decode_parcel(pp_, std::move(buffer_));
+            decode_parcels(pp_, std::move(buffer_), num_thread);
 
             state_ = sent_release_tag;
 
@@ -224,12 +225,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             if(request_ptr_ == 0) return true;
 
-            util::mpi_environment::scoped_lock l;
+            util::mpi_environment::scoped_try_lock l;
+
+            if(!l.locked) return false;
 
             int completed = 0;
-            MPI_Status status;
             int ret = 0;
-            ret = MPI_Test(request_ptr_, &completed, &status);
+            ret = MPI_Test(request_ptr_, &completed, MPI_STATUS_IGNORE);
             HPX_ASSERT(ret == MPI_SUCCESS);
             if(completed)// && status.MPI_ERROR != MPI_ERR_PENDING)
             {

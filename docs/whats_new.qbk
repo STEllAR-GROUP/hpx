@@ -9,8 +9,24 @@
 
 [section:hpx_0_9_11 __hpx__ V0.9.11]
 
+This release is the first after our change to a new development policy. We
+switched all develpment to be strictly performed on branches only, all direct
+commits to our main branch (`master`) are prohibited. Any change has to go
+through a peer review before it will be merged to `master`. As a result the
+overall stability of our code base has significantly increased, the development
+process itself has been simplified. This change manifests itself in a large
+number of pull-requests which has been merged (please see below for a full list
+of closed issues and pull-requests). All in all for this release, we closed
+almost 100 issues and merged over 270 pull-requests. There have been over 1600
+commits to the master branch since the last release.
+
 [heading General Changes]
 
+* We are moving into the direction of unifying managed and simple components. As
+  such, the classes [classref hpx::components::component] and
+  [classref hpx::components::component_base] have been added which currently just
+  forward to the currently existing simple component facilities. The examples
+  have been converted to only use those two classes.
 * Added integration with the [@https://circleci.com/gh/STEllAR-GROUP/hpx CircleCI]
   hosted continuous integration service. This gives us constant and immediate
   feedback on the health of our master branch.
@@ -35,11 +51,11 @@
     which will place multiple component instances as evenly as possible based
     on any performance counter.
   * [classref hpx::components::target_distribution_policy `hpx::target_distribution_policy`]
-    which allows to represent a given locality in the context of a distribution
+    which allows to represent a given locality in the context of a distrwibution
     policy.
 * The new distribution policies can now be also used with `hpx::async`. This
   change also deprecates `hpx::async_colocated(id, ...)` which now is replaced
-  by a distribution policy: `hpx::async(hpx::colocated(id), ...).
+  by a distribution policy: `hpx::async(hpx::colocated(id), ...)`.
 * The `hpx::vector` and `hpx::unordered_map` data structures can now be used
   with the new distribution policies as well.
 * The parallel facility `hpx::parallel::task_region` has been renamed to
@@ -47,14 +63,35 @@
   the changes in the corresponding standardization proposal __cpp11_n4088__.
 * Added extensions to the parallel facility
   [classref hpx::parallel::v2::task_block `hpx::parallel::task_block`] allowing
-  to combine a task+_block with an execution policy. This implies a minor
+  to combine a task_block with an execution policy. This implies a minor
   breaking change as the `hpx::parallel::task_block` is now a template.
 * Added new LCOs: `hpx::lcos::latch` and `hpx::lcos::local::latch` which
   semantically conform to the proposed `std::latch` (see __cpp17_n4399__).
+* Added performance counters exposing data related to data transferred by
+  input/output (filesystem) operations.
+* Added performance counters allowing to track the number of action invocations
+  (local and remote invocations).
+* Added new command line options [hpx_cmdline `--hpx:print-counter-at`] and
+  [hpx_cmdline `--hpx:reset-counters`].
+* The `hpx::vector` component has been renamed to `hpx::partitioned_vector` to
+  make it explicit that the underlying memory is not contiguous.
+* Introduced a completely new and uniform higher-level parallelism API which is
+  based on executors. All existing parallelism APIs have been adapted to this.
+  We have added a large number of different executor types, such as a
+  numa-aware executor, a this-thread executor, etc.
+* Added support for the MingW toolchain on Windows (thanks to Eric Lemanissier).
 
 [heading Breaking Changes]
 
-* The CMake project name has changed from 'hpx' to 'HPX' for consistency and 
+* We are moving into the direction of unifying managed and simple components. In
+  order to stop exposing the old facilities, all examples have been converted to
+  use the new classes. The breaking change in this release is that performance
+  counters are now a [classref hpx::components::component_base] instead of
+  [classref hpx::components::managed_component_base].
+* We removed the support for stackless threads. It turned out that there was no
+  performance benefit when using stackless threads. As such, we decided to clean
+  up our codebase. This feature was not documented.
+* The CMake project name has changed from 'hpx' to 'HPX' for consistency and
   compatibilty with naming conventions and other CMake projects. Generated
   config files go into <prefix>/lib/cmake/HPX and not <prefix>/lib/cmake/hpx.
 * The macro `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY` has been deprecated. Please
@@ -84,7 +121,7 @@
 * Replaced the use of Boost.Serialization with our own solution. While the new
   version is mostly compatible with Boost.Serialization, this change requires
   some minor code modifications in user code. For more information, please see the
-  corresponding [@https://mail.cct.lsu.edu/pipermail//hpx-users/2015-April/000558.html announcement]
+  corresponding [@http://thread.gmane.org/gmane.comp.lib.hpx.devel/196 announcement]
   on the __stellar_list__ mailing list.
 * The names used by cmake to influence various configuration options have been
   unified. The new naming scheme relies on all configuration constants to start
@@ -111,10 +148,237 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    1827] - Fixing a memory management issue for the Parquet application
+* [pr    1825] - Adding hpx::components::component and
+                 hpx::components::component_base
+* [pr    1823] - Adding git commit id to circleci build
+* [pr    1822] - applying fixes suggested by clang 3.7
+* [pr    1821] - Hyperlink fixes
+* [pr    1820] - added parallel multi-locality sanity test
+* [pr    1819] - Fixing #1667
+* [pr    1816] - Support hpxrx
+* [pr    1814] - Fix async to dispatch to the correct locality in all cases
+* [issue 1813] - async(launch::..., action(), ...) always invokes locally
+* [pr    1812] - fixed syntax error in CMakeLists.txt
+* [pr    1811] - Agas optimizations
+* [pr    1810] - drop superfluous typedefs
+* [pr    1809] - Allow HPX to be used as an optional package in 3rd party code
+* [pr    1808] - Fixing #1723
+* [pr    1807] - Making sure resolve_localities does not hang during normal
+                 operation
+* [issue 1806] - Spinlock no longer movable and deletes operator '=', breaks
+                 MiniGhost
+* [issue 1804] - register_with_basename causes hangs
+* [pr    1801] - Enhanced the inspect tool to take user directly to the problem
+                 with hyperlinks
+* [issue 1800] - Problems compiling application on smic
+* [pr    1799] - Fixing cv exceptions
+* [pr    1798] - Documentation refactoring & updating
+* [pr    1797] - Updating the activeharmony CMake module
+* [pr    1795] - Fixing cv
+* [pr    1794] - Fix connect with hpx::runtime_mode_connect
+* [pr    1793] - fix a wrong use of HPX_MAX_CPU_COUNT instead of
+                 HPX_HAVE_MAX_CPU_COUNT
+* [pr    1792] - Allow for default constructed parcel instances to be moved
+* [pr    1791] - Fix connect with hpx::runtime_mode_connect
+* [issue 1790] - assertion 'action_.get()' failed: HPX(assertion_failure) when
+                 running Octotiger with pull request 1786
+* [pr    1789] - Fixing discover_counter_types API function
+* [issue 1788] - connect with hpx::runtime_mode_connect
+* [issue 1787] - discover_counter_types not working
+* [pr    1786] - Changing addressing_service to use std::unordered_map instead
+                 of std::map
+* [pr    1785] - Fix is_iterator for container algorithms
+* [pr    1784] - Adding new command line options:
+* [pr    1783] - Minor changes for APEX support
+* [pr    1782] - Drop legacy forwarding action traits
+* [pr    1781] - Attempt to resolve the race between cv::wait_xxx and
+                 cv::notify_all
+* [pr    1780] - Removing serialize_sequence
+* [pr    1779] - Fixed #1501: hwloc configuration options are wrong for MIC
+* [pr    1778] - Removing ability to enable/disable parcel handling
+* [pr    1777] - Completely removing stackless threads
+* [pr    1776] - Cleaning up util/plugin
+* [pr    1775] - Agas fixes
+* [pr    1774] - Action invocation count
+* [pr    1773] - replaced MSVC variable with WIN32
+* [pr    1772] - Fixing Problems in MPI parcelport and future serialization.
+* [pr    1771] - Fixing intel 13 compiler errors related to variadic template
+                 template parameters for lcos::when_ tests
+* [pr    1770] - Forwarding decay to std::
+* [pr    1769] - Add more characters with special regex meaning to the existing
+                 patch
+* [pr    1768] - Adding test for receive_buffer
+* [pr    1767] - Making sure that uptime counter throws exception on any attempt
+                 to be reset
+* [pr    1766] - Cleaning up code related to throttling scheduler
+* [pr    1765] - Restricting thread_data to creating only with intrusive_pointers
+* [pr    1764] - Fixing 1763
+* [issue 1763] - UB in thread_data::operator delete
+* [pr    1762] - Making sure all serialization registries/factories are unique
+* [pr    1761] - Fixed #1751: hpx::future::wait_for fails a simple test
+* [pr    1758] - Fixing #1757
+* [issue 1757] - pinning not correct using --hpx:bind
+* [issue 1756] - compilation error with MinGW
+* [pr    1755] - Making output serialization const-correct
+* [issue 1752] - Error in AGAS
+* [issue 1751] - hpx::future::wait_for fails a simple test
+* [pr    1750] - Removing hpx_fwd.hpp includes
+* [pr    1749] - Simplify result_of and friends
+* [pr    1747] - Removed superfluous code from message_buffer.hpp
+* [pr    1746] - Tuple dependencies
+* [issue 1745] - Broken when_some which takes iterators
+* [pr    1744] - Refining archive interface
+* [pr    1743] - Fixing when_all when only a single future is passed
+* [pr    1742] - Config includes
+* [pr    1741] - Os executors
+* [issue 1740] - hpx::promise has some problems
+* [pr    1739] - Parallel composition with generic containers
+* [issue 1737] - Uptime problems
+* [pr    1736] - added convenience c-tor and begin()/end() to serialize_buffer
+* [pr    1735] - Config includes
+* [pr    1734] - Fixed #1688: Add timer counters for tfunc_total and exec_total
+* [issue 1733] - Add unit test for hpx/lcos/local/receive_buffer.hpp
+* [pr    1732] - Renaming get_os_thread_count
+* [pr    1731] - Basename registration
+* [issue 1730] - Use after move of thread_init_data
+* [pr    1729] - Rewriting channel based on new gate component
+* [pr    1728] - Fixing #1722
+* [pr    1727] - Fixing compile problems with apply_colocated
+* [pr    1726] - Apex integration
+* [pr    1725] - fixed test timeouts
+* [pr    1724] - Renaming vector
+* [issue 1723] - Drop support for intel compilers and gcc 4.4. based standard libs
+* [issue 1722] - Add support for detecting non-ready futures before serialization
+* [pr    1721] - Unifying parallel executors, initializing from launch policy
+* [pr    1720] - dropped superfluous typedef
+* [issue 1718] - Windows 10 x64, VS 2015 - Unknown CMake command
+                 "add_hpx_pseudo_target".
+* [pr    1717] - Timed executor traits for thread-executors
+* [pr    1716] - serialization of arrays didn't work with non-pod types. fixed
+* [pr    1715] - List serialization
+* [pr    1714] - changing misspellings
+* [pr    1713] - Fixed distribution policy executors
+* [pr    1712] - Moving library detection to be executed after feature tests
+* [pr    1711] - Simplify parcel
+* [pr    1710] - Compile only tests
+* [pr    1709] - Implemented timed executors
+* [pr    1708] - Implement parallel::executor_traits for thread-executors
+* [pr    1707] - Various fixes to threads::executors to make custom schedulers
+                 work
+* [pr    1706] - Command line option --hpx:cores does not work as expected
+* [issue 1705] - command line option --hpx:cores does not work as expected
+* [pr    1704] - vector deserialization is speeded up a little
+* [pr    1703] - Fixing shared_mutes
+* [issue 1702] - Shared_mutex does not compile with no_mutex cond_var
+* [pr    1701] - Add distribution_policy_executor
+* [pr    1700] - Executor parameters
+* [pr    1699] - Readers writer lock
+* [pr    1698] - Remove leftovers
+* [pr    1697] - Fixing held locks
+* [pr    1696] - Modified Scan Partitioner for Algorithms
+* [pr    1695] - This thread executors
+* [pr    1694] - Fixed #1688: Add timer counters for tfunc_total and exec_total
+* [pr    1693] - Fix #1691: is_executor template specification fails for
+                 inherited executors
+* [pr    1692] - Fixed #1662: Possible exception source in
+                 coalescing_message_handler
+* [issue 1691] - is_executor template specification fails for inherited executors
+* [pr    1690] - added macro for non-intrusive serialization of classes without
+                 a default c-tor
+* [pr    1689] - Replace value_or_error with custom storage, unify future_data
+                 state
+* [issue 1688] - Add timer counters for tfunc_total and exec_total
+* [pr    1687] - Fixed interval timer
+* [pr    1686] - Fixing cmake warnings about not existing pseudo target
+                 dependencies
+* [pr    1685] - Converting partitioners to use bulk async execute
+* [pr    1683] - Adds a tool for inspect that checks for character limits
+* [pr    1682] - Change project name to (uppercase) HPX
+* [pr    1681] - Counter shortnames
+* [pr    1680] - Extended Non-intrusive Serialization to Ease Usage for Library
+                 Developers
+* [pr    1679] - Working on 1544: More executor changes
+* [pr    1678] - Transpose fixes
+* [pr    1677] - Improve Boost compatibility check
+* [pr    1676] - 1d stencil fix
+* [issue 1675] - hpx project name is not HPX
+* [pr    1674] - Fixing the MPI parcelport
+* [pr    1673] - added move semantics to map/vector deserialization
+* [pr    1672] - Vs2015 await
+* [pr    1671] - Adapt transform for #1668
+* [pr    1670] - Started to work on #1668
+* [pr    1669] - Add this_thread_executors
+* [issue 1667] - Apple build instructions in docs are out of date
+* [pr    1666] - Apex integration
+* [pr    1665] - Fixes an error with the whitespace check that showed the
+                 incorrect location of the error
+* [issue 1664] - Inspect tool found incorrect endline whitespace
+* [pr    1663] - Improve use of locks
+* [issue 1662] - Possible exception source in coalescing_message_handler
+* [pr    1661] - Added support for 128bit number serialization
+* [pr    1660] - Serialization 128bits
+* [pr    1659] - Implemented inner_product and adjacent_diff algos
+* [pr    1658] - Add serialization for std::set (as there is for std::vector
+                 and std::map)
+* [pr    1657] - Use of shared_ptr in io_service_pool changed to unique_ptr
+* [issue 1656] - 1d_stencil codes all have wrong factor
+* [pr    1654] - When using runtime_mode_connect, find the correct localhost
+                 public ip address
+* [pr    1653] - Fixing 1617
+* [pr    1652] - Remove traits::action_may_require_id_splitting
+* [pr    1651] - Fixed performance counters related to AGAS cache timings
+* [pr    1650] - Remove leftovers of traits::type_size
+* [pr    1649] - Shorten target names on Windows to shorten used path names
+* [pr    1648] - Fixing problems introduced by merging #1623 for older compilers
+* [pr    1647] - Simplify running automatic builds on Windows
+* [issue 1646] - Cache insert and update performance counters are broken
+* [issue 1644] - Remove leftovers of traits::type_size
+* [issue 1643] - Remove traits::action_may_require_id_splitting
+* [pr    1642] - Adds spell checker to the inspect tool for qbk and doxygen
+                 comments
+* [pr    1640] - First step towards fixing 688
+* [pr    1639] - Re-apply remaining changes from limit_dataflow_recursion branch
+* [pr    1638] - This fixes possible deadlock in the test
+                 ignore_while_locked_1485
+* [pr    1637] - Fixing hpx::wait_all() invoked with two vector<future<T>>
+* [pr    1636] - Partially re-apply changes from limit_dataflow_recursion
+                 branch
+* [pr    1635] - Adding missing test for #1572
+* [pr    1634] - Revert "Limit recursion-depth in dataflow to a configurable
+                 constant"
+* [pr    1633] - Add command line option to ignore batch environment
+* [pr    1631] - hpx::lcos::queue exhibits strange behavior
+* [pr    1630] - Fixed endline_whitespace_check.cpp to detect lines with only
+                 whitespace
+* [issue 1629] - Inspect trailing whitespace checker problem
+* [pr    1628] - Removed meaningless const qualifiers. Minor icpc fix.
+* [pr    1627] - Fixing the queue LCO and add example demonstrating its use
+* [pr    1626] - Deprecating get_gid(), add get_id() and get_unmanaged_id()
+* [pr    1625] - Allowing to specify whether to send credits along with message
+* [issue 1624] - Lifetime issue
+* [issue 1623] - hpx::wait_all() invoked with two vector<future<T>> fails
+* [pr    1622] - Executor partitioners
+* [pr    1621] - Clean up coroutines implementation
+* [pr    1619] - Fix result type calculation for hpx::make_continuation
+* [pr    1618] - Fixing RDTSC on Xeon/Phi
+* [issue 1617] - hpx cmake not working when run as a subproject
+* [issue 1616] - cmake problem resulting in RDTSC not working correctly for
+                 Xeon Phi creates very strange results for duration counters
+* [issue 1615] - hpx::make_continuation requires input and output to be the same
+* [pr    1614] - Fixed remove copy test
+* [issue 1613] - Dataflow causes stack overflow
+* [pr    1612] - Modified foreach partitioner to use bulk execute
+* [pr    1611] - Limit recursion-depth in dataflow to a configurable constant
+* [pr    1610] - Increase timeout for CircleCI
+* [pr    1609] - Refactoring thread manager, mainly extracting thread pool
 * [pr    1608] - Fixed running multiple localities without localities parameter
+* [pr    1607] - More algorithm fixes to adjacentfind
 * [issue 1606] - Running without localities parameter binds to bogus port range
 * [issue 1605] - Too many serializations
 * [pr    1604] - Changes the HPX image into a hyperlink
+* [pr    1601] - Fixing problems with remove_copy algorithm tests
+* [pr    1600] - Actions with ids cleanup
 * [pr    1599] - Duplicate binding of global ids should fail
 * [pr    1598] - Fixing array access
 * [pr    1597] - Improved the reliability of connecting/disconnecting localities
@@ -123,11 +387,13 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1594] - Fixing preprocessor constant used to enable C++11 chrono
 * [pr    1593] - Adding operator|() for hpx::launch
 * [issue 1592] - Error (typo) in the docs
+* [issue 1590] - CMake fails when CMAKE_BINARY_DIR contains '+'.
 * [issue 1589] - Disconnecting a locality results in segfault using heartbeat
                  example
 * [pr    1588] - Fix doc string for config option HPX_WITH_EXAMPLES
 * [pr    1586] - Fixing 1493
 * [pr    1585] - Additional Check for Inspect Tool to detect Endline Whitespace
+* [issue 1584] - Clean up coroutines implementation
 * [pr    1583] - Adding a check for end line whitespace
 * [pr    1582] - Attempt to fix assert firing after scheduling loop was exited
 * [pr    1581] - Fixed adjacentfind_binary test
@@ -137,13 +403,16 @@ Here is a list of the important tickets we closed for this release.
                  type
 * [issue 1578] - Remove demangle_helper
 * [pr    1577] - Get ptr problems
+* [issue 1576] - Refactor async, dataflow, and future::then
 * [pr    1575] - Fixing tests for parallel rotate
 * [pr    1574] - Cleaning up schedulers
 * [pr    1573] - Fixing thread pool executor
 * [pr    1572] - Fixing number of configured localities
 * [pr    1571] - Reimplement decay
+* [pr    1570] - Refactoring async, apply, and dataflow APIs
 * [pr    1569] - Changed range for mach-o library lookup
 * [pr    1568] - Mark decltype support as required
+* [pr    1567] - Removed const from algorithms
 * [issue 1566] - CMAKE Configuration Test Failures for clang 3.5 on debian
 * [pr    1565] - Dylib support
 * [pr    1564] - Converted partitioners and some algorithms to use executors
@@ -166,6 +435,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1550] - Passing plain identifier inside HPX_DEFINE_PLAIN_ACTION_1
 * [pr    1549] - Fixing intel14/libstdc++4.4
 * [pr    1548] - Moving raw_ptr to detail namespace
+* [pr    1547] - Adding support for executors to future.then
 * [pr    1546] - Executor traits result types
 * [pr    1545] - Integrate executors with dataflow
 * [pr    1543] - Fix potential zero-copy for primarynamespace::bulk_service_async
@@ -204,8 +474,11 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1514] - Correct problems with loading dynamic components
 * [pr    1513] - Fixing intel glibc4 4
 * [issue 1508] - memory and papi counters do not work
+* [issue 1507] - Unrecognized Command Line Option Error causing exit status 0
+* [issue 1506] - Properly handle deferred futures
 * [pr    1505] - Adding #include - would not compile without this
 * [issue 1502] - `boost::filesystem::exists` throws unexpected exception
+* [issue 1501] - hwloc configuration options are wrong for MIC
 * [pr    1504] - Making sure boost::filesystem::exists() does not throw
 * [pr    1500] - Exit application on `--hpx:version`/`-v` and `--hpx:info`
 * [pr    1498] - Extended task block
@@ -214,6 +487,9 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1495] - Switching circleci build type to debug
 * [issue 1494] - `--hpx:version`/`-v` does not exit after printing version
                  information
+* [issue 1493] - add an "hpx_" prefix to libraries and components to avoid name
+                 conflicts
+* [issue 1492] - Define and ensure limitations for arguments to async/apply
 * [pr    1489] - Enable idle rate counter on demand
 * [pr    1488] - Made sure `detail::condition_variable` can be safely destroyed
 * [pr    1487] - Introduced default (main) template implementation for
@@ -226,14 +502,18 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1481] - Sync primitives safe destruction
 * [issue 1480] - Move external/boost/endian into hpx/util
 * [issue 1478] - Boost inspect violations
+* [pr    1479] - Adds serialization for arrays; some futher/minor fixes
 * [pr    1477] - Fixing problems with the Intel compiler using a GCC 4.4 std
                  library
 * [pr    1476] - Adding `hpx::lcos::latch` and `hpx::lcos::local::latch`
+* [issue 1475] - Boost inspect violations
 * [pr    1473] - Fixing action move tests
+* [issue 1471] - Sync primitives should not be movable
 * [pr    1470] - Removing `hpx::util::polymorphic_factory`
 * [pr    1468] - Fixed container creation
 * [issue 1467] - HPX application fail during finalization
-* [issue 1475] - Build error with Boost 1.58.0
+* [issue 1466] - HPX doesn't pick up Torque's nodefile on SuperMIC
+* [issue 1464] - HPX option for pre and post bootstrap performance counters
 * [pr    1463] - Replacing `async_colocated(id, ...)` with `async(colocated(id), ...)`
 * [pr    1462] - Consolidated task_region with N4411
 * [pr    1461] - Consolidate inconsistent CMake option names
@@ -281,11 +561,20 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1423] - Remove `HPX_STD_UNIQUE_PTR`
 * [issue 1422] - hpx:threads=all allocates too many os threads
 * [pr    1420] - added .travis.yml
+* [issue 1419] - Unify enums: `hpx::runtime::state` and `hpx::state`
 * [pr    1416] - Adding travis builder
 * [issue 1414] - Correct directory for dispatch_gcc46.hpp iteration
 * [issue 1410] - Set operation algorithms
+* [issue 1389] - Parallel algorithms relying on scan partitioner break for small
+                 number of elements
+* [issue 1325] - Exceptions thrown during parcel handling are not handled correctly
+* [issue 1315] - Errors while running performance tests
 * [issue 1309] - `hpx::vector` partitions are not easily extendable by
                  applications
+* [pr    1300] - Added serialization/de-serialization to examples.tuplespace
+* [issue 1251] - hpx::threads::get_thread_count doesn't consider pending threads
+* [issue 1001] - Zero copy serialization raises assert
+* [issue  524] - Extend scheduler to support threads which can't be stolen
 
 [endsect]
 

@@ -150,7 +150,8 @@ int hpx_main(boost::program_options::variables_map& vm)
 //        double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
         boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_future(%1%) == %2%,elapsed time:,%3%,[s],%4%\n";
-        std::cout << (boost::format(fmt) % n % r % (d / max_runs) % next_locality.load());
+        std::cout << (boost::format(fmt) % n % r % (d / max_runs)
+            % next_locality.load());
 
         get_serial_execution_count_action serial_count;
         for (hpx::id_type const& loc : hpx::find_all_localities())

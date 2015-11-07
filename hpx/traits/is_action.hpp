@@ -8,6 +8,7 @@
 
 #include <hpx/traits.hpp>
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/decay.hpp>
 #include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace traits
@@ -28,7 +29,7 @@ namespace hpx { namespace traits
 
     template <typename Action, typename Enable>
     struct is_action
-      : detail::is_action_impl<Action>
+      : detail::is_action_impl<typename util::decay<Action>::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////

@@ -7,7 +7,7 @@
 #if !defined(HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM)
 #define HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/promise.hpp>
@@ -16,6 +16,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/protect.hpp>
 #include <hpx/util/bind.hpp>
@@ -126,7 +127,10 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_cb<action_type>(this->get_id(), gid,
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_cb<action_type>(cont_id, gid,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
@@ -138,7 +142,10 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_cb<action_type>(this->get_id(), std::move(addr), gid,
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_cb<action_type>(cont_id, std::move(addr), gid,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
@@ -152,7 +159,10 @@ namespace hpx { namespace lcos
 
             typedef typename util::decay<Callback>::type callback_type;
 
-            hpx::apply_c_cb<action_type>(this->get_id(), gid,
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_cb<action_type>(cont_id, gid,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
                     util::protect(std::forward<Callback>(cb)), this->impl_,
@@ -168,7 +178,10 @@ namespace hpx { namespace lcos
 
             typedef typename util::decay<Callback>::type callback_type;
 
-            hpx::apply_c_cb<action_type>(this->get_id(), std::move(addr), gid,
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_cb<action_type>(cont_id, std::move(addr), gid,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
                     util::protect(std::forward<Callback>(cb)), this->impl_,
@@ -182,7 +195,10 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_p_cb<action_type>(this->get_id(), gid, priority,
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_p_cb<action_type>(cont_id, gid, priority,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
                 std::forward<Ts>(vs)...);
@@ -195,7 +211,10 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-            hpx::apply_c_p_cb<action_type>(this->get_id(), std::move(addr),
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_p_cb<action_type>(cont_id, std::move(addr),
                 gid, priority,
                 util::bind(&packaged_action::parcel_write_handler,
                     this->impl_, util::placeholders::_1, util::placeholders::_2),
@@ -210,7 +229,10 @@ namespace hpx { namespace lcos
 
             typedef typename util::decay<Callback>::type callback_type;
 
-            hpx::apply_c_p_cb<action_type>(this->get_id(), gid, priority,
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_p_cb<action_type>(cont_id, gid, priority,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
                     util::protect(std::forward<Callback>(cb)), this->impl_,
@@ -227,7 +249,10 @@ namespace hpx { namespace lcos
 
             typedef typename util::decay<Callback>::type callback_type;
 
-            hpx::apply_c_p_cb<action_type>(this->get_id(), std::move(addr),
+            naming::id_type cont_id(this->get_id());
+            naming::detail::set_dont_store_in_cache(cont_id);
+
+            hpx::apply_c_p_cb<action_type>(cont_id, std::move(addr),
                 gid, priority,
                 util::bind(
                     &packaged_action::parcel_write_handler_cb<callback_type>,
@@ -358,8 +383,11 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
+                naming::id_type cont_id(this->get_id());
+                naming::detail::set_dont_store_in_cache(cont_id);
+
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    std::move(addr), this->get_id(), gid,
+                    std::move(addr), cont_id, gid,
                     util::bind(&packaged_action::parcel_write_handler,
                         this->impl_, util::placeholders::_1, util::placeholders::_2),
                     std::forward<Ts>(vs)...);
@@ -382,8 +410,11 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
+                naming::id_type cont_id(this->get_id());
+                naming::detail::set_dont_store_in_cache(cont_id);
+
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    std::move(addr), this->get_id(), gid,
+                    std::move(addr), cont_id, gid,
                     util::bind(&packaged_action::parcel_write_handler,
                         this->impl_, util::placeholders::_1, util::placeholders::_2),
                     std::forward<Ts>(vs)...);
@@ -412,8 +443,11 @@ namespace hpx { namespace lcos
                 // remote execution
                 typedef typename util::decay<Callback>::type callback_type;
 
+                naming::id_type cont_id(this->get_id());
+                naming::detail::set_dont_store_in_cache(cont_id);
+
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    std::move(addr), this->get_id(), gid,
+                    std::move(addr), cont_id, gid,
                     util::bind(
                         &packaged_action::parcel_write_handler_cb<callback_type>,
                         util::protect(std::forward<Callback>(cb)), this->impl_,
@@ -443,8 +477,11 @@ namespace hpx { namespace lcos
                 // remote execution
                 typedef typename util::decay<Callback>::type callback_type;
 
+                naming::id_type cont_id(this->get_id());
+                naming::detail::set_dont_store_in_cache(cont_id);
+
                 hpx::applier::detail::apply_c_cb<action_type>(
-                    std::move(addr), this->get_id(), gid,
+                    std::move(addr), cont_id, gid,
                     util::bind(
                         &packaged_action::parcel_write_handler_cb<callback_type>,
                         util::protect(std::forward<Callback>(cb)), this->impl_,

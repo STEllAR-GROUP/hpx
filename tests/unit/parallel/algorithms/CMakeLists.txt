@@ -5,18 +5,32 @@
 
 set(tests
     adjacentdifference
+    adjacentdifference_exception
+    adjacentdifference_bad_alloc
     adjacentfind
+    adjacentfind_exception
+    adjacentfind_bad_alloc
     adjacentfind_binary
+    adjacentfind_binary_exception
+    adjacentfind_binary_bad_alloc
     all_of
     any_of
     copy
-    copyif
+    copyif_random
+    copyif_forward
+    copyif_input
+    copyif_exception
+    copyif_bad_alloc
     copyn
     count
     countif
     equal
     equal_binary
     exclusive_scan
+    exclusive_scan2
+    exclusive_scan_exception
+    exclusive_scan_bad_alloc
+    exclusive_scan_validate
     fill
     filln
     find
@@ -25,17 +39,25 @@ set(tests
     findfirstof_binary
     findif
     findifnot
+    findifnot_exception
+    findifnot_bad_alloc
     foreach
     foreach_executors
     foreach_projection
     foreachn
+    foreachn_exception
+    foreachn_bad_alloc
     foreachn_projection
+    foreachn_projection_exception
+    foreachn_projection_bad_alloc
     generate
     generaten
     includes
     inclusive_scan
     inclusive_scan_executors
     inner_product
+    inner_product_exception
+    inner_product_bad_alloc
     is_partitioned
     is_sorted
     is_sorted_executors

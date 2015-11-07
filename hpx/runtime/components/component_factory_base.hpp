@@ -10,14 +10,13 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
+#include <hpx/util/detail/pack.hpp>
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/capability.hpp>
 #endif
-
-#include <boost/mpl/list.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -130,7 +129,7 @@ namespace hpx { namespace components
 namespace hpx { namespace util { namespace plugin
 {
     ///////////////////////////////////////////////////////////////////////////
-    // The following specialization of the virtual_constructors template
+    // The following specialization of the virtual_constructor template
     // defines the argument list for the constructor of the concrete component
     // factory (derived from the component_factory_base above). This magic is needed
     // because we use hpx::plugin for the creation of instances of derived
@@ -148,13 +147,12 @@ namespace hpx { namespace util { namespace plugin
     //     };
     //
     template <>
-    struct virtual_constructors<hpx::components::component_factory_base>
+    struct virtual_constructor<hpx::components::component_factory_base>
     {
-        typedef boost::mpl::list<
-            boost::mpl::list<
+        typedef
+            hpx::util::detail::pack<
                 hpx::util::section const*, hpx::util::section const*, bool
-            >
-        > type;
+            > type;
     };
 }}}
 

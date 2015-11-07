@@ -7,7 +7,7 @@
 #if !defined(HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM)
 #define HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/assert.hpp>
@@ -22,6 +22,70 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
+    enum component_enum_type
+    {
+        component_invalid = -1,
+
+        // Runtime support component (provides system services such as
+        // component creation, etc). One per locality.
+        component_runtime_support = 0,
+
+        // Pseudo-component to be used for plain actions
+        component_plain_function = 1,
+
+        // Pseudo-component for direct access to local virtual memory.
+        component_memory = 2,
+
+        // Generic memory blocks.
+        component_memory_block = 3,
+
+        // Base component for LCOs that do not produce a value.
+        component_base_lco = 4,
+
+        // Base component for LCOs that do produce values.
+        component_base_lco_with_value = 5,
+
+        // Synchronization latch, barrier, and flex_barrier LCOs.
+        component_latch = ((6 << 16) | component_base_lco_with_value),
+        component_barrier = ((7 << 16) | component_base_lco),
+        component_flex_barrier = ((8 << 16) | component_base_lco),
+
+        // An LCO representing a value which may not have been computed yet.
+        component_promise = ((9 << 16) | component_base_lco_with_value),
+
+        // AGAS locality services.
+        component_agas_locality_namespace = 10,
+
+        // AGAS primary address resolution services.
+        component_agas_primary_namespace = 11,
+
+        // AGAS global type system.
+        component_agas_component_namespace = 12,
+
+        // AGAS symbolic naming services.
+        component_agas_symbol_namespace = 13,
+
+#if defined(HPX_HAVE_SODIUM)
+        // root CA, subordinate CA
+        signed_certificate_promise = ((14 << 16) | component_base_lco_with_value),
+        component_root_certificate_authority = 15,
+        component_subordinate_certificate_authority = 16,
+#endif
+
+        component_last,
+        component_first_dynamic = component_last,
+
+        // Force this enum type to be at least 32 bits.
+        component_upper_bound = 0x7fffffffL //-V112
+    };
+
+    enum factory_state_enum
+    {
+        factory_enabled  = 0,
+        factory_disabled = 1,
+        factory_check    = 2
+    };
+
     /// \brief Return the string representation for a given component type id
     HPX_EXPORT std::string const get_component_type_name(component_type type);
 
@@ -61,8 +125,9 @@ namespace hpx { namespace components
         component_type rhs_base = get_base_type(rhs);
 
         // special case for lco's
-        if ((lhs_base == component_base_lco && rhs_base == component_base_lco_with_value) ||
-            (rhs_base == component_base_lco && lhs_base == component_base_lco_with_value))
+        if ((lhs_base == component_base_lco && rhs_base == component_base_lco_with_value)
+            || (rhs_base == component_base_lco && lhs_base ==
+                component_base_lco_with_value))
         {
             return true;
         }

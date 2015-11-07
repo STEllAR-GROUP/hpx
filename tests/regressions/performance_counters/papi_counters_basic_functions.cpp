@@ -70,7 +70,8 @@ int hpx_main(boost::program_options::variables_map&)
         boost::uint64_t cnt4 = value4.get_value<boost::uint64_t>();
 
         std::cout << n << " counted fp instructions, result: " << cnt1 << std::endl
-                  << n << " uncounted fp instructions, result: " << cnt2-cnt1 << std::endl
+                  << n << " uncounted fp instructions, result: "
+                  << cnt2-cnt1 << std::endl
                   << 2*n << " fp instructions, count after reset: " << cnt3 << std::endl
           << n << " fp instructions, count after explicit reset: " << cnt4 << std::endl;
 

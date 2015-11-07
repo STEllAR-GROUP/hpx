@@ -113,13 +113,25 @@ namespace hpx
             apply_c(set, cont, id, std::move(e));
         }
     }
+
+#if defined(BOOST_MSVC) && !defined(HPX_DEBUG)
+    ///////////////////////////////////////////////////////////////////////////
+    // Explicitly instantiate specific apply needed for set_lco_value for MSVC
+    // (in release mode only, leads to missing symbols otherwise).
+    template bool apply<
+        lcos::base_lco_with_value<
+            util::unused_type, util::unused_type
+        >::set_value_action,
+        util::unused_type
+    >(naming::id_type const &, util::unused_type &&);
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
-    void continuation::trigger() const
+    void continuation::trigger()
     {
         if (!gid_) {
             HPX_THROW_EXCEPTION(invalid_status,
@@ -133,7 +145,7 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void continuation::trigger_error(boost::exception_ptr const& e) const
+    void continuation::trigger_error(boost::exception_ptr const& e)
     {
         if (!gid_) {
             HPX_THROW_EXCEPTION(invalid_status,
@@ -146,7 +158,7 @@ namespace hpx { namespace actions
         set_lco_error(gid_, e);
     }
 
-    void continuation::trigger_error(boost::exception_ptr && e) const //-V659
+    void continuation::trigger_error(boost::exception_ptr && e) //-V659
     {
         if (!gid_) {
             HPX_THROW_EXCEPTION(invalid_status,

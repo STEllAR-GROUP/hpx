@@ -6,8 +6,12 @@
 #if !defined(HPX_LCOS_ASYNC_COLOCATED_FWD_FEB_01_2014_0107PM)
 #define HPX_LCOS_ASYNC_COLOCATED_FWD_FEB_01_2014_0107PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/config.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/traits/is_continuation.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/lcos/async_fwd.hpp>
 #include <hpx/util/move.hpp>
 
 namespace hpx { namespace detail
@@ -32,25 +36,37 @@ namespace hpx { namespace detail
       , naming::id_type const& gid, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
-        >::type>
-    async_colocated(hpx::actions::continuation_type const& cont,
+    // MSVC complains about ambiguities if it sees this forward declaration
+#if !defined(BOOST_MSVC)
+    template <typename Action, typename Continuation, typename ...Ts>
+    typename std::enable_if<
+        traits::is_continuation<Continuation>::value,
+        lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::remote_result_type
+            >::type
+        >
+    >::type
+    async_colocated(Continuation && cont,
         naming::id_type const& gid, Ts&&... vs);
 
     template <
+        typename Continuation,
         typename Component, typename Signature, typename Derived,
         typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Derived>::remote_result_type
-        >::type>
+    typename std::enable_if<
+        traits::is_continuation<Continuation>::value,
+        lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type
+        >
+    >::type
     async_colocated(
-        hpx::actions::continuation_type const& cont
+        Continuation && cont
       , hpx::actions::basic_action<Component, Signature, Derived> /*act*/
       , naming::id_type const& gid, Ts&&... vs);
+#endif
 }}
 
 #if defined(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)

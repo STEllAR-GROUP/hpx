@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async_fwd.hpp>
@@ -98,6 +99,41 @@ namespace hpx { namespace detail
                 >::call(launch::all, policy, std::forward<Ts>(ts)...);
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action>
+    struct async_launch_policy_dispatch<Action,
+        typename boost::enable_if_c<
+            traits::is_action<Action>::value
+        >::type>
+    {
+        typedef typename traits::promise_local_result<
+                typename hpx::actions::extract_action<
+                    Action
+                >::remote_result_type
+            >::type result_type;
+
+        template <typename ...Ts>
+        BOOST_FORCEINLINE static
+        lcos::future<result_type>
+        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+            Action const&, naming::id_type const& id, Ts&&... ts)
+        {
+            return async<Action>(launch_policy, id, std::forward<Ts>(ts)...);
+        }
+
+        template <typename DistPolicy, typename ...Ts>
+        BOOST_FORCEINLINE static
+        typename boost::enable_if_c<
+            traits::is_distribution_policy<DistPolicy>::value,
+            lcos::future<result_type>
+        >::type
+        call(BOOST_SCOPED_ENUM(launch) launch_policy,
+            Action const&, DistPolicy const& policy, Ts&&... ts)
+        {
+            return async<Action>(launch_policy, policy, std::forward<Ts>(ts)...);
+        }
+    };
 }}
 
 namespace hpx
@@ -157,43 +193,23 @@ namespace hpx { namespace detail
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
+    // BOOST_SCOPED_ENUM(launch)
     template <typename Policy>
     struct async_dispatch<Policy,
         typename boost::enable_if_c<
             traits::is_launch_policy<Policy>::value
-         && traits::is_action<Policy>::value
         >::type>
     {
-        template <typename Action, typename ...Ts>
-        BOOST_FORCEINLINE static
-        lcos::future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<
-                    Action
-                >::remote_result_type
-            >::type>
-        call(BOOST_SCOPED_ENUM(launch) launch_policy,
-            Action const&, naming::id_type const& id, Ts&&... ts)
+        template <typename F, typename ...Ts>
+        BOOST_FORCEINLINE static auto
+        call(BOOST_SCOPED_ENUM(launch) const& launch_policy, F&& f, Ts&&... ts)
+        ->  decltype(detail::async_launch_policy_dispatch<
+                    typename util::decay<F>::type
+                >::call(launch_policy, std::forward<F>(f), std::forward<Ts>(ts)...))
         {
-            return async<Action>(launch_policy, id, std::forward<Ts>(ts)...);
-        }
-
-        template <typename Action, typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE static
-        typename boost::enable_if_c<
-            traits::is_distribution_policy<DistPolicy>::value,
-            lcos::future<
-                typename traits::promise_local_result<
-                    typename hpx::actions::extract_action<
-                        Action
-                    >::remote_result_type
-                >::type>
-        >::type
-        call(BOOST_SCOPED_ENUM(launch) launch_policy,
-            Action const&, DistPolicy const& policy, Ts&&... ts)
-        {
-            return async<Action>(launch_policy, policy, std::forward<Ts>(ts)...);
+            return async_launch_policy_dispatch<
+                    typename util::decay<F>::type
+                >::call(launch_policy, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };
 }}

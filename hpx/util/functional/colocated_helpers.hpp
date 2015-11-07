@@ -6,14 +6,17 @@
 #if !defined(HPX_UTIL_DETAIL_COLOCATED_HELPERS_FEB_04_2014_0828PM)
 #define HPX_UTIL_DETAIL_COLOCATED_HELPERS_FEB_04_2014_0828PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/traits/serialize_as_future.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/shared_ptr.hpp>
+#include <hpx/runtime/serialization/unique_ptr.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/move.hpp>
+
+#include <memory>
 
 #include <boost/format.hpp>
 
@@ -49,6 +52,8 @@ namespace hpx { namespace util { namespace functional
         template <typename Bound>
         struct apply_continuation_impl
         {
+            HPX_MOVABLE_BUT_NOT_COPYABLE(apply_continuation_impl);
+        public:
             typedef typename util::decay<Bound>::type bound_type;
 
             template <typename T>
@@ -65,22 +70,35 @@ namespace hpx { namespace util { namespace functional
               : bound_(std::move(bound))
             {}
 
+            template <typename Continuation>
             explicit apply_continuation_impl(
-                    Bound && bound, actions::continuation_type const& c)
+                    Bound && bound, Continuation && c)
               : bound_(std::move(bound)),
-                cont_(c)
+                cont_(new typename
+                    util::decay<Continuation>::type(std::forward<Continuation>(c)))
             {}
+
+            apply_continuation_impl(apply_continuation_impl && o)
+              : bound_(std::move(o.bound_))
+              , cont_(std::move(o.cont_))
+            {}
+
+            apply_continuation_impl &operator=(apply_continuation_impl && o)
+            {
+                bound_ = std::move(o.bound_);
+                cont_ = std::move(o.cont_);
+            }
 
             template <typename T>
             typename util::result_of<bound_type(naming::id_type, T)>::type
-            operator()(naming::id_type lco, T && t) const
+            operator()(naming::id_type lco, T && t)
             {
                 typedef typename util::result_of<
                     bound_type(naming::id_type, T)
                 >::type result_type;
 
                 if (cont_)
-                    bound_.apply_c(cont_, lco, std::forward<T>(t));
+                    bound_.apply_c(std::move(cont_), lco, std::forward<T>(t));
                 else
                     bound_.apply(lco, std::forward<T>(t));
                 return result_type();
@@ -114,10 +132,8 @@ namespace hpx { namespace util { namespace functional
 
             HPX_SERIALIZATION_SPLIT_MEMBER();
 
-            friend struct traits::serialize_as_future<apply_continuation_impl>;
-
             bound_type bound_;
-            actions::continuation_type cont_;
+            std::unique_ptr<actions::continuation> cont_;
         };
     }
 
@@ -129,58 +145,23 @@ namespace hpx { namespace util { namespace functional
             typename util::decay<Bound>::type>(std::forward<Bound>(bound));
     }
 
-    template <typename Bound>
+    template <typename Bound, typename Continuation>
     functional::detail::apply_continuation_impl<typename util::decay<Bound>::type>
-    apply_continuation(Bound && bound, actions::continuation_type const& c)
+    apply_continuation(Bound && bound, Continuation && c)
     {
         return functional::detail::apply_continuation_impl<
-            typename util::decay<Bound>::type>(std::forward<Bound>(bound), c);
+            typename util::decay<Bound>::type>(
+                std::forward<Bound>(bound), std::forward<Continuation>(c));
     }
-}}}
 
-namespace hpx { namespace traits
-{
-    template <typename Bound>
-    struct serialize_as_future<
-            util::functional::detail::apply_continuation_impl<Bound>
-        >
-      : traits::serialize_as_future<
-            typename util::functional::detail::apply_continuation_impl<
-                Bound
-            >::bound_type>
-    {
-        static bool
-        call_if(util::functional::detail::apply_continuation_impl<Bound>& b)
-        {
-            return (b.cont_ && b.cont_->has_to_wait_for_futures()) ||
-                traits::serialize_as_future<
-                    typename util::functional::detail::apply_continuation_impl<
-                        Bound
-                    >::bound_type
-                >::call_if(b.bound_);
-        }
-
-        static void
-        call(util::functional::detail::apply_continuation_impl<Bound>& b)
-        {
-            typedef typename util::functional::detail::apply_continuation_impl<
-                    Bound
-                >::bound_type bound_type;
-            traits::serialize_as_future<bound_type>::call(b.bound_);
-            if (b.cont_)
-                b.cont_->wait_for_futures();
-        }
-    };
-}}
-
-namespace hpx { namespace util { namespace functional
-{
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         template <typename Bound>
         struct async_continuation_impl
         {
+            HPX_MOVABLE_BUT_NOT_COPYABLE(async_continuation_impl);
+        public:
             typedef typename util::decay<Bound>::type bound_type;
 
             template <typename T>
@@ -197,22 +178,35 @@ namespace hpx { namespace util { namespace functional
               : bound_(std::move(bound))
             {}
 
+            template <typename Continuation>
             explicit async_continuation_impl(
-                    Bound && bound, actions::continuation_type const& c)
+                    Bound && bound, Continuation && c)
               : bound_(std::move(bound)),
-                cont_(c)
+                cont_(new typename util::decay<Continuation>
+                        ::type(std::forward<Continuation>(c)))
             {}
+
+            async_continuation_impl(async_continuation_impl && o)
+              : bound_(std::move(o.bound_))
+              , cont_(std::move(o.cont_))
+            {}
+
+            async_continuation_impl &operator=(async_continuation_impl && o)
+            {
+                bound_ = std::move(o.bound_);
+                cont_ = std::move(o.cont_);
+            }
 
             template <typename T>
             typename util::result_of<bound_type(naming::id_type, T)>::type
-            operator()(naming::id_type lco, T && t) const
+            operator()(naming::id_type lco, T && t)
             {
                 typedef typename util::result_of<
                     bound_type(naming::id_type, T)
                 >::type result_type;
 
                 if (cont_)
-                    bound_.apply_c(cont_, lco, std::forward<T>(t));
+                    bound_.apply_c(std::move(cont_), lco, std::forward<T>(t));
                 else
                     bound_.apply_c(lco, lco, std::forward<T>(t));
                 return result_type();
@@ -246,10 +240,8 @@ namespace hpx { namespace util { namespace functional
 
             HPX_SERIALIZATION_SPLIT_MEMBER();
 
-            friend struct traits::serialize_as_future<async_continuation_impl>;
-
             bound_type bound_;
-            actions::continuation_type cont_;
+            std::unique_ptr<actions::continuation> cont_;
         };
     }
 
@@ -261,48 +253,14 @@ namespace hpx { namespace util { namespace functional
             typename util::decay<Bound>::type>(std::forward<Bound>(bound));
     }
 
-    template <typename Bound>
+    template <typename Bound, typename Continuation>
     functional::detail::async_continuation_impl<typename util::decay<Bound>::type>
-    async_continuation(Bound && bound, actions::continuation_type const& c)
+    async_continuation(Bound && bound, Continuation && c)
     {
         return functional::detail::async_continuation_impl<
-            typename util::decay<Bound>::type>(std::forward<Bound>(bound), c);
+            typename util::decay<Bound>::type>(
+                std::forward<Bound>(bound), std::forward<Continuation>(c));
     }
 }}}
-
-namespace hpx { namespace traits
-{
-    template <typename Bound>
-    struct serialize_as_future<
-            util::functional::detail::async_continuation_impl<Bound>
-        >
-      : traits::serialize_as_future<
-            typename util::functional::detail::async_continuation_impl<
-                Bound
-            >::bound_type>
-    {
-        static bool
-        call_if(util::functional::detail::async_continuation_impl<Bound>& b)
-        {
-            return (b.cont_ && b.cont_->has_to_wait_for_futures()) ||
-                traits::serialize_as_future<
-                    typename util::functional::detail::async_continuation_impl<
-                        Bound
-                    >::bound_type
-                >::call_if(b.bound_);
-        }
-
-        static void
-        call(util::functional::detail::async_continuation_impl<Bound>& b)
-        {
-            typedef typename util::functional::detail::async_continuation_impl<
-                    Bound
-                >::bound_type bound_type;
-            traits::serialize_as_future<bound_type>::call(b.bound_);
-            if (b.cont_)
-                b.cont_->wait_for_futures();
-        }
-    };
-}}
 
 #endif

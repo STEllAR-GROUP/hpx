@@ -97,6 +97,8 @@ our tables below.
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Eric Lemanissier contributed fixes to allow compilation using the MingW
+  toolchain.
 * Nidhi Makhijani who helped cleaning up some enum consistencies in __hpx__.
 * Daniel Bourgeois (__cct__) who contributed to __hpx__ the implementation of
   several parallel algorithms (as proposed by __cpp11_n4107__).

@@ -18,6 +18,8 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 
+#include <memory>
+
 namespace hpx { namespace applier { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
@@ -44,11 +46,11 @@ namespace hpx { namespace applier { namespace detail
         call (naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Ts&&... vs)
         {
-            actions::continuation_type cont;
+            std::unique_ptr<actions::continuation> cont;
             threads::thread_init_data data;
             if (traits::action_decorate_continuation<Action>::call(cont))
             {
-                data.func = Action::construct_thread_function(cont, lva,
+                data.func = Action::construct_thread_function(std::move(cont), lva,
                     std::forward<Ts>(vs)...);
             }
             else
@@ -73,19 +75,30 @@ namespace hpx { namespace applier { namespace detail
                 lva, data, threads::pending);
         }
 
+        template <typename Continuation, typename ...Ts>
+        static void
+        call (Continuation && cont, naming::id_type const& target,
+            naming::address::address_type lva, threads::thread_priority priority,
+            Ts&&... vs)
+        {
+            std::unique_ptr<actions::continuation> c(
+                new typename util::decay<Continuation>::type(
+                    std::forward<Continuation>(cont)));
+            call(std::move(c), target, lva, priority, std::forward<Ts>(vs)...);
+        }
+
         template <typename ...Ts>
         static void
-        call (actions::continuation_type const& cont, naming::id_type const& target,
+        call (std::unique_ptr<actions::continuation> cont, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_priority priority,
             Ts&&... vs)
         {
             // first decorate the continuation
-            actions::continuation_type c(cont);
-            traits::action_decorate_continuation<Action>::call(c);
+            traits::action_decorate_continuation<Action>::call(cont);
 
             // now, schedule the thread
             threads::thread_init_data data;
-            data.func = Action::construct_thread_function(c, lva,
+            data.func = Action::construct_thread_function(std::move(cont), lva,
                 std::forward<Ts>(vs)...);
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
             data.lva = lva;
@@ -116,19 +129,31 @@ namespace hpx { namespace applier { namespace detail
             Action::execute_function(lva, std::forward<Ts>(vs)...);
         }
 
+        template <typename Continuation, typename ...Ts>
+        static void
+        call (Continuation && c, naming::id_type const& target,
+            naming::address::address_type lva, threads::thread_priority priority,
+            Ts&&... vs)
+        {
+            std::unique_ptr<actions::continuation> cont(
+                new typename util::decay<Continuation>::type(
+                    std::forward<Continuation>(c)));
+            call(std::move(cont), target, lva, priority, std::forward<Ts>(vs)...);
+        }
+
         template <typename ...Ts>
         static void
-        call (actions::continuation_type const& c, naming::id_type const& target,
+        call (std::unique_ptr<actions::continuation> cont, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_priority,
             Ts&&... vs)
         {
             try {
-                c->trigger(Action::execute_function(lva,
+                cont->trigger(Action::execute_function(lva,
                     std::forward<Ts>(vs)...));
             }
             catch (hpx::exception const& /*e*/) {
                 // make sure hpx::exceptions are propagated back to the client
-                c->trigger_error(boost::current_exception());
+                cont->trigger_error(boost::current_exception());
             }
         }
     };

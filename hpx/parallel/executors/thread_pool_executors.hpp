@@ -40,6 +40,18 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     typedef threads::executors::static_queue_executor static_queue_executor;
 #endif
 
+#if defined(HPX_HAVE_THROTTLE_SCHEDULER) && defined(HPX_HAVE_APEX)
+    /// Creates a new throttle_queue_executor
+    ///
+    /// \param max_punits   [in] The maximum number of processing units to
+    ///                     associate with the newly created executor.
+    /// \param min_punits   [in] The minimum number of processing units to
+    ///                     associate with the newly created executor
+    ///                     (default: 1).
+    ///
+    typedef threads::executors::throttle_queue_executor throttle_queue_executor;
+#endif
+
     /// Creates a new local_priority_queue_executor
     ///
     /// \param max_punits   [in] The maximum number of processing units to
