@@ -25,6 +25,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 
+// --------------------------------------------------------------------
 // Fill a vector with random numbers in the range [lower, upper]
 template <typename T>
 void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
@@ -38,6 +39,39 @@ void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
     }
 }
 
+// --------------------------------------------------------------------
+// generate a random string of a given length
+std::string random_string( size_t length )
+{
+    auto randchar = []() -> char
+    {
+        const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+        const size_t max_index = (sizeof(charset) - 1);
+        return charset[ rand() % max_index ];
+    };
+    std::string str(length,0);
+    std::generate_n( str.begin(), length, randchar );
+    return str;
+}
+
+// --------------------------------------------------------------------
+// fill a vector with random strings
+void rnd_strings(std::vector<std::string> &V) {
+    const std::size_t test_size = 1000000;
+    // Fill vector with random strings
+    V.clear();
+    V.reserve(test_size);
+    // random strings up to 128 chars long
+    for (std::size_t i=0; i<test_size; i++) {
+        V.push_back(random_string( std::rand() % 128));
+    }
+}
+
+// --------------------------------------------------------------------
+// check that the array is sorted correctly
 template <class IA, typename Compare>
 int verify(const std::vector <IA> &A, Compare comp, boost::uint64_t elapsed,
     bool print)
@@ -120,6 +154,7 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// async sort
 template <typename ExPolicy, typename T, typename Compare = std::less<T>>
         void test_sort1_async(ExPolicy && policy, T, Compare comp = Compare())
 {
@@ -209,5 +244,80 @@ void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
     bool is_sorted = (verify(c, comp, elapsed, true)!=0);
     HPX_TEST(is_sorted);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// overload of test routine 1 for strings
+// call sort on a string array with no comparison operator
+template <typename ExPolicy>
+void test_sort1(ExPolicy && policy, const std::string &)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(std::string).name(), "default", sync, random);
+
+    // Fill vector with random strings
+    std::vector<std::string> c;
+    rnd_strings(c);
+
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    // sort, blocking when seq, par, par_vec
+    hpx::parallel::sort(std::forward<ExPolicy>(policy),
+            c.begin(), c.end());
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
+    bool is_sorted = (verify(c, std::less<std::string>(), elapsed, true) != 0);
+    HPX_TEST(is_sorted);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// overload of test routine 1 for strings
+// call sort on a string array with a comparison operator
+template <typename ExPolicy, typename Compare = std::less<std::string>>
+        void test_sort1_comp(ExPolicy && policy, const std::string &,
+        Compare comp = Compare())
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(std::string).name(), typeid(Compare).name(),
+        sync, random);
+
+    // Fill vector with random strings
+    std::vector<std::string> c;
+    rnd_strings(c);
+
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    // sort, blocking when seq, par, par_vec
+    hpx::parallel::sort(std::forward<ExPolicy>(policy),
+            c.begin(), c.end(), comp);
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
+    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
+    HPX_TEST(is_sorted);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// overload of test routine 1 for strings
+// async sort
+template <typename ExPolicy, typename Compare = std::less<std::string>>
+        void test_sort1_async(ExPolicy && policy, const std::string &,
+        Compare comp = Compare())
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(std::string).name(), typeid(Compare).name(),
+        async, random);
+
+    // Fill vector with random strings
+    std::vector<std::string> c;
+    rnd_strings(c);
+
+    boost::uint64_t t = hpx::util::high_resolution_clock::now();
+    // sort, non blocking
+    hpx::future<void> f = hpx::parallel::sort(std::forward<ExPolicy>(policy),
+            c.begin(), c.end(), comp);
+    f.get();
+    boost::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
+
+    bool is_sorted = (verify(c, comp, elapsed, true)!=0);
+    HPX_TEST(is_sorted);
+}
+
 
 #endif

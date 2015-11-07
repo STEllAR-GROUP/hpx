@@ -23,6 +23,11 @@ void test_sort1()
     test_sort1(par,     double());
     test_sort1(par_vec, double());
 
+    // default comparison operator (std::less)
+    test_sort1(seq,     std::string());
+    test_sort1(par,     std::string());
+    test_sort1(par_vec, std::string());
+
     // user supplied comparison operator (std::less)
     test_sort1_comp(seq,     int(), std::less<std::size_t>());
     test_sort1_comp(par,     int(), std::less<std::size_t>());
@@ -33,11 +38,18 @@ void test_sort1()
     test_sort1_comp(par,     double(), std::greater<double>());
     test_sort1_comp(par_vec, double(), std::greater<double>());
 
+    // default comparison operator (std::less)
+    test_sort1_comp(seq,     std::string(), std::greater<std::string>());
+    test_sort1_comp(par,     std::string(), std::greater<std::string>());
+    test_sort1_comp(par_vec, std::string(), std::greater<std::string>());
+
     // Async execution, default comparison operator
     test_sort1_async(seq(task), int());
     test_sort1_async(par(task), char());
     test_sort1_async(seq(task), double());
     test_sort1_async(par(task), float());
+    test_sort1_async(seq(task), std::string());
+    test_sort1_async(par(task), std::string());
 
     // Async execution, user comparison operator
     test_sort1_async(seq(task), int(),    std::less<unsigned int>());
@@ -45,12 +57,17 @@ void test_sort1()
     //
     test_sort1_async(seq(task), double(), std::greater<double>());
     test_sort1_async(par(task), float(),  std::greater<float>());
+    //
+    test_sort1_async(seq(task), std::string(), std::greater<std::string>());
+    test_sort1_async(par(task), std::string(), std::greater<std::string>());
 
     test_sort1(execution_policy(seq),       int());
     test_sort1(execution_policy(par),       int());
     test_sort1(execution_policy(par_vec),   int());
     test_sort1(execution_policy(seq(task)), int());
     test_sort1(execution_policy(par(task)), int());
+    test_sort1(execution_policy(seq(task)), std::string());
+    test_sort1(execution_policy(par(task)), std::string());
 }
 
 void test_sort2()
