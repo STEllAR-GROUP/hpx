@@ -13,7 +13,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
-#include <hpx/lcos/when_all.hpp>
+#include <hpx/lcos/local/dataflow.hpp>
 
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -58,6 +58,50 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             Compare comp_;
             Proj proj_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy>
+        struct handle_sort_exception
+        {
+            static hpx::future<void> call(hpx::future<void> f)
+            {
+                HPX_ASSERT(f.has_exception());
+                return f;
+            }
+
+            static hpx::future<void> call(boost::exception_ptr const& e)
+            {
+                try {
+                    boost::rethrow_exception(e);
+                }
+                catch (std::bad_alloc const&) {
+                    // rethrow bad_alloc
+                    return hpx::make_exceptional_future<void>(
+                        boost::current_exception());
+                }
+                catch (...) {
+                    // package up everything else as an exception_list
+                    return hpx::make_exceptional_future<void>(
+                        exception_list(e));
+                }
+            }
+        };
+
+        template <>
+        struct handle_sort_exception<parallel_vector_execution_policy>
+        {
+            HPX_ATTRIBUTE_NORETURN
+            static hpx::future<void> call(hpx::future<void> &&)
+            {
+                hpx::terminate();
+            }
+
+            HPX_ATTRIBUTE_NORETURN
+            static hpx::future<void> call(boost::exception_ptr const&)
+            {
+                hpx::terminate();
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -169,7 +213,22 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         policy, c_first, last, comp
                     ));
 
-            return hpx::when_all(std::move(left), std::move(right));
+            return hpx::lcos::local::dataflow(
+                [](hpx::future<void> && left, hpx::future<void> && right)
+                {
+                    if (left.has_exception() || right.has_exception())
+                    {
+                        std::list<boost::exception_ptr> errors;
+                        if (left.has_exception())
+                            errors.push_back(left.get_exception_ptr());
+                        if (right.has_exception())
+                            errors.push_back(right.get_exception_ptr());
+
+                        boost::throw_exception(
+                            exception_list(std::move(errors)));
+                    }
+                },
+                std::move(left), std::move(right));
         }
 
         //------------------------------------------------------------------------
@@ -213,14 +272,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     ));
             }
             catch (...) {
-                return util::detail::handle_local_exception<ExPolicy>::call(
+                return detail::handle_sort_exception<ExPolicy>::call(
                     boost::current_exception());
             }
 
             if (result.has_exception())
             {
-                return util::detail::handle_local_exception<ExPolicy>::call(
-                    result.get_exception_ptr());
+                return detail::handle_sort_exception<ExPolicy>::call(
+                    std::move(result));
             }
 
             return result;
