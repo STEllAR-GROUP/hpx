@@ -178,6 +178,326 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
     HPX_TEST(is_sorted);
 }
 
+// test exceptions
+template <typename ExPolicy, typename T>
+void test_sort_exception(ExPolicy && policy, T)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), "default", sync, random);
+
+    // Fill vector with random values
+    std::vector<T> c(5000);
+    rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
+        (std::numeric_limits<T>::max)(), T(std::rand()));
+
+    {
+        // sort, blocking when seq, par, par_vec
+        bool caught_exception = false;
+        try {
+            typedef typename std::vector<T>::iterator base_iterator;
+            typedef test::decorated_iterator<
+                    base_iterator, std::random_access_iterator_tag
+                > decorated_iterator;
+
+            hpx::parallel::sort(std::forward<ExPolicy>(policy),
+                decorated_iterator(
+                    c.begin(), [](){ throw std::runtime_error("test"); }),
+                decorated_iterator(c.end()));
+
+            HPX_TEST(false);
+        }
+        catch(hpx::exception_list const&) {
+            caught_exception = true;
+        }
+        catch(...) {
+            HPX_TEST(false);
+        }
+
+        HPX_TEST(caught_exception);
+        if (caught_exception)
+            std::cout << "OK, ";
+        else
+            std::cout << "Failed, ";
+    }
+
+    {
+        // sort, blocking when seq, par, par_vec
+        bool caught_exception = false;
+        try {
+            typedef typename std::vector<T>::iterator base_iterator;
+            typedef test::decorated_iterator<
+                    base_iterator, std::random_access_iterator_tag
+                > decorated_iterator;
+
+            hpx::parallel::sort(std::forward<ExPolicy>(policy),
+                decorated_iterator(
+                    c.begin(), [](){ throw std::bad_alloc(); }),
+                decorated_iterator(c.end()));
+
+            HPX_TEST(false);
+        }
+        catch(std::bad_alloc const&) {
+            caught_exception = true;
+        }
+        catch(...) {
+            HPX_TEST(false);
+        }
+
+        HPX_TEST(caught_exception);
+        if (caught_exception)
+            std::cout << "OK " << std::endl;
+        else
+            std::cout << "Failed " << std::endl;
+    }
+}
+
+template <typename ExPolicy, typename T, typename Compare>
+void test_sort_exception(ExPolicy && policy, T, Compare comp)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(),
+        sync, random);
+
+    // Fill vector with random values
+    std::vector<T> c(5000);
+    rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
+        (std::numeric_limits<T>::max)(), T(std::rand()));
+
+    {
+        // sort, blocking when seq, par, par_vec
+        bool caught_exception = false;
+        try {
+            typedef typename std::vector<T>::iterator base_iterator;
+            typedef test::decorated_iterator<
+                    base_iterator, std::random_access_iterator_tag
+                > decorated_iterator;
+
+            hpx::parallel::sort(std::forward<ExPolicy>(policy),
+                decorated_iterator(
+                    c.begin(), [](){ throw std::runtime_error("test"); }),
+                decorated_iterator(c.end()),
+                comp);
+
+            HPX_TEST(false);
+        }
+        catch(hpx::exception_list const&) {
+            caught_exception = true;
+        }
+        catch(...) {
+            HPX_TEST(false);
+        }
+
+        HPX_TEST(caught_exception);
+        if (caught_exception)
+            std::cout << "OK, ";
+        else
+            std::cout << "Failed, ";
+    }
+
+    {
+        // sort, blocking when seq, par, par_vec
+        bool caught_exception = false;
+        try {
+            typedef typename std::vector<T>::iterator base_iterator;
+            typedef test::decorated_iterator<
+                    base_iterator, std::random_access_iterator_tag
+                > decorated_iterator;
+
+            hpx::parallel::sort(std::forward<ExPolicy>(policy),
+                decorated_iterator(
+                    c.begin(), [](){ throw std::bad_alloc(); }),
+                decorated_iterator(c.end()),
+                comp);
+
+            HPX_TEST(false);
+        }
+        catch(std::bad_alloc const&) {
+            caught_exception = true;
+        }
+        catch(...) {
+            HPX_TEST(false);
+        }
+
+        HPX_TEST(caught_exception);
+        if (caught_exception)
+            std::cout << "OK " << std::endl;
+        else
+            std::cout << "Failed " << std::endl;
+    }
+}
+
+// test exceptions
+template <typename ExPolicy, typename T>
+void test_sort_exception_async(ExPolicy && policy, T)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), "default", async, random);
+
+    // Fill vector with random values
+    std::vector<T> c(5000);
+    rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
+        (std::numeric_limits<T>::max)(), T(std::rand()));
+
+    {
+        // sort, blocking when seq, par, par_vec
+        bool caught_exception = false;
+        bool returned_from_algorithm = false;
+        try {
+            typedef typename std::vector<T>::iterator base_iterator;
+            typedef test::decorated_iterator<
+                    base_iterator, std::random_access_iterator_tag
+                > decorated_iterator;
+
+            hpx::future<void> f =
+                hpx::parallel::sort(std::forward<ExPolicy>(policy),
+                    decorated_iterator(
+                        c.begin(), [](){ throw std::runtime_error("test"); }),
+                    decorated_iterator(c.end()));
+
+            returned_from_algorithm = true;
+            f.get();
+
+            HPX_TEST(false);
+        }
+        catch(hpx::exception_list const&) {
+            caught_exception = true;
+        }
+        catch(...) {
+            HPX_TEST(false);
+        }
+
+        HPX_TEST(caught_exception);
+        HPX_TEST(returned_from_algorithm);
+        if (caught_exception && returned_from_algorithm)
+            std::cout << "OK, ";
+        else
+            std::cout << "Failed, ";
+    }
+
+    {
+        // sort, blocking when seq, par, par_vec
+        bool caught_exception = false;
+        bool returned_from_algorithm = false;
+        try {
+            typedef typename std::vector<T>::iterator base_iterator;
+            typedef test::decorated_iterator<
+                    base_iterator, std::random_access_iterator_tag
+                > decorated_iterator;
+
+            hpx::future<void> f =
+                hpx::parallel::sort(std::forward<ExPolicy>(policy),
+                    decorated_iterator(
+                        c.begin(), [](){ throw std::bad_alloc(); }),
+                    decorated_iterator(c.end()));
+
+            returned_from_algorithm = true;
+            f.get();
+
+            HPX_TEST(false);
+        }
+        catch(std::bad_alloc const&) {
+            caught_exception = true;
+        }
+        catch(...) {
+            HPX_TEST(false);
+        }
+
+        HPX_TEST(caught_exception);
+        HPX_TEST(returned_from_algorithm);
+        if (caught_exception && returned_from_algorithm)
+            std::cout << "OK " << std::endl;
+        else
+            std::cout << "Failed " << std::endl;
+    }
+}
+
+template <typename ExPolicy, typename T, typename Compare>
+void test_sort_exception_async(ExPolicy && policy, T, Compare comp)
+{
+    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(),
+        async, random);
+
+    // Fill vector with random values
+    std::vector<T> c(5000);
+    rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
+        (std::numeric_limits<T>::max)(), T(std::rand()));
+
+    {
+        // sort, blocking when seq, par, par_vec
+        bool caught_exception = false;
+        bool returned_from_algorithm = false;
+        try {
+            typedef typename std::vector<T>::iterator base_iterator;
+            typedef test::decorated_iterator<
+                    base_iterator, std::random_access_iterator_tag
+                > decorated_iterator;
+
+            hpx::future<void> f =
+                hpx::parallel::sort(std::forward<ExPolicy>(policy),
+                    decorated_iterator(
+                        c.begin(), [](){ throw std::runtime_error("test"); }),
+                    decorated_iterator(c.end()),
+                    comp);
+
+            returned_from_algorithm = true;
+            f.get();
+
+            HPX_TEST(false);
+        }
+        catch(hpx::exception_list const&) {
+            caught_exception = true;
+        }
+        catch(...) {
+            HPX_TEST(false);
+        }
+
+        HPX_TEST(caught_exception);
+        HPX_TEST(returned_from_algorithm);
+        if (caught_exception && returned_from_algorithm)
+            std::cout << "OK, ";
+        else
+            std::cout << "Failed, ";
+    }
+
+    {
+        // sort, blocking when seq, par, par_vec
+        bool caught_exception = false;
+        bool returned_from_algorithm = false;
+        try {
+            typedef typename std::vector<T>::iterator base_iterator;
+            typedef test::decorated_iterator<
+                    base_iterator, std::random_access_iterator_tag
+                > decorated_iterator;
+
+            hpx::future<void> f =
+                hpx::parallel::sort(std::forward<ExPolicy>(policy),
+                    decorated_iterator(
+                        c.begin(), [](){ throw std::bad_alloc(); }),
+                    decorated_iterator(c.end()),
+                    comp);
+
+            returned_from_algorithm = true;
+            f.get();
+
+            HPX_TEST(false);
+        }
+        catch(std::bad_alloc const&) {
+            caught_exception = true;
+        }
+        catch(...) {
+            HPX_TEST(false);
+        }
+
+        HPX_TEST(caught_exception);
+        HPX_TEST(returned_from_algorithm);
+        if (caught_exception && returned_from_algorithm)
+            std::cout << "OK " << std::endl;
+        else
+            std::cout << "Failed " << std::endl;
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // already sorted
 template <typename ExPolicy, typename T>

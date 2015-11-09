@@ -1148,7 +1148,7 @@ namespace hpx { namespace lcos
     {
         try
         {
-            throw e;
+            boost::throw_exception(e);
         } catch (...) {
             return lcos::make_exceptional_future<T>(boost::current_exception());
         }
