@@ -521,6 +521,8 @@ namespace hpx { namespace parcelset {
             // setting this flag to false - if more data is needed - disables final parcel receive call
             bool parcel_complete = true;
 
+            // if message was not piggybacked
+            char *piggy_back = h->piggy_back();
             char *chunk_data = h->chunk_data();
             if (chunk_data) {
                 // all the info about chunks we need is stored inside the header
@@ -544,8 +546,8 @@ namespace hpx { namespace parcelset {
                     for (serialization::serialization_chunk &c : recv_data.chunks) {
                         if (c.type_ == serialization::chunk_type_pointer) {
                             RdmaMemoryRegion *get_region;
-                            if (c.size_<=RDMA_DEFAULT_MEMORY_POOL_SMALL_CHUNK_SIZE) {
-                                get_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)RDMA_DEFAULT_MEMORY_POOL_SMALL_CHUNK_SIZE));
+                            if (c.size_<=RDMA_DEFAULT_MEMORY_POOL_LARGE_CHUNK_SIZE) {
+                                get_region = chunk_pool_->allocateRegion(c.size_));
                             }
                             else {
                                 get_region = chunk_pool_->AllocateTemporaryBlock(c.size_);
@@ -576,7 +578,6 @@ namespace hpx { namespace parcelset {
                 throw std::runtime_error("@TODO implement RDMA GET of mass chunk information when header too small");
             }
 
-            char *piggy_back = h->piggy_back();
             LOG_DEBUG_MSG("piggy_back is " << hexpointer(piggy_back) << " chunk data is " << hexpointer(h->chunk_data()));
             // if the main serialization chunk is piggybacked in second SGE
             if (piggy_back) {
@@ -592,6 +593,7 @@ namespace hpx { namespace parcelset {
                 }
             }
             else {
+                LOG_ERROR_MSG("@TODO implement RDMA GET of message when header too small");
                 std::terminate();
                 throw std::runtime_error("@TODO implement RDMA GET of message when header too small");
             }
@@ -762,14 +764,16 @@ namespace hpx { namespace parcelset {
             }
 
             //
-            // a zero byte receive indicates we are being informed that remote GET operations are complete
-            // we can release any data we were holding onto and signal a send as finished
+            // A zero byte receive indicates we are being informed that remote GET operations are complete
+            // we can release any data we were holding onto and signal a send as finished.
+            // On hardware that do not support immediate data, a 4 byte tag message is used.
             //
 
             else if (completion.opcode==IBV_WC_RECV && completion.byte_len<=4) {
                 handle_tag_recv_completion(wr_id, completion.imm_data, client);
                 return 0;
             }
+
             //
             // When an unmatched receive completes, it is a new parcel, if everything fits into
             // the header, call decode message, otherwise, queue all the Rdma Get operations
@@ -1144,6 +1148,7 @@ namespace hpx { namespace parcelset {
                     num_regions += 1;
                 }
                 else {
+                    LOG_DEBUG_MSG("Main message NOT piggybacked");
                     send_data.has_zero_copy  = true;
                 }
 

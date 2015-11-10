@@ -150,6 +150,7 @@ namespace hpx
                     if (filter.get() != nullptr)
                         archive_flags |= serialization::enable_compression;
 
+
                     // preallocate data
                     for (/**/; parcels_sent != parcels_size; ++parcels_sent)
                     {

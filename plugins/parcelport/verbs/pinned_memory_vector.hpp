@@ -122,7 +122,7 @@ class pinned_memory_vector
     std::size_t capacity() { return m_region_ ? m_region_->getLength() : 0; }
 
     inline void resize(std::size_t s) {
-        LOG_DEBUG_MSG("pinned_memory_vector " << hexpointer(m_array_) << hexpointer(m_region_) << " resizing from " << m_size_ << " to " << s);
+//        LOG_DEBUG_MSG("pinned_memory_vector " << hexpointer(m_array_) << hexpointer(m_region_) << " resizing from " << m_size_ << " to " << s);
         if (m_region_) {
             if (s>m_region_->getLength()) {
                 LOG_ERROR_MSG("Resizing from " << m_region_->getLength() << " to " << s)
@@ -139,7 +139,7 @@ class pinned_memory_vector
     }
     
     void reserve(std::size_t s) {
-        LOG_DEBUG_MSG("pinned_memory_vector " << hexpointer(m_array_) << hexpointer(m_region_) " reserving from " << m_size_ << " to " << s);
+//        LOG_DEBUG_MSG("pinned_memory_vector " << hexpointer(m_array_) << hexpointer(m_region_) " reserving from " << m_size_ << " to " << s);
         if (m_array_ || m_region_) {
             std::terminate();
             throw std::runtime_error("pinned_memory_vector should never be resized once an allocation has been assigned");            
