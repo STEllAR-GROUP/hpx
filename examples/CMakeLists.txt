@@ -33,7 +33,6 @@ set(subdirs
 if(HPX_WITH_CXX11_LAMBDAS)
   set(subdirs ${subdirs}
       1d_stencil
-      diskperf
       tuplespace
       transpose
      )
