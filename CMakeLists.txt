@@ -1519,7 +1519,6 @@ install( # Install HPX Python scripts
 
 install( # Install external dependencies
   DIRECTORY external/cache/boost
-            external/endian/boost
   DESTINATION include/hpx/external
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"
