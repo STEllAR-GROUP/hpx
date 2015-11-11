@@ -30,7 +30,6 @@
 #include <hpx/plugins/parcelport/mpi/sender.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver.hpp>
 
-#include <hpx/util/memory_chunk_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
@@ -109,16 +108,11 @@ namespace hpx { namespace parcelset
                 util::function_nonser<void()> const& on_stop)
               : base_type(ini, here(), on_start, on_stop)
               , stopped_(false)
-              , chunk_pool_(4096, max_connections(ini))
-              , sender_(chunk_pool_)
-              , receiver_(*this, chunk_pool_)
-              , handles_parcels_(0)
+              , receiver_(*this)
             {}
 
             ~parcelport()
             {
-                if(receive_early_parcels_thread_.joinable())
-                    receive_early_parcels_thread_.join();
                 util::mpi_environment::finalize();
             }
 
@@ -127,9 +121,14 @@ namespace hpx { namespace parcelset
             {
                 receiver_.run();
                 sender_.run();
-                receive_early_parcels_thread_ =
-                    boost::thread(&parcelport::receive_early_parcels, this,
-                        hpx::get_runtime_ptr());
+                for(std::size_t i = 0; i != io_service_pool_.size(); ++i)
+                {
+                    io_service_pool_.get_io_service(i).post(
+                        hpx::util::bind(
+                            &parcelport::io_service_work, this
+                        )
+                    );
+                }
                 return true;
             }
 
@@ -143,12 +142,6 @@ namespace hpx { namespace parcelset
                             "mpi::parcelport::do_stop");
                 }
                 stopped_ = true;
-                while(handles_parcels_ != 0)
-                {
-                    if(threads::get_self_ptr())
-                        hpx::this_thread::suspend(hpx::threads::pending,
-                            "mpi::parcelport::do_stop");
-                }
                 MPI_Barrier(util::mpi_environment::communicator());
             }
 
@@ -187,67 +180,38 @@ namespace hpx { namespace parcelset
                 if (stopped_)
                     return false;
 
-                handles_parcels h(this);
-
-                bool has_work = sender_.background_work(num_thread);
-                has_work = receiver_.background_work(num_thread) || has_work;
+                bool has_work = false;
+                has_work = sender_.background_work();
+                has_work = receiver_.background_work() || has_work;
                 return has_work;
             }
 
         private:
-            typedef util::memory_chunk_pool<> memory_pool_type;
-            typedef
-                util::detail::memory_chunk_pool_allocator<
-                    char, util::memory_chunk_pool<>
-                > allocator_type;
-            typedef
-                std::vector<char, allocator_type>
-                data_type;
             typedef lcos::local::spinlock mutex_type;
 
             boost::atomic<bool> stopped_;
 
-            memory_pool_type chunk_pool_;
-
             sender sender_;
             receiver receiver_;
 
-            boost::thread receive_early_parcels_thread_;
-
-            boost::atomic<std::size_t> handles_parcels_;
-
-            struct handles_parcels
+            void io_service_work()
             {
-                handles_parcels(parcelport *pp)
-                  : this_(pp)
+                std::size_t k = 0;
+                // We only execute work on the IO service while HPX is starting
+                while(hpx::is_starting())
                 {
-                    ++this_->handles_parcels_;
-                }
-
-                ~handles_parcels()
-                {
-                    --this_->handles_parcels_;
-                }
-
-                parcelport *this_;
-            };
-
-            void receive_early_parcels(hpx::runtime * rt)
-            {
-                rt->register_thread("receive_early_parcel");
-                try
-                {
-                    while(rt->get_state() <= state_startup)
+                    bool has_work = sender_.background_work();
+                    has_work = receiver_.background_work() || has_work;
+                    if(has_work)
                     {
-                        do_background_work(0);
+                        k = 0;
+                    }
+                    else
+                    {
+                        ++k;
+                        hpx::lcos::local::spinlock::yield(k);
                     }
                 }
-                catch(...)
-                {
-                    rt->unregister_thread();
-                    throw;
-                }
-                rt->unregister_thread();
             }
 
             void early_write_handler(

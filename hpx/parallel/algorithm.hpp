@@ -36,6 +36,7 @@
 #include <hpx/parallel/algorithms/set_intersection.hpp>
 #include <hpx/parallel/algorithms/set_symmetric_difference.hpp>
 #include <hpx/parallel/algorithms/set_union.hpp>
+#include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/algorithms/swap_ranges.hpp>
 
 #endif

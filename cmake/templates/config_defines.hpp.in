@@ -16,8 +16,8 @@
 #define HPX_PREFIX "@HPX_DEFINES_PREFIX@"
 #endif
 @hpx_config_defines@
-#if defined(HPX_HAVE_MAX_CPU_COUNT) && (HPX_HAVE_MAX_CPU_COUNT > 64) && !defined(HPX_WITH_MORE_THAN_64_THREADS)
-#define HPX_WITH_MORE_THAN_64_THREADS
+#if defined(HPX_HAVE_MAX_CPU_COUNT) && (HPX_HAVE_MAX_CPU_COUNT > 64) && !defined(HPX_HAVE_MORE_THAN_64_THREADS)
+#define HPX_HAVE_MORE_THAN_64_THREADS
 #endif
 
 #endif

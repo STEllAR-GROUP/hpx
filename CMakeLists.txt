@@ -272,12 +272,12 @@ hpx_option(HPX_WITH_MAX_CPU_COUNT STRING
   CATEGORY "Thread Manager" ADVANCED)
 hpx_add_config_define(HPX_HAVE_MAX_CPU_COUNT ${HPX_WITH_MAX_CPU_COUNT})
 
-if(NOT (${HPX_WITH_MAX_CPU_COUNT} LESS 65))
-  set(HPX_WITH_MORE_THAN_64_THREADS_DEFAULT OFF)
-  hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
-    "HPX applications will be able to run on more than 64 cores"
-    ${HPX_WITH_MORE_THAN_64_THREADS_DEFAULT}
-    CATEGORY "Thread Manager" ADVANCED)
+hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
+  "HPX applications will be able to run on more than 64 cores"
+  (NOT (${HPX_WITH_MAX_CPU_COUNT} LESS 65))
+  CATEGORY "Thread Manager" ADVANCED)
+if(HPX_WITH_MORE_THAN_64_THREADS)
+  hpx_add_config_define(HPX_HAVE_MORE_THAN_64_THREADS)
 endif()
 
 hpx_option(HPX_WITH_THREAD_STACK_MMAP BOOL
@@ -1133,7 +1133,7 @@ if(HPX_WITH_APEX)
   include(GitExternal)
   git_external(apex
     https://github.com/khuck/xpress-apex.git
-    master
+    v0.1
     VERBOSE)
 
   LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/apex/cmake/Modules")
@@ -1156,7 +1156,7 @@ if(HPX_WITH_APEX)
     set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${ACTIVEHARMONY_ROOT}/lib -lharmony)
   endif()
-  if(APEX_WITH_TAU)
+  if(APEX_WITH_TAU OR HPX_WITH_TAU)
     set(HPX_ADDITIONAL_RUNTIME_DEPENDENCIES
         ${HPX_ADDITIONAL_RUNTIME_DEPENDENCIES} -L${TAU_ROOT}/lib -lTAU)
   endif()
@@ -1519,7 +1519,6 @@ install( # Install HPX Python scripts
 
 install( # Install external dependencies
   DIRECTORY external/cache/boost
-            external/endian/boost
   DESTINATION include/hpx/external
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"

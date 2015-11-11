@@ -9,15 +9,26 @@
 
 [section:hpx_0_9_11 __hpx__ V0.9.11]
 
+Our main focus for this release was the design and development of a coherent
+set of higher-level APIs exposing various types of parallelism to the
+application programmer. We introduced the concepts of an `executor`, which can
+be used to customize the `where` and `when` of execution of tasks in the
+context of parallelizing codes. We extended all APIs related to managing parallel
+tasks to support executors which gives the user the choce of either using
+one of the predefined executor types or to provide its own, possibly application
+specific, executor. We paid very close attention to align all of these changes
+with the existing C++ Standards documents or with the ongoing proposals for
+standardization.
+
 This release is the first after our change to a new development policy. We
-switched all develpment to be strictly performed on branches only, all direct
+switched all development to be strictly performed on branches only, all direct
 commits to our main branch (`master`) are prohibited. Any change has to go
 through a peer review before it will be merged to `master`. As a result the
 overall stability of our code base has significantly increased, the development
 process itself has been simplified. This change manifests itself in a large
-number of pull-requests which has been merged (please see below for a full list
+number of pull-requests which have been merged (please see below for a full list
 of closed issues and pull-requests). All in all for this release, we closed
-almost 100 issues and merged over 270 pull-requests. There have been over 1600
+almost 100 issues and merged over 290 pull-requests. There have been over 1600
 commits to the master branch since the last release.
 
 [heading General Changes]
@@ -30,9 +41,10 @@ commits to the master branch since the last release.
 * Added integration with the [@https://circleci.com/gh/STEllAR-GROUP/hpx CircleCI]
   hosted continuous integration service. This gives us constant and immediate
   feedback on the health of our master branch.
-* The compiler configuration subsystem has been reimplemented. Instead of using
-  Boost.Config we now use our own lightweight set of cmake scripts to determine
-  the available language and library features supported by the used compiler.
+* The compiler configuration subsystem in the build system has been reimplemented.
+  Instead of using Boost.Config we now use our own lightweight set of cmake
+  scripts to determine the available language and library features supported by
+  the used compiler.
 * The API for creating instances of components has been consolidated. All
   component instances should be created using the [funcref hpx::new_ `hpx::new_<>()`]
   only. It allows to instantiate both, single component instances and multiple
@@ -68,7 +80,7 @@ commits to the master branch since the last release.
 * Added new LCOs: `hpx::lcos::latch` and `hpx::lcos::local::latch` which
   semantically conform to the proposed `std::latch` (see __cpp17_n4399__).
 * Added performance counters exposing data related to data transferred by
-  input/output (filesystem) operations.
+  input/output (filesystem) operations (thanks to Maciej Brodowicz).
 * Added performance counters allowing to track the number of action invocations
   (local and remote invocations).
 * Added new command line options [hpx_cmdline `--hpx:print-counter-at`] and
@@ -80,6 +92,18 @@ commits to the master branch since the last release.
   We have added a large number of different executor types, such as a
   numa-aware executor, a this-thread executor, etc.
 * Added support for the MingW toolchain on Windows (thanks to Eric Lemanissier).
+* HPX now includes support for APEX, (Autonomic Performance Environment for
+  eXascale). APEX is an instrumentation and software adaptation library that
+  provides an interface to TAU profiling / tracing as well as runtime adaptation
+  of HPX applications through policy definitions. For more information and
+  documentation, please see https://github.com/khuck/xpress-apex. To enable
+  APEX at configuration time, specify `-DHPX_WITH_APEX=On`. To also include
+  support for TAU profiling, specify `-DHPX_WITH_TAU=On` and specify the
+  `-DTAU_ROOT`, `-DTAU_ARCH` and `-DTAU_OPTIONS` cmake parameters.
+* We have implemented many more of the
+  [link hpx.manual.parallel.parallel_algorithms.parallel_algorithms parallel algorithms].
+  Please see [issue 1141] for the list of all available parallel algorithms
+  (thanks to Daniel Bourgeois and John Biddiscombe for contributing their work).
 
 [heading Breaking Changes]
 
@@ -143,12 +167,41 @@ commits to the master branch since the last release.
   backwards compatibility, use the cmake configuration option
   `HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY=On`.
 
-
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    1855] - Completely removing external/endian
+* [pr    1854] - Don't pollute CMAKE_CXX_FLAGS through find_package()
+* [pr    1853] - Updating CMake configuration to get correct version of TAU
+                 library
+* [pr    1852] - Fixing Performance Problems with MPI Parcelport
+* [pr    1851] - Fixing hpx_add_link_flag() and hpx_remove_link_flag()
+* [pr    1850] - Fixing 1836, adding parallel::sort
+* [pr    1849] - Fixing configuration for use of more than 64 cores
+* [pr    1848] - Change default APEX version for release
+* [pr    1847] - Fix client_base::then on release
+* [pr    1846] - Removing broken lcos::local::channel from release
+* [pr    1845] - Adding example demonstrating a possible safe-object
+                 implementation to release
+* [pr    1844] - Removing stubs from accumulator examples
+* [pr    1843] - Don't pollute CMAKE_CXX_FLAGS through find_package()
+* [pr    1841] - Fixing client_base<>::then
+* [pr    1840] - Adding example demonstrating a possible safe-object
+                 implementation
+* [pr    1838] - Update version rc1
+* [pr    1837] - Removing broken lcos::local::channel
+* [pr    1835] - Adding exlicit move constructor and assignment operator to
+                 hpx::lcos::promise
+* [pr    1834] - Making hpx::lcos::promise move-only
+* [pr    1833] - Adding fedora docs
+* [issue 1832] - hpx::lcos::promise<> must be move-only
+* [pr    1831] - Fixing resource manager gcc5.2
+* [pr    1830] - Fix intel13
+* [pr    1829] - Unbreaking thread test
+* [pr    1828] - Fixing #1620
 * [pr    1827] - Fixing a memory management issue for the Parquet application
+* [issue 1826] - Memory management issue in hpx::lcos::promise
 * [pr    1825] - Adding hpx::components::component and
                  hpx::components::component_base
 * [pr    1823] - Adding git commit id to circleci build
@@ -156,6 +209,7 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1821] - Hyperlink fixes
 * [pr    1820] - added parallel multi-locality sanity test
 * [pr    1819] - Fixing #1667
+* [issue 1817] - Hyperlinks generated by inspect tool are wrong
 * [pr    1816] - Support hpxrx
 * [pr    1814] - Fix async to dispatch to the correct locality in all cases
 * [issue 1813] - async(launch::..., action(), ...) always invokes locally
@@ -221,6 +275,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1757] - pinning not correct using --hpx:bind
 * [issue 1756] - compilation error with MinGW
 * [pr    1755] - Making output serialization const-correct
+* [issue 1753] - HPX performance degrades with time since execution begins
 * [issue 1752] - Error in AGAS
 * [issue 1751] - hpx::future::wait_for fails a simple test
 * [pr    1750] - Removing hpx_fwd.hpp includes
@@ -234,6 +289,8 @@ Here is a list of the important tickets we closed for this release.
 * [pr    1741] - Os executors
 * [issue 1740] - hpx::promise has some problems
 * [pr    1739] - Parallel composition with generic containers
+* [issue 1738] - After building program and successfully linking to a version
+                 of hpx DHPX_DIR seems to be ignored
 * [issue 1737] - Uptime problems
 * [pr    1736] - added convenience c-tor and begin()/end() to serialize_buffer
 * [pr    1735] - Config includes
@@ -360,6 +417,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1623] - hpx::wait_all() invoked with two vector<future<T>> fails
 * [pr    1622] - Executor partitioners
 * [pr    1621] - Clean up coroutines implementation
+* [issue 1620] - Revert #1535
 * [pr    1619] - Fix result type calculation for hpx::make_continuation
 * [pr    1618] - Fixing RDTSC on Xeon/Phi
 * [issue 1617] - hpx cmake not working when run as a subproject
@@ -573,7 +631,10 @@ Here is a list of the important tickets we closed for this release.
                  applications
 * [pr    1300] - Added serialization/de-serialization to examples.tuplespace
 * [issue 1251] - hpx::threads::get_thread_count doesn't consider pending threads
+* [issue 1008] - Decrease in application performance overtime; occasional
+                 spikes of major slowdown
 * [issue 1001] - Zero copy serialization raises assert
+* [issue  721] - Make HPX usable for Xeon Phi
 * [issue  524] - Extend scheduler to support threads which can't be stolen
 
 [endsect]
@@ -584,5 +645,5 @@ Here is a list of the important tickets we closed for this release.
 [endsect] [/ What's New]
 
 [/Proofread by:]
-[/Adrian Serio 3-13-12]
-
+[/Adrian Serio 3-13-15]
+[/Patricia Grubel 3-20-15]

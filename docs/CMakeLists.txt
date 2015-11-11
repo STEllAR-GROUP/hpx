@@ -28,7 +28,6 @@ set(documentation_dependencies
     "${PROJECT_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp"
     "${PROJECT_SOURCE_DIR}/examples/quickstart/error_handling.cpp"
     "${PROJECT_SOURCE_DIR}/examples/accumulators/server/accumulator.hpp"
-    "${PROJECT_SOURCE_DIR}/examples/accumulators/stubs/accumulator.hpp"
     "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.hpp"
     "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator.cpp"
     "${PROJECT_SOURCE_DIR}/examples/accumulators/accumulator_client.cpp"
@@ -89,6 +88,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_intersection.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_symmetric_difference.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/set_union.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/sort.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/swap_ranges.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/algorithms/transform_exclusive_scan.hpp"
@@ -208,7 +208,7 @@ if(BOOSTAUTOINDEX_FOUND)
 endif()
 
 set(image
-    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}_draft.png)
+    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}.png)
 
 set(HPX_CMAKE_OPTIONS "")
 foreach(_cat ${HPX_OPTION_CATEGORIES})
@@ -304,8 +304,8 @@ hpx_quickbook_to_html(hpx
                 toc.max.depth=4
                 generate.section.toc.level=4
                 boost.image.src=${image}
-                boost.image.w=460
-                boost.image.h=106
+                boost.image.w=466
+                boost.image.h=120
                 boost.image.alt="HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}

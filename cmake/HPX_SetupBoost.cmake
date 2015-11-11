@@ -12,6 +12,7 @@ endif()
 # Add additional version to recognize
 set(Boost_ADDITIONAL_VERSIONS
     ${Boost_ADDITIONAL_VERSIONS}
+    "1.60.0" "1.60"
     "1.59.0" "1.59"
     "1.58.0" "1.58"
     "1.57.0" "1.57")
@@ -99,7 +100,6 @@ endif()
 
 set(Boost_LIBRARIES ${Boost_TMP_LIBRARIES})
 set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/external/cache)
-set(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/external/endian)
 
 # If we compile natively for the MIC, we need some workarounds for certain
 # Boost headers
