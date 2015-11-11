@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser,
+//  Copyright (c) 2007-2015 Hartmut Kaiser,
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 
-#include "accumulators/template_function_accumulator.hpp"
+#include "template_function_accumulator.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -29,7 +29,8 @@ int hpx_main()
     {
         // Create an accumulator component on this locality.
         examples::template_function_accumulator accu =
-            examples::template_function_accumulator::create(hpx::find_here());
+            hpx::components::new_<examples::template_function_accumulator>(
+                hpx::find_here());
 
         // Print out the available commands.
         std::cout << help << std::endl << "> ";
@@ -103,7 +104,12 @@ int hpx_main()
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
+    // We force this example to use 2 threads by default as one of the threads
+    // will be sitting most of the time in the kernel waiting for user input.
+    std::vector<std::string> cfg;
+    cfg.push_back("hpx.os_threads=2");
+
     // Initialize and run HPX.
-    return hpx::init(argc, argv);
+    return hpx::init(argc, argv, cfg);
 }
 

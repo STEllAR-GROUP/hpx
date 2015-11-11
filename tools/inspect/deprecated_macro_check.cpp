@@ -118,7 +118,8 @@ namespace boost
       {
         if ( contents.find( *ptr ) != string::npos ) {
           ++errors;
-          error( library_name, full_path, loclink(full_path, string ( "Boost macro deprecated in 1.50: " ) + *ptr ));
+          error( library_name, full_path, loclink(full_path,
+              string ( "Boost macro deprecated in 1.50: " ) + *ptr ));
           }
       }
 
@@ -126,7 +127,8 @@ namespace boost
       {
         if ( contents.find( *ptr ) != string::npos ) {
           ++errors;
-          error( library_name, full_path, loclink(full_path, string("Boost macro deprecated in 1.51: ") + *ptr));
+          error( library_name, full_path, loclink(full_path,
+              string("Boost macro deprecated in 1.51: ") + *ptr));
           }
       }
 
@@ -134,7 +136,8 @@ namespace boost
       {
         if ( contents.find( *ptr ) != string::npos ) {
           ++errors;
-          error( library_name, full_path, loclink(full_path, string("Boost macro deprecated in 1.53: ") + *ptr));
+          error( library_name, full_path, loclink(full_path,
+              string("Boost macro deprecated in 1.53: ") + *ptr));
           }
       }
 

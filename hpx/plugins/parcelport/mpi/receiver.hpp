@@ -11,8 +11,6 @@
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver_connection.hpp>
 
-#include <hpx/util/memory_chunk_pool.hpp>
-
 #include <list>
 #include <iterator>
 
@@ -27,16 +25,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef hpx::lcos::local::spinlock mutex_type;
         typedef std::list<std::pair<int, header> > header_list;
         typedef std::set<std::pair<int, int> > handles_header_type;
-        typedef util::memory_chunk_pool<mutex_type> memory_pool_type;
         typedef
             receiver_connection
             connection_type;
         typedef std::shared_ptr<connection_type> connection_ptr;
-        typedef std::list<connection_ptr> connection_list;
+        typedef std::deque<connection_ptr> connection_list;
 
-        receiver(parcelport & pp, memory_pool_type & chunk_pool)
+        receiver(parcelport & pp)
           : pp_(pp)
-          , chunk_pool_(chunk_pool)
         {}
 
         void run()
@@ -45,24 +41,28 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             new_header();
         }
 
-        bool background_work(std::size_t num_thread)
+        bool background_work()
         {
             // We accept as many connections as we can ...
             connection_list connections;
             {
-                boost::unique_lock<mutex_type> l(connections_mtx_);
-                std::swap(connections, connections_);
+                boost::unique_lock<mutex_type> l(connections_mtx_, boost::try_to_lock);
+                if(l && !connections_.empty())
+                {
+                    connections.push_back(connections_.front());
+                    connections_.pop_front();
+                }
             }
 
             connection_ptr rcv;
-            do
-            {
+//             do
+//             {
                 rcv = accept();
                 if(rcv && !rcv->receive())
                 {
                     connections.push_back(rcv);
                 }
-            } while(rcv);
+//             } while(rcv);
             rcv.reset();
 
             if(!connections.empty())
@@ -89,7 +89,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             );
 
             // If some are still in progress, give them back
-//             if(end != connections.end())
+            if(connections.begin() != end)
             {
                 boost::unique_lock<mutex_type> l(connections_mtx_);
                 connections_.insert(
@@ -126,7 +126,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                             status.MPI_SOURCE
                           , h
                           , pp_
-                          , chunk_pool_
                         )
                     );
                     return res;
@@ -152,8 +151,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
 
         parcelport & pp_;
-
-        memory_pool_type & chunk_pool_;
 
         mutex_type headers_mtx_;
         MPI_Request hdr_request_;

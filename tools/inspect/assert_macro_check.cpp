@@ -74,12 +74,14 @@ namespace boost
         path relative( relative_to( full_path, search_root_path() ) );
         path::const_iterator pbeg = relative.begin(), pend = relative.end();
         if (pbeg != std::find(pbeg, pend, "boost") &&
-          !(pbeg == std::find(pbeg, pend, "libs") && pend != std::find(pbeg, pend, "src")))
+          !(pbeg == std::find(pbeg, pend, "libs") &&
+              pend != std::find(pbeg, pend, "src")))
           return;
       }
 
       long errors = 0;
-      boost::sregex_iterator cur(contents.begin(), contents.end(), assert_macro_regex), end;
+      boost::sregex_iterator cur(contents.begin(),
+          contents.end(), assert_macro_regex), end;
       for( ; cur != end; ++cur )
       {
         if(!(*cur)[3].matched)
@@ -96,7 +98,8 @@ namespace boost
                   line_start = it + 1; // could be end()
               }
           }
-          std::string lineloc = linelink (full_path, boost::lexical_cast<string>(line_number));
+          std::string lineloc = linelink (full_path,
+              boost::lexical_cast<string>(line_number));
           ++errors;
           error( library_name, full_path, "C-style assert macro on line "
             + lineloc );

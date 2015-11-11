@@ -4,24 +4,24 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
+#include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/register_locks.hpp>
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    generic_thread_pool_executor::generic_thread_pool_executor(
+    current_executor::current_executor(
             policies::scheduler_base* scheduler)
       : scheduler_base_(scheduler)
     {}
 
     threads::thread_state_enum
-    generic_thread_pool_executor::thread_function_nullary(
-        closure_type func)
+    current_executor::thread_function_nullary(closure_type func)
     {
         // execute the actual thread function
         func();
@@ -37,14 +37,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
-    void generic_thread_pool_executor::add(
+    void current_executor::add(
         closure_type && f,
         char const* desc, threads::thread_state_enum initial_state,
         bool run_now, threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new thread
         thread_init_data data(util::bind(
-            util::one_shot(&generic_thread_pool_executor::thread_function_nullary),
+            util::one_shot(&current_executor::thread_function_nullary),
             std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
@@ -57,14 +57,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             ec = make_success_code();
     }
 
-    void generic_thread_pool_executor::add_at(
+    void current_executor::add_at(
         boost::chrono::steady_clock::time_point const& abs_time,
         closure_type && f, char const* desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new suspended thread
         thread_init_data data(util::bind(
-            util::one_shot(&generic_thread_pool_executor::thread_function_nullary),
+            util::one_shot(&current_executor::thread_function_nullary),
             std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
@@ -86,7 +86,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule given function for execution in this executor no sooner
     // than time rel_time from now. This call never blocks, and may
     // violate bounds on the executor's queue size.
-    void generic_thread_pool_executor::add_after(
+    void current_executor::add_after(
         boost::chrono::steady_clock::duration const& rel_time,
         closure_type && f, char const* desc,
         threads::thread_stacksize stacksize, error_code& ec)
@@ -96,7 +96,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Return an estimate of the number of waiting tasks.
-    boost::uint64_t generic_thread_pool_executor::num_pending_closures(
+    boost::uint64_t current_executor::num_pending_closures(
         error_code& ec) const
     {
         return scheduler_base_->get_thread_count() -
@@ -104,13 +104,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Reset internal (round robin) thread distribution scheme
-    void generic_thread_pool_executor::reset_thread_distribution()
+    void current_executor::reset_thread_distribution()
     {
         scheduler_base_->reset_thread_distribution();
     }
 
     // Return the requested policy element
-    std::size_t generic_thread_pool_executor::get_policy_element(
+    std::size_t current_executor::get_policy_element(
         threads::detail::executor_parameter p, error_code& ec) const
     {
         switch(p) {
@@ -129,12 +129,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         return std::size_t(-1);
     }
 
-    hpx::state generic_thread_pool_executor::get_state() const
+    hpx::state current_executor::get_state() const
     {
         return scheduler_base_->get_state(hpx::get_worker_thread_num());
     }
 
-    void generic_thread_pool_executor::set_scheduler_mode(
+    void current_executor::set_scheduler_mode(
         threads::policies::scheduler_mode mode)
     {
         return scheduler_base_->set_scheduler_mode(mode);
@@ -146,15 +146,19 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     // this is just a wrapper around a scheduler_base assuming the wrapped
     // scheduler outlives the wrapper
-    generic_thread_pool_executor::generic_thread_pool_executor(
-            policies::scheduler_base* scheduler)
-      : scheduled_executor(new detail::generic_thread_pool_executor(scheduler))
+    current_executor::current_executor()
+      : scheduled_executor(new detail::current_executor(
+            get_self_id()->get_scheduler_base()))
     {}
 
-    hpx::state generic_thread_pool_executor::get_state() const
+    current_executor::current_executor(policies::scheduler_base* scheduler)
+      : scheduled_executor(new detail::current_executor(scheduler))
+    {}
+
+    hpx::state current_executor::get_state() const
     {
         return boost::static_pointer_cast<
-                detail::generic_thread_pool_executor
+                detail::current_executor
             >(executor::executor_data_)->get_state();
     }
 }}}

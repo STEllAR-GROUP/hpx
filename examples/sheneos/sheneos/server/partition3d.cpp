@@ -413,7 +413,7 @@ HPX_REGISTER_ACTION(partition3d_type::interpolate_one_bulk_action,
     sheneos_partition3d_interpolate_one_bulk_action);
 
 HPX_REGISTER_COMPONENT(
-    hpx::components::simple_component<partition3d_type>,
+    hpx::components::component<partition3d_type>,
     sheneos_partition_type);
 
 HPX_REGISTER_ACTION(

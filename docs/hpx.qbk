@@ -66,6 +66,7 @@
 [def __nmsu__                   [@http://www.nmsu.edu New Mexico State University]]
 [def __unlv__                   [@http://www.unlv.edu University of Nevada, Las Vegas]]
 [def __cscs__                   [@http://www.cscs.ch Swiss National Supercomputing Centre]]
+[def __ou__                     [@http://uoregon.edu/ University of Oregon]]
 
 [def __gsoc__                   [@https://developers.google.com/open-source/soc/ Google Summer of Code]]
 

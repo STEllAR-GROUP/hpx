@@ -7,6 +7,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "link_check.hpp"
+#include "function_hyper.hpp"
 #include "boost/regex.hpp"
 #include "boost/filesystem/operations.hpp"
 #include <boost/algorithm/string/case_conv.hpp>
@@ -483,7 +484,8 @@ namespace boost
        {
          ++m_unlinked_errors;
          path full_path( search_root_path() / path(itr->first) );
-         error( impute_library( full_path ), full_path, "Unlinked file" );
+         error( impute_library( full_path ), full_path,
+             loclink(full_path, "Unlinked file") );
        }
      }
    }

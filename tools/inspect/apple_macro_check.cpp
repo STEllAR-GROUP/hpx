@@ -22,7 +22,8 @@ namespace
   boost::regex apple_macro_regex(
     "("
     "^\\s*#\\s*undef\\s*" // # undef
-    "\\b(check|verify|require|check_error)\\b"     // followed by apple macro name, whole word
+    "\\b(check|verify|require|check_error)\\b"
+      // followed by apple macro name, whole word
     ")"
     "|"                   // or (ignored)
     "("
@@ -69,7 +70,8 @@ namespace boost
       path relative( relative_to( full_path, search_root_path() ) );
       if ( relative.empty() || *relative.begin() != "boost") return;
 
-      boost::sregex_iterator cur(contents.begin(), contents.end(), apple_macro_regex), end;
+      boost::sregex_iterator cur(contents.begin(),
+          contents.end(), apple_macro_regex), end;
 
       long errors = 0;
 
@@ -90,8 +92,6 @@ namespace boost
                   line_start = it + 1; // could be end()
               }
           }
-
-          std::string lineloc = linelink(full_path, std::to_string(line_number));
           ++errors;
           error( library_name, full_path,
             "Apple macro clash: " + std::string((*cur)[0].first, (*cur)[0].second-1),

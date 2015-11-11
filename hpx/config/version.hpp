@@ -32,7 +32,7 @@
 #define HPX_VERSION_MINOR        9
 #define HPX_VERSION_SUBMINOR     12
 
-#define HPX_VERSION_DATE         20160324
+#define HPX_VERSION_DATE         20151111
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x30

@@ -23,8 +23,6 @@ special different ways adapted to HPX.
 
 # barrier
 
-# channel
-
 # composable_guard - Composable guards operate in a manner similar to locks, but
 are applied only to asynchronous functions. The guard (or guards) is automatically
 locked at the beginning of a specified task and automatically unlocked at the end.

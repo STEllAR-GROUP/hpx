@@ -17,7 +17,7 @@ namespace examples { namespace server
 {
 
 struct HPX_COMPONENT_EXPORT hello_world
-  : hpx::components::managed_component_base<hello_world>
+  : hpx::components::component_base<hello_world>
 {
     void invoke();
     HPX_DEFINE_COMPONENT_ACTION(hello_world, invoke);

@@ -9,7 +9,6 @@ set(example_programs
     component_ctors
     component_in_executable
     component_inheritance
-    component_inheritance_simple
     component_with_executor
     composable_guard
     customize_async
@@ -24,6 +23,7 @@ set(example_programs
     fibonacci_futures_distributed
     fractals
     fractals_struct
+    safe_object
     interest_calculator
     interval_timer
     latch_local
@@ -46,7 +46,6 @@ set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_in_executable_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_inheritance_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(component_inheritance_simple_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(customize_async_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(event_synchronization_FLAGS COMPONENT_DEPENDENCIES iostreams)

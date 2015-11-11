@@ -1,44 +1,44 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_F976C441_3AEF_4CC3_A47C_A51042E0F12C)
-#define HPX_F976C441_3AEF_4CC3_A47C_A51042E0F12C
+#if !defined(HPX_ECFE19F9_A826_4AE1_AC7C_33DC5714CF0B)
+#define HPX_ECFE19F9_A826_4AE1_AC7C_33DC5714CF0B
 
 #include <hpx/include/components.hpp>
 
-#include "stubs/managed_accumulator.hpp"
+#include "server/accumulator.hpp"
 
 namespace examples
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// Client for the \a server::managed_accumulator component.
-    //[managed_accumulator_client_inherit
-    class managed_accumulator
+    /// Client for the \a server::accumulator component.
+    //[accumulator_client_inherit
+    class accumulator
       : public hpx::components::client_base<
-            managed_accumulator, stubs::managed_accumulator
+            accumulator, server::accumulator
         >
     //]
     {
-        //[managed_accumulator_base_type
+        //[accumulator_base_type
         typedef hpx::components::client_base<
-            managed_accumulator, stubs::managed_accumulator
+            accumulator, server::accumulator
         > base_type;
         //]
 
-        typedef base_type::argument_type argument_type;
+        typedef server::accumulator::argument_type argument_type;
 
     public:
         /// Default construct an empty client side representation (not
         /// connected to any existing component).
-        managed_accumulator()
+        accumulator()
         {}
 
         /// Create a client side representation for the existing
-        /// \a server::managed_accumulator instance with the given GID.
-        managed_accumulator(hpx::future<hpx::naming::id_type> && gid)
+        /// \a server::accumulator instance with the given GID.
+        accumulator(hpx::future<hpx::id_type> && gid)
           : base_type(std::move(gid))
         {}
 
@@ -48,11 +48,13 @@ namespace examples
         /// \note This function has fire-and-forget semantics. It will not wait
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
-        //[managed_accumulator_client_reset_non_blocking
+        //[accumulator_client_reset_non_blocking
         void reset_non_blocking()
         {
             HPX_ASSERT(this->get_id());
-            this->base_type::reset_non_blocking(this->get_id());
+
+            typedef server::accumulator::reset_action action_type;
+            hpx::apply<action_type>(this->get_id());
         }
         //]
 
@@ -62,7 +64,9 @@ namespace examples
         void reset_sync()
         {
             HPX_ASSERT(this->get_id());
-            this->base_type::reset_sync(this->get_id());
+
+            typedef server::accumulator::reset_action action_type;
+            hpx::async<action_type>(this->get_id()).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -74,17 +78,21 @@ namespace examples
         void add_non_blocking(argument_type arg)
         {
             HPX_ASSERT(this->get_id());
-            this->base_type::add_non_blocking(this->get_id(), arg);
+
+            typedef server::accumulator::add_action action_type;
+            hpx::apply<action_type>(this->get_id(), arg);
         }
 
         /// Add \p arg to the accumulator's value.
         ///
         /// \note This function is fully synchronous.
-        //[managed_accumulator_client_add_sync
+        //[accumulator_client_add_sync
         void add_sync(argument_type arg)
         {
             HPX_ASSERT(this->get_id());
-            this->base_type::add_sync(this->get_id(), arg);
+
+            typedef server::accumulator::add_action action_type;
+            hpx::async<action_type>(this->get_id(), arg).get();
         }
         //]
 
@@ -96,11 +104,13 @@ namespace examples
         ///          the future should be called. If the value is available,
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
-        //[managed_accumulator_client_query_async
-        hpx::lcos::future<argument_type> query_async()
+        //[accumulator_client_query_async
+        hpx::future<argument_type> query_async()
         {
             HPX_ASSERT(this->get_id());
-            return this->base_type::query_async(this->get_id());
+
+            typedef server::accumulator::query_action action_type;
+            return hpx::async<action_type>(this->get_id());
         }
         //]
 
@@ -110,7 +120,8 @@ namespace examples
         argument_type query_sync()
         {
             HPX_ASSERT(this->get_id());
-            return this->base_type::query_sync(this->get_id());
+
+            return query_async().get();
         }
     };
 }

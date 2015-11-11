@@ -344,7 +344,7 @@ namespace hpx { namespace lcos { namespace local
                     HPX_THROWS_IF(ec, no_state,
                         "packaged_task_base<Signature>::get_future",
                         "this packaged_task has no valid shared state");
-                    return lcos::future<Result>();
+                    return;
                 }
                 promise_ = local::promise<Result>();
             }

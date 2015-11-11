@@ -25,6 +25,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/wait_all.hpp>
@@ -1177,9 +1178,10 @@ hpx::future<bool> addressing_service::bind_range_async(
     future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
 
-    return f.then(
-        util::bind(&addressing_service::bind_postproc, this, _1, lower_id, g)
-    );
+    return f.then(util::bind(
+            util::one_shot(&addressing_service::bind_postproc),
+            this, _1, lower_id, g
+        ));
 }
 
 bool addressing_service::unbind_range_local(
@@ -1720,9 +1722,10 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
     using util::placeholders::_1;
     future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
-    return f.then(
-        util::bind(&addressing_service::resolve_full_postproc, this, _1, gid)
-    );
+    return f.then(util::bind(
+            util::one_shot(&addressing_service::resolve_full_postproc),
+            this, _1, gid
+        ));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2022,9 +2025,10 @@ lcos::future<boost::int64_t> addressing_service::incref_async(
 
     // pass the amount of compensated decrefs to the callback
     using util::placeholders::_1;
-    return f.then(
-        util::bind(&addressing_service::synchronize_with_async_incref,
-            this, _1, keep_alive, pending_decrefs));
+    return f.then(util::bind(
+            util::one_shot(&addressing_service::synchronize_with_async_incref),
+            this, _1, keep_alive, pending_decrefs
+        ));
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2151,10 +2155,10 @@ lcos::future<bool> addressing_service::register_name_async(
     if (new_credit != 0)
     {
         using util::placeholders::_1;
-        return f.then(
-            util::bind(correct_credit_on_failure, _1, id,
-                HPX_GLOBALCREDIT_INITIAL, new_credit)
-        );
+        return f.then(util::bind(
+                util::one_shot(&correct_credit_on_failure),
+                _1, id, HPX_GLOBALCREDIT_INITIAL, new_credit
+            ));
     }
 
     return f;
@@ -2244,7 +2248,7 @@ lcos::future<naming::id_type> addressing_service::resolve_name_async(
 namespace detail
 {
     hpx::future<hpx::id_type> on_register_event(hpx::future<bool> f,
-        lcos::promise<hpx::id_type, naming::gid_type> p)
+        hpx::future<hpx::id_type> result_f)
     {
         if (!f.get())
         {
@@ -2253,7 +2257,13 @@ namespace detail
                 "request 'symbol_ns_on_event' failed");
             return hpx::future<hpx::id_type>();
         }
-        return p.get_future();
+#if defined(HPX_INTEL_VERSION) && HPX_INTEL_VERSION < 1400
+        // The move was added to silence an error produced by intel13
+        return std::move(result_f);
+#else
+        // All other compilers do the right thing (tm)
+        return result_f;
+#endif
     }
 }
 
@@ -2275,7 +2285,9 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
         name, req, action_priority_);
 
     using util::placeholders::_1;
-    return f.then(util::bind(&detail::on_register_event, _1, std::move(p)));
+    return f.then(util::bind(
+            util::one_shot(&detail::on_register_event), _1, p.get_future()
+        ));
 }
 
 }}

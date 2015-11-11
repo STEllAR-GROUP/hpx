@@ -97,7 +97,19 @@ our tables below.
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
-* Nidhi Makhijani who helped cleaning up some enum consistencies in __hpx__.
+* Kevin Huck and Nick Chaimov (__ou__), who contributed the integration of APEX
+  (Autonomic Performance Environment for eXascale) with __hpx__.
+* Francisco Jose Tapia, who helped with implementing the parallel sort
+  algorithm for __hpx__.
+* Patrick Diehl, who worked on implementing CUDA support for our companion
+  library targeting GPGPUs (__hpxcl__).
+* Eric Lemanissier contributed fixes to allow compilation using the MingW
+  toolchain.
+* Nidhi Makhijani who helped cleaning up some enum consistencies in __hpx__ and
+  contributed to the resource manager used in the thread scheduling subsystem.
+  She also worked on __hpx__ in the context of the Google Summer of Code 2015.
+* Larry Xiao, Devang Bacharwar, Marcin Copik, and Konstantin Kronfeldner who
+  worked on HPX in the context of the Google Summer of Code program 2015.
 * Daniel Bourgeois (__cct__) who contributed to __hpx__ the implementation of
   several parallel algorithms (as proposed by __cpp11_n4107__).
 * Anuj Sharma and Christopher Bross (__inf3__), who worked on __hpx__ in the
@@ -110,7 +122,7 @@ the project through discussions, pull requests, documentation patches, etc.
   (as proposed by __cpp11_n4107__).
 * Damond Howard (__lsu__), who works on __hpxcl__ (mainly all work related to
   __cuda__).
-* Parsa Amini (__nmsu__), who works on the implementation and optimization of
+* Parsa Amini (__cct__), who works on the implementation and optimization of
   AGAS (Active Global Address Space).
 * Christoph Junghans (Los Alamos National Lab), who helped making our
   buildsystem more portable.
@@ -118,7 +130,8 @@ the project through discussions, pull requests, documentation patches, etc.
 * Antoine Tran Tan (Laboratoire de Recherche en Informatique, Paris), who
   worked on integrating __hpx__ as a backend for __nt2__.
 * John Biddiscombe (__cscs__), who helped with the BlueGene/Q port of
-  __hpx__ and made several other contributions.
+  __hpx__, implemented the parallel sort algorithm, and made several other
+  contributions.
 * Erik Schnetter (Perimeter Institute for Theoretical Physics), who greatly
   helped to make __hpx__ more robust by sumbitting a large amount of problem
   reports, feature requests, and made several direct contributions.
