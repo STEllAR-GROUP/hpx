@@ -95,6 +95,9 @@ namespace hpx { namespace util { namespace detail
         }
         typedef void (*delete_t)(void**);
     };
+
+    template <typename T>
+    struct construct_vtable {};
 }}}
 
 #endif

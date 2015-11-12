@@ -15,8 +15,6 @@
 #include <hpx/util/detail/vtable/copyable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
-#include <boost/mpl/identity.hpp>
-
 #include <type_traits>
 #include <utility>
 
@@ -34,7 +32,7 @@ namespace hpx { namespace util { namespace detail
         bool empty;
 
         template <typename T>
-        function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
+        function_vtable_ptr(construct_vtable<T>) BOOST_NOEXCEPT
           : invoke(&callable_vtable<Sig>::template invoke<T>)
           , copy(&copyable_vtable::template copy<T>)
           , get_type(&vtable::template get_type<T>)

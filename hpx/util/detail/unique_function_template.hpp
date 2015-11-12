@@ -14,8 +14,6 @@
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
-#include <boost/mpl/identity.hpp>
-
 #include <type_traits>
 #include <utility>
 
@@ -32,7 +30,7 @@ namespace hpx { namespace util { namespace detail
         bool empty;
 
         template <typename T>
-        unique_function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
+        unique_function_vtable_ptr(construct_vtable<T>) BOOST_NOEXCEPT
           : invoke(&callable_vtable<Sig>::template invoke<T>)
           , get_type(&vtable::template get_type<T>)
           , destruct(&vtable::template destruct<T>)

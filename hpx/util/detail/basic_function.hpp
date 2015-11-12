@@ -21,7 +21,6 @@
 #include <hpx/util/safe_bool.hpp>
 
 #include <boost/mpl/bool.hpp>
-#include <boost/mpl/identity.hpp>
 
 #include <type_traits>
 #include <typeinfo>
@@ -65,8 +64,8 @@ namespace hpx { namespace util { namespace detail
         typename serializable_vtable<IAr, OAr>::load_object_t load_object;
 
         template <typename T>
-        serializable_function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
-          : VTablePtr(boost::mpl::identity<T>())
+        serializable_function_vtable_ptr(construct_vtable<T>) BOOST_NOEXCEPT
+          : VTablePtr(construct_vtable<T>())
           , name("empty")
           , save_object(&serializable_vtable<IAr, OAr>::template save_object<T>)
           , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
@@ -234,7 +233,7 @@ namespace hpx { namespace util { namespace detail
 
     template <typename VTablePtr, typename Sig>
     VTablePtr const function_base<VTablePtr, Sig>::empty_table =
-        boost::mpl::identity<detail::empty_function<Sig> >();
+        detail::construct_vtable<detail::empty_function<Sig> >();
 
     template <typename Sig, typename VTablePtr>
     static bool is_empty_function(function_base<VTablePtr, Sig> const& f) BOOST_NOEXCEPT
