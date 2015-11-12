@@ -9,11 +9,13 @@
 #define HPX_UTIL_DETAIL_UNIQUE_FUNCTION_TEMPLATE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/vtable/callable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
 #include <boost/mpl/identity.hpp>
+
 #include <type_traits>
 #include <utility>
 
@@ -60,14 +62,17 @@ namespace hpx { namespace util
       , typename IAr = serialization::input_archive
       , typename OAr = serialization::output_archive
     >
-    class unique_function
+    class unique_function;
+
+    template <typename R, typename ...Ts, typename IAr, typename OAr>
+    class unique_function<R(Ts...), IAr, OAr>
       : public detail::basic_function<
-            detail::unique_function_vtable_ptr<Sig>
-          , Sig, IAr, OAr
+            detail::unique_function_vtable_ptr<R(Ts...)>
+          , R(Ts...), IAr, OAr
         >
     {
-        typedef detail::unique_function_vtable_ptr<Sig> vtable_ptr;
-        typedef detail::basic_function<vtable_ptr, Sig, IAr, OAr> base_type;
+        typedef detail::unique_function_vtable_ptr<R(Ts...)> vtable_ptr;
+        typedef detail::basic_function<vtable_ptr, R(Ts...), IAr, OAr> base_type;
 
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function);
 
@@ -82,9 +87,10 @@ namespace hpx { namespace util
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        template <typename F, typename Enable =
-            typename std::enable_if<
-                !std::is_same<F, unique_function>::value
+        template <typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, unique_function>::value
+             && traits::is_callable<FD&(Ts...), R>::value
             >::type>
         unique_function(F&& f)
           : base_type()
@@ -98,9 +104,10 @@ namespace hpx { namespace util
             return *this;
         }
 
-        template <typename F, typename Enable =
-            typename std::enable_if<
-                !std::is_same<F, unique_function>::value
+        template <typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, unique_function>::value
+             && traits::is_callable<FD&(Ts...), R>::value
             >::type>
         unique_function& operator=(F&& f)
         {
@@ -117,8 +124,8 @@ namespace hpx { namespace util
     };
 
     template <typename Sig, typename IAr, typename OAr>
-    static bool is_empty_function(unique_function<Sig, IAr,
-        OAr> const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(
+        unique_function<Sig, IAr, OAr> const& f) BOOST_NOEXCEPT
     {
         return f.empty();
     }
@@ -131,11 +138,14 @@ namespace hpx { namespace util
 
 #   else
 
-    template <typename Sig>
-    class unique_function_nonser
-      : public unique_function<Sig, void, void>
+    template <typename T>
+    class unique_function_nonser;
+
+    template <typename R, typename ...Ts>
+    class unique_function_nonser<R(Ts...)>
+      : public unique_function<R(Ts...), void, void>
     {
-        typedef unique_function<Sig, void, void> base_type;
+        typedef unique_function<R(Ts...), void, void> base_type;
 
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function_nonser);
 
@@ -148,9 +158,10 @@ namespace hpx { namespace util
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        template <typename F, typename Enable =
-            typename std::enable_if<
-                !std::is_same<F, unique_function_nonser>::value
+        template <typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, unique_function_nonser>::value
+             && traits::is_callable<FD&(Ts...), R>::value
             >::type>
         unique_function_nonser(F&& f)
           : base_type(std::forward<F>(f))
@@ -162,9 +173,10 @@ namespace hpx { namespace util
             return *this;
         }
 
-        template <typename F, typename Enable =
-            typename std::enable_if<
-                !std::is_same<F, unique_function_nonser>::value
+        template <typename F, typename FD = typename std::decay<F>::type,
+            typename Enable = typename std::enable_if<
+                !std::is_same<FD, unique_function_nonser>::value
+             && traits::is_callable<FD&(Ts...), R>::value
             >::type>
         unique_function_nonser& operator=(F&& f)
         {
@@ -174,7 +186,8 @@ namespace hpx { namespace util
     };
 
     template <typename Sig>
-    static bool is_empty_function(unique_function_nonser<Sig> const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(
+        unique_function_nonser<Sig> const& f) BOOST_NOEXCEPT
     {
         return f.empty();
     }
