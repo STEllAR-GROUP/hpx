@@ -13,10 +13,11 @@
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/util/demangle_helper.hpp>
-#include <hpx/util/tuple.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
+
+#include <utility>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -80,7 +81,7 @@ namespace hpx { namespace util { namespace detail
         {
             hpx::serialization::detail::polymorphic_intrusive_factory::instance().
                 register_class(
-                    detail::get_function_name<util::tuple<VTable, T> >()
+                    detail::get_function_name<std::pair<VTable, T> >()
                   , &function_registration::create
                 );
         }
@@ -108,8 +109,8 @@ namespace hpx { namespace util { namespace detail
         automatic_function_registration()
         {
             function_registration<
-                typename util::tuple_element<0, VTablePair>::type
-              , typename util::tuple_element<1, VTablePair>::type
+                typename VTablePair::first_type,
+                typename VTablePair::second_type
             > auto_register;
         }
 
