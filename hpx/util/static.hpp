@@ -23,7 +23,6 @@
     (_MSC_FULL_VER < 180021114)         // NovCTP_2013
 #include <boost/thread/once.hpp>
 #include <boost/bind.hpp>
-#include <boost/static_assert.hpp>
 
 #include <memory>   // for placement new
 #endif

@@ -9,7 +9,6 @@
 
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
-#include <boost/static_assert.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 
@@ -59,7 +58,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void invoke(T & t)
         {
-            BOOST_STATIC_ASSERT_MSG(!boost::is_pointer<T>::value,
+            static_assert(!boost::is_pointer<T>::value,
                 "HPX does not support serialization of raw pointers. "
                 "Please use smart pointers.");
 

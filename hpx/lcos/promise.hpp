@@ -26,7 +26,6 @@
 #include <hpx/util/move.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/exception_ptr.hpp>
 

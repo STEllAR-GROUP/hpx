@@ -11,7 +11,6 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/static_assert.hpp>
 #include <boost/type_traits/is_lvalue_reference.hpp>
 
 namespace hpx { namespace parallel { namespace util { namespace detail
@@ -182,7 +181,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail
     struct algorithm_result
       : algorithm_result_impl<typename hpx::util::decay<ExPolicy>::type, T>
     {
-        BOOST_STATIC_ASSERT_MSG(!boost::is_lvalue_reference<T>::value,
+        static_assert(!boost::is_lvalue_reference<T>::value,
             "T shouldn't be a lvalue reference");
     };
 }}}}

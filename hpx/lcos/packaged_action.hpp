@@ -24,7 +24,6 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
