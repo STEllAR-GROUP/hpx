@@ -158,7 +158,7 @@
 [def __x10__                    [@http://x10-lang.org/ X10]]
 [def __upc__                    [@http://upc.lbl.gov/ UPC]]
 [def __fortress__               [@http://labs.oracle.com/projects/plrg/Publications/index.html Fortress]]
-
+[def __lgd__                    [@http://www.libgeodecomp.org/ LibGeoDeComp]]
 [/ Some images]
 [def __note__                   [$./images/note.png [contentwidth 32px]]]
 [def __tip__                    [$./images/tip.png [contentwidth 32px]]]

@@ -101,10 +101,13 @@ the project through discussions, pull requests, documentation patches, etc.
   (Autonomic Performance Environment for eXascale) with __hpx__.
 * Francisco Jose Tapia, who helped with implementing the parallel sort
   algorithm for __hpx__.
+* Andreas Schaefer (__inf3__), who contributed a number of patches to our build
+  system and to improve the integration of his __lgd__ library with HPX.
 * Patrick Diehl, who worked on implementing CUDA support for our companion
   library targeting GPGPUs (__hpxcl__).
 * Eric Lemanissier contributed fixes to allow compilation using the MingW
   toolchain.
+* Brandon Corde contributed several modifications to the HPX `inspect` tool.
 * Nidhi Makhijani who helped cleaning up some enum consistencies in __hpx__ and
   contributed to the resource manager used in the thread scheduling subsystem.
   She also worked on __hpx__ in the context of the Google Summer of Code 2015.

@@ -104,6 +104,12 @@ commits to the master branch since the last release.
   [link hpx.manual.parallel.parallel_algorithms.parallel_algorithms parallel algorithms].
   Please see [issue 1141] for the list of all available parallel algorithms
   (thanks to Daniel Bourgeois and John Biddiscombe for contributing their work).
+* We have added a tool to HPX which is used to verify committed code is
+  conforming to a list of fundamental coding guidelines. This tool (called
+  `inspect`) is derived from a similar tool from Boost. We have modified and
+  augmented the tool for our purposes (thanks to Brandon Corde for contributing
+  additional guideline checkers). The `inspect` tool is run as part of the
+  CircleCI integration tests.
 
 [heading Breaking Changes]
 
@@ -171,6 +177,7 @@ commits to the master branch since the last release.
 
 Here is a list of the important tickets we closed for this release.
 
+* [pr    1862] - Minor cleanups
 * [pr    1855] - Completely removing external/endian
 * [pr    1854] - Don't pollute CMAKE_CXX_FLAGS through find_package()
 * [pr    1853] - Updating CMake configuration to get correct version of TAU
