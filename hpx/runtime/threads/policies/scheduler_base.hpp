@@ -197,9 +197,9 @@ namespace hpx { namespace threads { namespace policies
                 last_valid_runtime_state, first_valid_runtime_state);
 
             typedef boost::atomic<hpx::state> state_type;
-            for (state_type const& state : states_)
+            for (state_type const& state_iter : states_)
             {
-                hpx::state s = state.load();
+                hpx::state s = state_iter.load();
                 result.first = (std::min)(result.first, s);
                 result.second = (std::max)(result.second, s);
             }
