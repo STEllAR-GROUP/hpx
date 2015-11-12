@@ -53,6 +53,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/exception_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/exception_list.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos_fwd.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/throw_exception.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/components/component_storage/migrate_from_storage.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/components/component_storage/migrate_to_storage.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/execution_policy.hpp"

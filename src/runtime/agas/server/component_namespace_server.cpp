@@ -325,7 +325,7 @@ response component_namespace::bind_prefix(
             HPX_THROWS_IF(ec, lock_error
               , "component_namespace::bind_prefix"
               , "component id table insertion failed due to a locking "
-                "error or memory corruption")
+                "error or memory corruption");
             return response();
         }
 
@@ -352,7 +352,7 @@ response component_namespace::bind_prefix(
               , boost::str(boost::format(
                     "component id is already registered for the given "
                     "locality, key(%1%), prefix(%2%), ctype(%3%)")
-                    % key % prefix % cit->second))
+                    % key % prefix % cit->second));
             return response();
         }
 
@@ -386,7 +386,7 @@ response component_namespace::bind_prefix(
         HPX_THROWS_IF(ec, lock_error
             , "component_namespace::bind_prefix"
             , "factory table insertion failed due to a locking "
-              "error or memory corruption")
+              "error or memory corruption");
         return response();
     }
 

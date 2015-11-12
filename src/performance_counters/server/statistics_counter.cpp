@@ -359,7 +359,7 @@ namespace hpx { namespace performance_counters { namespace server
                     boost::str(boost::format(
                         "could not get or create performance counter: '%s'") %
                             base_counter_name_)
-                    )
+                    );
                 return false;
             }
         }

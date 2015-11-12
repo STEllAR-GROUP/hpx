@@ -36,6 +36,6 @@ int hpx_startup::user_main()
     HPX_THROW_EXCEPTION(hpx::not_implemented,
         "The console locality does not implement any main entry point usable "
         "as the main HPX thread (e.g. no hpx_main, hpx_startup::user_main, etc.)",
-        "hpx_startup::user_main")
+        "hpx_startup::user_main");
 }
 

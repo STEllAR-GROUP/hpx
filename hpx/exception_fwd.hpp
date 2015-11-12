@@ -9,7 +9,7 @@
 #ifndef HPX_EXCEPTION_FWD_HPP
 #define HPX_EXCEPTION_FWD_HPP
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 
 /// \cond NOINTERNAL
 namespace boost
@@ -26,6 +26,19 @@ namespace hpx
     class exception;
     /// \endcond
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Encode error category for new error_code.
+    enum throwmode
+    {
+        plain = 0,
+        rethrow = 1,
+        lightweight = 0x80, // do not generate an exception for this error_code
+        /// \cond NODETAIL
+        lightweight_rethrow = lightweight | rethrow
+        /// \endcond
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief Predefined error_code object used as "throw on error" tag.
     ///
     /// The predefined hpx::error_code object \a hpx::throws is supplied for use as
@@ -48,5 +61,7 @@ namespace hpx
     ///
     HPX_EXCEPTION_EXPORT extern error_code throws;
 }
+
+#include <hpx/throw_exception.hpp>
 
 #endif

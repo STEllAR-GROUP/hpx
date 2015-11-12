@@ -115,7 +115,7 @@ namespace hpx { namespace serialization
                         {
                             HPX_THROW_EXCEPTION(serialization_error
                               , "input_container::load_binary"
-                              , "archive data bstream structure mismatch")
+                              , "archive data bstream structure mismatch");
                             return;
                         }
                         ++current_chunk_;
