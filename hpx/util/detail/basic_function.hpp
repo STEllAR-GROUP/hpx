@@ -17,15 +17,13 @@
 #include <hpx/util/detail/get_table.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
-#include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/safe_bool.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>
-#include <boost/type_traits/is_pointer.hpp>
-#include <boost/type_traits/is_member_pointer.hpp>
 
+#include <type_traits>
 #include <typeinfo>
 #include <utility>
 
@@ -33,13 +31,13 @@ namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    static bool is_empty_function(F const&, boost::mpl::false_) BOOST_NOEXCEPT
+    static bool is_empty_function(F const&, std::false_type) BOOST_NOEXCEPT
     {
         return false;
     }
 
     template <typename F>
-    static bool is_empty_function(F const& f, boost::mpl::true_) BOOST_NOEXCEPT
+    static bool is_empty_function(F const& f, std::true_type) BOOST_NOEXCEPT
     {
         return f == 0;
     }
@@ -47,9 +45,9 @@ namespace hpx { namespace util { namespace detail
     template <typename F>
     static bool is_empty_function(F const& f) BOOST_NOEXCEPT
     {
-        boost::mpl::bool_<
-            boost::is_pointer<F>::value
-         || boost::is_member_pointer<F>::value
+        std::integral_constant<bool,
+            std::is_pointer<F>::value
+         || std::is_member_pointer<F>::value
         > is_pointer;
         return is_empty_function(f, is_pointer);
     }
@@ -152,7 +150,7 @@ namespace hpx { namespace util { namespace detail
         {
             if (!is_empty_function(f))
             {
-                typedef typename util::decay<F>::type target_type;
+                typedef typename std::decay<F>::type target_type;
 
                 VTablePtr const* f_vptr = get_table_ptr<target_type>();
                 if (vptr == f_vptr)
@@ -213,7 +211,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         T* target() const BOOST_NOEXCEPT
         {
-            typedef typename util::decay<T>::type target_type;
+            typedef typename std::decay<T>::type target_type;
 
             VTablePtr const* f_vptr = get_table_ptr<target_type>();
             if (vptr != f_vptr || empty())

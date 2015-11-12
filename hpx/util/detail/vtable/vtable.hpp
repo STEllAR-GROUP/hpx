@@ -9,10 +9,10 @@
 #define HPX_UTIL_DETAIL_VTABLE_VTABLE_HPP
 
 #include <hpx/config/forceinline.hpp>
-#include <hpx/util/move.hpp>
 
 #include <memory>
 #include <typeinfo>
+#include <utility>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -52,7 +52,7 @@ namespace hpx { namespace util { namespace detail
         {
             if (sizeof(T) <= sizeof(void*))
             {
-                new (v) T;
+                ::new (static_cast<void*>(v)) T;
             } else {
                 *v = new T;
             }
@@ -63,7 +63,7 @@ namespace hpx { namespace util { namespace detail
         {
             if (sizeof(T) <= sizeof(void*))
             {
-                new (v) T(std::forward<Arg>(arg));
+                ::new (static_cast<void*>(v)) T(std::forward<Arg>(arg));
             } else {
                 *v = new T(std::forward<Arg>(arg));
             }
