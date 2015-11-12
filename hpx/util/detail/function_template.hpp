@@ -157,6 +157,9 @@ namespace hpx { namespace util
         function(F&& f)
           : base_type()
         {
+            static_assert(
+                std::is_copy_constructible<typename decay<F>::type>::value,
+                "F shall be CopyConstructible");
             assign(std::forward<F>(f));
         }
 
@@ -188,6 +191,9 @@ namespace hpx { namespace util
             >::type>
         function& operator=(F&& f)
         {
+            static_assert(
+                std::is_copy_constructible<typename decay<F>::type>::value,
+                "F shall be CopyConstructible");
             assign(std::forward<F>(f));
             return *this;
         }
@@ -275,6 +281,9 @@ namespace hpx { namespace util
         function(F&& f)
           : base_type()
         {
+            static_assert(
+                std::is_copy_constructible<typename decay<F>::type>::value,
+                "F shall be CopyConstructible");
             assign(std::forward<F>(f));
         }
 
@@ -306,6 +315,9 @@ namespace hpx { namespace util
             >::type>
         function& operator=(F&& f)
         {
+            static_assert(
+                std::is_copy_constructible<typename decay<F>::type>::value,
+                "F shall be CopyConstructible");
             assign(std::forward<F>(f));
             return *this;
         }
