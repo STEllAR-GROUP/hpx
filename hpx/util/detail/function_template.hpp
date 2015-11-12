@@ -18,9 +18,9 @@
 #include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 
-#include <boost/type_traits/is_same.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <boost/mpl/identity.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace util { namespace detail
@@ -49,7 +49,7 @@ namespace hpx { namespace util { namespace detail
           , get_type(&vtable::template get_type<T>)
           , destruct(&vtable::template destruct<T>)
           , delete_(&vtable::template delete_<T>)
-          , empty(boost::is_same<T, empty_function<Sig> >::value)
+          , empty(std::is_same<T, empty_function<Sig> >::value)
         {}
 
         template <typename T, typename Arg>
@@ -150,12 +150,12 @@ namespace hpx { namespace util
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        template <typename F>
-        function(F&& f,
-            typename boost::disable_if<
-                boost::is_same<function, typename util::decay<F>::type>
-            >::type* = 0
-        ) : base_type()
+        template <typename F, typename Enable =
+            typename std::enable_if<
+                !std::is_same<F, function>::value
+            >::type>
+        function(F&& f)
+          : base_type()
         {
             assign(std::forward<F>(f));
         }
@@ -182,11 +182,11 @@ namespace hpx { namespace util
             return *this;
         }
 
-        template <typename F>
-        typename boost::disable_if<
-            boost::is_same<function, typename util::decay<F>::type>
-          , function&
-        >::type operator=(F&& f)
+        template <typename F, typename Enable =
+            typename std::enable_if<
+                !std::is_same<F, function>::value
+            >::type>
+        function& operator=(F&& f)
         {
             assign(std::forward<F>(f));
             return *this;
@@ -268,12 +268,12 @@ namespace hpx { namespace util
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        template <typename F>
-        function(F&& f,
-            typename boost::disable_if<
-                boost::is_same<function, typename util::decay<F>::type>
-            >::type* = 0
-        ) : base_type()
+        template <typename F, typename Enable =
+            typename std::enable_if<
+                !std::is_same<F, function>::value
+            >::type>
+        function(F&& f)
+          : base_type()
         {
             assign(std::forward<F>(f));
         }
@@ -300,11 +300,11 @@ namespace hpx { namespace util
             return *this;
         }
 
-        template <typename F>
-        typename boost::disable_if<
-            boost::is_same<function, typename util::decay<F>::type>
-          , function&
-        >::type operator=(F&& f)
+        template <typename F, typename Enable =
+            typename std::enable_if<
+                !std::is_same<F, function>::value
+            >::type>
+        function& operator=(F&& f)
         {
             assign(std::forward<F>(f));
             return *this;
@@ -352,12 +352,12 @@ namespace hpx { namespace util
           : base_type(static_cast<base_type&&>(other))
         {}
 
-        template <typename F>
-        function_nonser(F&& f,
-            typename boost::disable_if<
-                boost::is_same<function_nonser, typename util::decay<F>::type>
-            >::type* = 0
-        ) : base_type(std::forward<F>(f))
+        template <typename F, typename Enable =
+            typename std::enable_if<
+                !std::is_same<F, function_nonser>::value
+            >::type>
+        function_nonser(F&& f)
+          : base_type(std::forward<F>(f))
         {}
 
         function_nonser& operator=(function_nonser const& other)
@@ -372,11 +372,11 @@ namespace hpx { namespace util
             return *this;
         }
 
-        template <typename F>
-        typename boost::disable_if<
-            boost::is_same<function_nonser, typename util::decay<F>::type>
-          , function_nonser&
-        >::type operator=(F&& f)
+        template <typename F, typename Enable =
+            typename std::enable_if<
+                !std::is_same<F, function_nonser>::value
+            >::type>
+        function_nonser& operator=(F&& f)
         {
             base_type::operator=(std::forward<F>(f));
             return *this;
