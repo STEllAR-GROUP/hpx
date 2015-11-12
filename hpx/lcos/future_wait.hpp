@@ -142,7 +142,7 @@ namespace hpx { namespace lcos
             {
                 if (this != &rhs) {
                     lazy_values_ = std::move(rhs.lazy_values_);
-                    ready_count_ = rhs.ready_count_;
+                    ready_count_.store(rhs.ready_count_.load());
                     rhs.ready_count_ = 0;
                     f_ = std::move(rhs.f_);
                     success_counter_ = rhs.success_counter_;
