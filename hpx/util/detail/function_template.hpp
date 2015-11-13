@@ -109,7 +109,7 @@ namespace hpx { namespace util
           : base_type()
         {
             static_assert(
-                std::is_copy_constructible<FD>::value,
+                std::is_constructible<FD, FD const&>::value,
                 "F shall be CopyConstructible");
             assign(std::forward<F>(f));
         }
@@ -146,7 +146,7 @@ namespace hpx { namespace util
         function& operator=(F&& f)
         {
             static_assert(
-                std::is_copy_constructible<FD>::value,
+                std::is_constructible<FD, FD const&>::value,
                 "F shall be CopyConstructible");
             assign(std::forward<F>(f));
             return *this;
