@@ -127,7 +127,7 @@ if(Boost_VERSION LESS 105300)
   hpx_add_config_define(BOOST_NO_0X_HDR_ATOMIC)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 if(NOT MSVC)
   hpx_libraries(${Boost_LIBRARIES})
