@@ -12,6 +12,7 @@
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
+#include <hpx/util/unlock_guard.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/thread/locks.hpp>

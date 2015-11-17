@@ -7,8 +7,9 @@
 #if !defined(HPX_F0757EAC_E2A3_4F80_A1EC_8CC7EB55186F)
 #define HPX_F0757EAC_E2A3_4F80_A1EC_8CC7EB55186F
 
+#include <hpx/config.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/detail/condition_variable.hpp>
 
 #include <boost/thread/locks.hpp>
 

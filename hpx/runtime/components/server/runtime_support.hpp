@@ -425,7 +425,7 @@ namespace hpx { namespace components { namespace server
 
         typedef hpx::lcos::local::spinlock dijkstra_mtx_type;
         dijkstra_mtx_type dijkstra_mtx_;
-        lcos::local::condition_variable dijkstra_cond_;
+        lcos::local::condition_variable_any dijkstra_cond_;
 
         component_map_mutex_type cm_mtx_;
         plugin_map_mutex_type p_mtx_;
