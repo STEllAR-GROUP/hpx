@@ -6,6 +6,8 @@
 #if !defined(HPX_TAGGED_THREAD_STATE_MAR_12_2010_0125PM)
 #define HPX_TAGGED_THREAD_STATE_MAR_12_2010_0125PM
 
+#include <boost/cstdint.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace detail
 {
@@ -122,5 +124,3 @@ namespace hpx { namespace threads { namespace detail
 }}}
 
 #endif
-
-
