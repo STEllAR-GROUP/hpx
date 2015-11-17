@@ -1552,6 +1552,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           : inner_(std::move(policy.inner_))
         {}
 
+        /// Copy constructs a new execution_policy object.
+        ///
+        /// \param rhs Specifies the inner execution policy
         execution_policy(execution_policy const& rhs)
           : inner_(rhs.inner_)
         {}
