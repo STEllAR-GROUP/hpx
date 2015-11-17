@@ -15,9 +15,9 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
+    ///////////////////////////////////////////////////////////////////////////
     mutex::mutex(char const* const description)
       : owner_id_(threads::invalid_thread_id_repr)
     {
@@ -78,7 +78,39 @@ namespace hpx { namespace lcos { namespace local
         return true;
     }
 
-    bool mutex::try_lock_until(util::steady_time_point const& abs_time,
+    void mutex::unlock(error_code& ec)
+    {
+        HPX_ASSERT(threads::get_self_ptr() != 0);
+
+        HPX_ITT_SYNC_RELEASING(this);
+        boost::unique_lock<mutex_type> l(mtx_);
+
+        threads::thread_id_repr_type self_id = threads::get_self_id().get();
+        if (HPX_UNLIKELY(owner_id_ != self_id))
+        {
+            util::unregister_lock(this);
+            HPX_THROWS_IF(ec, lock_error,
+                "mutex::unlock",
+                "The calling thread does not own the mutex");
+            return;
+        }
+
+        util::unregister_lock(this);
+        HPX_ITT_SYNC_RELEASED(this);
+        owner_id_ = threads::invalid_thread_id_repr;
+
+        cond_.notify_one(std::move(l), ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    timed_mutex::timed_mutex(char const* const description)
+      : mutex(description)
+    {}
+
+    timed_mutex::~timed_mutex()
+    {}
+
+    bool timed_mutex::try_lock_until(util::steady_time_point const& abs_time,
         char const* description, error_code& ec)
     {
         HPX_ASSERT(threads::get_self_ptr() != 0);
@@ -110,29 +142,5 @@ namespace hpx { namespace lcos { namespace local
         HPX_ITT_SYNC_ACQUIRED(this);
         owner_id_ = self_id;
         return true;
-    }
-
-    void mutex::unlock(error_code& ec)
-    {
-        HPX_ASSERT(threads::get_self_ptr() != 0);
-
-        HPX_ITT_SYNC_RELEASING(this);
-        boost::unique_lock<mutex_type> l(mtx_);
-
-        threads::thread_id_repr_type self_id = threads::get_self_id().get();
-        if (HPX_UNLIKELY(owner_id_ != self_id))
-        {
-            util::unregister_lock(this);
-            HPX_THROWS_IF(ec, lock_error,
-                "mutex::unlock",
-                "The calling thread does not own the mutex");
-            return;
-        }
-
-        util::unregister_lock(this);
-        HPX_ITT_SYNC_RELEASED(this);
-        owner_id_ = threads::invalid_thread_id_repr;
-
-        cond_.notify_one(std::move(l), ec);
     }
 }}}

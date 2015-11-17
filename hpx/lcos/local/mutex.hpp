@@ -18,14 +18,14 @@
 
 #include <boost/thread/locks.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local
 {
+    ///////////////////////////////////////////////////////////////////////////
     class mutex
     {
         HPX_NON_COPYABLE(mutex);
 
-    private:
+    protected:
         typedef lcos::local::spinlock mutex_type;
 
     public:
@@ -51,6 +51,32 @@ namespace hpx { namespace lcos { namespace local
             return try_lock("mutex::try_lock", ec);
         }
 
+        HPX_EXPORT void unlock(error_code& ec = throws);
+
+    protected:
+        mutable mutex_type mtx_;
+        threads::thread_id_repr_type owner_id_;
+        detail::condition_variable cond_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    class timed_mutex : private mutex
+    {
+        HPX_NON_COPYABLE(timed_mutex);
+
+    public:
+        typedef boost::unique_lock<timed_mutex> scoped_lock;
+        typedef boost::detail::try_lock_wrapper<timed_mutex> scoped_try_lock;
+
+    public:
+        HPX_EXPORT timed_mutex(char const* const description = "");
+
+        HPX_EXPORT ~timed_mutex();
+
+        using mutex::lock;
+        using mutex::try_lock;
+        using mutex::unlock;
+
         HPX_EXPORT bool try_lock_until(util::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws);
 
@@ -71,17 +97,7 @@ namespace hpx { namespace lcos { namespace local
         {
             return try_lock_for(rel_time, "mutex::try_lock_for", ec);
         }
-
-        HPX_EXPORT void unlock(error_code& ec = throws);
-
-    private:
-        mutable mutex_type mtx_;
-        threads::thread_id_repr_type owner_id_;
-        detail::condition_variable cond_;
     };
-
-    typedef mutex timed_mutex;
-
 }}}
 
 #endif
