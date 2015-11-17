@@ -48,7 +48,7 @@ namespace hpx
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
-    /// \param futures  [in] A container holding an arbitrary amount of \a future
+    /// \param values   [in] A range holding an arbitrary amount of \a future
     ///                 or \a shared_future objects for which \a when_all
     ///                 should wait.
     ///

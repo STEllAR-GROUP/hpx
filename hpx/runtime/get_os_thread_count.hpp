@@ -29,7 +29,7 @@ namespace hpx
     /// valid, this function will fall back to retrieving the number of OS
     /// threads used by HPX.
     ///
-    /// \param id [in] The id of the object to locate.
+    /// \param exec [in] The executor to be used.
     HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor const& exec);
 }
 
