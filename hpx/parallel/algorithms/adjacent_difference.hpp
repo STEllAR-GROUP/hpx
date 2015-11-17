@@ -33,6 +33,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // adjacent_difference
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename Iter>
         struct adjacent_difference
           : public detail::algorithm<adjacent_difference<Iter>, Iter>

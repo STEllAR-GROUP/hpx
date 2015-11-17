@@ -33,6 +33,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // inner_product
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename T>
         struct inner_product
           : public detail::algorithm<inner_product<T>, T>

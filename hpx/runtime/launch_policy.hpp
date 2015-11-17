@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file hpx/runtime/launch_policy.hpp.hpp
+/// \file hpx/runtime/launch_policy.hpp
 
 #if !defined(HPX_RUNTIME_LAUNCH_POLICY_AUG_13_2015_0647PM)
 #define HPX_RUNTIME_LAUNCH_POLICY_AUG_13_2015_0647PM
@@ -17,7 +17,7 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    // Launch policy for \a hpx::async
+    /// Launch policy for \a hpx::async
     BOOST_SCOPED_ENUM_START(launch)
     {
         async = 0x01,
