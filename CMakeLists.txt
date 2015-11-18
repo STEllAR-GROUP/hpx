@@ -86,7 +86,15 @@ endif()
 ################################################################################
 # Fortran compiler detection
 #
-include(HPX_FortranCompiler)
+hpx_option(HPX_WITH_FORTRAN
+  BOOL
+  "Enable or disable the compilation of Fortran examples using HPX"
+  OFF ADVANCED)
+
+if (HPX_WITH_FORTRAN)
+  include(HPX_FortranCompiler)
+endif()
+
 ################################################################################
 
 ################################################################################
