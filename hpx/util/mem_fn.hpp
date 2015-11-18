@@ -11,7 +11,6 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/result_of.hpp>
 
-#include <boost/static_assert.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
 
 #include <utility>
@@ -62,7 +61,9 @@ namespace hpx { namespace util
     template <typename MemPtr>
     detail::mem_fn<MemPtr> mem_fn(MemPtr pm)
     {
-        BOOST_STATIC_ASSERT((boost::is_member_pointer<MemPtr>::value));
+        static_assert(
+            boost::is_member_pointer<MemPtr>::value,
+            "boost::is_member_pointer<MemPtr>::value");
 
         return detail::mem_fn<MemPtr>(pm);
     }

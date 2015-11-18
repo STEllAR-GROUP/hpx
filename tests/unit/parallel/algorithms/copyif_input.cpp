@@ -16,7 +16,9 @@
 template <typename ExPolicy>
 void test_copy_if(ExPolicy policy)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, std::input_iterator_tag> iterator;
@@ -90,7 +92,9 @@ void test_copy_if_async(ExPolicy p)
 template <typename ExPolicy>
 void test_copy_if_outiter(ExPolicy policy)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, std::input_iterator_tag> iterator;

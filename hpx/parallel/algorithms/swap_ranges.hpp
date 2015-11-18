@@ -21,7 +21,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -135,11 +134,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         typedef typename std::iterator_traits<ForwardIter2>::iterator_category
             iter2_category;
 
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::forward_iterator_tag, iter1_category>::value),
             "Required at least forward iterator tag.");
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             (boost::is_base_of<
                 std::forward_iterator_tag, iter2_category>::value),
             "Required at least forward iterator tag.");

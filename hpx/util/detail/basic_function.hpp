@@ -17,7 +17,6 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/safe_bool.hpp>
 
-#include <boost/static_assert.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
@@ -222,7 +221,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         T* target() BOOST_NOEXCEPT
         {
-            BOOST_STATIC_ASSERT_MSG(
+            static_assert(
                 (traits::is_callable<T(Ts...), R>::value)
               , "T shall be Callable with the function signature"
             );
@@ -233,7 +232,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         T* target() const BOOST_NOEXCEPT
         {
-            BOOST_STATIC_ASSERT_MSG(
+            static_assert(
                 (traits::is_callable<T(Ts...), R>::value)
               , "T shall be Callable with the function signature"
             );
