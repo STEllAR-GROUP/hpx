@@ -23,9 +23,9 @@ namespace hpx { namespace util { namespace batch_environments {
     struct pbs_environment
     {
         pbs_environment(std::vector<std::string> & nodelist, bool debug)
-          : node_num_(0)
-          , num_threads_(0)
-          , num_localities_(0)
+          : node_num_(std::size_t(-1))
+          , num_threads_(std::size_t(-1))
+          , num_localities_(std::size_t(-1))
           , valid_(false)
         {
             char *node_num = std::getenv("PBS_NODENUM");
@@ -37,7 +37,14 @@ namespace hpx { namespace util { namespace batch_environments {
 
                 // read the PBS node file. This initializes the number of threads
                 // and number of localities
-                read_nodefile(nodelist, debug);
+                if(nodelist.empty())
+                {
+                    read_nodefile(nodelist, debug);
+                }
+                else
+                {
+                    num_localities_ = nodelist.size();
+                }
             }
         }
 
