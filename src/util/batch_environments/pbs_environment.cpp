@@ -5,13 +5,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/util/batch_environments/pbs_environment.hpp>
-
 #include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/exception.hpp>
 
 #include <boost/format.hpp>
 
 #include <iostream>
 #include <fstream>
+#include <set>
 
 namespace hpx { namespace util { namespace batch_environments
 {
