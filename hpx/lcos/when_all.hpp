@@ -68,7 +68,7 @@ namespace hpx
     ///       but the futures held in the output collection may.
     template <typename Range>
     future<Range>
-    when_all(Range&& values)
+    when_all(Range&& values);
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
