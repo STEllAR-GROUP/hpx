@@ -758,7 +758,7 @@ hpx_check_for_cxx11_scoped_enums(
   DEFINITIONS HPX_HAVE_CXX11_SCOPED_ENUMS)
 
 hpx_check_for_cxx11_static_assert(
-  DEFINITIONS HPX_HAVE_CXX11_STATIC_ASSERT)
+  REQUIRED "HPX needs support for C++11 static_assert")
 
 hpx_check_for_cxx11_variadic_macros(
   REQUIRED "HPX needs support for C++11 variadic macros")

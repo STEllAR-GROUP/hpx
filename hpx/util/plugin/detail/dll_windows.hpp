@@ -12,7 +12,6 @@
 #include <iostream>
 
 #include <boost/config.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/type_traits/is_pointer.hpp>
@@ -134,7 +133,9 @@ namespace hpx { namespace util { namespace plugin {
             // make sure everything is initialized
             if (ec) return std::pair<SymbolType, Deleter>();
 
-            BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
+            static_assert(
+                boost::is_pointer<SymbolType>::value,
+                "boost::is_pointer<SymbolType>::value");
 
             // Cast the to right type.
             SymbolType address = (SymbolType)GetProcAddress

@@ -194,10 +194,13 @@ namespace hpx { namespace components
 
         // make sure that we have a back_ptr whenever we need to control the
         // lifetime of the managed_component
-        BOOST_STATIC_ASSERT((
+        static_assert((
             boost::is_same<ctor_policy, traits::construct_without_back_ptr>::value ||
             boost::is_same<dtor_policy,
-            traits::managed_object_controls_lifetime>::value));
+            traits::managed_object_controls_lifetime>::value),
+            "boost::is_same<ctor_policy, traits::construct_without_back_ptr>::value || "
+            "boost::is_same<dtor_policy, "
+            "traits::managed_object_controls_lifetime>::value");
 
         managed_component_base()
           : back_ptr_(0)

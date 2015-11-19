@@ -24,7 +24,7 @@
 #include <boost/detail/endian.hpp>
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/static_assert.hpp>
+
 #include <iosfwd>
 #include <climits>
 
@@ -144,7 +144,7 @@ namespace hpx { namespace util
     class endian< big, T, n_bits, unaligned >
       : cover_operators< endian< big, T, n_bits >, T >
     {
-        BOOST_STATIC_ASSERT( (n_bits/8)*8 == n_bits );
+        static_assert((n_bits/8)*8 == n_bits, "(n_bits/8)*8 == n_bits");
       public:
         typedef T value_type;
         endian() {}
@@ -159,7 +159,7 @@ namespace hpx { namespace util
     class endian< little, T, n_bits, unaligned >
       : cover_operators< endian< little, T, n_bits >, T >
     {
-        BOOST_STATIC_ASSERT( (n_bits/8)*8 == n_bits );
+        static_assert((n_bits/8)*8 == n_bits, "(n_bits/8)*8 == n_bits");
       public:
         typedef T value_type;
         endian() {}
@@ -174,7 +174,7 @@ namespace hpx { namespace util
     class endian< native, T, n_bits, unaligned >
       : cover_operators< endian< native, T, n_bits >, T >
     {
-        BOOST_STATIC_ASSERT( (n_bits/8)*8 == n_bits );
+        static_assert((n_bits/8)*8 == n_bits, "(n_bits/8)*8 == n_bits");
       public:
         typedef T value_type;
         endian() {}
@@ -198,8 +198,8 @@ namespace hpx { namespace util
     class endian< big, T, n_bits, aligned  >
       : cover_operators< endian< big, T, n_bits, aligned >, T >
     {
-        BOOST_STATIC_ASSERT( (n_bits/8)*8 == n_bits );
-        BOOST_STATIC_ASSERT( sizeof(T) == n_bits/8 );
+        static_assert((n_bits/8)*8 == n_bits, "(n_bits/8)*8 == n_bits");
+        static_assert(sizeof(T) == n_bits/8, "sizeof(T) == n_bits/8");
       public:
         typedef T value_type;
         endian() {}
@@ -219,8 +219,8 @@ namespace hpx { namespace util
     class endian< little, T, n_bits, aligned  >
       : cover_operators< endian< little, T, n_bits, aligned >, T >
     {
-        BOOST_STATIC_ASSERT( (n_bits/8)*8 == n_bits );
-        BOOST_STATIC_ASSERT( sizeof(T) == n_bits/8 );
+        static_assert((n_bits/8)*8 == n_bits, "(n_bits/8)*8 == n_bits");
+        static_assert(sizeof(T) == n_bits/8, "sizeof(T) == n_bits/8");
       public:
         typedef T value_type;
         endian() {}
