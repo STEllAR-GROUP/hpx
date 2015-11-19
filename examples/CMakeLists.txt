@@ -23,12 +23,17 @@ set(subdirs
     quickstart
     qt
     random_mem_access
-    sheneos
     spell_check
     startup_shutdown
     thread_aware_timer
     throttle
    )
+
+if(HPX_WITH_FORTRAN)
+  set(subdirs ${subdirs}
+    sheneos
+    )
+endif()
 
 if(HPX_WITH_CXX11_LAMBDAS)
   set(subdirs ${subdirs}
