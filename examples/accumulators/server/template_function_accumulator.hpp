@@ -82,7 +82,7 @@ namespace examples { namespace server
 
         // Actions with template arguments (see add<>() above) require special
         // type definitions. The simplest way to define such an action type is
-        // by deriving from the HPX facility make_action:
+        // by deriving from the HPX facility make_action.
         template <typename T>
         struct add_action
           : hpx::actions::make_action<void (template_function_accumulator::*)(T),

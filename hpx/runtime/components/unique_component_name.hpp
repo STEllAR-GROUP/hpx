@@ -7,7 +7,6 @@
 #define HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649
 
 #include <boost/config.hpp>
-#include <boost/mpl/assert.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
 
@@ -19,7 +18,7 @@ namespace hpx { namespace components
     template <typename ComponentType, typename Type = derived_name>
     struct unique_component_name
     {
-        BOOST_MPL_ASSERT_MSG(0, component_name_is_not_defined, (ComponentType));
+        static_assert(sizeof(ComponentType) == 0, "component name is not defined");
     };
 }}
 

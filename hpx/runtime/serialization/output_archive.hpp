@@ -181,7 +181,7 @@ namespace hpx { namespace serialization
         template <typename T>
         void save_bitwise(T const & t, boost::mpl::true_)
         {
-            BOOST_STATIC_ASSERT_MSG(!boost::is_abstract<T>::value,
+            static_assert(!boost::is_abstract<T>::value,
                 "Can not bitwise serialize a class that is abstract");
             if(disable_array_optimization())
             {

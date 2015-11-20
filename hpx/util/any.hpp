@@ -32,7 +32,6 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>
@@ -982,7 +981,9 @@ namespace hpx { namespace util
         // Please use BOOST_BROKEN_COMPILER_TYPE_TRAITS_SPECIALIZATION macro
         // to generate specialization of remove_reference for your class
         // See type traits library documentation for details
-        BOOST_STATIC_ASSERT(!is_reference<nonref>::value);
+        static_assert(
+            !is_reference<nonref>::value,
+            "!is_reference<nonref>::value");
 #endif
 
         nonref* result = any_cast<nonref>(&operand);
@@ -999,7 +1000,9 @@ namespace hpx { namespace util
 #ifdef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
         // The comment in the above version of 'any_cast' explains when this
         // assert is fired and what to do.
-        BOOST_STATIC_ASSERT(!is_reference<nonref>::value);
+        static_assert(
+            !is_reference<nonref>::value,
+            "!is_reference<nonref>::value");
 #endif
 
         return any_cast<nonref const&>(const_cast<basic_any<IArchive, OArchive,

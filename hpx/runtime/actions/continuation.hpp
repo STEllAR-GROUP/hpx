@@ -123,11 +123,9 @@ namespace hpx { namespace actions
             // you have a HPX_REGISTER_TYPED_CONTINUATION macro somewhere in a
             // source file, but the header in which the continuation is defined
             // misses a HPX_REGISTER_TYPED_CONTINUATION_DECLARATION
-            BOOST_MPL_ASSERT_MSG(
-                traits::needs_automatic_registration<Continuation>::value
-              , HPX_REGISTER_TYPED_CONTINUATION_DECLARATION_MISSING
-              , (Continuation)
-            );
+            static_assert(
+                traits::needs_automatic_registration<Continuation>::value,
+                "HPX_REGISTER_TYPED_CONTINUATION_DECLARATION missing");
             return util::type_id<Continuation>::typeid_.type_id();
         }
 #endif

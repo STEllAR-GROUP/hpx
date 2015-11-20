@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 
 #include "server/accumulator.hpp"
 
+//[accumulator_registration_definitions
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality.
 HPX_REGISTER_COMPONENT_MODULE();
@@ -31,4 +32,5 @@ HPX_REGISTER_ACTION(
 HPX_REGISTER_ACTION(
     accumulator_type::wrapped_type::query_action,
     accumulator_query_action);
+//]
 

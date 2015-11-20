@@ -17,8 +17,6 @@
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
 
-#include <boost/static_assert.hpp>
-
 #include <memory>
 
 namespace hpx { namespace actions { namespace detail
@@ -63,7 +61,7 @@ namespace hpx { namespace actions { namespace detail
     template <typename Action, int N>
     struct action_decorate_function
     {
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             !Action::direct_execution::value,
             "explicit decoration of direct actions is not supported");
 
@@ -201,7 +199,7 @@ namespace hpx { namespace actions { namespace detail
     template <typename Action, int N>
     struct action_decorate_continuation
     {
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             !Action::direct_execution::value,
             "explicit decoration of direct actions is not supported");
 

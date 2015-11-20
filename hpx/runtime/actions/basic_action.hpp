@@ -111,19 +111,19 @@ namespace hpx { namespace actions
     struct basic_action<Component, R(Args...), Derived>
     {
         // Flag the use of raw pointer types as action arguments
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             !util::detail::any_of<std::is_pointer<Args>...>::value,
             "Using raw pointers as arguments for actions is not supported.");
 
         // Flag the use of array types as action arguments
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             !util::detail::any_of<
                 std::is_array<typename std::remove_reference<Args>::type>...
             >::value,
             "Using arrays as arguments for actions is not supported.");
 
         // Flag the use of non-const reference types as action arguments
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             !util::detail::any_of<
                 detail::is_non_const_reference<Args>...
             >::value,

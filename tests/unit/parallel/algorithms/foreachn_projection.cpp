@@ -17,7 +17,9 @@
 template <typename ExPolicy, typename IteratorTag, typename Proj>
 void test_for_each_n(ExPolicy policy, IteratorTag, Proj && proj)
 {
-    BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
+    static_assert(
+        hpx::parallel::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;

@@ -311,7 +311,7 @@ namespace hpx { namespace lcos
     lcos::future<void>
     when_each(F&& func, std::vector<Future>& lazy_values)
     {
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             traits::is_future<Future>::value, "invalid use of when_each");
 
         typedef hpx::util::tuple<std::vector<Future> > argument_type;

@@ -342,7 +342,7 @@ namespace hpx { namespace lcos
         std::vector<Future> const& lazy_values,
         error_code& ec = throws)
     {
-        BOOST_STATIC_ASSERT_MSG(
+        static_assert(
             traits::is_future<Future>::value, "invalid use of wait_some");
 
         typedef

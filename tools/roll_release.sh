@@ -5,9 +5,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-VERSION_MAJOR=`grep '#define HPX_VERSION_MAJOR' hpx/version.hpp | awk {' print $3 '}`
-VERSION_MINOR=`grep '#define HPX_VERSION_MINOR' hpx/version.hpp | awk {' print $3 '}`
-VERSION_SUBMINOR=`grep '#define HPX_VERSION_SUBMINOR' hpx/version.hpp | awk {' print $3 '}`
+VERSION_MAJOR=`grep '#define HPX_VERSION_MAJOR' hpx/config/version.hpp | awk {' print $3 '}`
+VERSION_MINOR=`grep '#define HPX_VERSION_MINOR' hpx/config/version.hpp | awk {' print $3 '}`
+VERSION_SUBMINOR=`grep '#define HPX_VERSION_SUBMINOR' hpx/config/version.hpp | awk {' print $3 '}`
 
 DOT_VERSION=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR
 DASH_VERSION=$VERSION_MAJOR-$VERSION_MINOR-$VERSION_SUBMINOR
@@ -29,7 +29,7 @@ echo -n "Packaging $ZIP... "
 zip -q -x .git\* -x packages -x packages/\* -r packages/$ZIP .
 (cd packages/zip/hpx_$DOT_VERSION && unzip -qq ../../$ZIP)
 rm -f packages/$ZIP
-(cd packages/zip && zip -q -r ../$ZIP hpx_$DOT_VERSION)  
+(cd packages/zip && zip -q -r ../$ZIP hpx_$DOT_VERSION)
 rm -rf packages/zip/hpx_$DOT_VERSION
 (cd packages/zip && unzip -qq ../$ZIP)
 echo "DONE"
@@ -53,7 +53,7 @@ rm -rf packages/tar.bz2/hpx_$DOT_VERSION
 echo "DONE"
 
 echo -n "Packaging $SEVENZ... "
-7zr a -xr\!.git -xr\!packages packages/$SEVENZ . > /dev/null 
+7zr a -xr\!.git -xr\!packages packages/$SEVENZ . > /dev/null
 (cd packages/7z/hpx_$DOT_VERSION && 7zr x ../../$SEVENZ > /dev/null)
 rm -f packages/$SEVENZ
 (cd packages/7z && 7zr a ../$SEVENZ hpx_$DOT_VERSION > /dev/null)
