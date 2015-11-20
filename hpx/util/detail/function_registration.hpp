@@ -66,14 +66,17 @@ namespace hpx { namespace util { namespace detail
         }
     };
 
-    template <typename VTable, typename T>
+    template <typename VTablePair>
     struct function_registration
     {
         typedef function_registration_info_base base_type;
 
         static void * create()
         {
-            static function_registration_info<VTable, T> ri;
+            static function_registration_info<
+                typename VTablePair::first_type,
+                typename VTablePair::second_type
+            > ri;
             return &ri;
         }
 
@@ -81,7 +84,7 @@ namespace hpx { namespace util { namespace detail
         {
             hpx::serialization::detail::polymorphic_intrusive_factory::instance().
                 register_class(
-                    detail::get_function_name<std::pair<VTable, T> >()
+                    detail::get_function_name<VTablePair>()
                   , &function_registration::create
                 );
         }
@@ -108,10 +111,7 @@ namespace hpx { namespace util { namespace detail
     {
         automatic_function_registration()
         {
-            function_registration<
-                typename VTablePair::first_type,
-                typename VTablePair::second_type
-            > auto_register;
+            function_registration<VTablePair> auto_register;
         }
 
         automatic_function_registration& register_function()

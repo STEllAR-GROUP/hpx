@@ -55,6 +55,9 @@ namespace hpx { namespace util { namespace detail
     template <typename Function>
     struct init_registration;
 
+    template <typename VTablePtr, typename IAr, typename OAr, typename T>
+    struct serializable_function_registration;
+
     template <typename VTablePtr, typename IAr, typename OAr>
     struct serializable_function_vtable_ptr
       : VTablePtr
@@ -72,37 +75,42 @@ namespace hpx { namespace util { namespace detail
         {
             if (!this->empty)
             {
-                name = get_function_name<std::pair<
-                        serializable_function_vtable_ptr, T
-                       > >();
+                name = get_function_name<
+                    serializable_function_registration<VTablePtr, IAr, OAr, T>
+                >();
             }
-            init_registration<std::pair<
-                serializable_function_vtable_ptr, T
-            > >::g.register_function();
+            init_registration<
+                serializable_function_registration<VTablePtr, IAr, OAr, T>
+            >::g.register_function();
         }
+    };
+
+    template <typename VTablePtr, typename IAr, typename OAr, typename T>
+    struct serializable_function_registration
+    {
+        typedef serializable_function_vtable_ptr<VTablePtr, IAr, OAr> first_type;
+        typedef T second_type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // registration code for serialization
     template <typename VTablePtr, typename IAr, typename OAr, typename T>
     struct init_registration<
-        std::pair<serializable_function_vtable_ptr<VTablePtr, IAr, OAr>, T>
+        serializable_function_registration<VTablePtr, IAr, OAr, T>
     >
     {
-        typedef std::pair<
-            serializable_function_vtable_ptr<VTablePtr, IAr, OAr>, T
-        > vtable_ptr;
-
-        static automatic_function_registration<vtable_ptr> g;
+        static automatic_function_registration<
+            serializable_function_registration<VTablePtr, IAr, OAr, T>
+        > g;
     };
 
     template <typename VTablePtr, typename IAr, typename OAr, typename T>
     automatic_function_registration<
-        std::pair<serializable_function_vtable_ptr<VTablePtr, IAr, OAr>, T>
+        serializable_function_registration<VTablePtr, IAr, OAr, T>
     > init_registration<
-        std::pair<serializable_function_vtable_ptr<VTablePtr, IAr, OAr>, T>
+        serializable_function_registration<VTablePtr, IAr, OAr, T>
     >::g =  automatic_function_registration<
-                std::pair<serializable_function_vtable_ptr<VTablePtr, IAr, OAr>, T>
+                serializable_function_registration<VTablePtr, IAr, OAr, T>
             >();
 
     ///////////////////////////////////////////////////////////////////////////
@@ -406,12 +414,10 @@ namespace hpx { namespace util { namespace detail
 {
     template <typename VTablePtr, typename Sig>
     struct get_function_name_impl<
-        std::pair<
-            hpx::util::detail::serializable_function_vtable_ptr<
-                VTablePtr
-              , hpx::serialization::input_archive
-              , hpx::serialization::output_archive
-            >
+        hpx::util::detail::serializable_function_registration<
+            VTablePtr
+          , hpx::serialization::input_archive
+          , hpx::serialization::output_archive
           , hpx::util::detail::empty_function<Sig>
         >
     >
@@ -431,12 +437,10 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename VTablePtr, typename Sig>
     struct needs_automatic_registration<
-        std::pair<
-            hpx::util::detail::serializable_function_vtable_ptr<
-                VTablePtr
-              , hpx::serialization::input_archive
-              , hpx::serialization::output_archive
-            >
+        hpx::util::detail::serializable_function_registration<
+            VTablePtr
+          , hpx::serialization::input_archive
+          , hpx::serialization::output_archive
           , hpx::util::detail::empty_function<Sig>
         >
     > : boost::mpl::false_

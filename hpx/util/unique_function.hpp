@@ -22,12 +22,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_CONTINUATION_REGISTER_UNIQUE_FUNCTION_FACTORY(VTable, Name)       \
-    static ::hpx::util::detail::function_registration<                        \
-        VTable::first_type, VTable::second_type                               \
-    > const BOOST_PP_CAT(Name, _unique_function_factory_registration) =       \
-            ::hpx::util::detail::function_registration<                       \
-                VTable::first_type, VTable::second_type                       \
-            >();                                                              \
+    static ::hpx::util::detail::function_registration<VTable> const           \
+        BOOST_PP_CAT(Name, _unique_function_factory_registration) =           \
+            ::hpx::util::detail::function_registration<VTable>();             \
 /**/
 
 #define HPX_DECLARE_GET_UNIQUE_FUNCTION_NAME(VTable, Name)                    \
@@ -40,12 +37,10 @@
 #define HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(Sig, Functor, Name)     \
     namespace hpx { namespace util { namespace detail {                       \
         typedef                                                               \
-            std::pair<                                                        \
-                serializable_function_vtable_ptr<                             \
-                    unique_function_vtable_ptr<Sig>                           \
-                  , serialization::input_archive                              \
-                  , serialization::output_archive                             \
-                >                                                             \
+            serializable_function_registration<                               \
+                unique_function_vtable_ptr<Sig>                               \
+              , serialization::input_archive                                  \
+              , serialization::output_archive                                 \
               , util::decay<HPX_UTIL_STRIP(Functor)>::type                    \
             >                                                                 \
             BOOST_PP_CAT(BOOST_PP_CAT(__,                                     \
