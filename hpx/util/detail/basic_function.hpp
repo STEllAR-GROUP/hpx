@@ -55,62 +55,62 @@ namespace hpx { namespace util { namespace detail
     template <typename Function>
     struct init_registration;
 
-    template <typename VTablePtr, typename IAr, typename OAr, typename T>
+    template <typename VTablePtr, typename T>
     struct serializable_function_registration;
 
-    template <typename VTablePtr, typename IAr, typename OAr>
+    template <typename VTablePtr>
     struct serializable_function_vtable_ptr
       : VTablePtr
     {
         char const* name;
-        typename serializable_vtable<IAr, OAr>::save_object_t save_object;
-        typename serializable_vtable<IAr, OAr>::load_object_t load_object;
+        typename serializable_vtable::save_object_t save_object;
+        typename serializable_vtable::load_object_t load_object;
 
         template <typename T>
         serializable_function_vtable_ptr(construct_vtable<T>) BOOST_NOEXCEPT
           : VTablePtr(construct_vtable<T>())
           , name("empty")
-          , save_object(&serializable_vtable<IAr, OAr>::template save_object<T>)
-          , load_object(&serializable_vtable<IAr, OAr>::template load_object<T>)
+          , save_object(&serializable_vtable::save_object<T>)
+          , load_object(&serializable_vtable::load_object<T>)
         {
             if (!this->empty)
             {
                 name = get_function_name<
-                    serializable_function_registration<VTablePtr, IAr, OAr, T>
+                    serializable_function_registration<VTablePtr, T>
                 >();
             }
             init_registration<
-                serializable_function_registration<VTablePtr, IAr, OAr, T>
+                serializable_function_registration<VTablePtr, T>
             >::g.register_function();
         }
     };
 
-    template <typename VTablePtr, typename IAr, typename OAr, typename T>
+    template <typename VTablePtr, typename T>
     struct serializable_function_registration
     {
-        typedef serializable_function_vtable_ptr<VTablePtr, IAr, OAr> first_type;
+        typedef serializable_function_vtable_ptr<VTablePtr> first_type;
         typedef T second_type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // registration code for serialization
-    template <typename VTablePtr, typename IAr, typename OAr, typename T>
+    template <typename VTablePtr, typename T>
     struct init_registration<
-        serializable_function_registration<VTablePtr, IAr, OAr, T>
+        serializable_function_registration<VTablePtr, T>
     >
     {
         static automatic_function_registration<
-            serializable_function_registration<VTablePtr, IAr, OAr, T>
+            serializable_function_registration<VTablePtr, T>
         > g;
     };
 
-    template <typename VTablePtr, typename IAr, typename OAr, typename T>
+    template <typename VTablePtr, typename T>
     automatic_function_registration<
-        serializable_function_registration<VTablePtr, IAr, OAr, T>
+        serializable_function_registration<VTablePtr, T>
     > init_registration<
-        serializable_function_registration<VTablePtr, IAr, OAr, T>
+        serializable_function_registration<VTablePtr, T>
     >::g =  automatic_function_registration<
-                serializable_function_registration<VTablePtr, IAr, OAr, T>
+                serializable_function_registration<VTablePtr, T>
             >();
 
     ///////////////////////////////////////////////////////////////////////////
@@ -250,22 +250,19 @@ namespace hpx { namespace util { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename VTablePtr, typename Sig, typename IAr, typename OAr>
+    template <typename VTablePtr, typename Sig, bool Serializable>
     class basic_function;
 
-    template <
-        typename VTablePtr, typename R, typename ...Ts
-      , typename IAr, typename OAr
-    >
-    class basic_function<VTablePtr, R(Ts...), IAr, OAr>
+    template <typename VTablePtr, typename R, typename ...Ts>
+    class basic_function<VTablePtr, R(Ts...), true>
       : public function_base<
-            serializable_function_vtable_ptr<VTablePtr, IAr, OAr>
+            serializable_function_vtable_ptr<VTablePtr>
           , R(Ts...)
         >
     {
         HPX_MOVABLE_BUT_NOT_COPYABLE(basic_function);
 
-        typedef serializable_function_vtable_ptr<VTablePtr, IAr, OAr> vtable_ptr;
+        typedef serializable_function_vtable_ptr<VTablePtr> vtable_ptr;
         typedef function_base<vtable_ptr, R(Ts...)> base_type;
 
     public:
@@ -315,7 +312,7 @@ namespace hpx { namespace util { namespace detail
     private:
         friend class hpx::serialization::access;
 
-        void load(IAr& ar, const unsigned version)
+        void load(serialization::input_archive& ar, const unsigned version)
         {
             this->reset();
 
@@ -331,7 +328,7 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void save(OAr& ar, const unsigned version) const
+        void save(serialization::output_archive& ar, const unsigned version) const
         {
             bool is_empty = this->empty();
             ar << is_empty;
@@ -348,7 +345,7 @@ namespace hpx { namespace util { namespace detail
     };
 
     template <typename VTablePtr, typename R, typename ...Ts>
-    class basic_function<VTablePtr, R(Ts...), void, void>
+    class basic_function<VTablePtr, R(Ts...), false>
       : public function_base<VTablePtr, R(Ts...)>
     {
         HPX_MOVABLE_BUT_NOT_COPYABLE(basic_function);
@@ -400,9 +397,9 @@ namespace hpx { namespace util { namespace detail
         }
     };
 
-    template <typename Sig, typename VTablePtr, typename IAr, typename OAr>
+    template <typename Sig, typename VTablePtr, bool Serializable>
     static bool is_empty_function(
-        basic_function<VTablePtr, Sig, IAr, OAr> const& f) BOOST_NOEXCEPT
+        basic_function<VTablePtr, Sig, Serializable> const& f) BOOST_NOEXCEPT
     {
         return f.empty();
     }
@@ -416,8 +413,6 @@ namespace hpx { namespace util { namespace detail
     struct get_function_name_impl<
         hpx::util::detail::serializable_function_registration<
             VTablePtr
-          , hpx::serialization::input_archive
-          , hpx::serialization::output_archive
           , hpx::util::detail::empty_function<Sig>
         >
     >
@@ -439,8 +434,6 @@ namespace hpx { namespace traits
     struct needs_automatic_registration<
         hpx::util::detail::serializable_function_registration<
             VTablePtr
-          , hpx::serialization::input_archive
-          , hpx::serialization::output_archive
           , hpx::util::detail::empty_function<Sig>
         >
     > : boost::mpl::false_

@@ -226,11 +226,11 @@ int hpx_main(variables_map& vm)
 
             small_object const f(17);
 
-            function<boost::uint64_t(boost::uint64_t const&), void, void> f0(f);
+            function<boost::uint64_t(boost::uint64_t const&), false> f0(f);
 
-            function<boost::uint64_t(boost::uint64_t const&), void, void> f1(f0);
+            function<boost::uint64_t(boost::uint64_t const&), false> f1(f0);
 
-            function<boost::uint64_t(boost::uint64_t const&), void, void> f2;
+            function<boost::uint64_t(boost::uint64_t const&), false> f2;
 
             f2 = f0;
 
@@ -248,13 +248,13 @@ int hpx_main(variables_map& vm)
             big_object const f(5, 12);
 
             function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&),
-                void, void> f0(f);
+                false> f0(f);
 
             function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&),
-                void, void> f1(f0);
+                false> f1(f0);
 
             function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&),
-                void, void> f2;
+                false> f2;
 
             f2 = f0;
 

@@ -55,22 +55,18 @@ namespace hpx { namespace util { namespace detail
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Sig
-      , typename IAr = serialization::input_archive
-      , typename OAr = serialization::output_archive
-    >
+    template <typename Sig, bool Serializable = true>
     class unique_function;
 
-    template <typename R, typename ...Ts, typename IAr, typename OAr>
-    class unique_function<R(Ts...), IAr, OAr>
+    template <typename R, typename ...Ts, bool Serializable>
+    class unique_function<R(Ts...), Serializable>
       : public detail::basic_function<
             detail::unique_function_vtable_ptr<R(Ts...)>
-          , R(Ts...), IAr, OAr
+          , R(Ts...), Serializable
         >
     {
         typedef detail::unique_function_vtable_ptr<R(Ts...)> vtable_ptr;
-        typedef detail::basic_function<vtable_ptr, R(Ts...), IAr, OAr> base_type;
+        typedef detail::basic_function<vtable_ptr, R(Ts...), Serializable> base_type;
 
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function);
 
@@ -121,9 +117,9 @@ namespace hpx { namespace util
         using base_type::target;
     };
 
-    template <typename Sig, typename IAr, typename OAr>
+    template <typename Sig, bool Serializable>
     static bool is_empty_function(
-        unique_function<Sig, IAr, OAr> const& f) BOOST_NOEXCEPT
+        unique_function<Sig, Serializable> const& f) BOOST_NOEXCEPT
     {
         return f.empty();
     }
@@ -132,7 +128,7 @@ namespace hpx { namespace util
 #   ifdef HPX_HAVE_CXX11_ALIAS_TEMPLATES
 
     template <typename Sig>
-    using unique_function_nonser = unique_function<Sig, void, void>;
+    using unique_function_nonser = unique_function<Sig, false>;
 
 #   else
 
@@ -141,9 +137,9 @@ namespace hpx { namespace util
 
     template <typename R, typename ...Ts>
     class unique_function_nonser<R(Ts...)>
-      : public unique_function<R(Ts...), void, void>
+      : public unique_function<R(Ts...), false>
     {
-        typedef unique_function<R(Ts...), void, void> base_type;
+        typedef unique_function<R(Ts...), false> base_type;
 
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function_nonser);
 

@@ -38,8 +38,6 @@
         typedef                                                               \
             serializable_function_registration<                               \
                 function_vtable_ptr<Sig>                                      \
-              , ::hpx::serialization::input_archive                           \
-              , ::hpx::serialization::output_archive                          \
               , util::decay<HPX_UTIL_STRIP(Functor)>::type                    \
             >                                                                 \
             BOOST_PP_CAT(BOOST_PP_CAT(__,                                     \
