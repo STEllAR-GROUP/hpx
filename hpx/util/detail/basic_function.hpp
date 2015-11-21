@@ -115,7 +115,10 @@ namespace hpx { namespace util { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename VTablePtr, typename Sig>
-    class function_base
+    class function_base;
+
+    template <typename VTablePtr, typename R, typename ...Ts>
+    class function_base<VTablePtr, R(Ts...)>
     {
         HPX_MOVABLE_BUT_NOT_COPYABLE(function_base);
 
@@ -126,7 +129,7 @@ namespace hpx { namespace util { namespace detail
           : vptr(&empty_table)
           , object(0)
         {
-            vtable::default_construct<empty_function<Sig> >(&object);
+            vtable::default_construct<empty_function<R(Ts...)> >(&object);
         }
 
         function_base(function_base&& other) BOOST_NOEXCEPT
@@ -134,7 +137,7 @@ namespace hpx { namespace util { namespace detail
           , object(other.object) // move-construct
         {
             other.vptr = &empty_table;
-            vtable::default_construct<empty_function<Sig> >(&other.object);
+            vtable::default_construct<empty_function<R(Ts...)> >(&other.object);
         }
 
         ~function_base()
@@ -165,7 +168,7 @@ namespace hpx { namespace util { namespace detail
                     vtable::reconstruct<target_type>(&object, std::forward<F>(f));
                 } else {
                     reset();
-                    vtable::destruct<empty_function<Sig> >(&this->object);
+                    vtable::destruct<empty_function<R(Ts...)> >(&object);
 
                     vptr = f_vptr;
                     vtable::construct<target_type>(&object, std::forward<F>(f));
@@ -182,7 +185,7 @@ namespace hpx { namespace util { namespace detail
                 vptr->delete_(&object);
 
                 vptr = &empty_table;
-                vtable::default_construct<empty_function<Sig> >(&object);
+                vtable::default_construct<empty_function<R(Ts...)> >(&object);
             }
         }
 
@@ -216,8 +219,13 @@ namespace hpx { namespace util { namespace detail
         }
 
         template <typename T>
-        T* target() const BOOST_NOEXCEPT
+        T* target() BOOST_NOEXCEPT
         {
+            BOOST_STATIC_ASSERT_MSG(
+                (traits::is_callable<T(Ts...), R>::value)
+              , "T shall be Callable with the function signature"
+            );
+
             typedef typename std::decay<T>::type target_type;
 
             VTablePtr const* f_vptr = get_table_ptr<target_type>();
@@ -225,6 +233,28 @@ namespace hpx { namespace util { namespace detail
                 return 0;
 
             return &vtable::get<target_type>(&object);
+        }
+
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            BOOST_STATIC_ASSERT_MSG(
+                (traits::is_callable<T(Ts...), R>::value)
+              , "T shall be Callable with the function signature"
+            );
+
+            typedef typename std::decay<T>::type target_type;
+
+            VTablePtr const* f_vptr = get_table_ptr<target_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+
+            return &vtable::get<target_type>(&object);
+        }
+
+        BOOST_FORCEINLINE R operator()(Ts... vs) const
+        {
+            return vptr->invoke(&object, std::forward<Ts>(vs)...);
         }
 
     private:
@@ -239,9 +269,9 @@ namespace hpx { namespace util { namespace detail
         mutable void *object;
     };
 
-    template <typename VTablePtr, typename Sig>
-    VTablePtr const function_base<VTablePtr, Sig>::empty_table =
-        detail::construct_vtable<detail::empty_function<Sig> >();
+    template <typename VTablePtr, typename R, typename ...Ts>
+    VTablePtr const function_base<VTablePtr, R(Ts...)>::empty_table =
+        detail::construct_vtable<detail::empty_function<R(Ts...)> >();
 
     template <typename Sig, typename VTablePtr>
     static bool is_empty_function(function_base<VTablePtr, Sig> const& f) BOOST_NOEXCEPT
@@ -280,33 +310,6 @@ namespace hpx { namespace util { namespace detail
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
-        }
-
-        BOOST_FORCEINLINE R operator()(Ts... vs) const
-        {
-            return this->vptr->invoke(&this->object, std::forward<Ts>(vs)...);
-        }
-
-        template <typename T>
-        T* target() BOOST_NOEXCEPT
-        {
-            BOOST_STATIC_ASSERT_MSG(
-                (traits::is_callable<T(Ts...), R>::value)
-              , "T shall be Callable with the function signature"
-            );
-
-            return base_type::template target<T>();
-        }
-
-        template <typename T>
-        T* target() const BOOST_NOEXCEPT
-        {
-            BOOST_STATIC_ASSERT_MSG(
-                (traits::is_callable<T(Ts...), R>::value)
-              , "T shall be Callable with the function signature"
-            );
-
-            return base_type::template target<T>();
         }
 
     private:
@@ -367,33 +370,6 @@ namespace hpx { namespace util { namespace detail
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
-        }
-
-        BOOST_FORCEINLINE R operator()(Ts... vs) const
-        {
-            return this->vptr->invoke(&this->object, std::forward<Ts>(vs)...);
-        }
-
-        template <typename T>
-        T* target() BOOST_NOEXCEPT
-        {
-            static_assert(
-                (traits::is_callable<T(Ts...), R>::value)
-              , "T shall be Callable with the function signature"
-            );
-
-            return base_type::template target<T>();
-        }
-
-        template <typename T>
-        T* target() const BOOST_NOEXCEPT
-        {
-            static_assert(
-                (traits::is_callable<T(Ts...), R>::value)
-              , "T shall be Callable with the function signature"
-            );
-
-            return base_type::template target<T>();
         }
     };
 
