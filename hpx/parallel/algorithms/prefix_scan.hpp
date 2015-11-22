@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         for (/* */; count-- != 0; (void) ++first, ++dest)
         {
           init = op(init, *first);
-          *dest = temp;
+//          *dest = temp;
           temp = init;
         }
         return init;
@@ -73,15 +73,19 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
       //---------------------------------------------------------------------
       // sequential update, applies V to each value in the sequence
       //---------------------------------------------------------------------
-      template <typename OutIter, typename T, typename Op>
-      T sequential_update_n(OutIter first, std::size_t count,
+      template <typename InIter, typename OutIter, typename T, typename Op>
+      T sequential_update_n(InIter first, OutIter dest, std::size_t count,
         T value, Op && op)
       {
-        for (/* */; count-- != 0; (void) ++first)
+        T init = value;
+        T temp = init;
+        for (/* */; count-- != 0; (void) ++first, ++dest)
         {
-          *first = op(value, *first);
+          init = op(init, *first);
+          *dest = temp;
+          temp = init;
         }
-        return value;
+        return init;
       }
 
       ///////////////////////////////////////////////////////////////////////
@@ -100,7 +104,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           sequential(ExPolicy, InIter first, InIter last,
             OutIter dest, T && init, Op && op)
         {
-          return sequential_scan(first, last, dest,
+          return detail::sequential_scan(first, last, dest,
             std::forward<T>(init), std::forward<Op>(op));
         }
 
@@ -133,12 +137,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           OutIter final_dest = dest;
           std::advance(final_dest, count);
 
-          const int serial_limit = 65536;
+          const int serial_scan_limit = 65536*8;
 
           // we want 2^N chunks of data, so based on our input list, find a good N
           int log2N = 0;
-          int chunkcount = count / serial_limit;
+          int chunkcount = count / serial_scan_limit;
           int n_chunks = chunkcount;
+          if (n_chunks < 2) {
+            return sequential(policy, first, last, dest, std::forward<T>(init), std::forward<Op>(op));
+          }
           while (n_chunks >>= 1) ++log2N;
           n_chunks = (1 << log2N);
           int chunksize = count / n_chunks;
@@ -156,7 +163,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           std::vector< hpx::future<T> > work_items;
           std::vector< hpx::future<void> > work_partials;
           work_chunks.reserve(n_chunks);
-          work_items.reserve(n_chunks * 2);
+          work_items.reserve(n_chunks);
           FwdIter it2, it1 = first;
           for (int k = 0; k < n_chunks; ++k) {
             if (k < n_chunks - 1) {
@@ -169,9 +176,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             // start and end of chunk of our input array
             work_chunks.push_back(std::make_tuple(it1, dest, chunksize, *(it1 + chunksize - 1)));
             // spawn a task to do a sequential scan on this chunk
-            hpx::future<T> w1 = hpx::async(&sequential_scan_n<FwdIter, FwdIter, T, Op>, it1, chunksize, dest, T(), op);
-            work_items.push_back(std::move(w1));
-            //
+            work_items.push_back(
+              std::move(
+                hpx::async(&sequential_scan_n<FwdIter, FwdIter, T, Op>, 
+                  it1, chunksize, dest, T(), op)));
             it1 = it2;
             std::advance(dest, chunksize);
           }
@@ -180,34 +188,26 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           //
           using hpx::lcos::local::dataflow;
           //
-          int futures_offset = 0;
-          for (int d = 0; d < log2N; ++d) {
-            int d_2 = (1 << d);
-            int dp1_2 = (2 << d);
-            int steps = n_chunks >> (d + 1);
-            for (int k = 0, f = 0; k < n_chunks; k += dp1_2, f += 2) {
-              int i1 = (d == 0) ? k + d_2 - 1 : f + futures_offset;
-              int i2 = (d == 0) ? k + dp1_2 - 1 : f + 1 + futures_offset;
-              work_items.push_back(
-                std::move(
-                  dataflow(
-                    [=, &work_chunks](hpx::future<T> &&w1, hpx::future<T> &&w2) {
-                T sum_left = w1.get();
-                T sum_right = w2.get();
-                T partial = op(sum_left, sum_right);
-                if (d == 0) {
-                  std::get<3>(work_chunks[i1]) = sum_left;
+          hpx::when_all(std::move(work_items)).then(
+            [=, &work_chunks](hpx::future<std::vector<hpx::future<T> > > fv) {
+              // move the items into a local vector
+              std::vector<hpx::future<T> > items(fv.get());
+              for (int c = 0; c < n_chunks; ++c) {
+                std::get<3>(work_chunks[c]) = items[c].get();
+              }
+              for (int d = 0; d < log2N; ++d) {
+                int d_2 = (1 << d);
+                int dp1_2 = (2 << d);
+                for (int k = 0, f = 0; k < n_chunks; k += dp1_2, f += 2) {
+                  int i1 = k + d_2 - 1;
+                  int i2 = k + dp1_2 - 1;
+                    T sum_left  = std::get<3>(work_chunks[i1]);
+                    T sum_right = std::get<3>(work_chunks[i2]);
+                    std::get<3>(work_chunks[k + dp1_2 - 1]) = op(sum_left, sum_right);;
                 }
-                std::get<3>(work_chunks[k + dp1_2 - 1]) = partial;
-                return partial;
-              }, std::move(work_items[i1]), std::move(work_items[i2])
-                )));
+              }
             }
-            futures_offset = work_items.size() - steps;
-          }
-          // there is only one remaining future 
-          T final_sum = work_items.back().get();
-          work_items.clear();
+          ).get();
 
           // --------------------------
           // Downsweep:
@@ -227,8 +227,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           // now combine the partial sums back into the initial chunks
           for (int c = 0; c < n_chunks; ++c) {
             // spawn a task to do a sequential update on this chunk
-            hpx::future<T> w1 = hpx::async(&sequential_update_n<FwdIter, T, Op>,
-              std::get<1>(work_chunks[c]), std::get<2>(work_chunks[c]), std::get<3>(work_chunks[c]), op);
+            hpx::future<T> w1 = hpx::async(&sequential_update_n<FwdIter, FwdIter, T, Op>,
+              std::get<0>(work_chunks[c]), 
+              std::get<1>(work_chunks[c]), 
+              std::get<2>(work_chunks[c]), 
+              std::get<3>(work_chunks[c]), op);
             work_items.push_back(std::move(w1));
           }
           hpx::wait_all(work_items);
@@ -351,7 +354,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return parallel_scan_struct<OutIter>().call(
+        return detail::parallel_scan_struct<OutIter>().call(
           std::forward<ExPolicy>(policy), is_seq(),
           first, last, dest, std::move(init), std::forward<Op>(op));
     }
@@ -447,7 +450,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             boost::is_same<std::output_iterator_tag, output_iterator_category>
         >::type is_seq;
 
-        return parallel_scan_struct<OutIter>().call(
+        return detail::parallel_scan_struct<OutIter>().call(
           std::forward<ExPolicy>(policy), is_seq(),
           first, last, dest, std::move(init), std::plus<T>());
     }
