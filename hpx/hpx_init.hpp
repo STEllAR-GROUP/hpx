@@ -371,8 +371,6 @@ namespace hpx
     init(boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, hpx::runtime_mode mode);
 
-    /// \fn int init(std::string const& app_name, int argc = 0, char** argv = 0)
-    ///
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main entry point, which can be used to set up the
@@ -485,9 +483,6 @@ namespace hpx
     inline int init(std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-    /// \fn int init(int (*f)(boost::program_options::variables_map& vm),
-    /// std::string const& app_name, int argc, char** argv)
-    ///
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main entry point, which can be used to set up the
@@ -523,9 +518,6 @@ namespace hpx
         std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-    /// \fn int init(int (*f)(boost::program_options::variables_map& vm),
-    /// std::string const& app_name, int argc, char** argv)
-    ///
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main entry point, which can be used to set up the

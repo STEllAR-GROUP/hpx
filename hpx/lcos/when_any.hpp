@@ -52,8 +52,8 @@ namespace hpx
     /// representing the same list of futures after one future of that list
     /// finishes execution.
     ///
-    /// \param futures  [in] A container holding an arbitrary amount of \a future or
-    ///                 \a shared_future objects for which \a when_any should
+    /// \param values   [in] A range holding an arbitrary amount of \a futures
+    ///                 or \a shared_future objects for which \a when_any should
     ///                 wait.
     ///
     /// \return   Returns a when_any_result holding the same list of futures
@@ -66,7 +66,7 @@ namespace hpx
     ///             iterator.
     template <typename Range>
     future<when_any_result<Range>>
-    when_any(Range& values)
+    when_any(Range& values);
 
     /// The function \a when_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns a new future object
