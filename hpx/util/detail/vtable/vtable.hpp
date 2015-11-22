@@ -24,6 +24,10 @@ namespace hpx { namespace util { namespace detail
     template <typename VTable, typename T>
     inline VTable const* get_vtable() HPX_NOEXCEPT
     {
+        static_assert(
+            std::is_same<T, typename std::decay<T>::type>::value,
+            "T shall have no cv-ref-qualifiers");
+
         static VTable const vtable = construct_vtable<T>();
         return &vtable;
     }
