@@ -38,7 +38,7 @@
     namespace hpx { namespace util { namespace detail {                       \
         typedef                                                               \
             serializable_function_registration<                               \
-                function_vtable_ptr<Sig>                                      \
+                function_vtable<Sig>                                          \
               , util::decay<HPX_UTIL_STRIP(Functor)>::type                    \
             >                                                                 \
             BOOST_PP_CAT(BOOST_PP_CAT(__,                                     \

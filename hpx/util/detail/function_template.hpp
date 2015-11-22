@@ -12,53 +12,13 @@
 #include <hpx/traits/get_function_address.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/detail/basic_function.hpp>
-#include <hpx/util/detail/vtable/callable_vtable.hpp>
-#include <hpx/util/detail/vtable/copyable_vtable.hpp>
+#include <hpx/util/detail/vtable/function_vtable.hpp>
 #include <hpx/util/detail/vtable/vtable.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-
-namespace hpx { namespace util { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig>
-    struct function_vtable_ptr
-    {
-        typename callable_vtable<Sig>::invoke_t invoke;
-        typename callable_vtable<Sig>::get_function_address_t get_function_address;
-        copyable_vtable::copy_t copy;
-        vtable::get_type_t get_type;
-        vtable::destruct_t destruct;
-        vtable::delete_t delete_;
-        bool empty;
-
-        template <typename T>
-        function_vtable_ptr(construct_vtable<T>) HPX_NOEXCEPT
-          : invoke(&callable_vtable<Sig>::template invoke<T>)
-          , get_function_address(&callable_vtable<Sig>::template get_function_address<T>)
-          , copy(&copyable_vtable::template copy<T>)
-          , get_type(&vtable::template get_type<T>)
-          , destruct(&vtable::template destruct<T>)
-          , delete_(&vtable::template delete_<T>)
-          , empty(std::is_same<T, empty_function<Sig> >::value)
-        {}
-
-        template <typename T, typename Arg>
-        HPX_FORCEINLINE static void construct(void** v, Arg&& arg)
-        {
-            vtable::construct<T>(v, std::forward<Arg>(arg));
-        }
-
-        template <typename T, typename Arg>
-        HPX_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
-        {
-            vtable::reconstruct<T>(v, std::forward<Arg>(arg));
-        }
-    };
-}}}
 
 namespace hpx { namespace util
 {
@@ -69,12 +29,12 @@ namespace hpx { namespace util
     template <typename R, typename ...Ts, bool Serializable>
     class function<R(Ts...), Serializable>
       : public detail::basic_function<
-            detail::function_vtable_ptr<R(Ts...)>
+            detail::function_vtable<R(Ts...)>
           , R(Ts...), Serializable
         >
     {
-        typedef detail::function_vtable_ptr<R(Ts...)> vtable_ptr;
-        typedef detail::basic_function<vtable_ptr, R(Ts...), Serializable> base_type;
+        typedef detail::function_vtable<R(Ts...)> vtable;
+        typedef detail::basic_function<vtable, R(Ts...), Serializable> base_type;
 
     public:
         typedef typename base_type::result_type result_type;
@@ -90,7 +50,7 @@ namespace hpx { namespace util
         function(function const& other)
           : base_type()
         {
-            detail::vtable::delete_<
+            detail::vtable::_delete<
                 detail::empty_function<R(Ts...)>
             >(this->object);
 
@@ -124,7 +84,7 @@ namespace hpx { namespace util
             if (this != &other)
             {
                 reset();
-                detail::vtable::delete_<
+                detail::vtable::_delete<
                     detail::empty_function<R(Ts...)>
                 >(this->object);
 
