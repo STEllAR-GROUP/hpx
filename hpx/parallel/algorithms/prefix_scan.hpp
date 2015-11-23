@@ -56,15 +56,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
       //---------------------------------------------------------------------
       // sequential exclusive_scan using count instead of end
       //---------------------------------------------------------------------
-      template <typename InIter, typename OutIter, typename T, typename Op>
+      template <typename InIter, typename T, typename Op>
       T sequential_scan_n(InIter first, std::size_t count,
-        OutIter dest, T init, Op && op)
+        T init, Op && op)
       {
         T temp = init;
-        for (/* */; count-- != 0; (void) ++first, ++dest)
+        for (/* */; count-- != 0; (void) ++first)
         {
           init = op(init, *first);
-//          *dest = temp;
           temp = init;
         }
         return init;
@@ -137,18 +136,20 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           OutIter final_dest = dest;
           std::advance(final_dest, count);
 
-          const int serial_scan_limit = 65536*8;
+          const int serial_scan_limit = 65536*2;
 
           // we want 2^N chunks of data, so based on our input list, find a good N
           int log2N = 0;
           int chunkcount = count / serial_scan_limit;
           int n_chunks = chunkcount;
-          if (n_chunks < 2) {
+          int cores =  executor_information_traits<typename ExPolicy::executor_type>::
+              processing_units_count(policy.executor(), policy.parameters());
+          if (n_chunks < 2 || cores==1) {
             return sequential(policy, first, last, dest, std::forward<T>(init), std::forward<Op>(op));
           }
           while (n_chunks >>= 1) ++log2N;
           n_chunks = (1 << log2N);
-          int chunksize = count / n_chunks;
+          std::size_t chunksize = count / n_chunks;
 
           // --------------------------
           // Upsweep:
@@ -158,7 +159,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           // into our original input data. Then we will do the scan algorithm using the 2^N items
           // as our base input.
           // This first loop spawns 2^N sequential scans on the initial lists
-          typedef std::tuple<FwdIter, FwdIter, std::size_t, T> chunk_info;
+          typedef std::tuple<FwdIter, OutIter, std::size_t, T> chunk_info;
           std::vector< chunk_info >     work_chunks;
           std::vector< hpx::future<T> > work_items;
           std::vector< hpx::future<void> > work_partials;
@@ -178,8 +179,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             // spawn a task to do a sequential scan on this chunk
             work_items.push_back(
               std::move(
-                hpx::async(&sequential_scan_n<FwdIter, FwdIter, T, Op>, 
-                  it1, chunksize, dest, T(), op)));
+                 hpx::async(&sequential_scan_n<FwdIter, T, Op>,
+                  it1, chunksize, std::move(T()), std::ref(op))));
             it1 = it2;
             std::advance(dest, chunksize);
           }
@@ -227,12 +228,14 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
           // now combine the partial sums back into the initial chunks
           for (int c = 0; c < n_chunks; ++c) {
             // spawn a task to do a sequential update on this chunk
+
             hpx::future<T> w1 = hpx::async(&sequential_update_n<FwdIter, FwdIter, T, Op>,
               std::get<0>(work_chunks[c]), 
               std::get<1>(work_chunks[c]), 
               std::get<2>(work_chunks[c]), 
-              std::get<3>(work_chunks[c]), op);
+              std::get<3>(work_chunks[c]), std::ref(op));
             work_items.push_back(std::move(w1));
+
           }
           hpx::wait_all(work_items);
           return final_dest;
