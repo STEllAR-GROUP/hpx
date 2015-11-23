@@ -29,220 +29,228 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
-namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
-{
+namespace hpx {
+namespace parallel {
+HPX_INLINE_NAMESPACE(v1)
+    {
     ///////////////////////////////////////////////////////////////////////////
     // exclusive_scan
     namespace detail
     {
-        /// \cond NOINTERNAL
-        //---------------------------------------------------------------------
-        // sequential exclusive_scan using iterators for start/end
-        //---------------------------------------------------------------------
-      template<typename InIter, typename OutIter, typename T, typename Op>
-      OutIter sequential_scan(InIter first, InIter last,
+    /// \cond NOINTERNAL
+    //---------------------------------------------------------------------
+    // sequential exclusive_scan using iterators for start/end
+    //---------------------------------------------------------------------
+    template<typename InIter, typename OutIter, typename T, typename Op>
+    OutIter sequential_scan(InIter first, InIter last,
         OutIter dest, T init, Op && op)
-      {
+    {
         T temp = init;
-        for (/* */; first != last; (void) ++first, ++dest)
-        {
-          init = op(init, *first);
-          *dest = temp;
-          temp = init;
+        for (/* */; first != last; (void) ++first, ++dest) {
+            init = op(init, *first);
+            *dest = temp;
+            temp = init;
         }
         return dest;
-      }
+    }
 
-      //---------------------------------------------------------------------
-      // sequential exclusive_scan using count instead of end
-      //---------------------------------------------------------------------
-      template <typename InIter, typename T, typename Op>
-      T sequential_scan_n(InIter first, std::size_t count,
+    //---------------------------------------------------------------------
+    // sequential exclusive_scan using count instead of end
+    //---------------------------------------------------------------------
+    template<typename InIter, typename T, typename Op>
+    T sequential_scan_n(InIter first, std::size_t count,
         T init, Op && op)
-      {
+    {
         T temp = init;
-        for (/* */; count-- != 0; (void) ++first)
-        {
-          init = op(init, *first);
-          temp = init;
+        for (/* */; count-- != 0; (void) ++first) {
+            init = op(init, *first);
+            temp = init;
         }
         return init;
-      }
+    }
 
-      //---------------------------------------------------------------------
-      // sequential update, applies V to each value in the sequence
-      //---------------------------------------------------------------------
-      template <typename InIter, typename OutIter, typename T, typename Op>
-      T sequential_update_n(InIter first, OutIter dest, std::size_t count,
+    //---------------------------------------------------------------------
+    // sequential update, applies V to each value in the sequence
+    //---------------------------------------------------------------------
+    template<typename InIter, typename OutIter, typename T, typename Op>
+    T sequential_update_n(InIter first, OutIter dest, std::size_t count,
         T value, Op && op)
-      {
+    {
         T init = value;
         T temp = init;
-        for (/* */; count-- != 0; (void) ++first, ++dest)
-        {
-          init = op(init, *first);
-          *dest = temp;
-          temp = init;
+        for (/* */; count-- != 0; (void) ++first, ++dest) {
+            init = op(init, *first);
+            *dest = temp;
+            temp = init;
         }
         return init;
-      }
+    }
 
-      ///////////////////////////////////////////////////////////////////////
-      template<typename OutIter>
-      struct parallel_scan_struct
-        : public hpx::parallel::v1::detail::algorithm<parallel_scan_struct<OutIter>, OutIter>
-      {
+    ///////////////////////////////////////////////////////////////////////
+    template<typename OutIter>
+    struct parallel_scan_struct
+        : public hpx::parallel::v1::detail::algorithm<
+          parallel_scan_struct<OutIter>, OutIter>
+    {
         parallel_scan_struct()
-          :
-          parallel_scan_struct::algorithm("parallel_scan")
+        :
+            parallel_scan_struct::algorithm("parallel_scan")
         {
         }
 
         template<typename ExPolicy, typename InIter, typename T, typename Op>
         static OutIter
-          sequential(ExPolicy, InIter first, InIter last,
+        sequential(ExPolicy, InIter first, InIter last,
             OutIter dest, T && init, Op && op)
         {
-          return detail::sequential_scan(first, last, dest,
-            std::forward<T>(init), std::forward<Op>(op));
+            return detail::sequential_scan(first, last, dest,
+                std::forward < T > (init), std::forward < Op > (op));
         }
 
         template<typename ExPolicy, typename FwdIter, typename T, typename Op>
         static typename hpx::parallel::util::detail::algorithm_result<
-          ExPolicy, OutIter
+        ExPolicy, OutIter
         >::type
-          parallel(ExPolicy policy, FwdIter first, FwdIter last,
+        parallel(ExPolicy policy, FwdIter first, FwdIter last,
             OutIter dest, T && init, Op && op)
         {
-          typedef hpx::parallel::util::detail::algorithm_result<ExPolicy, OutIter> result;
-          typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
-          typedef typename std::iterator_traits<FwdIter>::difference_type difference_type;
+            typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
+            typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
+            typedef typename std::iterator_traits<FwdIter>::difference_type
+                difference_type;
 
-          if (first == last)
-            return result::get(std::move(dest));
+            if (first == last)
+                return result::get(std::move(dest));
 
-          // --------------------------------------------------------------------------
-          // Parallel prefix sum /scan algorithm, after algorithm described in [1]
-          // available here 
-          // http://http.developer.nvidia.com/GPUGems3/gpugems3_ch39.html
-          //
-          // 1. Hubert Nguyen. 2007. Gpu Gems 3 (First ed.). Addison-Wesley Professional.
-          // --------------------------------------------------------------------------
+            // --------------------------------------------------------------------------
+            // Parallel prefix sum /scan algorithm, after algorithm described in [1]
+            // available here
+            // http://http.developer.nvidia.com/GPUGems3/gpugems3_ch39.html
+            //
+            // 1. Hubert Nguyen. 2007. Gpu Gems 3 (First ed.).
+            // Addison-Wesley Professional.
+            // --------------------------------------------------------------------------
 
-          difference_type count = std::distance(first, last);
+            difference_type count = std::distance(first, last);
 
-          //    std::cout << "parallel scan with " << count << std::endl;
+            //    std::cout << "parallel scan with " << count << std::endl;
 
-          OutIter final_dest = dest;
-          std::advance(final_dest, count);
+            OutIter final_dest = dest;
+            std::advance(final_dest, count);
 
-          const int serial_scan_limit = 65536*2;
+            const int serial_scan_limit = 65536 * 2;
 
-          // we want 2^N chunks of data, so based on our input list, find a good N
-          int log2N = 0;
-          int chunkcount = count / serial_scan_limit;
-          int n_chunks = chunkcount;
-          int cores =  executor_information_traits<typename ExPolicy::executor_type>::
-              processing_units_count(policy.executor(), policy.parameters());
-          if (n_chunks < 2 || cores==1) {
-            return sequential(policy, first, last, dest, std::forward<T>(init), std::forward<Op>(op));
-          }
-          while (n_chunks >>= 1) ++log2N;
-          n_chunks = (1 << log2N);
-          std::size_t chunksize = count / n_chunks;
-
-          // --------------------------
-          // Upsweep:
-          // --------------------------
-          // because our list might not be an exact power of 2 and we wish to run 2^N tasks/chunks
-          // we will first create a list of iterator start/end points for a 2^N list as indices
-          // into our original input data. Then we will do the scan algorithm using the 2^N items
-          // as our base input.
-          // This first loop spawns 2^N sequential scans on the initial lists
-          typedef std::tuple<FwdIter, OutIter, std::size_t, T> chunk_info;
-          std::vector< chunk_info >     work_chunks;
-          std::vector< hpx::future<T> > work_items;
-          std::vector< hpx::future<void> > work_partials;
-          work_chunks.reserve(n_chunks);
-          work_items.reserve(n_chunks);
-          FwdIter it2, it1 = first;
-          for (int k = 0; k < n_chunks; ++k) {
-            if (k < n_chunks - 1) {
-              it2 = it1 + chunksize;
+            // we want 2^N chunks of data, so based on our input list, find a good N
+            int log2N = 0;
+            int chunkcount = count / serial_scan_limit;
+            int n_chunks = chunkcount;
+            int cores = executor_information_traits<typename ExPolicy::executor_type>::
+                processing_units_count(policy.executor(), policy.parameters());
+            if (n_chunks < 2 || cores == 1) {
+                return sequential(policy, first, last, dest, std::forward < T > (init),
+                    std::forward < Op > (op));
             }
-            else { // last chunk might not be exactly the right size
-              chunksize = std::distance(it2, last);
-              it2 = last;
+            while (n_chunks >>= 1)
+                ++log2N;
+            n_chunks = (1 << log2N);
+            std::size_t chunksize = count / n_chunks;
+
+            // --------------------------
+            // Upsweep:
+            // --------------------------
+            // because our list might not be an exact power of 2 and we wish to run
+            // 2^N tasks/chunks we will first create a list of iterator start/end points
+            // for a 2^N list as indices into our original input data.
+            // Then we will do the scan algorithm using the 2^N items as our base input.
+            // This first loop spawns 2^N sequential scans on the initial lists
+            typedef std::tuple<FwdIter, OutIter, std::size_t, T> chunk_info;
+            std::vector < chunk_info > work_chunks;
+            std::vector<hpx::future<T> > work_items;
+            std::vector<hpx::future<void> > work_partials;
+            work_chunks.reserve(n_chunks);
+            work_items.reserve(n_chunks);
+            FwdIter it2, it1 = first;
+            for (int k = 0; k < n_chunks; ++k) {
+                if (k < n_chunks - 1) {
+                    it2 = it1 + chunksize;
+                }
+                else { // last chunk might not be exactly the right size
+                    chunksize = std::distance(it2, last);
+                    it2 = last;
+                }
+                // start and end of chunk of our input array
+                work_chunks.push_back(
+                    std::make_tuple(it1, dest, chunksize, *(it1 + chunksize - 1)));
+                // spawn a task to do a sequential scan on this chunk
+                work_items.push_back(
+                    std::move(
+                        hpx::async(&sequential_scan_n<FwdIter, T, Op>,
+                            it1, chunksize, std::move(T()), std::ref(op))));
+                it1 = it2;
+                std::advance(dest, chunksize);
             }
-            // start and end of chunk of our input array
-            work_chunks.push_back(std::make_tuple(it1, dest, chunksize, *(it1 + chunksize - 1)));
-            // spawn a task to do a sequential scan on this chunk
-            work_items.push_back(
-              std::move(
-                 hpx::async(&sequential_scan_n<FwdIter, T, Op>,
-                  it1, chunksize, std::move(T()), std::ref(op))));
-            it1 = it2;
-            std::advance(dest, chunksize);
-          }
-          // 
-          // now do a tree of combine operations on the result of the 2^N sequence results
-          //
-          using hpx::lcos::local::dataflow;
-          //
-          hpx::when_all(std::move(work_items)).then(
-            [=, &work_chunks](hpx::future<std::vector<hpx::future<T> > > fv) {
-              // move the items into a local vector
-              std::vector<hpx::future<T> > items(fv.get());
-              for (int c = 0; c < n_chunks; ++c) {
-                std::get<3>(work_chunks[c]) = items[c].get();
-              }
-              for (int d = 0; d < log2N; ++d) {
+            //
+            // do a tree of combine operations on the result of the 2^N sequence results
+            //
+            using hpx::lcos::local::dataflow;
+            //
+            hpx::when_all(std::move(work_items)).then(
+                [=, &work_chunks](hpx::future<std::vector<hpx::future<T> > > fv) {
+                // move the items into a local vector
+                std::vector<hpx::future<T> > items(fv.get());
+                for (int c = 0; c < n_chunks; ++c) {
+                    std::get<3>(work_chunks[c]) = items[c].get();
+                }
+                for (int d = 0; d < log2N; ++d) {
+                    int d_2 = (1 << d);
+                    int dp1_2 = (2 << d);
+                    for (int k = 0, f = 0; k < n_chunks; k += dp1_2, f += 2) {
+                        int i1 = k + d_2 - 1;
+                        int i2 = k + dp1_2 - 1;
+                        T sum_left = std::get<3>(work_chunks[i1]);
+                        T sum_right = std::get<3>(work_chunks[i2]);
+                        std::get<3>(work_chunks[k + dp1_2 - 1]) = op(sum_left, sum_right);
+                    }
+                }
+            }
+            ).get();
+
+            // --------------------------
+            // Downsweep:
+            // --------------------------
+            //
+            std::get < 3 > (work_chunks.back()) = 0;
+            for (int d = log2N - 1; d >= 0; --d) {
                 int d_2 = (1 << d);
                 int dp1_2 = (2 << d);
-                for (int k = 0, f = 0; k < n_chunks; k += dp1_2, f += 2) {
-                  int i1 = k + d_2 - 1;
-                  int i2 = k + dp1_2 - 1;
-                    T sum_left  = std::get<3>(work_chunks[i1]);
-                    T sum_right = std::get<3>(work_chunks[i2]);
-                    std::get<3>(work_chunks[k + dp1_2 - 1]) = op(sum_left, sum_right);;
+                int steps = n_chunks >> (d + 1);
+                for (int k = 0; k < n_chunks - 1; k += dp1_2) {
+                    T temp = std::get < 3 > (work_chunks[k + d_2 - 1]);
+                    std::get < 3 > (work_chunks[k + d_2 - 1]) =
+                        std::get < 3 > (work_chunks[k + dp1_2 - 1]);
+                    std::get < 3 > (work_chunks[k + dp1_2 - 1]) =
+                        temp + std::get < 3 > (work_chunks[k + dp1_2 - 1]);
                 }
-              }
             }
-          ).get();
+            // now combine the partial sums back into the initial chunks
+            for (int c = 0; c < n_chunks; ++c) {
+                // spawn a task to do a sequential update on this chunk
 
-          // --------------------------
-          // Downsweep:
-          // --------------------------
-          //
-          std::get<3>(work_chunks.back()) = 0;
-          for (int d = log2N - 1; d >= 0; --d) {
-            int d_2 = (1 << d);
-            int dp1_2 = (2 << d);
-            int steps = n_chunks >> (d + 1);
-            for (int k = 0; k<n_chunks - 1; k += dp1_2) {
-              T temp = std::get<3>(work_chunks[k + d_2 - 1]);
-              std::get<3>(work_chunks[k + d_2 - 1]) = std::get<3>(work_chunks[k + dp1_2 - 1]);
-              std::get<3>(work_chunks[k + dp1_2 - 1]) = temp + std::get<3>(work_chunks[k + dp1_2 - 1]);
+                hpx::future<T> w1 = hpx::async(
+                    &sequential_update_n<FwdIter, FwdIter, T, Op>,
+                    std::get < 0 > (work_chunks[c]),
+                    std::get < 1 > (work_chunks[c]),
+                    std::get < 2 > (work_chunks[c]),
+                    std::get < 3 > (work_chunks[c]), std::ref(op));
+                work_items.push_back(std::move(w1));
+
             }
-          }
-          // now combine the partial sums back into the initial chunks
-          for (int c = 0; c < n_chunks; ++c) {
-            // spawn a task to do a sequential update on this chunk
-
-            hpx::future<T> w1 = hpx::async(&sequential_update_n<FwdIter, FwdIter, T, Op>,
-              std::get<0>(work_chunks[c]), 
-              std::get<1>(work_chunks[c]), 
-              std::get<2>(work_chunks[c]), 
-              std::get<3>(work_chunks[c]), std::ref(op));
-            work_items.push_back(std::move(w1));
-
-          }
-          hpx::wait_all(work_items);
-          return final_dest;
+            hpx::wait_all(work_items);
+            return final_dest;
         }
-      };
+    };
 
-        /// \endcond
+    /// \endcond
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -324,11 +332,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// \a op is not mathematically associative, the behavior of
     /// \a inclusive_scan may be non-deterministic.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter, typename T,
-        typename Op>
+    template<typename ExPolicy, typename InIter, typename OutIter, typename T,
+    typename Op>
     inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    is_execution_policy<ExPolicy>,
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
     prefix_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
         T init, Op && op)
@@ -345,11 +353,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         static_assert(
             (boost::mpl::or_<
                 boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
+                std::forward_iterator_tag, output_iterator_category>,
                 boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
-            "Requires at least output iterator.");
+                std::output_iterator_tag, output_iterator_category>
+        >::value),
+        "Requires at least output iterator.");
 
         typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
@@ -358,8 +366,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::parallel_scan_struct<OutIter>().call(
-          std::forward<ExPolicy>(policy), is_seq(),
-          first, last, dest, std::move(init), std::forward<Op>(op));
+            std::forward < ExPolicy > (policy), is_seq(),
+            first, last, dest, std::move(init), std::forward < Op > (op));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -421,12 +429,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     /// The difference between \a exclusive_scan and \a inclusive_scan is that
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
-    template <typename ExPolicy, typename InIter, typename OutIter, typename T>
+    template<typename ExPolicy, typename InIter, typename OutIter, typename T>
     inline typename boost::enable_if<
-        is_execution_policy<ExPolicy>,
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+    is_execution_policy<ExPolicy>,
+    typename util::detail::algorithm_result<ExPolicy, OutIter>::type
     >::type
-      prefix_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
+    prefix_scan(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
         T init)
     {
         typedef typename std::iterator_traits<InIter>::iterator_category
@@ -441,11 +449,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         static_assert(
             (boost::mpl::or_<
                 boost::is_base_of<
-                    std::forward_iterator_tag, output_iterator_category>,
+                std::forward_iterator_tag, output_iterator_category>,
                 boost::is_same<
-                    std::output_iterator_tag, output_iterator_category>
-            >::value),
-            "Requires at least output iterator.");
+                std::output_iterator_tag, output_iterator_category>
+        >::value),
+        "Requires at least output iterator.");
 
         typedef typename boost::mpl::or_<
             is_sequential_execution_policy<ExPolicy>,
@@ -454,9 +462,11 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type is_seq;
 
         return detail::parallel_scan_struct<OutIter>().call(
-          std::forward<ExPolicy>(policy), is_seq(),
-          first, last, dest, std::move(init), std::plus<T>());
+            std::forward < ExPolicy > (policy), is_seq(),
+            first, last, dest, std::move(init), std::plus<T>());
     }
-}}}
+    }
+}
+}
 
 #endif
