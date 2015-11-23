@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2015 John Biddiscombe
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,16 +11,13 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unwrapped.hpp>
-#include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-//#include <hpx/parallel/util/partitioner.hpp>
-//#include <hpx/parallel/util/scan_partitioner.hpp>
-//#include <hpx/parallel/util/loop.hpp>
+
 
 #include <algorithm>
 #include <numeric>
@@ -115,7 +112,6 @@ HPX_INLINE_NAMESPACE(v1)
             OutIter dest, T && init, Op && op)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
-            typedef hpx::util::zip_iterator<FwdIter, OutIter> zip_iterator;
             typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
 
@@ -132,28 +128,31 @@ HPX_INLINE_NAMESPACE(v1)
             // --------------------------------------------------------------------------
 
             difference_type count = std::distance(first, last);
-
-            //    std::cout << "parallel scan with " << count << std::endl;
-
             OutIter final_dest = dest;
             std::advance(final_dest, count);
 
-            const int serial_scan_limit = 65536 * 2;
-
-            // we want 2^N chunks of data, so based on our input list, find a good N
-            int log2N = 0;
-            int chunkcount = count / serial_scan_limit;
-            int n_chunks = chunkcount;
             int cores = executor_information_traits<typename ExPolicy::executor_type>::
-                processing_units_count(policy.executor(), policy.parameters());
-            if (n_chunks < 2 || cores == 1) {
-                return sequential(policy, first, last, dest, std::forward < T > (init),
-                    std::forward < Op > (op));
+              processing_units_count(policy.executor(), policy.parameters());
+
+            int n_chunks, log2N;
+            std::size_t chunk_size;
+            if (cores>1) {
+              const std::size_t sequential_scan_limit = 32768;
+              // we want 2^N chunks of data, so find a good N
+              log2N = 0;
+              while (cores >>= 1) ++log2N;
+              n_chunks = (1 << log2N);
+              chunk_size = count / n_chunks;
+              while (chunk_size < sequential_scan_limit) {
+                chunk_size <<= 1;
+                n_chunks >>= 1;
+                log2N -= 1;
+              }
             }
-            while (n_chunks >>= 1)
-                ++log2N;
-            n_chunks = (1 << log2N);
-            std::size_t chunksize = count / n_chunks;
+            if (n_chunks < 2 || cores == 1) {
+              return sequential(policy, first, last, dest, std::forward < T >(init),
+                std::forward < Op >(op));
+            }
 
             // --------------------------
             // Upsweep:
@@ -172,22 +171,22 @@ HPX_INLINE_NAMESPACE(v1)
             FwdIter it2, it1 = first;
             for (int k = 0; k < n_chunks; ++k) {
                 if (k < n_chunks - 1) {
-                    it2 = it1 + chunksize;
+                    it2 = it1 + chunk_size;
                 }
                 else { // last chunk might not be exactly the right size
-                    chunksize = std::distance(it2, last);
+                    chunk_size = std::distance(it2, last);
                     it2 = last;
                 }
                 // start and end of chunk of our input array
                 work_chunks.push_back(
-                    std::make_tuple(it1, dest, chunksize, *(it1 + chunksize - 1)));
+                    std::make_tuple(it1, dest, chunk_size, *(it1 + chunk_size - 1)));
                 // spawn a task to do a sequential scan on this chunk
                 work_items.push_back(
                     std::move(
                         hpx::async(&sequential_scan_n<FwdIter, T, Op>,
-                            it1, chunksize, std::move(T()), std::ref(op))));
+                            it1, chunk_size, std::move(T()), std::ref(op))));
                 it1 = it2;
-                std::advance(dest, chunksize);
+                std::advance(dest, chunk_size);
             }
             //
             // do a tree of combine operations on the result of the 2^N sequence results
