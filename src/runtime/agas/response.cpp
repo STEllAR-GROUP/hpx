@@ -366,6 +366,9 @@ namespace hpx { namespace agas
         // TODO: verification of namespace_action_code
     }
 
+    response::~response()
+    {}
+
     response::response(
         response const& other
         )
