@@ -382,6 +382,9 @@ namespace hpx { namespace agas
         HPX_ASSERT(type_ == symbol_ns_on_event);
     }
 
+    request::~request()
+    {}
+
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     request::request(

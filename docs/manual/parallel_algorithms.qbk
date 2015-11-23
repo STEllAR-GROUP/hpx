@@ -413,7 +413,7 @@ may choose whether or not to report exceptions, and if so, in what manner they
 are communicated back to the caller. However, all executors in __hpx__
 report exceptions in a manner consistent with the behavior of execution policies
 described by the Parallelism TS, where multiple exceptions are collected into
-an __exception_list__. This list is reported through `async_execute()'s`
+an __exception_list__. This list is reported through `async_execute()`'s
 returned future, or thrown directly by execute().
 
 In __hpx__ we have implemented the following executor types:

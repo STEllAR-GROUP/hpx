@@ -20,6 +20,8 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
+#include <memory>
+
 // The number of types that the request's variant can represent.
 #define HPX_AGAS_REQUEST_SUBTYPES 13
 
@@ -121,6 +123,8 @@ struct HPX_EXPORT request
       , bool call_for_past_events
       , hpx::id_type result_lco
         );
+
+    ~request();
 
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
@@ -240,7 +244,7 @@ struct HPX_EXPORT request
     HPX_SERIALIZATION_SPLIT_MEMBER()
 
     namespace_action_code mc; //-V707
-    boost::shared_ptr<request_data> data;
+    std::unique_ptr<request_data> data;
 };
 
 }}

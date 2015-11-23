@@ -32,6 +32,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     // inner_product
     namespace detail
     {
+        /// \cond NOINTERNAL
         template <typename T>
         struct inner_product
           : public detail::algorithm<inner_product<T>, T>
@@ -255,7 +256,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     ///                     it.
     ///                     The type \a Ret must be
     ///                     such that it can be implicitly converted to a type
-    ///                     of \t.
+    ///                     of \tT.
     ///
     /// The operations in the parallel \a inner_product algorithm invoked
     /// with an execution policy object of type \a sequential_execution_policy

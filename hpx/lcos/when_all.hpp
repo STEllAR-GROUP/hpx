@@ -48,7 +48,7 @@ namespace hpx
     /// returns a new future object representing the same list of futures
     /// after they finished executing.
     ///
-    /// \param futures  [in] A container holding an arbitrary amount of \a future
+    /// \param values   [in] A range holding an arbitrary amount of \a future
     ///                 or \a shared_future objects for which \a when_all
     ///                 should wait.
     ///
@@ -68,7 +68,7 @@ namespace hpx
     ///       but the futures held in the output collection may.
     template <typename Range>
     future<Range>
-    when_all(Range&& values)
+    when_all(Range&& values);
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and

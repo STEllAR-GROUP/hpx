@@ -371,8 +371,6 @@ namespace hpx
     start(boost::program_options::options_description const& desc_cmdline, int argc,
         char** argv, hpx::runtime_mode mode);
 
-    /// \fn int start(std::string const& app_name, int argc = 0, char** argv = 0)
-    ///
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main, non-blocking entry point, which can be used
@@ -488,9 +486,6 @@ namespace hpx
     inline bool start(std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-    /// \fn bool start(int (*f)(boost::program_options::variables_map& vm),
-    ///  std::string const& app_name, int argc, char** argv)
-    ///
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main, non-blocking entry point, which can be used
