@@ -107,7 +107,7 @@ namespace hpx { namespace detail
         call(BOOST_SCOPED_ENUM(launch) launch_policy, F&& f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<
-                F(Ts...)
+                F(Ts&&...)
             >::type result_type;
 
             if (launch_policy == launch::sync) {
@@ -164,7 +164,7 @@ namespace hpx { namespace detail
         call(Executor& sched, F&& f, Ts&&... ts)
         {
             typedef typename util::detail::deferred_result_of<
-                    F(Ts...)
+                    F(Ts&&...)
                 >::type result_type;
 
             lcos::local::futures_factory<result_type()> p(sched,
