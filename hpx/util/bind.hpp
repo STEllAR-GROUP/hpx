@@ -297,7 +297,6 @@ namespace hpx { namespace util
             }
 
         private:
-        public: // because serialize_as_future
             typename std::decay<F>::type _f;
             util::tuple<typename std::decay<Ts>::type...> _args;
         };
