@@ -34,7 +34,7 @@ namespace hpx { namespace threads
     struct register_work_tag {};
     struct set_state_tag {};
 
-    struct thread_init_data;
+    class thread_init_data;
 
     ///////////////////////////////////////////////////////////////////////////
     struct threadmanager_base : private boost::noncopyable

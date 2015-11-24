@@ -10,7 +10,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/util/unique_function.hpp>
 
 #include <cstdint>
 
@@ -23,11 +23,12 @@ namespace hpx { namespace components { namespace server
     naming::gid_type create(std::size_t count);
 
     template <typename Component>
-    naming::gid_type create(util::function_nonser<void(void*)> const& ctor);
+    naming::gid_type create(
+        util::unique_function_nonser<void(void*)> const& ctor);
 
     template <typename Component>
     naming::gid_type create(naming::gid_type const& gid,
-        util::function_nonser<void(void*)> const& ctor);
+        util::unique_function_nonser<void(void*)> const& ctor);
 }}}
 
 #endif

@@ -37,7 +37,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         BOOST_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
             bool
         >::type
         call(F&& f, Ts&&... ts)
@@ -59,7 +59,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         BOOST_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
             bool
         >::type
         call(Executor& sched, F&& f, Ts&&... ts)
@@ -81,7 +81,7 @@ namespace hpx { namespace detail
         template <typename F, typename ...Ts>
         BOOST_FORCEINLINE static
         typename boost::enable_if_c<
-            traits::detail::is_deferred_callable<F(Ts...)>::value,
+            traits::detail::is_deferred_callable<F(Ts&&...)>::value,
             bool
         >::type
         call(Executor& exec, F&& f, Ts&&... ts)

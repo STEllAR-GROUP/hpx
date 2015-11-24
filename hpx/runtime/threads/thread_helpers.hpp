@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
-    struct thread_init_data;
+    class thread_init_data;
 
     namespace executors
     {
