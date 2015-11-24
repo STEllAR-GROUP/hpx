@@ -189,7 +189,7 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        BOOST_FORCEINLINE void put_parcel(parcel p)
+        HPX_FORCEINLINE void put_parcel(parcel p)
         {
             using util::placeholders::_1;
             using util::placeholders::_2;

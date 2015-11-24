@@ -198,7 +198,7 @@ namespace hpx { namespace util { namespace coroutines
 #endif
 
     template <typename Functor>
-    void rebind(BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+    void rebind(Functor && f, naming::id_type && target,
         thread_id_repr_type id = 0)
     {
         HPX_ASSERT(exited());
@@ -215,7 +215,7 @@ namespace hpx { namespace util { namespace coroutines
         static const int arity = 1;
     };
 
-    BOOST_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type())
+    HPX_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type())
     {
       HPX_ASSERT(m_pimpl);
       HPX_ASSERT(m_pimpl->is_ready());

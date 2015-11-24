@@ -172,7 +172,7 @@ namespace hpx { namespace lcos
         protected:
             // End of the tuple is reached
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void do_await(TupleIter&&, boost::mpl::true_)
             {
                 this->set_value(util::unused);     // simply make ourself ready
@@ -227,7 +227,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::false_, boost::mpl::true_)
             {
                 await_range(iter,
@@ -237,7 +237,7 @@ namespace hpx { namespace lcos
 
             // Current element is a simple future
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void await_next(TupleIter iter, boost::mpl::true_, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
@@ -283,7 +283,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename TupleIter>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void do_await(TupleIter&& iter, boost::mpl::false_)
             {
                 typedef typename util::decay_unwrap<
@@ -332,13 +332,13 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future>
-    BOOST_FORCEINLINE void wait_all(std::vector<Future>& values)
+    HPX_FORCEINLINE void wait_all(std::vector<Future>& values)
     {
         lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }
 
     template <typename Future>
-    BOOST_FORCEINLINE void wait_all(std::vector<Future>&& values)
+    HPX_FORCEINLINE void wait_all(std::vector<Future>&& values)
     {
         lcos::wait_all(const_cast<std::vector<Future> const&>(values));
     }

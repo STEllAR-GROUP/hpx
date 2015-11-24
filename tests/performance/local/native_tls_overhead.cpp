@@ -19,7 +19,7 @@
 
 #if defined(_GLIBCXX_HAVE_TLS)
     #define HPX_NATIVE_TLS __thread
-#elif defined(BOOST_WINDOWS)
+#elif defined(HPX_WINDOWS)
     #define HPX_NATIVE_TLS __declspec(thread)
 #elif defined(__FreeBSD__) || (defined(__APPLE__) && defined(__MACH__))
     #define HPX_NATIVE_TLS __thread

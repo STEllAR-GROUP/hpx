@@ -114,7 +114,7 @@ namespace hpx
         }
     }
 
-#if defined(BOOST_MSVC) && !defined(HPX_DEBUG)
+#if defined(HPX_MSVC) && !defined(HPX_DEBUG)
     ///////////////////////////////////////////////////////////////////////////
     // Explicitly instantiate specific apply needed for set_lco_value for MSVC
     // (in release mode only, leads to missing symbols otherwise).

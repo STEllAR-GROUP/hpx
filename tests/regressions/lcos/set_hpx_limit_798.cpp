@@ -6,9 +6,6 @@
 // This test case demonstrates the issue described in #798: HPX_LIMIT does not
 // work for local dataflow
 
-// anything > 10 triggers #798
-#define HPX_LIMIT 15
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>

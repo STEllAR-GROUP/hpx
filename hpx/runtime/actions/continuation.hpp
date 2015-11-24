@@ -233,7 +233,7 @@ namespace hpx { namespace actions
         };
 
         template <typename T>
-        BOOST_FORCEINLINE T operator()(naming::id_type const& lco, T && t) const
+        HPX_FORCEINLINE T operator()(naming::id_type const& lco, T && t) const
         {
             hpx::set_lco_value(lco, std::forward<T>(t));
 
@@ -287,7 +287,7 @@ namespace hpx { namespace actions
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
+        HPX_FORCEINLINE void serialize(Archive& ar, unsigned int const)
         {
             ar & cont_ & target_;
         }
@@ -351,7 +351,7 @@ namespace hpx { namespace actions
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
+        HPX_FORCEINLINE void serialize(Archive& ar, unsigned int const)
         {
             ar & cont_ & target_ & f_;
         }

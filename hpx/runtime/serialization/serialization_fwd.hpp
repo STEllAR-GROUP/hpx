@@ -35,7 +35,7 @@ namespace hpx { namespace serialization
     struct output_archive;
     struct binary_filter;
 
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     void register_pointer(input_archive & ar, boost::uint64_t pos,
         detail::ptr_helper_ptr helper);
 
@@ -67,12 +67,12 @@ namespace hpx { namespace serialization
     }                                                                               \
 /**/
 #define HPX_SERIALIZATION_SPLIT_FREE(T)                                             \
-    BOOST_FORCEINLINE                                                               \
+    HPX_FORCEINLINE                                                               \
     void serialize(hpx::serialization::input_archive & ar, T & t, unsigned)         \
     {                                                                               \
         load(ar, t, 0);                                                             \
     }                                                                               \
-    BOOST_FORCEINLINE                                                               \
+    HPX_FORCEINLINE                                                               \
     void serialize(hpx::serialization::output_archive & ar, T & t, unsigned)        \
     {                                                                               \
         save(ar, const_cast<boost::add_const<T>::type &>(t), 0);                    \
@@ -80,14 +80,14 @@ namespace hpx { namespace serialization
 /**/
 #define HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(TEMPLATE, ARGS)                       \
     HPX_UTIL_STRIP(TEMPLATE)                                                        \
-    BOOST_FORCEINLINE                                                               \
+    HPX_FORCEINLINE                                                               \
     void serialize(hpx::serialization::input_archive & ar,                          \
             HPX_UTIL_STRIP(ARGS) & t, unsigned)                                     \
     {                                                                               \
         load(ar, t, 0);                                                             \
     }                                                                               \
     HPX_UTIL_STRIP(TEMPLATE)                                                        \
-    BOOST_FORCEINLINE                                                               \
+    HPX_FORCEINLINE                                                               \
     void serialize(hpx::serialization::output_archive & ar,                         \
             HPX_UTIL_STRIP(ARGS) & t, unsigned)                                     \
     {                                                                               \

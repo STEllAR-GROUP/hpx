@@ -35,7 +35,7 @@ namespace hpx { namespace util
 
     public:
         // constants and types
-        static BOOST_CONSTEXPR_OR_CONST int rank = Rank;
+        static HPX_CONSTEXPR_OR_CONST int rank = Rank;
 
         typedef std::ptrdiff_t& reference;
         typedef std::ptrdiff_t const& const_reference;
@@ -44,7 +44,7 @@ namespace hpx { namespace util
 
         // [coord.index.cnstr], index construction
         //! Effects: Zero-initializes each component.
-        index() BOOST_NOEXCEPT
+        index() HPX_NOEXCEPT
         {
             std::fill(vs_ + 0, vs_ + rank, 0);
         }
@@ -75,13 +75,13 @@ namespace hpx { namespace util
         // [coord.index.eq], index equality
         //! Returns: true if (*this)[i] == rhs[i] for all i in the range
         //! [0, Rank), otherwise false.
-        bool operator==(index const& rhs) const BOOST_NOEXCEPT
+        bool operator==(index const& rhs) const HPX_NOEXCEPT
         {
             return std::equal(vs_ + 0, vs_ + rank, rhs.vs_ + 0);
         }
 
         //! Returns: !(*this == rhs).
-        bool operator!=(index const& rhs) const BOOST_NOEXCEPT
+        bool operator!=(index const& rhs) const HPX_NOEXCEPT
         {
             return !(*this == rhs);
         }
@@ -139,7 +139,7 @@ namespace hpx { namespace util
         }
 
         //! Returns: *this.
-        index  operator+() const BOOST_NOEXCEPT
+        index  operator+() const HPX_NOEXCEPT
         {
             return index(*this);
         }
@@ -199,7 +199,7 @@ namespace hpx { namespace util
 
     public:
         // constants and types
-        static BOOST_CONSTEXPR_OR_CONST int rank = Rank;
+        static HPX_CONSTEXPR_OR_CONST int rank = Rank;
 
         typedef std::ptrdiff_t& reference;
         typedef std::ptrdiff_t const& const_reference;
@@ -211,7 +211,7 @@ namespace hpx { namespace util
         // [coord.bounds.cnstr], bounds construction
 
         //! Effects: Zero-initializes each component.
-        bounds() BOOST_NOEXCEPT
+        bounds() HPX_NOEXCEPT
         {
             std::fill(vs_ + 0, vs_ + rank, 0);
         }
@@ -242,20 +242,20 @@ namespace hpx { namespace util
         // [coord.bounds.eq], bounds equality
         //! Returns: true if (*this)[i] == rhs[i] for all i in the range
         //! [0, Rank), otherwise false.
-        bool operator==(bounds const& rhs) const BOOST_NOEXCEPT
+        bool operator==(bounds const& rhs) const HPX_NOEXCEPT
         {
             return std::equal(vs_ + 0, vs_ + rank, rhs.vs_ + 0);
         }
 
         //! Returns: !(*this == rhs).
-        bool operator!=(bounds const& rhs) const BOOST_NOEXCEPT
+        bool operator!=(bounds const& rhs) const HPX_NOEXCEPT
         {
             return !(*this == rhs);
         }
 
         // [coord.bounds.obs], bounds observers
         //! Returns: The product of all components of *this.
-        size_type size() const BOOST_NOEXCEPT
+        size_type size() const HPX_NOEXCEPT
         {
             return std::accumulate(vs_ + 0, vs_ + rank, 1,
                 std::multiplies<value_type>());
@@ -263,7 +263,7 @@ namespace hpx { namespace util
 
         //! Returns: true if 0 <= idx[i] and idx[i] < (*this)[i] for all i in
         //! the range [0, Rank), otherwise false.
-        bool contains(index<Rank> const& idx) const BOOST_NOEXCEPT
+        bool contains(index<Rank> const& idx) const HPX_NOEXCEPT
         {
             for (std::size_t i = 0; i < rank; ++i)
             {
@@ -277,14 +277,14 @@ namespace hpx { namespace util
         //! Returns: A bounds_iterator referring to the first element of the
         //! space defined by *this such that *begin() == index<Rank>{} if
         //! size() != 0, begin() == end() otherwise.
-        const_iterator begin() const BOOST_NOEXCEPT
+        const_iterator begin() const HPX_NOEXCEPT
         {
             return const_iterator(*this, index<Rank>());
         }
 
         //! Returns: A bounds_iterator which is the past-the-end iterator for
         //! the space defined by *this.
-        const_iterator end() const BOOST_NOEXCEPT
+        const_iterator end() const HPX_NOEXCEPT
         {
             index<Rank> idx;
             idx[0] = vs_[0];
@@ -596,7 +596,7 @@ namespace hpx { namespace util
     {
     public:
         // constants and types
-        static BOOST_CONSTEXPR_OR_CONST int rank = 1;
+        static HPX_CONSTEXPR_OR_CONST int rank = 1;
 
         typedef std::ptrdiff_t& reference;
         typedef std::ptrdiff_t const& const_reference;
@@ -605,7 +605,7 @@ namespace hpx { namespace util
 
         // [coord.index.cnstr], index construction
         //! Effects: Zero-initializes each component.
-        index() BOOST_NOEXCEPT
+        index() HPX_NOEXCEPT
           : vs_(0)
         {
         }
@@ -613,20 +613,20 @@ namespace hpx { namespace util
         //! Effects: Initializes the 0th component of *this with v.
         //! Remarks: This constructor shall not participate in overload
         //! resolution unless Rank is 1.
-        index(value_type v) BOOST_NOEXCEPT
+        index(value_type v) HPX_NOEXCEPT
           : vs_(v)
         {}
 
         // [coord.index.eq], index equality
         //! Returns: true if (*this)[i] == rhs[i] for all i in the range
         //! [0, Rank), otherwise false.
-        bool operator==(index const& rhs) const BOOST_NOEXCEPT
+        bool operator==(index const& rhs) const HPX_NOEXCEPT
         {
             return vs_ == rhs.vs_;
         }
 
         //! Returns: !(*this == rhs).
-        bool operator!=(index const& rhs) const BOOST_NOEXCEPT
+        bool operator!=(index const& rhs) const HPX_NOEXCEPT
         {
             return !(*this == rhs);
         }
@@ -712,7 +712,7 @@ namespace hpx { namespace util
         }
 
         //! Returns: *this.
-        index  operator+() const BOOST_NOEXCEPT
+        index  operator+() const HPX_NOEXCEPT
         {
             return index(*this);
         }
@@ -774,7 +774,7 @@ namespace hpx { namespace util
     {
     public:
         // constants and types
-        static BOOST_CONSTEXPR_OR_CONST int rank = 1;
+        static HPX_CONSTEXPR_OR_CONST int rank = 1;
 
         typedef std::ptrdiff_t& reference;
         typedef std::ptrdiff_t const& const_reference;
@@ -786,14 +786,14 @@ namespace hpx { namespace util
         // [coord.bounds.cnstr], bounds construction
 
         //! Effects: Zero-initializes each component.
-        bounds() BOOST_NOEXCEPT
+        bounds() HPX_NOEXCEPT
           : vs_ (0)
         {}
 
         //! Effects: Initializes the 0th component of *this with v.
         //! Remarks: This constructor shall not participate in overload
         //! resolution unless Rank is 1.
-        bounds(value_type v) BOOST_NOEXCEPT
+        bounds(value_type v) HPX_NOEXCEPT
           : vs_(v)
         {}
 
@@ -811,27 +811,27 @@ namespace hpx { namespace util
         // [coord.bounds.eq], bounds equality
         //! Returns: true if (*this)[i] == rhs[i] for all i in the range
         //! [0, Rank), otherwise false.
-        bool operator==(bounds const& rhs) const BOOST_NOEXCEPT
+        bool operator==(bounds const& rhs) const HPX_NOEXCEPT
         {
             return vs_ == rhs.vs_;
         }
 
         //! Returns: !(*this == rhs).
-        bool operator!=(bounds const& rhs) const BOOST_NOEXCEPT
+        bool operator!=(bounds const& rhs) const HPX_NOEXCEPT
         {
             return !(*this == rhs);
         }
 
         // [coord.bounds.obs], bounds observers
         //! Returns: The product of all components of *this.
-        size_type size() const BOOST_NOEXCEPT
+        size_type size() const HPX_NOEXCEPT
         {
             return vs_;
         }
 
         //! Returns: true if 0 <= idx[i] and idx[i] < (*this)[i] for all i in
         //! the range [0, Rank), otherwise false.
-        bool contains(index<1> const& idx) const BOOST_NOEXCEPT
+        bool contains(index<1> const& idx) const HPX_NOEXCEPT
         {
             return (idx[0] >= 0 && idx[0] < vs_);
         }
@@ -840,14 +840,14 @@ namespace hpx { namespace util
         //! Returns: A bounds_iterator referring to the first element of the
         //! space defined by *this such that *begin() == index<Rank>{} if
         //! size() != 0, begin() == end() otherwise.
-        const_iterator begin() const BOOST_NOEXCEPT
+        const_iterator begin() const HPX_NOEXCEPT
         {
             return const_iterator(*this, index<1>());
         }
 
         //! Returns: A bounds_iterator which is the past-the-end iterator for
         //! the space defined by *this.
-        const_iterator end() const BOOST_NOEXCEPT
+        const_iterator end() const HPX_NOEXCEPT
         {
             return const_iterator(*this, index<1>(vs_));
         }

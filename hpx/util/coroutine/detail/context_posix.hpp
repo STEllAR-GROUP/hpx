@@ -47,7 +47,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/atomic.hpp>
 
 #if defined(__FreeBSD__) || (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) \

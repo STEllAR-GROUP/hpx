@@ -38,7 +38,7 @@ struct clocksource
 
     static_assert(base_clock::is_steady == true,
         "base_clock is not steady");
-#if !defined(BOOST_MSVC)
+#if !defined(HPX_MSVC)
     static_assert(boost::mpl::or_<
             std::ratio_equal<period, std::nano>,
             boost::ratio_equal<period, boost::nano>

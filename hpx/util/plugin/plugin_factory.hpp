@@ -15,7 +15,6 @@
 
 #include <hpx/exception.hpp>
 
-#include <boost/config.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 

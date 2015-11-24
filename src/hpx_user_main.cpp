@@ -16,7 +16,7 @@ int hpx_startup::user_main()
 //     std::string cmdline(ini.get_entry("hpx.reconstructed_cmd_line", ""));
 //
 //     using namespace boost::program_options;
-// #if defined(BOOST_WINDOWS)
+// #if defined(HPX_WINDOWS)
 //     std::vector<std::string> args = split_winmain(cmdline);
 // #else
 //     std::vector<std::string> args = split_unix(cmdline);

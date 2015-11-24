@@ -7,15 +7,14 @@
 #define HPX_UTIL_VALUE_LOGGER_DEC_08_0548PM
 
 #include <fstream>
-#include <boost/version.hpp>
-#include <boost/config.hpp>
-#include <boost/cstdint.hpp>
 #include <boost/lockfree/primitives.hpp>
 #include <boost/lexical_cast.hpp>
 
-#if defined(BOOST_WINDOWS)
+#include <hpx/config.hpp>
+
+#if defined(HPX_WINDOWS)
 #  include <process.h>
-#elif defined(BOOST_HAS_UNISTD_H)
+#elif defined(HPX_HAVE_UNISTD_H)
 #  include <unistd.h>
 #endif
 

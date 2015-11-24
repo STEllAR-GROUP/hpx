@@ -39,7 +39,7 @@ namespace hpx { namespace util { namespace detail
         bool empty;
 
         template <typename T>
-        unique_function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
+        unique_function_vtable_ptr(boost::mpl::identity<T>) HPX_NOEXCEPT
           : invoke(&callable_vtable<Sig>::template invoke<T>)
           , get_type(&vtable::template get_type<T>)
           , destruct(&vtable::template destruct<T>)
@@ -48,13 +48,13 @@ namespace hpx { namespace util { namespace detail
         {}
 
         template <typename T, typename Arg>
-        BOOST_FORCEINLINE static void construct(void** v, Arg&& arg)
+        HPX_FORCEINLINE static void construct(void** v, Arg&& arg)
         {
             vtable::construct<T>(v, std::forward<Arg>(arg));
         }
 
         template <typename T, typename Arg>
-        BOOST_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
+        HPX_FORCEINLINE static void reconstruct(void** v, Arg&& arg)
         {
             vtable::reconstruct<T>(v, std::forward<Arg>(arg));
         }
@@ -69,7 +69,7 @@ namespace hpx { namespace util { namespace detail
         typename serializable_vtable<IAr, OAr>::load_object_t load_object;
 
         template <typename T>
-        unique_function_vtable_ptr(boost::mpl::identity<T>) BOOST_NOEXCEPT
+        unique_function_vtable_ptr(boost::mpl::identity<T>) HPX_NOEXCEPT
           : unique_function_vtable_ptr<Sig, void, void>(boost::mpl::identity<T>())
           , name(get_function_name<util::tuple<unique_function_vtable_ptr, T> >())
           , save_object(&serializable_vtable<IAr, OAr>::template save_object<T>)
@@ -125,11 +125,11 @@ namespace hpx { namespace util
     public:
         typedef typename base_type::result_type result_type;
 
-        unique_function() BOOST_NOEXCEPT
+        unique_function() HPX_NOEXCEPT
           : base_type()
         {}
 
-        unique_function(unique_function&& other) BOOST_NOEXCEPT
+        unique_function(unique_function&& other) HPX_NOEXCEPT
           : base_type(static_cast<base_type&&>(other))
         {}
 
@@ -143,7 +143,7 @@ namespace hpx { namespace util
             assign(std::forward<F>(f));
         }
 
-        unique_function& operator=(unique_function&& other) BOOST_NOEXCEPT
+        unique_function& operator=(unique_function&& other) HPX_NOEXCEPT
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
@@ -213,11 +213,11 @@ namespace hpx { namespace util
     public:
         typedef typename base_type::result_type result_type;
 
-        unique_function() BOOST_NOEXCEPT
+        unique_function() HPX_NOEXCEPT
           : base_type()
         {}
 
-        unique_function(unique_function&& other) BOOST_NOEXCEPT
+        unique_function(unique_function&& other) HPX_NOEXCEPT
           : base_type(static_cast<base_type&&>(other))
         {}
 
@@ -231,7 +231,7 @@ namespace hpx { namespace util
             assign(std::forward<F>(f));
         }
 
-        unique_function& operator=(unique_function&& other) BOOST_NOEXCEPT
+        unique_function& operator=(unique_function&& other) HPX_NOEXCEPT
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
@@ -254,7 +254,7 @@ namespace hpx { namespace util
 
     template <typename Sig, typename IArchive, typename OArchive>
     static bool is_empty_function(unique_function<Sig, IArchive,
-        OArchive> const& f) BOOST_NOEXCEPT
+        OArchive> const& f) HPX_NOEXCEPT
     {
         return f.empty();
     }
@@ -276,11 +276,11 @@ namespace hpx { namespace util
         HPX_MOVABLE_BUT_NOT_COPYABLE(unique_function_nonser);
 
     public:
-        unique_function_nonser() BOOST_NOEXCEPT
+        unique_function_nonser() HPX_NOEXCEPT
           : base_type()
         {}
 
-        unique_function_nonser(unique_function_nonser&& other) BOOST_NOEXCEPT
+        unique_function_nonser(unique_function_nonser&& other) HPX_NOEXCEPT
           : base_type(static_cast<base_type&&>(other))
         {}
 
@@ -292,7 +292,7 @@ namespace hpx { namespace util
         ) : base_type(std::forward<F>(f))
         {}
 
-        unique_function_nonser& operator=(unique_function_nonser&& other) BOOST_NOEXCEPT
+        unique_function_nonser& operator=(unique_function_nonser&& other) HPX_NOEXCEPT
         {
             base_type::operator=(static_cast<base_type&&>(other));
             return *this;
@@ -307,7 +307,7 @@ namespace hpx { namespace util
     };
 
     template <typename Sig>
-    static bool is_empty_function(unique_function_nonser<Sig> const& f) BOOST_NOEXCEPT
+    static bool is_empty_function(unique_function_nonser<Sig> const& f) HPX_NOEXCEPT
     {
         return f.empty();
     }

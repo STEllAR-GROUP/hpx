@@ -9,7 +9,7 @@
 #if !defined(HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM)
 #define HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM
 
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #pragma once
 #endif
 

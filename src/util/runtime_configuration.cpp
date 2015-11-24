@@ -18,20 +18,20 @@
 // TODO: move parcel ports into plugins
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 
-#include <boost/config.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/tokenizer.hpp>
 
+#include <boost/predef/detail/endian_compat.h>
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_string.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 #  include <process.h>
-#elif defined(BOOST_HAS_UNISTD_H)
+#elif defined(HPX_HAVE_UNISTD_H)
 #  include <unistd.h>
 #endif
 
@@ -42,7 +42,7 @@
 #include <sys/types.h>
 #endif
 
-#if !defined(BOOST_WINDOWS)
+#if !defined(HPX_WINDOWS)
 #  if defined(HPX_DEBUG)
 #    define HPX_DLL_STRING  "libhpxd" HPX_SHARED_LIB_EXTENSION
 #  else

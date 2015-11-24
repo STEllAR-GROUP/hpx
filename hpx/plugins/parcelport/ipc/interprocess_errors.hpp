@@ -13,7 +13,7 @@
 #include <string>
 
 #if !defined(BOOST_SYSTEM_NOEXCEPT)
-#define BOOST_SYSTEM_NOEXCEPT BOOST_NOEXCEPT
+#define BOOST_SYSTEM_NOEXCEPT HPX_NOEXCEPT
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

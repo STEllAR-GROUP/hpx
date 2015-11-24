@@ -43,15 +43,15 @@ namespace hpx { namespace util
 
     namespace placeholders
     {
-        BOOST_STATIC_CONSTEXPR detail::placeholder<1> _1 = {};
-        BOOST_STATIC_CONSTEXPR detail::placeholder<2> _2 = {};
-        BOOST_STATIC_CONSTEXPR detail::placeholder<3> _3 = {};
-        BOOST_STATIC_CONSTEXPR detail::placeholder<4> _4 = {};
-        BOOST_STATIC_CONSTEXPR detail::placeholder<5> _5 = {};
-        BOOST_STATIC_CONSTEXPR detail::placeholder<6> _6 = {};
-        BOOST_STATIC_CONSTEXPR detail::placeholder<7> _7 = {};
-        BOOST_STATIC_CONSTEXPR detail::placeholder<8> _8 = {};
-        BOOST_STATIC_CONSTEXPR detail::placeholder<9> _9 = {};
+        HPX_STATIC_CONSTEXPR detail::placeholder<1> _1 = {};
+        HPX_STATIC_CONSTEXPR detail::placeholder<2> _2 = {};
+        HPX_STATIC_CONSTEXPR detail::placeholder<3> _3 = {};
+        HPX_STATIC_CONSTEXPR detail::placeholder<4> _4 = {};
+        HPX_STATIC_CONSTEXPR detail::placeholder<5> _5 = {};
+        HPX_STATIC_CONSTEXPR detail::placeholder<6> _6 = {};
+        HPX_STATIC_CONSTEXPR detail::placeholder<7> _7 = {};
+        HPX_STATIC_CONSTEXPR detail::placeholder<8> _8 = {};
+        HPX_STATIC_CONSTEXPR detail::placeholder<9> _9 = {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ namespace hpx { namespace util
             typedef T& type;
 
             template <typename Us>
-            static BOOST_FORCEINLINE
+            static HPX_FORCEINLINE
             type call(T& t, Us&& /*unbound*/)
             {
                 return t;
@@ -80,7 +80,7 @@ namespace hpx { namespace util
             typedef T&& type;
 
             template <typename Us>
-            static BOOST_FORCEINLINE
+            static HPX_FORCEINLINE
             type call(T& t, Us&& /*unbound*/)
             {
                 return std::move(t);
@@ -113,7 +113,7 @@ namespace hpx { namespace util
                 I, typename util::decay<Us>::type
             >::type&& type;
 
-            static BOOST_FORCEINLINE
+            static HPX_FORCEINLINE
             type call(T /*t*/, Us&& unbound)
             {
                 return util::get<I>(std::forward<Us>(unbound));
@@ -142,7 +142,7 @@ namespace hpx { namespace util
                 T&(Us&&)
             >::type type;
 
-            static BOOST_FORCEINLINE
+            static HPX_FORCEINLINE
             type call(T& t, Us&& unbound)
             {
                 return util::invoke_fused(
@@ -155,7 +155,7 @@ namespace hpx { namespace util
         {
             typedef X& type;
 
-            static BOOST_FORCEINLINE
+            static HPX_FORCEINLINE
             type call(T& t, Us&& /*unbound*/)
             {
                 return t.get();
@@ -168,7 +168,7 @@ namespace hpx { namespace util
         {
             typedef X& type;
 
-            static BOOST_FORCEINLINE
+            static HPX_FORCEINLINE
             type call(T& t, Us&& /*unbound*/)
             {
                 return t.get();
@@ -177,7 +177,7 @@ namespace hpx { namespace util
 #endif
 
         template <typename F, typename T, typename Us>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename bind_eval_impl<F, T, typename std::decay<T>::type, Us>::type
         bind_eval(T& t, Us&& unbound)
         {

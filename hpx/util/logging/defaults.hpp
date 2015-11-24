@@ -16,7 +16,7 @@
 #ifndef JT28092007_defaults_HPP_DEFINED
 #define JT28092007_defaults_HPP_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
 # pragma once
 #endif
 
@@ -67,7 +67,7 @@ Example:
 
 // define HPX_LOG_USE_WCHAR_T if you want your char type to be 'wchar_t'
 
-#if defined(BOOST_WINDOWS) && !defined(HPX_LOG_DONOT_USE_WCHAR_T)
+#if defined(HPX_WINDOWS) && !defined(HPX_LOG_DONOT_USE_WCHAR_T)
 #if defined( UNICODE) || defined(_UNICODE)
 #undef HPX_LOG_USE_WCHAR_T
 #define HPX_LOG_USE_WCHAR_T
@@ -108,7 +108,7 @@ Example:
 
         struct lock_resource {
             template<class lock_type> struct finder {
-//#if !defined( HPX_HAVE_LOG_NO_TSS) && defined(BOOST_WINDOWS)
+//#if !defined( HPX_HAVE_LOG_NO_TSS) && defined(HPX_WINDOWS)
                 // on Windows, I've tested the threading
 //                typedef typename locker::tss_resource_with_cache<lock_type,
 //                            5, hpx::util::logging::threading::mutex > type;

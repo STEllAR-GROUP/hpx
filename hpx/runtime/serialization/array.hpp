@@ -15,7 +15,7 @@
 #include <cstddef>
 
 #include <boost/array.hpp>
-#ifndef BOOST_NO_CXX11_HDR_ARRAY
+#ifdef HPX_HAVE_CXX11_ARRAY
 #include <array>
 #endif
 
@@ -85,7 +85,7 @@ namespace hpx { namespace serialization
     };
 
     // make_array function
-    template <class T> BOOST_FORCEINLINE
+    template <class T> HPX_FORCEINLINE
     array<T> make_array(T* begin, std::size_t size)
     {
         return array<T>(begin, size);
@@ -98,7 +98,7 @@ namespace hpx { namespace serialization
         ar & hpx::serialization::make_array(a.begin(), a.size());
     }
 
-#ifndef BOOST_NO_CXX11_HDR_ARRAY
+#ifdef HPX_HAVE_CXX11_ARRAY
   // implement serialization for std::array
     template <class Archive, class T, std::size_t N>
     void serialize(Archive& ar, std::array<T,N>& a, const unsigned int /* version */)
@@ -110,28 +110,28 @@ namespace hpx { namespace serialization
     // allow our array to be serialized as prvalue
     // compiler should support good ADL implementation
     // but it is rather for all hpx serialization library
-    template <typename T> BOOST_FORCEINLINE
+    template <typename T> HPX_FORCEINLINE
     output_archive & operator<<(output_archive & ar, array<T> t)
     {
         ar.invoke(t);
         return ar;
     }
 
-    template <typename T> BOOST_FORCEINLINE
+    template <typename T> HPX_FORCEINLINE
     input_archive & operator>>(input_archive & ar, array<T> t)
     {
         ar.invoke(t);
         return ar;
     }
 
-    template <typename T> BOOST_FORCEINLINE
+    template <typename T> HPX_FORCEINLINE
     output_archive & operator&(output_archive & ar, array<T> t) //-V524
     {
         ar.invoke(t);
         return ar;
     }
 
-    template <typename T> BOOST_FORCEINLINE
+    template <typename T> HPX_FORCEINLINE
     input_archive & operator&(input_archive & ar, array<T> t) //-V524
     {
         ar.invoke(t);
@@ -139,7 +139,7 @@ namespace hpx { namespace serialization
     }
 
     // serialize plain arrays:
-    template <typename T, std::size_t N> BOOST_FORCEINLINE
+    template <typename T, std::size_t N> HPX_FORCEINLINE
     output_archive & operator<<(output_archive & ar, T (&t)[N])
     {
         array<T> array = make_array(t, N);
@@ -147,7 +147,7 @@ namespace hpx { namespace serialization
         return ar;
     }
 
-    template <typename T, std::size_t N> BOOST_FORCEINLINE
+    template <typename T, std::size_t N> HPX_FORCEINLINE
     input_archive & operator>>(input_archive & ar, T (&t)[N])
     {
         array<T> array = make_array(t, N);
@@ -155,7 +155,7 @@ namespace hpx { namespace serialization
         return ar;
     }
 
-    template <typename T, std::size_t N> BOOST_FORCEINLINE
+    template <typename T, std::size_t N> HPX_FORCEINLINE
     output_archive & operator&(output_archive & ar, T (&t)[N]) //-V524
     {
         array<T> array = make_array(t, N);
@@ -163,7 +163,7 @@ namespace hpx { namespace serialization
         return ar;
     }
 
-    template <typename T, std::size_t N> BOOST_FORCEINLINE
+    template <typename T, std::size_t N> HPX_FORCEINLINE
     input_archive & operator&(input_archive & ar, T (&t)[N]) //-V524
     {
         array<T> array = make_array(t, N);

@@ -9,7 +9,7 @@
 #ifndef HPX_COROUTINE_B9FD4B38_8972_488B_82BA_BA01C5FDA5FF
 #define HPX_COROUTINE_B9FD4B38_8972_488B_82BA_BA01C5FDA5FF
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 #  define HPX_COROUTINE_SYMBOL_EXPORT      __declspec(dllexport)
 #  define HPX_COROUTINE_SYMBOL_IMPORT      __declspec(dllimport)
 #elif defined(HPX_HAVE_COROUTINE_GCC_HIDDEN_VISIBILITY) || defined \

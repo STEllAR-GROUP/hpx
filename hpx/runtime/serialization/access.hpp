@@ -24,7 +24,7 @@ namespace hpx { namespace serialization
 {
     namespace detail
     {
-        template <class Archive, class T> BOOST_FORCEINLINE
+        template <class Archive, class T> HPX_FORCEINLINE
         void serialize_force_adl(Archive& ar, T& t, unsigned)
         {
             serialize(ar, t, 0);
@@ -110,7 +110,7 @@ namespace hpx { namespace serialization
             serialize_dispatcher<T>::type::call(ar, t, 0);
         }
 
-        template <typename Archive, typename T> BOOST_FORCEINLINE
+        template <typename Archive, typename T> HPX_FORCEINLINE
         static void save_base_object(Archive & ar, const T & t, unsigned)
         {
             // explicitly specify virtual function
@@ -118,7 +118,7 @@ namespace hpx { namespace serialization
             t.T::save(ar, 0);
         }
 
-        template <typename Archive, typename T> BOOST_FORCEINLINE
+        template <typename Archive, typename T> HPX_FORCEINLINE
         static void load_base_object(Archive & ar, T & t, unsigned)
         {
             // explicitly specify virtual function
@@ -126,7 +126,7 @@ namespace hpx { namespace serialization
             t.T::load(ar, 0);
         }
 
-        template <typename T> BOOST_FORCEINLINE
+        template <typename T> HPX_FORCEINLINE
         static std::string get_name(const T* t)
         {
             return t->hpx_serialization_get_name();

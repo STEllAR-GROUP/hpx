@@ -721,6 +721,9 @@ hpx_add_config_define(BOOST_RESULT_OF_USE_DECLTYPE)
 hpx_check_for_cxx11_decltype_n3276(
   DEFINITIONS HPX_HAVE_CXX11_DECLTYPE_N3276)
 
+hpx_check_for_cxx11_sfinae_expression(
+  DEFINITIONS HPX_HAVE_CXX11_SFINAE_EXPRESSION)
+
 hpx_check_for_cxx11_defaulted_functions(
   DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_FUNCTIONS)
 
@@ -770,8 +773,14 @@ hpx_check_for_cxx11_extended_friend_declarations(
   DEFINITIONS HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS)
 
 # Check the availability of certain C++11 library features
+hpx_check_for_cxx11_std_array(
+  DEFINITIONS HPX_HAVE_CXX11_STD_ARRAY)
+
 hpx_check_for_cxx11_std_chrono(
   DEFINITIONS HPX_HAVE_CXX11_STD_CHRONO)
+
+hpx_check_for_cxx11_std_cstdint(
+  DEFINITIONS HPX_HAVE_CXX11_STD_CSTDINT)
 
 hpx_check_for_cxx11_std_initializer_list(
   DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
@@ -810,6 +819,13 @@ hpx_check_for_cxx14_std_integer_sequence(
 
 hpx_check_for_cxx14_std_result_of_sfinae(
   DEFINITIONS HPX_HAVE_CXX14_STD_RESULT_OF_SFINAE)
+
+################################################################################
+# Check for misc system headers
+################################################################################
+
+hpx_check_for_unistd_h(
+  DEFINITIONS HPX_HAVE_UNISTD_H)
 
 if(NOT WIN32)
   ##############################################################################

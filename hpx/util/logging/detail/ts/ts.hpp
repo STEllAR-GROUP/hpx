@@ -16,12 +16,7 @@
 #ifndef JT28092007_HPX_LOG_TS_HPP
 #define JT28092007_HPX_LOG_TS_HPP
 
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
-#include <boost/config.hpp>
+#include <hpx/config.hpp>
 
 #include <hpx/util/logging/detail/ts/ts_none.hpp>
 
@@ -30,7 +25,7 @@
     #ifdef HPX_LOG_USE_BOOST_THREADS
         #include <hpx/util/logging/detail/ts/ts_boost.hpp>
     #else
-        #ifdef BOOST_WINDOWS
+        #ifdef HPX_WINDOWS
         #include <hpx/util/logging/detail/ts/ts_win32.hpp>
         #else
         #include <hpx/util/logging/detail/ts/ts_posix.hpp>
@@ -49,7 +44,7 @@ namespace hpx { namespace util { namespace logging { namespace threading {
     #ifdef HPX_LOG_USE_BOOST_THREADS
         typedef mutex_boost mutex;
     #else
-        #ifdef BOOST_WINDOWS
+        #ifdef HPX_WINDOWS
         typedef mutex_win32 mutex;
         #else
         typedef mutex_posix mutex;

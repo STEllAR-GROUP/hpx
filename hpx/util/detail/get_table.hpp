@@ -13,7 +13,7 @@
 namespace hpx { namespace util { namespace detail
 {
     template <typename VTable, typename T>
-    static VTable const* get_table() BOOST_NOEXCEPT
+    static VTable const* get_table() HPX_NOEXCEPT
     {
         static VTable const vtable = boost::mpl::identity<T>();
         return &vtable;

@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <memory>
 
-#ifdef BOOST_MSVC
+#ifdef HPX_MSVC
 #pragma warning(push)
 #pragma warning(disable:4251)
 #endif
@@ -150,7 +150,7 @@ namespace test
     };
 }
 
-#ifdef BOOST_MSVC
+#ifdef HPX_MSVC
 #pragma warning(pop)
 #endif
 

@@ -15,10 +15,6 @@
 // $134.01 and will have made $34.01 in interest.
 ///////////////////////////////////////////////////////////////////////////////
 
-// When using the dataflow component we have to define the following constant
-// as this example uses up to 6 arguments for one of its components.
-#define HPX_LIMIT 6
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>

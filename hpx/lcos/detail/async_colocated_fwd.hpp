@@ -37,7 +37,7 @@ namespace hpx { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // MSVC complains about ambiguities if it sees this forward declaration
-#if !defined(BOOST_MSVC)
+#if !defined(HPX_MSVC)
     template <typename Action, typename Continuation, typename ...Ts>
     typename std::enable_if<
         traits::is_continuation<Continuation>::value,

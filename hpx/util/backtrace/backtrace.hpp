@@ -10,31 +10,17 @@
 #ifndef HPX_BACKTRACE_HPP
 #define HPX_BACKTRACE_HPP
 
-#include <boost/config.hpp>
+#include <hpx/config/export_definitions.hpp>
 #include <string>
 #include <vector>
 #include <iosfwd>
 
 ///////////////////////////////////////////////////////////////////////////////
-//#ifdef BOOST_HAS_DECLSPEC // defined by boost.config
-// we need to import/export our code only if the user has specifically
-// asked for it by defining either BOOST_ALL_DYN_LINK if they want all boost
-// libraries to be dynamically linked, or HPX_BACKTRACE_DYN_LINK
-// if they want just this one to be dynamically linked:
-#if defined(BOOST_ALL_DYN_LINK) || defined(HPX_BACKTRACE_DYN_LINK)
-// export if this is our own source, otherwise import:
 #ifdef HPX_BACKTRACE_SOURCE
-# define HPX_BACKTRACE_DECL BOOST_SYMBOL_EXPORT
+# define HPX_BACKTRACE_DECL HPX_SYMBOL_EXPORT
 #else
-# define HPX_BACKTRACE_DECL BOOST_SYMBOL_IMPORT
+# define HPX_BACKTRACE_DECL HPX_SYMBOL_IMPORT
 #endif  // HPX_BACKTRACE_SOURCE
-#endif  // DYN_LINK
-//#endif  // BOOST_HAS_DECLSPEC
-//
-// if HPX_BACKTRACE_DECL isn't defined yet define it now:
-#ifndef HPX_BACKTRACE_DECL
-#define HPX_BACKTRACE_DECL
-#endif
 
 namespace hpx { namespace util
 {

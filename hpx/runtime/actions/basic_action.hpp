@@ -77,7 +77,7 @@ namespace hpx { namespace actions
 
             typedef threads::thread_state_enum result_type;
 
-            BOOST_FORCEINLINE result_type operator()(threads::thread_state_ex_enum)
+            HPX_FORCEINLINE result_type operator()(threads::thread_state_ex_enum)
             {
                 LTM_(debug) << "Executing " << Action::get_action_name(lva_)
                     << " with continuation(" << cont_->get_id() << ")";
@@ -187,7 +187,7 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
 
             template <typename ...Ts>
-            BOOST_FORCEINLINE result_type operator()(
+            HPX_FORCEINLINE result_type operator()(
                 naming::address::address_type lva, Ts&&... vs) const
             {
                 try {
@@ -260,7 +260,7 @@ namespace hpx { namespace actions
 
         // direct execution
         template <typename ...Ts>
-        static BOOST_FORCEINLINE result_type
+        static HPX_FORCEINLINE result_type
         execute_function(naming::address::address_type lva, Ts&&... vs)
         {
             LTM_(debug)
@@ -277,7 +277,7 @@ namespace hpx { namespace actions
         struct sync_invoke
         {
             template <typename IdOrPolicy, typename ...Ts>
-            BOOST_FORCEINLINE static LocalResult call(
+            HPX_FORCEINLINE static LocalResult call(
                 boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
                 IdOrPolicy const& id_or_policy, error_code& ec, Ts&&... vs)
             {
@@ -286,7 +286,7 @@ namespace hpx { namespace actions
             }
 
             template <typename IdOrPolicy, typename ...Ts>
-            BOOST_FORCEINLINE static LocalResult call(
+            HPX_FORCEINLINE static LocalResult call(
                 boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
                 IdOrPolicy const& id_or_policy, error_code& /*ec*/, Ts&&... vs)
             {
@@ -297,7 +297,7 @@ namespace hpx { namespace actions
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ...Ts>
-        BOOST_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE local_result_type operator()(
             BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
             error_code& ec, Ts&&... vs) const
         {
@@ -307,14 +307,14 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        BOOST_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE local_result_type operator()(
             naming::id_type const& id, error_code& ec, Ts&&... vs) const
         {
             return (*this)(launch::all, id, ec, std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
-        BOOST_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE local_result_type operator()(
             BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& id,
             Ts&&... vs) const
         {
@@ -322,7 +322,7 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        BOOST_FORCEINLINE local_result_type operator()(
+        HPX_FORCEINLINE local_result_type operator()(
             naming::id_type const& id, Ts&&... vs) const
         {
             return (*this)(launch::all, id, throws, std::forward<Ts>(vs)...);
@@ -330,7 +330,7 @@ namespace hpx { namespace actions
 
         ///////////////////////////////////////////////////////////////////////
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
@@ -346,7 +346,7 @@ namespace hpx { namespace actions
         }
 
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
@@ -359,7 +359,7 @@ namespace hpx { namespace actions
         }
 
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
@@ -372,7 +372,7 @@ namespace hpx { namespace actions
         }
 
         template <typename DistPolicy, typename ...Ts>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             local_result_type
@@ -408,7 +408,7 @@ namespace hpx { namespace actions
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
+        HPX_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
 
         static boost::atomic<boost::int64_t> invocation_count_;
 

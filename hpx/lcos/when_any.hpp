@@ -259,7 +259,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void operator()(Sequence_& sequence,
                 typename boost::enable_if_c<
                     traits::is_future_range<Sequence_>::value
@@ -269,7 +269,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void apply(Sequence_& sequence,
                 typename boost::enable_if_c<
                     boost::fusion::traits::is_sequence<Sequence_>::value
@@ -279,7 +279,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            BOOST_FORCEINLINE
+            HPX_FORCEINLINE
             void apply(Sequence_& sequence,
                 typename boost::disable_if_c<
                     boost::fusion::traits::is_sequence<Sequence_>::value
@@ -293,7 +293,7 @@ namespace hpx { namespace lcos
         };
 
         template <typename Sequence>
-        BOOST_FORCEINLINE
+        HPX_FORCEINLINE
         void set_on_completed_callback(when_any<Sequence>& when)
         {
             set_when_any_callback_impl<Sequence> callback(when);

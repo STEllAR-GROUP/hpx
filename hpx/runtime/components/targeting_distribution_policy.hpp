@@ -119,7 +119,7 @@ namespace hpx { namespace components
         ///       this class
         ///
         template <typename Action, typename ...Ts>
-        BOOST_FORCEINLINE hpx::future<
+        HPX_FORCEINLINE hpx::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -133,7 +133,7 @@ namespace hpx { namespace components
         ///       this class
         ///
         template <typename Action, typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE hpx::future<
+        HPX_FORCEINLINE hpx::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>

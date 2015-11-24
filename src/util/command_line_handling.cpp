@@ -947,14 +947,14 @@ namespace hpx { namespace util
         {
             sleep(1);
         }
-#elif defined(BOOST_WINDOWS)
+#elif defined(HPX_WINDOWS)
         DebugBreak();
 #endif
     }
 
     void command_line_handling::handle_attach_debugger()
     {
-#if defined(_POSIX_VERSION) || defined(BOOST_WINDOWS)
+#if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
         if(vm_.count("hpx:attach-debugger"))
         {
             std::string option = vm_["hpx:attach-debugger"].as<std::string>();

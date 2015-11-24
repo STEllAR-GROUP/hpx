@@ -23,10 +23,8 @@ namespace hpx { namespace util
         std_out_of_range = 3,
         std_logic_error = 4,
         std_bad_alloc = 5,
-#ifndef BOOST_NO_TYPEID
         std_bad_cast = 6,
         std_bad_typeid = 7,
-#endif
         std_bad_exception = 8,
         std_exception = 9,
 

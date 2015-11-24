@@ -7,8 +7,6 @@
 #if !defined(HPX_UNIQUE_PLUGIN_NAME_MAR_24_2013_245PM)
 #define HPX_UNIQUE_PLUGIN_NAME_MAR_24_2013_245PM
 
-#include <boost/config.hpp>
-
 #include <boost/preprocessor/stringize.hpp>
 
 namespace hpx { namespace plugins

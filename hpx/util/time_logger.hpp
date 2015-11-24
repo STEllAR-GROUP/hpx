@@ -10,11 +10,12 @@
 #include <boost/version.hpp>
 #include <boost/cstdint.hpp>
 
+#include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 
-#if defined(BOOST_WINDOWS)
+#if defined(HPX_WINDOWS)
 #  include <process.h>
-#elif defined(BOOST_HAS_UNISTD_H)
+#elif defined(HPX_HAVE_UNISTD_H)
 #  include <unistd.h>
 #endif
 

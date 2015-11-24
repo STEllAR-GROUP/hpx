@@ -32,8 +32,6 @@
 
 #include <hpx/util/assert.hpp>
 
-#include <boost/config.hpp>
-
 #if defined(_POSIX_VERSION)
 /**
  * Most of these utilities are really pure C++, but they are useful

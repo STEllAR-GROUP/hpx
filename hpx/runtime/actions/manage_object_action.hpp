@@ -8,7 +8,7 @@
 #define HPX_RUNTIME_ACTIONS_MANAGE_OBJECT_ACTION_JAN_26_2010_0141PM
 
 #include <cstring>
-#include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/exception.hpp>

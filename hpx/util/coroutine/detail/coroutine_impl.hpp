@@ -30,7 +30,7 @@
 #ifndef HPX_COROUTINE_COROUTINE_IMPL_HPP_20060601
 #define HPX_COROUTINE_COROUTINE_IMPL_HPP_20060601
 
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #pragma warning (push)
 #pragma warning (disable: 4355) //this used in base member initializer
 #endif
@@ -49,7 +49,6 @@
 
 #include <cstddef>
 #include <boost/optional.hpp>
-#include <boost/config.hpp>
 #include <utility>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
@@ -94,8 +93,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         std::ptrdiff_t = default_stack_size);
 
     template <typename Functor>
-    static inline void rebind(type* p, BOOST_FWD_REF(Functor),
-        BOOST_RV_REF(naming::id_type) target, thread_id_repr_type = 0);
+    static inline void rebind(type* p, Functor &&,
+        naming::id_type && target, thread_id_repr_type = 0);
 
     result_type * result()
     {
@@ -465,7 +464,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   template<typename Functor>
   inline void coroutine_impl<CoroutineType, ContextImpl, Heap>::
       rebind(typename coroutine_impl<CoroutineType, ContextImpl, Heap>::type* p,
-        BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+        Functor && f, naming::id_type && target,
         thread_id_repr_type id)
   {
       typedef typename hpx::util::decay<Functor>::type functor_type;
@@ -489,7 +488,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
 }}}}
 
-#if defined(_MSC_VER)
+#if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
 

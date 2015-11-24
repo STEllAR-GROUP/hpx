@@ -65,7 +65,7 @@ namespace hpx
         /// exception_list.
         ///
         /// \note Complexity: Constant time.
-        std::size_t size() const BOOST_NOEXCEPT
+        std::size_t size() const HPX_NOEXCEPT
         {
             boost::lock_guard<mutex_type> l(mtx_);
             return exceptions_.size();
@@ -73,14 +73,14 @@ namespace hpx
 
         /// An iterator referring to the first exception_ptr object contained
         /// within the exception_list.
-        exception_list_type::const_iterator begin() const BOOST_NOEXCEPT
+        exception_list_type::const_iterator begin() const HPX_NOEXCEPT
         {
             boost::lock_guard<mutex_type> l(mtx_);
             return exceptions_.begin();
         }
 
         /// An iterator which is the past-the-end value for the exception_list.
-        exception_list_type::const_iterator end() const BOOST_NOEXCEPT
+        exception_list_type::const_iterator end() const HPX_NOEXCEPT
         {
             boost::lock_guard<mutex_type> l(mtx_);
             return exceptions_.end();

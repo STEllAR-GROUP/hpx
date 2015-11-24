@@ -12,7 +12,6 @@
 #include <string>
 #include <map>
 
-#include <boost/config.hpp>
 #include <boost/any.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/algorithm/string/case_conv.hpp>

@@ -35,7 +35,7 @@ namespace hpx { namespace detail
     struct apply_dispatch
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename boost::enable_if_c<
             traits::detail::is_deferred_callable<F(Ts&&...)>::value,
             bool
@@ -57,7 +57,7 @@ namespace hpx { namespace detail
         >::type>
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename boost::enable_if_c<
             traits::detail::is_deferred_callable<F(Ts&&...)>::value,
             bool
@@ -79,7 +79,7 @@ namespace hpx { namespace detail
         >::type>
     {
         template <typename F, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename boost::enable_if_c<
             traits::detail::is_deferred_callable<F(Ts&&...)>::value,
             bool
@@ -100,7 +100,7 @@ namespace hpx { namespace detail
         >::type>
     {
         template <typename Action, typename BoundArgs, typename ...Ts>
-        BOOST_FORCEINLINE static bool
+        HPX_FORCEINLINE static bool
         call(hpx::util::detail::bound_action<Action, BoundArgs> const& bound,
             Ts&&... ts)
         {
@@ -112,7 +112,7 @@ namespace hpx { namespace detail
 namespace hpx
 {
     template <typename F, typename ...Ts>
-    BOOST_FORCEINLINE bool apply(F&& f, Ts&&... ts)
+    HPX_FORCEINLINE bool apply(F&& f, Ts&&... ts)
     {
         return detail::apply_dispatch<typename util::decay<F>::type>::call(
             std::forward<F>(f), std::forward<Ts>(ts)...);
